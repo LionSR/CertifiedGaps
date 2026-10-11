@@ -6,11 +6,11 @@
         "config": {
             "method": "lossless gzip, original JSON written by Results.write_result"
         },
-        "created_utc": "2026-10-11T05:37:31.795",
+        "created_utc": "2026-10-11T09:48:12.462",
         "certified": false,
         "source_sha256": {
-            "archive_spectra.jl": "66108a466ffe8c965602a96adda0f34d4f85a321e4cc2e0d2ebe8da0e817dafa",
-            "result_io.jl": "c5f18e2baa5989307226825a7b283c3dcd03075b4b8356fa406a07864fb4c33f"
+            "archive_spectra.jl": "cc3bfa68396d48316af5d95da01279140d3fafd482b00ddb10304f81f5aaed6d",
+            "result_io.jl": "c836b59b61711a1e8ba343b78c25e0b9c312683af2910be4ee2ede603f698b34"
         },
         "blas_threads": 1
     },
@@ -35,6 +35,13 @@
             "compressed_sha256": "141d241ca7af4c4a56d4938bf7f4b617c477aeb90f8503ed42514d2d95ba4b02",
             "original_bytes": 1456489,
             "compressed_bytes": 90353
+        },
+        {
+            "file": "spectrum_L14.json.gz",
+            "original_sha256": "e9a2d9425146945ef54082643fa34d070eb0f3128c06d23b9cfe032b58a42ad5",
+            "compressed_sha256": "5938bda3eb0865db6255c8fce5f5e237b13bc1dc51a4a62dd45e5738864577d4",
+            "original_bytes": 118398000,
+            "compressed_bytes": 19629189
         }
     ]
 }

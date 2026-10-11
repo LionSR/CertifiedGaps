@@ -4,10 +4,12 @@ See [REPORT.md](REPORT.md) for results, exact Cartesian reflection positivity, n
 purity and energy-mismatch tables, resource limits, and conditional seed-scale forecasts.
 
 This directory is a **numerical negative grid survey**, not a uniform-gap certificate.
-Complete dense spectra reach 12 sites; low-energy numerical references extend to 16 sites.
-The numerical SU(2) highest-weight construction is implemented and validated against
-small complete spectra. Large 14-site pilots succeeded; the complete sector sweep is
-being collected. Selected sectors must not be used as a complete partition function.
+Complete dense spectra reach 14 sites for all six angles; low-energy numerical references
+extend to 16 sites. The SU(2) highest-weight construction is validated against small
+complete spectra. All 120 L14 sector entries are present, with exact integer multiplicity
+counts totaling 3^14 states. L14 adds the odd-n0=7 diagnostic; it does not supply an
+admissible even seed. The next eligible seed requires complete L16 data, beyond this
+implementation's memory budget.
 
 From the repository root, with Julia 1.12.4 and the core dependencies installed:
 

@@ -3,6 +3,13 @@ using CertifiedGaps.ExactDiagonalization
 include("../su2.jl")
 include("../dimensions.jl")
 BLAS.set_num_threads(1)
+@testset "Empty highest-weight sectors" begin
+    for (L,S,k) in ((2,1,0),(2,2,1))
+        A,B,_=su2_components(L,S,k)
+        @test size(A)==(0,0)
+        @test isempty(eigvals(Symmetric(A+B)))
+    end
+end
 @testset "Exact highest-weight polynomial on small charge spaces" begin
     for L in 2:4,M in 0:L
         states=[s for s in 0:3^L-1 if charge(s,L)==M]

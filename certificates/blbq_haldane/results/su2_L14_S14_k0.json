@@ -1,0 +1,87 @@
+{
+    "metadata": {
+        "julia_threads": 4,
+        "julia": "1.12.4",
+        "status": "complete dense SU2 sector; numerical, not certified",
+        "config": {
+            "L": 14,
+            "S": 14,
+            "k": 0,
+            "theta": [
+                0,
+                -0.1,
+                -0.3,
+                -0.5,
+                -0.6,
+                -0.7
+            ]
+        },
+        "created_utc": "2026-10-11T09:46:03.985",
+        "certified": false,
+        "source_sha256": {
+            "su2_sector.jl": "668f1d2098af4ed431f8254a67be0b1a88b19bbd78b3499ef11f3c2dbba8c09c",
+            "model.jl": "d9cc4eee4fa5207381bdb208e758b004bf89e0b88d13ab43439990c77ea570d5",
+            "su2.jl": "bfc86cd37044709057ded32547b975779b3c5daf40d5693ad783e40ae15cce2e",
+            "sectors.jl": "0fb18eadcb0893d111d19d73f66109127d16b1f88d7e7e5a81bd509dc15b66a9"
+        },
+        "CertifiedGaps": "0.2.0",
+        "blas_threads": 1
+    },
+    "L": 14,
+    "S": 14,
+    "k": 0,
+    "dimension": 1,
+    "multiplicity": 29,
+    "build_seconds": 4.460865687,
+    "diagnostics": {
+        "rank": 1,
+        "seconds": 0
+    },
+    "eigensolve_seconds": [
+        0.357965639,
+        4.5465e-5,
+        0.357956102,
+        2.6771e-5,
+        0.357959035,
+        0.357956843
+    ],
+    "seconds": 6.298331022262573,
+    "spectra": [
+        {
+            "theta": 0,
+            "energies": [
+                14
+            ]
+        },
+        {
+            "theta": -0.1,
+            "energies": [
+                12.532390480836767
+            ]
+        },
+        {
+            "theta": -0.3,
+            "energies": [
+                9.23742795449973
+            ]
+        },
+        {
+            "theta": -0.5,
+            "energies": [
+                5.5741983260063765
+            ]
+        },
+        {
+            "theta": -0.6,
+            "energies": [
+                3.6497039812050005
+            ]
+        },
+        {
+            "theta": -0.7,
+            "energies": [
+                1.6887430006551654
+            ]
+        }
+    ]
+}

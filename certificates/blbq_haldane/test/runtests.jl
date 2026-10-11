@@ -55,7 +55,14 @@ qparse(s)=let a=split(s,"//");parse(BigInt,a[1])//parse(BigInt,a[2]);end
         end
         for f in filter(x->startswith(x,"spectrum_L"),readdir(joinpath(@__DIR__,"../results")))
             d=read_result_json(joinpath(@__DIR__,"../results",f))
+            if hasproperty(d,:input_hashes)
+                for (name,hash) in pairs(d.input_hashes)
+                    @test sha256_file(joinpath(@__DIR__,"../results",string(name)))==hash
+                end
+            end
             @test sum(s.dimension*s.multiplicity for s in d.sectors)==3^d.L
+            refpath=joinpath(@__DIR__,"../results/reference_L14.json")
+            reference=d.L==14 && isfile(refpath) ? JSON3.read(read(refpath,String)) : nothing
             for (t,spectrum) in enumerate(d.spectra)
                 spec=result_spectrum(d,t)
                 @test spec.N==3^d.L
@@ -65,6 +72,13 @@ qparse(s)=let a=split(s,"//");parse(BigInt,a[1])//parse(BigInt,a[2]);end
                 d.L==2 && (variance*=2) # the two directed bonds coincide
                 @test spectrum_moment(spec,1) ≈ mean atol=1e-10
                 @test spectrum_moment(spec,2) ≈ variance+mean^2 rtol=1e-10
+                if reference!==nothing
+                    # Multiplet weight one plus the positive next-level spacing checks
+                    # the singlet interpretation numerically, without an enclosure claim.
+                    @test spec.weights[1]==1
+                    @test spec.E[1] ≈ reference.summary[t].ground atol=1e-8
+                    @test spectrum_gap(spec) ≈ reference.summary[t].gap atol=1e-8
+                end
             end
         end
     end

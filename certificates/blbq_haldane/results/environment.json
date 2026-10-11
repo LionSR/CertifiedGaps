@@ -7,25 +7,25 @@
             "memory_limit_bytes": 17179869184,
             "cpu_quota": 4
         },
-        "created_utc": "2026-10-11T07:35:11.571",
+        "created_utc": "2026-10-11T09:57:18.755",
         "certified": false,
         "source_sha256": {
             "preflight.jl": "a0de50d269aa9bd5356c66a29d34135a17dba3489feebe0fee4ab0377748134e",
             "run.sh": "c51105b50c4f3d60097593f64a392d826394c1f0d870ac251fd6a4306c5f0291",
             "archive_spectra.jl": "cc3bfa68396d48316af5d95da01279140d3fafd482b00ddb10304f81f5aaed6d",
-            "report.jl": "96a0ef3f1c1169abdcc966b64b7ac5784f18b3457690605ba8d4dcbc21183fbb",
-            "validate.jl": "470f54b17762375deecadaeae683e4667c079aefedf2a770aab2b8d86d3b61ad",
+            "report.jl": "b7049b4f51b4d8047a29f6ef4d57c11ec5ed3611021ef5651f75d3adcdc53c2d",
+            "validate.jl": "4bf8cd479dd9587d1da7957478af19e65d6c37ec59b7ae1e46325633780eb668",
             "migration_audit.jl": "cb1ac80f6bcbe11cb9da61f9b40f0effa4bf78a782a41b3bf4584e48f5a26edc",
             "fix_pilot_provenance.jl": "b022bf0774ab456141428318e90d59d3f52658a91ea9742ddfb2b36da0aac780",
-            "audit.jl": "203e02958e740381fca119bd61a6e9b65358605b98ad6fc3f21351771b1b491b",
+            "audit.jl": "b7e81aaf93d627080e25a3639bd4ad50a8934d67752e20ba79c4b42fa94d67e9",
             "reference.jl": "1a65b68ddedfd5fe704d77cdd318cf1ad4ef3ef7b3b27cb498e884dcdf36bfc9",
             "scan.jl": "f129f3882e31a00f1857f3a7969977c3d5bd5ba4474efcf9494b9a58ac6b0fa3",
             "check.jl": "c4637091abde17ea83b862796f384041105515c1fd0a2e21b7ec5512e04ceef9",
-            "test/runtests.jl": "cbdc274a922a16843c3e92c63e32877c3ae65449aab0a9e538486196fdca2a9f",
+            "test/runtests.jl": "260ee2cd88f8ac70224d6dc4639a39292087ff07a885bb0fb5132ff0606010e2",
             "su2_sector.jl": "668f1d2098af4ed431f8254a67be0b1a88b19bbd78b3499ef11f3c2dbba8c09c",
             "Project.toml": "a33b94dfec5b8bd84c903b438fadbcd3f66d91662904e7a8ff7360a1b5356574",
-            "analyze.jl": "42c72b3e1c9cedde8966c5c9e7d7a7450acbe0bb578a5c00f313a32ec961ac09",
-            "test/su2_small.jl": "e2391997e0161e2540fa1ac5dee5383cfd424693c6d90fc3221abd39476b5811",
+            "analyze.jl": "ba30996595269f38f3bed86cfc4b8c554dd517d6b3936ef3aa114e67ff446dc2",
+            "test/su2_small.jl": "d34869601272c44511cac76116d2acf27433f73b384fb7c4f7a6ca8ba62eb389",
             "su2_benchmark.jl": "80b2368129d97990a53ac7282c7d2c399f74fc5db6950a69fc99dcb5f05da856",
             "su2.jl": "bfc86cd37044709057ded32547b975779b3c5daf40d5693ad783e40ae15cce2e",
             "dimensions.jl": "981b19e1ba476061eba4cd5cf787af5d40c9bfc173203938d0825d8e1efcc089",
@@ -105,6 +105,15 @@
     "core_environment_hashes": {
         "Project.toml": "1043d2457f2be2f349c00ddd5b994dd5bd5566672813eab1f54671f8b53a99d1",
         "Manifest.toml": "422dd9dcc0c0257c0ccd5852c56a5bb43b214080ece90651b2ddd9209eff9b7f"
+    },
+    "resource_observations": {
+        "scope": "entire environment lifetime, including pilots; not a per-sector peak",
+        "cgroup": {
+            "memory.max": "17179869184",
+            "cpu.max": "400000 100000",
+            "memory.peak": "15962419200",
+            "memory.events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0"
+        }
     },
     "setup": "juliaup installer HTTP 403; official julialang-s3 Julia 1.12.4 tarball succeeded; instantiate/precompile succeeded"
 }

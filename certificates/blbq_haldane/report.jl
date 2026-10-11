@@ -98,7 +98,10 @@ pass analytic first- and second-moment checks at infinite temperature: for L>=3,
 the L=2 variance has an extra factor two because both bonds coincide. These floating checks
 validate the numerical implementation; they are not verified eigenvalue enclosures.
 
-| L (sites) | Total dimension | Largest dense block | Stored blocks | Wall seconds, six angles |
+The L14 timing is the sum of separately run sector calculations. Each sector process
+has its own 45-minute timeout; the aggregate sweep is longer than one process limit.
+
+| L (sites) | Total dimension | Largest dense block | Stored blocks | Recorded seconds, six angles |
 |---:|---:|---:|---:|---:|
 """)
     for file in sort(filter(f->startswith(f,"spectrum_L"),readdir(joinpath(ROOT,"results")));by=f->parse(Int,match(r"L(\d+)",f)[1]))
@@ -114,6 +117,9 @@ maximizing beta. Grid: beta = 1/8, 2/8, ..., 64 (512 points), using core `scan_s
 and `best_seed`. Maxima are numerical, not upper bounds on the continuous-beta optimum.
 All even grid points were checked with the actual asymmetric recurrence, not just the
 symmetric 0.12731 sufficient threshold. No eligible positive recurrence bound appeared.
+Values displayed as 1 are rounded numerical values. In the odd-n near-unit rows,
+Float64 cancellation and saturation limit the precision of both the value and its
+maximizing beta; those rows do not identify a sharply resolved temperature optimum.
 
 | theta | n0 | eligible even seed? | beta at max | max min(Ps,Pt) | Ps | Pt |
 |---:|---:|:---:|---:|---:|---:|---:|
@@ -162,6 +168,7 @@ M=0 alone. This spacing equals the full spectral gap if the ground state is a un
 singlet; that condition is not certified by the reference computation. Complete spectra
 are preferred when available. These are numerical ED references only, never partition-
 function inputs or uniform gap lower bounds.
+$(complete14 ? "For L14, the complete weighted spectrum has a lowest-level multiplet weight of one at every angle, and its ground energy and gap agree with the independent M=0 reference within 1e-8. These are numerical checks of the singlet interpretation, not a uniqueness certificate." : "")
 
 | theta | n | parity | delta(n) | ED gap at 2n | full spectrum at 2n? |
 |---:|---:|:---:|---:|---:|:---:|
@@ -236,10 +243,7 @@ is used for Z14. The full sweep is resumable with `run_su2_grid.sh`, with a
 The exact character counts give largest `(S,k)` highest-weight multiplicities **8,482**
 at L=14 (0.536 GiB per dense matrix) and **59,143** at L=16 (26.06 GiB). These counts use
 `d(S,k)=d(M=S,k)-d(M=S+1,k)` and assert `sum_(S,k) (2S+1)d(S,k)=3^L`.
-Thus this work does **not** establish that full 14-site ED is intrinsically infeasible:
-the former basis-construction blocker has been resolved numerically.
-$(complete14 ? "The full 14-site sweep is complete. At 16 sites, even the largest SU(2) block's single dense matrix exceeds this environment's memory limit." : "The remaining full sector sweep is the current blocker to the larger-ring purity table.") No
-memory-overcommitted 14-site dense solve or incomplete-spectrum purity calculation was run.
+$(complete14 ? "The full L14 sweep completed with 120 sector entries, including 112 nonempty blocks. Each angle stores 352,131 levels with integer weights accounting for all 4,782,969 states. The sum of recorded sector calculation times is 14,322 seconds (3.98 hours); the longest recorded sector calculation is 642 seconds. No sector failed or timed out. The environment-wide memory peak was 14.87 GiB, including earlier pilots, with zero OOM events; see results/environment.json. At L16, one matrix for the largest SU(2) block requires 26.06 GiB, exceeding this environment's memory budget." : "The remaining full sector sweep is the current blocker to the larger-ring purity table.")
 With one-site cells, full Z14 adds the odd-n0=7 diagnostic; the next eligible seed
 beyond n0=6 is n0=8, which needs complete Z16 under the stated two-purity workflow.
 
@@ -278,8 +282,8 @@ certificates/blbq_haldane/run.sh -t 4 certificates/blbq_haldane/scan.jl 2 3 4 5 
 certificates/blbq_haldane/run.sh certificates/blbq_haldane/reference.jl 14
 certificates/blbq_haldane/run.sh certificates/blbq_haldane/reference.jl 16
 certificates/blbq_haldane/run.sh certificates/blbq_haldane/preflight.jl
-certificates/blbq_haldane/run.sh certificates/blbq_haldane/analyze.jl
-certificates/blbq_haldane/run.sh certificates/blbq_haldane/report.jl
+certificates/blbq_haldane/run_su2_grid.sh
+certificates/blbq_haldane/finalize_su2.sh
 certificates/blbq_haldane/run.sh certificates/blbq_haldane/test/runtests.jl
 ```
 

@@ -18,19 +18,21 @@
                 3,
                 4,
                 5,
-                6
+                6,
+                7
             ]
         },
-        "created_utc": "2026-10-11T05:40:00.581",
+        "created_utc": "2026-10-11T09:49:24.755",
         "certified": false,
         "source_sha256": {
             "model.jl": "d9cc4eee4fa5207381bdb208e758b004bf89e0b88d13ab43439990c77ea570d5",
-            "analyze.jl": "654d55434cbae811dce544d0dbf589040ee94d0295f5bcce44ba13662c189b7f",
-            "test/su2_small.jl": "017424f382c5f1207af23ccf3d1e3bc08aa93902fe791e3313ac7c491bfdb04c",
+            "analyze.jl": "ba30996595269f38f3bed86cfc4b8c554dd517d6b3936ef3aa114e67ff446dc2",
+            "test/su2_small.jl": "d34869601272c44511cac76116d2acf27433f73b384fb7c4f7a6ca8ba62eb389",
             "reference.jl": "1a65b68ddedfd5fe704d77cdd318cf1ad4ef3ef7b3b27cb498e884dcdf36bfc9",
             "scan.jl": "f129f3882e31a00f1857f3a7969977c3d5bd5ba4474efcf9494b9a58ac6b0fa3",
+            "result_io.jl": "c836b59b61711a1e8ba343b78c25e0b9c312683af2910be4ee2ede603f698b34",
             "sectors.jl": "0fb18eadcb0893d111d19d73f66109127d16b1f88d7e7e5a81bd509dc15b66a9",
-            "test/runtests.jl": "cfc5f43ada8ba7282b5229673428beb94747f631c634fc8edfa2f6ee1023f79f"
+            "test/runtests.jl": "260ee2cd88f8ac70224d6dc4639a39292087ff07a885bb0fb5132ff0606010e2"
         },
         "blas_threads": 1
     },
@@ -39,6 +41,7 @@
         "spectrum_L7.json": "c820e545192851539479f8234673c694d729f58b996a463e986139311d088c23",
         "spectrum_L3.json": "284552d4005c423244b95ec19f90ceab63dc761dc3554c86df8c16946fe2a569",
         "reference_L14.json": "3a0800b5df07057e182640d93d1f8cac491ab6bcdb81db811a565a2dd1ce1548",
+        "spectrum_L14.json.gz": "5938bda3eb0865db6255c8fce5f5e237b13bc1dc51a4a62dd45e5738864577d4",
         "spectrum_L12.json.gz": "f8ed7fb5be7e0720deab73470aea698c7030bf78578ff0df65f5274261d5ca55",
         "spectrum_L2.json": "34508f88a13da48be64e4f4318d62b68ec02884fd4ca3e85ac40b344c80bb537",
         "spectrum_L6.json": "b164bb84f8cc3f1ee3cf5f624a34cf476b855cda0b15e6c4227287d683f2c30d",
@@ -47,7 +50,7 @@
         "spectrum_L5.json": "52aa1fd54121d029a470faf32d75bf2586bfa0104ccf366a9f211f5d71ee35b0",
         "spectrum_L10.json.gz": "850f54d32ea401e527d49b2a7bfce37858b37a0e595680e615bad9a2bbbfba15"
     },
-    "seconds": 47.34454393386841,
+    "seconds": 63.56869888305664,
     "certified_gap": null,
     "validity_range": null,
     "best_even": [
@@ -169,6 +172,17 @@
             "grid_boundary": false
         },
         {
+            "theta": 0,
+            "n": 7,
+            "beta": 63.875,
+            "spatial": 1.4727365979198244e14,
+            "thermal": 0.9999999999990905,
+            "max_min": 0.9999999999990905,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
             "theta": -0.1,
             "n": 2,
             "beta": 0.875,
@@ -220,6 +234,17 @@
             "thermal": 0.3020408149203213,
             "max_min": 0.29179077067349146,
             "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.1,
+            "n": 7,
+            "beta": 63.875,
+            "spatial": 1.4794667001274783e23,
+            "thermal": 0.9999999999954525,
+            "max_min": 0.9999999999954525,
+            "eligible": false,
             "bound": null,
             "grid_boundary": false
         },
@@ -279,6 +304,17 @@
             "grid_boundary": false
         },
         {
+            "theta": -0.3,
+            "n": 7,
+            "beta": 64,
+            "spatial": 3.261654237598851e45,
+            "thermal": 0.999999999998181,
+            "max_min": 0.999999999998181,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": true
+        },
+        {
             "theta": -0.5,
             "n": 2,
             "beta": 0.625,
@@ -330,6 +366,17 @@
             "thermal": 0.2659193137708147,
             "max_min": 0.24858321908365266,
             "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.5,
+            "n": 7,
+            "beta": 59.625,
+            "spatial": 2.0793496897414324e53,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
             "bound": null,
             "grid_boundary": false
         },
@@ -389,6 +436,17 @@
             "grid_boundary": false
         },
         {
+            "theta": -0.6,
+            "n": 7,
+            "beta": 54.625,
+            "spatial": 2.361576833137625e45,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
             "theta": -0.7,
             "n": 2,
             "beta": 0.625,
@@ -442,6 +500,17 @@
             "eligible": true,
             "bound": null,
             "grid_boundary": false
+        },
+        {
+            "theta": -0.7,
+            "n": 7,
+            "beta": 49.75,
+            "spatial": 1.65079444728158e38,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
         }
     ],
     "energy_scaling": [
@@ -493,11 +562,11 @@
         {
             "theta": 0,
             "n": 7,
-            "delta": -0.5107368078787644,
+            "delta": -0.5107368078787786,
             "ground_n": -9.57219834602882,
-            "ground_2n": -19.655133499936404,
-            "gap_2n": 0.45896534693753566,
-            "complete_spectrum_2n": false
+            "ground_2n": -19.65513349993642,
+            "gap_2n": 0.45896534693756763,
+            "complete_spectrum_2n": true
         },
         {
             "theta": 0,
@@ -556,11 +625,11 @@
         {
             "theta": -0.1,
             "n": 7,
-            "delta": -0.8352428778699839,
+            "delta": -0.8352428778700229,
             "ground_n": -11.05930754207996,
-            "ground_2n": -22.953857962029904,
-            "gap_2n": 0.43686137911765854,
-            "complete_spectrum_2n": false
+            "ground_2n": -22.953857962029943,
+            "gap_2n": 0.43686137911764433,
+            "complete_spectrum_2n": true
         },
         {
             "theta": -0.1,
@@ -619,11 +688,11 @@
         {
             "theta": -0.3,
             "n": 7,
-            "delta": -1.637477557600345,
+            "delta": -1.6374775576003415,
             "ground_n": -13.736803030661605,
-            "ground_2n": -29.111083618923555,
-            "gap_2n": 0.44896734437857333,
-            "complete_spectrum_2n": false
+            "ground_2n": -29.11108361892355,
+            "gap_2n": 0.44896734437858754,
+            "complete_spectrum_2n": true
         },
         {
             "theta": -0.3,
@@ -682,11 +751,11 @@
         {
             "theta": -0.5,
             "n": 7,
-            "delta": -2.0958706980205903,
+            "delta": -2.0958706980206756,
             "ground_n": -16.145310983040105,
-            "ground_2n": -34.3864926641008,
+            "ground_2n": -34.386492664100885,
             "gap_2n": 0.5172281407444927,
-            "complete_spectrum_2n": false
+            "complete_spectrum_2n": true
         },
         {
             "theta": -0.5,
@@ -745,11 +814,11 @@
         {
             "theta": -0.6,
             "n": 7,
-            "delta": -1.9528216623821137,
+            "delta": -1.952821662382192,
             "ground_n": -17.32532082609923,
-            "ground_2n": -36.60346331458057,
-            "gap_2n": 0.5659979289513899,
-            "complete_spectrum_2n": false
+            "ground_2n": -36.60346331458065,
+            "gap_2n": 0.5659979289514467,
+            "complete_spectrum_2n": true
         },
         {
             "theta": -0.6,
@@ -808,11 +877,11 @@
         {
             "theta": -0.7,
             "n": 7,
-            "delta": -1.8129992917858715,
+            "delta": -1.8129992917858573,
             "ground_n": -18.344197540861416,
-            "ground_2n": -38.5013943735087,
-            "gap_2n": 0.6212467507108386,
-            "complete_spectrum_2n": false
+            "ground_2n": -38.50139437350869,
+            "gap_2n": 0.6212467507108528,
+            "complete_spectrum_2n": true
         },
         {
             "theta": -0.7,
@@ -830,7 +899,7 @@
             "estimates": [
                 {
                     "method": "gap intercept vs L^(-1)",
-                    "gap": 0.3175509493959017,
+                    "gap": 0.31755094939592293,
                     "lengths": [
                         12,
                         14,
@@ -838,19 +907,19 @@
                     ],
                     "finite_gaps": [
                         0.48419646991241194,
-                        0.45896534693753566,
+                        0.45896534693756763,
                         0.4427955613584835
                     ],
                     "forecasts": [
                         {
                             "n": 22,
-                            "beta": 23.618257209646984,
-                            "epsilon_s": 0.11629229491646796,
+                            "beta": 23.618257209645407,
+                            "epsilon_s": 0.11629229491646066,
                             "epsilon_t": 0.13571516221325378,
-                            "conditional_bound": 0.0036498145337984624,
+                            "conditional_bound": 0.0036498145338069317,
                             "correlation_length": 3.7333307180905284,
                             "log_amplitude": 0.64037047775877,
-                            "gap_assumed": 0.3175509493959017,
+                            "gap_assumed": 0.31755094939592293,
                             "style": "exponential",
                             "fit_ns": [
                                 4,
@@ -865,13 +934,13 @@
                         },
                         {
                             "n": 24,
-                            "beta": 25.586445310450898,
-                            "epsilon_s": 0.1670688318516592,
+                            "beta": 25.58644531044919,
+                            "epsilon_s": 0.16706883185164906,
                             "epsilon_t": 0.08168097099973826,
-                            "conditional_bound": 0.00185082076491908,
+                            "conditional_bound": 0.001850820764938025,
                             "correlation_length": 5.518339477891271,
                             "log_amplitude": 0.9967593210101082,
-                            "gap_assumed": 0.3175509493959017,
+                            "gap_assumed": 0.31755094939592293,
                             "style": "exponential_sqrt",
                             "fit_ns": [
                                 4,
@@ -888,7 +957,7 @@
                 },
                 {
                     "method": "gap intercept vs L^(-2)",
-                    "gap": 0.3894935562388349,
+                    "gap": 0.3894935562388534,
                     "lengths": [
                         12,
                         14,
@@ -896,19 +965,19 @@
                     ],
                     "finite_gaps": [
                         0.48419646991241194,
-                        0.45896534693753566,
+                        0.45896534693756763,
                         0.4427955613584835
                     ],
                     "forecasts": [
                         {
                             "n": 20,
-                            "beta": 20.53949255862516,
-                            "epsilon_s": 0.16781834691585384,
+                            "beta": 20.539492558624186,
+                            "epsilon_s": 0.1678183469158466,
                             "epsilon_t": 0.07730545921024105,
-                            "conditional_bound": 0.006109355352006344,
+                            "conditional_bound": 0.006109355352015011,
                             "correlation_length": 3.7333307180905284,
                             "log_amplitude": 0.64037047775877,
-                            "gap_assumed": 0.3894935562388349,
+                            "gap_assumed": 0.3894935562388534,
                             "style": "exponential",
                             "fit_ns": [
                                 4,
@@ -923,13 +992,13 @@
                         },
                         {
                             "n": 24,
-                            "beta": 19.897633416168123,
-                            "epsilon_s": 0.13251766423446454,
+                            "beta": 19.897633416167178,
+                            "epsilon_s": 0.1325176642344587,
                             "epsilon_t": 0.11657338303504257,
-                            "conditional_bound": 0.00857139002056037,
+                            "conditional_bound": 0.008571390020566023,
                             "correlation_length": 5.518339477891271,
                             "log_amplitude": 0.9967593210101082,
-                            "gap_assumed": 0.3894935562388349,
+                            "gap_assumed": 0.3894935562388534,
                             "style": "exponential_sqrt",
                             "fit_ns": [
                                 4,
@@ -951,7 +1020,7 @@
             "estimates": [
                 {
                     "method": "gap intercept vs L^(-1)",
-                    "gap": 0.20979447182064825,
+                    "gap": 0.2097944718206385,
                     "lengths": [
                         12,
                         14,
@@ -959,19 +1028,19 @@
                     ],
                     "finite_gaps": [
                         0.47621802305457805,
-                        0.43686137911765854,
+                        0.43686137911764433,
                         0.40984911544860125
                     ],
                     "forecasts": [
                         {
                             "n": 26,
-                            "beta": 38.13255864453445,
-                            "epsilon_s": 0.1504259949553331,
+                            "beta": 38.132558644536225,
+                            "epsilon_s": 0.15042599495533956,
                             "epsilon_t": 0.09931000949165798,
-                            "conditional_bound": 0.0033046190535412846,
+                            "conditional_bound": 0.003304619053537202,
                             "correlation_length": 4.190909545657233,
                             "log_amplitude": 0.7489544052734299,
-                            "gap_assumed": 0.20979447182064825,
+                            "gap_assumed": 0.2097944718206385,
                             "style": "exponential",
                             "fit_ns": [
                                 4,
@@ -986,13 +1055,13 @@
                         },
                         {
                             "n": 32,
-                            "beta": 39.324201102176154,
-                            "epsilon_s": 0.14976407732459585,
+                            "beta": 39.32420110217798,
+                            "epsilon_s": 0.14976407732460223,
                             "epsilon_t": 0.09540765646924967,
-                            "conditional_bound": 0.0051441262484869105,
+                            "conditional_bound": 0.005144126248483952,
                             "correlation_length": 6.5803201355595276,
                             "log_amplitude": 1.1053432485247678,
-                            "gap_assumed": 0.20979447182064825,
+                            "gap_assumed": 0.2097944718206385,
                             "style": "exponential_sqrt",
                             "fit_ns": [
                                 4,
@@ -1009,7 +1078,7 @@
                 },
                 {
                     "method": "gap intercept vs L^(-2)",
-                    "gap": 0.3250322847920319,
+                    "gap": 0.32503228479202356,
                     "lengths": [
                         12,
                         14,
@@ -1017,19 +1086,19 @@
                     ],
                     "finite_gaps": [
                         0.47621802305457805,
-                        0.43686137911765854,
+                        0.43686137911764433,
                         0.40984911544860125
                     ],
                     "forecasts": [
                         {
                             "n": 24,
-                            "beta": 24.612939619578732,
-                            "epsilon_s": 0.155977433635915,
+                            "beta": 24.612939619579365,
+                            "epsilon_s": 0.15597743363591868,
                             "epsilon_t": 0.09203409366099202,
-                            "conditional_bound": 0.005557689954015352,
+                            "conditional_bound": 0.005557689954011928,
                             "correlation_length": 4.190909545657233,
                             "log_amplitude": 0.7489544052734299,
-                            "gap_assumed": 0.3250322847920319,
+                            "gap_assumed": 0.32503228479202356,
                             "style": "exponential",
                             "fit_ns": [
                                 4,
@@ -1044,13 +1113,13 @@
                         },
                         {
                             "n": 30,
-                            "beta": 24.612939619578732,
-                            "epsilon_s": 0.13248922179555492,
+                            "beta": 24.612939619579365,
+                            "epsilon_s": 0.1324892217955581,
                             "epsilon_t": 0.11368739337895513,
-                            "conditional_bound": 0.008823161068614808,
+                            "conditional_bound": 0.008823161068612594,
                             "correlation_length": 6.5803201355595276,
                             "log_amplitude": 1.1053432485247678,
-                            "gap_assumed": 0.3250322847920319,
+                            "gap_assumed": 0.32503228479202356,
                             "style": "exponential_sqrt",
                             "fit_ns": [
                                 4,
@@ -1072,7 +1141,7 @@
             "estimates": [
                 {
                     "method": "gap intercept vs L^(-1)",
-                    "gap": 0.058177514425425125,
+                    "gap": 0.05817751442543444,
                     "lengths": [
                         12,
                         14,
@@ -1080,19 +1149,19 @@
                     ],
                     "finite_gaps": [
                         0.5149986325551659,
-                        0.44896734437857333,
+                        0.44896734437858754,
                         0.4009343429247636
                     ],
                     "forecasts": [
                         {
                             "n": 36,
-                            "beta": 148.2531539063251,
-                            "epsilon_s": 0.16872612203687987,
+                            "beta": 148.25315390630138,
+                            "epsilon_s": 0.16872612203685527,
                             "epsilon_t": 0.07461199010953087,
-                            "conditional_bound": 0.001005728422586371,
+                            "conditional_bound": 0.0010057284225900311,
                             "correlation_length": 4.720501809487847,
                             "log_amplitude": 0.9388835665503306,
-                            "gap_assumed": 0.058177514425425125,
+                            "gap_assumed": 0.05817751442543444,
                             "style": "exponential",
                             "fit_ns": [
                                 4,
@@ -1107,13 +1176,13 @@
                         },
                         {
                             "n": 48,
-                            "beta": 158.99613607345012,
-                            "epsilon_s": 0.1859831815043071,
+                            "beta": 158.99613607342465,
+                            "epsilon_s": 0.18598318150428025,
                             "epsilon_t": 0.05384575314618473,
-                            "conditional_bound": 0.00041570547753565646,
+                            "conditional_bound": 0.0004157054775420862,
                             "correlation_length": 7.987316963734672,
                             "log_amplitude": 1.295272409801669,
-                            "gap_assumed": 0.058177514425425125,
+                            "gap_assumed": 0.05817751442543444,
                             "style": "exponential_sqrt",
                             "fit_ns": [
                                 4,
@@ -1130,7 +1199,7 @@
                 },
                 {
                     "method": "gap intercept vs L^(-2)",
-                    "gap": 0.2560944531030638,
+                    "gap": 0.256094453103072,
                     "lengths": [
                         12,
                         14,
@@ -1138,19 +1207,19 @@
                     ],
                     "finite_gaps": [
                         0.5149986325551659,
-                        0.44896734437857333,
+                        0.44896734437858754,
                         0.4009343429247636
                     ],
                     "forecasts": [
                         {
                             "n": 30,
-                            "beta": 31.23847433267305,
-                            "epsilon_s": 0.1295977567406156,
+                            "beta": 31.238474332672048,
+                            "epsilon_s": 0.12959775674061172,
                             "epsilon_t": 0.11368739337895513,
-                            "conditional_bound": 0.008287474861235052,
+                            "conditional_bound": 0.008287474861237022,
                             "correlation_length": 4.720501809487847,
                             "log_amplitude": 0.9388835665503306,
-                            "gap_assumed": 0.2560944531030638,
+                            "gap_assumed": 0.256094453103072,
                             "style": "exponential",
                             "fit_ns": [
                                 4,
@@ -1165,13 +1234,13 @@
                         },
                         {
                             "n": 38,
-                            "beta": 33.190878978465115,
-                            "epsilon_s": 0.1553582013830051,
+                            "beta": 33.19087897846405,
+                            "epsilon_s": 0.15535820138300052,
                             "epsilon_t": 0.08857305078237596,
-                            "conditional_bound": 0.006076396361516093,
+                            "conditional_bound": 0.006076396361518612,
                             "correlation_length": 7.987316963734672,
                             "log_amplitude": 1.295272409801669,
-                            "gap_assumed": 0.2560944531030638,
+                            "gap_assumed": 0.256094453103072,
                             "style": "exponential_sqrt",
                             "fit_ns": [
                                 4,
@@ -1274,7 +1343,7 @@
             "estimates": [
                 {
                     "method": "gap intercept vs L^(-1)",
-                    "gap": -0.01865990666608487,
+                    "gap": -0.018659906666047246,
                     "lengths": [
                         12,
                         14,
@@ -1282,7 +1351,7 @@
                     ],
                     "finite_gaps": [
                         0.6636737752126614,
-                        0.5659979289513899,
+                        0.5659979289514467,
                         0.4931268498685384
                     ],
                     "forecasts": [
@@ -1292,7 +1361,7 @@
                 },
                 {
                     "method": "gap intercept vs L^(-2)",
-                    "gap": 0.27717338000198,
+                    "gap": 0.27717338000201275,
                     "lengths": [
                         12,
                         14,
@@ -1300,19 +1369,19 @@
                     ],
                     "finite_gaps": [
                         0.6636737752126614,
-                        0.5659979289513899,
+                        0.5659979289514467,
                         0.4931268498685384
                     ],
                     "forecasts": [
                         {
                             "n": 32,
-                            "beta": 29.31378186441266,
-                            "epsilon_s": 0.138932260031831,
+                            "beta": 29.313781864409197,
+                            "epsilon_s": 0.1389322600318158,
                             "epsilon_t": 0.10739747393910194,
-                            "conditional_bound": 0.007115061003693236,
+                            "conditional_bound": 0.00711506100370238,
                             "correlation_length": 4.99431671844032,
                             "log_amplitude": 1.1293152408387404,
-                            "gap_assumed": 0.27717338000198,
+                            "gap_assumed": 0.27717338000201275,
                             "style": "exponential",
                             "fit_ns": [
                                 4,
@@ -1327,13 +1396,13 @@
                         },
                         {
                             "n": 42,
-                            "beta": 31.568688161675173,
-                            "epsilon_s": 0.16673995896011548,
+                            "beta": 31.568688161671442,
+                            "epsilon_s": 0.16673995896009752,
                             "epsilon_t": 0.07673520734072359,
-                            "conditional_bound": 0.00501099438898205,
+                            "conditional_bound": 0.005010994388994195,
                             "correlation_length": 8.804041997496203,
                             "log_amplitude": 1.4857040840900786,
-                            "gap_assumed": 0.27717338000198,
+                            "gap_assumed": 0.27717338000201275,
                             "style": "exponential_sqrt",
                             "fit_ns": [
                                 4,
@@ -1355,7 +1424,7 @@
             "estimates": [
                 {
                     "method": "gap intercept vs L^(-1)",
-                    "gap": -0.011561664951687296,
+                    "gap": -0.011561664951677278,
                     "lengths": [
                         12,
                         14,
@@ -1363,7 +1432,7 @@
                     ],
                     "finite_gaps": [
                         0.7268330989886351,
-                        0.6212467507108386,
+                        0.6212467507108528,
                         0.5422529442648596
                     ],
                     "forecasts": [
@@ -1373,7 +1442,7 @@
                 },
                 {
                     "method": "gap intercept vs L^(-2)",
-                    "gap": 0.30860321398356116,
+                    "gap": 0.3086032139835696,
                     "lengths": [
                         12,
                         14,
@@ -1381,19 +1450,19 @@
                     ],
                     "finite_gaps": [
                         0.7268330989886351,
-                        0.6212467507108386,
+                        0.6212467507108528,
                         0.5422529442648596
                     ],
                     "forecasts": [
                         {
                             "n": 32,
-                            "beta": 25.923255615951387,
-                            "epsilon_s": 0.13081145301627076,
+                            "beta": 25.92325561595068,
+                            "epsilon_s": 0.13081145301626743,
                             "epsilon_t": 0.12078979213689384,
-                            "conditional_bound": 0.004689823458053903,
+                            "conditional_bound": 0.004689823458056962,
                             "correlation_length": 5.007632941364743,
                             "log_amplitude": 1.170384770783847,
-                            "gap_assumed": 0.30860321398356116,
+                            "gap_assumed": 0.3086032139835696,
                             "style": "exponential",
                             "fit_ns": [
                                 4,
@@ -1408,13 +1477,13 @@
                         },
                         {
                             "n": 42,
-                            "beta": 27.94850996094759,
-                            "epsilon_s": 0.15807731412856132,
+                            "beta": 27.948509960946826,
+                            "epsilon_s": 0.15807731412855738,
                             "epsilon_t": 0.0864944726858167,
-                            "conditional_bound": 0.0065354813274512286,
+                            "conditional_bound": 0.006535481327453979,
                             "correlation_length": 8.845506580753918,
                             "log_amplitude": 1.5267736140351849,
-                            "gap_assumed": 0.30860321398356116,
+                            "gap_assumed": 0.3086032139835696,
                             "style": "exponential_sqrt",
                             "fit_ns": [
                                 4,

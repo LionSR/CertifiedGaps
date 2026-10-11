@@ -3,9 +3,10 @@
 ## Outcome and scope
 
 **No eligible seed was found on the computed grid. No uniform spectral gap is certified.**
-Complete dense spectra reach **12 sites**, with numerical references through **16 sites**.
-The constructive SU(2) reduction passes small-spectrum tests and 14-site pilots; its
-complete 14-site sweep is still being collected. No partial sector set is used as Z14.
+Complete dense spectra reach **14 sites** for every requested angle, with numerical
+low-energy references through **16 sites**. All 120 (S,k) slots were collected and their
+multiplet-weighted dimensions sum to **4,782,969 = 3^14**. This is a numerical negative
+grid survey, not a proof that no seed exists at larger eligible scales.
 
 
 One unit cell is one spin-1 site. The tested Hamiltonian is
@@ -83,7 +84,10 @@ pass analytic first- and second-moment checks at infinite temperature: for L>=3,
 the L=2 variance has an extra factor two because both bonds coincide. These floating checks
 validate the numerical implementation; they are not verified eigenvalue enclosures.
 
-| L (sites) | Total dimension | Largest dense block | Stored blocks | Wall seconds, six angles |
+The L14 timing is the sum of separately run sector calculations. Each sector process
+has its own 45-minute timeout; the aggregate sweep is longer than one process limit.
+
+| L (sites) | Total dimension | Largest dense block | Stored blocks | Recorded seconds, six angles |
 |---:|---:|---:|---:|---:|
 | 2 | 9 | 2 | 5 | 1.31596 |
 | 3 | 27 | 2 | 9 | 0.00296807 |
@@ -94,6 +98,7 @@ validate the numerical implementation; they are not verified eigenvalue enclosur
 | 8 | 6561 | 127 | 61 | 0.148689 |
 | 10 | 59049 | 835 | 86 | 4.07773 |
 | 12 | 531441 | 5798 | 115 | 1067.58 |
+| 14 | 4782969 | 8482 | 120 | 14322 |
 
 ## Purity scaling table
 
@@ -102,6 +107,9 @@ maximizing beta. Grid: beta = 1/8, 2/8, ..., 64 (512 points), using core `scan_s
 and `best_seed`. Maxima are numerical, not upper bounds on the continuous-beta optimum.
 All even grid points were checked with the actual asymmetric recurrence, not just the
 symmetric 0.12731 sufficient threshold. No eligible positive recurrence bound appeared.
+Values displayed as 1 are rounded numerical values. In the odd-n near-unit rows,
+Float64 cancellation and saturation limit the precision of both the value and its
+maximizing beta; those rows do not identify a sharply resolved temperature optimum.
 
 | theta | n0 | eligible even seed? | beta at max | max min(Ps,Pt) | Ps | Pt |
 |---:|---:|:---:|---:|---:|---:|---:|
@@ -110,33 +118,39 @@ symmetric 0.12731 sufficient threshold. No eligible positive recurrence bound ap
 | 0 | 4 | yes | 2.25 | 0.261921 | 0.261921 | 0.285953 |
 | 0 | 5 | no | 60.25 | 1 | 1.0005e+27 | 1 |
 | 0 | 6 | yes | 3.25 | 0.328774 | 0.328774 | 0.344587 |
+| 0 | 7 | no | 63.875 | 1 | 1.47274e+14 | 1 |
 | -0.1 | 2 | yes | 0.875 | 0.174944 | 0.179517 | 0.174944 |
 | -0.1 | 3 | no | 40.25 | 1 | 4.40885e+61 | 1 |
 | -0.1 | 4 | yes | 1.875 | 0.243032 | 0.264827 | 0.243032 |
 | -0.1 | 5 | no | 59 | 1 | 3.66317e+39 | 1 |
 | -0.1 | 6 | yes | 2.875 | 0.291791 | 0.291791 | 0.302041 |
+| -0.1 | 7 | no | 63.875 | 1 | 1.47947e+23 | 1 |
 | -0.3 | 2 | yes | 0.75 | 0.144661 | 0.144661 | 0.185162 |
 | -0.3 | 3 | no | 32 | 1 | 5.29978e+58 | 1 |
 | -0.3 | 4 | yes | 1.625 | 0.227725 | 0.227725 | 0.254607 |
 | -0.3 | 5 | no | 50.75 | 1 | 2.21151e+59 | 1 |
 | -0.3 | 6 | yes | 2.375 | 0.263705 | 0.263705 | 0.266475 |
+| -0.3 | 7 | no | 64 | 1 | 3.26165e+45 | 1 |
 | -0.5 | 2 | yes | 0.625 | 0.157937 | 0.158698 | 0.157937 |
 | -0.5 | 3 | no | 26 | 1 | 1.82802e+44 | 1 |
 | -0.5 | 4 | yes | 1.375 | 0.232111 | 0.240975 | 0.232111 |
 | -0.5 | 5 | no | 42.375 | 1 | 1.3138e+49 | 1 |
 | -0.5 | 6 | yes | 2.125 | 0.248583 | 0.248583 | 0.265919 |
+| -0.5 | 7 | no | 59.625 | 1 | 2.07935e+53 | 1 |
 | -0.6 | 2 | yes | 0.625 | 0.134015 | 0.134015 | 0.174979 |
 | -0.6 | 3 | no | 23.75 | 1 | 3.47498e+38 | 1 |
 | -0.6 | 4 | yes | 1.375 | 0.217236 | 0.217236 | 0.257173 |
 | -0.6 | 5 | no | 39 | 1 | 3.32114e+42 | 1 |
 | -0.6 | 6 | yes | 2 | 0.256224 | 0.256224 | 0.257587 |
+| -0.6 | 7 | no | 54.625 | 1 | 2.36158e+45 | 1 |
 | -0.7 | 2 | yes | 0.625 | 0.116593 | 0.116593 | 0.189237 |
 | -0.7 | 3 | no | 21.875 | 1 | 3.61373e+33 | 1 |
 | -0.7 | 4 | yes | 1.25 | 0.221996 | 0.251182 | 0.221996 |
 | -0.7 | 5 | no | 36.125 | 1 | 6.493e+36 | 1 |
 | -0.7 | 6 | yes | 1.875 | 0.241512 | 0.27508 | 0.241512 |
+| -0.7 | 7 | no | 49.75 | 1 | 1.65079e+38 | 1 |
 
-No n0=7,8 grid maximum is available until complete Z14/Z16 spectra exist.
+The n0=7 row uses complete Z14 but is ineligible by parity. No n0=8 grid maximum is reported because full Z16 was not computed.
 In particular,
 the larger-ring Krylov results are **not** silently treated as complete spectra or used
 in `logZ_bounds`. Odd-n near-unit diagnostic ratios cannot establish the theorem.
@@ -176,6 +190,7 @@ M=0 alone. This spacing equals the full spectral gap if the ground state is a un
 singlet; that condition is not certified by the reference computation. Complete spectra
 are preferred when available. These are numerical ED references only, never partition-
 function inputs or uniform gap lower bounds.
+For L14, the complete weighted spectrum has a lowest-level multiplet weight of one at every angle, and its ground energy and gap agree with the independent M=0 reference within 1e-8. These are numerical checks of the singlet interpretation, not a uniqueness certificate.
 
 | theta | n | parity | delta(n) | ED gap at 2n | full spectrum at 2n? |
 |---:|---:|:---:|---:|---:|:---:|
@@ -184,42 +199,42 @@ function inputs or uniform gap lower bounds.
 | 0 | 4 | even | 0.663044 | 0.593555 | yes |
 | 0 | 5 | odd | -1.03187 | 0.524808 | yes |
 | 0 | 6 | even | 0.36529 | 0.484196 | yes |
-| 0 | 7 | odd | -0.510737 | 0.458965 | no, reference only |
+| 0 | 7 | odd | -0.510737 | 0.458965 | yes |
 | 0 | 8 | even | 0.227105 | 0.442796 | no, reference only |
 | -0.1 | 2 | even | 2.50886 | 1.17499 | yes |
 | -0.1 | 3 | odd | -3.52649 | 0.803729 | yes |
 | -0.1 | 4 | even | 0.833391 | 0.63211 | yes |
 | -0.1 | 5 | odd | -1.54405 | 0.535898 | yes |
 | -0.1 | 6 | even | 0.482296 | 0.476218 | yes |
-| -0.1 | 7 | odd | -0.835243 | 0.436861 | no, reference only |
+| -0.1 | 7 | odd | -0.835243 | 0.436861 | yes |
 | -0.1 | 8 | even | 0.320877 | 0.409849 | no, reference only |
 | -0.3 | 2 | even | 3.38206 | 1.55259 | yes |
 | -0.3 | 3 | odd | -4.29421 | 1.01185 | yes |
 | -0.3 | 4 | even | 1.12472 | 0.757481 | yes |
 | -0.3 | 5 | odd | -2.69257 | 0.610228 | yes |
 | -0.3 | 6 | even | 0.680991 | 0.514999 | yes |
-| -0.3 | 7 | odd | -1.63748 | 0.448967 | no, reference only |
+| -0.3 | 7 | odd | -1.63748 | 0.448967 | yes |
 | -0.3 | 8 | even | 0.48199 | 0.400934 | no, reference only |
 | -0.5 | 2 | even | 4.0591 | 1.92963 | yes |
 | -0.5 | 3 | odd | -4.00439 | 1.24593 | yes |
 | -0.5 | 4 | even | 1.34513 | 0.921334 | yes |
 | -0.5 | 5 | odd | -2.72087 | 0.730862 | yes |
 | -0.5 | 6 | even | 0.827735 | 0.605661 | yes |
-| -0.5 | 7 | odd | -2.09587 | 0.517228 | no, reference only |
+| -0.5 | 7 | odd | -2.09587 | 0.517228 | yes |
 | -0.5 | 8 | even | 0.599448 | 0.45157 | no, reference only |
 | -0.6 | 2 | even | 4.32085 | 2.10766 | yes |
 | -0.6 | 3 | odd | -3.8291 | 1.36407 | yes |
 | -0.6 | 4 | even | 1.42743 | 1.00992 | yes |
 | -0.6 | 5 | odd | -2.56682 | 0.801343 | yes |
 | -0.6 | 6 | even | 0.880739 | 0.663674 | yes |
-| -0.6 | 7 | odd | -1.95282 | 0.565998 | no, reference only |
+| -0.6 | 7 | odd | -1.95282 | 0.565998 | yes |
 | -0.6 | 8 | even | 0.640803 | 0.493127 | no, reference only |
 | -0.7 | 2 | even | 4.5295 | 2.27455 | yes |
 | -0.7 | 3 | odd | -3.63279 | 1.47935 | yes |
 | -0.7 | 4 | even | 1.49079 | 1.09953 | yes |
 | -0.7 | 5 | odd | -2.40723 | 0.875251 | yes |
 | -0.7 | 6 | even | 0.920176 | 0.726833 | yes |
-| -0.7 | 7 | odd | -1.813 | 0.621247 | no, reference only |
+| -0.7 | 7 | odd | -1.813 | 0.621247 | yes |
 | -0.7 | 8 | even | 0.670672 | 0.542253 | no, reference only |
 
 ## Conditional required-scale forecasts
@@ -300,10 +315,7 @@ is used for Z14. The full sweep is resumable with `run_su2_grid.sh`, with a
 The exact character counts give largest `(S,k)` highest-weight multiplicities **8,482**
 at L=14 (0.536 GiB per dense matrix) and **59,143** at L=16 (26.06 GiB). These counts use
 `d(S,k)=d(M=S,k)-d(M=S+1,k)` and assert `sum_(S,k) (2S+1)d(S,k)=3^L`.
-Thus this work does **not** establish that full 14-site ED is intrinsically infeasible:
-the former basis-construction blocker has been resolved numerically.
-The remaining full sector sweep is the current blocker to the larger-ring purity table. No
-memory-overcommitted 14-site dense solve or incomplete-spectrum purity calculation was run.
+The full L14 sweep completed with 120 sector entries, including 112 nonempty blocks. Each angle stores 352,131 levels with integer weights accounting for all 4,782,969 states. The sum of recorded sector calculation times is 14,322 seconds (3.98 hours); the longest recorded sector calculation is 642 seconds. No sector failed or timed out. The environment-wide memory peak was 14.87 GiB, including earlier pilots, with zero OOM events; see results/environment.json. At L16, one matrix for the largest SU(2) block requires 26.06 GiB, exceeding this environment's memory budget.
 With one-site cells, full Z14 adds the odd-n0=7 diagnostic; the next eligible seed
 beyond n0=6 is n0=8, which needs complete Z16 under the stated two-purity workflow.
 
@@ -342,8 +354,8 @@ certificates/blbq_haldane/run.sh -t 4 certificates/blbq_haldane/scan.jl 2 3 4 5 
 certificates/blbq_haldane/run.sh certificates/blbq_haldane/reference.jl 14
 certificates/blbq_haldane/run.sh certificates/blbq_haldane/reference.jl 16
 certificates/blbq_haldane/run.sh certificates/blbq_haldane/preflight.jl
-certificates/blbq_haldane/run.sh certificates/blbq_haldane/analyze.jl
-certificates/blbq_haldane/run.sh certificates/blbq_haldane/report.jl
+certificates/blbq_haldane/run_su2_grid.sh
+certificates/blbq_haldane/finalize_su2.sh
 certificates/blbq_haldane/run.sh certificates/blbq_haldane/test/runtests.jl
 ```
 

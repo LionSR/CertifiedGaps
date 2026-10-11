@@ -84,7 +84,8 @@ function analyze()
         end
         push!(extrapolations,(;theta,estimates))
     end
-    sources=source_hashes(ROOT;dirs=("test",),files=("analyze.jl","model.jl","sectors.jl","scan.jl","reference.jl"))
+    sources=source_hashes(ROOT;dirs=("test",),
+        files=("analyze.jl","result_io.jl","model.jl","sectors.jl","scan.jl","reference.jl"))
     data=(;metadata=run_metadata((;thetas=THETAS,beta_grid="1//8:1//8:64//1",n_grid=ns);
             source_sha256=sources,status="numerical negative grid survey, not certified"),
         input_hashes=file_hashes(joinpath(ROOT,"results"),filter(f->startswith(f,"spectrum_L")||startswith(f,"reference_L"),readdir(joinpath(ROOT,"results")))),
