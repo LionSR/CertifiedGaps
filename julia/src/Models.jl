@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.Models
+    CertifiedGaps.Models
 
 Ring models used to test the criterion. Each constructor returns a named tuple
 `(; chain, rp_bond, d)`: the `Chain` used for exact diagonalisation, and the bond term in the

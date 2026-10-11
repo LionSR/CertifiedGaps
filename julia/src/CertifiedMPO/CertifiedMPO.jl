@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO
+    CertifiedGaps.CertifiedMPO
 
 Certified matrix-product-operator toolkit in exact rationals and Arb balls (Nemo). Cores are
 `Array{RationalBig,4}` indexed (left, output, input, right); numerical routines only propose

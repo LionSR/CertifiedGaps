@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.Squaring
+    CertifiedGaps.CertifiedMPO.Squaring
 
 Certified left-to-right compression of an MPO square B² (or reflected Gram B'B), its exact
 replay, portable witnesses, and Gram-flow error propagation. Moved verbatim from spin2

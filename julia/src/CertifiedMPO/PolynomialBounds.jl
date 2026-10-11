@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.PolynomialBounds
+    CertifiedGaps.CertifiedMPO.PolynomialBounds
 
 Exact Taylor thermal majorants Q(K) ≥ exp(-δK) with a scalar inflation bound, Arb-accepted
 rational upper endpoints, and the positive sum-of-squares form of even Taylor polynomials.

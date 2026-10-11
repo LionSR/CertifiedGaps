@@ -522,7 +522,7 @@ bounding the two directional errors separately.
 
 \subsection{First computational pilot}
 
-The companion code in \texttt{aklt/} uses primitive cells
+The companion code in \texttt{models/aklt/} uses primitive cells
 \(A(x,y),B(x,y)\), with edges from \(A(x,y)\) to
 \(B(x,y),B(x-1,y),B(x,y-1)\) and both coordinates periodic.
 The initial geometries are \(2\times2\), \(4\times2\), and
@@ -582,7 +582,7 @@ order only after each complete step. At bond dimension 128 and
 reducing repeated swaps does not resolve the benchmark discrepancy.
 
 Machine-readable spectra, convergence grids, and diagnostics are saved
-under \texttt{aklt/results/}, with source hashes, geometry, parameters,
+under \texttt{models/aklt/results/}, with source hashes, geometry, parameters,
 completion flags, and \texttt{certified=false}. The smallest-system
 checks compare the two independent projector constructions, the exact
 single-bond partition function, and full-spectrum four-site evolution,
@@ -724,7 +724,7 @@ This is stronger than the scalar squaring inequality
 has nonreal eigenvalues.
 
 \paragraph{Verification and remaining scope.}
-The directory \path{aklt/scripts/} contains the scripts
+The directory \path{models/aklt/scripts/} contains the scripts
 \path{check_projection_transfer.py} and
 \path{check_projection_moment_bounds.py}, which record
 the transfer construction and the complete spectral bounds. In the

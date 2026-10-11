@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.Results
+    CertifiedGaps.Results
 
 Writing results and recording where they came from: atomic JSON output, SHA-256 fingerprints
 of source trees and environments, run metadata, and JSON parsing that never routes a large

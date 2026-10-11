@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.Seeds
+    CertifiedGaps.Seeds
 
 Seed search: seed defects from exact spectra, and the certified bound over a grid of seed
 lengths and inverse temperatures.

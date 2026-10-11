@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.ExactDiagonalization
+    CertifiedGaps.ExactDiagonalization
 
 Exact diagonalisation of spin systems with nearest-neighbour or graph interactions, split into
 sectors of a conserved charge, and partition-function enclosures from the resulting spectra

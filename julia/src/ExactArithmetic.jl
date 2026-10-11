@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.ExactArithmetic
+    CertifiedGaps.ExactArithmetic
 
 Exact rational arithmetic with outward rounding. Every routine returns rationals, and every
 enclosure is valid without floating point, so its output can certify an inequality.

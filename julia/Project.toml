@@ -1,4 +1,4 @@
-name = "ThermalMPOGap"
+name = "CertifiedGaps"
 uuid = "5b0c3f0e-7a51-4c55-9b1e-2f7f3d6a8c11"
 version = "0.2.0"
 authors = ["thermal-mpo-gap"]
@@ -20,7 +20,7 @@ ITensorMPS = "0d1a4710-d33b-49a5-8f18-73bdf49b47e2"
 ITensors = "9136182c-28ba-11e9-034c-db9fb085ebd5"
 
 [extensions]
-ThermalMPOGapITensorsExt = ["ITensors", "ITensorMPS"]
+CertifiedGapsITensorsExt = ["ITensors", "ITensorMPS"]
 
 [compat]
 Dates = "1"
