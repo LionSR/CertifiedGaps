@@ -25,3 +25,18 @@ Chosen route: exact symbolic RP coefficient identities; complete dense magnetiza
 momentum ED with multiplicities and small-system crosschecks; numerical purity grid and
 explicitly conditional extrapolation. Only if an eligible seed appears, implement and run
 verified full eigenvalue enclosures. A resource-limited survey is reported as such.
+
+## Follow-up: constructive SU(2) route
+
+In magnetization M=S and momentum k, D=S+ has full row rank and kernel dimension
+r=d(M=S,k)-d(M=S+1,k). The spectrum of D'*D is exactly
+J(J+1)-S(S+1), J=S,...,L. Thus the polynomial product over J>S of
+(I-D'*D/[J(J+1)-S(S+1)]) is the highest-weight projector. Project deterministic Gaussian
+columns and QR-orthonormalize them; then densely diagonalize Q'*H*Q with multiplet
+weight 2S+1. Sparse D multiplication avoids dense Casimir diagonalization or a large
+sparse-QR factorization. This is a numerical reduction, not a rigorous enclosure.
+
+The implementation orders polynomial roots to limit intermediate amplification, checks
+raising residuals and orthogonality, and first compares complete weighted spectra with
+unreduced small rings. Benchmarks determine whether projected bases and dense eigensolves
+fit the 16 GiB memory and 45-minute per-run budgets before attempting L=14.
