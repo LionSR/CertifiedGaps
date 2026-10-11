@@ -1,6 +1,8 @@
-using SparseArrays, Test, LinearAlgebra, ThermalMPOGap, ThermalMPOGap.Results
+using SparseArrays, Test, LinearAlgebra, CertifiedGaps, CertifiedGaps.Results
 include(joinpath(@__DIR__, "../src/Ladder.jl"))
 using .Ladder
+include(joinpath(@__DIR__, "../src/Provenance.jl"))
+using .Provenance
 BLAS.set_num_threads(1)
 @testset "Exact ladder RP and full sector resolution" begin
     for g in (2//1,5//2,3//1,4//1)
@@ -49,7 +51,8 @@ end
         @test Rational{BigInt}(-Ladder.down(()->expm1(ls))) == es
         @test Rational{BigInt}(-Ladder.down(()->expm1(lt))) == et
         for (rel,hash) in c["metadata"]["source_sha256"]
-            @test sha256_file(joinpath(@__DIR__,"..",rel)) == hash
+            snapshot=basename(p)=="certificate_g3_1.json" ? HISTORICAL_SNAPSHOT : nothing
+            @test source_sha256(joinpath(@__DIR__,".."),rel;snapshot)==hash
         end
 
         for spec in c["spectra"]

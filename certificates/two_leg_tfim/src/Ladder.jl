@@ -1,6 +1,6 @@
 module Ladder
-using LinearAlgebra, SparseArrays, ThermalMPOGap
-using ThermalMPOGap.Results
+using LinearAlgebra, SparseArrays, CertifiedGaps
+using CertifiedGaps.Results
 export rp_identity, blocks, block_matrix, full_spectrum, verify_eigen, logz_interval
 BLAS.set_num_threads(1)
 

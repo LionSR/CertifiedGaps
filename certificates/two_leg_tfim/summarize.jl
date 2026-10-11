@@ -1,4 +1,4 @@
-using ThermalMPOGap.Results, Printf
+using CertifiedGaps.Results, Printf
 root=@__DIR__; fields=["2_1","5_2","3_1","4_1"]
 io=IOBuffer()
 println(io,"All scan values below are **numerical, not certified**. The grid is β=1/8,2/8,…,32; n0=2,3,4.\n")

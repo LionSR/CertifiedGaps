@@ -1,6 +1,6 @@
 include("src/Ladder.jl")
-using .Ladder, ThermalMPOGap, ThermalMPOGap.Results, ThermalMPOGap.Seeds
-using ThermalMPOGap.ExactDiagonalization
+using .Ladder, CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds
+using CertifiedGaps.ExactDiagonalization
 using LinearAlgebra
 BLAS.set_num_threads(1)
 g=parse(Rational{Int},get(ARGS,1,"2//1"))
@@ -18,6 +18,6 @@ summary=[(;n, max_min_purity=maximum(min(1-r.εₛ,1-r.εₜ) for r in rs if r.n
     delta=specs[2n].E[1]-2specs[n].E[1]) for n in 2:4]
 write_result(joinpath(root,"results","scan_g$tag.json"),(;g=string(g),best,summary,grid=rs,
     metadata=run_metadata((;ns=2:4,beta="1//8:1//8:32//1",max_rungs=8);
-        source_sha256=source_hashes(root;files=["scan.jl"]),packages=(ThermalMPOGap,),
+        source_sha256=source_hashes(root;files=["scan.jl"]),packages=(CertifiedGaps,),
         status="numerical, not certified")))
 println("BEST ",best); println(summary)

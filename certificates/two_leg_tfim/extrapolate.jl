@@ -1,5 +1,5 @@
 # Exploratory extrapolation only; neither these spectra nor this ansatz are certified.
-using ThermalMPOGap, ThermalMPOGap.Results, ThermalMPOGap.Seeds
+using CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds
 root=@__DIR__; out=[]
 for tag in ("2_1","5_2")
     c=read_exact_json(joinpath(root,"results","scan_g$tag.json"))

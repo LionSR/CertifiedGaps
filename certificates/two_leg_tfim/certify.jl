@@ -1,5 +1,5 @@
 include("src/Ladder.jl")
-using .Ladder, ThermalMPOGap, ThermalMPOGap.Results, LinearAlgebra
+using .Ladder, CertifiedGaps, CertifiedGaps.Results, LinearAlgebra
 BLAS.set_num_threads(1)
 root=@__DIR__
 g=parse(Rational{Int},get(ARGS,1,"4//1"))
@@ -28,6 +28,6 @@ payload=(;g=string(g),n0=n,beta=string(beta),epsilon_s=string(es),epsilon_t=stri
     metadata=run_metadata((;g=string(g),n0=n,beta=string(beta));
         source_sha256=merge(source_hashes(root;files=["certify.jl","scan.jl"]),
             Dict("../../julia/"*k=>v for (k,v) in source_hashes(joinpath(root,"../../julia")))),
-        packages=(ThermalMPOGap,),status="certified",certified=true))
-write_result(joinpath(root,"results","certificate_g$tag.json"),payload)
+        packages=(CertifiedGaps,),status="certified",certified=true))
+write_result(joinpath(root,"results","certificate_g$(tag)_certifiedgaps.json"),payload)
 println("CERTIFIED g=$g n0=$n beta=$beta bound=$(bound.bound), seconds=$(time()-t)")

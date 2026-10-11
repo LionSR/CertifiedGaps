@@ -151,3 +151,11 @@ Julia 1.12.4 was verified; `Pkg.instantiate()` and `Pkg.precompile()` succeeded 
 The completed verification kernel took 645.83 seconds; including final JSON serialization the script reported 652.22 seconds. Maximum eigenvalue enclosure radii were approximately 1.50e-10 for four rungs and 3.94e-5 for eight rungs. The outward rational defect bounds have decimal approximations εs≈0.11240836635 and εt≈0.05161523886; exact fractions are in the certificate.
 
 No numerical or dependency blocker remains. Search scope is n0≤4, with doubled rings through eight rungs. This covers every even seed permitted by the scope-note theorem whose doubled ring fits the requested ten-rung cap. The odd n0=5 / ten-rung diagnostic was not computed. No conclusion of impossibility at larger sizes or other temperatures is claimed.
+
+## Current package integration
+
+The certificate scripts now use **CertifiedGaps** after integrating upstream main
+`22b2759`. Historical numerical and certified JSONs retain their original bytes and
+source fingerprints. [MIGRATION-2026-10-11.md](MIGRATION-2026-10-11.md) documents the
+namespace-only mathematical comparison, explicit historical Git provenance, and fresh
+validation on the renamed package. Use the current README reproduction commands.

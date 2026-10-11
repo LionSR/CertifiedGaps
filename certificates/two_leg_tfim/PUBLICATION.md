@@ -1,4 +1,11 @@
-# Draft PR integration status — 2026-10-11
+# Draft PR publication history — 2026-10-11
+
+The initial integration blocker described below is resolved by the CertifiedGaps
+migration. See [MIGRATION-2026-10-11.md](MIGRATION-2026-10-11.md) and the current README
+for current-package validation and reproduction. The original published artifacts
+remain unchanged. The following section records the initial publication state.
+
+## Initial publication state
 
 The scientific result and independent replay are complete at the audited revisions:
 certificate `d546444493b82f8bd9990d55dec585c2bb3ef30e`, replay audit

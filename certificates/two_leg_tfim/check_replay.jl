@@ -1,8 +1,10 @@
-using Test, ThermalMPOGap, ThermalMPOGap.Results
+using Test, CertifiedGaps, CertifiedGaps.Results
 include("src/Ladder.jl")
 using .Ladder
+include("src/Provenance.jl")
+using .Provenance
 root=@__DIR__
-p=joinpath(root,get(ARGS,1,"results/audit_2026-10-11_replay.json"))
+p=joinpath(root,get(ARGS,1,"results/migration_2026-10-11_replay.json"))
 c=read_exact_json(p)
 started=time()
 original=joinpath(root,"results","certificate_g3_1.json")
@@ -10,7 +12,8 @@ old=read_exact_json(original)
 checks=@testset "Fresh spectral replay artifact" begin
     @test sha256_file(joinpath(root,"results","certificate_g3_1.json"))==c["original_certificate_sha256"]
     for (path,hash) in c["source_hashes"]
-        @test sha256_file(joinpath(root,path))==hash
+        snapshot=basename(p)=="audit_2026-10-11_replay.json" ? HISTORICAL_SNAPSHOT : nothing
+        @test source_sha256(root,path;snapshot)==hash
     end
     @test all(c["agreement"][key] for key in (
         "all_eigenvalues_identical","all_radii_identical","all_residual_bounds_identical",
@@ -55,7 +58,7 @@ checks=@testset "Fresh spectral replay artifact" begin
     end
 end
 
-result_path=joinpath(root,get(ARGS,2,"results/audit_2026-10-11_check.json"))
+result_path=joinpath(root,get(ARGS,2,"results/migration_2026-10-11_check.json"))
 @assert !isfile(result_path) "Choose a new checker-result filename"
 write_result(result_path,(;status="passed",seconds=time()-started,
     test_counts=string(Test.get_test_counts(checks)),
