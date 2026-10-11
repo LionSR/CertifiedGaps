@@ -59,11 +59,17 @@ An independent exact realignment identity gives eigenvalues `2c-s` (multiplicity
 ## Complete spectra and symmetry counting
 
 All partition functions below use every eigenvalue from dense real symmetric LAPACK
-solves. The reduction uses total Sz=M, cyclic translation k, spin reversal within M=0,
+solves. Through L12, the reduction uses total Sz=M, cyclic translation k, spin reversal within M=0,
 and reflection at k=0 and k=pi. Opposite M and conjugate k share spectra, with explicit
 multiplicities 2 where appropriate. At general k, reflection followed by conjugation is
 an antiunitary involution; its fixed basis makes the Hamiltonian real. It does not itself
 halve the block. Sparse involution projectors supply the additional ± sectors.
+
+The L14 construction instead uses total-spin highest-weight spaces at fixed momentum,
+with multiplet weight 2S+1 and conjugate-momentum weight 1 or 2. It does not further split
+reflection parity at k=0 or pi. The collector requires all 120 (S,k) entries, including
+empty sectors, and checks each dimension against an independent integer character formula
+before allowing L14 into a partition function.
 
 Each result records every block dimension and multiplicity, and asserts both
 `sum(dim * multiplicity) == 3^L` and that the expanded spectrum has exactly `3^L`

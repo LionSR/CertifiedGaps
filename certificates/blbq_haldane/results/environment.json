@@ -7,13 +7,13 @@
             "memory_limit_bytes": 17179869184,
             "cpu_quota": 4
         },
-        "created_utc": "2026-10-11T06:22:38.029",
+        "created_utc": "2026-10-11T07:35:11.571",
         "certified": false,
         "source_sha256": {
             "preflight.jl": "a0de50d269aa9bd5356c66a29d34135a17dba3489feebe0fee4ab0377748134e",
             "run.sh": "c51105b50c4f3d60097593f64a392d826394c1f0d870ac251fd6a4306c5f0291",
             "archive_spectra.jl": "cc3bfa68396d48316af5d95da01279140d3fafd482b00ddb10304f81f5aaed6d",
-            "report.jl": "b3bfbdc88f32bd4a78fdd886af5921f22f25307c74ce577bb11c53bd366546e4",
+            "report.jl": "96a0ef3f1c1169abdcc966b64b7ac5784f18b3457690605ba8d4dcbc21183fbb",
             "validate.jl": "470f54b17762375deecadaeae683e4667c079aefedf2a770aab2b8d86d3b61ad",
             "migration_audit.jl": "cb1ac80f6bcbe11cb9da61f9b40f0effa4bf78a782a41b3bf4584e48f5a26edc",
             "fix_pilot_provenance.jl": "b022bf0774ab456141428318e90d59d3f52658a91ea9742ddfb2b36da0aac780",
