@@ -23,3 +23,10 @@ conditional forecast is not evidence of a true seed, and certainly not a certifi
 The theorem requires even seed length in one-site cells. A complete L=14 spectrum adds
 an odd-n=7 diagnostic; it does not extend the admissible seed search beyond n=6. The
 next eligible seed, n=8, would require complete L=16 spectra in this workflow.
+
+The larger-ring reference routine searches M=0, which contains one state per integer-spin
+multiplet. Its recorded `gap` is therefore a multiplet spacing. Identifying it with the
+full spectral gap requires a unique singlet ground state; M=0 alone cannot count a
+possible SU(2) ground multiplet. This is explicitly stated in the report, and complete
+weighted spectra take precedence wherever available. The extrapolations inherit this
+uncertainty and do not establish uniqueness or a uniform gap.

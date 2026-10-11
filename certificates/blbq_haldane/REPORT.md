@@ -159,13 +159,17 @@ The closest computed eligible point is **theta=0, n0=6, beta=3.25**, with balanc
 Positive even-n delta makes Ps fall as exp(-beta delta) in the ground-state-dominated
 regime. This competes with the larger beta required for thermal purity. Odd-n deltas are
 shown separately through the parity column and must not be fit together with even n.
-The reference gap column is the **finite-ring** E1-E0 at 2n, not a bulk gap assertion.
+The gap column uses complete-spectrum E1-E0 where available. Otherwise it is the
+numerical M=0 multiplet spacing described below, not a bulk gap assertion.
 
 At L=14 and 16, `reference.jl` searches all momentum and spin-reversal/reflection blocks
 in M=0, with six converged low levels per block. Every integer-spin SU(2) multiplet has an
 M=0 state, so this covers low multiplet energies numerically. Krylov convergence and
-residual norms are recorded, but multiplicities are not certified. These are numerical
-ED references only, never partition-function inputs or uniform gap lower bounds.
+residual norms are recorded, but multiplet ground-state degeneracy is not resolved by
+M=0 alone. This spacing equals the full spectral gap if the ground state is a unique
+singlet; that condition is not certified by the reference computation. Complete spectra
+are preferred when available. These are numerical ED references only, never partition-
+function inputs or uniform gap lower bounds.
 
 | theta | n | parity | delta(n) | ED gap at 2n | full spectrum at 2n? |
 |---:|---:|:---:|---:|---:|:---:|
@@ -270,7 +274,7 @@ The juliaup installer returned HTTP 403. The official Julia 1.12.4 S3 tarball su
 `Pkg.instantiate()` and `Pkg.precompile()` completed using the unmodified core project
 and manifest. The runtime/depot are ignored and confined to this certificate directory.
 All runs set `BLAS.set_num_threads(1)` and `OPENBLAS_NUM_THREADS=1`; dense parameter solves
-use four Julia threads. No existing tracked repository file was modified.
+use four Julia threads. All changes relative to the base are confined to this certificate directory.
 
 At L=14 the initial M=1,k=1 block has **41,835** states before SU(2) reduction.
 One real dense matrix requires **13.04 GiB**; matrix construction plus eigensolver copies
@@ -342,7 +346,7 @@ Each invocation runs `julia --project=julia`; each completed numerical run is be
 and initial package imports. Result JSON uses the shared core's `Results.write_result`
 (ThermalMPOGap historically, CertifiedGaps after the rename). Large complete spectra are
 losslessly gzip-compressed; `archive.json` records original and compressed hashes.
-and contains source hashes and run metadata. Exact rational tokens are strings. Spectrum
+Result metadata contains source hashes and run metadata. Exact rational tokens are strings. Spectrum
 files retain every eigenvalue and every sector dimension, enabling independent numerical
 reanalysis without repeating ED. `scaling.json` hashes its spectrum/reference inputs.
 The fast test recomputes exact RP, small-system spectrum crosschecks, complete dimension

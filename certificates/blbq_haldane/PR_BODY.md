@@ -2,7 +2,7 @@ This draft adds a numerical BLBQ Haldane scaling survey and a constructive SU(2)
 
 - Exact Cartesian RP identities, including an independent realignment spectrum check, hold symbolically for the requested angle range.
 - Complete dense spectra through L=12 cover all six angles. No eligible even seed passes; theta=0 is closest (n0=6, beta=3.25, balanced purity 0.328774).
-- Numerical low-energy references at L=14 and 16 extend delta(n) through n=8. These truncated references are never used for partition functions.
+- Numerical low-energy references at L=14 and 16 extend delta(n) through n=8. These truncated references are never used for partition functions. Their M=0 multiplet spacing equals the full gap only if the ground state is a unique singlet; this calculation does not certify that assumption.
 - The new Casimir-polynomial highest-weight construction passes exact small projector checks and complete-spectrum comparisons through L=7. Large L=14 pilots succeeded. The full L=14 sector sweep is running as resumable, individually time-limited jobs; no incomplete sector set is treated as Z14.
 - The theorem requires even n0, so full Z14 adds an odd-n0=7 diagnostic. The next eligible seed needs full Z16.
 
