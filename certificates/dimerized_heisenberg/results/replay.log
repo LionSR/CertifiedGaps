@@ -1,0 +1,16 @@
+Precompiling packages...
+   3418.0 ms  ✓ ThermalMPOGap
+  1 dependency successfully precompiled in 4 seconds. 59 already precompiled.
+Test Summary:                                      | Pass  Total  Time
+Exact RP obstruction audit (not a gap certificate) |  106    106  5.4s
+Test Summary:                                    | Pass  Total   Time
+Numerical sector implementation vs core dense ED |   20     20  18.4s
+Test Summary:                      | Pass  Total  Time
+Exact alternative cell conventions |    2      2  2.8s
+Test Summary:                                                | Pass  Total  Time
+Independent exact residual and analytic four-spin validation |  108    108  5.3s
+verified stored delta=1//2 bound=0.5326577398571627
+verified stored delta=1//4 bound=0.057966591686137485
+verified stored delta=3//10 bound=0.17291646480187198
+Test Summary:                                   | Pass  Total  Time
+Verified saved spectral and purity certificates | 2167   2167  4.2s

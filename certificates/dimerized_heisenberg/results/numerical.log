@@ -1,0 +1,36 @@
+delta=1//2 cells=2 dimension=16 gap=1.3228756555322958 seconds=1.348227728
+delta=1//2 cells=3 dimension=64 gap=1.2180554919699 seconds=0.000430004
+delta=1//2 cells=4 dimension=256 gap=1.1955056073938226 seconds=0.002113144
+delta=1//2 cells=6 dimension=4096 gap=1.1890182824109203 seconds=0.120971995
+delta=1//2 cells=8 dimension=65536 gap=1.1886516517536574 seconds=23.923172446
+saved /workspace/haldane-gap-diagrams/certificates/dimerized_heisenberg/results/numerical_delta_1_2.json best=Dict{String, Real}("numerical_bound" => 0.5347953348174902, "epsilon_t" => 0.012004541341293175, "n0_cells" => 4, "epsilon_s" => 0.011265182014107259, "beta0" => 6.0)
+delta=3//10 cells=2 dimension=16 gap=1.1269427669584644 seconds=0.000168164
+delta=3//10 cells=3 dimension=64 gap=0.9222215465527981 seconds=0.000288552
+delta=3//10 cells=4 dimension=256 gap=0.8529313647920507 seconds=0.001671573
+delta=3//10 cells=6 dimension=4096 gap=0.8168504950598754 seconds=0.06399676
+delta=3//10 cells=8 dimension=65536 gap=0.8111443956582738 seconds=19.997897002
+saved /workspace/haldane-gap-diagrams/certificates/dimerized_heisenberg/results/numerical_delta_3_10.json best=Dict{String, Real}("numerical_bound" => 0.17320431229383276, "epsilon_t" => 0.05160475505880002, "n0_cells" => 4, "epsilon_s" => 0.09511390745351037, "beta0" => 6.5)
+delta=1//4 cells=2 dimension=16 gap=1.0897247358851678 seconds=0.000139762
+delta=1//4 cells=3 dimension=64 gap=0.8580589092924935 seconds=0.000274
+delta=1//4 cells=4 dimension=256 gap=0.7714184992610695 seconds=0.004161414
+delta=1//4 cells=6 dimension=4096 gap=0.7196540100722046 seconds=0.060008728
+delta=1//4 cells=8 dimension=65536 gap=0.709347628263707 seconds=19.935571029
+saved /workspace/haldane-gap-diagrams/certificates/dimerized_heisenberg/results/numerical_delta_1_4.json best=Dict{String, Real}("numerical_bound" => 0.05823218366533664, "epsilon_t" => 0.05103438201382419, "n0_cells" => 4, "epsilon_s" => 0.16567693327925415, "beta0" => 7.25)
+delta=1//5 cells=2 dimension=16 gap=1.058300524425836 seconds=0.000376021
+delta=1//5 cells=3 dimension=64 gap=0.8008435818402644 seconds=0.000334324
+delta=1//5 cells=4 dimension=256 gap=0.6950423977341926 seconds=0.001222354
+delta=1//5 cells=6 dimension=4096 gap=0.6226227691984798 seconds=0.065615422
+delta=1//5 cells=8 dimension=65536 gap=0.6046145816957145 seconds=18.873500211
+saved /workspace/haldane-gap-diagrams/certificates/dimerized_heisenberg/results/numerical_delta_1_5.json best=nothing
+delta=3//20 cells=2 dimension=16 gap=1.0331989159885913 seconds=0.000137752
+delta=3//20 cells=3 dimension=64 gap=0.7526787676467106 seconds=0.00051871
+delta=3//20 cells=4 dimension=256 gap=0.627074203141925 seconds=0.001901491
+delta=3//20 cells=6 dimension=4096 gap=0.5287135242954211 seconds=0.055384771
+delta=3//20 cells=8 dimension=65536 gap=0.4983262723464188 seconds=19.172070622
+saved /workspace/haldane-gap-diagrams/certificates/dimerized_heisenberg/results/numerical_delta_3_20.json best=nothing
+delta=1//10 cells=2 dimension=16 gap=1.0148891565092222 seconds=0.000164953
+delta=1//10 cells=3 dimension=64 gap=0.7158825502430091 seconds=0.000284014
+delta=1//10 cells=4 dimension=256 gap=0.572062274156274 seconds=0.001225244
+delta=1//10 cells=6 dimension=4096 gap=0.4440388228337655 seconds=0.057868365
+delta=1//10 cells=8 dimension=65536 gap=0.39502870771149823 seconds=20.634657643
+saved /workspace/haldane-gap-diagrams/certificates/dimerized_heisenberg/results/numerical_delta_1_10.json best=nothing

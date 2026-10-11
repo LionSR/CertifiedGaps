@@ -1,0 +1,8 @@
+verified delta=1//2 L=4 q=0 k=0 parity=1 dim=1 radius=6.661338147750954e-14 sec=0.000172339
+verified delta=1//2 L=4 q=1 k=0 parity=1 dim=2 radius=1.6913262512402957e-13 sec=0.000159495
+verified delta=1//2 L=4 q=1 k=1 parity=1 dim=2 radius=1.3386021485537185e-13 sec=6.044e-5
+verified delta=1//2 L=4 q=2 k=0 parity=1 dim=3 radius=6.839195273702928e-13 sec=0.000160449
+verified delta=1//2 L=4 q=2 k=0 parity=-1 dim=1 radius=6.661338147750954e-14 sec=7.8475e-5
+verified delta=1//2 L=4 q=2 k=1 parity=-1 dim=2 radius=2.1316282072803064e-13 sec=7.1277e-5
+maxradius=6.839195273702928e-13
+[13.9383, 13.9384]_com

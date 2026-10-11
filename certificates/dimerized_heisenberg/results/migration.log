@@ -1,0 +1,5 @@
+Precompiling packages...
+   3376.8 ms  ✓ CertifiedGaps
+  1 dependency successfully precompiled in 4 seconds. 59 already precompiled.
+Test Summary:                                                | Pass  Total   Time
+Current CertifiedGaps core with immutable historical spectra | 1536   1536  11.5s

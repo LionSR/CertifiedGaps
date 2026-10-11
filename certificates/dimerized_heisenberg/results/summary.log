@@ -1,0 +1,186 @@
+delta=1//10 gap=0.39502870771149823 best=nothing ratio=nothing seconds=20.694546566
+diagnostics=JSON3.Object[{
+       "max_min_purity": 0.4294922247160269,
+            "best_seed": nothing,
+            "peak_beta": 3.5,
+             "n0_cells": 2,
+    "energy_difference": 0.31904538554224215,
+   "even_seed_eligible": true
+}, {
+       "max_min_purity": 0.49290533767602507,
+            "best_seed": nothing,
+            "peak_beta": 5.25,
+             "n0_cells": 3,
+    "energy_difference": 0.17059894477683368,
+   "even_seed_eligible": false
+}, {
+       "max_min_purity": 0.5836027230756669,
+            "best_seed": nothing,
+            "peak_beta": 6.5,
+             "n0_cells": 4,
+    "energy_difference": 0.09923589992566839,
+   "even_seed_eligible": true
+}]
+xi=1.8456463566487458 scaled=0.39763245362950167 prediction=Dict{String, Real}("surrogate_bound" => 0.04319376733382209, "n0_cells" => 8, "beta0" => 14.0)
+delta=1//2 gap=1.1886516517536574 best={
+   "numerical_bound": 0.5347953348174902,
+         "epsilon_t": 0.012004541341293175,
+          "n0_cells": 4,
+         "epsilon_s": 0.011265182014107259,
+             "beta0": 6
+} ratio=0.44991763064350165 seconds=25.987215575
+diagnostics=JSON3.Object[{
+       "max_min_purity": 0.7934584408689889,
+            "best_seed": nothing,
+            "peak_beta": 3.25,
+             "n0_cells": 2,
+    "energy_difference": 0.07652526955254402,
+   "even_seed_eligible": true
+}, {
+       "max_min_purity": 0.9468287947790075,
+            "best_seed": {
+                            "numerical_bound": 0.35002785598365116,
+                                  "epsilon_t": 0.03283025859402429,
+                                   "n0_cells": 3,
+                                  "epsilon_s": 0.05598348841665406,
+                                      "beta0": 5
+                         },
+            "peak_beta": 4.75,
+             "n0_cells": 3,
+    "energy_difference": 0.011523788633882148,
+   "even_seed_eligible": false
+}, {
+       "max_min_purity": 0.9882922344282926,
+            "best_seed": {
+                            "numerical_bound": 0.5347953348174902,
+                                  "epsilon_t": 0.012004541341293175,
+                                   "n0_cells": 4,
+                                  "epsilon_s": 0.011265182014107259,
+                                      "beta0": 6
+                         },
+            "peak_beta": 6.25,
+             "n0_cells": 4,
+    "energy_difference": 0.0018662798725266327,
+   "even_seed_eligible": true
+}]
+xi=0.5493097815108099 scaled=0.3460434783193115 prediction=Dict{String, Real}("surrogate_bound" => 0.5511876913893393, "n0_cells" => 4, "beta0" => 5.75)
+delta=1//4 gap=0.709347628263707 best={
+   "numerical_bound": 0.05823218366533664,
+         "epsilon_t": 0.05103438201382419,
+          "n0_cells": 4,
+         "epsilon_s": 0.16567693327925415,
+             "beta0": 7.25
+} ratio=0.08209258950773322 seconds=20.000408706
+diagnostics=JSON3.Object[{
+       "max_min_purity": 0.5352457253331379,
+            "best_seed": nothing,
+            "peak_beta": 3.25,
+             "n0_cells": 2,
+    "energy_difference": 0.21616230049067653,
+   "even_seed_eligible": true
+}, {
+       "max_min_purity": 0.7342027248219105,
+            "best_seed": nothing,
+            "peak_beta": 4.75,
+             "n0_cells": 3,
+    "energy_difference": 0.07263713653413184,
+   "even_seed_eligible": false
+}, {
+       "max_min_purity": 0.864766521728791,
+            "best_seed": {
+                            "numerical_bound": 0.05823218366533664,
+                                  "epsilon_t": 0.05103438201382419,
+                                   "n0_cells": 4,
+                                  "epsilon_s": 0.16567693327925415,
+                                      "beta0": 7.25
+                         },
+            "peak_beta": 6,
+             "n0_cells": 4,
+    "energy_difference": 0.025383552176898583,
+   "even_seed_eligible": true
+}]
+xi=0.951135507127141 scaled=0.37745837614448263 prediction=Dict{String, Real}("surrogate_bound" => 0.05801178473064093, "n0_cells" => 4, "beta0" => 7.0)
+delta=1//5 gap=0.6046145816957145 best=nothing ratio=nothing seconds=18.941545058
+diagnostics=JSON3.Object[{
+       "max_min_purity": 0.4880378366035515,
+            "best_seed": nothing,
+            "peak_beta": 3.5,
+             "n0_cells": 2,
+    "energy_difference": 0.25236186295121055,
+   "even_seed_eligible": true
+}, {
+       "max_min_purity": 0.6605579207477228,
+            "best_seed": nothing,
+            "peak_beta": 4.75,
+             "n0_cells": 3,
+    "energy_difference": 0.09961711689436381,
+   "even_seed_eligible": false
+}, {
+       "max_min_purity": 0.7895944149928976,
+            "best_seed": nothing,
+            "peak_beta": 6.25,
+             "n0_cells": 4,
+    "energy_difference": 0.04100521748997199,
+   "even_seed_eligible": true
+}]
+xi=1.1265895861364965 scaled=0.38528821881397285 prediction=Dict{String, Real}("surrogate_bound" => 0.1684172598152177, "n0_cells" => 6, "beta0" => 9.25)
+delta=3//10 gap=0.8111443956582738 best={
+   "numerical_bound": 0.17320431229383276,
+         "epsilon_t": 0.05160475505880002,
+          "n0_cells": 4,
+         "epsilon_s": 0.09511390745351037,
+             "beta0": 6.5
+} ratio=0.21353080070690872 seconds=20.064469084
+diagnostics=JSON3.Object[{
+       "max_min_purity": 0.5973908780494881,
+            "best_seed": nothing,
+            "peak_beta": 3.25,
+             "n0_cells": 2,
+    "energy_difference": 0.1816309358160746,
+   "even_seed_eligible": true
+}, {
+       "max_min_purity": 0.7944178632431675,
+            "best_seed": nothing,
+            "peak_beta": 4.75,
+             "n0_cells": 3,
+    "energy_difference": 0.05197269854672015,
+   "even_seed_eligible": false
+}, {
+       "max_min_purity": 0.9125503179819907,
+            "best_seed": {
+                            "numerical_bound": 0.17320431229383276,
+                                  "epsilon_t": 0.05160475505880002,
+                                   "n0_cells": 4,
+                                  "epsilon_s": 0.09511390745351037,
+                                      "beta0": 6.5
+                         },
+            "peak_beta": 6,
+             "n0_cells": 4,
+    "energy_difference": 0.015518137836542323,
+   "even_seed_eligible": true
+}]
+xi=0.8273289726580354 scaled=0.3707595985033983 prediction=Dict{String, Real}("surrogate_bound" => 0.17915062540021814, "n0_cells" => 4, "beta0" => 6.25)
+delta=3//20 gap=0.4983262723464188 best=nothing ratio=nothing seconds=19.230291404
+diagnostics=JSON3.Object[{
+       "max_min_purity": 0.45445295187476964,
+            "best_seed": nothing,
+            "peak_beta": 3.5,
+             "n0_cells": 2,
+    "energy_difference": 0.2878922256591778,
+   "even_seed_eligible": true
+}, {
+       "max_min_purity": 0.5797356109074747,
+            "best_seed": nothing,
+            "peak_beta": 5,
+             "n0_cells": 3,
+    "energy_difference": 0.1330862481842212,
+   "even_seed_eligible": false
+}, {
+       "max_min_purity": 0.7017084403022635,
+            "best_seed": nothing,
+            "peak_beta": 6.25,
+             "n0_cells": 4,
+    "energy_difference": 0.0650049379936215,
+   "even_seed_eligible": true
+}]
+xi=1.3956068664323589 scaled=0.3939949030399809 prediction=Dict{String, Real}("surrogate_bound" => 0.051774737784856535, "n0_cells" => 6, "beta0" => 10.5)

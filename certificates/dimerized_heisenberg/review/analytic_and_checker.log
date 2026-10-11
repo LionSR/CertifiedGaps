@@ -1,0 +1,7 @@
+Test Summary:                                                | Pass  Total  Time
+Independent exact residual and analytic four-spin validation |  108    108  7.6s
+verified stored delta=1//2 bound=0.5326577398571627
+verified stored delta=1//4 bound=0.057966591686137485
+verified stored delta=3//10 bound=0.17291646480187198
+Test Summary:                                   | Pass  Total  Time
+Verified saved spectral and purity certificates | 2167   2167  7.0s
