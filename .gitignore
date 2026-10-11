@@ -33,5 +33,7 @@ lean/.lake/
 
 # Large or regenerable result data; small certificates read by tests are tracked
 /aklt/results/
-/spin2/results/*-witness.json
-/spin2/results/*n256*.json
+/spin2/results/*
+!/spin2/results/trial-certificate.json
+!/spin2/results/trial-137-certificate.json
+!/spin2/results/trial-295-symmetric-certificate.json
