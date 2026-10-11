@@ -1,0 +1,14 @@
+# Local references, drafts, and build products
+/work/
+.DS_Store
+
+# LaTeX intermediate files (the final PDF is tracked)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
