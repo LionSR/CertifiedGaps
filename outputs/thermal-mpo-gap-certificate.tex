@@ -1,0 +1,328 @@
+\documentclass[aps,prl,reprint,amsmath,amssymb,nofootinbib,raggedbottom]{revtex4-2}
+\usepackage[T1]{fontenc}
+\usepackage{tnnotes}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue,urlcolor=blue]{hyperref}
+\hypersetup{pdftitle={How the Initial Estimate Is Certified}}
+
+% ------------------------------------------------ diagrams specific to this note
+% A periodic matrix-product vector against its copy: two rings of A tensors
+% joined by physical legs; #1 = 1 inserts one bond operator h on two sites.
+\newcommand{\mpsnorm}[1]{\tikz[tn,tn centered]{
+ \foreach \y/\s in {.85/1,-.85/-1}{
+   \draw[ring] (-.5,\y)--(-.5,{\y+\s*.75})--(6.7,{\y+\s*.75})--(6.7,\y)--cycle;}
+ \foreach \x in {.5,2.0,4.6,6.0}{\draw[phys] (\x,-.85)--(\x,.85);}
+ \tndots{3.3}{.85} \tndots{3.3}{-.85}
+ \ifnum#1=1 \node[sym,minimum width=2.6em,minimum height=.7em,fill=mpoblue!20] at (1.25,0) {$h$};\fi
+ \foreach \x in {.5,2.0,4.6,6.0}{
+   \node[mpo,fill=white,minimum width=.9em] at (\x,.85) {$A$};
+   \node[mpo,fill=white,minimum width=.9em] at (\x,-.85) {$A$};}}}
+% Word-sized capped masses: bars at a dashed cap, the last one partial.
+\newcommand{\capbars}{\tikz[baseline=0pt,x=.34em,y=1.1em]{
+ \foreach \h [count=\i] in {.8,.8,.8,.35}{\fill[mpored!70] ({\i-1},0) rectangle ++(.78,\h);}
+ \draw[black!55,densely dashed,line width=.3pt] (-.2,.8)--(3.95,.8);
+ \draw[black!50,line width=.3pt] (-.2,0)--(3.95,0);}}
+% Word-sized transfer spectrum at b=49/4: one bar above the cap l (red), the
+% rest of J (red, light) and the three identical N lists (grey).
+\newcommand{\seedspectrum}{\tikz[baseline=0pt,x=.34em,y=1.1em]{
+ \fill[mpored] (0,0) rectangle ++(.78,1);
+ \foreach \h [count=\i] in {.35,.2}{\fill[mpored!40] (\i,0) rectangle ++(.78,\h);}
+ \foreach \h [count=\i from 3] in {.58,.58,.58,.3,.3,.3}{\fill[black!30] (\i,0) rectangle ++(.78,\h);}
+ \draw[black!50,line width=.3pt] (-.2,0)--(9,0);}}
+
+\begin{document}
+\title{How the Initial Estimate Is Certified}
+\date{October 10, 2026}
+\begin{abstract}
+The finite-scale input $\Ps(2304,784), \Pt(4608,784) \ge 0.99$ of Ref.~\cite{main} is established without direct tensor contraction at that scale.
+Ref.~\cite{source} certifies a pair of bounds at length $36$ and $\beta=49/4$, which are then propagated to $(2304,784)$ through six scale doublings with decoupled defects.
+The underlying verification reduces to three closed tensor networks: twisted rings of at most twelve sites, symmetry-projected rings, and an integer matrix-product trial state of bond dimension $26$ on $72$ sites.
+\end{abstract}
+\maketitle
+\setlength{\abovedisplayskip}{5pt plus 2pt minus 1pt}
+\setlength{\belowdisplayskip}{5pt plus 2pt minus 1pt}
+
+\appendix
+\setcounter{secnumdepth}{2}
+\setcounter{section}{8}
+
+\section{Architecture of the Certificate}\label{app:c-plan}
+Throughout, $X_b$ is the spatial transfer operator of Ref.~\cite{main} at
+inverse temperature $b$, with the energy shift $\kappa=700741/500000$
+absorbed into $H$. Its eigenvalues $\lambda_i(b)$ are real, and
+$Z_n(b)=\sum_i\lambda_i^n$. The certificate proceeds in four steps, from
+twisted partition functions to the initial estimate:
+\begin{equation}
+ \begin{aligned}
+ \underbrace{\tnchain[node=xvertex,last=sym,ring]{,,\cdots,,U_g}}_{n\le12,\ b=49/4}
+ &\ \xrightarrow{\ \text{sectors}\ }\
+ \underbrace{\seedspectrum}_{\lambda_0>\ell}\\
+ &\ \xrightarrow{\ \text{trial}\ }\ (p_0,q_0)
+ \ \xrightarrow{\ \times6\ }\
+ \underbrace{\Ps,\Pt\ge0.99}_{(2304,784)}.
+ \end{aligned}
+ \label{eq:c-plan}
+\end{equation}
+\begin{itemize}
+\item \emph{Twisted partition functions} (Sec.~\ref{app:c-tori}): certified values of
+$Z_n(b,g)$ for $4\le n\le12$, $b=49/4$, and two twists $g$.
+\item \emph{Sectors and filters} (Sec.~\ref{app:c-spectrum}): bounds on
+every eigenvalue of $X_b$, sector by sector. A trial vector then forces
+one eigenvalue above $\ell=0.999$.
+\item \emph{Initial defects} (Sec.~\ref{app:c-spectrum}):
+$1-\Ps(36,b)\le p_0$ and $1-\Pt(72,b)\le q_0$.
+\item \emph{Six doublings} (Sec.~\ref{app:c-doubling}): the coupled update
+reaches $(2304,784)$.
+\end{itemize}
+Every number is an exact rational or an integer; floating-point
+arithmetic is used nowhere in the proof.
+
+\section{Twisted boundary conditions}\label{app:c-tori}
+\emph{Twists and symmetries.} A proper signed permutation $g$ of the
+Cartesian axes acts on histories by $U_g$, which relabels events and
+multiplies by their signs. Rotating every matrix inside a site trace shows
+that $U_g$ slides through a transfer vertex,
+\begin{equation}
+ \tnchain[last=sym]{X_b,U_g}=\tnchain[node=sym,last=xop]{U_g,X_b},
+ \label{eq:c-slide}
+\end{equation}
+so a single $U_g$ may be placed on any virtual bond of the ring. On the
+physical side it conjugates one end of a single bond, the seam:
+\begin{equation}
+ Z_n(b,g)=\Tr X_b^nU_g
+ =\tnchain[node=xvertex,last=sym,ring]{,,\cdots,,U_g}
+ =\Tr e^{-bH_n(g)} .
+ \label{eq:c-twist}
+\end{equation}
+The certificate needs $g=1$ and the $\pi$ rotation $g=P$.
+
+\emph{Purification.} The physical side is computed as a squared
+Frobenius norm, which splits the imaginary-time circle at half its length,
+\begin{equation}
+ Z_n(b,g)=\tncolumn[ring]{F,F^\dagger}=\|F\|_F^2,\qquad F=e^{-bH/2},
+ \label{eq:c-cut}
+\end{equation}
+so that only columns $Fe_r$ are needed, one basis state $e_r$ at a time.
+
+\emph{Uniformization.} Shift and scale $H$ so that
+$R=1-(\tfrac32n+H)/16$ is a contraction. Uniformization (Jensen's method)
+then writes $F$, up to the scalar $e^{-b(\kappa-3/2)n/2}$, as a Poisson
+mixture of powers of $R$:
+\begin{equation}
+ F\propto e^{98(R-1)}=\sum_{j\ge0}e^{-98}\frac{98^j}{j!}\;
+ \tncolumn[node=gibbs,gap=.15em]{R,R,\cdots,R}\,,
+ \label{eq:c-poisson}
+\end{equation}
+with $j$ factors of $R$ in the $j$th term. This is the discrete counterpart of the
+event expansion behind the thermal MPO: the events of $W_\beta$ arrive as a
+Poisson process, and here each factor of $R$ is one event.
+
+The sum is cut at $j=280$. The truncation error is below $2^{-84}$ in
+operator norm, because $\|R\|\le1$~\cite{foxglynn}. The truncated sum is
+evaluated by Horner's rule on integer vectors scaled by $Q=2^{55}$, taking
+the floor after every multiplication by $R$. Each multiplication adds at most
+$\sqrt{\dim}+1$ to the Euclidean error, and the contraction carries earlier
+errors forward unamplified. Each column is therefore known to within
+$281(\sqrt{3^n}+2)$ in units of $1/Q$.
+
+\emph{Orbits.} The trace in Eq.~\eqref{eq:c-cut} needs one column per
+basis word. Cyclic shifts, reversal and global spin flip permute the
+columns without changing their norms. For the twisted ring, a shift moves
+the seam, and a diagonal sign gauge moves it back. Only one representative
+per orbit is computed, weighted by the orbit size. The results are eighteen
+integers $W_{n,g}$ of about $30$ digits. Turning them into rational
+enclosures gives the table of $Z_n(49/4,g)$, each value to within
+$\pm3\times10^{-5}$. As an independent sanity check, not
+part of the proof, floating-point exact diagonalization reproduces all
+ten centers for $4\le n\le8$ to within $10^{-6}$.
+
+\section{From partition functions to the transfer spectrum}\label{app:c-spectrum}
+\emph{Sector projectors.} The four twists $g\in D_2=\{1,P_x,P_y,P_z\}$ commute
+with $X_b$, so their character sums are projectors that can be inserted
+into the ring:
+\begin{equation}
+ \begin{gathered}
+ \Pi_\chi=\tfrac14\textstyle\sum_{g\in D_2}\chi(g)U_g,\\
+ \Tr X_b^n\Pi_\chi=\tnchain[node=xvertex,last=sym,ring]{,,\cdots,,\Pi_\chi}.
+ \end{gathered}
+ \label{eq:c-proj}
+\end{equation}
+A cyclic rotation of the axes permutes the three nontrivial characters, so
+those three sectors carry identical eigenvalue lists, called $N$. Write $J$
+for the list of the invariant sector. Inverting the characters gives both
+lists from the two twists alone:
+\begin{equation}
+ J_n=\tfrac14\bigl[Z_n+3Z_n(P)\bigr],\qquad
+ N_n=\tfrac14\bigl[Z_n-Z_n(P)\bigr],
+ \label{eq:c-sectors}
+\end{equation}
+with $Z_n=J_n+3N_n$. The coefficients sum to at most one in absolute value,
+so each sector moment inherits the $3\times10^{-5}$ error. This holds for
+odd $n$ too; odd moments carry sign information.
+
+\emph{Polynomial filters} (the term of Ref.~\cite{source}). For any polynomial $F\ge0$ on $\mathbb R$, the closed
+network $\Tr F(X_b)$ is a finite combination of ring partition functions:
+\begin{equation}
+ \sum_iF(\lambda_i)=\sum_jf_j\,\tnchain[node=xvertex,ring]{,\cdots,}_{\,j}
+ \ \le\ B .
+ \label{eq:c-filter}
+\end{equation}
+Every term on the left is nonnegative, so no single eigenvalue can have
+$F(\lambda)>B$. Two degree-12 filters of the form
+$x^4Q(x)^2$ give
+\begin{equation}
+ |\lambda|<v_J=1.00139\ \text{in }J,\qquad |\lambda|<v_N=0.872\ \text{in }N.
+ \label{eq:c-caps}
+\end{equation}
+The filter needs $F\ge0$ on the whole real line, not only on
+$[0,\infty)$, because $X_b$ is self-adjoint but not positive. Reflection
+positivity is what makes the eigenvalues real~\cite{scope}.
+
+\emph{Capped masses} (also Ref.~\cite{source}'s term; a convexity bound). The twelfth moments are bounded by
+$m_J=1.0657205$ and $m_N=0.2783155$. Weights $t_i\le h$ with total mass at
+most $m$ have their $r$th powers maximized by filling bars to the cap,
+\capbars:
+\begin{equation}
+ \sum_it_i^r\le\mathcal C(m,h,r)=qh^r+(m-qh)^r,\qquad
+ q=\lfloor m/h\rfloor .
+ \label{eq:c-capped}
+\end{equation}
+
+\emph{The trial vector.} One matrix-product vector on $72$ sites, with real
+integer tensors $A_s$ of bond dimension $26$, has energy per site below
+$-\kappa$. Its norm and energy are two double-layer rings,
+\begin{equation}
+ \begin{gathered}
+ \langle\psi|\psi\rangle=\mpsnorm0=\Tr T^{72},\\
+ \langle\psi|H|\psi\rangle=72\,\mpsnorm1 .
+ \end{gathered}
+ \label{eq:c-trial}
+\end{equation}
+The virtual space carries four spin-$\frac12$, three spin-$\frac32$ and one
+spin-$\frac52$ multiplets, $4\cdot2+3\cdot4+6=26$. The contraction splits
+into blocks of dimension at most $162$, evaluated in exact integers. The
+outcome, $E_0(72)<-72\kappa$, means that one Boltzmann factor of $Z_{72}(b)$
+exceeds one, so
+\begin{equation}
+ Z_{72}(b)>1\quad\text{for every }b>0 .
+ \label{eq:c-z72}
+\end{equation}
+
+\emph{A dominant eigenvalue.} Suppose every eigenvalue in $J$ had
+$|\lambda|\le\ell=0.999$. The capped-mass bound applied to $J$ and to the
+three copies of $N$ would give $Z_{72}(49/4)\le0.931<1$, contradicting
+Eq.~\eqref{eq:c-z72}. Hence some $\lambda_0\in J$ has $|\lambda_0|>\ell$:
+the spectrum looks like \seedspectrum, with one tall bar.
+
+Removing $\lambda_0$ leaves the following bound on the $k$th moment of the rest:
+\begin{equation}
+ R_A(k)=3\,\mathcal C\bigl(m_N,v_N^{12},\tfrac k{12}\bigr)
+ +\bigl(m_J-\ell^{12}\bigr)^{k/12}.
+ \label{eq:c-rest}
+\end{equation}
+
+\emph{Initial defects.} The two purities at the base scale now follow, each
+keeping only the dominant term:
+\begin{equation}
+ \begin{aligned}
+ \Ps(36,b)&=\frac{\Zt42}{\Ztsq21}\ge\Bigl(1+\frac{R_A(36)}{\ell^{36}}\Bigr)^{-2}
+   =1-p_0,\\
+ \Pt(72,b)&=\frac{Z_{72}(2b)}{Z_{72}(b)^2}\ge\bigl(v_J^{72}+R_A(72)\bigr)^{-2}
+   =1-q_0 .
+ \end{aligned}
+ \label{eq:c-seed}
+\end{equation}
+The first line uses $Z_{72}\ge\lambda_0^{72}$. The second uses
+$Z_{72}(2b)>1$ from the trial vector. Numerically $p_0=0.0479$ and
+$q_0=0.1815$.
+
+\section{Six doublings}\label{app:c-doubling}
+The thermal defect $q_0$ exceeds the diagonal threshold
+$\varepsilon_*\simeq0.127$ of Ref.~\cite{scope}. A single common $\varepsilon$
+would therefore not start the iteration. The coupled update keeps the two
+defects apart instead:
+\begin{equation}
+ \begin{aligned}
+ p_{j+1}&=\bigl\lceil f\bigl(1-(1-p_j)^2(1-q_j)\bigr)\bigr\rceil_7,\\
+ q_{j+1}&=\bigl\lceil f\bigl(1-(1-q_j)^2(1-p_{j+1})\bigr)\bigr\rceil_7,
+ \end{aligned}
+ \label{eq:c-update}
+\end{equation}
+These are moves~1--4 of the proof map of Ref.~\cite{main}, with each output
+rounded up to a multiple of $10^{-7}$.
+
+\begin{proofdiagram}
+\begin{tikzpicture}[x=.95cm,y=1.55cm,font=\scriptsize]
+ % log10 of the defects; data from Eq. (c-update), recomputed exactly
+ \def\ps{-1.320,-1.218,-1.163,-1.147,-1.199,-1.425,-2.073}
+ \def\qs{-.741,-.761,-.787,-.840,-.977,-1.351,-2.260}
+ \draw[black!40,densely dashed,line width=.35pt] (0,-2)--(6,-2)
+   node[right,black!60] {$10^{-2}$};
+ \draw[black!40,densely dotted,line width=.35pt] (0,-.895)--(6,-.895)
+   node[right,black!60] {$\varepsilon_*$};
+ \foreach \v [count=\i from 0] in \ps{\ifnum\i>0 \draw[mpored,line width=.7pt] ({\i-1},\pl)--(\i,\v);\fi
+   \fill[mpored] (\i,\v) circle[radius=1.3pt]; \xdef\pl{\v}}
+ \foreach \v [count=\i from 0] in \qs{\ifnum\i>0 \draw[mpoblue,line width=.7pt] ({\i-1},\ql)--(\i,\v);\fi
+   \fill[mpoblue] (\i,\v) circle[radius=1.3pt]; \xdef\ql{\v}}
+ \node[mpored,anchor=north] at (2.5,-1.19) {$p_j$ (spatial)};
+ \node[mpoblue,anchor=south] at (1.5,-.76) {$q_j$ (thermal)};
+ \foreach \n [count=\i from 0] in {36,72,144,288,576,1152,2304}{
+   \node[black!60] at (\i,-2.42) {$\n$};}
+ \node[black!60,anchor=east] at (-.25,-2.42) {$n$};
+\end{tikzpicture}
+\end{proofdiagram}
+\noindent The figure plots the defects on a logarithmic scale against the
+length $n_j=36\cdot2^j$; the inverse temperature doubles alongside.
+\begin{itemize}
+\item The thermal defect falls from the first step.
+\item The spatial defect first \emph{rises}, to $0.071$ at $j=3$: at small
+$n$ the coupling identity costs more than squaring gains.
+\item Both then collapse together and cross $10^{-2}$ at the last step,
+\begin{equation}
+ \begin{gathered}
+ 1-\Ps(2304,784)\le0.0084513,\\ 1-\Pt(4608,784)\le0.0054986 .
+ \end{gathered}
+ \label{eq:c-final}
+\end{equation}
+\end{itemize}
+This recovers the initial estimate of Ref.~\cite{main} (Proposition~5.5 of Ref.~\cite{source}); re-evaluating the recurrence from the rational definitions of $p_0$ and $q_0$ confirms agreement digit for digit.
+
+\emph{The weaker initial estimate.} Ref.~\cite{source} also certifies
+$\Ps(60,105/4),\ \Pt(120,105/4)>7/8$. That estimate uses a table at $b=21/2$ for
+$n\le10$, three twists, the trial vector at $N=120$, and a temperature lift
+$\sum z_i^{5/2}\le(\sum z_i)^{5/2}$. It gives the weaker bound
+$\Delta_L>\frac4{105}\log\frac{80}{79}$ for every even $L\ge60$.
+
+\section{Model-Dependent vs Universal Components}\label{app:c-general}
+Each ingredient is a closed network, and only a few of them depend on the
+model.
+\begin{itemize}
+\item \emph{Model independent:} the uniformization of Eq.~\eqref{eq:c-poisson},
+the orbit reduction, the filters of Eq.~\eqref{eq:c-filter}, the capped
+masses, and the doubling of Eq.~\eqref{eq:c-update}.
+\item \emph{Model specific:}
+ \begin{itemize}
+ \item the symmetry group that splits the spectrum into sectors, which
+ for spin~1 makes $N$ appear three times;
+ \item one good trial vector;
+ \item the sizes at which the filters isolate one eigenvalue.
+ \end{itemize}
+\end{itemize}
+For spin~1 those sizes are rings of twelve sites, $3^{12}\simeq5\times10^5$
+states. For spin~2 the same rings have $5^{12}\simeq2.4\times10^8$ states,
+and the correlation length is roughly eight times longer. That cost is the
+main obstacle to a spin-2 certificate.
+\begin{thebibliography}{5}
+\bibitem{main}
+Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime
+tensor networks}, \texttt{outputs/thermal-mpo-gap-note.tex} (2026).
+\bibitem{scope}
+Companion note, \emph{Scope of the two-purity method},
+\texttt{outputs/thermal-mpo-gap-scope.tex} (2026).
+\bibitem{source}
+OpenAI, \emph{The periodic spin-one Haldane gap}, manuscript dated
+September 24, 2026, Secs.~3--5 and Appendices A--C.
+\bibitem{foxglynn}
+B. L. Fox and P. W. Glynn, Computing Poisson probabilities,
+Commun. ACM \textbf{31}, 440 (1988).
+\end{thebibliography}
+\end{document}

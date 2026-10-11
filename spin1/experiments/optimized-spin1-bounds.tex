@@ -1,0 +1,1492 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,booktabs,hyperref}
+\newtheorem{proposition}{Proposition}
+\newcommand{\Tr}{\operatorname{Tr}}
+\title{Stronger spin-one gap bounds from the same finite certificates}
+\author{Computational research note}
+\date{8 October 2026}
+\begin{document}
+\maketitle
+
+\noindent
+The exact Julia scalar calculations and the temperature-lifting argument
+below, combined with the analytic transfer and bootstrap statements in
+\emph{The periodic spin-one Haldane gap}, give
+\[
+ \boxed{\gamma_L>0.072901771\quad\text{for every even }L\ge36.}
+\]
+Here $H_L=\sum_{j=1}^L\mathbf S_j\cdot\mathbf S_{j+1}$, $\mathbf S^2=2I$,
+and the bond coupling is one. The ground state is unique in this range.
+A simpler temperature-lifting choice gives the readable statement
+$\gamma_L>7/100=0.07$ in the same range. The calculations reuse the existing
+trial vector, thermal contractions, shift, and polynomial filters. The new
+bound combines the stronger thermal data with the length-120 trial and
+raises inverse temperature before reducing the information to two purities.
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+Calculation & Gap lower bound & Even lengths covered\\
+\midrule
+Published source 1 & $\log(20)/784\simeq0.003821087$ & $L\ge2304$\\
+Published source 2 & $(4/105)\log(80/79)\simeq0.000479192$ & $L\ge60$\\
+Improved source 1 & $0.016978269$ & $L\ge36$\\
+Improved source 2 & $0.011977901$ & $L\ge60$\\
+Temperature lifting, simple & $0.070450002>7/100$ & $L\ge36$\\
+Temperature lifting, optimized & $0.072901771$ & $L\ge36$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Source 1 uses the eighteen thermal values at lengths 4--12 and the length-72
+trial certificate. Source 2 uses only nine thermal values at lengths 6, 8,
+and 10 and the length-120 trial certificate. Thus source 2 remains useful as
+the less expensive input set, even though the improved source-1 conclusion
+is stronger. The temperature-lifting calculation uses the eighteen source-1
+thermal values and the length-120 trial; the original length-72 seed covers
+the early lengths. All these finite inputs were already reproduced.
+No global optimum is claimed.
+
+\section{Comparison with the numerical bulk gap}
+For the same convention $J=1$, the large-system numerical estimates are
+\[
+ \Delta_{S=1}\simeq0.41048(6),\qquad
+ \Delta_{S=2}\simeq0.08917(4).
+\]
+These are the estimates in Table I of S.~Todo and K.~Kato,
+\href{https://arxiv.org/abs/cond-mat/9911047}{\emph{Cluster Algorithms for
+General-$S$ Quantum Spin Systems}}, Phys. Rev. Lett. \textbf{87}, 047203 (2001).
+That table reports spatial correlation lengths $6.0153(3)$ and $49.49(1)$,
+respectively. The quoted numerical uncertainties are not rigorous spectral
+enclosures. The spin-one DMRG estimate $0.41050(2)$ of White and Huse,
+\href{https://doi.org/10.1103/PhysRevB.48.3844}{Phys. Rev. B \textbf{48}, 3844
+(1993)}, is consistent with this scale.
+
+The temperature-lifting lower bound is approximately $17.76\%$ of the
+numerical bulk gap, compared with $4.14\%$ for our earlier $0.016978269$
+bound and $0.93\%$ for the published $\log(20)/784$ bound.
+It improves our earlier bound by about $4.29$ and the published bound by
+about $19.1$, while remaining about $5.63$ times below the numerical value.
+These statements compare
+a uniform bound on finite periodic chains with the numerical bulk benchmark;
+we have not independently reproduced the quoted thermodynamic-limit gap.
+
+The selected quantity $A_j=(1-p_j)^2(1-q_j)$ below is a dimensionless
+\emph{purity lower bound}, not a gap estimate. Along the successful bootstrap,
+where both length and inverse temperature grow as $2^j$, the controlled
+defects tend to zero and $A_j\to1$. The gap information is in the rate,
+through $\log[A_j/(1-A_j)]/b_j$, rather than the limiting value $1$ itself.
+This is not a statement that purity tends to one at fixed temperature as
+length grows.
+
+\section{Input scope and provenance}
+The immutable upstream source is the OpenAI math repository, commit
+\texttt{adc7f1241b42e322a6451854ab7e4b4c146bf78a}, directory
+\texttt{The-periodic-spin-one-Haldane-gap-September-24-2026} under
+\texttt{preprints}. The relevant arguments are in
+\texttt{build/initialization.tex} and \texttt{build/bootstrap.tex}.
+The previously completed Julia reproduction checks all finite thermal and
+trial integers against the upstream evidence. The new scalar calculation
+checks that reproduction's implementation and component hashes before using
+the input data. It does not describe reusing those outputs as fresh thermal
+contraction.
+
+Let $a=700741/500000$ and
+\[
+ Z_n(b)=\Tr e^{-b(H_n+naI)},\qquad
+ S(n,b)=\frac{Z_{2n}(b)}{Z_n(b)^2},\qquad
+ T(n,b)=\frac{Z_n(2b)}{Z_n(b)^2}.
+\]
+The paper's transfer theorem supplies the real spatial eigenvalue lists and
+their sector multiplicities. Its length-72 and length-120 trial inequalities
+give $Z_{72}(b)>1$ and $Z_{120}(b)>1$ for every $b>0$.
+
+\section{A compact improved source-1 initialization}
+Retain the original filters and their original error allowances:
+\begin{align*}
+ F_J(x)&=x^4(7+17x-280x^2-185x^3+1000x^4)^2,\\
+ F_N(x)&=x^4(12-394x^2+1000x^4)^2,\\
+ B_J&=318604.54848175,\qquad B_N=48169.880699.
+\end{align*}
+Every terminating decimal in a defining formula here denotes an exact
+rational. Choose
+\[
+ U=1.001351,\quad V=0.871256,\quad \ell=0.999997,
+ \qquad m_J=1.0657205,\quad m_N=0.2783155.
+\]
+The verifier checks $F_J(\pm U)>B_J$ and $F_N(\pm V)>B_N$.
+It expands each $F(\pm(v+y))$ and checks every nonconstant coefficient is
+nonnegative. This verifies both entire exterior rays, so the paper's
+polynomial-filter lemma gives $|\lambda|<U$ in $J$ and $|\lambda|<V$ in $N$.
+
+Write
+\[
+ \mathcal C(m,h,r)=\lfloor m/h\rfloor h^r+
+          (m-\lfloor m/h\rfloor h)^r,
+ \qquad B(k)=3\mathcal C(m_N,V^{12},k/12).
+\]
+The same capped-mass argument as in the paper now verifies
+\[
+ \mathcal C(m_J,\ell^{12},6)+B(72)<1,
+ \qquad \ell^{12}<m_J<2\ell^{12}.
+\]
+Since $Z_{72}(49/4)>1$, one spatial eigenvalue in $J$ has modulus greater
+than $\ell$. Removing it leaves twelfth-moment mass at most
+$m_J-\ell^{12}$. Hence, for $k=36,72$,
+\[
+ R_A(k)=B(k)+(m_J-\ell^{12})^{k/12}
+\]
+bounds the residual $k$th moment. At $(n,b)=(36,49/4)$ we therefore have
+\begin{align*}
+ 1-S(36,b)&\le p_0=1-(1+R_A(36)/\ell^{36})^{-2},\\
+ 1-T(72,b)&\le q_0=1-(U^{72}+R_A(72))^{-2}.
+\end{align*}
+Their numerical values are about $0.0449638076$ and $0.176903757$.
+These initial bounds need not satisfy the paper's common-defect bootstrap
+hypotheses. The coupled update permits unequal defects.
+
+\section{Cover the early lengths before applying the uniform theorem}
+The following finite-prefix version is a direct consequence of the paper's
+coupled update, purity interpolation, and uniform bootstrap proposition.
+
+\begin{proposition}
+Suppose $p_j,q_j$ are valid upper bounds on the spatial and temporal defects
+at $(n_j,b_j)=(2^jn_0,2^jb_0)$ for $0\le j\le K$. Put
+$A_j=(1-p_j)^2(1-q_j)$ and suppose $A_j>1/2$ for $j<K$.
+Suppose $u=\max(p_K,q_K)$ and $C$ satisfy
+\[
+ 0<u<1/6,\quad
+ G(u):=\tfrac12\big((1-u)^{-1}+(1-u)^{-2}+(1-u)^{-3}\big)^2\le C,
+ \quad Cu<1,\quad C(1-3u)>3.
+\]
+If $g$ is strictly smaller than every member of
+\[
+ \left\{\frac{\log(A_j/(1-A_j))}{b_j}:0\le j<K\right\}
+ \cup\left\{\frac{\log(1/(Cu))}{b_K}\right\},
+\]
+then the ground state is unique and $\gamma_L>g$ for every even $L\ge n_0$.
+\end{proposition}
+
+\begin{proof}
+For $n_j\le L\le2n_j$, the interpolation inequality gives
+$T(L,b_j)\ge A_j^{L/(2n_j)}\ge A_j>1/2$. The largest physical Gibbs weight
+$w_0$ is at least this purity, so it is unique. For a weight $w_1$ at the
+first excited energy,
+\[
+ e^{-b_j\gamma_L}=w_1/w_0\le(1-w_0)/w_0\le(1-A_j)/A_j.
+\]
+This proves the required estimate on each finite interval. The original
+uniform bootstrap proposition covers every even $L\ge n_K$.
+The intervals $[n_j,2n_j]$ for $j<K$ and the last half-line cover all
+even lengths at least $n_0$.
+\end{proof}
+
+Use the original update $f(u)=u^2/[2(1-u)^2]$, retaining the two defects:
+\begin{align*}
+ p_{j+1}&=\left\lceil f(1-(1-p_j)^2(1-q_j))\right\rceil_{100},\\
+ q_{j+1}&=\left\lceil f(1-(1-q_j)^2(1-p_{j+1}))\right\rceil_{100},
+ \qquad\lceil x\rceil_{100}=10^{-100}\lceil10^{100}x\rceil.
+\end{align*}
+For the compact constants, take $K=9$ and $C=5$. The verifier checks all
+uniform-theorem hypotheses and all intervening length intervals. The
+following entries are explanatory approximations; full rational bounds are
+in the certificate.
+
+\begin{center}
+\begin{tabular}{rrrr}
+\toprule
+$j$ & $p_j$ & $q_j$ & $\log(A_j/(1-A_j))/b_j$\\
+\midrule
+0 & $0.0449638076$ & $0.176903757$ & $0.0900056767$\\
+1 & $0.0551175965$ & $0.158002808$ & $0.0452204114$\\
+2 & $0.0545331044$ & $0.120970423$ & $0.0265228864$\\
+3 & $0.0371649174$ & $0.0592125617$ & $0.0195936555$\\
+4 & $0.0107429704$ & $0.0100975890$ & $0.0175199506$\\
+5 & $0.0005203714$ & $0.0002212682$ & $0.0170259785$\\
+6 & $7.97715\,10^{-7}$ & $9.83379\,10^{-8}$ & $0.0169496858$\\
+7 & $1.43443\,10^{-12}$ & $1.93410\,10^{-14}$ & $0.0169454007$\\
+8 & $4.17084\,10^{-24}$ & $7.48147\,10^{-28}$ & $0.0169453721$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+At $j=9$, $n_9=18432$, $b_9=6272$, and
+$u\simeq3.47981322\,10^{-47}$. The uniform tail bound exceeds
+$0.016799278>1/60$. All earlier interval bounds exceed $1/60$ as well.
+This proves the compact claim.
+
+\section{Tighter constants and the less expensive branch}
+Exact bisection on a grid of spacing $10^{-12}$ gives valid source-1 choices
+\[
+ U=1.001350644012,\quad V=0.871255704653,
+ \quad\ell=0.999997937629.
+\]
+Eleven coupled updates, upward rounding at spacing $10^{-512}$, and an
+outward-rounded $C\ge G(u)$ then establish the earlier improved bound
+$0.016978269$. The very fine rounding avoids a floor in the rapidly
+squaring defects; it concerns only scalar integers, not tensor dimensions.
+
+For source 2 the script preserves the filters $x^6(-2+10x^2)^2$ and
+$x^6(-25+100x^2)^2$, the thermal error $10^{-5}$, the moment degrees, and
+the temperature multiplier $5/2$. It sharpens the two cutoffs to
+$U=1.002408155316$, $V=0.886411420539$, uses the sector-center-plus-error
+moment bounds directly, and obtains rational upper bounds
+\[
+ D=1.445289213010,\quad E=1.198064585836,\quad R_q=0.064761703869.
+\]
+As in the original proof, $D^2>m^5$, $E^2>p^5$, and
+$R_q^2>(q-1)^5$. Set $\tau=(D+11E)/12$ and $\tau_0=(D+3E)/4$.
+The original four-vertex residual bound $R(t)$ is repeatedly used to
+upgrade the dominant weight whenever $s^4+R(t)^2<1$.
+The final lower bound is $t=0.998895181835$; the resulting initial defects
+are approximately $0.1209336963$ and $0.1179460383$.
+Applying the same finite-prefix proposition gives $\gamma_L>0.011977901$
+for every even $L\ge60$.
+
+For comparison, merely retaining the original exact seeds and improving
+the bootstrap gives $0.004710839$ at $L\ge36$ from source 1 and
+$0.006924382$ at $L\ge60$ from source 2. Thus both tighter initialization
+and better use of the coupled recurrence contribute to the improvement.
+
+\section{Temperature lifting before the purity bootstrap}
+\label{sec:temperature-lifting}
+
+The following recombination of the same finite inputs gives a larger gain.
+It generalizes the paper's source-2 temperature argument to the stronger
+source-1 moments, retaining the threefold sector multiplicity at every
+required moment order.
+
+Use the tighter rational $U,V,m_J,m_N$ above and put $b_0=49/4$.
+For every even $k\ge12$, capped masses give
+\begin{align*}
+ \mathcal J(k)&=U^k+(m_J-U^{12})^{k/12},\\
+ \mathcal N(k)&=V^k+(m_N-V^{12})^{k/12},\\
+ Z_k(b_0)&\le M_k:=\mathcal J(k)+3\mathcal N(k),\qquad
+ Z_k(b_0,P)\le\mathcal J(k).
+\end{align*}
+Indeed $U^{12}<m_J<2U^{12}$ and $V^{12}<m_N<2V^{12}$.
+The last inequality uses $Z_k(b_0,P)=J_k-N_k$ and $N_k\ge0$.
+
+Choose $r\ge1$ and an even $12\le k\le60$. Because each twisted partition
+function is itself the Gibbs trace of a self-adjoint Hamiltonian, raising
+its positive Boltzmann factors to the power $r$ gives
+\[
+ Z_k(rb_0)\le D:=M_k^r,\qquad
+ Z_k(rb_0,P)\le E:=\mathcal J(k)^r.
+\]
+Outward rational upper bounds may replace $D,E$. In the new spatial
+operator at $b=rb_0$, set $w_i=|\lambda_i(b)|^k$ and
+\[
+ h=60/k\ge1,\qquad \tau=(D+3E)/4.
+\]
+Then $\sum_iw_i\le D$, the $J$-sector mass is at most $\tau$, and
+the existing length-120 trial gives
+\[
+ \sum_iw_i^{2h}=Z_{120}(b)>1.
+\]
+
+Choose a rational $t>0$ with $Dt^{2h-1}<1$ and $3t>D$.
+Some weight $w_0>t$ exists, since otherwise the last sum is at most
+$Dt^{2h-1}<1$. This weight belongs to $J$: every $N$ weight occurs
+three times, which would contradict the total mass bound.
+After removing $w_0$, let $x$ be the remaining $J$ mass. Then
+$0\le x\le\tau-t$, while the full remaining $N$ mass is at most
+$D-t-x$. For every $s\ge1$, the residual $s$th moment is at most
+\[
+ R_s(t)=\max\left\{
+   3\left(\frac{D-t}{3}\right)^s,
+   (\tau-t)^s+3\left(\frac{D-\tau}{3}\right)^s
+ \right\}.
+\]
+To prove this, bound each sector list by the $s$th power of its total mass.
+The three identical $N$ lists contribute at most
+$3[(D-t-x)/3]^s$. The resulting convex function of $x$ attains its maximum
+at one of the two endpoints. All quantities are nonnegative because
+$t\le\tau\le D$.
+
+We may repeatedly replace $t$ by a larger rational $t'$ whenever
+\[
+ (t')^{2h}+R_{2h}(t)<1.
+\]
+If $w_0\le t'$, this inequality would contradict $Z_{120}(b)>1$.
+Using $R_{2h}$ directly preserves more multiplicity information than
+squaring an upper bound on $R_h$.
+Consequently a spatial seed at length 60 is
+\[
+ S(60,b)\ge\left(1+\frac{R_h(t)}{t^h}\right)^{-2}.
+\]
+
+The temporal seed uses the same trial in the physical spectrum.
+Write $Q=M_{120}>1$. At $b_0$, the ground Boltzmann factor $z_0>1$
+and the total mass is at most $Q$. Hence
+\[
+ \sum_{i>0}\frac{z_i}{z_0}\le Q-1,\qquad
+ \sum_{i>0}\left(\frac{z_i}{z_0}\right)^r\le(Q-1)^r.
+\]
+This yields the second seed without a new contraction:
+\[
+ T(120,b)\ge\bigl(1+(Q-1)^r\bigr)^{-2}.
+\]
+The spatial weights $w_i$ and physical Boltzmann factors $z_i$ play
+different roles; the proof uses the original transfer theorem to connect
+their partition functions.
+
+\begin{center}
+\begin{tabular}{rrrrr}
+\toprule
+$k$ & $r$ & $1-S(60,rb_0)$ upper & $1-T(120,rb_0)$ upper & Gap bound\\
+\midrule
+30 & $2$ & $0.0307608679$ & $0.0590740709$ & $0.070450002$\\
+28 & $17/8$ & $0.0305302052$ & $0.0479556776$ & $0.072901771$\\
+\bottomrule
+\end{tabular}
+\end{center}
+The displayed defect bounds are rounded upward for readability; the
+calculation uses full rational enclosures. Ten coupled updates use an
+upward rounding grid $10^{-2048}$, keeping its floor below the relevant
+defects, followed by the uniform tail theorem. This covers even $L\ge60$.
+The earlier source-1 seed gives an interval bound greater than $0.09$ on
+every even $36\le L\le72$. Combining these overlapping ranges establishes
+both displayed bounds for every even $L\ge36$.
+The simpler row just doubles inverse temperature and uses $h=2$; its
+residual estimates therefore involve only second and fourth powers.
+The numerical discovery script scans even $k$ from 12 to 60 and $r$ from
+1 to 3 in increments of $1/40$. Its output is not a certificate; the two
+selected parameter choices are replayed through the rational verifier.
+
+\section{Reproduction and the arithmetic trust boundary}
+Run from the repository root:
+\begin{verbatim}
+julia --startup-file=no --project=spin1 \
+  spin1/experiments/optimize_bounds.jl
+julia --startup-file=no --project=spin1 \
+  spin1/experiments/test_bounds.jl
+julia --startup-file=no --project=spin1 \
+  spin1/experiments/temperature_lift.jl
+julia --startup-file=no --project=spin1 \
+  spin1/experiments/test_temperature_lift.jl
+\end{verbatim}
+The output \texttt{spin1/experiments/bounds.json} contains the complete
+initialization parameters, every rational defect pair, interval coverage,
+the tail-theorem parameters, logarithm enclosures, and source hashes.
+All accepting comparisons use integers or rationals. Displayed floating-point
+numbers are diagnostic only.
+The new \texttt{temperature-lift.json} records the lifted moment bounds,
+dominant-weight refinements, both bootstrap chains, and the early-length
+bridge, together with script and input hashes. Fractional powers are
+enclosed using integer roots: for $x\ge0$ and $r=a/b\ge0$, the verifier
+checks rational endpoints $l,u$ through $l^b\le x^a\le u^b$.
+No floating-point comparison accepts a certificate.
+
+To enclose a logarithm, range-reduce $x=2^ky$ with $1\le y<2$, round $y$
+outward to a rational grid, and use $z=(y-1)/(y+1)$ in
+\[
+ \log y=2\sum_{j=0}^{M-1}\frac{z^{2j+1}}{2j+1}+E_M,\qquad
+ 0\le E_M\le\frac{2z^{2M+1}}{(2M+1)(1-z^2)}.
+\]
+Here $M=40$ and $0\le z\le1/3$; $\log2$ is treated by the same formula.
+The final rational claim is strictly below all computed lower endpoints.
+
+The tests independently rearrange the coupled updates, verify continuous
+coverage of lengths, check the seed inequalities and reject unsafe cutoffs,
+rebuild all 27 input thermal enclosures, and check both variational signs.
+They also use high-precision floating-point logarithms as an independent
+numerical control, not as certificate authority.
+This is exact finite arithmetic combined with the paper's analytic
+arguments; it is not a Lean formalization of the transfer theorem or of
+the infinite induction. The physical trial still has bond dimension 26.
+
+\section{Spin-two variational certificates and the remaining thermal input}
+The spin-two extension uses $\mathbf S^2=6I$ and the same coupling $J=1$.
+The scalar coupled recurrence and the finite-prefix argument above apply
+once its model-specific thermal and variational inputs have been supplied.
+The smaller numerical gap and longer correlation length make those inputs
+more demanding; the spin-one gap constant cannot simply be rescaled.
+
+The first Julia search used virtual space
+\[
+ V_0\oplus2V_1\oplus2V_2\oplus V_3,\qquad D=24,
+\]
+with 29 real reduced coefficients. Exact highest-weight equations construct
+integer polynomial tensors. After rounding the numerical coefficients to
+integers, the physical matrices have the form
+\[
+ A_m=\sqrt{\binom4{2+m}}\,P_m,\qquad
+ P_m\in\mathbb Z^{24\times24},\quad -2\le m\le2.
+\]
+The square roots cancel in the norm and bond-energy contractions, leaving
+integer transfer blocks. Their largest dimension is 106. The finite
+certificate verifies
+\[
+ \frac{\langle\psi_N,H_N\psi_N\rangle}
+ {N\langle\psi_N,\psi_N\rangle}<-4.7595
+ \qquad(N=128,256,512).
+\]
+The corresponding energy densities, shown only as approximations, are
+$-4.7595998798$, $-4.7595993033$, and $-4.7595993033$.
+Thus $E_0(N)<-4.7595N$ and the shifted partition function exceeds one
+at each of these lengths for every positive inverse temperature.
+Direct four-site integer amplitudes agree with the transfer contraction;
+an independent ITensors MPO/MPS calculation agrees in total energy within
+$7.2\times10^{-15}$.
+
+The spin-two numerical bulk energy density in Todo--Kato is
+$-4.761249(6)$, so this first trial is still roughly $0.00165$ per bond above
+that reference. Its energy certificate does not certify a gap.
+An improved search uses analytic derivatives of both transfer fixed points
+and factors the energy channel into small multiplicity matrices. At virtual
+dimension $137$, quantization to integer coefficients followed by exact
+representation checks and outward-rounded Arb contractions gives the strict
+finite trial-energy intervals
+\begin{center}
+\begin{tabular}{rcc}
+\toprule
+$N$ & Lower endpoint & Upper endpoint\\
+\midrule
+128 & $-4.761268026389$ & $-4.761268026385$\\
+256 & $-4.761228827807$ & $-4.761228827803$\\
+512 & $-4.761228489623$ & $-4.761228489619$\\
+\bottomrule
+\end{tabular}
+\end{center}
+These enclose the normalized \emph{trial} energy, not the exact ground energy.
+In particular, $E_0(N)<-4.76122N$ at all three lengths. The largest reduced
+matrix is $529\times529$, in place of the full $18769\times18769$ transfer
+matrix. The verifier checks exact covariance, complete irreducible bases,
+and every highest-weight image before evaluating the long-chain traces.
+The full run took about 489 seconds. The integer witness and strict rational
+intervals are saved in \texttt{spin2/results/trial-137-certificate.json}.
+A further numerical search at dimension $197$ gives energy per bond
+$-4.7612412068$. Enlarging the multiplicity spaces to dimension $295$
+and using a regularized transfer-metric preconditioner gives
+$-4.7612463445$. These two values are numerical search results.
+The $D=295$ coefficients are saved in
+\texttt{spin2/results/trial-295-refined.json}.
+
+The larger verifier uses exact tensor covariance and complete irreducible
+bases to determine the reduced channels from highest-weight coefficients.
+Schur's lemma determines the other weights. A further exact involution,
+$X\mapsto UX^{\mathsf T}U^{\mathsf T}$ with $U$ a spin rotation by $\pi$,
+splits these matrices into two smaller blocks. The implementation checks
+commutation of both reduced channels with this involution over the rationals.
+Independent full-image checks and the split and unsplit contractions agree
+in all 92 certificate tests. Sparse ladder arithmetic reduced the measured
+$D=295$ matrix-construction time from about 390 to 62 seconds; this comparison
+does not include the subsequent interval matrix powers.
+
+The larger finite-energy certificate has now completed. Its strict trial-energy
+intervals are
+\begin{center}
+\begin{tabular}{rcc}
+\toprule
+$N$ & Lower endpoint & Upper endpoint\\
+\midrule
+128 & $-4.761288829076$ & $-4.761288829072$\\
+256 & $-4.761247250800$ & $-4.761247250796$\\
+512 & $-4.761246333989$ & $-4.761246333985$\\
+1024 & $-4.761246333503$ & $-4.761246333499$\\
+\bottomrule
+\end{tabular}
+\end{center}
+Thus $E_0(N)<-4.7612463N$ at all four lengths. The largest arithmetic block
+has dimension 978, reduced from 1921 by the verified involution. The complete
+run took about 549 seconds with four FLINT threads. The integer witness,
+source hashes, and interval results are in
+\texttt{spin2/results/trial-295-symmetric-certificate.json}.
+
+No spin-two finite-temperature purity seed has yet been certified.
+The existing periodic DMRG pilot gives gaps near $0.54557$ at $L=8$ and
+$0.3109$ at $L=16$; the latter has appreciable residuals. These short-chain
+numbers should not be used as estimates of the $0.08917$ bulk gap.
+
+The scalar screening has also been relaxed from requiring both purities to
+exceed $0.99$. Exact recurrence checks admit, for example, target purities
+$(S,T)\ge(0.95,0.83)$. If such targets were realized, the necessary energy
+screen would be
+\[
+ \frac{\log[T/(1-T)]}{\Delta_{2n}}\le\beta
+ \le\frac{-\log(ST)}{E_0(2n)-2E_0(n)},
+\]
+for positive denominator. This permits the energy-mismatch-to-gap ratio to
+be as large as $0.14986$, versus $0.00437435$ for the old $0.99$ targets.
+It is only a necessary screen; neither target pair has been established for
+spin two, and the current small-chain pilot fails even the relaxed screen.
+
+The scripts \texttt{spin2/scripts/certify\_trial.jl} and
+\texttt{spin2/scripts/bootstrap\_screen.jl} reproduce these two steps.
+The full integer trial parameters, norms, energy numerators, and block
+contributions are retained in \texttt{spin2/results/trial-certificate.json}.
+
+\subsection{A conditional criterion using one thermal upper bound}
+The improved trial permits a useful simplification of the thermal task.
+Write $\widehat Z_L(b)=\Tr e^{-b(H_L+aL)}$; scalar shifts preserve the purities
+and rescale the self-adjoint spatial transfer operator.
+
+\begin{proposition}[One-trace temperature lifting]
+Let $n\ge4$ be even, let $h,r\ge1$ be integers, and suppose
+\[
+ \widehat Z_n(\beta)\le U,\qquad E_0(2hn)<-2hna,\qquad U>1.
+\]
+Set $D=U^r$ and $Q=U^{2h}$. Choose $t_0>0$ satisfying
+$Dt_0^{2h-1}<1$ and $2t_0>D$. One may take $t=t_0$, or any
+$t\in[t_0,1]$ satisfying $t^{2h}+(D-t)^{2h}<1$. Then
+\[
+ S(hn,r\beta)\ge
+ \left[1+\left(\frac{D-t}{t}\right)^h\right]^{-2},\qquad
+ T(2hn,r\beta)\ge[1+(Q-1)^r]^{-2}.
+\]
+\end{proposition}
+\begin{proof}
+The physical power inequality gives $\widehat Z_n(r\beta)\le U^r=D$.
+For the shifted spatial transfer eigenvalues at $r\beta$, put
+$w_i=|\lambda_i|^n$. Thus $\sum_iw_i\le D$ and
+$\sum_iw_i^{2h}=\widehat Z_{2hn}(r\beta)>1$ by the variational hypothesis.
+If $\max_iw_i\le t_0$, then the latter sum is at most
+$Dt_0^{2h-1}<1$, a contradiction. The largest weight therefore exceeds
+$t_0>D/2$. On this interval, $x^{2h}+(D-x)^{2h}$ is increasing.
+Bounding the remaining $2h$-moment by $(D-x)^{2h}$ proves that the largest
+weight also exceeds any admissible $t$. The remaining $h$-moment is at most
+$(D-t)^h$, proving the spatial estimate.
+
+At inverse temperature $\beta$, the spatial moment inequality gives
+$\widehat Z_{2hn}(\beta)\le U^{2h}=Q$. Its ground-state Boltzmann weight
+exceeds one, so the sum of all excited weights relative to the ground
+weight is less than $Q-1$. Raising inverse temperature by the integer $r$
+bounds this sum by $(Q-1)^r$. The squared ground-state probability alone
+gives the stated thermal-purity bound.
+\end{proof}
+
+For example, with $n=128$, $\beta=32$, $h=2$, $r=3$, and $U=1.08$, exact
+rational scalar checks give the \emph{conditional} conclusion
+\[
+ \Delta_L>0.006039844\qquad\text{for every even }L\ge256.
+\]
+The length-512 variational hypothesis is supplied by the certificate above
+with $a=4.76122$. However, at this shift the length-128 trial already gives
+\[
+ \widehat Z_{128}(32)>
+ e^{32\cdot128(4.761268026385-4.76122)}>1.1967>1.08.
+\]
+Thus this illustrative thermal target is \textbf{ruled out}, rather than
+merely unverified. Larger thermal lengths and more accurate trial shifts
+must be explored. The proposition supplies a family of conditional tests,
+not a spin-two gap proof.
+The script \texttt{spin2/scripts/one\_trace\_target.jl} and its 63 tests
+check the conditional scalar argument.
+
+The new length-1024 certificate supplies the trial hypothesis for
+\[
+ n=256,\qquad\beta=64,\qquad h=2,\qquad r=3,
+ \qquad a=4.7612463.
+\]
+At these parameters, the still-unproved thermal inequality
+$\widehat Z_{256}(64)\le1.08$ would imply
+\[
+ \Delta_L>0.003019921\qquad\text{for every even }L\ge512.
+\]
+This target passes the preceding variational rejection screen; that necessary
+check does not establish the thermal inequality. The exact conditional
+calculation is saved in \texttt{spin2/results/one-trace-current-targets.json}.
+
+\subsection{Thermal upper bounds and compression}
+Split the even ring into disjoint odd and even bond layers, $H=A+B$.
+The Araki--Lieb--Thirring inequality and the product-formula limit imply
+\[
+ Z_N(\beta)\le
+ \Tr\left(e^{-\beta A/m}e^{-\beta B/m}\right)^m,
+ \qquad m\in\mathbb N.
+\]
+Thus a certified contraction of the right side needs no separate estimate
+of the Trotter error. A Julia reference implementation uses exact rational
+two-site spectral projectors and outward-rounded Arb products in every
+magnetization sector. Its 42 checks include the independently known
+four-site spectrum. It currently treats only reference sizes.
+
+After the Marshall transformation the gates are nonnegative entrywise.
+A candidate compression can therefore be replaced by rational nonnegative
+factors satisfying $M\le UV$ entrywise, checked exactly; subsequent positive
+contractions preserve this inequality. A four-site prototype bounds the
+thermal amplitude in this way. At $\beta=4$, its upper bound exceeds the
+uncompressed Trotter trace by a factor about $1.00844$ at bond dimension 569
+(the full cut has dimension 625). This establishes a small-system compression
+certificate, but not yet an efficient scheme for the large thermal traces
+needed above.
+
+Repeated compression is more demanding than this single-compression test.
+Starting at $\beta=1/8$ and making five squarings, with compression at the
+initial stage and after each squaring, gives the following four-site results
+at $\beta=4$, with 64 Trotter steps. Each entry is the certified upper trace
+divided by the uncompressed Trotter trace; displayed ratios are approximate.
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Compression certificate & Represented rank bound & Upper/reference\\
+\midrule
+Entrywise positive majorant & 569 & 3.25495415\\
+Hilbert--Schmidt error & 564 & 1.00841069\\
+Spectral majorant & 565 & 1.00388214\\
+\bottomrule
+\end{tabular}
+\end{center}
+The full four-site cut has dimension 625. These results do not establish
+the cost or accuracy of a long-chain contraction.
+
+For the second row, let $A$ be the exact Hermitian thermal amplitude and
+$B$ its Hermitian approximation. If
+$\|A-B\|_{\mathrm F}\le\varepsilon$ and $\|B\|\le b$, and a new
+approximation $C$ satisfies $\|B^2-C\|_{\mathrm F}\le\delta$, then
+\[
+ \|A^2-C\|_{\mathrm F}\le
+ \delta+\varepsilon(2b+\varepsilon).
+\]
+Indeed, writing $E=A-B$ gives
+$A^2-B^2=BE+EB+E^2$ and applying the operator/Hilbert--Schmidt norm
+inequalities proves the claim. Consequently
+\[
+ \Tr A^2\le(\|B\|_{\mathrm F}+\varepsilon)^2.
+\]
+The verifier includes outward-rounded matrix-product errors in $\delta$.
+SVD truncation respects charge and transpose parity; rational rounding
+preserves Hermiticity without doubling the represented rank.
+
+The third row uses a different induction. Suppose $M\ge0$ and its ordered
+eigenvalues dominate those of $A\ge0$. Given Hermitian $C$ and
+$\|M^2-C\|\le\delta$, put $M'=C+\delta I$. Then
+$M'\ge M^2\ge0$. The min--max principle gives
+\[
+ \lambda_i(M')\ge\lambda_i(M^2)=\lambda_i(M)^2
+ \ge\lambda_i(A)^2=\lambda_i(A^2).
+\]
+This preserves spectral domination at every squaring. The final
+$\Tr[(M')^2]$ therefore bounds the desired trace. Adding the identity costs
+at most one additional Schmidt term.
+
+Both norm certificates currently obtain an operator-norm bound by enumerating
+the four-site magnetization sectors. In the rational polynomial gauge,
+for a matrix $R$ similar to a Hermitian matrix and any strictly positive
+rational vector $v$,
+\[
+ \|R\|_{\rm physical}\le
+ \max_i\frac{(|R|v)_i}{v_i},
+\]
+where $|R|$ means entrywise absolute value. The candidate $v$ is numerical,
+but the displayed upper bound is checked rationally. Replacing this dense
+step by a sufficiently sharp long-chain norm witness remains an open computational
+task. The results are saved in
+\texttt{repeated-positive-compression.json},
+\texttt{repeated-l2-symmetric.json}, and
+\texttt{loewner-compression.json} under \texttt{spin2/results/}.
+No uniform spin-two gap has been proved by these calculations.
+
+\subsection{A local MPO norm witness and its present limitation}
+For an MPO core $W^{[j]}_{b,s,t,a}$ in an orthonormal physical basis, let
+$L_b$ denote the partial operators to its left, with $\|L_b\|\le l_b$.
+The next partial operator has matrix entries
+$X^a_{st}=\sum_bW^{[j]}_{b,s,t,a}L_b$. Hence
+\[
+ C^a_{st}=\sum_b|W^{[j]}_{b,s,t,a}|l_b,
+ \qquad
+ \|X^a\|\le\|C^a\|_2
+ \le\sqrt{\|C^a\|_1\|C^a\|_\infty}.
+\]
+The first inequality follows by bounding the norms of the physical block
+components of an input vector. Applying this recursively, also from the
+right, supplies upper bounds at every MPO cut. The calculation uses only
+local tensors. Rational square-root upper bounds are accepted by integer
+squaring comparisons.
+
+The Julia implementation \texttt{Spin2MPONorms.jl} passes 33 checks,
+including an exact norm-one result for a 128-site identity MPO and dense
+controls on random small MPOs. It currently loses too much cancellation:
+on the four-site ITensors candidates at $\beta=1$, the resulting bounds
+exceed 25 although their numerical Hilbert--Schmidt norm is one.
+These bounds concern the exact quantized candidate tensors; their error
+relative to the physical thermal operator has not been certified.
+A tighter norm construction is required before this route can provide
+the missing thermal input.
+
+\subsection{Gauge optimization and certified MPO squaring}
+A sharper norm witness regards a local core as a matrix from
+$(b,t)$ to $(a,s)$. Sequential composition bounds the full MPO norm by
+the product of these local matrix norms. Positive rational diagonal
+changes of virtual basis cancel exactly on internal bonds. Numerical
+optimization proposes these gauges and local norm bounds $\alpha_j$;
+outward-rounded Arb Cholesky accepts a bound only when
+$\alpha_j^2 I-W_j^*W_j$ (or the smaller reversed Gram matrix) is
+certainly positive definite.
+
+For the quantum-number-aware ITensors candidates at $\beta=1/8$, the
+four-site product decreases from $3.11769$ to a certified bound below
+$0.16689992$, and the eight-site product from $38.97081$ to below
+$0.04945418$. Their numerical Hilbert--Schmidt norms are one.
+At $\beta=1$, the respective certified products remain above one,
+so the method still loses too much information there. Saved exact
+rational tensors, gauges, and local bounds permit independent replay
+without trusting ITensors or a numerical eigensolver. The norm tests
+now comprise 68 passing checks.
+
+These local bounds also give a compression certificate without forming
+a four-layer transfer matrix. Let $R_a$ be the right-tail operators of
+an MPO, and suppose the coefficient map
+$v\mapsto\sum_a v_a R_a$ has norm at most $\gamma$ from Euclidean
+space to Hilbert--Schmidt space. In a separately gauged copy put
+$A_a=g_aR_a$, and suppose $\|[A_1\ \cdots\ A_D]\|\le b$. Then
+\[
+ \left\|\sum_{a,b}V_{ab}A_aR_b\right\|_{\mathrm F}
+ \le b\gamma\|V\|_{\mathrm F}.
+\]
+Indeed, factor this operator into the block row of the $A_a$ and the
+column of operators $\sum_bV_{ab}R_b$. The latter column has squared
+Hilbert--Schmidt norm at most $\gamma^2\sum_{a,b}|V_{ab}|^2$.
+Both $b$ and $\gamma$ have local interval norm witnesses.
+The additional cap $b\le\gamma(\sum_a g_a^2)^{1/2}$ and optional
+two-site blocks can sharpen them.
+
+In a left-to-right compression, write the exact local identities as
+$R_{j-1}P_j=Q_jR_j+E_j$, where $P_j$ is the squared input core and
+the final step has zero residual. If the preceding $Q$-prefix map has
+norm at most $c_{j-1}$ and $\|E_j\|_{\mathrm F}\le\eta_j$, telescoping
+gives
+\[
+ \|B^2-C\|_{\mathrm F}
+ \le \sum_j c_{j-1}\eta_j b_{j+1}\gamma_{j+1}.
+\]
+The Julia verifier checks the residuals rationally and all local norm
+bounds by interval Cholesky. It does not assume exact numerical
+canonical form or Hermiticity of the approximate MPO. Its 59 tests
+include independent dense contractions and rejection of corrupted witnesses.
+
+The completed bond-dimension-eight tests at initial $\beta=1/128$
+give relative squaring-error upper bounds $0.020357$, $0.053945$, and
+$0.134228$ for 8, 16, and 32 sites, respectively. All saved rational
+witnesses pass independent replay. The denominator here is the output
+MPO's Hilbert--Schmidt norm. These errors are still too large for the
+needed repeated squaring, and the initial MPO's distance from the exact
+Gibbs amplitude remains uncertified. Consequently these advances do
+not yet establish a thermal seed or a uniform spin-two gap.
+
+Reducing the starting step and allowing the output rank to exceed the
+input rank is more effective. For the same exact sixteen-site input
+at $\beta=1/1024$ and input bond dimension 16, the relative
+squaring-error bounds are
+\[
+\begin{array}{c|ccccc}
+\text{output dimension}&16&24&32&48&64\\\hline
+\text{error upper bound}&0.00542631&0.000693457&1.0764\,10^{-5}&1.431\,10^{-6}&4.81\,10^{-13}.
+\end{array}
+\]
+The refinements reuse saved rational input tensors and gauges and raise
+coefficient-rounding precision from 40 to 48 bits. The dimension-64
+certificate has relative error below $4.81\times10^{-13}$ and passes
+independent replay. A complete
+sequence of certified squarings, including the initial Gibbs-operator
+approximation, is still required.
+
+\subsection{An exact polynomial starting object}
+There is a second thermal upper-bound route that avoids a product formula.
+Put $K=H_N+NI$. The two-site spin-two eigenvalues
+$-6,-5,-3,0,4$ imply $\|K\|\le5N$. For $m=2^k$ and
+$\delta=\beta/(2m)$, choose rational
+\[
+ r\ge e^{5N\delta}\frac{(5N\delta)^3}{6},\qquad
+ Q=I-\delta K+\tfrac12\delta^2K^2+rI.
+\]
+The scalar Taylor remainder and functional calculus give
+$Q\ge e^{-\delta K}>0$. Because both are functions of $K$, their
+eigenvalues can be raised to the power $2m$, giving
+\[
+ Z_N(\beta)\le e^{\beta N}\Tr Q^{2m}
+ =e^{\beta N}\|Q^m\|_{\mathrm F}^2.
+\]
+This uses commutation, not a general operator-monotonicity assertion.
+Furthermore $0\le Q-e^{-\delta K}\le2rI$ and
+$e^{-\delta K}\ge e^{-5N\delta}I$. Hence the exact polynomial upper
+trace is at most
+\[
+ \exp\!\left(4mr e^{5N\delta}\right) Z_N(\beta).
+\]
+At $N=256$, $\beta=64$, and $k=28$, outward-rounded scalar arithmetic
+bounds this factor by $1.000636180$. Thus this starting approximation
+costs less than $0.064\%$, before any MPO compression. The shifted
+target would require a certified upper bound on
+\[
+ e^{-(a-1)\beta N}\|Q^m\|_{\mathrm F}^2.
+\]
+The code \texttt{Spin2PolynomialBounds.jl} passes 263 checks, including
+comparison with the independent exact four-site spectrum. The scalar
+majorant is established; a rigorous long-chain MPO contraction of its
+powers is still missing. No spin-two gap follows from the scalar
+approximation estimate alone.
+
+\subsection{Exact compression and the remaining norm bottleneck}
+The rational polynomial representation and its physical metric are now
+implemented. In the basis with weights $w=(1,4,6,4,1)$, a coefficient
+$X_{st}$ has squared Hilbert--Schmidt weight $w_t/w_s$. Local norm
+certificates use rational weighted Gram matrices and outward-rounded
+Cholesky checks. Bounds are rounded at a relative scale, including for
+the exponentially small norms of normalized operators.
+
+The initial construction represents $K$ with bond dimension $8$ and
+$Q$ with bond dimension $73$. Exact rational row reduction removes
+dependencies from both ends. For $N=16$ and $N=256$ the resulting maximum
+bond dimension is $34$; for $N=4$ it is $33$. This introduces
+\emph{zero} compression error. The saved witnesses contain local
+intertwining matrices $T_j$ satisfying
+\[
+ W_j T_{j+1}=T_j\widetilde W_j,\qquad T_1=T_{N+1}=1.
+\]
+These identities telescope to equality of the full operators and have
+passed independent exact replay at all three lengths. This replaces the
+earlier dimension-$16$ starting approximation, whose certified relative
+error at $N=256$ was $1.12\times10^{-12}$, when an exact starting object
+is preferable.
+
+The first complete short flow uses approximate Gram products
+$B_j^*B_j$ and an exact spatial reflection after each compression.
+Reflection preserves operator and Hilbert--Schmidt norms and permits
+alternating the compression direction without another rounding step.
+At $N=16$, four dimension-$16$ steps, starting from the earlier rounded
+seed, pass independent replay. They reach only
+$\beta=3.814697265625\times10^{-6}$. Their forward normalized
+Hilbert--Schmidt error bound is $9.95\times10^{-8}$; backward Gram norm
+bounds reduce it to $8.94\times10^{-8}$. This is not a useful
+low-temperature certificate yet.
+
+The exact seed also supplies the rational spectral bound
+\[
+ a_0=\frac{1+r+5N\delta+(5N\delta)^2/2}{5^{N/2}}
+ \ge\|Q/5^{N/2}\|.
+\]
+Under the recorded positive normalizations $\kappa_j$, reference
+norm bounds obey $a_{j+1}\ge a_j^2/\kappa_j$. Expanding a Gram-product
+error around either the exact reference or its approximation permits
+using the smaller of their separately certified norm bounds in
+$\epsilon_{j+1}\le[\delta_j+\epsilon_j(2b_j+\epsilon_j)]/\kappa_j$.
+For the same four-step run, this reduces the final error further to
+$4.180\times10^{-9}$, about $24$ times smaller than the original
+forward bound. The entire source flow was independently replayed
+before applying this scalar refinement.
+
+An operator-error verifier now bounds the same local compression
+residuals with independent rational gauges on the output prefix and
+both input tails. If $p_{j-1}$ bounds the prefix column operator,
+$e_j$ the gauged residual, and $t^{(1)}_{j+1},t^{(2)}_{j+1}$ the two
+tail row operators, telescoping gives
+\[
+ \|B^*B-C\|\le
+ \sum_j p_{j-1}e_jt^{(1)}_{j+1}t^{(2)}_{j+1}.
+\]
+For the first saved sixteen-site step this gives
+$2.673\times10^{-18}$, whereas the earlier Hilbert--Schmidt estimate
+was $8.728\times10^{-17}$. These bounds control different norms;
+the operator estimate is intended for the high-entropy part of the
+flow. It does not by itself bound the final thermal trace.
+
+A checked scalar bridge can connect such an operator estimate to a
+later trace-moment certificate. If $A\ge0$ acts on a space of dimension
+$d$, $\|A-B\|\le\eta$, and $\Tr|B|^p\le M$ for even $p\ge2$, then
+for every $t>0$,
+\[
+ \Tr A^p\le(1+t)^{p-1}M
+       +d(1+1/t)^{p-1}\eta^p.
+\]
+This follows from singular-value perturbation and scalar convexity.
+For example, if $d=5^{256}$, $p=64$, $M\le1$, and
+$\eta\le10^{-8}$, choosing $t=625\eta$ gives an upper factor below
+$1.0005$. The required long-chain operator-error and trace-moment
+inputs have not yet been certified. The remaining task is still the
+full low-temperature trace bound, and no uniform spin-two gap has
+been established.
+
+\subsection{A trace correction that retains cancellations}
+The preceding norm bounds can be wasteful when the desired observable is
+only the final squared Hilbert--Schmidt norm. Let $A$ be the operator before
+one compression, let $C$ be its compressed approximation, and suppose
+$\|A-C\|_{\mathrm F}\le\eta$. The exact identity
+\[
+ \|A\|_{\mathrm F}^2
+ =2\operatorname{Re}\Tr(C^*A)-\|C\|_{\mathrm F}^2
+   +\|A-C\|_{\mathrm F}^2
+\]
+gives the upper certificate
+\[
+ \|A\|_{\mathrm F}^2
+ \le 2\operatorname{Re}\Tr(C^*A)-\|C\|_{\mathrm F}^2+\eta^2.
+\]
+An upper enclosure of the signed overlap and a lower enclosure of
+$\|C\|_{\mathrm F}^2$ suffice. The remaining residual contribution is
+quadratic, whereas the triangle certificate
+$(\|C\|_{\mathrm F}+\eta)^2$ has a linear error term.
+For a squaring $A=B^2$ (or a Gram product $B^*B$), the overlap has three
+MPO layers, rather than the four layers of the direct squared norm.
+This changes the contraction cost and the certificate simultaneously.
+
+The script \texttt{trace\_correction\_probe.jl} replays the rational local
+residual certificates and encloses the overlaps with ball arithmetic.
+Four-site checks against a direct uncompressed contraction give:
+\begin{center}
+\begin{tabular}{rcc}
+Output dimension & Triangle upper/reference & Corrected upper/reference\\
+\hline
+16 & 1.155853810 & 1.004971213\\
+32 & 1.013744177 & 1.000046216
+\end{tabular}
+\end{center}
+At dimension $32$, the excess upper bound is reduced about $297$-fold
+without changing the compressed candidate. These are certificates for
+\emph{one compression of a saved candidate operator}. They do not
+certify its initial Gibbs error or earlier squarings. The following
+extension retains these earlier contributions as well.
+
+\subsection{A backward certificate for the complete trace flow}
+Use the real Hilbert--Schmidt pairing
+$\langle X,Y\rangle=\operatorname{Re}\Tr(X^*Y)$.
+Let $S_j$ be either the identity or spatial reflection, and set
+\[
+ A_{j+1}=S_j(A_j^*A_j)/\kappa_j,\qquad
+ D_j=A_j-B_j,\qquad
+ R_j=S_j(B_j^*B_j)/\kappa_j-B_{j+1},
+\]
+where $\kappa_j>0$. No Hermiticity of the approximations $B_j$ is
+required. Choose backward approximations $G_j$ with $G_K=B_K$, and define
+\[
+ T_j=\frac{B_j\bigl(S_j(G_{j+1})+S_j(G_{j+1})^*\bigr)}{\kappa_j}-G_j.
+\]
+Suppose separately verified bounds give
+$\|D_j\|_{\mathrm F}\le\epsilon_j$,
+$\|T_j\|_{\mathrm F}\le\tau_j$, and
+$\|G_{j+1}\|\le\gamma_j$. Define
+\begin{align*}
+ c&=\|B_K\|_{\mathrm F}^2+2\langle G_0,A_0-B_0\rangle
+       +2\sum_{j=0}^{K-1}\langle G_{j+1},R_j\rangle,\\
+ r&=2\sum_{j=0}^{K-1}
+       \left(\tau_j\epsilon_j+\frac{\gamma_j\epsilon_j^2}{\kappa_j}\right).
+\end{align*}
+Then
+\[
+ \boxed{c-r\ \le\ \|A_K\|_{\mathrm F}^2
+          \ \le\ c+r+\epsilon_K^2.}
+\]
+For interval contractions, replace $c$ by its lower or upper endpoint
+on the corresponding side.
+
+Indeed, expanding the Gram step gives
+\[
+ D_{j+1}=R_j+
+ \frac{S_j(B_j^*D_j+D_j^*B_j+D_j^*D_j)}{\kappa_j}.
+\]
+Pairing with $G_{j+1}$ transfers the linear part to $G_j+T_j$.
+Telescoping and expanding $\|B_K+D_K\|_{\mathrm F}^2$ yield
+\[
+ \|A_K\|_{\mathrm F}^2=c+\|D_K\|_{\mathrm F}^2
+ +2\sum_{j=0}^{K-1}\left(
+ \langle T_j,D_j\rangle+
+ \frac{\langle G_{j+1},S_j(D_j^*D_j)\rangle}{\kappa_j}\right).
+\]
+Cauchy--Schwarz bounds the first remainder; operator/trace-norm duality
+bounds the second by $\gamma_j\epsilon_j^2/\kappa_j$.
+Thus the signed linear errors are retained, and the remaining errors
+are products of primal and backward errors or squares of primal errors.
+
+The backward operator norms need not be replaced by Hilbert--Schmidt
+norms. If $b_j\ge\|B_j\|$ and $g_K\ge\|B_K\|$, the same dual defects give
+\[
+ g_j=\frac{2b_jg_{j+1}}{\kappa_j}+\tau_j\ \ge\ \|G_j\|.
+\]
+At each step one may take the smaller of this bound and a separately
+certified Hilbert--Schmidt norm. This avoids an unnecessary
+dimension-dependent loss when the thermal operator is close to a
+multiple of the identity.
+
+The complete five-step, four-site benchmark in
+\texttt{adjoint\_trace\_probe.jl} reaches $\beta=4$. The following
+ratios use an independently enclosed uncompressed Trotter trace:
+\begin{center}
+\begin{tabular}{rrcc}
+Forward rank & Backward intermediate rank & Triangle/reference & Corrected/reference\\
+\hline
+358 & 625 & 1.232375999 & 1.018555350\\
+564 & 625 & 1.008410682 & 1.000024309\\
+564 & 358 & 1.008410682 & 1.000301094
+\end{tabular}
+\end{center}
+The second row improves the excess upper bound about $346$-fold.
+The third compresses the backward intermediates and retains about
+$28$-fold improvement; its terminal $G_K=B_K$ still has rank $564$.
+The saved rational forward and backward residuals, positive-vector
+operator-norm witnesses, and signed contractions all pass independent
+replay. These are full-flow enclosures of a four-site Trotter trace.
+Its upper endpoint bounds the Gibbs trace, but its lower endpoint
+does not supply a Gibbs lower bound.
+
+Mixed MPO products and streamed three-layer overlaps are now implemented
+with local rational witnesses. The latter avoid explicitly constructing
+product cores or a full physical operator. A first sixteen-site
+single-step check reduces the upper bound by $6.8181\times10^{-11}$
+times the candidate squared norm. This is a comparison of two certified
+upper bounds, not a measurement of their error against the exact trace.
+
+The complete backward correction is now also implemented for the saved
+four-step, sixteen-site MPO flow, including the initial seed error.
+The forward and backward maximum bond dimensions are both $16$.
+The first unconditioned backward construction was weaker than the triangle
+bound. Reusing the forward rational gauges in the reflected direction
+substantially reduces its certified defects. Replacing reciprocal gauge
+proposals by nearby dyadics reduces arithmetic cost while preserving
+exact cancellation of the gauges in the represented operator.
+
+After independently replaying all forward and backward witnesses,
+and applying the backward operator-norm refinement, the ratios are
+\[
+ \frac{U_{\rm triangle}}{\|B_K\|_{\mathrm F}^2}
+ \simeq1.0000000083597809,\qquad
+ \frac{U_{\rm corrected}}{\|B_K\|_{\mathrm F}^2}
+ \simeq1.0000000000036466.
+\]
+With $L_{\rm corrected}$ the certified lower endpoint for the exact
+polynomial trace, the interval-width comparison is
+\[
+ \frac{U_{\rm triangle}-L_{\rm corrected}}
+      {U_{\rm corrected}-L_{\rm corrected}}
+ \simeq1307.0,
+ \qquad
+ \frac{U_{\rm corrected}}{L_{\rm corrected}}-1
+ <6.399\times10^{-12}.
+\]
+These compare certified enclosures, not errors relative to a known exact
+trace. The portable result is
+\texttt{mpo-adjoint-flow-refined-n16.json}. Its verifier reconstructs
+the backward inputs from the saved forward candidates, checks local
+rational product residuals and norm bounds, and recomputes every signed
+overlap. The resulting Gibbs upper bound is still at
+$\beta=1/262144$, leaving $24$ further doublings to reach $\beta=64$.
+
+Longer error recurrences now support upward dyadic rounding after each
+step. Each rounded value is checked to dominate the exact rational
+recurrence, with $128$ relative binary digits retained. This prevents
+denominator growth from repeatedly squaring exact error fractions
+in an otherwise bounded recurrence. A thousand-step stability check
+keeps denominators at most $150$ binary digits; an actual two-step
+four-site flow with rounded errors also passes independent replay.
+
+There is a further useful improvement to propagation. If independently
+certified bounds give $\|A\|\le a$, $\|B\|\le b$, and
+$\|A-B\|_{\mathrm F}\le\epsilon$, then
+\[
+ \|A^*A-B^*B\|_{\mathrm F}
+ \le\epsilon\min\{2a+\epsilon,\;2b+\epsilon,\;a+b\}.
+\]
+The last coefficient follows from
+$A^*A-B^*B=A^*(A-B)+(A^*-B^*)B$.
+Using both norm certificates avoids an unnecessary
+$\epsilon^2/\kappa$ term when the normalized operator norms are much
+smaller than the available Hilbert--Schmidt error. For example, the
+conditional inputs $a=5^{-128}$, $b=2a$, $\kappa=a$, zero local residual,
+and $\epsilon=10^{-12}$ give propagated error $3\times10^{-12}$,
+whereas the earlier coefficient gives more than $10^{60}$.
+This is a conditional propagation stress test; it supplies no local
+compression residual. The two-norm formula is
+implemented in both the generator and verifier.
+The required $N=256$, $\beta=64$ thermal certificate remains missing,
+and no uniform spin-two gap has been proved.
+
+\subsection{Balancing full auxiliary matrices at 256 sites}
+Diagonal auxiliary scalings do not resolve the norm problem for the
+saved dimension-$16$ starting MPO at $N=256$: the first numerical search
+gave a product of local norm estimates about $1.659\times10^{75}$ times
+the analytic bound $a_0$ for the exact seed. Full matrix gauges give a
+substantially different result. A stable QR/SVD sweep computes left-prefix
+Schmidt data; the proposal splits each Schmidt scale between its left
+and right factors and rotates the auxiliary basis accordingly.
+
+The proposed matrices are rounded to rational matrices $G_j$. Their
+inverses and the transformed cores are computed exactly:
+\[
+ \widetilde W_j=G_jW_jG_{j+1}^{-1},\qquad G_1=G_{N+1}=1.
+\]
+These factors cancel on every internal bond, so the global operator is
+unchanged. Verified local operator bounds then give
+\[
+ \|B_0\|\le\prod_j\|\widetilde W_j\|_{\rm local}
+ <1.000000701\,a_0,
+ \qquad
+ a_0=\frac{1+r+5N\delta+(5N\delta)^2/2}{5^{N/2}}.
+\]
+For the actual saved $N=256$ candidate, the certified upper norm is
+approximately $3.403345322\times10^{-90}$. The proof is stored in
+\texttt{schmidt-seed-norm-n256.json}. Independent replay checks its
+source fingerprint and physical adjoint, exact gauge inverses, and
+weighted local Gram inequalities. The numerical Schmidt decomposition
+is only a proposal and is not trusted by the verifier.
+
+Exact initial seeds can also be conditioned with rational matrix gauges.
+At $N=4$, the conditioned seed retains zero initial error; two subsequent
+dimension-$32$ squarings have total certified error below
+$1.225\times10^{-13}$ and pass independent replay. The earlier raw
+exact-basis first-step error bound exceeded $7358$, illustrating why an
+exact representation alone is insufficient for effective truncation.
+
+The full-matrix norm certificate resolves one obstruction at the target
+chain length. It does not certify the compression errors of the complete
+thermal flow. The separate operator-error residual routine currently
+supports matrix gauges, as do the Hilbert--Schmidt Gram and adjoint routines.
+The $\beta=64$ trace and the uniform spin-two gap remain
+unproved.
+
+\paragraph{Normalization without a long interval contraction.}
+The first matrix-gauge squaring attempt passed its local residual checks
+but failed in the final $192$-bit global norm contraction. For the
+left-compressed output $C$, let $\alpha_j$ be the verified norm bound
+of its $j$th left-prefix map and let $T$ be the terminal core. Then
+\[
+ \|C\|_{\mathrm F}\le \|T\|_{\mathrm F}\prod_{j=1}^{N-1}\alpha_j.
+\]
+The terminal norm uses the rational physical metric, and its upper
+square root is checked by exact integer arithmetic. This gives a
+normalization bound without propagating a dense interval environment
+through all sites. Any positive rational normalization is allowed:
+its exact scale is retained in the final trace formula. At four sites,
+the resumed three-step flow using this bound passes independent replay,
+with total error below $1.326\times10^{-11}$ at
+$\beta=1/524288$.
+
+Interior bridge products can also be enclosed by interval arithmetic
+during candidate generation. The rounded candidates remain exact
+rational arrays, and each residual bound includes the interval
+enclosure. Small-system tests pass both interval and exact-rational
+replay, including zero and extremely small operators. The last core
+is still contracted exactly. A raw local witness is now saved before
+normalization so that a later failure does not discard the expensive
+squaring computation. These changes do not supply the missing
+low-temperature trace.
+
+With the revised normalization and interval bridge contractions, the
+first dimension-$16$ squaring at $N=256$ completes at
+$\beta=1/2097152$. Its propagated Hilbert--Schmidt error is below
+$6.762\times10^{-8}$, with amplification coefficient below $2.001$.
+The square and its local verification take approximately $157$ seconds.
+The earlier diagonal-gauge run at the same length and dimension gave an
+unusable error bound above $7.60\times10^{25}$; the tail grouping and
+normalization also differ, so this is not an isolated gauge comparison.
+The result and portable witness are saved as
+\texttt{polynomial-schmidt-flow-n256.json} and its associated step file.
+This completes only one of the $28$ squarings: $27$ further temperature
+doublings and their error certificates are still required.
+
+\subsection{Certifying the benefit of local orthogonality}
+The sum of local truncation errors can be replaced by a backward
+quadratic recurrence that checks the cross terms. At cut $j$, write
+the local compression as $M_j=U_jR_j+E_j$, and let $W_j$ be its physical
+row metric. In addition to the existing bounds
+$\|E_j\|_{\mathrm F,W_j}\le\delta_j$ and
+$\|U_j\|\le\alpha_j$, certify
+\[
+ \|U_j^{\mathsf T}W_jE_j\|_{\mathrm F}\le\theta_j.
+\]
+Let $\Gamma_{j+1}$ bound the remaining product-tail coefficient map.
+If $e_{j+1}$ bounds the suffix compression error, then
+\[
+ \|D_j\|_{\mathrm F}^2\le
+ (\delta_j\Gamma_{j+1})^2+\alpha_j^2e_{j+1}^2
+ +2\theta_j\Gamma_{j+1}e_{j+1},\qquad e_N=0.
+\]
+The quantity $D_j$ is the actual suffix error; $e_j$ is chosen as
+an outward-rounded upper square root of the right-hand side. To prove the estimate, decompose
+the suffix error as $E_jT_{j+1}+U_jD_{j+1}$ and move $U_j$ across the
+weighted inner product in the cross term. The two factors are bounded
+by $\theta_j\Gamma_{j+1}$ and $e_{j+1}$.
+
+For exact orthogonal projections $\theta_j=0$, recovering the usual
+sum-of-squares benefit. Rounded singular vectors need not be orthogonal:
+the stored $\theta_j$ bounds their actual defects, checked directly in
+rational or outward-rounded interval arithmetic. One may also use
+$\theta_j\le\alpha_j\delta_j$ and retain the previous triangle bound
+whenever it is smaller after rounding. The implementation can keep all
+saved cores and bridges fixed while recomputing this sharper certificate.
+Small-system tests compare against the exact physical operator and reject
+a corrupted projection-defect bound.
+
+At $N=256$ and $\beta=1/2097152$, the following first-step error bounds
+all pass independent replay:
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Error estimate & Retained dimension & Propagated error upper bound\\
+\midrule
+Triangle sum & 16 & $6.762\times10^{-8}$\\
+Projection-defect recurrence & 16 & $4.259\times10^{-9}$\\
+Triangle sum & 32 & $8.361\times10^{-11}$\\
+Projection and rescaled gauges & 16 & $7.740\times10^{-11}$\\
+Projection and fitted bridges & 32 & $7.413\times10^{-12}$\\
+\bottomrule
+\end{tabular}
+\end{center}
+The first two rows use exactly the same compressed cores and bridges;
+the improvement of approximately $15.9$ is due to the certificate.
+The third row instead increases the retained dimension, improving the
+original propagated bound by approximately $809$.
+The rescaled dimension-$16$ row retains exactly the original compressed
+cores and normalization, checked directly in the saved witnesses, and
+improves the original bound by more than $870$. The final row uses
+$64$-bit relative quantization and fits each outgoing bridge to the
+actual rounded left factor before certifying the residual and its
+projection defect. Its improvement exceeds $9000$ relative to the
+original dimension-$16$ bound. These comparisons concern the first
+thermal-step error; they do not establish the required low-temperature trace.
+
+Auxiliary gauges can also be optimized for the compression error,
+separately from the candidate operator norm. If $G'_j=D_jG_j$ for
+positive rational diagonal matrices $D_j$, replace the saved bridges by
+$R'_{kab}=R_{kab}/(D_{j+1})_{aa}$ on the first input's auxiliary leg.
+The diagonal factors cancel in the local products, so every compressed
+output core remains unchanged, including the exact terminal core.
+The residual and tail bounds must be recomputed for the new gauges.
+This change of certificate is implemented and tested with exact rational
+replay; a numerical gauge search is only a proposal for these checks.
+The successful dimension-$16$ rescaling uses row factors corresponding
+to Schmidt power $0.2$, rather than $0.5$. It permits a looser candidate
+operator-norm bound, about $2.356a_0$, in exchange for smaller certified
+compression errors. The total propagated bound, including the resulting
+larger amplification of the initial error, is the fourth row above.
+
+\paragraph{Reducing the arithmetic and storage burden.}
+Matrix gauges and their inverses are still checked exactly over the
+rationals. Their interior transformed cores may now be evaluated as
+outward-rounded interval enclosures, avoiding storage of every large
+rational coefficient created by a dense inverse. The terminal core is
+kept exact. If an interval residual check is inconclusive, the verifier
+recomputes that core in rational arithmetic. Exact replay remains
+available, and the new path independently verifies the rescaled
+$256$-site certificate.
+
+Reflected outputs are now stored by their exact reconstruction rule
+$B_{j+1}=\mathcal S(C_j)/\kappa_j$, avoiding a duplicate copy of every
+coefficient. The four-site witness shrinks from $4{,}035{,}669$ to
+$2{,}800{,}932$ bytes; interval and exact-rational replay reconstruct
+the same final candidate as the older format. The improved first-step
+certificates are saved in
+\texttt{polynomial-projection-rescaled-d16-n256.json} and
+\texttt{polynomial-projection-d32-fitted-prefix1-n256.json}.
+The hybrid trajectory has completed two independently replayed doublings,
+reaching $\beta=1/1048576$ with propagated error at most
+$1.747656072\times10^{-10}$. The target $\beta=64$ still requires
+$26$ further doublings.
+No uniform spin-two gap has been certified.
+
+\section{Higher-order initialization by positive polynomial squares}
+
+The number of subsequent squarings can be reduced by increasing the degree
+of the initial polynomial. Write $K=H+NI$, $M=5N$, $m=2^p$, and
+$\delta=\beta/(2m)$. For any positive integer $d$, choose a rational
+\[
+ r\ge e^{\delta M}\frac{(\delta M)^{d+1}}{(d+1)!},\qquad
+ Q=\sum_{j=0}^d\frac{(-\delta K)^j}{j!}+rI.
+\]
+Taylor's remainder and functional calculus give
+\[
+ e^{-\delta K}\le Q\le e^{-\delta K}+2rI
+ \le(1+2r e^{\delta M})e^{-\delta K}.
+\]
+These operators commute, so
+\[
+ Z_H(\beta)\le e^{\beta N}\operatorname{Tr}Q^{2m}
+ \le \exp(4mr e^{\delta M})Z_H(\beta).
+\]
+The following scalar bounds at $N=256$, $\beta=64$ have been checked with
+outward-rounded arithmetic; displayed upper bounds are rounded upward.
+\begin{center}
+\begin{tabular}{rrr}
+\toprule
+Degree $d$ & Subsequent squarings $p$ & Inflation upper bound\\
+\midrule
+2 & 28 & $1.000636180$\\
+4 & 21 & $1.000206619$\\
+6 & 18 & $1.000646796$\\
+8 & 17 & $1.000076720$\\
+12 & 16 & $1.000000327$\\
+\bottomrule
+\end{tabular}
+\end{center}
+These bounds concern the exact polynomial; an MPO approximation still
+requires its own certificate. The recorded calculation is
+\texttt{polynomial-degree-screen-n256.json}.
+
+For the fourth-order polynomial there is an exact rational identity
+\[
+ P_4(x)=\left(1+\frac{x}{2}+\frac{x^2}{12}\right)^2
+       +\frac1{12}\left(x+\frac{x^2}{2}\right)^2
+       +\frac1{72}(x^2)^2.
+\]
+It permits construction from three quadratic Gram certificates. This is
+systematic: for $P_{2k}(x)=\sum_{j=0}^{2k}x^j/j!$,
+\[
+ P_{2k}(x)=\frac1{(2k)!}\int_0^\infty e^{-t}(t+x)^{2k}\,dt.
+\]
+The moment Gram matrix of $(t+x)^k$ is rational and positive definite.
+An exact $LDL^{\mathsf T}$ decomposition gives positive rational weights
+times squares of degree-$k$ polynomials. The implementation checks the
+coefficient identity exactly, including examples through degree $32$.
+
+To track normalization, put $\sigma=5^{-N/2}$ and
+$A_i=\sigma p_i(-\delta K)$ for the three quadratic factors above.
+They are self-adjoint, and
+\[
+ \sigma Q=\sigma^{-1}\sum_i w_i A_i^*A_i+r\sigma I.
+\]
+If $\|C_i-A_i^*A_i\|_{\rm HS}\le\eta_i$ and a final compressed
+candidate $B$ differs from
+$\sigma^{-1}\sum_iw_i C_i+r\sigma I$ by at most $\rho$, then
+\[
+ \|B-\sigma Q\|_{\rm HS}\le
+ \rho+\sigma^{-1}\sum_iw_i\eta_i.
+\]
+The Julia seed builder uses the existing Gram verifier for each term and
+a separate contraction for the final compression error. This trades
+three initial Gram constructions for seven fewer subsequent squarings.
+A net runtime improvement and a 256-site fourth-order seed certificate
+have not yet been established.
+The thermal-flow generator and verifier now accept this seed format and
+replay all three factor witnesses. The four-site seed and two subsequent
+squarings now pass independent replay.
+The first four-site prototype, at
+$\beta=4$, $p=8$, and retained dimension $32$, gives a generator-checked
+initial error bound of $4.562\times10^{-4}$. Only
+$1.322\times10^{-7}$ comes from the final compression; the factor Gram
+certificates dominate. A separate
+four-site test uses the target initial step $\beta=64$, $p=21$, and
+retains up to $34$ components in the quadratic factors. With Gram output
+dimension $32$, it gives a generator-checked bound of
+$2.072\times10^{-8}$, with less than $1.759\times10^{-15}$ from final
+compression. Retaining dimension $34$ gives $1.815\times10^{-9}$ and
+passes independent replay.
+
+Rescaling the three factor gauges, with powers $0.05$, $0.05$, and
+$0.25$, gives an independently replayed bound of $3.999\times10^{-13}$.
+Exact comparisons of the saved files confirm unchanged inputs, factor
+outputs, and final candidate: the bound improves by more than $4500$
+without changing the trial operator. The numerical screen proposes the
+rescalings; each selected bound is recomputed with rational and interval
+arithmetic. The result
+is \texttt{quartic-seed-d34-refined-n4.json}.
+
+After two further squarings, at $\beta=1/8192$, the default gauges give
+an independently replayed error bound of $3.645\times10^{-8}$.
+Optimizing the residual gauges at each step reduces the independently replayed
+bound to $2.166\times10^{-11}$, an improvement of more than $1680$.
+Both input and output cores, and both normalization constants, remain
+exactly unchanged.
+These are four-site, high-temperature tests; they do not establish the
+required low-temperature trace bound at $N=256$.
+
+An additional variant retains exact quadratic inputs. Two rational
+compression sweeps produce local intertwining identities, which the
+verifier checks before accepting zero input error. This addresses a
+large-system difficulty: the normalized factor's operator norm is of
+order $5^{-N/2}$, and an ordinary absolute Hilbert--Schmidt rounding error
+can greatly exceed this scale. Removing that input error avoids its
+amplification in the Gram estimate. Conditioning is essential: the raw
+four-site exact representation gives an error bound above $1.2\times10^4$.
+Exact right conditioning lowers it to $1.254\times10^{-9}$, and subsequent
+gauge refinement gives $3.410\times10^{-13}$, with all three factor input
+errors exactly zero. The refined candidate and factor outputs are unchanged.
+This exact-input variant now passes independent replay.
+
+\paragraph{Lossless witness encoding.}
+Large dyadic denominators can be stored by their binary exponents, without
+altering any coefficient. On the existing three-step four-site fixture,
+this reduces the combined witness size from $7{,}562{,}803$ to
+$5{,}768{,}539$ bytes, or $23.7\%$. Every decoded field agrees exactly
+with its predecessor, and the reencoded flow passes independent replay.
+Legacy rational encodings remain readable. This is a storage improvement;
+an end-to-end runtime improvement has not been measured.
+
+\paragraph{Separate gauges for separate inequalities.}
+The complete-operator norm and the compression residual need not use the
+same auxiliary gauges. If a second family $F_j$, with identity boundary
+gauges, gives independently verified local operator bounds $v_j$, then
+$b_F=\prod_jv_j$ bounds the complete input operator. Hence the Gram error
+coefficient may use $b=\min\{b_F,b_G,b_{\rm HS}\}$, while retaining the
+original residual-tail bounds from the family $G_j$. In particular, the
+global bound $b_F$ is never substituted for a suffix-map bound.
+The verifier supports this additional certificate and checks its gauge
+cancellations and local inequalities. Explicit small-operator tests pass
+in exact and interval arithmetic and reject corrupted auxiliary bounds.
+The four-step integration run reaches $\beta=1/2048$ with an independently
+replayed Hilbert--Schmidt error bound of $1.311\times10^{-9}$.
+An additional $256$-site improvement from this separation has not
+yet been demonstrated.
+
+\paragraph{Full matrix gauges for operator errors.}
+The operator-error residual certificate now handles full matrix gauges.
+Let $G_j$ be the original first-input gauge, $F_j,S_j$ the new tail gauges,
+and $P_j$ the new output-prefix gauge. The exact residual transforms by
+\[
+ E'_{q'sta'b'}=\sum_{q,a,b}(P_j)_{q'q}E_{qstab}
+ (G_{j+1}F_{j+1}^{-1})_{aa'}(S_{j+1}^{-1})_{bb'}.
+\]
+The prefix and tail gauge factors cancel in the full telescoping identity.
+Three separate auxiliary-axis contractions implement this formula without
+forming a Kronecker matrix. The checker visits one residual at a time;
+interval arithmetic has an exact local fallback. All $138$ tests pass,
+including exact reconstruction of the complete residual on small systems
+with noncommuting gauges, unequal auxiliary dimensions, and rejection of
+corrupted bounds.
+
+On the second four-site quartic step, the initial operator-error bound is
+$9.762\times10^{-8}$. Selecting independent gauge powers $(0.1,0.05,0)$
+reduces it to $2.834\times10^{-12}$, an improvement exceeding $34{,}000$,
+with input, output, and original bridges fixed. Both bounds pass independent
+replay. The optimized operator bound is still looser than the saved
+Hilbert--Schmidt bound $6.613\times10^{-13}$ on this small example.
+
+\paragraph{Operator error at initialization.}
+The unequal-dimension extension certifies linear compression as $A\cdot I$.
+Starting from a verified exact quadratic polynomial, four-site compression
+to dimension $16$ gives an operator-error bound $1.467\times10^{-7}$.
+Changing only the error gauges lowers it to $2.280\times10^{-13}$, with the
+full product witness and candidate unchanged; independent replay passes.
+Retaining dimension $34$ and refining its gauges gives an independently replayed
+bound $7.289\times10^{-17}$, or $1.823\times10^{-15}$ relative to the
+analytic operator-norm bound.
+The long-chain operator-error and trace-moment inputs are still missing.
+
+\paragraph{Backward Schatten propagation.}
+A systematic alternative to forward error propagation uses a different
+Schatten norm at each doubling. Let $D=5^N$, let $k$ be the number of
+Gram compressions, and put $p_j=2^{k+1-j}$. Suppose $C_j$ approximates
+$B_{j-1}^\dagger B_{j-1}$ with certified Hilbert--Schmidt and operator
+errors $\zeta_j$ and $\sigma_j$, respectively, and $B_j$ equals
+$C_j/\kappa_j$, up to a unitary spatial reflection, with $\kappa_j>0$.
+Starting from $m_k\geq\lVert B_k\rVert_2$, define, with upward rounding,
+\[
+ m_{j-1}=\sqrt{\kappa_jm_j+
+       \min\{\zeta_j,D^{1/p_j}\sigma_j\}}.
+\]
+The Schatten triangle inequality and
+$\lVert B^\dagger B\rVert_p=\lVert B\rVert_{2p}^2$ prove inductively that
+$m_j\geq\lVert B_j\rVert_{p_j}$. An unavailable operator certificate
+is omitted from the minimum. If $A_0=Q/\sqrt D$ is the exact positive
+polynomial seed and $A_0-B_0$ has certified errors $\eta_2,\eta_\infty$,
+then
+\[
+ \operatorname{Tr}Q^{p_0}
+ \leq D^{p_0/2}
+ \bigl(m_0+\min\{\eta_2,D^{1/p_0}\eta_\infty\}\bigr)^{p_0}.
+\]
+For $Q\geq e^{-\delta(H+NI)}$, the two operators commute, so at
+$\beta=\delta p_0$ this gives a shifted thermal trace upper bound after
+multiplication by $e^{-(a-1)N\beta}$.
+
+This recurrence avoids the forward global-operator amplification factors.
+At early steps $D^{1/p_j}$ is close to one; at late steps the minimum
+can use the Hilbert--Schmidt error. The implementation checks every
+rounded square root by an exact rational squaring inequality and obtains
+dimension factors by repeated square roots. All $107$ additional tests
+pass, including explicit matrix chains, non-Hermitian candidates,
+reflections, and the exponent required for $28$ squarings at $N=256$.
+A replay script connects these scalar inequalities to saved MPO witnesses.
+The required low-temperature long-chain inputs remain unproved; this
+recurrence is not itself a spin-$2$ gap certificate.
+
+\end{document}

@@ -1,0 +1,8 @@
+Test Summary:                | Pass  Total  Time
+Provenance and finite inputs |   33     33  1.6s
+Test Summary:                               | Pass  Total  Time
+Log enclosure independent numerical control |   13     13  0.4s
+Test Summary:                                   | Pass  Total  Time
+Every update, length interval, and uniform tail |  459    459  0.5s
+Test Summary:                                 | Pass  Total  Time
+Seed inequalities and unsafe cutoff rejection |   44     44  1.8s

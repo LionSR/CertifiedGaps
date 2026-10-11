@@ -1,0 +1,26 @@
+Validation on 2026-10-08, Julia 1.12.4, --startup-file=no --project=spin1.
+
+spin1/experiments/temperature_lift.jl
+simple: gamma > 0.070450002, every even L >= 36; p=0.030760867845141177, q=0.05907407081835988
+optimized: gamma > 0.072901771, every even L >= 36; p=0.030530205127236806, q=0.04795567755025411
+
+spin1/experiments/test_temperature_lift.jl
+Rational powers with independent integer comparisons: 170/170 passed.
+Finite distributions check the residual and lifting inequalities: 96/96 passed.
+Saved certificates and input identity: 19/19 passed.
+Total: 285/285 tests passed. The record checker additionally asserts every
+dominant-weight refinement, bootstrap update, interval, and tail inequality.
+
+spin1/experiments/test_bounds.jl
+Provenance and finite inputs: 33/33 passed.
+Log enclosure independent numerical control: 13/13 passed.
+Every update, length interval, and uniform tail: 459/459 passed.
+Seed inequalities and unsafe cutoff rejection: 44/44 passed.
+Total: 549/549 earlier tests passed.
+
+The built-in desktop LaTeX compiler successfully compiled the updated
+optimized-spin1-bounds.tex. No new thermal or long-chain trial contractions
+were run. The arithmetic reuses hash-checked, previously reproduced finite
+inputs and combines them with the analytic argument documented in the note.
+Neither these tests nor compilation constitute independent peer review or
+formal verification of the analytic transfer and bootstrap theorems.

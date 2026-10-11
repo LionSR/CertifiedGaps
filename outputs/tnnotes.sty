@@ -1,0 +1,291 @@
+% tnnotes.sty -- notation and tensor-network diagrams shared by the
+% thermal-MPO gap notes. See README.md, "Shared notation".
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{tnnotes}[2026/10/07 Shared notation and tensor-network diagrams]
+\RequirePackage{bm,amsthm,tikz}
+\usetikzlibrary{arrows.meta,backgrounds}
+
+% ---------------------------------------------------------------- notation
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\trv}{\operatorname{Tr}_{\mathrm v}} % trace over virtual legs
+\newcommand{\Ps}{P_{\mathrm s}}                  % spatial purity
+\newcommand{\Pt}{P_{\tau}}                       % thermal purity
+\newcommand{\opp}{\mathrm{o}}                    % opposite endpoint fields
+\newcommand{\same}{\mathrm{s}}                   % equal endpoint fields
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+
+% A centered, column-wide block for a tikzpicture inside running text.
+\newenvironment{proofdiagram}
+ {\par\smallskip\noindent\begin{minipage}{\columnwidth}\centering}
+ {\end{minipage}\par\smallskip}
+
+% ---------------------------------------------------------------- diagrams
+% Horizontal wires are virtual legs (space); vertical double wires are
+% physical legs (imaginary time); closed loops are traces.
+% Blue marks thermal objects (W, rho); red marks spatial ones (X, sigma, Pi, R).
+\definecolor{mpoblue}{HTML}{5B9DBD}
+\definecolor{mpored}{HTML}{D9666B}
+\tikzset{
+ % inline diagram: y=0 sits on the math axis
+ tn/.style={baseline=-.6ex,x=1em,y=1em,line width=.45pt,
+   font=\scriptsize,inner sep=1pt},
+ % inline diagram centered on its bounding box (for diagrams with labels)
+ tn centered/.style={baseline={([yshift=-.5ex]current bounding box.center)}},
+ mpo/.style={draw,fill=mpoblue!28,minimum width=1.1em,minimum height=.85em},
+ gibbs/.style={draw,fill=mpoblue!20,minimum height=1em,inner xsep=2pt},
+ xop/.style={draw,fill=mpored!22,minimum height=1.05em,inner xsep=2.5pt},
+ xvertex/.style={draw,fill=mpored,minimum size=.42em,inner sep=0pt},
+ bvec/.style={circle,draw,fill=black!13,minimum size=.5em,inner sep=0pt},
+ sym/.style={draw,fill=black!10,minimum size=1.2em},
+ phys/.style={double,double distance=.7pt},
+ ring/.style={rounded corners=2pt},
+ gap/.style={fill=white,inner sep=.5pt},
+ flow/.style={-{Latex[length=1.4mm]},line width=.5pt},
+ % proof maps: a point at (length, inverse temperature) states one bound
+ mappt/.style={circle,draw,line width=.5pt,minimum size=5pt,inner sep=0pt},
+ maprule/.style={font=\scriptsize,text=black!65,fill=white,inner sep=1pt},
+ maptag/.style={font=\scriptsize,text=black!50},
+ mapbox/.style={black!25,densely dashed,rounded corners=6pt},
+ mapaxis/.style={text=black!55}}
+
+% Physical trace of one MPO tensor, and the transfer vertex it produces.
+\newcommand{\Wtrace}{\tikz[tn]{
+ \draw (-.6,0)--(.3,0);
+ \draw (0,.2)--(0,.38) arc[start angle=180,end angle=0,radius=.27]
+   --(.54,-.38) arc[start angle=0,end angle=-180,radius=.27]--(0,-.2);
+ \node[draw,fill=mpoblue!30,minimum width=.42em,minimum height=.4em,
+   inner sep=0pt] at (0,0) {};}}
+\newcommand{\Xvertex}{\tikz[tn]{
+ \draw (-.45,0)--(.45,0); \node[xvertex] at (0,0) {};}}
+
+% \tndots{x}{y}: an ellipsis on a wire, centered at (x,y) in em units; it cuts
+% a short gap in the wire and leaves the neighbouring tensors untouched.
+\newcommand{\tndots}[2]{%
+ \fill[white] ({#1-.5},{#2-.12}) rectangle ({#1+.5},{#2+.12});
+ \foreach \d in {-.28,0,.28}{\fill ({#1+\d},#2) circle[radius=.055];}}
+% \tnpatch{x}{y}{cols}{rows}{cell}: a closed spacetime patch of the network,
+% dashed edges identified; cell is in the picture's own units.
+% One n x beta torus is 2 columns x 1 row.
+\newcommand{\tnpatch}[5]{%
+ \begin{scope}[shift={(#1,#2)}]
+ \fill[mpoblue!10] (0,0) rectangle ({#3*#5},{#4*#5});
+ \draw[black!40,densely dashed,line width=.3pt] (0,0) rectangle ({#3*#5},{#4*#5});
+ \foreach \i in {1,...,#3}{
+   \draw[line width=.4pt] ({(\i-.5)*#5},0)--({(\i-.5)*#5},{#4*#5});}
+ \foreach \j in {1,...,#4}{
+   \draw[line width=.4pt] (0,{(\j-.5)*#5})--({#3*#5},{(\j-.5)*#5});
+   \foreach \i in {1,...,#3}{
+     \filldraw[fill=mpoblue,line width=.25pt]
+       ({(\i-.68)*#5},{(\j-.68)*#5}) rectangle ++({.36*#5},{.36*#5});}}
+ \end{scope}}
+% \Zbox[cell]{cols}{rows}: word-sized torus glyph; \Zbox21 is Z_n(beta).
+\newcommand{\Zbox}[3][.45]{\tikz[x=1em,y=1em,
+ baseline={([yshift=-.5ex]current bounding box.center)}]{\tnpatch{0}{0}{#2}{#3}{#1}}}
+% \Zrect[cell]{cols}{rows}: the same torus without tensors, legible when
+% several glyphs appear in one formula.
+\newcommand{\Zrect}[3][.42]{\tikz[x=1em,y=1em,
+ baseline={([yshift=-.5ex]current bounding box.center)}]{
+ \fill[mpoblue!18] (0,0) rectangle ({#2*#1},{#3*#1});
+ \foreach \i in {1,...,#2}{
+   \draw[mpoblue,line width=.35pt] ({(\i-.5)*#1},0)--++(0,{#3*#1});}
+ \foreach \j in {1,...,#3}{
+   \draw[mpoblue,line width=.35pt] (0,{(\j-.5)*#1})--++({#2*#1},0);}
+ \draw[black!70,line width=.35pt] (0,0) rectangle ({#2*#1},{#3*#1});}}
+% \specbars[color]{h1,h2,...}: word-sized spectrum, one bar per eigenvalue,
+% heights in units of 1.1em (the largest weight is at most one).
+\newcommand{\specbars}[2][mpoblue]{\tikz[baseline=0pt,x=.34em,y=1.1em]{
+ \foreach \h [count=\i] in {#2}{
+   \fill[#1] ({\i-1},0) rectangle ++(.78,\h);
+   \draw[black!50,line width=.3pt] ({\i-1.11},0)--++(1,0);}}}
+% ------------------------------------------------- word-sized graphics
+% Each sits on the text baseline and is at most about 1em tall.
+% Energy levels: the ground line, a few excited lines, the gap marked in red.
+\newcommand{\levels}{\tikz[baseline=0pt,x=1em,y=1em,line width=.6pt]{
+ \draw (0,0)--(1,0);
+ \foreach \y in {.5,.72,.9}{\draw[black!50,line width=.4pt] (0,\y)--(1,\y);}
+ \draw[mpored,line width=1pt] (1.18,0)--(1.18,.5);}}
+% Exponential decay, e.g. e^{-beta Delta} against beta.
+\newcommand{\decayglyph}[1][black!70]{\tikz[baseline=0pt,x=1.5em,y=.85em,line width=.45pt]{
+ \draw[black!35,line width=.3pt] (0,0)--(1,0);
+ \draw[#1,domain=0:1,samples=25,smooth] plot (\x,{exp(-3.2*\x)});}}
+% The squaring bound f(z)=z^2/[2(1-z)^2] on 0<=z<=.3, under the diagonal.
+\newcommand{\fcurve}{\tikz[baseline=0pt,x=3.3em,y=3.3em,line width=.45pt]{
+ \draw[black!35,line width=.3pt] (0,0)--(.3,0) (0,0)--(0,.3);
+ \draw[black!45,densely dotted] (0,0)--(.3,.3);
+ \draw[mpored,domain=0:.3,samples=25,smooth] plot (\x,{\x*\x/(2*(1-\x)*(1-\x))});}}
+% A boundary vector (grey) projected onto the leading eigenvector (red).
+\newcommand{\overlapglyph}{\tikz[baseline=0pt,x=1em,y=1em,line width=.5pt]{
+ \draw[-{Latex[length=.8mm]},mpored] (0,0)--(1.1,0);
+ \draw[-{Latex[length=.8mm]},black!60] (0,0)--(.62,.78);
+ \draw[black!40,densely dotted,line width=.35pt] (.62,.78)--(.62,0);}}
+% An open chain with endpoint fields; #1=1 equal, #1=-1 opposite.
+\newcommand{\fieldchain}[1]{\tikz[baseline=0pt,x=1em,y=1em,line width=.5pt]{
+ \draw[black!55] (0,.4)--(1.8,.4);
+ \foreach \x in {0,.45,.9,1.35,1.8}{\fill (\x,.4) circle[radius=.09];}
+ \draw[-{Latex[length=1.2mm,width=1mm]},mpored,line width=.8pt] (-.38,-.05)--(-.38,.9);
+ \draw[-{Latex[length=1.2mm,width=1mm]},mpored,line width=.8pt] (2.18,{.425-#1*.475})--(2.18,{.425+#1*.475});}}
+\newcommand{\fieldsame}{\fieldchain{1}}
+\newcommand{\fieldopp}{\fieldchain{-1}}
+% \stackbar{d}: a whole split into a leading share (red) and a remainder d (grey).
+\newcommand{\stackbar}[1]{\tikz[baseline=0pt,x=1.8em,y=1em]{
+ \fill[mpored!55] (0,0) rectangle ({1-#1},.45);
+ \fill[black!30] ({1-#1},0) rectangle (1,.45);}}
+% The spacetime torus doubling in length and inverse temperature, three steps.
+\newcommand{\torusseq}{\tikz[baseline=0pt,x=1em,y=1em]{
+ \foreach \w/\h/\x in {.3/.15/0,.6/.3/.45,1.2/.6/1.2}{
+   \fill[mpoblue!18] (\x,0) rectangle ++(\w,\h);
+   \draw[black!60,line width=.3pt] (\x,0) rectangle ++(\w,\h);}}}
+
+% ------------------------------------------------- generic tensor networks
+% \tnchain[keys]{i1,i2,...}: a horizontal network on one virtual wire.
+% Items are typeset in math mode; an item \cdots is an ellipsis; an empty item
+% is allowed (e.g. for transfer vertices). Boxes are spaced by their real
+% widths, so labels never collide. Keys:
+%   node=<style>  style of every item (default xop)     last=<style> last item
+%   item={opts}   extra node options                    gap=<len>    wire gap
+%   legs[=<len>]  physical legs through each item       ring        trace loop
+%   capl=<label>, capr=<label>, caps    boundary vectors (left, right, both)
+%   name=<prefix> node names <prefix>-1, ..., and <prefix>-L/R for the ends
+%   nostubl, nostubr  no wire beyond an uncapped end (a vector, not an operator)
+% \tnchainpath takes the same arguments for use inside a tikzpicture.
+\newif\iftn@legs \newif\iftn@ring \newif\iftn@capl \newif\iftn@capr
+\pgfqkeys{/tn/chain}{
+ node/.code={\tikzset{tn item/.style={#1}}},
+ last/.code={\tikzset{tn last/.style={#1}}},
+ item/.code={\tikzset{tn extra/.style={#1}}},
+ gap/.code={\def\tn@gap{#1}},
+ legs/.code={\tn@legstrue\def\tn@leglen{#1}}, legs/.default=.8em,
+ ring/.code={\tn@ringtrue},
+ capl/.code={\tn@capltrue\def\tn@capllabel{#1}},
+ capr/.code={\tn@caprtrue\def\tn@caprlabel{#1}},
+ caps/.code={\tn@capltrue\tn@caprtrue\def\tn@capllabel{}\def\tn@caprlabel{}},
+ name/.code={\def\tn@name{#1}},
+ nostubl/.code={\def\tn@stubl{0em}}, nostubr/.code={\def\tn@stubr{0em}}}
+\def\tn@reset#1{\tn@legsfalse\tn@ringfalse\tn@caplfalse\tn@caprfalse
+ \def\tn@name{c}\def\tn@gap{.55em}\def\tn@leglen{.8em}
+ \def\tn@capllabel{}\def\tn@caprlabel{}\def\tn@stubl{.55em}\def\tn@stubr{.55em}
+ \tikzset{tn item/.style={#1},tn last/.style={tn item},tn extra/.style={}}}
+\edef\tn@dotsmark{\detokenize{\cdots}}
+% place the items along x (#1=1) or down y (#1=0)
+\def\tn@place#1#2{%
+ \foreach \tn@it [count=\tn@i] in {#2}{\xdef\tn@count{\tn@i}}%
+ \foreach \tn@it [count=\tn@i] in {#2}{%
+  \ifnum\tn@i=1 \def\tn@pos{(0,0)}\else
+   \pgfmathtruncatemacro\tn@prev{\tn@i-1}%
+   \ifnum#1=1 \edef\tn@pos{([xshift=\tn@gap]\tn@name-\tn@prev.east)}%
+   \else\edef\tn@pos{([yshift=-\tn@gap]\tn@name-\tn@prev.south)}\fi\fi
+  \ifnum#1=1 \def\tn@anchor{west}\else\def\tn@anchor{north}\fi
+  \ifnum\pdfstrcmp{\detokenize\expandafter{\tn@it}}{\tn@dotsmark}=0 
+   \node[anchor=\tn@anchor,minimum width=1.1em,minimum height=.5em,inner sep=0pt]
+     (\tn@name-\tn@i) at \tn@pos {};
+   \fill[white] ([xshift=-.5em,yshift=-.12em]\tn@name-\tn@i.center)
+     rectangle ([xshift=.5em,yshift=.12em]\tn@name-\tn@i.center);
+   \foreach \tn@d in {-.28,0,.28}{
+     \fill ([xshift=\tn@d em]\tn@name-\tn@i.center) circle[radius=.055em];}
+  \else
+   \ifnum\tn@i=\tn@count
+    \node[tn last,tn extra,anchor=\tn@anchor] (\tn@name-\tn@i) at \tn@pos {\ensuremath{\tn@it}};
+   \else
+    \node[tn item,tn extra,anchor=\tn@anchor] (\tn@name-\tn@i) at \tn@pos {\ensuremath{\tn@it}};
+   \fi
+   \iftn@legs\begin{pgfonlayer}{background}
+    \draw ([yshift=\tn@leglen]\tn@name-\tn@i.center)--([yshift=-\tn@leglen]\tn@name-\tn@i.center);
+   \end{pgfonlayer}\fi
+  \fi}}
+\newcommand{\tnchainpath}[2][]{%
+ \tn@reset{xop}\pgfqkeys{/tn/chain}{#1}%
+ \tn@place1{#2}%
+ \iftn@ring\def\tn@leadl{.85em}\def\tn@leadr{.85em}\else
+  \iftn@capl\def\tn@leadl{1.1em}\else\let\tn@leadl\tn@stubl\fi
+  \iftn@capr\def\tn@leadr{1.1em}\else\let\tn@leadr\tn@stubr\fi\fi
+ \coordinate (\tn@name-L) at ([xshift=-\tn@leadl]\tn@name-1.west);
+ \coordinate (\tn@name-R) at ([xshift=\tn@leadr]\tn@name-\tn@count.east);
+ \begin{pgfonlayer}{background}
+ \iftn@ring
+  \iftn@legs\coordinate (\tn@name-B) at ([yshift=-\tn@leglen-.5em]\tn@name-1.center);
+  \else\coordinate (\tn@name-B) at ([yshift=-.4em]\tn@name-1.south);\fi
+  \draw[ring] (\tn@name-L)--(\tn@name-L|-\tn@name-B)--(\tn@name-R|-\tn@name-B)
+    --(\tn@name-R)--cycle;
+ \else\draw (\tn@name-L)--(\tn@name-R);\fi
+ \end{pgfonlayer}
+ \iftn@capl\ifx\tn@capllabel\@empty\node[bvec] at (\tn@name-L) {};
+  \else\node[bvec,label=above:{\ensuremath{\tn@capllabel}}] at (\tn@name-L) {};\fi\fi
+ \iftn@capr\ifx\tn@caprlabel\@empty\node[bvec] at (\tn@name-R) {};
+  \else\node[bvec,label=above:{\ensuremath{\tn@caprlabel}}] at (\tn@name-R) {};\fi\fi}
+\newcommand{\tnchain}[2][]{\tikz[tn]{\tnchainpath[#1]{#2}}}
+% \tncolumn[keys]{i1,i2,...}: the same in imaginary time, on a physical double
+% wire running downward; ring closes it into a trace on the right.
+\newcommand{\tncolumnpath}[2][]{%
+ \tn@reset{gibbs}\def\tn@gap{.3em}\pgfqkeys{/tn/chain}{#1}%
+ \tn@place0{#2}%
+ \coordinate (\tn@name-T) at ([yshift=.45em]\tn@name-1.north);
+ \coordinate (\tn@name-B) at ([yshift=-.45em]\tn@name-\tn@count.south);
+ \begin{pgfonlayer}{background}
+ \iftn@ring
+  \coordinate (\tn@name-X) at ([xshift=.6em]\tn@name-1.east);
+  \draw[phys,ring] (\tn@name-T)--(\tn@name-T-|\tn@name-X)--(\tn@name-B-|\tn@name-X)
+    --(\tn@name-B)--cycle;
+ \else\draw[phys] (\tn@name-T)--(\tn@name-B);\fi
+ \end{pgfonlayer}}
+\newcommand{\tncolumn}[2][]{\tikz[tn,tn centered]{\tncolumnpath[#1]{#2}}}
+
+% Torus terms for ratio formulas: \Zt{cols}{rows}, and a power \Ztsq[k]{c}{r}.
+\newcommand{\Zt}[2]{\Zrect[.55]{#1}{#2}}
+\newcommand{\Ztsq}[3][2]{{\Zt{#2}{#3}}^{#1}}
+
+% \sparkline{min}{max}{v0,v1,...}: word-sized line of the values (e.g. log10
+% of a sequence); the first value is a black dot, the last a red one.
+\newcommand{\sparkline}[3]{\tikz[baseline=0pt,x=.75em,y=.9em,line width=.45pt]{
+ \foreach \tn@v [count=\tn@i from 0] in {#3}{
+  \pgfmathsetmacro\tn@y{(\tn@v-(#1))/((#2)-(#1))}
+  \ifnum\tn@i=0 \fill (0,\tn@y) circle[radius=.08em];
+  \else\draw[black!70] ({\tn@i-1},\tn@py)--(\tn@i,\tn@y);\fi
+  \xdef\tn@py{\tn@y}\xdef\tn@lx{\tn@i}}
+ \fill[mpored] (\tn@lx,\tn@py) circle[radius=.11em];}}
+
+% ------------------------------------------------------------- proof maps
+% A proof map places one bound per point on a grid of lengths (columns) and
+% inverse temperatures (rows); arrows are the moves that derive them.
+%   \begin{proofmap}[column spacing]{col labels}{row labels} ... \end{proofmap}
+%   \mappoint{kind}{col}{row}{label}  kind: s, t, b (spatial, thermal,
+%       boundary), with suffix o for an open (intermediate) point; it is
+%       named m<col><row>, and labelled below in row 0, above otherwise
+%   \mapmove[color]{from}{to}{label options}{label}, \mapedge[color]{from}{to}
+%   \mapbox[margin]{tag}{first col}{last col}{row}
+\tikzset{
+ map s/.style={mappt,fill=mpored},  map so/.style={mappt,draw=mpored,fill=white},
+ map t/.style={mappt,fill=mpoblue}, map to/.style={mappt,draw=mpoblue,fill=white},
+ map b/.style={mappt,fill=black!35},map bo/.style={mappt,draw=black!50,fill=white}}
+\def\mapdx{2.9}\def\mapdy{1.7}
+\newenvironment{proofmap}[3][2.9]{%
+ \def\mapdx{#1}%
+ \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \foreach \tn@l [count=\tn@c from 0] in {#2}{
+   \node[mapaxis] at ({\tn@c*\mapdx},-.95) {$\tn@l$};}
+ \foreach \tn@l [count=\tn@r from 0] in {#3}{
+   \node[mapaxis,anchor=east] at (-.95,{\tn@r*\mapdy}) {$\tn@l$};}}
+ {\end{tikzpicture}}
+\newcommand{\mappoint}[4]{%
+ \ifnum#3=0 \node[map #1,label=below:{#4}] (m#2#3) at ({#2*\mapdx},0) {};
+ \else\node[map #1,label=above:{#4}] (m#2#3) at ({#2*\mapdx},{#3*\mapdy}) {};\fi}
+\newcommand{\mapedge}[3][black!55]{\draw[flow,#1,shorten <=.5pt,shorten >=.5pt] (m#2)--(m#3);}
+\newcommand{\mapmove}[5][black!55]{%
+ \draw[flow,#1,shorten <=.5pt,shorten >=.5pt] (m#2)--(m#3) node[maprule,pos=.5,#4] {#5};}
+\newcommand{\mapbox}[5][.85]{%
+ \pgfmathsetmacro\tn@xa{#3*\mapdx-#1}\pgfmathsetmacro\tn@xb{#4*\mapdx+#1}%
+ \pgfmathsetmacro\tn@xm{(\tn@xa+\tn@xb)/2}%
+ \ifnum#5=0
+  \draw[mapbox] (\tn@xa,-.62) rectangle (\tn@xb,.28);
+  \node[maptag,anchor=north] at (\tn@xm,-.62) {#2};
+ \else
+  \pgfmathsetmacro\tn@ya{#5*\mapdy-.28}\pgfmathsetmacro\tn@yb{#5*\mapdy+.62}%
+  \draw[mapbox] (\tn@xa,\tn@ya) rectangle (\tn@xb,\tn@yb);
+  \node[maptag,anchor=south] at (\tn@xm,\tn@yb) {#2};
+ \fi}
+% A bare virtual leg and a bare physical leg, for the diagram conventions.
+\newcommand{\virtleg}{\tikz[tn]{\draw (0,0)--(1.1,0);}}
+\newcommand{\physleg}{\tikz[tn]{\draw[phys] (0,-.5)--(0,.5);}}
+\endinput

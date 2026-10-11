@@ -1,0 +1,475 @@
+\documentclass[aps,prl,reprint,amsmath,amssymb,nofootinbib,raggedbottom]{revtex4-2}
+\usepackage[T1]{fontenc}
+\usepackage{tnnotes}
+\usepackage[colorlinks=true,citecolor=blue,linkcolor=blue,urlcolor=blue]{hyperref}
+\hypersetup{pdftitle={Scope of the Two-Purity Method}}
+
+\newtheorem{corollary}{Corollary}
+
+% ------------------------------------------------ diagrams specific to this note
+% One bond event: C on the left site, Theta(C) on its mirror image; the dashed
+% line is the mirror, the double lines are the two sites' imaginary-time legs.
+\newcommand{\bondform}[2]{\tikz[tn,tn centered]{
+ \draw[phys] (0,-1)--(0,1); \draw[phys] (3.2,-1)--(3.2,1);
+ \draw (0,0)--(3.2,0);
+ \draw[black!45,densely dashed,line width=.35pt] (1.6,-1.15)--(1.6,1.15);
+ \node[xop,fill=white] at (0,0) {$#1$};
+ \node[xop,fill=white] at (3.2,0) {$#2$};}}
+% A transfer vertex with named virtual legs.
+\newcommand{\Xab}[2]{\tikz[tn]{\draw (-.95,0)--(.95,0); \node[xvertex] at (0,0) {};
+ \node[anchor=east] at (-1,0) {$#1$}; \node[anchor=west] at (1,0) {$#2$};}}
+% One site of the transfer vertex, opened in imaginary time: the physical
+% trace (closed double loop) with the left-bond insertions #1 and the
+% right-bond insertions #2.
+\newcommand{\eventsite}[2]{\tikz[tn,tn centered]{
+ \begin{pgfonlayer}{background}
+ \draw[phys,ring] (0,-1.9)--(0,1.9)--(1.9,1.9)--(1.9,-1.9)--cycle;
+ \draw (-1.9,1)--(0,1); \draw (-1.9,-1)--(0,-1);
+ \draw[preaction={draw,white,line width=2.5pt}] (0,0)--(2.6,0);
+ \end{pgfonlayer}
+ \node[xop,fill=white] at (0,1) {$#1$};
+ \node[xop,fill=white] at (0,-1) {$#1$};
+ \node[xop,fill=white] at (0,0) {$#2$};
+ \node[anchor=east] at (-1.9,0) {$a$}; \node[anchor=west] at (2.6,0) {$b$};}}
+% The reflection-positivity inequality: a spacetime torus cut by the mirror,
+% A on the left half, theta(A) on its image.
+\newcommand{\rpcut}{\tikz[tn,tn centered]{
+ \fill[mpoblue!12] (0,0) rectangle (4.4,1.8);
+ \draw[black!60,line width=.35pt] (0,0) rectangle (4.4,1.8);
+ \draw[black!45,densely dashed,line width=.35pt] (2.2,-.25)--(2.2,2.05);
+ \node[xop,fill=white] at (1.1,.9) {$A$};
+ \node[xop,fill=white] at (3.3,.9) {$\theta(A)$};}}
+% delta(eps) = [(1-eps)^-3 - 1]^2/2 against the diagonal, 0 <= eps <= .16;
+% they cross at eps* = .127.
+\newcommand{\deltacurve}{\tikz[baseline=0pt,x=6.5em,y=6.5em,line width=.45pt]{
+ \draw[black!35,line width=.3pt] (0,0)--(.16,0) (0,0)--(0,.16);
+ \draw[black!45,densely dotted] (0,0)--(.16,.16);
+ \draw[mpored,domain=0:.1405,samples=30,smooth]
+   plot (\x,{.5*(1/((1-\x)*(1-\x)*(1-\x))-1)*(1/((1-\x)*(1-\x)*(1-\x))-1)});
+ \fill (.1273,.1273) circle[radius=.035em];}}
+
+\begin{document}
+\title{Scope of the Two-Purity Method}
+\date{October 8, 2026}
+\begin{abstract}
+The two-purity method establishes a uniform spectral gap from bond reflection positivity and certified finite-scale purity bounds. Bond reflection positivity ensures that the continuous-time spatial transfer operator is self-adjoint, enabling spatial scale doubling dual to imaginary time. We formalize the method as a general criterion for one-dimensional translation-invariant lattice systems and classify standard spin Hamiltonians according to their reflection positivity.
+\end{abstract}
+\maketitle
+\setlength{\abovedisplayskip}{5pt plus 2pt minus 1pt}
+\setlength{\belowdisplayskip}{5pt plus 2pt minus 1pt}
+
+\appendix
+\setcounter{secnumdepth}{2}
+\setcounter{section}{3}
+
+\section{Prerequisites of the Two-Purity Iteration}\label{app:uses}
+The proof in Ref.~\cite{main} is built from three kinds of moves.
+\begin{itemize}
+\item \emph{The coupling identities} are equalities between ratios of tori,
+such as $\Zt42/\Ztsq[4]21$. They hold for every Hamiltonian.
+\item \emph{Squaring in time}, $\tncolumn{\rho_n,\rho_n}\propto\rho_n(2\beta)$, needs only
+$e^{-\beta H}=e^{-\beta H/2}(e^{-\beta H/2})^\dagger\ge0$. This holds for every Hamiltonian:
+the mirror in time pairs each half of the torus with its adjoint.
+\item \emph{Squaring in space}, $\tnchain{\sigma_n,\sigma_n}\propto\sigma_{2n}$, needs
+$\sigma_n=X_\beta^n/Z_n\ge0$. This holds when the spatial transfer
+operator is self-adjoint, $X_\beta=X_\beta^\dagger$. The same property gives
+$Z_n=\sum_i\lambda_i^n$ with real $\lambda_i$, and hence the $\ell^p$
+interpolation to intermediate lengths.
+\end{itemize}
+Self-adjointness of $X_\beta$ is the spatial analogue of the time mirror, and
+it is not automatic. The rest of the proof is unchanged once it holds.
+The three hypotheses are therefore:
+\begin{itemize}
+\item[(H1)] \emph{Locality.} A translation-invariant chain with finite local
+dimension and nearest-neighbour terms. Finite-range interactions reduce to
+this by blocking sites.
+\item[(H2)] \emph{Bond reflection positivity} (Sec.~\ref{app:rp}).
+\item[(H3)] \emph{Input.} Both purities are near one at a single scale
+(Sec.~\ref{app:criterion}).
+\end{itemize}
+Hypotheses (H1) and (H2) are algebraic properties of the Hamiltonian, whereas (H3) reflects the underlying spectral gap.
+
+\section{Reflection positivity}\label{app:rp}
+Let $\Theta$ be an antiunitary map on one site with $\Theta^2=\pm1$, for
+example complex conjugation $K$ in a chosen basis. For an operator $C$ on one site write
+$\Theta(C)=\Theta C\Theta^{-1}$.
+\begin{itemize}
+\item \emph{Reflection.} Cut the chain between two neighbouring sites. Mirror
+the chain across the cut and apply $\Theta$ on every site. Call the result
+$\theta$. It is antilinear, it maps the operators on the left half to those
+on the right half, and $\theta^2=1$.
+\item \emph{Bond form.} A nearest-neighbour Hamiltonian is in \emph{bond
+reflection-positive form}~\cite{dls,fils,biskup,jaffejanssens} if it reads
+\begin{equation}
+ H=\sum_jD_j-\sum_{j,k}c_k\,C_{k,j}\,\Theta(C_k)_{j+1},\qquad c_k>0,
+ \label{eq:rpform}
+\end{equation}
+with $\Theta(D)=D$. Each bond event of weight $c_k$ inserts $C_k$ on one
+site and its mirror image $\Theta(C_k)$ on the next site,
+\begin{equation*}
+ -h_{j,j+1}=\sum_kc_k\;\bondform{C_k}{\Theta(C_k)}.
+\end{equation*}
+The sign in front matters. A term with $c_k<0$ cannot be absorbed by
+rescaling $C_k$, because $\Theta$ conjugates the factor $i$:
+$(iC)\otimes\Theta(iC)=C\otimes\Theta(C)$.
+\end{itemize}
+The model of Ref.~\cite{main} has this form with $\Theta=K$ in the Cartesian
+basis and $c_k=1$. Its generators $G_\alpha=iS^\alpha$ are real, so
+$-\bm S\cdot\bm S=\sum_\alpha G_\alpha\otimes\overline{G_\alpha}$.
+
+\emph{Reflection positivity and transfer matrices.} Expand $e^{-\beta H}$ in the bond
+events that cross the mirror. Each term is a left half followed by its mirror
+image, so for every operator $A$ on the left half,
+\begin{equation}
+ \Tr\bigl[A\,\theta(A)\,e^{-\beta H}\bigr]=\rpcut
+ =\sum\langle\Phi_A|\Phi_A\rangle\ge0 .
+ \label{eq:rp}
+\end{equation}
+Reflection positivity began as the Osterwalder--Schrader axiom that
+rebuilds a Hilbert space and a positive transfer matrix from Euclidean
+data~\cite{os}. On the lattice it gives a self-adjoint, positive transfer
+matrix~\cite{luscher}, and its Cauchy--Schwarz structure drives infrared
+bounds and chessboard estimates~\cite{fss,fils,dls}. For spins and
+Majoranas, Jaffe and Janssens characterize exactly which couplings are
+reflection positive~\cite{jaffejanssens}. The two-purity method needs only
+the weaker consequence that follows: the network cut at a single bond is
+Hermitian. This is the Lüscher statement with space and time exchanged.
+
+\begin{lemma}[Mirror is conjugation]\label{lem:mirror}
+Under Eq.~\eqref{eq:rpform}, build the continuous-time MPO as in
+Ref.~\cite{main}. The events are $(\tau,k)$, they occur at rate $c_k$, and
+$e^{-\tau D}$ propagates between them. Then the transfer kernel obeys
+\begin{equation}
+ \overline{\Xab ab}=\Xab ba,\qquad\text{i.e.}\quad
+ \overline{X_\beta(a,b)}=X_\beta(b,a).
+ \label{eq:mirror}
+\end{equation}
+\end{lemma}
+\begin{proof}
+Open the vertex in imaginary time. Events on the left bond $a$ insert
+$\Theta(C)$, and events on the right bond $b$ insert $C$, along a single traced
+physical loop:
+\begin{equation*}
+ \overline{X_\beta(a,b)}=\overline{\eventsite{\Theta C}{C}}
+ =\eventsite{C}{\Theta C}=X_\beta(b,a).
+\end{equation*}
+Write $\Theta=VK$. Complex conjugation of a trace conjugates every
+insertion and keeps the time order. Conjugating the loop by $V$ then maps
+$\overline{\Theta(C)}\mapsto C$, $\overline C\mapsto\Theta(C)$ and
+$\overline D\mapsto D$, because $V\overline V=\pm1$ and $\Theta(D)=D$. The
+picture that results is the mirror image of the original: the left
+insertions are now $C$ and the right ones are $\Theta(C)$.
+\end{proof}
+
+\begin{theorem}[Space behaves like time]\label{thm:space}
+Assume (H1) and (H2). Then $X_\beta$ is a self-adjoint Hilbert--Schmidt
+operator on $L^2(\mu_\beta)$. For every even $n$, $Z_n(\beta)=\sum_i\lambda_i(\beta)^n$ with
+real $\lambda_i$, and $\sigma_n(\beta)\ge0$. In particular the squaring
+lemma, the coupling identities and the $\ell^p$ interpolation of
+Ref.~\cite{main} hold verbatim.
+\end{theorem}
+\begin{proof}
+The event measure $\mu_\beta$ is positive because $c_k>0$, and it is finite,
+with mass $e^{\beta\sum_kc_k}$ per bond. Normalize $\|C_k\|=1$. The kernel is
+then bounded, $|X_\beta(a,b)|\le d\,e^{\beta\|D\|}$, hence Hilbert--Schmidt,
+and it is Hermitian by Lemma~\ref{lem:mirror}. The remaining statements are
+those of Ref.~\cite{main} for a self-adjoint $X_\beta$.
+\end{proof}
+
+\emph{Relation to the sign problem.} A Hamiltonian is stoquastic if, in some basis, every
+configuration of a quantum Monte Carlo expansion has a nonnegative weight.
+Reflection positivity asks less of individual configurations and more of their
+structure: a weight may be negative, but each configuration paired with
+its mirror image contributes a square $|\cdot|^2$.
+\begin{itemize}
+\item In Ref.~\cite{main} the event measure is positive, but the entries of
+$W$ and $X_\beta$ carry signs, because the $G_\alpha$ are real antisymmetric
+matrices. A sampler over histories would meet a sign problem; the spectral
+argument does not, since $\sum_i\lambda_i^n>0$.
+\item Neither property implies the other. The quantum Heisenberg ferromagnet
+is stoquastic but not reflection positive~\cite{speer}; see also
+Proposition~\ref{prop:xyz}.
+\item The sign-free fermion Monte Carlo methods based on time reversal or
+Majorana symmetry exploit the same mirror-squared factorization,
+$\det M\cdot\overline{\det M}$~\cite{wuzhang,wei,li,jaffe}.
+\end{itemize}
+
+\section{The general criterion}\label{app:criterion}
+Define the one-step loss
+\begin{equation}
+ \delta(\varepsilon)=\tfrac12\bigl[(1-\varepsilon)^{-3}-1\bigr]^2 .
+ \label{eq:delta}
+\end{equation}
+It lies below the diagonal, \deltacurve, up to $\varepsilon_*\simeq0.1273$,
+the root of $\delta(\varepsilon)=\varepsilon$. Ref.~\cite{main} uses the
+cruder bound $\delta\le5\varepsilon^2$, valid for $\varepsilon\le1/100$.
+
+\begin{theorem}[Two-purity criterion]\label{thm:criterion}
+Assume (H1) and (H2), and suppose that for some even $n_0$ and some $\beta_0>0$,
+\begin{equation}
+ \Ps(n_0,\beta_0),\ \Pt(2n_0,\beta_0)\ge1-\varepsilon_0,\qquad
+ \varepsilon_0<\varepsilon_* .
+ \label{eq:H3}
+\end{equation}
+Set $\varepsilon_{j+1}=\delta(\varepsilon_j)$, $n_j=2^jn_0$ and
+$\beta_j=2^j\beta_0$. Then for every even $L\ge n_0$ the ground state
+is unique and
+\begin{equation}
+ \Delta_L\ \ge\ c:=\inf_{j\ge0}\frac1{\beta_j}
+ \log\frac{1-3\varepsilon_j}{3\varepsilon_j}\ >\ 0 .
+ \label{eq:c}
+\end{equation}
+\end{theorem}
+\begin{proof}
+By Theorem~\ref{thm:space}, the four moves of the doubling estimate in
+Ref.~\cite{main} apply without change. Move~1 gives
+$\Ps(n,2\beta)\ge(1-\varepsilon)^3$. Move~2 squares in space to get
+$\Ps(2n,2\beta)\ge1-\delta(\varepsilon)$. Move~3 gives
+$\Pt(4n,\beta)\ge(1-\varepsilon)^2(1-\delta)\ge(1-\varepsilon)^3$, which
+requires $\delta\le\varepsilon$, i.e.\ $\varepsilon\le\varepsilon_*$.
+Move~4 squares in time to get $\Pt(4n,2\beta)\ge1-\delta(\varepsilon)$.
+Induction on $j$ gives
+$\Ps(n_j,\beta_j),\Pt(2n_j,\beta_j)\ge1-\varepsilon_j$, with
+$\varepsilon_j$ decreasing because $\delta(\varepsilon)<\varepsilon$ on
+$(0,\varepsilon_*)$.
+Since $3\varepsilon_j<1/2$, the interpolation and gap-recovery steps of
+Ref.~\cite{main} give uniqueness and $e^{-\beta_j\Delta_L}\le
+3\varepsilon_j/(1-3\varepsilon_j)$ whenever $n_j\le L\le2n_j$.
+Every term of the infimum is positive. Since
+$\delta(\varepsilon)\le K\varepsilon^2$ near zero, $\varepsilon_j$ falls
+doubly exponentially. The terms therefore converge to a positive limit, and
+the infimum is positive.
+\end{proof}
+With $(n_0,\beta_0,\varepsilon_0)=(2304,784,1/100)$ this is the theorem of
+Ref.~\cite{main}, with $c\ge(\log20)/784$.
+
+\begin{corollary}[What (H3) excludes]\label{cor:obstruct}
+Under (H1) and (H2), Eq.~\eqref{eq:H3} cannot hold at any scale
+\begin{itemize}
+\item[(i)] if the ground state is $k$-fold degenerate at the length $2n_0$
+with $k\ge2$, because $\Pt\le w_0\le1/k$ there, a spectrum like \specbars{.49,.49,.02};
+\item[(ii)] if $\liminf_L\Delta_L=0$ along even $L$, because
+Theorem~\ref{thm:criterion} would contradict it.
+\end{itemize}
+\end{corollary}
+Corollary~\ref{cor:obstruct} rules out gapless chains, symmetry-broken
+chains, and chains whose ground state on the ring is asymptotically
+degenerate.
+
+The converse is expected but not proved. In a gapped chain with a unique
+ground state and correlation length $\xi$, one expects
+$1-\Ps\sim e^{-n/\xi}$ and $1-\Pt\sim n\,e^{-\beta\Delta}$. Both vanish
+along the doubling sequence \torusseq, so Eq.~\eqref{eq:H3} should hold at
+some finite scale, though perhaps a very large one.
+
+For a conformal critical chain the picture is different. The extensive free
+energy cancels in each torus ratio, so $\Ps$ and $\Pt$ approach ratios of
+the universal torus partition function at a fixed aspect ratio. These are
+numbers below one, so the defect stalls instead of collapsing.
+
+\section{Classification of Reflection-Positive Hamiltonians}\label{app:catalogue}
+\emph{Bilinear spin couplings.} Consider spin~$S$ with a nearest-neighbour
+coupling matrix $J$ (real symmetric) and a uniform field $\bm h$,
+\begin{equation}
+ H=\sum_j\bm S_j^{\mathsf T}J\,\bm S_{j+1}+\bm h\cdot\bm S_j .
+ \label{eq:bilinear}
+\end{equation}
+\begin{proposition}\label{prop:xyz}
+Suppose there is a symmetric orthogonal $O$ with $\det O=-1$ such that
+$-JO\succeq0$ and $O\bm h=\bm h$. Then Eq.~\eqref{eq:bilinear} is in the form
+of Eq.~\eqref{eq:rpform}, for every $S$. For diagonal
+$J=\operatorname{diag}(J_x,J_y,J_z)$ with nonzero entries and $\bm h=0$, such
+an $O$ exists exactly when an even number of $J_x,J_y,J_z$ are negative
+(ferromagnetic).
+\end{proposition}
+\begin{proof}
+$O=-R$ with $R$ the identity or a $\pi$ rotation. Let $T$ be time reversal,
+so $TST^{-1}=-S$, and put $\Theta=U_RT$. Then $\Theta\bm S\Theta^{-1}=O\bm S$.
+Since $U_R$ commutes with $T$, $\Theta^2=U_R^2T^2=\pm1$. Factor
+$-JO=\sum_kv_kv_k^{\mathsf T}$ with real $v_k$ and set
+$C_k=v_k\cdot\bm S$. Then
+$\sum_kC_k\otimes\Theta(C_k)=\sum\bm S^{\mathsf T}(-JO)O\bm S
+=-\bm S^{\mathsf T}J\bm S$, and $\Theta(\bm h\cdot\bm S)=(O\bm h)\cdot\bm S$.
+For diagonal $J$ the polar factor is unique: $O=\operatorname{sign}(-J)$,
+and $\det O=-1$ counts the ferromagnetic entries modulo two.
+\end{proof}
+\noindent The proposition sorts the standard spin chains as follows.
+\begin{itemize}
+\item \emph{Reflection positive:}
+ \begin{itemize}
+ \item the Heisenberg antiferromagnet for every $S$, with $O=-1$;
+ \item XXZ chains $S^xS^x+S^yS^y+\Delta S^zS^z$ with $\Delta\ge0$;
+ \item the XY model with any signs, since a zero entry frees $O_{zz}$;
+ \item the transverse-field Ising chain with either sign, with $O$ fixing
+ the field axis.
+ \end{itemize}
+\item \emph{Not of this form:}
+ \begin{itemize}
+ \item the Heisenberg ferromagnet (three ferromagnetic entries);
+ \item XXZ chains with $\Delta<0$;
+ \item the antiferromagnet in a uniform field, since $O=-1$ reverses $\bm h$.
+ \end{itemize}
+\end{itemize}
+
+The sublattice rotations by $\pi$ that map antiferromagnets to ferromagnets
+change two signs at once, so they never alter this parity.
+
+The uniform-field obstruction explains a choice made in Ref.~\cite{main},
+Appendix~A. There the boundary chain is built with opposite endpoint fields
+\fieldopp, since $\theta(-hS^z_1)=+hS^z_n$ makes that chain mirror
+symmetric. The equal-field chain \fieldsame{} is reached only through the
+symmetry $U_P$.
+
+\emph{Spin-1 bilinear--biquadratic chain.}
+Consider $H=\sum_j\cos\vartheta\,\bm S_j\cdot\bm S_{j+1}
++\sin\vartheta\,(\bm S_j\cdot\bm S_{j+1})^2$. In the Cartesian basis the
+quadrupoles $Q_{\alpha\beta}=S^\alpha S^\beta$ are real. Their antisymmetric
+part is $\frac12\epsilon_{\alpha\beta\gamma}G_\gamma$, so
+\begin{equation}
+ -h=\bigl(\cos\vartheta-\tfrac12\sin\vartheta\bigr)\sum_\alpha G_\alpha\otimes\overline{G_\alpha}
+ -\sin\vartheta\sum_{\alpha,\beta}Q^{+}_{\alpha\beta}\otimes\overline{Q^{+}_{\alpha\beta}},
+ \label{eq:blbq}
+\end{equation}
+where $Q^+_{\alpha\beta}=\frac12(Q_{\alpha\beta}+Q_{\beta\alpha})$; the cross terms cancel between symmetric and antisymmetric parts.
+\begin{proposition}\label{prop:blbq}
+With $\Theta=K$ in the Cartesian basis, the bilinear--biquadratic chain is
+in reflection-positive form if and only if
+$-\pi+\arctan2\le\vartheta\le0$.
+\end{proposition}
+\begin{proof}
+The condition holds if both coefficients in Eq.~\eqref{eq:blbq} are
+nonnegative, which is the stated window. For the converse, the form exists exactly
+when the realigned bond matrix becomes positive semidefinite after some
+on-site shift. Maximizing its least eigenvalue over all shifts gives a negative
+value outside the window, for example $-0.087$ at $\vartheta=-0.66\pi$ and
+$-0.156$ at $\vartheta=0.05\pi$ (Sec.~\ref{app:checks}).
+\end{proof}
+
+\begin{proofdiagram}
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \def\R{1.35}
+ % reflection-positive window [-pi+arctan 2, 0], in degrees [-116.57, 0]
+ \fill[mpored!14] (0,0)--(0:\R) arc[start angle=0,end angle=-116.57,radius=\R]--cycle;
+ \draw[black!35,line width=.4pt] (0,0) circle[radius=\R];
+ \draw[mpored,line width=2.2pt] (0:\R) arc[start angle=0,end angle=-116.57,radius=\R];
+ % method applies: Haldane part of the window, (-45, 0]
+ \draw[mpoblue,line width=2.2pt] (0:{\R+.12}) arc[start angle=0,end angle=-45,radius={\R+.12}];
+ % phase boundaries
+ \foreach \a in {45,90,-45,-135}{\draw[black!55,line width=.4pt] (\a:{\R-.12})--(\a:{\R+.12});}
+ \node[black!70] at (-22:{\R+.75}) {Haldane};
+ \node[black!70] at (67.5:{\R+.4}) {critical};
+ \node[black!70] at (180:{\R+.45}) {FM};
+ \node[black!70] at (-90:{\R+.38}) {dimerized};
+ % special points
+ \foreach \a in {0,18.43,45,-45,-116.57}{\fill (\a:\R) circle[radius=1.4pt];}
+ \node[anchor=west,font=\scriptsize] at (18.43:{\R+.08}) {AKLT};
+ \node[anchor=west,font=\scriptsize] at ([yshift=-1pt]0:{\R+.2}) {Heisenberg};
+ \node[anchor=south west,font=\scriptsize] at (45:{\R+.02}) {ULS};
+ \node[anchor=north west,font=\scriptsize] at (-45:{\R+.14}) {TB};
+ \node[anchor=north east,font=\scriptsize] at (-116.57:{\R+.02}) {$-\pi{+}\arctan2$};
+ \draw[flow,black!40] (0,0)--(35:.6) node[pos=1.15,black!60,font=\scriptsize] {$\vartheta$};
+\end{tikzpicture}
+\end{proofdiagram}
+The red arc in the figure is the reflection-positive window. The blue arc,
+$-\pi/4<\vartheta\le0$, is where it meets the Haldane phase, so
+Theorem~\ref{thm:criterion} can apply there. Elsewhere in the window
+Corollary~\ref{cor:obstruct} excludes it: the dimerized ground states are
+degenerate, and the Takhtajan--Babujian point TB is critical.
+
+The Heisenberg chain sits exactly on the edge of the window. The AKLT and
+ULS points lie outside it: the positive biquadratic coefficient has the
+wrong sign. Proving the AKLT gap this way would need a different $\Theta$, a
+different cut, or blocking: a numerical search over every on-site
+$\Theta$ finds none (Sec.~\ref{app:checks}).
+
+\emph{Beyond the chain.} Finite-range couplings fit after blocking: put $r$
+sites in a unit cell and reflect within the block. Reflection-positive
+fermion models~\cite{jaffe} and two-dimensional lattices with reflection
+planes~\cite{fils,biskup} supply the structural property (H2). In
+two dimensions the spatial transfer operator acts on a whole column, so
+(H3) becomes much harder to verify.
+
+\section{Numerical checks}\label{app:checks}
+The checks are short floating-point scripts kept outside this repository. Two tests are used.
+\begin{itemize}
+\item \emph{Gram test} (\texttt{rp\_check.py}). This tests
+Eq.~\eqref{eq:rp} on open chains of $4$ and $6$ sites,
+$\beta\in[0.3,3]$. The left-half operators $A$ index a Hermitian form, and
+the test reports its least eigenvalue relative to the largest, minimized over
+the on-site antiunitary $\Theta=VK$.
+\item \emph{Realignment test} (\texttt{t4.py}). This checks the form of
+Eq.~\eqref{eq:rpform} directly, with the on-site shift optimized.
+\end{itemize}
+The results:
+\begin{itemize}
+\item \emph{Spin-$\tfrac12$ XYZ chain.} All eight sign patterns of
+$(J_x,J_y,J_z)=(\pm1,\pm.7,\pm.4)$ follow the parity rule: those with zero
+or two ferromagnetic entries give $\ge-10^{-12}$ after optimizing $V$, and
+the other four give $-0.048$. The antiferromagnet in a uniform field gives
+$-0.095$, and the transverse-field Ising chain gives $\ge-10^{-12}$.
+\item \emph{Spin-1, Cartesian $\Theta=K$.} The Heisenberg antiferromagnet
+and $-(\bm S\cdot\bm S)^2$ pass. The ferromagnet fails at $-0.39$ and AKLT
+fails at $-0.04$. Over $\vartheta$, the test is nonnegative at the sampled points inside the
+window of Proposition~\ref{prop:blbq}, $\vartheta/\pi\in[-.62,0]$, and negative at the sampled points
+outside it, $\vartheta/\pi\in\{-1,-.88,-.75\}\cup[.12,1]$.
+\item \emph{Spin-1, every on-site $\Theta=VK$.} Minimizing over $V\in U(3)$
+with twelve restarts does not help: AKLT stays at $-0.040$, ULS at $-0.18$,
+$\vartheta=-0.75\pi$ at $-0.15$, and the ferromagnet improves only to $-0.15$.
+\end{itemize}
+These tests are necessary conditions for a particular $\theta$. A failure
+excludes that $\Theta$, not every possible proof.
+\begin{thebibliography}{13}
+\bibitem{main}
+Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime
+tensor networks}, \texttt{outputs/thermal-mpo-gap-note.tex} (2026).
+\bibitem{os}
+K. Osterwalder and R. Schrader,
+\href{https://doi.org/10.1007/BF01645738}{Axioms for Euclidean Green's
+functions}, Commun. Math. Phys. \textbf{31}, 83 (1973).
+\bibitem{luscher}
+M. L\"uscher, Construction of a selfadjoint, strictly positive transfer
+matrix for Euclidean lattice gauge theories, Commun. Math. Phys.
+\textbf{54}, 283 (1977).
+\bibitem{fss}
+J. Fr\"ohlich, B. Simon, and T. Spencer,
+\href{https://doi.org/10.1007/BF01608557}{Infrared bounds, phase
+transitions and continuous symmetry breaking}, Commun. Math. Phys.
+\textbf{50}, 79 (1976).
+\bibitem{jaffejanssens}
+A. Jaffe and B. Janssens,
+\href{https://doi.org/10.1007/s00220-015-2545-z}{Characterization of
+reflection positivity: Majoranas and spins}, Commun. Math. Phys.
+\textbf{346}, 1021 (2016).
+\bibitem{dls}
+F. J. Dyson, E. H. Lieb, and B. Simon,
+\href{https://doi.org/10.1007/BF01106729}{Phase transitions in quantum spin
+systems with isotropic and nonisotropic interactions},
+J. Stat. Phys. \textbf{18}, 335 (1978).
+\bibitem{fils}
+J. Fr\"ohlich, R. Israel, E. H. Lieb, and B. Simon,
+\href{https://doi.org/10.1007/BF01940327}{Phase transitions and reflection
+positivity. I.}, Commun. Math. Phys. \textbf{62}, 1 (1978).
+\bibitem{biskup}
+M. Biskup, \emph{Reflection positivity and phase transitions in lattice spin
+models}, in \emph{Methods of Contemporary Mathematical Statistical
+Physics}, Lecture Notes in Math. \textbf{1970} (Springer, 2009).
+\bibitem{speer}
+E. R. Speer, Failure of reflection positivity in the quantum Heisenberg
+ferromagnet, Lett. Math. Phys. \textbf{10}, 41 (1985).
+\bibitem{jaffe}
+A. Jaffe and F. L. Pedrocchi, Reflection positivity for Majoranas,
+Ann. Henri Poincar\'e \textbf{16}, 189 (2015).
+\bibitem{wuzhang}
+C. Wu and S.-C. Zhang, Sufficient condition for absence of the sign problem
+in the fermionic quantum Monte Carlo algorithm, Phys. Rev. B \textbf{71},
+155115 (2005).
+\bibitem{wei}
+Z.-C. Wei, C. Wu, Y. Li, S. Zhang, and T. Xiang, Majorana positivity and the
+fermion sign problem of quantum Monte Carlo simulations,
+Phys. Rev. Lett. \textbf{116}, 250601 (2016).
+\bibitem{li}
+Z.-X. Li, Y.-F. Jiang, and H. Yao, Majorana-time-reversal symmetries: a
+fundamental principle for sign-problem-free quantum Monte Carlo
+simulations, Phys. Rev. Lett. \textbf{117}, 267002 (2016).
+\end{thebibliography}
+\end{document}

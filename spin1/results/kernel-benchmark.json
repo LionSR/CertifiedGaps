@@ -1,0 +1,25 @@
+{
+    "status": "passed",
+    "comparisons": [
+        {
+            "reference_seconds": 63.04187607765198,
+            "source": 1,
+            "total": "22469818310308511355538446",
+            "twist": 1,
+            "magnetization": 1,
+            "optimized_seconds": 28.863887786865234,
+            "speedup": 2.1841089649170455,
+            "n": 11
+        },
+        {
+            "reference_seconds": 21.77508807182312,
+            "source": 2,
+            "total": "442349457431012750814090160",
+            "twist": 2,
+            "magnetization": 1,
+            "optimized_seconds": 8.428339958190918,
+            "speedup": 2.5835559766026552,
+            "n": 10
+        }
+    ]
+}

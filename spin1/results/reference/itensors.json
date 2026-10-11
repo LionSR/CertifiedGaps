@@ -1,0 +1,39 @@
+{
+    "thermal_traces": [
+        {
+            "trace": 124.88537982663786,
+            "within_rigorous_interval": true,
+            "twist": 0
+        },
+        {
+            "trace": 0.06575703548241217,
+            "within_rigorous_interval": true,
+            "twist": 1
+        }
+    ],
+    "ITensors": "0.9.32",
+    "dmrg_energy": -6,
+    "status": "numerical-crosscheck-passed",
+    "certified": false,
+    "wall_seconds": 92.51159620285034,
+    "matrix_max_errors": [
+        5.551115123125783e-16,
+        5.551115123125783e-16,
+        5.564975606931872e-16
+    ],
+    "trial_energy": -5.999999960868348,
+    "exact_trial_energy": -5.999999960868347,
+    "ITensorMPS": "0.4.2",
+    "thermal_mpo": {
+        "beta": 0.1,
+        "fine_logZ": 4.421544101214193,
+        "fine_absolute_error": 4.963552528991499e-7,
+        "coarse_logZ": 4.4215455922579165,
+        "coarse_dbeta": 0.05,
+        "fine_dbeta": 0.025,
+        "exact_logZ": 4.4215436048589405,
+        "n": 4
+    },
+    "julia": "1.12.4",
+    "completed_utc": "2026-10-08T06:03:15.893"
+}

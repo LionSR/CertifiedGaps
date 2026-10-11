@@ -1,0 +1,30 @@
+{
+    "status": "passed",
+    "scope": "Same 64 columns and all 192 Horner steps of the n=12 Sz=0 sector; microbenchmark, not a complete certificate",
+    "comparisons": [
+        {
+            "batch": 4,
+            "two_buffer_bytes": 4722496,
+            "partial_total": "5518739613271214148",
+            "seconds": 9.485392093658447
+        },
+        {
+            "batch": 8,
+            "two_buffer_bytes": 9444992,
+            "partial_total": "5518739613271214148",
+            "seconds": 4.99084997177124
+        },
+        {
+            "batch": 16,
+            "two_buffer_bytes": 18889984,
+            "partial_total": "5518739613271214148",
+            "seconds": 4.209807872772217
+        },
+        {
+            "batch": 32,
+            "two_buffer_bytes": 37779968,
+            "partial_total": "5518739613271214148",
+            "seconds": 3.229243040084839
+        }
+    ]
+}

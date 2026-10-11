@@ -1,0 +1,46 @@
+name = "ThermalMPOGap"
+uuid = "5b0c3f0e-7a51-4c55-9b1e-2f7f3d6a8c11"
+version = "0.2.0"
+authors = ["thermal-mpo-gap"]
+
+[deps]
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
+IntervalArithmetic = "d1acc4aa-44c8-5952-acd4-ba5d80a2a253"
+JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
+KrylovKit = "0b1a1467-8014-51b9-945f-bf0ae24f4b77"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Nemo = "2edaba10-b0f1-5616-af89-8c11ac63239a"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+SHA = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+
+[weakdeps]
+ITensorMPS = "0d1a4710-d33b-49a5-8f18-73bdf49b47e2"
+ITensors = "9136182c-28ba-11e9-034c-db9fb085ebd5"
+
+[extensions]
+ThermalMPOGapITensorsExt = ["ITensors", "ITensorMPS"]
+
+[compat]
+Dates = "1"
+ITensorMPS = "0.4.2"
+ITensors = "0.9.32"
+IntervalArithmetic = "1"
+JSON3 = "1.14"
+KrylovKit = "0.10"
+LinearAlgebra = "1"
+Nemo = "0.57"
+Printf = "1"
+Random = "1"
+SHA = "0.7, 1"
+SparseArrays = "1"
+julia = "1.10"
+
+[extras]
+ITensorMPS = "0d1a4710-d33b-49a5-8f18-73bdf49b47e2"
+ITensors = "9136182c-28ba-11e9-034c-db9fb085ebd5"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test", "ITensors", "ITensorMPS"]

@@ -1,0 +1,17 @@
+Spin-1 periodic certificate reproduction in Julia
+
+The numerical recipes, constants, polynomial MPS matrices, and verification
+logic are adapted from OpenAI's "The periodic spin-one Haldane gap"
+(September 24, 2026), distributed in https://github.com/openai/math under
+the Apache License, Version 2.0.
+
+Pinned upstream commit: adc7f1241b42e322a6451854ab7e4b4c146bf78a
+Upstream directory:
+preprints/The-periodic-spin-one-Haldane-gap-September-24-2026
+
+Original files are preserved under references/periodic-gap-source/.
+The upstream license is references/periodic-gap-source/LICENSE.upstream.
+These Julia files are a modified implementation, not upstream-authored Julia.
+Source2 uses unpacked real/Eisenstein integer coordinates in place of upstream's
+packed integer lanes. Independent physical-operator and ITensors controls are
+provided in addition to exact agreement with the upstream certificate integers.

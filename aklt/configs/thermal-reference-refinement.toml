@@ -1,0 +1,9 @@
+mode = "thermal"
+nx = 2
+ny = 2
+shapes = [[2, 2]]
+blas_threads = 1
+betas = [0.25, 0.5, 1.0]
+maxdims = [64, 128]
+dbetas = [0.125, 0.0625]
+cutoff = 1e-12

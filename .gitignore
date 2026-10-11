@@ -1,4 +1,4 @@
-# Local references, drafts, and build products
+# Local reading notes, archived drafts, and build products
 /work/
 .DS_Store
 
@@ -12,3 +12,26 @@
 *.out
 *.synctex.gz
 *.toc
+*Notes.bib
+
+# Survey of the criterion across models (kept local only)
+/survey/
+
+# Not part of the repository: downloaded papers and upstream evidence (fetch the evidence
+# spin1 needs with `julia tools/fetch_upstream.jl`), scratch reproductions
+/references/
+/working/
+
+# No Python in this repository (aklt's local analysis helpers stay local)
+*.py
+
+# Editor and build caches
+outputs/.texpadtmp/
+lean/.lake/
+*.tmp
+*.jls
+
+# Large or regenerable result data; small certificates read by tests are tracked
+/aklt/results/
+/spin2/results/*-witness.json
+/spin2/results/*n256*.json

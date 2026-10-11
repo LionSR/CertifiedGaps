@@ -1,0 +1,778 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools,booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\ee}{\varepsilon}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\title{The thermal-purity recursion in \(2+1\) dimensions}
+\author{}
+\date{October 8, 2026}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+	For a frustration-free Hamiltonian with exact ground energy zero, the
+	natural recursion variable is the partition-function excess \(R=Z-1\).
+	Temporal doubling squares this excess from above. Two scalar spatial
+	gluing inequalities then give
+	\(R'\le(1+R^2)^4-1\le5R^2\) for \(R\le0.01\).
+	A single finite-volume seed yields a uniform gap on dyadic tori;
+	spatial moment interpolation extends it to intermediate periods.
+	We also retain the general three-purity cube recursion, derive an
+	error-tolerant gluing update, and give an exact local obstruction to
+	the standard time-reversal reflection-positive construction for AKLT.
+	The scalar spatial gluing inequalities remain unproved here for AKLT.
+	For a separate exact projection filter, we certify quadratic spatial
+	concentration at transverse width two and depth one despite nonreal
+	transfer eigenvalues. Extending this estimate as width and depth grow
+	remains open.
+\end{abstract}
+
+\section{Quadratic Excess Recursion for Frustration-Free Systems}
+
+Suppose \(H_{n,m}\ge0\) has at least one zero-energy ground state for
+each periodic rectangle considered. Set
+\[
+	Z(n,m,\beta)=\Tr e^{-\beta H_{n,m}},\qquad
+	R(n,m,\beta)=Z(n,m,\beta)-1.
+\]
+One zero-energy eigenvector contributes exactly one to \(Z\). If the
+remaining energies, including any additional zeros, are \(E_k\), then
+\begin{equation}
+	R(n,m,2\beta)=\sum_{k\ge1}e^{-2\beta E_k}
+	\le\left(\sum_{k\ge1}e^{-\beta E_k}\right)^2
+	=R(n,m,\beta)^2.
+	\label{eq:ff-time}
+\end{equation}
+This does not assume uniqueness. A bound \(R<1\) subsequently proves
+uniqueness, since any additional zero-energy state contributes one.
+
+The spatial input is only the pair of scalar inequalities
+\begin{align}
+	Z(2n,m,b)  & \le Z(n,m,b)^2,\label{eq:ff-x}  \\
+	Z(2n,2m,b) & \le Z(2n,m,b)^2.\label{eq:ff-y}
+\end{align}
+For one recursion step these are needed at \(b=2\beta\).
+An exact self-adjoint spatial-transfer representation implies them,
+but is a stronger assumption: no spatial squaring lemma is used here.
+
+\begin{theorem}[Frustration-free \(2+1\)D recursion]
+	If \eqref{eq:ff-x}--\eqref{eq:ff-y} hold at \(b=2\beta\), then
+	\begin{equation}
+		\boxed{R(2n,2m,2\beta)
+			\le\bigl[1+R(n,m,\beta)^2\bigr]^4-1.}
+		\label{eq:ff-update}
+	\end{equation}
+	In particular, for \(0\le R\le0.01\),
+	\begin{equation}
+		\boxed{R'\le4R^2+6R^4+4R^6+R^8\le5R^2.}
+		\label{eq:ff-quadratic}
+	\end{equation}
+\end{theorem}
+
+\begin{proof}
+	First double imaginary time using \eqref{eq:ff-time}; then double
+	the two spatial periods using \eqref{eq:ff-x}--\eqref{eq:ff-y}:
+	\[
+		Z(2n,2m,2\beta)\le Z(n,m,2\beta)^4
+		\le\bigl[1+R(n,m,\beta)^2\bigr]^4.
+	\]
+	Subtract one. For \(R\le0.01\), the coefficient of \(R^2\) is at
+	most \(4+6(0.01)^2+4(0.01)^4+(0.01)^6<5\).
+\end{proof}
+
+The order matters for the bound: temporal doubling first gives the
+leading coefficient \(4\). Spatial doubling first would give the
+weaker \(R'\le[(1+R)^4-1]^2\), with leading coefficient \(16\).
+In \(d\) spatial dimensions the same argument gives
+\(R'\le(1+R^2)^{2^d}-1\), with leading coefficient \(2^d\).
+
+\paragraph{One finite seed.}
+Assume the gluing inequalities at every subsequent dyadic step, and
+certify only
+\begin{equation}
+	Z(n_0,m_0,\beta_0)\le1.01.
+	\label{eq:ff-seed}
+\end{equation}
+With \((n_j,m_j,\beta_j)=2^j(n_0,m_0,\beta_0)\), induction gives
+\begin{equation}
+	R(n_j,m_j,\beta_j)\le r_j:=\frac15\,20^{-2^j},
+	\qquad r_{j+1}=5r_j^2.
+	\label{eq:ff-scales}
+\end{equation}
+The ground state is unique on each such torus and
+\(e^{-\beta_j\Delta_{n_j,m_j}}\le R(n_j,m_j,\beta_j)\).
+Thus \(\Delta_{n_j,m_j}>(\log20)/\beta_0\), uniformly in \(j\).
+There is no need to reconstruct the gap from a normalized purity.
+
+If a finite seed Hamiltonian has a unique zero-energy ground state,
+Hilbert-space dimension \(D\), and a certified finite-volume gap
+\(\gamma_*>0\), then
+\[
+	R(n_0,m_0,\beta)\le(D-1)e^{-\beta\gamma_*}.
+\]
+Consequently, \(\beta_0=\log[100(D-1)]/\gamma_*\) suffices for
+\eqref{eq:ff-seed}. Under the spatial assumptions, this yields the
+explicit, possibly small, lower bound
+\begin{equation}
+	\Delta_{n_j,m_j}>
+	\frac{\gamma_*\log20}{\log[100(D-1)]}.
+	\label{eq:ff-finite-gap}
+\end{equation}
+Existence of a finite-volume seed is therefore automatic from finite
+dimensionality and uniqueness. The substantive uniform input is the
+spatial gluing property, not the existence of three low-temperature
+purity certificates.
+
+\paragraph{Intermediate periods require an additional input.}
+If the spatial moment representations introduced below also hold,
+then for even \(n_j\le L_x\le2n_j\) and \(m_j\le L_y\le2m_j\),
+\[
+	Z(L_x,L_y,\beta_j)
+	\le Z(n_j,m_j,\beta_j)^{L_xL_y/(n_jm_j)}
+	\le(1+r_j)^4.
+\]
+Since \((1+r)^4-1<5r\) for \(0<r\le0.01\),
+\[
+	e^{-\beta_j\Delta_{L_x,L_y}}
+	\le R(L_x,L_y,\beta_j)<5r_j=20^{-2^j}.
+\]
+The same gap bound follows on these windows. In particular, equal seed
+periods cover all sufficiently large even square tori. Scalar doubling
+inequalities alone establish the dyadic result, not this interpolation.
+
+\paragraph{Errors in spatial gluing.}
+The exact inequalities can be relaxed. Suppose at \(b=2\beta_j\),
+\begin{align*}
+	Z(2n_j,m_j,b)  & \le e^{\eta_{x,j}}Z(n_j,m_j,b)^2,  \\
+	Z(2n_j,2m_j,b) & \le e^{\eta_{y,j}}Z(2n_j,m_j,b)^2,
+\end{align*}
+with nonnegative errors. Put \(\eta_j=2\eta_{x,j}+\eta_{y,j}\).
+The same proof gives the rigorous perturbed update
+\begin{equation}
+	\boxed{R_{j+1}\le e^{\eta_j}(1+R_j^2)^4-1.}
+	\label{eq:ff-perturbed}
+\end{equation}
+For \(R_j,\eta_j\le0.01\), this is at most
+\(5R_j^2+2\eta_j\). A constant nonzero gluing error is therefore
+insufficient for this iteration to prove a gap; it creates an error
+floor. An estimate \(\eta_j\le cR_j^2\) instead retains a quadratic
+recursion with coefficient \(5+2c\). PEPS boundary estimates would
+need an explicit bridge to these thermal partition-function errors
+before they could be used as this input.
+
+\section{Directional Purities and Spatial Transfer Operators}
+
+Let \(H_{n,m}\) be a finite-dimensional Hamiltonian on a periodic
+two-dimensional lattice, and put
+\[
+	Z(n,m,\beta)=\Tr e^{-\beta H_{n,m}},\qquad \beta>0.
+\]
+The integers \(n,m\) count spatial slices or fixed unit cells, not
+necessarily individual spins. We use even periods throughout.
+Write \(v=(n,m,\beta)\), with commuting doubling operations
+\[
+	D_xv=(2n,m,\beta),\quad D_yv=(n,2m,\beta),\quad
+	D_tv=(n,m,2\beta).
+\]
+Define
+\begin{align}
+	P_x(v) & =\frac{Z(2n,m,\beta)}{Z(n,m,\beta)^2}, &
+	P_y(v) & =\frac{Z(n,2m,\beta)}{Z(n,m,\beta)^2}, &
+	P_t(v) & =\frac{Z(n,m,2\beta)}{Z(n,m,\beta)^2}.
+	\label{eq:purities}
+\end{align}
+Here \(t\) denotes imaginary time. The temporal ratio is always the
+purity of \(\rho_v=e^{-\beta H_{n,m}}/Z(v)\).
+
+\paragraph{Spatial-transfer hypothesis.}
+For every transverse period and inverse temperature used below, assume
+there exist self-adjoint operators \(T_x(m,\beta)\) and
+\(T_y(n,\beta)\), independent of their respective longitudinal periods,
+such that
+\begin{equation}
+	Z(n,m,\beta)=\tr T_x(m,\beta)^n
+	=\tr T_y(n,\beta)^m.
+	\label{eq:transfer}
+\end{equation}
+Assume the even powers in these identities are positive trace-class
+operators. No uniform bound on the transfer-space dimension is needed.
+The operators for different directions need not act on the same space
+or commute. The identities must be exact; an unbounded truncation error
+cannot be inserted into the argument.
+
+For even \(n,m\), the trace-one operators
+\[
+	\sigma_x(v)=\frac{T_x(m,\beta)^n}{Z(v)},\qquad
+	\sigma_y(v)=\frac{T_y(n,\beta)^m}{Z(v)},\qquad
+	\sigma_t(v)=\rho_v
+\]
+are positive, and \(P_a(v)=\tr\sigma_a(v)^2\). Consequently,
+\begin{equation}
+	0<P_a(v)\le1,\qquad
+	\sigma_a(D_av)=\frac{\sigma_a(v)^2}{P_a(v)},
+	\qquad a\in\{x,y,t\}.
+	\label{eq:square-states}
+\end{equation}
+An exact tensor-network representation alone does not imply
+\eqref{eq:transfer}: spatial reflection, positivity, and the identification
+of the same transfer operator at different lengths must be checked.
+
+\section{Squaring Lemma and Spacetime Cube Coupling}
+
+For any positive trace-one operator with eigenvalues \(p_i\), write
+\(P=\sum_i p_i^2\). Its normalized square has purity \(P'\), with
+\[
+	1-P'=\frac{2\sum_{i<j}p_i^2p_j^2}{P^2}
+	\le\frac{(1-P)^2}{2P^2}.
+\]
+Thus, with
+\begin{equation}
+	f(z)=\frac{z^2}{2(1-z)^2},\qquad 0\le z<1,
+	\label{eq:f}
+\end{equation}
+we have \(1-P_a(D_av)\le f(1-P_a(v))\).
+
+Every pair of directions also satisfies the exact identity
+\begin{equation}
+	P_a(v)^2P_b(D_av)=P_b(v)^2P_a(D_bv).
+	\label{eq:face}
+\end{equation}
+This follows by cancellation of partition functions and requires no
+transfer assumption. The same cancellation on the three-dimensional
+cube gives, for any permutation \((a,b,c)\) of \((x,y,t)\),
+\begin{equation}
+	Q(v):=\frac{Z(D_xD_yD_tv)}{Z(v)^8}
+	=P_a(v)^4P_b(D_av)^2P_c(D_bD_av).
+	\label{eq:cube}
+\end{equation}
+The exponents \(4,2,1\) count how often the earlier ratios enter the
+successive squarings. In particular, since every factor is at most one,
+\begin{equation}
+	P_c(D_aD_bv)\ge Q(v).
+	\label{eq:last-edge}
+\end{equation}
+The cube identity supplies the coupling; positivity supplies this
+inequality.
+
+\section{Staggered Three-Component Scale-Doubling Iteration}
+
+At the base point \(v\), assume
+\begin{equation}
+	P_x(v)\ge1-\ee_x,\qquad
+	P_y(D_xv)\ge1-\ee_y,\qquad
+	P_t(D_yD_xv)\ge1-\ee_t.
+	\label{eq:seed}
+\end{equation}
+These are the three edges of the path \(x,y,t\) through one cube.
+Put \(v'=D_xD_yD_tv\). The next-scale quantities occupy the same
+staggered positions:
+\begin{equation}
+	P_x(v'),\qquad P_y(D_xv'),\qquad P_t(D_yD_xv').
+	\label{eq:target}
+\end{equation}
+In coordinates, the input and output are
+\[
+	\begin{array}{c|c|c}
+		  & \text{input}     & \text{output}      \\ \hline
+		x & P_x(n,m,\beta)   & P_x(2n,2m,2\beta)  \\
+		y & P_y(2n,m,\beta)  & P_y(4n,2m,2\beta)  \\
+		t & P_t(2n,2m,\beta) & P_t(4n,4m,2\beta).
+	\end{array}
+\]
+
+\begin{theorem}[Three-component update]
+	Define successively
+	\begin{align}
+		u_x      & =(1-\ee_x)^4(1-\ee_y)^2(1-\ee_t),       &
+		\delta_x & =f(1-u_x),\label{eq:update-x}             \\
+		u_y      & =(1-\ee_y)^4(1-\ee_t)^2(1-\delta_x),    &
+		\delta_y & =f(1-u_y),\label{eq:update-y}             \\
+		u_t      & =(1-\ee_t)^4(1-\delta_x)^2(1-\delta_y), &
+		\delta_t & =f(1-u_t).\label{eq:update-t}
+	\end{align}
+	Provided the input defects lie in \([0,1)\) and
+	\(\delta_x,\delta_y<1\), the output defects in
+	\eqref{eq:target} are bounded by \(\delta_x,\delta_y,\delta_t\),
+	respectively.
+\end{theorem}
+
+\begin{proof}
+	First use the cube at \(v\). Its path \(x,y,t\) gives
+	\(Q(v)\ge u_x\). Reorder the path to \(y,t,x\); by
+	\eqref{eq:last-edge},
+	\(P_x(D_yD_tv)\ge u_x\).
+	Squaring in \(x\) yields \(P_x(v')\ge1-\delta_x\).
+
+	Next use the cube based at \(D_xv\). Its path \(y,t,x\) uses two
+	old bounds and the just-proved bound:
+	\[
+		Q(D_xv)=P_y(D_xv)^4P_t(D_yD_xv)^2P_x(v')\ge u_y.
+	\]
+	Reordering to \(x,t,y\) gives
+	\(P_y(D_x^2D_tv)\ge u_y\).
+	Squaring in \(y\) yields \(P_y(D_xv')\ge1-\delta_y\).
+
+	Finally use the cube based at \(D_xD_yv\). Its path \(t,x,y\)
+	gives
+	\[
+		Q(D_xD_yv)=P_t(D_xD_yv)^4P_x(v')^2P_y(D_xv')\ge u_t.
+	\]
+	Reordering to \(x,y,t\) gives
+	\(P_t(D_x^2D_y^2v)\ge u_t\).
+	Squaring in \(t\) yields \(P_t(D_xD_yv')\ge1-\delta_t\).
+\end{proof}
+
+\begin{theorem}[Closed scalar recursion]
+	If the three input defects are at most \(\ee\le10^{-3}\), then all
+	three output defects are at most
+	\begin{equation}
+		g(\ee)=f\bigl(1-(1-\ee)^7\bigr)
+		=\frac12\bigl[(1-\ee)^{-7}-1\bigr]^2
+		\le25\ee^2.
+		\label{eq:scalar}
+	\end{equation}
+\end{theorem}
+
+\begin{proof}
+	Bernoulli's inequality and monotonicity of \(f\) give
+	\[
+		g(\ee)\le f(7\ee)
+		=\frac{49\ee^2}{2(1-7\ee)^2}
+		\le25\ee^2\le\ee.
+	\]
+	The numerical inequality is exact: at \(\ee=1/1000\),
+	\(49{,}000{,}000<50\cdot993^2=49{,}302{,}450\).
+	The first update has \(u_x\ge(1-\ee)^7\), so
+	\(\delta_x\le g(\ee)\le\ee\).
+	This implies \(u_y\ge(1-\ee)^7\), hence the same bound on
+	\(\delta_y\); it then implies the corresponding bound on
+	\(\delta_t\). Thus the recursion closes.
+\end{proof}
+
+\section{Uniform Spectral Gap from Certified Seeds}
+
+Suppose three finite-scale certificates establish
+\begin{equation}
+	P_x(n_0,m_0,\beta_0),\quad
+	P_y(2n_0,m_0,\beta_0),\quad
+	P_t(2n_0,2m_0,\beta_0)\ \ge0.999.
+	\label{eq:certificates}
+\end{equation}
+Set
+\begin{equation}
+	n_j=2^jn_0,\quad m_j=2^jm_0,\quad\beta_j=2^j\beta_0,
+	\qquad \ee_j=\frac1{25}40^{-2^j}.
+	\label{eq:scales}
+\end{equation}
+Then \(\ee_0=10^{-3}\) and \(\ee_{j+1}=25\ee_j^2\), so the
+same three staggered purities at scale \(j\) are at least
+\(1-\ee_j\).
+
+We can also cover intermediate even periods. Choose even \(L_x,L_y\)
+such that, for the same \(j\),
+\begin{equation}
+	n_j\le L_x\le2n_j,\qquad m_j\le L_y\le2m_j.
+	\label{eq:window}
+\end{equation}
+For fixed transverse period and temperature, \eqref{eq:transfer}
+expresses \(Z\) as an even spectral moment. Monotonicity of the
+\(\ell^p\) norms, applied successively in \(x\) and \(y\), gives
+\begin{align*}
+	Z(L_x,L_y,\beta_j)
+	 & \le Z(n_j,m_j,\beta_j)^{L_xL_y/(n_jm_j)},     \\
+	Z(L_x,L_y,2\beta_j)
+	 & \ge Z(2n_j,2m_j,2\beta_j)^{L_xL_y/(4n_jm_j)}.
+\end{align*}
+With \(\alpha=L_xL_y/(4n_jm_j)\in[1/4,1]\), this implies
+\begin{align}
+	P_t(L_x,L_y,\beta_j)
+	 & \ge Q(n_j,m_j,\beta_j)^\alpha\notag         \\
+	 & \ge(1-\ee_j)^{7\alpha}\ge1-7\ee_j>\tfrac12.
+	\label{eq:interpolation}
+\end{align}
+If \(w_0\ge w_1\ge\cdots\) are the physical Gibbs weights, purity
+is at most \(w_0\). Thus the ground state is unique and
+\[
+	e^{-\beta_j\Delta_{L_x,L_y}}
+	=\frac{w_1}{w_0}
+	\le\frac{7\ee_j}{1-7\ee_j}
+	<40^{-2^j}.
+\]
+Consequently,
+\begin{equation}
+	\boxed{\Delta_{L_x,L_y}>\frac{\log40}{\beta_0}.}
+	\label{eq:gap}
+\end{equation}
+This holds on the union of windows \eqref{eq:window}, conditional on
+\eqref{eq:transfer} and \eqref{eq:certificates}. In particular, taking
+\(n_0=m_0\) covers every even square torus of side at least \(n_0\).
+It does not assert a bound for all aspect ratios or for open boundaries.
+For a common seed defect \(0<\ee_0\le10^{-3}\), the same argument
+replaces \(40\) by \((25\ee_0)^{-1}\).
+
+\section{Application and Obstructions in the Hexagonal AKLT Model}
+
+For the spin-\(3/2\) hexagonal AKLT Hamiltonian in projector
+normalization,
+\[
+	H_{n,m}^{\mathrm{AKLT}}=\sum_{\langle u,v\rangle}
+	P_{uv}^{(S_{\mathrm{tot}}=3)},
+\]
+choose fixed unit cells and two compatible periodic slice directions.
+The frustration-free refinement requires:
+\begin{enumerate}
+	\item Prove the two scalar gluing inequalities
+	      \eqref{eq:ff-x}--\eqref{eq:ff-y} on the required scales, or
+	      control their errors through \eqref{eq:ff-perturbed}.
+	      Self-adjoint transfers are one sufficient construction.
+	\item Bound one finite-volume partition-function excess, or use a
+	      certified finite-volume gap and dimension as in
+	      \eqref{eq:ff-finite-gap}. Spatial moment interpolation is a
+	      separate requirement if all intermediate periods are desired.
+\end{enumerate}
+No AKLT scalar gluing proof is supplied here. The result is therefore
+a proved conditional gap criterion, not an AKLT gap proof.
+
+\paragraph{An exact obstruction to the standard reflection argument.}
+This spatial input cannot simply be borrowed from the Heisenberg
+interaction. Consider one spin-\(3/2\) AKLT bond
+\(h=P^{(3)}\) and the quadrupole
+\[
+	Q=(S^z)^2-\frac54I=\operatorname{diag}(1,-1,-1,1).
+\]
+Let \(\theta(A)=U\overline A U^\dagger\), where
+\(U=e^{-i\pi S^y}\), be the usual spin time-reversal action used with
+a spatial reflection. Then \(\theta(Q)=Q\). Reflection positivity
+for this bond would require
+\(\Tr[e^{-t h}(A\otimes\theta(A))]\ge0\) for every \(A\).
+But \(\Tr Q=0\), \(e^{-tP^{(3)}}=I+(e^{-t}-1)P^{(3)}\), and
+\begin{equation}
+	\Tr[P^{(3)}(Q\otimes Q)]=\frac75.
+	\label{eq:quadrupole-trace}
+\end{equation}
+Hence for every \(t>0\),
+\begin{equation}
+	\boxed{\Tr[e^{-tP^{(3)}}(Q\otimes\theta(Q))]
+		=\frac75(e^{-t}-1)<0.}
+	\label{eq:rp-obstruction}
+\end{equation}
+For a direct check of \eqref{eq:quadrupole-trace}, the diagonal
+expectations of \(Q\otimes Q\) in \(\lvert3,M\rangle\),
+\(M=-3,-2,\ldots,3\), are
+\(1,-1,1/5,1,1/5,-1,1\); their sum is \(7/5\).
+Equivalently, with \(X=\mathbf S_1\cdot\mathbf S_2\), the projector is
+\(P^{(3)}=(X+15I/4)(X+11I/4)(X+3I/4)/90\).
+The characterization of thermal reflection positivity by cross-plane
+couplings is discussed in Ref.~\cite{jaffe}.
+
+This calculation rules out this particular local reflection-positive
+construction. It does not disprove the weaker scalar inequalities
+\eqref{eq:ff-x}--\eqref{eq:ff-y}, or every possible blocked transfer
+construction. Those statements must be tested independently.
+
+There is also a direct spectral diagnostic for scalar gluing. On two
+tori with unique zero-energy ground states, write
+\(Z(n,m,\beta)=1+g_{n,m}e^{-\beta\Delta_{n,m}}+\cdots\).
+If \(\Delta_{2n,m}<\Delta_{n,m}\), then
+\(Z(2n,m,\beta)>Z(n,m,\beta)^2\) for all sufficiently large
+\(\beta\). Thus a verified decrease of the finite-volume gap under
+doubling would obstruct the exact gluing inequality at those sizes.
+
+The PEPS boundary method offers a complementary route: relative
+factorization of overlapping ground-state boundary operators implies
+control of regional ground-space projectors and hence a bulk
+gap~\cite{klp}. The recent AKLT preprint~\cite{kastoryano} develops
+boundary-response estimates using paths and loops. Such estimates may
+inform the model-specific analysis above, but they are not automatically
+thermal-purity certificates. Here the objects are the full physical
+partition functions, rather than the PEPS boundary Gram operators.
+
+\section{Empirical Doubling Coefficients and Diagnostics}
+
+Exact spatial gluing is sufficient but not necessary for the recursion.
+For the dyadic sequence define the actual coefficient
+\begin{equation}
+	C_j=\frac{R(n_{j+1},m_{j+1},\beta_{j+1})}
+	{R(n_j,m_j,\beta_j)^2}.
+	\label{eq:actual-C}
+\end{equation}
+If \(C_j\le C\) uniformly, with \(C\ge1\) and \(CR_0<1\), then
+induction gives
+\[
+	R_j\le C^{-1}(CR_0)^{2^j},\qquad
+	\Delta_{n_j,m_j}\ge\frac{\log(1/(CR_0))}{\beta_0}.
+\]
+This only needs control along the chosen sequence
+\(\beta_j/n_j=\beta_0/n_0\), rather than at all temperatures for
+each fixed torus. Finitely many measured coefficients do not prove the
+uniform bound.
+
+A useful diagnostic of the sufficient gluing construction is
+\[
+	G_j=\log Z(2n_j,2m_j,2\beta_j)
+	-4\log Z(n_j,m_j,2\beta_j).
+\]
+Taking \(\eta_j=\max\{0,G_j\}\) in
+\eqref{eq:ff-perturbed} is valid directly, and can be sharper than
+bounding the two directional errors separately.
+
+\subsection{First computational pilot}
+
+The companion code in \texttt{aklt/} uses primitive cells
+\(A(x,y),B(x,y)\), with edges from \(A(x,y)\) to
+\(B(x,y),B(x-1,y),B(x,y-1)\) and both coordinates periodic.
+The initial geometries are \(2\times2\), \(4\times2\), and
+\(4\times4\) cells, containing 8, 16, and 32 spins. These small
+quotients have finite-size winding effects; in particular, the
+eight-spin quotient has short winding cycles. They are not open
+hexagonal patches.
+
+Independent full-spectrum diagonalization of the eight-spin quotient
+includes all \(4^8=65536\) states through total-\(S^z\) sectors.
+It gives one eigenvalue within \(10^{-9}\) of zero and
+\begin{align*}
+	E_0       & \simeq1.35\times10^{-14}, &
+	\Delta_8  & \simeq0.0920298633241,      \\
+	R(2,2,64) & \simeq0.00831113960.      &
+\end{align*}
+The numerical threshold for \(R\le0.01\) is
+\(\beta\simeq61.9932\). This provides a candidate finite seed at
+\(\beta_0=64\), not an interval certificate. If the seed and uniform
+spatial gluing were certified, the conservative recursion above would
+give \((\log20)/64\simeq0.0468083\). Neither the full gap claim nor
+uniform gluing follows from this finite calculation.
+
+The thermal implementation evolves the MPO amplitude
+\(e^{-\beta H/2}\), using
+\(e^{-tP^{(3)}}=I+(e^{-t}-1)P^{(3)}\) for each local gate.
+It retains the full thermal trace and reconstructs \(\log Z\) from
+normalization factors. A forward/reverse gate sweep has second-order
+Trotter error; compression and the swaps needed for nonlocal gates
+introduce additional errors.
+
+At \(\beta=2\), full diagonalization gives
+\(\log Z=5.31205522615\). The following benchmark uses time step
+\(\delta\beta=1/8\), cutoff \(10^{-12}\), and the default policy
+of returning moved sites after each gate:
+\begin{center}
+	\begin{tabular}{rrr}
+		\toprule
+		Maximum MPO bond dimension & Computed \(\log Z\) & Error in \(\log Z\) \\
+		\midrule
+		16                         & 3.53951535          & -1.77253988         \\
+		32                         & 3.88853480          & -1.42352043         \\
+		64                         & 4.72481476          & -0.58724047         \\
+		128                        & 4.97859393          & -0.33346129         \\
+		\bottomrule
+	\end{tabular}
+\end{center}
+Even this moderate-temperature benchmark is not converged. For example,
+at bond dimension 64, halving the time step gives
+\(\log Z=4.58083645\), increasing the discrepancy. The smaller time
+step alone does not remove compression error. Negative gluing defects
+or small doubling coefficients from these compressed calculations must
+therefore not be treated as evidence for the desired inequalities.
+A separate test keeps moved sites between gates and restores their
+order only after each complete step. At bond dimension 128 and
+\(\delta\beta=1/8\), this gives \(\log Z(2)=4.91941052\);
+reducing repeated swaps does not resolve the benchmark discrepancy.
+
+Machine-readable spectra, convergence grids, and diagnostics are saved
+under \texttt{aklt/results/}, with source hashes, geometry, parameters,
+completion flags, and \texttt{certified=false}. The smallest-system
+checks compare the two independent projector constructions, the exact
+single-bond partition function, and full-spectrum four-site evolution,
+including its nonlocal closing bond. The immediate computational task
+is to resolve partition-function differences accurately before using
+larger thermal calculations to assess the recursion.
+
+\section{Quadratic concentration without a self-adjoint spatial transfer}
+\label{sec:nonreal}
+
+The coupled squaring mechanism of the OpenAI proof~\cite{oai,main} uses
+scalar properties of the spatial moments. Self-adjointness is one
+sufficient way to obtain those properties. Nonreal transfer eigenvalues
+rule out a positive metric making that transfer self-adjoint, but do not
+by themselves rule out the scalar inequalities needed for the recursion.
+We establish this distinction for one exact AKLT projection-filter slice.
+
+\subsection{An exact filter and its spatial transfer}
+
+Let \(E_1,E_2,E_3\) be the three matchings used in the pilot, with
+\(E_1\) intracell, \(E_2\) joining \(A(x,y)\) to \(B(x-1,y)\),
+and \(E_3\) joining \(A(x,y)\) to \(B(x,y-1)\). Set
+\[
+	q_e=I-P_e^{(3)},\qquad Q_c=\prod_{e\in E_c}q_e,\qquad
+	D=Q_3Q_2Q_1,\qquad F=D^\dagger D=Q_1Q_2Q_3Q_2Q_1.
+\]
+Then \(0\le F\le I\) and \(\ker(I-F)=\ker H\): equality of
+norms through a product of orthogonal projections requires every
+projection to fix the vector. Define the discrete-depth moments
+\[
+	\mathcal Z(n,m,t)=\Tr F_{n,m}^{\,t},\qquad t\in\mathbb N.
+\]
+Temporal squaring is exact for these moments. The converse detectability
+inequality gives \(I-F\le4H\)~\cite{aav}. Thus a uniform estimate
+\(F\le G+q(I-G)\), where \(G\) projects onto \(\ker H\) and
+\(q<1\), would give \(\Delta(H)\ge(1-q)/4\).
+
+Fix transverse width \(n=2\) and depth \(t=1\), and let the
+longitudinal period be \(L\). A row contains the four spins
+\(A_0,A_1,B_0,B_1\). Write
+\[
+	A=Q_{1,\mathrm{row}},\qquad
+	B=Q_{2,\mathrm{row}}A Q_{2,\mathrm{row}},\qquad
+	\mathcal R(X)_{(a,a'),(b,b')}=X_{(a,b),(a',b')}.
+\]
+Here each of \(a,b\) indexes two spins, hence has dimension 16.
+Cyclicity, \(Q_1^2=Q_1\), and direct contraction of the interrow
+\(Q_3\) bonds give the \(256\)-dimensional transfer
+\begin{equation}
+	T=\mathcal R(A)^{\mathsf T}\mathcal R(B^{\mathsf T}),\qquad
+	z_L:=\mathcal Z(2,L,1)=\tr T^L.
+	\label{eq:filter-row}
+\end{equation}
+This transfer has a conjugate pair
+\(0.4111133913\pm0.3495535140i\), each with multiplicity five.
+Exact characteristic-polynomial and root-count checks establish their
+nonreality. Therefore neither \(T\) nor \(T^2\) can be made
+self-adjoint by a positive metric. The scalar moments nevertheless
+satisfy a quadratic concentration estimate.
+
+\subsection{A scalar replacement for spectral positivity}
+
+\begin{lemma}[Concentration from a controlled trace remainder]
+	Suppose \(z_L=\lambda_0^L(1+r_L)\), where \(\lambda_0>0\), and
+	for every even \(L\ge L_0\),
+	\[
+		0<r_L\le\tfrac1{10},\qquad
+		0<r_{2L}\le\kappa r_L^2,\qquad 0<\kappa\le\tfrac{34}{100}.
+	\]
+	Then the scalar defect \(d_L=1-z_{2L}/z_L^2\) obeys
+	\begin{equation}
+		0<d_L<1,\qquad
+		d_{2L}\le\frac{\kappa}{2}\left(\frac{11}{10}\right)^4 d_L^2
+		<\frac14d_L^2.
+		\label{eq:nonreal-square}
+	\end{equation}
+\end{lemma}
+
+\begin{proof}
+	The identity
+	\[
+		d_L=\frac{2r_L+r_L^2-r_{2L}}{(1+r_L)^2}
+	\]
+	gives \(d_L\ge2r_L/(1+r_L)^2>0\), since \(\kappa<1\),
+	and \(d_L<1\) since \(z_{2L}>0\). Also
+	\(d_{2L}\le2r_{2L}\le2\kappa r_L^2\), using
+	\(r_{4L}\ge0\). Substitute
+	\(r_L\le(1+r_L)^2d_L/2\) and \(r_L\le1/10\).
+\end{proof}
+
+\paragraph{Exact spectral bounds for the fixed slice.}
+The verifier finds one simple leading eigenvalue \(\lambda_0\),
+one real eigenvalue \(\alpha\) of multiplicity three, 242 remaining
+real eigenvalues, and ten nonreal eigenvalues. Exact rational root
+counts certify
+\begin{align*}
+	9.57      & <\lambda_0<9.59,                               & 3.36 & <\alpha<3.37, \\
+	|\lambda| & <0.84\quad\text{for the remaining real modes}, &      &               \\
+	|\lambda| & <0.55\quad\text{for every nonreal mode}.       &      &
+\end{align*}
+All displayed decimal endpoints are exact rational bounds. No
+diagonalizability assumption is needed: traces of powers count
+eigenvalues with algebraic multiplicity.
+
+For even \(L\ge4\), let
+\(r_L=\sum_{i>0}(\lambda_i/\lambda_0)^L\) and
+\(u=55/336\). Real modes contribute nonnegatively, so
+\[
+	r_L\ge3(\alpha/\lambda_0)^L
+	\left[1-\frac{10}{3}u^L\right]>0.
+\]
+The absolute remainder has the uniform bound
+\[
+	r_L\le3\left(\frac{337}{957}\right)^4
+	+242\left(\frac{84}{957}\right)^4
+	+10\left(\frac{55}{957}\right)^4
+	<0.060605<\frac1{10}.
+\]
+Bounding the numerator at \(2L\) and the denominator at \(L\) gives
+\[
+	\frac{r_{2L}}{r_L^2}
+	\le
+	\frac{3+242(1/4)^{2L}+10u^{2L}}
+	{9[1-(10/3)u^L]^2}
+	\le\kappa_*:=
+	\frac{3+242(1/4)^8+10u^8}
+	{9[1-(10/3)u^4]^2}
+	<0.335348<0.34.
+\]
+The lemma therefore proves
+\begin{equation}
+	\boxed{d_{2L}\le\tfrac14d_L^2
+		\quad\text{for every even }L\ge4,
+		\quad z_L=\mathcal Z(2,L,1).}
+	\label{eq:fixed-slice-result}
+\end{equation}
+This is stronger than the scalar squaring inequality
+\(d_{2L}\le f(d_L)\) used earlier, although the spatial transfer
+has nonreal eigenvalues.
+
+\paragraph{Verification and remaining scope.}
+The directory \path{aklt/scripts/} contains the scripts
+\path{check_projection_transfer.py} and
+\path{check_projection_moment_bounds.py}, which record
+the transfer construction and the complete spectral bounds. In the
+physical basis change \(S=\operatorname{diag}\sqrt{\binom3a}\),
+\(a=0,1,2,3\), each bond gate becomes rational with denominator 60.
+Consequently \(60^8T\) is integral in the corresponding transfer
+basis. The checks use exact characteristic polynomials and root counts,
+and compare the transfer trace with an independent eight-spin tensor
+contraction. The JSON results include source hashes and distinguish
+the exact checks from numerical diagnostics.
+
+Equation~\eqref{eq:fixed-slice-result} holds at one fixed transverse
+width and one fixed depth. It does not control the mixed-width,
+mixed-depth tuples needed by the cube recursion. The next mathematical
+target is to propagate such domination estimates in both transverse
+size and depth, so that both spatial ratios remain in \((0,1]\) and
+obey their squaring bounds throughout the staggered recursion.
+The cube proof then applies to the scalar ratios directly, without
+requiring spatial density operators. No uniform AKLT gap follows from
+the fixed-slice certificate alone.
+
+\begin{thebibliography}{9}
+	\setlength{\itemsep}{2pt plus 1pt}
+	\setlength{\parskip}{0pt}
+	\bibitem{klp}
+	M. J. Kastoryano, A. Lucia, and D. P\'erez-Garc\'ia,
+	\emph{Locality at the boundary implies gap in the bulk for 2D PEPS},
+	Commun. Math. Phys. \textbf{366}, 895--926 (2019),
+	\href{https://arxiv.org/abs/1709.07691}{arXiv:1709.07691}.
+	\bibitem{kastoryano}
+	M. J. Kastoryano,
+	\emph{Spectral Gap of the Hexagonal AKLT Model via Boundary-State
+		Factorization}, preprint (September 23, 2026),
+	\href{https://arxiv.org/abs/2609.27993}{arXiv:2609.27993}.
+	\bibitem{jaffe}
+	A. Jaffe and B. Janssens,
+	\emph{Characterization of Reflection Positivity: Majoranas and Spins},
+	\href{https://arxiv.org/abs/1506.04197}{arXiv:1506.04197}.
+	\bibitem{oai}
+	OpenAI, \emph{The periodic spin-one Haldane gap},
+	manuscript dated September 24, 2026,
+	\href{https://github.com/openai/math/blob/main/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/paper.pdf}{OpenAI Math Release}.
+	\bibitem{main}
+	Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime
+		tensor networks}, \texttt{outputs/thermal-mpo-gap-note.tex} (2026).
+	\bibitem{aav}
+	A. Anshu, I. Arad, and T. Vidick,
+	\emph{A simple proof of the detectability lemma and spectral gap amplification},
+	\href{https://arxiv.org/abs/1602.01210}{arXiv:1602.01210}.
+\end{thebibliography}
+\end{document}

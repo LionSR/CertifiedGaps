@@ -1,0 +1,66 @@
+{
+    "execution_mode": "stored-output-audit",
+    "thermal_certificates": 27,
+    "implementation_sha256": {
+        "src/thermal_kernels.jl": "550c44df9620d1d427c47f720fd7bcb13f3d542f1045734a9ce6e0a336e349f8",
+        "Project.toml": "58bac423b53a7e82e9623b80a47e86e3f8fa10402f3f18f4e27ee36976e1444e",
+        "test/audit_failures.jl": "117632d6cda22d0a920abf62ec2ab62ac8cd96b6745845fbfb1cc1ad89209c6c",
+        "src/itensors_checks.jl": "dc36000703ce38d0a8cc0fcac8573d9919c063c3b8bbab73b0bef9b605d685a9",
+        "src/arithmetic.jl": "12a451573a3a682abc33fc580b21e6fa8aa3426d177c04bb94352ba958153527",
+        "src/audit.jl": "68580b2f8d4aaee97f21b55a7aef4a249ae332d1815ed747b54a3ddc1fa17af2",
+        "src/thermal.jl": "af8c6a34be85140d947b00bcb3eb0b506d2fe854b887c1463e01623eecad3e16",
+        "scripts/itensors_crosscheck.jl": "5f7fa69933b082cb08f981d9cf1c4ab425e54f2b183f211fffd63a7ad420767a",
+        "Manifest.toml": "8339b809bcd1fee7097b64357181988adbf8a49c6a761933eba1c42e1c38f046",
+        "scripts/scalars.jl": "ba3813287f0d701eca02d40dd030119d97d8803c16b09717c3019e4c8c279650",
+        "src/Spin1Certificates.jl": "c90d70618e99bcd9bf3f0e814a0b23956671961be9e3f7d43eda07bca726e480",
+        ".JuliaFormatter.toml": "3fee7c5f054e21a1468b83cc3c2747d152d611b3085cb8f8518ad2df5ed69ac8",
+        "scripts/trials.jl": "ed0bf4d649911ed18634dbb986db5eda8e23514ccd3ece259bc97746804bc750",
+        "src/scalars.jl": "f2284930c15ee84596b60c89ce4122fccf330cc1fbf1b9eb8a82ffeda503021e",
+        "src/trials.jl": "97d4944e3b50d20cb4312f934fa8cbdc5c9090e49bb2b1bd7bb60a87162cc0ea",
+        "scripts/reproduce.jl": "a41ff978e668e2de82e0b52e53add166739f00079d273301df36625ba766b12b",
+        "src/trials_su2.jl": "b4c646b987e26b062f5f4a4a055df3e9ccacbfef614b5070d8db7071ad67c21e",
+        "test/runtests.jl": "1aef68bc101f029cf76a02cfc39bb31a2d75a28a7ce4f37c8f9dc1073208113c",
+        "scripts/arithmetic.jl": "09e8826b311572c312cb11458c21273dbbe19fdb7e25011cc703025b88e557d9",
+        "scripts/thermal.jl": "eeb4df9ce6e6f5568880bb09790938fece86b9d3597c605999a291e477b39103"
+    },
+    "status": "passed",
+    "scope": "Periodic spin-1 finite certificates. Analytic transfer and induction arguments are not formalized here. ITensors results are numerical controls.",
+    "components": {
+        "itensors": {
+            "sha256": "74be2740007f52b8813d0d1013d5e722ba8b84b0780cbac923b341e60265bfd4",
+            "original_completed_utc": "2026-10-08T06:03:15.893"
+        },
+        "trials": {
+            "sha256": "835c2fa67dfe7469deda0f0c0fe478f099d89e808fb5ce45569904e91b321272",
+            "original_completed_utc": "2026-10-08T05:59:15.348"
+        },
+        "source2": {
+            "sha256": "e313142a5ba1d675b1a113fbc9ba88328476df55194a2dffefe8a0cf56c5d2e0",
+            "original_completed_utc": "2026-10-08T05:58:56.308",
+            "certificates": 9,
+            "original_wall_seconds": 79.68038606643677
+        },
+        "source1": {
+            "sha256": "28ee010200249fd5b28e2f3afa46ac9f72dd10b9a03a0f3c96e16edc9776b2bb",
+            "original_completed_utc": "2026-10-08T06:25:30.819",
+            "certificates": 18,
+            "original_wall_seconds": 1860.3489680290222
+        },
+        "arithmetic": {
+            "sha256": "852d3f568a16f15fe7c3243d583519c6669287838c6b0a4bd49c7ee78d42f16f",
+            "original_completed_utc": "2026-10-08T05:59:40.989"
+        },
+        "scalars": {
+            "sha256": "6d633bf533101b7fb26d4112d1317e3f57261538f9ac0d094e947ccc10c3f304",
+            "original_completed_utc": "2026-10-08T05:57:18.294"
+        }
+    },
+    "audit_utc": "2026-10-08T06:28:19.072",
+    "trial_certificates": 2,
+    "julia": "1.12.4",
+    "source_commit": "adc7f1241b42e322a6451854ab7e4b4c146bf78a",
+    "source_integrity": {
+        "verified_files": 43,
+        "manifest_sha256": "2d2461e8f87ef9c3af62ce226412b106fcfb34f01d5139683a90708859e2dc92"
+    }
+}
