@@ -46,7 +46,7 @@ end
             if haskey(data["metadata"], "ThermalMPOGap")
                 # Immutable provenance of the original validated run, before the
                 # upstream rename. This commit remains an ancestor of the PR.
-                revision="107116f7b5cc79db5023553f14dec2b98245d375"
+                revision="6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2"
                 relative=relpath(normpath(joinpath(ROOT,path)),REPO)
                 archived=read(`git -C $REPO show $revision:$relative`)
                 @test bytes2hex(SHA.sha256(archived))==hash

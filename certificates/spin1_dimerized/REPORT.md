@@ -216,7 +216,9 @@ requested 45-minute run limit. There are no remaining execution blockers.
 Source SHA-256 hashes, Julia/package versions, thread counts and run configurations
 are stored through `ThermalMPOGap.Results.write_result`/`run_metadata`. Exact
 rationals are strings. All repository edits are confined to this certificate
-folder. No PR, merge, publication, or changes to the shared core are performed.
+folder. Subsequent draft-PR preparation, upstream package-name compatibility,
+independent review and replay are recorded in [PUBLICATION.md](PUBLICATION.md).
+No changes to the shared core are proposed.
 
 Environment: the approved juliaup installer URL returned HTTP 403. The official
 Julia 1.12.4 Linux x86-64 tarball was downloaded from julialang-s3.julialang.org
@@ -231,8 +233,8 @@ outside the certified seed, and any extrapolation beyond the six-cell ring cap.
 
 For commands in this particular cloud environment, first set
 `PATH=/tmp/julia-1.12.4/bin:$PATH` and `JULIA_DEPOT_PATH=/tmp/julia-depot`.
-The route memo was committed locally as required by `AGENTS.md`; no changes have
-been merged or published.
+The route memo was committed locally as required by `AGENTS.md`. Draft publication
+status is tracked separately; nothing is merged into the target branch.
 
 ## Results from completed runs
 

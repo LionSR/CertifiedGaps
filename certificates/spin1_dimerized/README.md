@@ -43,5 +43,5 @@ installation and instantiate the existing `julia` project normally.
 Publication/current-main compatibility and independent-review status are tracked
 in [PUBLICATION.md](PUBLICATION.md). The original run used ThermalMPOGap; current
 main calls the same package UUID CertifiedGaps. Original source-hash verification
-uses archived commit `107116f7b5cc79db5023553f14dec2b98245d375` in this branch's
+uses archived commit `6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2` in this branch's
 history; the recurrence is also replayed with the current core.

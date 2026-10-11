@@ -1,8 +1,15 @@
 # Draft PR publication and audit status
 
 The original completed computation is preserved at commit
-`107116f7b5cc79db5023553f14dec2b98245d375`. Its core was named ThermalMPOGap.
+`6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2`. Its core was named ThermalMPOGap.
 Upstream main subsequently renamed the same package UUID to CertifiedGaps.
+GitHub rejected the initial push under its private-email protection. Unpublished
+commit identities were changed to the authenticated account’s GitHub noreply
+address. The archived computation commit above has exactly the same tree
+(`7ec89f1635d7b9a493159bd8433b7459f93bb3bf`) as the original local commit
+`107116f7b5cc79db5023553f14dec2b98245d375`; no historical file or result hash
+was changed. Only the current checker’s archive locator was updated.
+
 This branch incorporates upstream main without proposing core changes, and its
 loader aliases CertifiedGaps under the historical name. The original JSON files
 and their source hashes are preserved unchanged. The fast checker verifies those
@@ -10,9 +17,10 @@ hashes against the archived original commit, then recomputes the RP identities,
 seed conversions and recurrence using the current core. Thus a full Git history
 (or access to that commit) is required for the historical-source audit.
 
-Independent reviewer audit and a fresh twelve-spin spectral replay are pending.
-The reviewer is checking the cell Gram argument, odd-seed recurrence/interpolation,
-uniqueness, all symmetry counts and the matrix/partition enclosure arithmetic.
+The independent [audit](AUDIT.md) found no substantive mathematical blocker.
+It supplies explicit cell Gram, odd-seed recurrence/interpolation and uniqueness
+arguments, and reviews symmetry counts and enclosure arithmetic. A fresh
+twelve-spin spectral replay remains in progress.
 The replay recomputes the model matrices and dense eigensystems; it does not use
 the stored eigenvalue radii or partition enclosures. It preserves original outputs:
 
