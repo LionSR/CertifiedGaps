@@ -19,8 +19,8 @@ seed conversions and recurrence using the current core. Thus a full Git history
 
 The independent [audit](AUDIT.md) found no substantive mathematical blocker.
 It supplies explicit cell Gram, odd-seed recurrence/interpolation and uniqueness
-arguments, and reviews symmetry counts and enclosure arithmetic. A fresh
-twelve-spin spectral replay remains in progress.
+arguments, and reviews symmetry counts and enclosure arithmetic. The fresh
+twelve-spin spectral replay completed successfully in 949.35 seconds (15.82 minutes).
 The replay recomputes the model matrices and dense eigensystems; it does not use
 the stored eigenvalue radii or partition enclosures. It preserves original outputs:
 
@@ -32,8 +32,8 @@ julia --project=julia certificates/spin1_dimerized/certify.jl 7
 
 The stored output reports a lower bound of 0.2187941698399417 at delta=7/10,
 n=3, beta=17/4 for even cell lengths L>=3, i.e. physical lengths 8,12,16,... .
-The draft status explicitly leaves mathematical/numerical implementation review
-open until the independent audit and replay are recorded. The odd-cell extension
+The PR remains a draft for human review, with the independent audit and replay
+now recorded. The odd-cell extension
 is a mathematical argument in this directory, not a separately machine-checked
 Lean theorem. No Lean formalization of these numerical inputs is claimed.
 
@@ -47,3 +47,36 @@ All dense spectra are retained (about 73 MB of JSON) for inspection.
 
 Only this certificate directory is proposed. No core changes, CI additions,
 merges into the target branch, or ready-for-review promotion are authorized here.
+
+## Current-core compatibility validation
+
+Against upstream `22b2759e0790197b83e2571b465aa8dc69ebc0be`, the main checker
+passed 115 assertions and the supplemental verified-block checker passed 16.
+[The separate validation record](results/current_main_validation.json) preserves
+current source hashes and log fingerprints. The core recurrence implementation
+is unchanged from the archived computation; relevant module-header differences
+are documentation names. Certificate arithmetic is unchanged. The loader, local
+package dependency name, historical-source lookup and optional replay destination
+are the compatibility changes. The user-requested `certificates/spin1_dimerized/`
+location is retained despite the new general `models/` convention.
+
+## Completed full replay
+
+The separate [replay result](results/replay_certificate_d7.json) records a fresh
+dense eigensystem and enclosure calculation for all 7 small-ring and 79
+large-ring blocks, with weighted dimensions 729 and 531441.
+`replay_check.jl` passed all 40 assertions in its 2.0-second test set: every
+mathematical output (including every block error bound and log-partition endpoint)
+is identical to the original, the current source hashes match, and the rational
+seeds reproduce the bound. Only provenance and runtimes differ.
+[The comparison record](results/replay_comparison.json) stores both result hashes
+and runtimes. Original result files remain unchanged.
+
+```sh
+OPENBLAS_NUM_THREADS=1 julia --project=julia certificates/spin1_dimerized/replay_check.jl
+```
+
+There are no remaining execution or audit blockers. This is a computational
+certificate supported by an explicit mathematical proof and independent review,
+subject to the stated arithmetic assumptions; it is not a Lean-checked model
+instantiation. No changes have been merged into the target branch.

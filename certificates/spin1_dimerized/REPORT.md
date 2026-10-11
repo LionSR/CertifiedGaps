@@ -236,6 +236,17 @@ For commands in this particular cloud environment, first set
 The route memo was committed locally as required by `AGENTS.md`. Draft publication
 status is tracked separately; nothing is merged into the target branch.
 
+## Independent audit and fresh replay
+
+[The independent audit](AUDIT.md) found no substantive mathematical blocker.
+A fresh full spectral computation against `CertifiedGaps` completed in 949.35
+seconds and reproduced every mathematical output exactly, including all sector
+error bounds, log-partition endpoints, rational seeds and the final bound.
+The replay comparison passed 40 assertions; current-core fast and supplemental
+checks passed 115 and 16 assertions respectively. Original outputs are preserved.
+See [PUBLICATION.md](PUBLICATION.md) and the separate
+[comparison record](results/replay_comparison.json) for provenance and limitations.
+
 ## Results from completed runs
 
 Best numerical seed per parameter, over n=2,3 and beta=0.25:0.25:32:
