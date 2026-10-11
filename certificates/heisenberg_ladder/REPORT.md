@@ -244,7 +244,7 @@ The recurrence implementation itself is byte-identical.
 ### Numerical scan status (draft)
 
 The even-seed grid is complete through n0=4. Full 10-rung scans are complete
-for J=4,3,5/2 and still running for J=7/2,2,3/2. No unfinished 10-rung
+for J=4,3,5/2,2,3/2; only J=7/2 is still running. No unfinished 10-rung
 result is included in a completed-scan claim.
 
 | J | Best (n0,beta) | Numerical recurrence bound |

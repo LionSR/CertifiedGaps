@@ -15,13 +15,13 @@ On Julia 1.12.4 against current main (`22b2759`, `CertifiedGaps`):
 
 The valid even-seed grid is complete for J_perp in {4,3.5,3,2.5,2,1.5}, n0 in {2,4}, beta=0.25:0.25:16. Numerical bounds are 1.10240444, 0.77864899, 0.45418980, 0.04243459 for the first four values; no even seed was found at 2 or 1.5. The observed grid threshold is bracketed by 2.4881973267 and 2.4882354736. These results are **numerical, not certified**.
 
-Full 10-rung dense scans are complete for J=4,3,2.5. Scans for J=2,1.5 and a checkpointed retry for J=3.5 remain active. The earlier J=3.5 10-rung attempt was OOM-killed; no partial spectrum from that process is represented as complete. This PR stays draft and will be updated with the remaining results. The completed 10-rung J=4 reference gap is numerical: 3.1375441605.
+Full 10-rung dense scans are complete for J=4,3,2.5,2,1.5. Only the checkpointed retry for J=3.5 remains active. The earlier J=3.5 10-rung attempt was OOM-killed; no partial spectrum from that process is represented as complete. This PR stays draft and will be updated with the remaining results. The completed 10-rung J=4 reference gap is numerical: 3.1375441605.
 
 Odd n0=3,5 are diagnostics only: the theorem requires even n0, and odd original ladder rings are frustrated. A 10-rung ring therefore does not provide a valid new n0=5 certificate.
 
 ### Audit limitations and reproduction
 
-The fresh audit shares the symmetry builder and residual-bound implementation; it is not an independently implemented eigensolver or a formal verification of the full pipeline. The repository's abstract two-purity theorem and ordinary IEEE/OpenBLAS arithmetic model remain assumptions. No rigorous thermodynamic reference gap, coupling threshold, monotonicity result, or absence of seeds beyond the searched grid is claimed.
+The fresh audit shares the symmetry builder and residual-bound implementation; it is not an independently implemented eigensolver or a formal verification of the full pipeline. The repository's abstract two-purity theorem and ordinary IEEE/OpenBLAS arithmetic model remain assumptions. No rigorous thermodynamic reference gap, coupling threshold, monotonicity result, or absence of seeds beyond the searched grid is claimed. Fresh replay is tested with Julia 1.12.4 and the checked-in manifest; a different BLAS implementation may require regenerated enclosures rather than bit-identical replay.
 
 Set `OPENBLAS_NUM_THREADS=1`. Regenerate the certificate with `julia --project=julia certificates/heisenberg_ladder/certify.jl`, then run the checker and audit above. Numerical scans use `scan_lowmem.jl '4//1'` (and the other rational couplings). `REPORT.md` gives the theorem, exact decomposition, normalization, validity range, provenance, and full reproduction details. Numerical JSONs retain complete sector dimensions, low levels and logZ grids; the rigorous complete eigenvalue enclosures are retained in full.
 
