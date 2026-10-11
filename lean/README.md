@@ -109,8 +109,8 @@ at a single scale. It cannot produce those purities itself. They carry the physi
 * The moment form alone holds for gapless models too.
 * The classical Ising ring satisfies it, has `P_s → 1`, and still has a twofold degenerate
   ground state.
-* Theorem 2.24 of `../survey/theory/STRENGTHENING.md` shows that neither seed can be dropped.
+* Neither seed can be dropped (Theorem 2.24 of the local survey notes, not in this repository).
 
 The seeds `P_s(2304, 784), P_τ(4608, 784) ≥ 0.99` are Proposition 5.5 of the OpenAI preprint.
-They come from certified numerics, which `../spin1/` reproduces in Julia. Proving them in Lean
+They come from certified numerics, which `../models/spin1/` reproduces in Julia. Proving them in Lean
 is the remaining open problem, and the hard one.

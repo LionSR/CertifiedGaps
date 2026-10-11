@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.MPOAlgebra
+    CertifiedGaps.CertifiedMPO.MPOAlgebra
 
 Exact rational MPO algebra: direct sums, local products, exact right-tail compression with
 rational intertwiners and its replay, invertible conditioning gauges, the certified initial

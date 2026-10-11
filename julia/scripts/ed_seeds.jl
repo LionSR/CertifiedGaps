@@ -5,8 +5,8 @@
 #     large sectors by Lanczos, where the survey found no seed with n₀ ≤ 6.
 # Run: julia --project=julia julia/scripts/ed_seeds.jl
 
-using ThermalMPOGap, Printf, LinearAlgebra
-using ThermalMPOGap.ExactDiagonalization, ThermalMPOGap.Models, ThermalMPOGap.Seeds
+using CertifiedGaps, Printf, LinearAlgebra
+using CertifiedGaps.ExactDiagonalization, CertifiedGaps.Models, CertifiedGaps.Seeds
 
 BLAS.set_num_threads(1)   # one BLAS thread per process; oversubscription is far slower
 

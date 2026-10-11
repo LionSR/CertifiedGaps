@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.SchattenBridge
+    CertifiedGaps.CertifiedMPO.SchattenBridge
 
 Conditional Schatten-norm bounds: the backward Gram-chain bound (`gram_chain_upper`) and the
 operator-error to trace-moment bridge (`trace_upper`, `normalized_upper`). Moved verbatim

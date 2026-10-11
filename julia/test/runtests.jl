@@ -1,10 +1,10 @@
-using ThermalMPOGap, IntervalArithmetic, LinearAlgebra, Test
-using ThermalMPOGap.ExactArithmetic, ThermalMPOGap.Results, ThermalMPOGap.Spins
-using ThermalMPOGap.ReflectionPositivity, ThermalMPOGap.ExactDiagonalization
-using ThermalMPOGap.Models, ThermalMPOGap.Seeds
-using ITensors, ITensorMPS, ThermalMPOGap.Purification
+using CertifiedGaps, IntervalArithmetic, LinearAlgebra, Test
+using CertifiedGaps.ExactArithmetic, CertifiedGaps.Results, CertifiedGaps.Spins
+using CertifiedGaps.ReflectionPositivity, CertifiedGaps.ExactDiagonalization
+using CertifiedGaps.Models, CertifiedGaps.Seeds
+using ITensors, ITensorMPS, CertifiedGaps.Purification
 
-@testset "ThermalMPOGap" begin
+@testset "CertifiedGaps" begin
     @testset "recurrence constants (survey §2.6)" begin
         @test fixed_point_bracket_holds()
         εstar = diagonal_fixed_point()

@@ -1,6 +1,6 @@
-# ThermalMPOGap.jl
+# CertifiedGaps.jl
 
-The shared Julia core of this repository. `spin1/`, `spin2/` and `aklt/` depend on it as a path
+The shared Julia core of this repository. `models/spin1`, `models/spin2` and `models/aklt` depend on it as a path
 dependency; anything two projects need lives here once.
 
 It holds the numerics of the two-purity doubling criterion. A ring with spatial and thermal
@@ -10,7 +10,7 @@ L ≥ n₀ when its transfer operator is self-adjoint and the seed defects at (n
 ## Layout
 
 Each submodule is used on its own, so generic names never collide with a project's:
-`using ThermalMPOGap.ExactDiagonalization`. The top level re-exports `Recurrence` only.
+`using CertifiedGaps.ExactDiagonalization`. The top level re-exports `Recurrence` only.
 
 | submodule | file | content |
 |---|---|---|
@@ -22,7 +22,7 @@ Each submodule is used on its own, so generic names never collide with a project
 | `ExactDiagonalization` | `src/ExactDiagonalization.jl` | `Chain` on any bond list (`ring_bonds`, `open_bonds`, `graph_bonds`), charge sectors, `spectrum` (dense or Lanczos, optional spin-flip doubling), `PartialSpectrum`, `logZ_bounds`, `log_partition` |
 | `Models` | `src/Models.jl` | `tfim` (with exact `tfim_logZ`), `heisenberg(s)`, `staggered_heisenberg` |
 | `Seeds` | `src/Seeds.jl` | `seed_defects` from spectra, `scan_seeds`, `best_seed` |
-| `Purification` | `src/Purification.jl`, `ext/ThermalMPOGapITensorsExt.jl` | `purified_log_partition`: thermal purification with ITensors; enabled by `using ITensors, ITensorMPS` |
+| `Purification` | `src/Purification.jl`, `ext/CertifiedGapsITensorsExt.jl` | `purified_log_partition`: thermal purification with ITensors; enabled by `using ITensors, ITensorMPS` |
 | `CertifiedMPO` | `src/CertifiedMPO/` | certified MPO arithmetic with Nemo/Arb (norms, squaring, products, operator errors, gauges), moved from spin2 |
 
 ## Conventions
@@ -45,8 +45,8 @@ julia --project=julia julia/scripts/ed_seeds.jl     # ED seed searches (≈15 mi
 From another project: `Pkg.develop(path = "../julia")`, then e.g.
 
 ```julia
-using ThermalMPOGap                                  # doubling map and bounds
-using ThermalMPOGap.ExactDiagonalization, ThermalMPOGap.Models
+using CertifiedGaps                                  # doubling map and bounds
+using CertifiedGaps.ExactDiagonalization, CertifiedGaps.Models
 spec = spectrum(heisenberg(1).chain, 8; spin_flip = true)
 certified_gap_bound(1 // 100, 1 // 100, 784)         # (bound = 0.0042911…, …)
 ```

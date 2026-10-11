@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.Norms
+    CertifiedGaps.CertifiedMPO.Norms
 
 Rigorous operator and Hilbert--Schmidt norm witnesses for exact rational MPOs: local maps,
 gauges, interval Cholesky acceptance, squared-tail bounds, and the sparse exact core encoding.

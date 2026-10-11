@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.OperatorError
+    CertifiedGaps.CertifiedMPO.OperatorError
 
 Telescoping operator-norm error of a compressed square or product, with independent vector or
 matrix gauges for each of the three residual families, streamed residuals, replay and witness

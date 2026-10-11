@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.ReflectionPositivity
+    CertifiedGaps.ReflectionPositivity
 
 Reflection positivity of a bond in a chosen local basis (survey §1.2, Proposition 3.2). The
 continuous-time transfer kernel is self-adjoint when −h = Σ_α C_α ⊗ conj(C_α) with a real

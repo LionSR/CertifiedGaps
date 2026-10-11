@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.Spins
+    CertifiedGaps.Spins
 
 Local spin operators in the three bases the projects use:
 

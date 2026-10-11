@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.Products
+    CertifiedGaps.CertifiedMPO.Products
 
 Certified zip-up compression of an MPO product A·B with unequal auxiliary dimensions (in
 rational or interval candidate arithmetic), its replay, its witness encoding, and the

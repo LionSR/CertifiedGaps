@@ -31,8 +31,8 @@ A **gap certificate** for a model consists of:
    full spectrum or of every symmetry block with its multiplicity. **No inequality may be
    accepted on the strength of a `Float64` computation**, an ARPACK/Lanczos run, DMRG, or an
    unverified dense eigensolve.
-3. **The bound**: `ThermalMPOGap.certified_gap_bound` (interval) or
-   `ThermalMPOGap.Recurrence.rational_gap_chain` (exact rational) applied to the seed bounds.
+3. **The bound**: `CertifiedGaps.certified_gap_bound` (interval) or
+   `CertifiedGaps.Recurrence.rational_gap_chain` (exact rational) applied to the seed bounds.
 4. **A checker** that recomputes 1–3 from the stored certificate in a few minutes and fails
    loudly on any mismatch.
 
@@ -62,11 +62,11 @@ seed purities computable or boundable at sizes far beyond ED:
   Theorem 2.24(v), P_τ(2n₀) can be replaced by P_τ(n₀) and Pₛ(n₀, 2β₀), halving the largest
   ring. Unequal defects are cheap in εₛ and expensive in εₜ; spend effort accordingly.
 - **Symmetry and exact counting.** Character formulas, SU(2) multiplet counting, sector
-  inversion from twisted traces (as in `spin1/`) instead of enumerating states.
+  inversion from twisted traces (as in `models/spin1/`) instead of enumerating states.
 - **Variational sandwiches.** Upper bounds on E₀(2n) from trial states (MPS) and lower bounds
   on E₀(n) (e.g. Anderson/cluster bounds) bound the spatial defect δₙ = E₀(2n) − 2E₀(n).
 
-Start every task by writing `certificates/<slug>/IDEAS.md`: the candidate routes, why each
+Start every task by writing `models/<slug>/IDEAS.md`: the candidate routes, why each
 might or might not work for this model, how its cost scales with n₀ and β₀, and which one you
 chose. Commit that memo even if the implementation fails; a clear negative ("route X fails
 because ...") is a result.
@@ -74,15 +74,15 @@ because ...") is a result.
 ## Repository layout
 
 - `outputs/`: LaTeX notes (main proof, scope, certificate method). Do not edit unless asked.
-- `julia/`: shared core package `ThermalMPOGap` (recurrence and certified bounds, exact
+- `julia/`: shared core package `CertifiedGaps` (recurrence and certified bounds, exact
   arithmetic, results I/O, spin operators, RP test, exact diagonalisation, models, Nemo/Arb
   certified MPO toolkit, ITensors purification extension). See `julia/README.md`.
-- `spin1/`: exact-arithmetic reproduction of the spin-1 Heisenberg certificate (integer
+- `models/spin1/`: exact-arithmetic reproduction of the spin-1 Heisenberg certificate (integer
   Poisson trace recursion with twisted rings and symmetry representatives, polynomial
   filters, MPS trial contractions). The template for large-n certificates.
-- `spin2/`, `aklt/`: spin-2 and 2D AKLT investigations (no certificate yet).
+- `models/spin2/`, `models/aklt/`: spin-2 and 2D AKLT investigations (no certificate yet).
 - `lean/`: Lean 4 formalisation of the abstract criterion (seeds are hypotheses).
-- `certificates/<model-slug>/`: **where new certificates go** (one directory per model).
+- `models/<model-slug>/`: **where new certificates go** (one directory per model).
 
 ## Environment
 
@@ -93,19 +93,19 @@ julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 ```
 
 A new certificate directory is its own Julia project depending on the core:
-`julia --project=certificates/<slug> -e 'using Pkg; Pkg.develop(path="julia")'` (adjust the
+`julia --project=models/<slug> -e 'using Pkg; Pkg.develop(path="julia")'` (adjust the
 relative path to `../../julia` inside the project). Set `OPENBLAS_NUM_THREADS=1` unless you
 need threaded BLAS.
 
 ## Rules
 
-- Work only inside `certificates/<your-model-slug>/` unless the task says otherwise. If the
+- Work only inside `models/<your-model-slug>/` unless the task says otherwise. If the
   core is missing something generic, add it to `julia/` in a separate, minimal commit with a
   test, and say why in the PR description.
-- Never modify `spin1/results`, `spin2/results`, `aklt/results` or anything under `lean/`.
+- Never modify `models/spin1/results`, `models/spin2/results`, `models/aklt/results` or anything under `lean/`.
 - No Python files: everything is Julia (and LaTeX for notes).
 - Certificate JSON stores every exact number as a string (`"num//den"`); use
-  `ThermalMPOGap.Results.write_result` and `parse_exact_json`. Record the code's SHA-256
+  `CertifiedGaps.Results.write_result` and `parse_exact_json`. Record the code's SHA-256
   (`source_hashes`) and the Julia/package versions (`run_metadata`).
 - Each certificate directory has: `Project.toml`, `src/` or a single `certify.jl` that produces
   `certificate.json`, `check.jl` that verifies it, `test/runtests.jl` (fast), and a `README.md`
@@ -130,4 +130,4 @@ need threaded BLAS.
 | two-leg ladder J⊥ = 4 (1-rung cells) | checkerboard sublattice rotation | (4, 2) rungs | 1.102 | ≈3.14 |
 | XY in a field, JₓJ_y < 0 | standard basis | free fermions | — | — |
 | bilinear–biquadratic θ = −0.1 | Cartesian | ≈(34, 31) estimated | ≈0.107 | ≈0.338 |
-| spin-1 Heisenberg (the note) | Cartesian | (2304, 784) certified in `spin1/`; gap > 0.0729 for L ≥ 36 claimed in `spin1/experiments` | | 0.4105 |
+| spin-1 Heisenberg (the note) | Cartesian | (2304, 784) certified in `spin1/`; gap > 0.0729 for L ≥ 36 claimed in `models/spin1/experiments` | | 0.4105 |
