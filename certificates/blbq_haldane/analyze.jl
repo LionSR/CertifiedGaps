@@ -64,6 +64,7 @@ function analyze()
         grounds=Dict(L=>s.E[1] for (L,s) in specs)
         gaps=Dict(L=>spectrum_gap(s) for (L,s) in specs)
         for (L,d) in references
+            haskey(inputs,L) && continue
             grounds[L]=d.summary[t].ground;gaps[L]=d.summary[t].gap
         end
         dns=sort([n for n in keys(grounds) if haskey(grounds,2n)])

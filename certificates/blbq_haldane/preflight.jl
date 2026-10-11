@@ -42,7 +42,7 @@ for L in (10,12,14,16)
         M1_k1_dimension=d,single_dense_matrix_GiB=8d^2/2.0^30,
         SU2_highest_weight_max_dimension=maximum(highest),
         SU2_single_matrix_GiB=8maximum(highest)^2/2.0^30,
-        SU2_basis_implemented=false,
+        SU2_basis_implemented=true,
         two_dense_matrices_GiB=16d^2/2.0^30,
         cubic_work_relative_L12=(d/dimension(12,1,1))^3))
 end

@@ -7,10 +7,10 @@
             "memory_limit_bytes": 17179869184,
             "cpu_quota": 4
         },
-        "created_utc": "2026-10-11T05:08:31.257",
+        "created_utc": "2026-10-11T05:56:11.817",
         "certified": false,
         "source_sha256": {
-            "preflight.jl": "c44bc86897a1985717762c8c172d24c83d58808594b0a9a4f35f615855765e67"
+            "preflight.jl": "a5d321b7956bd7391c492fc76419a62937173dcabe3d49f77a8fdfcc61015716"
         },
         "blas_threads": 1
     },
@@ -25,7 +25,7 @@
             "single_dense_matrix_GiB": 0.005194731056690216,
             "SU2_highest_weight_max_dimension": 207,
             "SU2_single_matrix_GiB": 0.0003192499279975891,
-            "SU2_basis_implemented": false,
+            "SU2_basis_implemented": true,
             "two_dense_matrices_GiB": 0.010389462113380432,
             "cubic_work_relative_L12": 0.0029869282706129208
         },
@@ -39,7 +39,7 @@
             "single_dense_matrix_GiB": 0.25046470761299133,
             "SU2_highest_weight_max_dimension": 1264,
             "SU2_single_matrix_GiB": 0.011903762817382812,
-            "SU2_basis_implemented": false,
+            "SU2_basis_implemented": true,
             "two_dense_matrices_GiB": 0.5009294152259827,
             "cubic_work_relative_L12": 1
         },
@@ -53,7 +53,7 @@
             "single_dense_matrix_GiB": 13.03976196795702,
             "SU2_highest_weight_max_dimension": 8482,
             "SU2_single_matrix_GiB": 0.5360269844532013,
-            "SU2_basis_implemented": false,
+            "SU2_basis_implemented": true,
             "two_dense_matrices_GiB": 26.07952393591404,
             "cubic_work_relative_L12": 375.6511190363926
         },
@@ -67,7 +67,7 @@
             "single_dense_matrix_GiB": 718.645506978035,
             "SU2_highest_weight_max_dimension": 59143,
             "SU2_single_matrix_GiB": 26.061344511806965,
-            "SU2_basis_implemented": false,
+            "SU2_basis_implemented": true,
             "two_dense_matrices_GiB": 1437.29101395607,
             "cubic_work_relative_L12": 153692.35432627486
         }

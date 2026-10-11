@@ -3,11 +3,10 @@
 ## Outcome and scope
 
 **No eligible seed was found on the computed grid. No uniform spectral gap is certified.**
-Complete dense spectra reach **12 sites**, while numerical low-energy references reach
-**16 sites**. The requested complete 14-site partition-function calculation was **not
-achieved**. Accordingly, this is a resource-limited negative grid survey, not a proof that
-no seed exists. A constructive numerical SU(2) reduction now passes small-spectrum tests
-and 14-site pilots; the complete 14-site sector sweep is not yet available.
+Complete dense spectra reach **12 sites**, with numerical references through **16 sites**.
+The constructive SU(2) reduction passes small-spectrum tests and 14-site pilots; its
+complete 14-site sweep is still being collected. No partial sector set is used as Z14.
+
 
 One unit cell is one spin-1 site. The tested Hamiltonian is
 `H_L = sum_j [cos(theta) X_(j,j+1) + sin(theta) X_(j,j+1)^2]`,
@@ -16,8 +15,8 @@ One unit cell is one spin-1 site. The tested Hamiltonian is
 For L=2 both directed ring bonds are included, as in the core convention.
 There is no on-site term. No energy shift or rescaling is applied.
 
-The scope note's theorem requires **even n0**. Odd n0=3,5 are reported only as
-finite-ring diagnostics; odd-n spatial ratios need not be purities of a positive operator.
+The scope note's theorem requires **even n0**. Every reported odd n0 is only a
+finite-ring diagnostic; odd-n spatial ratios need not be purities of a positive operator.
 The hypothetical validity range would be **even L ≥ n0 cells = sites**. Since there is
 no certified seed, **there is no asserted validity range or positive bound-to-gap ratio**.
 
@@ -67,8 +66,9 @@ an antiunitary involution; its fixed basis makes the Hamiltonian real. It does n
 halve the block. Sparse involution projectors supply the additional ± sectors.
 
 Each result records every block dimension and multiplicity, and asserts both
-`sum(dim * multiplicity) == 3^L` and that the collected spectrum has exactly `3^L`
-entries. The tests compare complete reduced and unreduced spectra at L=2,3,4,5 for three
+`sum(dim * multiplicity) == 3^L` and that the expanded spectrum has exactly `3^L`
+states. SU(2) outputs retain energies with exact integer multiplet/momentum weights.
+The tests compare complete reduced and unreduced spectra at L=2,3,4,5 for three
 angles (including -0.7). Matrix Hermiticity, real-basis consistency, symmetry invariance
 and involution identities are also checked during construction. Complete spectra also
 pass analytic first- and second-moment checks at infinite temperature: for L>=3,
@@ -130,7 +130,8 @@ symmetric 0.12731 sufficient threshold. No eligible positive recurrence bound ap
 | -0.7 | 5 | no | 36.125 | 1 | 6.493e+36 | 1 |
 | -0.7 | 6 | yes | 1.875 | 0.241512 | 0.27508 | 0.241512 |
 
-For n0=7,8 no grid maximum is reported: full Z14 and Z16 were not computed. In particular,
+No n0=7,8 grid maximum is available until complete Z14/Z16 spectra exist.
+In particular,
 the larger-ring Krylov results are **not** silently treated as complete spectra or used
 in `logZ_bounds`. Odd-n near-unit diagnostic ratios cannot establish the theorem.
 
@@ -262,7 +263,7 @@ leave the required scale **unresolved**. The finite values shown for those angle
 only outputs of the positive-intercept ansatz. The short series cannot distinguish
 the assumed exponential mismatch tail from a long preasymptotic regime.
 
-## Resource limit and unmet target
+## Resources and reachable sizes
 
 The environment has Julia **1.12.4**, a **16 GiB** cgroup memory limit and **4 CPU** quota.
 The juliaup installer returned HTTP 403. The official Julia 1.12.4 S3 tarball succeeded;
@@ -271,7 +272,7 @@ and manifest. The runtime/depot are ignored and confined to this certificate dir
 All runs set `BLAS.set_num_threads(1)` and `OPENBLAS_NUM_THREADS=1`; dense parameter solves
 use four Julia threads. No existing tracked repository file was modified.
 
-At L=14 the M=1,k=1 block has **41,835** states after all the implemented symmetries.
+At L=14 the initial M=1,k=1 block has **41,835** states before SU(2) reduction.
 One real dense matrix requires **13.04 GiB**; matrix construction plus eigensolver copies
 in the implemented path requires more than the available memory (two matrices alone:
 **26.08 GiB**). Cubic work is approximately **376 times** the corresponding L=12 block.
@@ -284,16 +285,16 @@ complete spectra agree with unreduced dense ED through L=7. A Householder-QR pil
 L=14, S=2, k=1 produced an 8,106-state dense block in 649.6 seconds including one angle's
 eigensolve. The faster CholeskyQR2 version passed the same small tests; its first full
 L=14, S=0, k=0 block took 61.8 seconds for all six angles. No incomplete sector collection
-is used for Z14. The remaining full sweep is resumable with `run_su2_grid.sh`, with a
+is used for Z14. The full sweep is resumable with `run_su2_grid.sh`, with a
 45-minute timeout per sector process. See `review_notes.md` and the SU2 pilot JSON.
 The exact character counts give largest `(S,k)` highest-weight multiplicities **8,482**
 at L=14 (0.536 GiB per dense matrix) and **59,143** at L=16 (26.06 GiB). These counts use
 `d(S,k)=d(M=S,k)-d(M=S+1,k)` and assert `sum_(S,k) (2S+1)d(S,k)=3^L`.
 Thus this work does **not** establish that full 14-site ED is intrinsically infeasible:
-the former basis-construction blocker has been resolved numerically. The remaining full
-sector sweep is the blocker to the requested larger-ring purity scaling table. No
+the former basis-construction blocker has been resolved numerically.
+The remaining full sector sweep is the current blocker to the larger-ring purity table. No
 memory-overcommitted 14-site dense solve or incomplete-spectrum purity calculation was run.
-With one-site cells, full Z14 would add the odd-n0=7 diagnostic; the next eligible seed
+With one-site cells, full Z14 adds the odd-n0=7 diagnostic; the next eligible seed
 beyond n0=6 is n0=8, which needs complete Z16 under the stated two-purity workflow.
 
 ## Rigor boundary and eigenvalue-enclosure theorem
