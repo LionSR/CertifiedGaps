@@ -63,21 +63,13 @@ The two-purity method establishes a uniform spectral gap from bond reflection po
 \setcounter{section}{3}
 
 \section{Prerequisites of the Two-Purity Iteration}\label{app:uses}
-The proof in Ref.~\cite{main} is built from three kinds of moves.
+The scale-doubling iteration in Ref.~\cite{main} comprises three elementary operations:
 \begin{itemize}
-\item \emph{The coupling identities} are equalities between ratios of tori,
-such as $\Zt42/\Ztsq[4]21$. They hold for every Hamiltonian.
-\item \emph{Squaring in time}, $\tncolumn{\rho_n,\rho_n}\propto\rho_n(2\beta)$, needs only
-$e^{-\beta H}=e^{-\beta H/2}(e^{-\beta H/2})^\dagger\ge0$. This holds for every Hamiltonian:
-the mirror in time pairs each half of the torus with its adjoint.
-\item \emph{Squaring in space}, $\tnchain{\sigma_n,\sigma_n}\propto\sigma_{2n}$, needs
-$\sigma_n=X_\beta^n/Z_n\ge0$. This holds when the spatial transfer
-operator is self-adjoint, $X_\beta=X_\beta^\dagger$. The same property gives
-$Z_n=\sum_i\lambda_i^n$ with real $\lambda_i$, and hence the $\ell^p$
-interpolation to intermediate lengths.
+\item \emph{Coupling identities.} Equalities between partition-function ratios on the spacetime torus, such as $\Zt42/\Ztsq[4]21$. These hold universally for every translation-invariant lattice Hamiltonian.
+\item \emph{Temporal squaring.} The relation $\tncolumn{\rho_n,\rho_n}\propto\rho_n(2\beta)$ requires only positivity of the Gibbs operator, $e^{-\beta H}=e^{-\beta H/2}(e^{-\beta H/2})^\dagger\ge0$, which holds generally by Euclidean time reflection.
+\item \emph{Spatial squaring.} The dual relation $\tnchain{\sigma_n,\sigma_n}\propto\sigma_{2n}$ requires positivity of the spatial transfer operator, $\sigma_n=X_\beta^n/Z_n\ge0$. This holds whenever $X_\beta$ is self-adjoint ($X_\beta=X_\beta^\dagger$), which additionally guarantees that $Z_n=\sum_i\lambda_i^n$ with real eigenvalues $\lambda_i$, permitting $\ell^p$ norm interpolation to non-dyadic intermediate lengths.
 \end{itemize}
-Self-adjointness of $X_\beta$ is the spatial analogue of the time mirror, and
-it is not automatic. The rest of the proof is unchanged once it holds.
+Self-adjointness of $X_\beta$ represents the spatial counterpart of Euclidean time reflection, and is not automatic. Once it holds, the remaining doubling argument follows directly.
 The three hypotheses are therefore:
 \begin{itemize}
 \item[(H1)] \emph{Locality.} A translation-invariant chain with finite local

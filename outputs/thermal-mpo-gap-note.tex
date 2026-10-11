@@ -30,9 +30,10 @@
 \date{October 8, 2026}
 \begin{abstract}
 Following the recent machine-assisted resolution of the Haldane conjecture for periodic and boundary-field spin-1 Heisenberg chains by OpenAI~\cite{source,boundary}, we show that the analytical derivations can be recast as elementary tensor-network contractions.
-While automated proof search established the result through coordinate-dependent spectral filters and character projections, formulating the system as an exact continuous-time thermal matrix product operator exposes the underlying spacetime geometry.
-The argument then reduces to a contractive scale-doubling recurrence on planar diagrams that fits within two pages, with its core criterion verified in Lean~4.
-This provides a compact proof of the Haldane gap and illustrates how diagrammatic representations can clarify and compress complex machine-generated proofs in quantum many-body physics.
+Formulating the system as an exact continuous-time thermal matrix product operator exposes the underlying spacetime geometry.
+The step from a finite-scale estimate to a uniform gap then reduces to a contractive scale-doubling recurrence on planar diagrams, under three pages long and formalized in Lean~4 with the two numerical inputs as its only unproved hypotheses.
+The finite-scale estimate itself is taken unchanged from Ref.~\cite{source}, whose certificate uses spectral filters and character projections.
+This illustrates how diagrammatic representations can clarify and compress machine-generated proofs in quantum many-body physics.
 \end{abstract}
 \maketitle
 \setlength{\abovedisplayskip}{5pt plus 2pt minus 1pt}
@@ -342,7 +343,7 @@ The scale-doubling recurrence and the gap deduction are formally verified in Lea
 \section*{Discussion: Representation in Machine-Assisted Proofs}
 The uniform spectral gap theorems for the periodic and boundary-field spin-1 Heisenberg chains, together with the certified finite-scale numerical inputs, originate from the machine-assisted proofs by OpenAI~\cite{source,boundary}.
 
-A notable feature of the original thirty-page manuscripts is the complexity of their analytical apparatus. To isolate eigenvalues and bridge scales, the machine-guided search erected extensive coordinate-dependent structures, including degree-12 polynomial spectral filters and dihedral character projectors, alongside lemmas that ultimately proved redundant to the final inequality. Automated reasoning systems typically operate via local symbolic rewrite rules in a fixed coordinate basis. Without the topological and geometric representations native to many-body physics, long-horizon symbolic search tends to accumulate representational overhead to ensure soundness.
+The original thirty-page proofs isolate eigenvalues and bridge scales through extensive coordinate constructions, including degree-12 polynomial spectral filters and dihedral character projectors, alongside lemmas that remain unused in the final inequality. Automated reasoning systems typically operate via local symbolic rewrite rules in a fixed basis. Without the geometric and topological representations native to many-body physics, long-horizon symbolic search tends to accumulate representational overhead to ensure soundness.
 
 In this work, the authors proposed to GPT-6 to examine the argument through spacetime tensor networks, and interactively digested the resulting structure. Tensor network diagrams provide the geometric inductive bias that symbolic coordinate expansions lack. By placing imaginary time and spatial extent on equal footing on a Euclidean torus, the self-adjoint spatial transfer operator and contractive scale-doubling iteration become elementary planar identities. This indicates that diagrammatic tensor networks can serve not only as a calculational tool, but as an effective distillation framework for interpreting, simplifying, and extracting the essential physical mechanisms from machine-generated mathematical proofs. All mathematical arguments and formal proofs were verified and adjudicated by the authors.
 
