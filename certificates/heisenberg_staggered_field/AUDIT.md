@@ -1,7 +1,7 @@
 # Independent certification audit
 
-**PASS: accept the five certificates at h = 1, 3/4, 1/2, 7/20, and 1/4,
-computed from complete 8- and 16-site spectra.** Their uniform gap bounds apply
+**PASS: accept the five conservative bounds below at h = 1, 3/4, 1/2, 7/20,
+and 1/4, computed from complete 8- and 16-site spectra.** Their uniform gap bounds apply
 to every even L >= 8 one-spin cells/sites. This acceptance does not extend to
 the numerical twenty-site search candidates.
 
@@ -79,12 +79,74 @@ alone would not establish a general rounding theorem.
 
 ## Limits of acceptance
 
-The fast checker propagates the saved large-block eigenvalue enclosures; it
-does not reconstruct their large eigenvector matrices or recompute all original
-residuals. Source hashes establish which implementation produced the stored
-records. Re-running `certify.jl` is the available full reconstruction path.
+The initial fast checker propagates saved large-block eigenvalue enclosures;
+it does not reconstruct their eigenvectors or original residuals. The separate
+17-test audit uses direct scalar interval accumulation on small blocks. Neither
+initial check alone constituted a fresh large-block spectral execution.
 
-The five 8/16-site certificates are accepted. Reference gaps, optimization,
+## Completed full spectral replay
+
+The reviewer subsequently executed `spectral_replay.jl` on all five fields.
+For each field this rebuilt every exact 8/16-site momentum block, computed full
+dense Q and Lambda, recomputed R and E and their rounding allowances, and
+propagated fresh eigenvalue radii through logZ, rational seeds and recurrence.
+Original eigenvalues, radii and seeds were comparison data, not inputs to these
+fresh spectral stages. This is fresh execution of the same reviewed verifier,
+**not an independently implemented second spectral verifier**. No search ran.
+
+Attempt 1 stopped at an exact seed-equality assertion for h=3/4. Attempt 2 saved
+fresh witnesses before comparison and stopped because the h=3/4 fresh bound
+did not support the original nine-decimal displayed bound. Those attempts and
+their scripts are retained as `spectral_replay_attempt1.*` and
+`spectral_replay_attempt2.*`. These failures were not silently discarded.
+
+The final execution resumed the two already completed attempt-2 spectral
+witnesses after verifying archived source/original-certificate hashes and
+recomputing enclosure propagation; it then performed the remaining three full
+spectral stages. `results/spectral_replay.json` has status `complete` and explicit
+per-row execution provenance; its log is `results/spectral_replay.log`.
+Attempt 2 took 84.068 seconds and the resumed execution 116.027 seconds.
+These timings exclude the earlier aborted attempt 1.
+
+| h | fresh raw bound | full spectral stage seconds | accepted bound |
+|---|---:|---:|---:|
+| 1 | 1.1482614900945929 | 47.904 | 1.148261 |
+| 3/4 | 0.8907821437909684 | 31.552 | 0.890782 |
+| 1/2 | 0.5947852422865794 | 41.783 | 0.594785 |
+| 7/20 | 0.38350830551700044 | 33.863 | 0.383508 |
+| 1/4 | 0.21448610675192437 | 33.450 | 0.214486 |
+
+Accepted values are rounded **down to six decimals from min(original,fresh)**,
+with exact rational values stored in the replay JSON. Every fresh bound is
+positive, and every matched original/fresh eigenvalue enclosure overlaps.
+Overlap is only a consistency check; the fresh certificate itself supplies the
+proof. All original certificate files remain unchanged.
+
+Only h=1 reproduced all original spectral fields, seeds and raw bound exactly.
+At h=3/4 the original raw bound was 0.8907822037452694; at h=7/20 it was
+0.3835083070577823. Their fresh bounds are smaller and do **not** reproduce the
+original nine-decimal claims 0.890782203 and 0.383508307. The conservative values
+above supersede those display claims. The other two changed fresh bounds are
+slightly stronger. Exact fresh-minus-original seed differences are:
+
+| h | spatial defect difference | thermal defect difference |
+|---|---|---|
+| 1 | 0//1 | 0//1 |
+| 3/4 | 2991185//9007199254740992 | 5980245//4503599627370496 |
+| 1/2 | -2009921//9007199254740992 | -4027265//4503599627370496 |
+| 7/20 | 907975//9007199254740992 | 3666675//9007199254740992 |
+| 1/4 | -431123//9007199254740992 | -1822071//9007199254740992 |
+
+The observed h=3/4 maximum eigenvalue difference is approximately
+1.95399e-14. Its largest radius increase occurs at L=16,p=8,k=2:
+1.9753391920702282e-10. In that block the entry-error bound is unchanged,
+the residual upper bound changes by 3.6492607308249224e-15, and the
+orthogonality upper bound increases by 1.471519586164419e-11. Thus the
+observed radius variation there is dominated by the orthogonality contribution,
+not by shifts of the eigenvalues. These reported differences are numerical
+diagnostics; no unverified explanation about a library-level cause is asserted.
+
+The five conservative 8/16-site certificate bounds above are accepted. Reference gaps, optimization,
 twenty-site partial-spectrum candidates, apparent search thresholds, and scaling
 extrapolations remain numerical. In particular the stronger best twenty-site
 candidates have not undergone complete dense certification, and no physical

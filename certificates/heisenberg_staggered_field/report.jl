@@ -2,11 +2,18 @@ include("common.jl")
 using Printf
 fmt(x)=@sprintf("%.9g",x)
 function boundfmt(x)
-    a=floor(BigInt,BigFloat(x)*big(10)^9)
-    string(a÷10^9,".",lpad(string(a%10^9),9,'0'))
+    a=floor(BigInt,Rational{BigInt}(x)*big(10)^6)
+    string(a÷10^6,".",lpad(string(a%10^6),6,'0'))
 end
 readjson(path)=JSON3.read(read(path,String),Dict{String,Any})
 certs=[readjson(joinpath(ROOT,"results","certificate_$(tag(h)).json")) for h in FIELDS]
+replay=readjson(joinpath(ROOT,"results","spectral_replay.json"))
+@assert replay["status"]=="complete"
+for c in certs
+    fresh=only(filter(r->r["h"]==c["h"],replay["records"]))
+    c["bound"]=min(c["bound"],fresh["bound"])
+    c["ratio"]=c["bound"]/c["reference_gap"]
+end
 scans=[readjson(joinpath(ROOT,"results","scan_$(tag(h))_20.json")) for h in FIELDS]
 threshold=[readjson(joinpath(ROOT,"results","scan_$(tag(h))_20.json")) for h in [1//5,3//20,1//10]]
 open(joinpath(ROOT,"REPORT.md"),"w") do io
@@ -76,7 +83,7 @@ and seed defects are strings in the certificate JSON.
     for c in certs
         println(io,"| $(c["h"]) | $(c["n0"]) | $(c["beta"]) | $(boundfmt(c["bound"])) | $(fmt(c["reference_gap"])) | $(fmt(c["ratio"])) | $(fmt(c["seconds"])) |")
     end
-    println(io,"\nDisplayed rigorous bounds are rounded downward to nine decimal places; the full `.bound` output is stored in JSON.")
+    println(io,"\nDisplayed rigorous bounds are rounded DOWN to six decimal places from the smaller original and freshly replayed bound. Original raw outputs remain in certificate JSONs; fresh raw outputs and exact seed differences are in `results/spectral_replay.json`. The full spectral replay found small numerical differences, so the earlier nine-decimal display is superseded; see AUDIT.md.")
     c=certs[1]
     println(io,"\nFor h=1, the exact stored upper seed defects are epsilon_s = `$(c["epsilon_s"])` and epsilon_t = `$(c["epsilon_t"])`, with beta = `$(c["beta"])`.")
     println(io,"\n| h=1 ring | max entry error | max residual upper | max orthogonality upper | max eigenvalue radius |")

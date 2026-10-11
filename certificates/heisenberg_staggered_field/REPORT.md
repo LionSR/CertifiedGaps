@@ -59,13 +59,13 @@ and seed defects are strings in the certificate JSON.
 
 | h | n0 | beta | rigorous bound | numerical 16-site gap | bound/gap | certification seconds |
 |---|---:|---:|---:|---:|---:|---:|
-| 1//1 | 8 | 21//4 | 1.148261490 | 1.87351193 | 0.612892543 | 79.2549119 |
-| 3//4 | 8 | 21//4 | 0.890782203 | 1.57089206 | 0.567055005 | 80.252265 |
-| 1//2 | 8 | 11//2 | 0.594785232 | 1.23131976 | 0.483046933 | 50.400383 |
-| 7//20 | 8 | 23//4 | 0.383508307 | 0.994380622 | 0.385675564 | 47.0755551 |
-| 1//4 | 8 | 25//4 | 0.214486106 | 0.812031433 | 0.264135226 | 44.339813 |
+| 1//1 | 8 | 21//4 | 1.148261 | 1.87351193 | 0.612892543 | 79.2549119 |
+| 3//4 | 8 | 21//4 | 0.890782 | 1.57089206 | 0.567054967 | 80.252265 |
+| 1//2 | 8 | 11//2 | 0.594785 | 1.23131976 | 0.483046933 | 50.400383 |
+| 7//20 | 8 | 23//4 | 0.383508 | 0.994380622 | 0.385675562 | 47.0755551 |
+| 1//4 | 8 | 25//4 | 0.214486 | 0.812031433 | 0.264135226 | 44.339813 |
 
-Displayed rigorous bounds are rounded downward to nine decimal places; the full `.bound` output is stored in JSON.
+Displayed rigorous bounds are rounded DOWN to six decimal places from the smaller original and freshly replayed bound. Original raw outputs remain in certificate JSONs; fresh raw outputs and exact seed differences are in `results/spectral_replay.json`. The full spectral replay found small numerical differences, so the earlier nine-decimal display is superseded; see AUDIT.md.
 
 For h=1, the exact stored upper seed defects are epsilon_s = `3124087506499//4503599627370496` and epsilon_t = `6599110342439//9007199254740992`, with beta = `21//4`.
 
