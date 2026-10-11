@@ -113,3 +113,22 @@ The current checker verifies that the model, seed assembler and dense drivers di
 - `test/runtests.jl`: exact RP, source/data hashes, multiplicity accounting, partition interval reconstruction, and recurrence from stored rational seeds. See `results/fast-tests.log` for the actual final test count and timing.
 - Julia 1.12.4, IntervalArithmetic 1.0.12, one BLAS thread. Runtime/dependency details are in README.md and result metadata. All project changes stay inside this directory; no core or CI changes and no merge were performed.
 
+
+## Independent audit and fresh full spectral replay
+
+The separate [audit outcome](audit/RESULT.md) records a successful independent
+model-specific proof/code review and fresh dense recomputation of all L=6 and
+L=12 blocks for both certificates on current `CertifiedGaps` main
+`22b2759e0790197b83e2571b465aa8dc69ebc0be`. Every eigenvalue center and spectral
+radius, both rational seeds, and both raw bounds reproduce exactly. Four worker
+runs took 21.09–24.83 minutes each. The new evidence checker passes 240/240 in
+17.896 seconds wall time; the reviewer added 129 exact normalization/model checks
+and 90 high-precision diagnostics, all passing.
+
+This resolves the earlier replay limitation: historical/pinned and original
+fast checks consumed stored radii; the new dense jobs actually reconstructed
+matrices/eigenvectors and recomputed construction, residual and orthogonality
+bounds. New records are under `audit/`; original numerical evidence and archived
+sources remain unchanged. The result remains conditional on the stated
+IEEE/BLAS model, interval runtime and repository theorem, and D=3.206 remains
+the smallest successful sampled value rather than a global threshold.

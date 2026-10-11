@@ -72,3 +72,19 @@ recurrence source, package-name-only migration of model/driver code, and exact
 reproduction of both bounds. This is not a blanket audit of the entire renamed
 package or a second full L=12 diagonalization. The explicit user-requested certificate
 location is retained despite the upstream move of other models under `models/`.
+
+## Completed independent audit
+
+See [audit/RESULT.md](audit/RESULT.md) for the completed independent review and
+fresh full spectral replay on current `CertifiedGaps`. Both certificates reproduce
+exactly, including every spectral center/radius and exact rational seed. New
+records preserve the original evidence. Run the new fast checker with:
+
+```sh
+julia --project=julia certificates/spin1_largeD/audit/check.jl
+```
+
+It passed 240/240 in 17.896 seconds wall time. The original and pinned checkers
+above trust stored radii; `audit/replay_worker.jl` is the separate dense replay
+that actually recomputes them. Full commands, worker runtimes, independent review
+and precise limitations are in [audit/README.md](audit/README.md) and the outcome.

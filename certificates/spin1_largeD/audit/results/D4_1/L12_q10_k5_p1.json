@@ -1,0 +1,28 @@
+{
+    "k": 5,
+    "multiplicity": 4,
+    "orthogonality_upper": 7.651049397202735e-14,
+    "dimension": 6,
+    "D": "4//1",
+    "L": 12,
+    "energies": [
+        47.1385286623347,
+        47.60445467976513,
+        48.213374474984455,
+        48.767026332835385,
+        49.23836350773614,
+        56.03825234234425
+    ],
+    "seconds": 0.00020694732666015625,
+    "source_hashes": {
+        "replay_worker.jl": "3ed2250c52ba9ba4f1d01f987f0a2a70bd84a53890447262376351d5e2c76d45",
+        "../model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472"
+    },
+    "residual_upper": 5.104054159892938e-12,
+    "radius": 1.0003854461443895e-11,
+    "construction_upper": 1.6653345369377348e-15,
+    "parity": 1,
+    "q": 10,
+    "core_tree": "5ebfb34b3f28f37a6fe600857b387dfe887de8b8",
+    "recomputed_from_model": true
+}

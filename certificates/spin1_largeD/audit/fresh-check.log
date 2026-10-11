@@ -1,0 +1,9 @@
+FRESH CERTIFICATE D4_1 bound=0.6946941929576096 original=0.6946941929576096 seeds_equal=true worker_seconds=[1489.7822399139404, 1265.312488079071]
+FRESH CERTIFICATE D1603_500 bound=0.0022134568960786357 original=0.0022134568960786357 seeds_equal=true worker_seconds=[1300.9895420074463, 1429.7618148326874]
+Test Summary:                                            | Pass  Total   Time
+Fresh spectral replay evidence and rational certificates |  240    240  10.7s
+Fast audit check trusts freshly recorded radii; replay_worker.jl recomputes them from model inputs.
+
+real	0m17.896s
+user	0m16.747s
+sys	0m1.228s

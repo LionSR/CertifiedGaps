@@ -23,7 +23,11 @@ The dense jobs used `ef0a3e6cf54ec56dcef5e8a37963d0184f6fd31b` (`ThermalMPOGap`)
 
 ## Audit limitations
 
-This remains a draft for scientific review. The eigenvalue proof assumes IEEE binary64 arithmetic and the documented standard BLAS dot-product error model; it explicitly bounds BLAS rounding rather than treating floating eigensolver output as exact. The fast checker verifies provenance, stored spectral-enclosure accounting, partition intervals and the rational recurrence; it does **not** reconstruct every eigenvector/residual. Full dense replay is needed to repeat that stage. The upstream rename validation is not a second L=12 ED run or a blanket audit of the entire core.
+The independent audit and fresh full spectral replay are now complete; see [audit/RESULT.md](https://github.com/LionSR/haldane-gap-diagrams/blob/codex/spin1-large-d-certificate/certificates/spin1_largeD/audit/RESULT.md) and [the independent review](https://github.com/LionSR/haldane-gap-diagrams/blob/codex/spin1-large-d-certificate/certificates/spin1_largeD/audit/INDEPENDENT_REVIEW.md). All L=6 and L=12 matrices, dense eigensystems, construction errors, residual bounds and orthogonality bounds were recomputed from model inputs on current `CertifiedGaps` main `22b2759e0790197b83e2571b465aa8dc69ebc0be`. Every spectral center and radius, both rational seeds, and both raw bounds reproduce exactly. New evidence is separate under `audit/`; originals remain unchanged. The four worker runs took 21.09–24.83 minutes each, without repeating the search.
+
+The reviewer added **129 exact normalization/model checks** and **90 high-precision residual diagnostics**, all passing. The new fresh-evidence checker passes **240/240 in 17.896 s wall time**; the original current-core checker was also rerun, **134/134**. Historical/pinned and fast checkers trusted stored radii; they did not perform full spectral replay. The new worker runs explicitly close that gap. The new fast checker checks their stored evidence, while `audit/replay_worker.jl` repeats dense ED.
+
+The model-specific audit found no defect under the repository theorem and stated IEEE/BLAS arithmetic model. It is not formal verification of the BLAS binary, interval runtime or entire shared theorem. Fresh large computations reuse the separately audited implementation, rather than a second independently written large-matrix eigensolver. The eigenvalue proof explicitly bounds BLAS rounding rather than treating eigensolver output as exact. This remains a draft; no merge is requested or performed.
 
 The search uses numerical partial spectra only for screening. Unsuccessful grid points, ED reference gaps and ratios, interpolation in the plot, and size extrapolations are **numerical, not certified**. No nonexistence result over all D or β is claimed. L=14 dense ED was not feasible on this 16 GiB host: a charge-one momentum block alone needs 28.0 GB for one complex dense matrix. The supplied D=4, β=3 survey value differs from the numerical rerun by about 2.17e−5; it was not used as certificate input.
 
@@ -37,6 +41,8 @@ julia --project=julia certificates/spin1_largeD/test/runtests.jl
 julia --project=julia certificates/spin1_largeD/test/small.jl
 julia --project=julia certificates/spin1_largeD/test/symmetry.jl
 julia --project=julia certificates/spin1_largeD/check_pinned.jl
+julia --project=julia certificates/spin1_largeD/audit/reviewer_checks.jl
+julia --project=julia certificates/spin1_largeD/audit/check.jl
 ```
 
 The pinned replay needs the original core commit in Git history and installed dependencies; it uses a temporary workspace and changes no checkout files. For full dense reproduction, use a disposable checkout to preserve the recorded results:

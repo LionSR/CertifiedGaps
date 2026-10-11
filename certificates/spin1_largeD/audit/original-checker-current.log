@@ -1,0 +1,4 @@
+D=1603//500 beta=381//125 uniform bound=0.0022134568960786357, even L >= 6 sites
+D=4//1 beta=9//4 uniform bound=0.6946941929576096, even L >= 6 sites
+Test Summary:                        | Pass  Total   Time
+Stored spin-one large-D certificates |  134    134  22.6s

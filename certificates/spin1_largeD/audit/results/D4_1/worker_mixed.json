@@ -1,0 +1,183 @@
+{
+    "records": [
+        {
+            "multiplicity": 1,
+            "file": "L12_q0_k0_p1.json",
+            "dimension": 3117,
+            "seconds": 15.480716943740845
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k1_p1.json",
+            "dimension": 3038,
+            "seconds": 47.89275884628296
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k2_p1.json",
+            "dimension": 3107,
+            "seconds": 32.43846392631531
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k3_p1.json",
+            "dimension": 3039,
+            "seconds": 24.858644008636475
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k4_p1.json",
+            "dimension": 3112,
+            "seconds": 25.112005949020386
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k5_p1.json",
+            "dimension": 3038,
+            "seconds": 24.454176902770996
+        },
+        {
+            "multiplicity": 1,
+            "file": "L12_q0_k6_p1.json",
+            "dimension": 3110,
+            "seconds": 8.931572914123535
+        },
+        {
+            "multiplicity": 1,
+            "file": "L12_q0_k0_p-1.json",
+            "dimension": 3049,
+            "seconds": 7.90404200553894
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k1_p-1.json",
+            "dimension": 3098,
+            "seconds": 28.52119207382202
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k2_p-1.json",
+            "dimension": 3051,
+            "seconds": 24.58878993988037
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k3_p-1.json",
+            "dimension": 3101,
+            "seconds": 26.02827286720276
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k4_p-1.json",
+            "dimension": 3048,
+            "seconds": 24.66105890274048
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q0_k5_p-1.json",
+            "dimension": 3098,
+            "seconds": 25.0419340133667
+        },
+        {
+            "multiplicity": 1,
+            "file": "L12_q0_k6_p-1.json",
+            "dimension": 3053,
+            "seconds": 8.312067985534668
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q2_k0_p1.json",
+            "dimension": 4867,
+            "seconds": 32.35584211349487
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q2_k1_p1.json",
+            "dimension": 4846,
+            "seconds": 90.53633308410645
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q2_k2_p1.json",
+            "dimension": 4867,
+            "seconds": 96.3488998413086
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q2_k3_p1.json",
+            "dimension": 4846,
+            "seconds": 132.9590539932251
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q2_k4_p1.json",
+            "dimension": 4867,
+            "seconds": 141.92531204223633
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q2_k5_p1.json",
+            "dimension": 4846,
+            "seconds": 95.19625282287598
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q2_k6_p1.json",
+            "dimension": 4867,
+            "seconds": 35.35896587371826
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q3_k0_p1.json",
+            "dimension": 3607,
+            "seconds": 13.96480417251587
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q3_k1_p1.json",
+            "dimension": 3603,
+            "seconds": 39.15222883224487
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q3_k2_p1.json",
+            "dimension": 3603,
+            "seconds": 37.69694113731384
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q3_k3_p1.json",
+            "dimension": 3607,
+            "seconds": 59.50051808357239
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q3_k4_p1.json",
+            "dimension": 3603,
+            "seconds": 52.01656198501587
+        },
+        {
+            "multiplicity": 4,
+            "file": "L12_q3_k5_p1.json",
+            "dimension": 3603,
+            "seconds": 52.705878019332886
+        },
+        {
+            "multiplicity": 2,
+            "file": "L12_q3_k6_p1.json",
+            "dimension": 3607,
+            "seconds": 14.143154859542847
+        }
+    ],
+    "source_hashes": {
+        "replay_worker.jl": "3ed2250c52ba9ba4f1d01f987f0a2a70bd84a53890447262376351d5e2c76d45",
+        "../model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472"
+    },
+    "julia_version": "1.12.4",
+    "D": "4//1",
+    "seconds": 1265.312488079071,
+    "core_tree": "5ebfb34b3f28f37a6fe600857b387dfe887de8b8",
+    "group": "mixed",
+    "blas_threads": 1,
+    "recomputed_from_model": true
+}
