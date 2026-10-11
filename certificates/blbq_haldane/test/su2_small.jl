@@ -1,6 +1,7 @@
 using Test, CertifiedGaps, LinearAlgebra
 using CertifiedGaps.ExactDiagonalization
 include("../su2.jl")
+include("../dimensions.jl")
 BLAS.set_num_threads(1)
 @testset "Exact highest-weight polynomial on small charge spaces" begin
     for L in 2:4,M in 0:L
@@ -30,6 +31,7 @@ end
             o=orbits(L,S)
             count(p->mod(k*p,L)==0,o.periods)==0 && continue
             A,B,diag=su2_components(L,S,k)
+            @test size(A,1)==dimension(L,S,k)-dimension(L,S+1,k)
             mult=(2S+1)*((k==0 || 2k==L) ? 1 : 2)
             dim+=mult*size(A,1)
             for (t,theta) in enumerate((0.0,-0.3,-0.7))

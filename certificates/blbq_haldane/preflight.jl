@@ -1,34 +1,6 @@
 using CertifiedGaps.Results, LinearAlgebra
 BLAS.set_num_threads(1)
-function charge_count(L,M)
-    abs(M)>L && return 0
-    coeff=[1]
-    for _ in 1:L
-        next=zeros(Int,length(coeff)+2)
-        for i in eachindex(coeff), j in 0:2; next[i+j]+=coeff[i]; end
-        coeff=next
-    end
-    coeff[M+L+1]
-end
-function mobius(n)
-    sign=1
-    for p in 2:n
-        n%p==0 || continue
-        n÷=p;sign=-sign
-        n%p==0 && return 0
-    end
-    sign
-end
-function dimension(L,M,k)
-    value=0
-    for r in 1:L
-        L%r==0 && M%r==0 || continue
-        ramanujan=sum(d*mobius(r÷d) for d in 1:r if gcd(r,k)%d==0)
-        value+=ramanujan*charge_count(L÷r,M÷r)
-    end
-    @assert value%L==0
-    value÷L
-end
+include("dimensions.jl")
 rows=Any[]
 for L in (10,12,14,16)
     dims=[dimension(L,M,k) for M in -L:L,k in 0:L-1]
@@ -48,6 +20,6 @@ for L in (10,12,14,16)
 end
 write_result(joinpath(@__DIR__,"results/preflight.json"),(;
     metadata=run_metadata((;memory_limit_bytes=17179869184,cpu_quota=4);
-        source_sha256=source_hashes(@__DIR__;dirs=(),files=("preflight.jl",)),
+        source_sha256=source_hashes(@__DIR__;dirs=(),files=("preflight.jl","dimensions.jl")),
         status="exact integer dimensions, floating resource projections"),rows))
 println(rows)
