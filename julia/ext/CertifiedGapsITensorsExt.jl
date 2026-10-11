@@ -1,7 +1,7 @@
-module ThermalMPOGapITensorsExt
+module CertifiedGapsITensorsExt
 
 using ITensors, ITensorMPS
-import ThermalMPOGap.Purification: purified_log_partition
+import CertifiedGaps.Purification: purified_log_partition
 
 # The shared algorithm of spin2 `thermal_curve`, aklt `thermal_curve` and spin1 `thermal_logz`.
 function purified_log_partition(sites, pairs, halfgate, betas; dbeta, maxdim, cutoff,

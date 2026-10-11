@@ -22,9 +22,9 @@ The argument has two halves:
 | statement | status | where |
 |---|---|---|
 | Δ_L > (log 20)/784 ≈ 0.00382 for every even L ≥ 2304 | proof in the main note, given the purity bounds at (2304, 784) | [`outputs/thermal-mpo-gap-note.pdf`](outputs/thermal-mpo-gap-note.pdf) |
-| the purity bounds Pₛ(2304, 784), P_τ(4608, 784) ≥ 0.99 | reproduced in exact arithmetic (status `passed`) | [`spin1/`](spin1/) |
+| the purity bounds Pₛ(2304, 784), P_τ(4608, 784) ≥ 0.99 | reproduced in exact arithmetic (status `passed`) | [`models/spin1/`](models/spin1/) |
 | the doubling criterion, abstractly | formalised in Lean 4; the two purity bounds are its only unproved hypotheses | [`lean/`](lean/) |
-| Δ_L > 0.0729 for every even L ≥ 36 | exact-arithmetic computation with a new temperature-lifting argument; not yet independently reviewed | [`spin1/experiments/`](spin1/experiments/) |
+| Δ_L > 0.0729 for every even L ≥ 36 | exact-arithmetic computation with a new temperature-lifting argument; not yet independently reviewed | [`models/spin1/experiments/`](models/spin1/experiments/) |
 | open chains with endpoint fields h = 3/5: Δ_n > (log 10)/392 for odd n ≥ 1921 | proof in appendices A–C, given four finite estimates of the boundary-field paper | main note |
 | which Hamiltonians the method covers | appendices D–H | [`outputs/thermal-mpo-gap-scope.pdf`](outputs/thermal-mpo-gap-scope.pdf) |
 | how the starting estimate is certified, in diagrams | appendices I–M | [`outputs/thermal-mpo-gap-certificate.pdf`](outputs/thermal-mpo-gap-certificate.pdf) |
@@ -34,10 +34,10 @@ The argument has two halves:
 | directory | content |
 |---|---|
 | [`outputs/`](outputs/) | the LaTeX notes and their PDFs, the shared diagram package `tnnotes.sty`, notation and diagram conventions |
-| [`julia/`](julia/) | `ThermalMPOGap`, the shared Julia core: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, reflection-positivity tests, exact diagonalisation, certified MPO arithmetic (Nemo/Arb), thermal purification (ITensors) |
-| [`spin1/`](spin1/) | `Spin1Certificates`: exact reproduction of the spin-1 starting estimates (integer trace recursions on twisted rings, polynomial filters, MPS trial contractions) and the improved bounds |
-| [`spin2/`](spin2/) | the spin-2 Heisenberg chain: transfer algebra, DMRG baselines, certified MPO bounds; no uniform gap yet |
-| [`aklt/`](aklt/) | `AKLTPilot`: numerical test of the 2+1-dimensional recursion on the hexagonal AKLT model |
+| [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, reflection-positivity tests, exact diagonalisation, certified MPO arithmetic (Nemo/Arb), thermal purification (ITensors) |
+| [`models/spin1/`](models/spin1/) | `Spin1Certificates`: exact reproduction of the spin-1 starting estimates (integer trace recursions on twisted rings, polynomial filters, MPS trial contractions) and the improved bounds |
+| [`models/spin2/`](models/spin2/) | the spin-2 Heisenberg chain: transfer algebra, DMRG baselines, certified MPO bounds; no uniform gap yet |
+| [`models/aklt/`](models/aklt/) | `AKLTPilot`: numerical test of the 2+1-dimensional recursion on the hexagonal AKLT model |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalisation of the abstract criterion |
 | [`tools/`](tools/) | `fetch_upstream.jl`: downloads the preprint's evidence files at a pinned commit and checks their hashes |
 
@@ -53,9 +53,9 @@ julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 
 # spin-1 certificates: fetch the preprint's evidence (pinned commit, hash-checked), then test
 julia tools/fetch_upstream.jl
-julia --project=spin1 -e 'using Pkg; Pkg.instantiate()'
-julia --project=spin1 spin1/test/runtests.jl
-julia --project=spin1 --threads=4 spin1/scripts/reproduce.jl all /tmp/spin1-fresh   # ≈20–45 min
+julia --project=models/spin1 -e 'using Pkg; Pkg.instantiate()'
+julia --project=models/spin1 models/spin1/test/runtests.jl
+julia --project=models/spin1 --threads=4 models/spin1/scripts/reproduce.jl all /tmp/spin1-fresh   # ≈20–45 min
 
 # Lean
 cd lean && lake exe cache get && lake build

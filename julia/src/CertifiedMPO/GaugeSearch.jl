@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.GaugeSearch
+    CertifiedGaps.CertifiedMPO.GaugeSearch
 
 Numerical gauge proposals only: Schmidt-balanced full-matrix gauges and a log-diagonal gauge
 descent. Every proposal still needs a rational witness from `Norms`. Moved verbatim from

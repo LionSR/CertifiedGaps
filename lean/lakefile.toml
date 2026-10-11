@@ -1,5 +1,5 @@
-name = "ThermalMPOGap"
-defaultTargets = ["ThermalMPOGap"]
+name = "CertifiedGaps"
+defaultTargets = ["CertifiedGaps"]
 
 [leanOptions]
 pp.unicode.fun = true
@@ -13,4 +13,4 @@ scope = "leanprover-community"
 rev = "v4.35.0-rc3"
 
 [[lean_lib]]
-name = "ThermalMPOGap"
+name = "CertifiedGaps"

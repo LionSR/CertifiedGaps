@@ -32,8 +32,8 @@ lean/.lake/
 *.jls
 
 # Large or regenerable result data; small certificates read by tests are tracked
-/aklt/results/
-/spin2/results/*
-!/spin2/results/trial-certificate.json
-!/spin2/results/trial-137-certificate.json
-!/spin2/results/trial-295-symmetric-certificate.json
+/models/aklt/results/
+/models/spin2/results/*
+!/models/spin2/results/trial-certificate.json
+!/models/spin2/results/trial-137-certificate.json
+!/models/spin2/results/trial-295-symmetric-certificate.json

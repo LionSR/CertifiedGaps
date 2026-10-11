@@ -2,8 +2,8 @@
 # (survey Proposition 4.13 and models/tfim_g2, tfim_g125).
 # Run: julia --project=julia julia/scripts/tfim.jl
 
-using ThermalMPOGap, Printf
-using ThermalMPOGap.Models: tfim_seed_defects
+using CertifiedGaps, Printf
+using CertifiedGaps.Models: tfim_seed_defects
 
 # BigFloat defects at 2048 bits, padded upward by a relative 1e-30 before rounding to Float64.
 padded(ε) = Float64(ε * (1 + big(10)^-30), RoundUp)

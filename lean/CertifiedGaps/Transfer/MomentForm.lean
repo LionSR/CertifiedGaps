@@ -3,7 +3,7 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import ThermalMPOGap.PurityCriterion
+import CertifiedGaps.PurityCriterion
 import Mathlib.Analysis.Matrix.PosDef
 
 /-!
@@ -16,14 +16,14 @@ roots of the eigenvalues of `T` (indexed through `Fintype.equivFin` and padded w
 
 ## Main results
 
-* `ThermalMPOGap.trace_pow_eq_sum_eigenvalues`: `tr (T ^ N) = ∑ i, λ i ^ N` for Hermitian `T`.
-* `ThermalMPOGap.hasMomentForm_of_trace_pow`: the moment form from a positive semidefinite `T`.
+* `CertifiedGaps.trace_pow_eq_sum_eigenvalues`: `tr (T ^ N) = ∑ i, λ i ^ N` for Hermitian `T`.
+* `CertifiedGaps.hasMomentForm_of_trace_pow`: the moment form from a positive semidefinite `T`.
 -/
 
 open Matrix Unitary
 open scoped ComplexOrder
 
-namespace ThermalMPOGap
+namespace CertifiedGaps
 
 /-- The trace of a power of a Hermitian matrix is the power sum of its eigenvalues. -/
 theorem trace_pow_eq_sum_eigenvalues {D : Type*} [Fintype D] [DecidableEq D]
@@ -57,4 +57,4 @@ theorem hasMomentForm_of_trace_pow {D : Type*} [Fintype D] [DecidableEq D]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
   simp only [μ, i.2, dite_true, pow_mul, Real.sq_sqrt (hT.eigenvalues_nonneg _)]
 
-end ThermalMPOGap
+end CertifiedGaps

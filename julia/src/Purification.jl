@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.Purification
+    CertifiedGaps.Purification
 
 Numerical thermal purification: log Z(β) of a spin system from an MPO amplitude
 A = exp(−βH/2), evolved from the normalised identity with a second-order product formula.

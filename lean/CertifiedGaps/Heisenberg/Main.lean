@@ -3,8 +3,8 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import ThermalMPOGap.Heisenberg.Gap
-import ThermalMPOGap.Transfer.Moments
+import CertifiedGaps.Heisenberg.Gap
+import CertifiedGaps.Transfer.Moments
 
 /-!
 # The spin-one Heisenberg gap, unconditionally (with open inputs)
@@ -30,7 +30,7 @@ namespace SpinOneHeisenberg
 
 /-- **Input 1 (proved).** The spatial moment inequalities for the Heisenberg traces at every
 `β > 0`, from Trotterized finite transfer matrices and the product formula
-(`ThermalMPOGap.Transfer.Moments`). -/
+(`CertifiedGaps.Transfer.Moments`). -/
 theorem spatialMomentBounds (β : ℝ) (hβ : 0 < β) :
     SpatialMomentBounds (fun L ↦ partitionFunction L β) 2 :=
   spatialMomentBounds_partitionFunction β hβ

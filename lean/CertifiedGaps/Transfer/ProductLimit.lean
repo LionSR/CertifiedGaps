@@ -20,15 +20,15 @@ It is obtained by comparing `g (1 / M)` with `exp ((1 / M) • A)`, whose `M`-th
 
 ## Main results
 
-* `ThermalMPOGap.norm_pow_sub_pow_le`: the telescoping estimate for powers.
-* `ThermalMPOGap.tendsto_pow_of_hasDerivAt`: the Chernoff lemma in a complete normed algebra.
-* `ThermalMPOGap.tendsto_list_prod_one_add_smul_pow`: the product formula for complex matrices
+* `CertifiedGaps.norm_pow_sub_pow_le`: the telescoping estimate for powers.
+* `CertifiedGaps.tendsto_pow_of_hasDerivAt`: the Chernoff lemma in a complete normed algebra.
+* `CertifiedGaps.tendsto_list_prod_one_add_smul_pow`: the product formula for complex matrices
   (with the default product topology on `Matrix n n ℂ`).
 -/
 
 open Filter Topology
 
-namespace ThermalMPOGap
+namespace CertifiedGaps
 
 section General
 
@@ -191,4 +191,4 @@ theorem tendsto_list_prod_one_add_smul_pow {n : Type*} [Fintype n] [DecidableEq 
   push_cast
   rw [div_eq_inv_mul]
 
-end ThermalMPOGap
+end CertifiedGaps

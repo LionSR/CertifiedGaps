@@ -2,7 +2,7 @@
 
 julia_version = "1.12.4"
 manifest_format = "2.0"
-project_hash = "c9edd3c31c894aa9ecf5d24e3214a0412cb92702"
+project_hash = "e04e97ddfdea485c987146596e03bba4f78ab28c"
 
 [[deps.AbstractAlgebra]]
 deps = ["Compat", "LinearAlgebra", "MacroTools", "PrecompileTools", "Preferences", "Random", "RandomExtensions"]
@@ -43,6 +43,19 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "e329286945d0cfc04456972ea732551869af1cfc"
 uuid = "4e9b3aee-d8a1-5a3d-ad8b-7d824db253f0"
 version = "1.0.1+0"
+
+[[deps.CertifiedGaps]]
+deps = ["Dates", "IntervalArithmetic", "JSON3", "KrylovKit", "LinearAlgebra", "Nemo", "Printf", "Random", "SHA", "SparseArrays"]
+path = "."
+uuid = "5b0c3f0e-7a51-4c55-9b1e-2f7f3d6a8c11"
+version = "0.2.0"
+
+    [deps.CertifiedGaps.extensions]
+    CertifiedGapsITensorsExt = ["ITensors", "ITensorMPS"]
+
+    [deps.CertifiedGaps.weakdeps]
+    ITensorMPS = "0d1a4710-d33b-49a5-8f18-73bdf49b47e2"
+    ITensors = "9136182c-28ba-11e9-034c-db9fb085ebd5"
 
 [[deps.Compat]]
 deps = ["TOML", "UUIDs"]
@@ -348,19 +361,6 @@ version = "1.0.3"
 deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 version = "1.10.0"
-
-[[deps.ThermalMPOGap]]
-deps = ["Dates", "IntervalArithmetic", "JSON3", "KrylovKit", "LinearAlgebra", "Nemo", "Printf", "Random", "SHA", "SparseArrays"]
-path = "."
-uuid = "5b0c3f0e-7a51-4c55-9b1e-2f7f3d6a8c11"
-version = "0.2.0"
-
-    [deps.ThermalMPOGap.extensions]
-    ThermalMPOGapITensorsExt = ["ITensors", "ITensorMPS"]
-
-    [deps.ThermalMPOGap.weakdeps]
-    ITensorMPS = "0d1a4710-d33b-49a5-8f18-73bdf49b47e2"
-    ITensors = "9136182c-28ba-11e9-034c-db9fb085ebd5"
 
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]

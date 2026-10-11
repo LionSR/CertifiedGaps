@@ -3,8 +3,8 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import ThermalMPOGap.Transfer.Defs
-import ThermalMPOGap.Transfer.PiTensor
+import CertifiedGaps.Transfer.Defs
+import CertifiedGaps.Transfer.PiTensor
 import Mathlib.LinearAlgebra.Matrix.PosDef
 
 /-!
@@ -37,7 +37,7 @@ only on `M` and `τ ≥ 0`, not on `N`.
 * `exists_posSemidef_transfer`: the factorization through a positive semidefinite `T`.
 -/
 
-open Matrix ThermalMPOGap
+open Matrix CertifiedGaps
 open scoped Kronecker ComplexOrder
 
 namespace SpinOneHeisenberg

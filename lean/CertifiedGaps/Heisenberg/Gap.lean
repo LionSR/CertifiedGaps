@@ -3,8 +3,8 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import ThermalMPOGap.PurityCriterion
-import ThermalMPOGap.Heisenberg.Hamiltonian
+import CertifiedGaps.PurityCriterion
+import CertifiedGaps.Heisenberg.Hamiltonian
 
 /-!
 # A uniform gap for the periodic spin-one Heisenberg ring from thermal-MPO inputs

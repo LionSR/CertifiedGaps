@@ -30,7 +30,7 @@ spin chains.
 
 open Matrix
 
-namespace ThermalMPOGap
+namespace CertifiedGaps
 
 section Expand
 
@@ -161,4 +161,4 @@ theorem trace_piTensor [DecidableEq ι] (A : ι → Matrix n n R) :
 
 end PiTensor
 
-end ThermalMPOGap
+end CertifiedGaps

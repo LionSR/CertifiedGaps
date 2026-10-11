@@ -1,7 +1,7 @@
 # Constants of the doubling recurrence (survey §2.2, §2.5, §2.6), recomputed independently.
 # Run: julia --project=julia julia/scripts/constants.jl
 
-using ThermalMPOGap, IntervalArithmetic, Printf
+using CertifiedGaps, IntervalArithmetic, Printf
 
 B(x) = interval(BigFloat, x)
 lower(x) = Float64(inf(x), RoundDown)

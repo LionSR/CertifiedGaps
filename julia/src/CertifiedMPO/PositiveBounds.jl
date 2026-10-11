@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.PositiveBounds
+    CertifiedGaps.CertifiedMPO.PositiveBounds
 
 Exact entrywise majorants M ≤ U V with nonnegative rational factors, from numerical NMF and
 covering-LP candidates; acceptance is an exact matrix inequality. Moved verbatim from spin2

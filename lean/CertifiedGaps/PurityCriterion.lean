@@ -45,7 +45,7 @@ For each length `L`, the Hamiltonian is represented by its spectrum with multipl
 ## Scope
 
 Theorem 1 of the note (the spin-one Heisenberg chain) is stated for the Lean Hamiltonian in
-`ThermalMPOGap.Heisenberg.Gap`, with two inputs as hypotheses: the moment inequalities,
+`CertifiedGaps.Heisenberg.Gap`, with two inputs as hypotheses: the moment inequalities,
 which the continuous-time thermal MPO gives through the moment form (5) (Proposition 3.1 of the
 note's Ref. [1]), and the numerical estimates `P_s(2304, 784), P_τ(4608, 784) ≥ 0.99`
 (Proposition 5.5 of Ref. [1]). The staged plan is `lean/README.md`.

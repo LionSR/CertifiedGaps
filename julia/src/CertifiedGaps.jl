@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap
+    CertifiedGaps
 
 Shared numerics for the thermal-MPO gap criterion: a ring with spatial and thermal purities
 
@@ -8,7 +8,7 @@ Shared numerics for the thermal-MPO gap criterion: a ring with spatial and therm
 has a uniform gap Δ_L ≥ b_∞ for every even L ≥ n₀ when its transfer operator is self-adjoint
 (reflection positivity) and the seed defects at (n₀, β₀) lie in the admissible region.
 
-Submodules, each used on its own (`using ThermalMPOGap.ExactDiagonalization`):
+Submodules, each used on its own (`using CertifiedGaps.ExactDiagonalization`):
 
 | submodule | content |
 |---|---|
@@ -25,7 +25,7 @@ Submodules, each used on its own (`using ThermalMPOGap.ExactDiagonalization`):
 
 Theorem numbers in docstrings refer to `survey/theory/STRENGTHENING.md`.
 """
-module ThermalMPOGap
+module CertifiedGaps
 
 include("ExactArithmetic.jl")
 include("Results.jl")

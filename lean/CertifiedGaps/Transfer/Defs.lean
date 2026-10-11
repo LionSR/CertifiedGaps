@@ -3,7 +3,7 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import ThermalMPOGap.Heisenberg.Hamiltonian
+import CertifiedGaps.Heisenberg.Hamiltonian
 
 /-!
 # Trotter slices of the Heisenberg ring

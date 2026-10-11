@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.CertifiedMPO.AdjointTrace
+    CertifiedGaps.CertifiedMPO.AdjointTrace
 
 Conditional trace enclosure for a sequence of approximate Hermitian squares or reflected
 Gram steps (`trace_interval`). Moved verbatim from spin2 `Spin2AdjointTrace`.

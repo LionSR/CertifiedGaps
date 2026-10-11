@@ -1,5 +1,5 @@
 """
-    ThermalMPOGap.Recurrence
+    CertifiedGaps.Recurrence
 
 The two-purity doubling criterion. Seed defects εₛ = 1 − Pₛ(n₀, β₀) and
 εₜ = 1 − P_τ(2n₀, β₀) are pushed through the exact doubling map; the per-scale bounds

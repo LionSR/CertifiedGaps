@@ -16,7 +16,7 @@ This file defines the antiferromagnetic spin-one Heisenberg Hamiltonian
 `H_L = ∑ⱼ Sⱼ · Sⱼ₊₁` on a ring of `L` sites, as an explicit complex matrix indexed by
 configurations `Fin L → Fin 3`, and identifies the trace of its Gibbs operator with the
 eigenvalue sum `∑ₘ exp (-β Eₘ(L))`. This is the concrete Hamiltonian-side input for the
-abstract two-purity criterion of `ThermalMPOGap.PurityCriterion`, whose partition function is
+abstract two-purity criterion of `CertifiedGaps.PurityCriterion`, whose partition function is
 exactly such an eigenvalue sum.
 
 ## Definitions

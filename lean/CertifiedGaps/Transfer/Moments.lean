@@ -3,10 +3,10 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import ThermalMPOGap.PurityCriterion
-import ThermalMPOGap.Transfer.ProductLimit
-import ThermalMPOGap.Transfer.MomentForm
-import ThermalMPOGap.Transfer.Factorization
+import CertifiedGaps.PurityCriterion
+import CertifiedGaps.Transfer.ProductLimit
+import CertifiedGaps.Transfer.MomentForm
+import CertifiedGaps.Transfer.Factorization
 
 /-!
 # The spatial moment inequalities for the Heisenberg ring
@@ -24,7 +24,7 @@ the limit (`SpatialMomentBounds.of_tendsto_hasMomentForm`).
   satisfy the moment inequalities above length `2`.
 -/
 
-open Filter Matrix ThermalPurityGap ThermalMPOGap
+open Filter Matrix ThermalPurityGap CertifiedGaps
 open scoped ComplexOrder
 
 namespace SpinOneHeisenberg

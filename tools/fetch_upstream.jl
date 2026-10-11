@@ -6,7 +6,7 @@
 # github.com/openai/math at a fixed commit, into references/periodic-gap-source/ (git-ignored).
 #
 # Integrity chain: the downloaded source-manifest.json must have the SHA-256 that spin1 pins
-# (MANIFEST_SHA in spin1/src/Spin1Certificates.jl); every other file must match the hash the
+# (MANIFEST_SHA in models/spin1/src/Spin1Certificates.jl); every other file must match the hash the
 # manifest lists for it. Any mismatch aborts.
 #
 # Run from the repository root (no project environment needed):
