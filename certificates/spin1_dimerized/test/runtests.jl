@@ -1,4 +1,5 @@
 using Test
+using SHA
 include("../common.jl")
 include("../rp.jl")
 @testset "Exact RP and cell reflection" begin
@@ -42,7 +43,16 @@ end
         @test Rational{BigInt}(sup(1-exp(z2lo-2z1hi)))<=es
         @test Rational{BigInt}(sup(1-exp(z22lo-2z2hi)))<=et
         for (path,hash) in data["metadata"]["source_sha256"]
-            @test sha256_file(joinpath(ROOT,path))==hash
+            if haskey(data["metadata"], "ThermalMPOGap")
+                # Immutable provenance of the original validated run, before the
+                # upstream rename. This commit remains an ancestor of the PR.
+                revision="107116f7b5cc79db5023553f14dec2b98245d375"
+                relative=relpath(normpath(joinpath(ROOT,path)),REPO)
+                archived=read(`git -C $REPO show $revision:$relative`)
+                @test bytes2hex(SHA.sha256(archived))==hash
+            else
+                @test sha256_file(joinpath(ROOT,path))==hash
+            end
         end
         @test sum(parse(Int,r["dimension"])*parse(Int,r["multiplicity"]) for r in data["sectors_n"])==9^n
         @test sum(parse(Int,r["dimension"])*parse(Int,r["multiplicity"]) for r in data["sectors_2n"])==9^(2n)

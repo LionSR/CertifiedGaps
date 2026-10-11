@@ -39,3 +39,9 @@ export JULIA_DEPOT_PATH=/tmp/julia-depot
 
 Set these before the commands above. On another machine use its Julia 1.12.4
 installation and instantiate the existing `julia` project normally.
+
+Publication/current-main compatibility and independent-review status are tracked
+in [PUBLICATION.md](PUBLICATION.md). The original run used ThermalMPOGap; current
+main calls the same package UUID CertifiedGaps. Original source-hash verification
+uses archived commit `107116f7b5cc79db5023553f14dec2b98245d375` in this branch's
+history; the recurrence is also replayed with the current core.

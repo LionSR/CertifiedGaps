@@ -72,7 +72,7 @@ function rational_upper(x; digits=12)
     y=Rational{BigInt}(sup(x)); d=big(10)^digits
     cld(numerator(y)*d,denominator(y))//d
 end
-function certify_selected(delta; n0=nothing, beta0=nothing)
+function certify_selected(delta; n0=nothing, beta0=nothing, output_path=nothing)
     check_rp(delta)
     scan=JSON3.read(read(joinpath(ROOT,"results","scan_d$(Int(10delta)).json"),String))
     scan.best===nothing && return nothing
@@ -90,11 +90,11 @@ function certify_selected(delta; n0=nothing, beta0=nothing)
     end
     interval_record(x)=Dict("lower"=>ratstr(Rational{BigInt}(inf(x))),"upper"=>ratstr(Rational{BigInt}(sup(x))))
     data=Dict("metadata"=>provenance(Dict("delta"=>ratstr(delta),"n0"=>n,"beta0"=>ratstr(beta));certified=true),"delta"=>ratstr(delta),"n0"=>n,"beta0"=>ratstr(beta),"epsilon_s"=>ratstr(es),"epsilon_t"=>ratstr(et),"bound"=>bound.bound,"bound_exact_binary"=>ratstr(Rational{BigInt}(bound.bound)),"logZ_n_beta"=>interval_record(z1),"logZ_2n_beta"=>interval_record(z2),"logZ_2n_2beta"=>interval_record(z22),"sectors_n"=>s1,"sectors_2n"=>s2,"seconds"=>total_time,"reference_gap_numerical"=>sort(v2)[2]-minimum(v2),"validity"=>"even L >= $n cells; site counts N divisible by 4 and N >= $(4cld(n,2))","positive_transfer_gram_proof"=>true,"verification"=>"dense symmetry sectors; exact projectors for large rings; polar/Weyl and rigorous IEEE norm bounds")
-    write_result(joinpath(ROOT,"results","certificate_d$(Int(10delta)).json"),data)
+    write_result(output_path===nothing ? joinpath(ROOT,"results","certificate_d$(Int(10delta)).json") : output_path,data)
     println("CERTIFICATE delta=$delta bound=$(bound.bound) seed=($n,$beta) es=$es et=$et")
     data
 end
 include("verified_blocks.jl")
 if abspath(PROGRAM_FILE)==@__FILE__
-    certify_selected(parse(Int,ARGS[1])//10; n0=length(ARGS)>1 ? parse(Int,ARGS[2]) : nothing,beta0=length(ARGS)>2 ? parserat(ARGS[3]) : nothing)
+    certify_selected(parse(Int,ARGS[1])//10; n0=length(ARGS)>1 ? parse(Int,ARGS[2]) : nothing,beta0=length(ARGS)>2 ? parserat(ARGS[3]) : nothing,output_path=get(ENV,"SPIN1_DIMERIZED_REPLAY_PATH",nothing))
 end

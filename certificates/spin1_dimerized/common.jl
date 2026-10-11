@@ -1,5 +1,6 @@
-using ThermalMPOGap, LinearAlgebra, SparseArrays, JSON3
-using ThermalMPOGap.Results, ThermalMPOGap.ExactDiagonalization, ThermalMPOGap.Seeds
+using CertifiedGaps, LinearAlgebra, SparseArrays, JSON3
+const ThermalMPOGap = CertifiedGaps  # Historical name retained for stored certificate compatibility.
+using .ThermalMPOGap.Results, .ThermalMPOGap.ExactDiagonalization, .ThermalMPOGap.Seeds
 using IntervalArithmetic
 BLAS.set_num_threads(1)
 const ROOT = @__DIR__
