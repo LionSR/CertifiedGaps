@@ -1,0 +1,40 @@
+{
+    "source_entries_verified": 235,
+    "status": "passed",
+    "accepted": [
+        {
+            "fresh_raw_bound": 1.1482614900945929,
+            "bound": "1148261//1000000",
+            "h": "1//1"
+        },
+        {
+            "fresh_raw_bound": 0.8907821437909684,
+            "bound": "445391//500000",
+            "h": "3//4"
+        },
+        {
+            "fresh_raw_bound": 0.5947852422865794,
+            "bound": "118957//200000",
+            "h": "1//2"
+        },
+        {
+            "fresh_raw_bound": 0.38350830551700044,
+            "bound": "95877//250000",
+            "h": "7//20"
+        },
+        {
+            "fresh_raw_bound": 0.21448610675192437,
+            "bound": "107243//500000",
+            "h": "1//4"
+        }
+    ],
+    "historical_results_verified": 105,
+    "migration_base": "22b2759e0790197b83e2571b465aa8dc69ebc0be",
+    "historical_head": "1c4c07711072b8bfe1a60d188a498a491b8dc42b",
+    "migration_replay_sha256": "96a50f7ab794593eac31ea9d0b450b98ce7294720ff654f9e3335f8acbe2687c",
+    "source_sha256": {
+        "common.jl": "308ddae709853a1505962603f1f389c855033278b462610a2ef498c518592588",
+        "migration_check.jl": "ed38d706f33b1fb1371289c32cbd50fe277a156fd4190844a683fbe5a502c367",
+        "historical_provenance.jl": "741c6be3704170caf1bf7d720f5d83caa1f777b38bcbaea13dfdc8ec4cc360ad"
+    }
+}

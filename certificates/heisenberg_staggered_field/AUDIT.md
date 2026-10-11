@@ -151,3 +151,13 @@ twenty-site partial-spectrum candidates, apparent search thresholds, and scaling
 extrapolations remain numerical. In particular the stronger best twenty-site
 candidates have not undergone complete dense certification, and no physical
 threshold is established.
+
+## CertifiedGaps migration review
+
+The independent reviewer subsequently inspected the rename-only source changes,
+archived source hash checks, and the completed five-field migration replay.
+All five fresh bounds exactly match the prior full replay and support the
+accepted six-decimal claims. The migration replay took 189.418 seconds and
+recomputed all 270 blocks without resuming old witnesses. The reviewer accepted
+the migration; no additional computation was executed by the reviewer during
+this migration review. See MIGRATION.md and the separate migration_ results.

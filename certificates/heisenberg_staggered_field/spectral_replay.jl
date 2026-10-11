@@ -1,11 +1,12 @@
 # Full bounded spectral replay from exact model parameters in saved certificates.
 # No scan is read or run; original certificate files are not overwritten.
 include("common.jl")
+include("historical_provenance.jl")
 start=time(); records=Any[]
 prior=joinpath(ROOT,"results","spectral_replay_attempt2.json")
 if "--resume-attempt2" in ARGS
     saved=JSON3.read(read(prior,String),Dict{String,Any})
-    @assert saved["source_sha256"]["common.jl"]==sha256_file(joinpath(ROOT,"common.jl"))
+    @assert saved["source_sha256"]["common.jl"]==sha256_file(joinpath(ROOT,"historical_sources","common.jl"))
     @assert saved["source_sha256"]["spectral_replay.jl"]==sha256_file(joinpath(ROOT,"spectral_replay_attempt2.jl"))
     for r in saved["records"]
         original=joinpath(ROOT,"results","certificate_$(tag(rat(r["h"]))).json")
@@ -24,7 +25,7 @@ if "--resume-attempt2" in ARGS
     end
 end
 function save_replay(records,start,status)
-    write_result(joinpath(ROOT,"results","spectral_replay.json"),Dict(
+    write_result(joinpath(ROOT,"results","migration_spectral_replay.json"),Dict(
         "status"=>status,
         "scope"=>"Reconstructed exact model blocks; recomputed complete dense eigenvectors, residuals, orthogonality defects, rigorous radii, logZ, rational seeds and recurrence. No parameter search; no saved eigenvalues or radii reused as verification inputs.",
         "implementation"=>"Fresh execution of existing verifier, not a second independently implemented spectral verifier",
@@ -38,7 +39,7 @@ for h in FIELDS
     path=joinpath(ROOT,"results","certificate_$(tag(h)).json")
     c=JSON3.read(read(path,String),Dict{String,Any})
     for (name,hash) in c["metadata"]["source_sha256"]
-        source=startswith(name,"core/") ? joinpath(REPO,"julia",name[6:end]) : joinpath(ROOT,name)
+        source=joinpath(ROOT,"historical_sources",name)
         @assert sha256_file(source)==hash
     end
     hh=rat(c["h"]);n=c["n0"];beta=rat(c["beta"])

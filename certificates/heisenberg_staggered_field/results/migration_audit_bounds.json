@@ -1,0 +1,74 @@
+{
+    "source_hashes": {
+        "audit_bounds.jl": "91f032618b6fc2a1cbcc478936d22cc7d681fdb696f7a810bd9aa6bfed266711",
+        "common.jl": "308ddae709853a1505962603f1f389c855033278b462610a2ef498c518592588"
+    },
+    "julia": "1.12.4",
+    "passed": true,
+    "rows": [
+        {
+            "gamma_residual_upper": 1.9090504474523854e-13,
+            "direct_interval_residual_upper": 3.5652682413748e-15,
+            "gamma_orthogonality_upper": 1.0691518861683442e-13,
+            "k": 0,
+            "dimension": 4,
+            "L": 4,
+            "direct_interval_orthogonality_upper": 7.870063977598499e-16
+        },
+        {
+            "gamma_residual_upper": 8.891034997940505e-162,
+            "direct_interval_residual_upper": 0,
+            "gamma_orthogonality_upper": 3.638916967616769e-14,
+            "k": 1,
+            "dimension": 2,
+            "L": 4,
+            "direct_interval_orthogonality_upper": 0
+        },
+        {
+            "gamma_residual_upper": 8.388570959911202e-13,
+            "direct_interval_residual_upper": 1.2143853357196363e-14,
+            "gamma_orthogonality_upper": 3.47699128438842e-13,
+            "k": 0,
+            "dimension": 8,
+            "L": 6,
+            "direct_interval_orthogonality_upper": 2.5731455107587012e-15
+        },
+        {
+            "gamma_residual_upper": 2.846503730762837e-13,
+            "direct_interval_residual_upper": 6.430300671198461e-15,
+            "gamma_orthogonality_upper": 2.1370918528506123e-13,
+            "k": 1,
+            "dimension": 6,
+            "L": 6,
+            "direct_interval_orthogonality_upper": 4.375519676349327e-15
+        },
+        {
+            "gamma_residual_upper": 5.001714559097948e-12,
+            "direct_interval_residual_upper": 1.682114966362674e-14,
+            "gamma_orthogonality_upper": 1.8325445451272406e-12,
+            "k": 0,
+            "dimension": 20,
+            "L": 8,
+            "direct_interval_orthogonality_upper": 9.462003729813432e-15
+        },
+        {
+            "gamma_residual_upper": 2.5670029353782587e-12,
+            "direct_interval_residual_upper": 1.502435549749277e-14,
+            "gamma_orthogonality_upper": 1.2164740527413865e-12,
+            "k": 1,
+            "dimension": 16,
+            "L": 8,
+            "direct_interval_orthogonality_upper": 1.0649429638212366e-14
+        },
+        {
+            "gamma_residual_upper": 3.0434793976873895e-12,
+            "direct_interval_residual_upper": 1.8111832906879984e-14,
+            "gamma_orthogonality_upper": 1.5041192144344548e-12,
+            "k": 2,
+            "dimension": 18,
+            "L": 8,
+            "direct_interval_orthogonality_upper": 6.444679794204778e-15
+        }
+    ],
+    "description": "Independent scalar interval accumulation on small dense blocks; no search"
+}

@@ -1,5 +1,5 @@
-using ThermalMPOGap, LinearAlgebra, SparseArrays, IntervalArithmetic, JSON3
-using ThermalMPOGap.Results, ThermalMPOGap.Seeds, ThermalMPOGap.ExactDiagonalization
+using CertifiedGaps, LinearAlgebra, SparseArrays, IntervalArithmetic, JSON3
+using CertifiedGaps.Results, CertifiedGaps.Seeds, CertifiedGaps.ExactDiagonalization
 using KrylovKit, Random
 BLAS.set_num_threads(1)
 const ROOT = @__DIR__
@@ -7,12 +7,12 @@ const REPO = normpath(joinpath(ROOT,"../.."))
 const FIELDS = [1//1,3//4,1//2,7//20,1//4]
 rat(x::AbstractString) = (p=split(x,"//"); parse(BigInt,p[1])//parse(BigInt,p[2]))
 tag(h) = replace(string(h),"//"=>"_")
-iv(x) = ThermalMPOGap.Recurrence.to_interval(x)
+iv(x) = CertifiedGaps.Recurrence.to_interval(x)
 iv(x::Irrational) = interval(Float64,x)
 function provenance(config; certified=false)
     hashes = source_hashes(ROOT; dirs=("test",),files=("common.jl","scan.jl","certify.jl"))
     merge!(hashes, Dict("core/"*k=>v for (k,v) in source_hashes(joinpath(REPO,"julia"))))
-    run_metadata(config;source_sha256=hashes,packages=(ThermalMPOGap,IntervalArithmetic),
+    run_metadata(config;source_sha256=hashes,packages=(CertifiedGaps,IntervalArithmetic),
         status=certified ? "certified" : "numerical, not certified",certified)
 end
 function exact_rp(h)

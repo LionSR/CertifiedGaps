@@ -2,6 +2,7 @@
 
 See [REPORT.md](REPORT.md) for results, proof details, conventions and limitations.
 See [AUDIT.md](AUDIT.md) for the independent certification audit and saved-artifact checks.
+See [MIGRATION.md](MIGRATION.md) for validation against the renamed `CertifiedGaps` core.
 The model is the periodic spin-1/2 Heisenberg chain with staggered Sz field.
 An odd-sublattice pi rotation about y gives the exact real RP operators
 `{Sx, iSy, Sz}` and the uniform real on-site term `-h Sz`.
@@ -40,7 +41,7 @@ julia --project=julia certificates/heisenberg_staggered_field/spectral_replay.jl
 This reconstructs the exact model blocks, computes fresh complete dense eigenvectors,
 and recomputes residuals, orthogonality defects, radii, partition intervals, rational
 seeds and bounds for all five certificates. It preserves the originals and writes
-`results/spectral_replay.json` with exact comparisons against every stored spectral
+`results/migration_spectral_replay.json` with exact comparisons against every stored spectral
 field. Binary differences and support of the original nine-decimal claims are
 diagnostic and are preserved. Final published bounds are rounded DOWN to six
 decimals from the smaller original and fresh outward bound. It is a fresh
@@ -58,3 +59,13 @@ witnesses and computing the remaining three. See AUDIT.md for the exact scope.
 Cloud setup used `/tmp/julia-1.12.4/bin/julia` and
 `JULIA_DEPOT_PATH=/tmp/julia-depot`. The official juliaup installer returned HTTP 403;
 the official Julia binary archive worked. No existing repository files are changed.
+
+Current commands require the `CertifiedGaps` core on main at
+`22b2759e0790197b83e2571b465aa8dc69ebc0be` (the draft branch includes that base).
+The pre-migration validated snapshot is commit
+`1c4c07711072b8bfe1a60d188a498a491b8dc42b`. Its JSONs, logs and original
+`audit_manifest.json` are unchanged. Historical hashed sources are retained under
+`historical_sources/`; do not execute that archive. The provenance checker verifies
+their original hashes and checks that current certificate/core sources differ only
+by the package identifier. `environment.jl` writes a separate migration record;
+`seal.jl` writes `migration_manifest.json`, preserving the old manifest.

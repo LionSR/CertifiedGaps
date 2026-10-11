@@ -1,5 +1,9 @@
 # Uniform gap certificates: Heisenberg chain in a staggered field
 
+For current-main compatibility and separately recorded validation of the
+CertifiedGaps package rename, see MIGRATION.md. Historical results and hashes
+remain unchanged; migration outputs have a separate migration_ prefix.
+
 ## Outcome and scope
 
 All five requested fields have rigorous certificates from 8- and 16-site rings.

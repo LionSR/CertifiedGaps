@@ -6,7 +6,7 @@ end
 @testset "independent small-ring spectra and sector counts" begin
     for L in (2,4,6)
         a=all_spectra(L,3//4;verified=true)
-        b=spectrum(ThermalMPOGap.Models.staggered_heisenberg(3//4).chain,L;dense_max=1000)
+        b=spectrum(CertifiedGaps.Models.staggered_heisenberg(3//4).chain,L;dense_max=1000)
         @test a.spec.N==2^L
         @test maximum(abs.(a.spec.E-b.E))<1e-12
         @test sum(r["dimension"]*r["multiplicity"] for r in a.records)==2^L
