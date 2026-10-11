@@ -35,3 +35,20 @@ This PR targets upstream `22b2759` and imports `CertifiedGaps`, the renamed
 core with the same package UUID and unchanged recurrence. Historical numerical
 scan metadata was produced before the rename. Fresh certification and checker
 results use the current core; no core files are modified by this PR.
+
+The certified J=4 seed (n0,beta)=(4,2) gives bound 1.10240309174412 for every
+even L>=4 rungs (2L>=8 sites, site count divisible by four). Exact RP uses the
+checkerboard rotation and real matrices {Sx,iSy,Sz} on each leg. Certification
+took 12.14 seconds; the fresh full checker took 22.70 seconds. All other
+coupling bounds, the threshold and finite-ring gap references are numerical.
+
+Additional replay commands:
+
+```sh
+julia --project=julia certificates/heisenberg_ladder/audit.jl
+julia --project=julia certificates/heisenberg_ladder/check_scans.jl
+```
+
+The former independently recomputes directed MPFR partition bounds from fresh
+verified spectra; the latter replays all six saved numerical grids. Current
+rational seeds include upward 10^-8 rounding slack for repeat residual bounds.

@@ -1,6 +1,6 @@
 # Spin-1/2 two-leg Heisenberg ladder
 
-**Certified:** at J_perp=4, Δ_L ≥ 1.102403170532509 for every even L ≥ 4 rungs
+**Certified:** at J_perp=4, Δ_L ≥ 1.10240309174412 for every even L ≥ 4 rungs
 (2L ≥ 8 spin sites, with the site count divisible by four). The exact binary
 lower bound is the `.bound` value in `results/certificate.json`.
 
@@ -166,9 +166,15 @@ P_t >= exp(lo(logZ_2n_2beta) - 2 hi(logZ_2n_beta)).
 ```
 
 The implemented interval `-expm1` expressions return upper defect endpoints;
-these are rounded up again to rationals on the 10^-12 grid. Those rationals
+these are rounded up again to rationals on the 10^-8 grid. Those rationals
 and exact rational beta are passed to `certified_gap_bound`, with its default
-J=48 outward-rounded recurrence and tail correction.
+J=48 outward-rounded recurrence and tail correction. The 10^-8 rounding grid
+leaves slack for run-to-run variation in the computed residual/orthogonality
+allowances. An earlier 10^-12 rounding produced valid producer enclosures but
+was too tight for every fresh replay. The current checker retains strict
+inequalities; it verifies fresh enclosures against these wider rational seeds.
+This slightly weakens the current bound while the original validated snapshot
+and its tighter reported number remain unchanged under `legacy/`.
 
 The checker repeats exact RP, sector dimension accounting, source hashes,
 and the bound from stored rational seeds. It includes `recheck_seeds.jl`, which
@@ -201,7 +207,13 @@ J=7/2 10-rung attempt was killed by the memory limit (exit 137, confirmed
 cgroup OOM event). Its small-ring checkpoints and the completed certificate
 survived. Only the missing large-ring calculation was queued for retry with
 the tested sparse-to-real construction. Final results below use completed
-runs, never partial spectra from the killed process.
+runs, never partial spectra from the killed process. The checkpointed retry
+completed every dense eigensolve in 1328.7 seconds. Its completeness assertion
+then detected a shared-variable race in the threaded row aggregation. Renaming
+the outer aggregate removed that race; all saved blocks were reassembled
+without repeating eigensolves. An independent per-file audit checked labels,
+sorted finite eigenvalues, dimensions totaling 1,048,576, trace approximately
+zero, and normalized second moment 26.71875 before accepting the result.
 
 ## Results
 
@@ -220,7 +232,7 @@ is retained even though the newer repository guide prefers `models/`.
 
 ## Separate current-head audit
 
-`audit.jl` passed in 12.763 seconds. It did not read stored radii:
+`audit.jl` passed in 12.468 seconds. It did not read stored radii:
 it replayed all 256 and 65,536 eigenvalues from fresh verified dense solves,
 checked the exact normalized trace and second trace moment of the ladder,
 and independently recomputed the three log partition functions with 256-bit
@@ -241,20 +253,73 @@ The recurrence implementation itself is byte-identical.
 
 <!-- GENERATED RESULTS -->
 
-### Numerical scan status (draft)
+**Certified at J_perp=4:** Δ_L ≥ **1.10240309174412** for **every even L ≥ 4 rungs**, i.e. N=2L ≥ 8 sites with N divisible by 4.
 
-The even-seed grid is complete through n0=4. Full 10-rung scans are complete
-for J=4,3,5/2,2,3/2; only J=7/2 is still running. No unfinished 10-rung
-result is included in a completed-scan claim.
+The best seed is (n0,beta)=(4,2//1), with exact upper bounds eps_s=3508321//100000000 and eps_t=123121//5000000. The rigorous run took 12.14 s, including output. Maximum eigenvalue radius: 4.356367421759628e-8.
 
-| J | Best (n0,beta) | Numerical recurrence bound |
-|---:|:---|---:|
-| 4.0 | (4, 2) | 1.1024044365 |
-| 3.5 | (4, 2.25) | 0.7786489922 |
-| 3.0 | (4, 2.5) | 0.4541898038 |
-| 2.5 | (4, 3) | 0.0424345905 |
-| 2.0 | none | none |
-| 1.5 | none | none |
+| J_perp | Best eligible (n0,beta) | Numerical eps_s | Numerical eps_t | Numerical recurrence bound | ED gap (10 rungs) | Dense 10-rung seconds | Driver seconds |
+|---:|:---|---:|---:|---:|---:|---:|---:|
+| 4//1 | (4, 2.00) | 0.0350831773 | 0.0246240738 | 1.1024044365 | 3.13754416 | 1869.78 | 1885.71 |
+| 7//2 | (4, 2.25) | 0.0580684983 | 0.0298705122 | 0.7786489922 | 2.65844555 | 1335.20 | 3.02 |
+| 3//1 | (4, 2.50) | 0.0989635484 | 0.0449771825 | 0.4541898038 | 2.18636459 | 2021.56 | 2037.10 |
+| 5//2 | (4, 3.00) | 0.1855843084 | 0.0511472364 | 0.0424345905 | 1.72518490 | 1915.72 | 1935.13 |
+| 2//1 | none | — | — | — | 1.28197332 | 1840.29 | 1861.20 |
+| 3//2 | none | — | — | — | 0.87118950 | 1884.56 | 1923.77 |
 
-The numerical finite-grid threshold lies between 2.4881973267 and 2.4882354736.
-This is not a certified coupling threshold or a physical critical point.
+The certified bound is 35.136% of the numerical 10-rung ED gap 3.137544160545442. The 8-rung ED reference is 3.137580825265868 (ratio 0.3513544839600128). These finite-ring gaps are numerical references, not thermodynamic-limit estimates.
+
+All scans use beta=0.25:0.25:16 and n0=2:5, restricting valid seeds to even n0. Every numerical scan still computes the full dense spectrum through 10 rungs.
+
+| Rungs L | Sites | Total dimension | Largest dense block | Numerical seconds at J=4 |
+|---:|---:|---:|---:|---:|
+| 2 | 4 | 16 | 3 | 0.416 |
+| 3 | 6 | 64 | 3 | 0.000 |
+| 4 | 8 | 256 | 10 | 0.000 |
+| 5 | 10 | 1024 | 22 | 0.001 |
+| 6 | 12 | 4096 | 66 | 0.008 |
+| 8 | 16 | 65536 | 715 | 1.546 |
+| 10 | 20 | 1048576 | 8398 | 1869.780 |
+
+Exact sector dimensions and multiplicities are individually recorded in each spectrum JSON.
+
+### Numerical threshold
+
+Fixed-grid bisection finds a failure at J=2.4881973266601562 and a success at J=2.4882354736328125. Exact sampled endpoints are 326133//131072 and 163069//65536. This locates an observed transition near 2.4882 for n0∈{2,4} and this beta grid. It does not certify the endpoint, global monotonicity, a continuum-beta optimum, or a physical gap threshold.
+
+### Failed seeds and size extrapolation
+
+| J_perp | n0 | max_beta min(P_s,P_t) | beta at maximum | delta(n0) | Eligible even seed? |
+|---:|---:|---:|---:|---:|:---|
+| 2//1 | 2 | 0.253053603 | 1.25 | 1.065667491 | yes |
+| 2//1 | 3 | 0.999999994 | 16.00 | -0.322825577 | no |
+| 2//1 | 4 | 0.718235125 | 2.75 | 0.1170352853 | yes |
+| 2//1 | 5 | 0.999999993 | 16.00 | -0.05076675557 | no |
+| 3//2 | 2 | 0.190233876 | 1.50 | 1.336607189 | yes |
+| 3//2 | 3 | 0.999997267 | 16.00 | -0.5265151978 | no |
+| 3//2 | 4 | 0.540677383 | 3.00 | 0.2093884448 | yes |
+| 3//2 | 5 | 0.999994689 | 16.00 | -0.1200195646 | no |
+
+A deliberately tentative extrapolation fits delta(n)=delta(4) exp(-(n-4)/xi) using only the even n=2,4 data, xi=2/log(delta(2)/delta(4)). It models P_s≈exp(-beta delta(n)) and P_t≈exp(-6n exp(-beta gap_10)). The latter is a dilute-triplet estimate. The first predicted even seed, maximizing the recurrence bound on beta=0.25:0.25:32 at that n, is:
+
+* J=2//1: xi≈0.905, predicted (n0,beta)=(6, 5.25).
+* J=3//2: xi≈1.079, predicted (n0,beta)=(8, 8.5).
+
+These are numerical hypotheses, not seed enclosures. Two even sizes cannot validate exponential scaling, and the doubled leg bond at L=2 biases that fit. Odd-n delta values come from frustrated rings and are excluded from the fit. Actual even n0=6 testing would require a 12-rung ring beyond the requested cap.
+
+### Certified versus numerical
+
+* Certified: rational RP identity and real onsite term at every stated J; the J=4 full-spectrum enclosures, rational seed defects, and uniform gap above.
+* Exact combinatorial accounting: all orbit stabilizers, sector dimensions, and multiplicities.
+* Numerical, not certified: parameter scans, other positive recurrence values, threshold refinement, finite-ring reference gaps and ratios, failed-grid evidence, and extrapolated future seeds. No claim of absence at all beta or all sizes.
+
+
+### Final executed checks
+
+On the current CertifiedGaps base with Julia 1.12.4, `validate.jl` recorded
+12.710 seconds for the independent small-Hamiltonian smoke checks and 22.697
+seconds for the complete fresh certificate checker (below the two-minute cap).
+The separate MPFR audit took 12.468 seconds. `check_scans.jl` replayed all six
+compacted numerical grids and complete sector counts successfully in 0.724
+seconds. Evidence is in `results/validation.json`, `results/audit.json` and
+`results/scan_validation.json`. All scans and the supervisor have terminated;
+there is no pending background computation.

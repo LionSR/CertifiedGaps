@@ -1,28 +1,31 @@
-This adds a verified two-purity certificate for the spin-1/2 two-leg Heisenberg ladder at J_parallel=1, J_perp=4. The outward-rounded lower bound is **1.102403170532509 for every even L >= 4 one-rung cells**: N=2L >= 8 spin sites, with N divisible by four.
+This adds a verified two-purity certificate for the spin-1/2 two-leg Heisenberg ladder at J_parallel=1, J_perp=4. The outward-rounded lower bound is **1.10240309174412 for every even L >= 4 one-rung cells**: N=2L >= 8 spin sites, with N divisible by four.
 
-The seed is (n0,beta)=(4,2), with rational upper defects `17541603577//500000000000` and `3078024217//125000000000`. Exact rational RP identities, complete dense symmetry spectra, residual/orthogonality error bounds, outward partition-function enclosures, and the recurrence are implemented only under `certificates/heisenberg_ladder/`.
+The seed is (n0,beta)=(4,2), with rational upper defects `3508321//100000000` and `123121//5000000`. Exact rational RP identities, complete dense symmetry spectra, residual/orthogonality error bounds, outward partition-function enclosures, and the recurrence are implemented only under `certificates/heisenberg_ladder/`. Seeds are rounded upward on a 10^-8 grid to retain slack across fresh residual calculations; the historical tighter snapshot is preserved unchanged.
+
+### Completed numerical search
+
+All six couplings {4,3.5,3,2.5,2,1.5} are complete through 10 rungs (20 spins). Every 10-rung spectrum accounts for 1,048,576 states; the largest dense block has dimension 8,398. All individual dense runs stayed below approximately 45 minutes. No scan or supervisor remains running.
+
+For valid even n0 in {2,4}, beta=0.25:0.25:16, numerical bounds are 1.10240444, 0.77864899, 0.45418980, 0.04243459 at the first four couplings. No even seed was found at 2 or 1.5. The observed finite-grid transition is bracketed by 2.4881973266601562 and 2.4882354736328125. These are **numerical, not certified** threshold results. The J=4 10-rung reference gap is 3.1375441605; the certificate is 35.136% of this finite-ring reference.
+
+The report records failed-grid purity maxima, delta(n), and explicitly tentative extrapolations (n0,beta)=(6,5.25) at J=2 and (8,8.5) at J=1.5. Odd n0=3,5 are diagnostics only: the theorem requires even n0, and odd original ladder rings are frustrated.
+
+One J=3.5 attempt was OOM-killed. The lower-memory retry checkpointed every sector. Its final dimension assertion caught a threaded aggregation race, which was corrected; all saved sectors were independently checked and reassembled without repeating eigensolves or accepting a partial spectrum.
 
 ### Validation
 
-On Julia 1.12.4 against current main (`22b2759`, `CertifiedGaps`):
+On Julia 1.12.4 against main `22b2759` (`CertifiedGaps`), with OPENBLAS_NUM_THREADS=1:
 
-- `julia --project=julia certificates/heisenberg_ladder/test/runtests.jl`: passed; 24.6 s including fresh verified 4/8-rung eigensolves, source hashes, sector completeness, stored-seed replay, exact RP, and bound recomputation.
-- `julia --project=julia certificates/heisenberg_ladder/smoke.jl`: passed; independent full Hamiltonians and spectra through 5 rungs, plus exact second-moment normalization checks; 14.3 s.
-- `julia --project=julia certificates/heisenberg_ladder/audit.jl`: passed; 12.8 s. Replays all 256 and 65,536 eigenvalues without reading saved radii; independently checks exact trace moments and the three log partition functions using directed 256-bit MPFR arithmetic.
-- The `CertifiedGaps` migration was checked against all core source files: they match the old source after namespace replacement. No core file is changed by this PR. The original validated `ThermalMPOGap` snapshot and matching source hashes are preserved byte-for-byte under `legacy/`.
+- `julia --project=julia certificates/heisenberg_ladder/test/runtests.jl`: passed in 22.70 s, including fresh verified 4/8-rung eigensolves, hashes, complete sector counts, exact RP, strict rational seed inequalities and bound recomputation.
+- `julia --project=julia certificates/heisenberg_ladder/smoke.jl`: passed in 12.71 s; independently constructed full Hamiltonians and spectra through 5 rungs and exact second moments.
+- `julia --project=julia certificates/heisenberg_ladder/audit.jl`: passed in 12.47 s; fresh complete spectra without saved radii, exact trace moments, and independently implemented directed 256-bit MPFR partition sums.
+- `julia --project=julia certificates/heisenberg_ladder/check_scans.jl`: passed; all six compacted numerical grids, dimensions and best-seed calculations replay correctly.
+- All 25 core sources match the pre-rename source after namespace replacement. The original validated ThermalMPOGap snapshot and source hashes are preserved byte-for-byte under `legacy/`; current proof outputs were regenerated with CertifiedGaps.
 
-### Numerical scope and work still running
+### Reproduction and limits
 
-The valid even-seed grid is complete for J_perp in {4,3.5,3,2.5,2,1.5}, n0 in {2,4}, beta=0.25:0.25:16. Numerical bounds are 1.10240444, 0.77864899, 0.45418980, 0.04243459 for the first four values; no even seed was found at 2 or 1.5. The observed grid threshold is bracketed by 2.4881973267 and 2.4882354736. These results are **numerical, not certified**.
+Regenerate with `julia --project=julia certificates/heisenberg_ladder/certify.jl`, then run the checker and audit above. Numerical scans use `scan_lowmem.jl '4//1'` and the other rational couplings. REPORT.md gives the exact RP decomposition, uniqueness argument, enclosure theorem, normalization, timings and provenance. Numerical JSONs retain complete sector counts, low levels and logZ grids; verified spectra retain all eigenvalue enclosures.
 
-Full 10-rung dense scans are complete for J=4,3,2.5,2,1.5. Only the checkpointed retry for J=3.5 remains active. The earlier J=3.5 10-rung attempt was OOM-killed; no partial spectrum from that process is represented as complete. This PR stays draft and will be updated with the remaining results. The completed 10-rung J=4 reference gap is numerical: 3.1375441605.
+The fresh audit shares the symmetry builder and residual-bound implementation; it is not an independent eigensolver or formal verification of the entire pipeline. The repository's abstract theorem and ordinary IEEE/OpenBLAS arithmetic model remain assumptions. No rigorous thermodynamic reference gap, coupling threshold, monotonicity, or absence of seeds beyond the grid is claimed. A different arithmetic backend may require regenerated enclosures.
 
-Odd n0=3,5 are diagnostics only: the theorem requires even n0, and odd original ladder rings are frustrated. A 10-rung ring therefore does not provide a valid new n0=5 certificate.
-
-### Audit limitations and reproduction
-
-The fresh audit shares the symmetry builder and residual-bound implementation; it is not an independently implemented eigensolver or a formal verification of the full pipeline. The repository's abstract two-purity theorem and ordinary IEEE/OpenBLAS arithmetic model remain assumptions. No rigorous thermodynamic reference gap, coupling threshold, monotonicity result, or absence of seeds beyond the searched grid is claimed. Fresh replay is tested with Julia 1.12.4 and the checked-in manifest; a different BLAS implementation may require regenerated enclosures rather than bit-identical replay.
-
-Set `OPENBLAS_NUM_THREADS=1`. Regenerate the certificate with `julia --project=julia certificates/heisenberg_ladder/certify.jl`, then run the checker and audit above. Numerical scans use `scan_lowmem.jl '4//1'` (and the other rational couplings). `REPORT.md` gives the theorem, exact decomposition, normalization, validity range, provenance, and full reproduction details. Numerical JSONs retain complete sector dimensions, low levels and logZ grids; the rigorous complete eigenvalue enclosures are retained in full.
-
-No CI, merge, or shared-core changes are included.
+No shared-core changes or CI additions. This PR remains **draft**; no merge is requested.

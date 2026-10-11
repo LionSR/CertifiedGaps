@@ -36,15 +36,15 @@ function summarize()
             "), with exact upper bounds eps_s=",c.eps_s," and eps_t=",c.eps_t,". ",
             "The rigorous run took ",round(c.seconds;digits=2)," s, including output. ",
             "Maximum eigenvalue radius: ",c.maximum_eigenvalue_radius,".\n")
-        println(io,"| J_perp | Best eligible (n0,beta) | Numerical eps_s | Numerical eps_t | Numerical recurrence bound | ED gap (10 rungs) | Scan seconds |")
-        println(io,"|---:|:---|---:|---:|---:|---:|---:|")
+        println(io,"| J_perp | Best eligible (n0,beta) | Numerical eps_s | Numerical eps_t | Numerical recurrence bound | ED gap (10 rungs) | Dense 10-rung seconds | Driver seconds |")
+        println(io,"|---:|:---|---:|---:|---:|---:|---:|---:|")
         for s in scans
             b=s.best; gap=s.rings[Symbol("10")].gap
             if b===nothing
-                @printf(io,"| %s | none | — | — | — | %.8f | %.2f |\n",s.J,gap,s.seconds)
+                @printf(io,"| %s | none | — | — | — | %.8f | %.2f | %.2f |\n",s.J,gap,s.rings[Symbol("10")].seconds,s.seconds)
             else
-                @printf(io,"| %s | (%d, %.2f) | %.10f | %.10f | %.10f | %.8f | %.2f |\n",
-                    s.J,b.n0,b.beta,b.eps_s,b.eps_t,b.bound,gap,s.seconds)
+                @printf(io,"| %s | (%d, %.2f) | %.10f | %.10f | %.10f | %.8f | %.2f | %.2f |\n",
+                    s.J,b.n0,b.beta,b.eps_s,b.eps_t,b.bound,gap,s.rings[Symbol("10")].seconds,s.seconds)
             end
         end
         gap10=scans[1].rings[Symbol("10")].gap

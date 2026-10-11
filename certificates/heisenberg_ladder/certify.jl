@@ -32,8 +32,8 @@ function certify()
     a=full_spectrum(n,J;verified=true); b=full_spectrum(2n,J;verified=true)
     la=enclosed_logZ(a,beta); lb=enclosed_logZ(b,beta); lc=enclosed_logZ(b,2beta)
     es=-expm1(lb-2la); et=-expm1(lc-2lb)
-    # Round rational upper bounds to a convenient decimal grid, still outward.
-    ratup(x)=ceil(BigInt,Rational{BigInt}(sup(x))*big(10)^12)//big(10)^12
+    # Outward 1e-8 rounding gives replay slack for small eigensolver/norm variations.
+    ratup(x)=ceil(BigInt,Rational{BigInt}(sup(x))*big(10)^8)//big(10)^8
     eps_s=ratup(es); eps_t=ratup(et)
     answer=certified_gap_bound(eps_s,eps_t,beta); @assert answer.bound !== nothing
     enc(x)=Dict("lo"=>string(Rational{BigInt}(inf(x))),"hi"=>string(Rational{BigInt}(sup(x))))
@@ -48,7 +48,7 @@ function certify()
     write_result(joinpath(@__DIR__,"results","certificate.json"),Dict(
         "metadata"=>provenance(Dict("J"=>string(J));certified=true),
         "J"=>string(J),"n0"=>n,"beta"=>string(beta),"eps_s"=>string(eps_s),
-        "eps_t"=>string(eps_t),"bound"=>answer.bound,"recurrence"=>answer,
+        "eps_t"=>string(eps_t),"seed_rounding_grid"=>"1//100000000","bound"=>answer.bound,"recurrence"=>answer,
         "logZ_n_beta"=>enc(la),"logZ_2n_beta"=>enc(lb),"logZ_2n_2beta"=>enc(lc),
         "validity"=>"every even L >= $n rungs (N=2L >= $(2n) spin sites; N divisible by 4)",
         "seconds"=>time()-start,"ed_gap_2n"=>gap,"bound_over_ed_gap"=>answer.bound/gap,

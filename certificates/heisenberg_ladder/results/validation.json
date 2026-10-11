@@ -3,12 +3,12 @@
         {
             "passed": true,
             "script": "smoke.jl",
-            "seconds": 14.333909073
+            "seconds": 12.710405366
         },
         {
             "passed": true,
             "script": "test/runtests.jl",
-            "seconds": 24.608890115
+            "seconds": 22.697271954
         }
     ],
     "metadata": {
@@ -26,7 +26,7 @@
                 "complete dimensions"
             ]
         },
-        "created_utc": "2026-10-11T05:29:24.231",
+        "created_utc": "2026-10-11T05:58:57.670",
         "certified": true,
         "source_sha256": {
             "certificates/heisenberg_ladder/recheck_seeds.jl": "cbf1b0d32bc81bee13212319f5f44726e68d58495a7240853d833c141a4d306c",
@@ -59,10 +59,11 @@
             "julia/src/CertifiedMPO/PositiveBounds.jl": "8921e7de4f45a27260dfc22e00719b06651674fc3dd792d6580e294b5fd68382",
             "certificates/heisenberg_ladder/legacy/source/compact_results.jl": "9a110caec9069d1d8c6bbd7d560ebded98ff82f7243a82be53c6d25729eb09c4",
             "certificates/heisenberg_ladder/legacy/source/ladder.jl": "23707cbb4ecb643c16785e1f22494a9df6ba2c6f736477a640a370c5ca9b2d68",
-            "certificates/heisenberg_ladder/certify.jl": "cd8c95a1d594edf3d813cc67dc2f3595c743934065d2ae42a1ba773ef7640ef7",
+            "certificates/heisenberg_ladder/certify.jl": "663a4fd7a7fde3b515c367efcfac7b7f6acd608df35900a5f970944447f129a6",
             "certificates/heisenberg_ladder/legacy/source/smoke.jl": "e1dbb2d9c7cab13a4f179f2ba82d0d2a06695c2f2e6b5c031db4553289998ce9",
             "certificates/heisenberg_ladder/small_summary.jl": "3b1d5bfee510aabdf3ed2cb71c23951dff83a66beaf2b2e00975038e53ee0f46",
             "julia/src/Seeds.jl": "a8239c9745b2aae6db03c8de535f6a6ecb3aab71ade5a50699ad03a96903abf7",
+            "certificates/heisenberg_ladder/check_scans.jl": "be4e737a58cf610822a93e63d1ed51e2fb9c00e0527e255438cb926cd082f3c8",
             "outputs/thermal-mpo-gap-scope.tex": "4e77e5d839d79efc4472b6b75a505726b54fb79de5fd4604c27d8927b8d809e7",
             "certificates/heisenberg_ladder/audit.jl": "15687887c1a1bf7e32c70d9f6d75170b064a9e2eea3c9f7afd92d13721ea3874",
             "certificates/heisenberg_ladder/legacy/source/scan.jl": "b97a8996a169d6332af120209578aa257973c369b01361bd70556fa6312cb515",
@@ -88,10 +89,10 @@
             "julia/src/CertifiedGaps.jl": "29d4ed14e0fb99d588b26a4ff75824deab3d13f501d8809d99bdee085e3e4ce9",
             "certificates/heisenberg_ladder/validate.jl": "71c5502137afa44f4347bc5c9597fa44af218b019afddbbb0c49ef7a708c1b97",
             "julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
-            "certificates/heisenberg_ladder/summarize.jl": "1e018a7132a27c9d9e8de973b5bde45d2629830e3be2da80eb5539fe5381ca2f",
+            "certificates/heisenberg_ladder/summarize.jl": "c3348d92efbf487e36ae2e231bd6cf82cd4e7fb1ef786dc4000fc2ffdac9d486",
             "certificates/heisenberg_ladder/legacy/source/check.jl": "c4637091abde17ea83b862796f384041105515c1fd0a2e21b7ec5512e04ceef9",
             "julia/Manifest.toml": "422dd9dcc0c0257c0ccd5852c56a5bb43b214080ece90651b2ddd9209eff9b7f",
-            "certificates/heisenberg_ladder/retry_j3p5.jl": "e9673056d8983445048f8a265838ceb496a9abebbcb0c9d085cca99978810b41",
+            "certificates/heisenberg_ladder/retry_j3p5.jl": "a62caf4c56a1eaeb215dcf392b00bc206b698158e18ea8238897bc82c2c5382c",
             "julia/Project.toml": "1043d2457f2be2f349c00ddd5b994dd5bd5566672813eab1f54671f8b53a99d1"
         },
         "CertifiedGaps": "0.2.0",
