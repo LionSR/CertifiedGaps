@@ -1,6 +1,6 @@
 This draft adds a numerical BLBQ Haldane scaling survey and a constructive SU(2) highest-weight reduction under `certificates/blbq_haldane/`. It does **not** claim a uniform spectral-gap certificate.
 
-Sweep checkpoint, 2026-10-11 07:34 UTC: 24/120 L14 sector files complete, covering all S=0,1,2 momenta; S=3, k=0 is active. The preceding block completed in 9m37s. No timeouts or OOM events have occurred. Every sector has a 45-minute timeout within a 16 GiB environment. Remaining work is estimated at roughly two hours plus final audit, based on measured block timings; this is not a completion guarantee. Complete partition-function data still stops at L12.
+Sweep checkpoint, 2026-10-11 07:58 UTC: 26/120 L14 sector files complete; S=3, k=2 is active at 7m01s and 7.7 GiB. The two completed S=3 blocks took 10m27s and 7m22s, including the largest 8,482-state block. No sectors have failed or timed out, and no OOM events have occurred. Every sector has a 45-minute timeout within a 16 GiB environment. Remaining work is projected at about two hours, with roughly half an hour uncertainty, plus final audit; this is not a completion guarantee. Complete partition-function data still stops at L12, and partial L14 outputs are excluded from Z.
 
 - Exact Cartesian RP identities, including an independent realignment spectrum check, hold symbolically for the requested angle range.
 - Complete dense spectra through L=12 cover all six angles. No eligible even seed passes; theta=0 is closest (n0=6, beta=3.25, balanced purity 0.328774).
