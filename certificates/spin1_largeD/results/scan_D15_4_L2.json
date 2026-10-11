@@ -1,0 +1,99 @@
+{
+    "rigorous": false,
+    "L": 2,
+    "radii": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "dimension": 9,
+    "D": "15//4",
+    "seconds": 0.00011014938354492188,
+    "energies": [
+        -1.1949334595148753,
+        1.75,
+        1.75,
+        5.5,
+        5.75,
+        5.75,
+        6.694933459514875,
+        9.5,
+        9.5
+    ],
+    "source_hashes": {
+        "test/small.jl": "23dad0c38b533fecb021865debe4c5bc2dfb02388056e4a8eafac38028e96298",
+        "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+        "scan.jl": "6498f6374d59577f1ec28da8b746b4d3fbc5f80b298f73ab59f7a2e90abdf3e4"
+    },
+    "complete": true,
+    "sectors": [
+        {
+            "levels": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "parity": 1,
+            "dimension": 2,
+            "seconds": 3.695487976074219e-5,
+            "q": 0
+        },
+        {
+            "levels": 1,
+            "k": 1,
+            "multiplicity": 1,
+            "parity": -1,
+            "dimension": 1,
+            "seconds": 9.5367431640625e-7,
+            "q": 0
+        },
+        {
+            "levels": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 0,
+            "q": 1
+        },
+        {
+            "levels": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 1.1920928955078125e-6,
+            "q": 1
+        },
+        {
+            "levels": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 0,
+            "q": 2
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "numerical, not certified",
+        "config": {
+            "D": "15//4",
+            "L": 2
+        },
+        "created_utc": "2026-10-11T04:47:18.388",
+        "certified": false,
+        "source_sha256": {
+            "test/small.jl": "23dad0c38b533fecb021865debe4c5bc2dfb02388056e4a8eafac38028e96298",
+            "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+            "scan.jl": "6498f6374d59577f1ec28da8b746b4d3fbc5f80b298f73ab59f7a2e90abdf3e4"
+        },
+        "blas_threads": 1
+    }
+}

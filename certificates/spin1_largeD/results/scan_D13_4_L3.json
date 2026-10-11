@@ -1,0 +1,171 @@
+{
+    "rigorous": false,
+    "L": 3,
+    "radii": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "dimension": 27,
+    "D": "13//4",
+    "seconds": 9.894371032714844e-5,
+    "energies": [
+        -0.7291182167922293,
+        2.099632372816139,
+        2.099632372816139,
+        2.099632372816139,
+        2.099632372816139,
+        3.5,
+        4.3424635468163375,
+        4.3424635468163375,
+        4.5,
+        4.5,
+        6.5,
+        6.5,
+        6.5,
+        6.5,
+        6.5,
+        6.5,
+        8.22911821679223,
+        8.900367627183858,
+        8.900367627183858,
+        8.900367627183858,
+        8.900367627183858,
+        9.5,
+        9.5,
+        9.657536453183663,
+        9.657536453183663,
+        12.75,
+        12.75
+    ],
+    "source_hashes": {
+        "test/small.jl": "23dad0c38b533fecb021865debe4c5bc2dfb02388056e4a8eafac38028e96298",
+        "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+        "scan.jl": "6498f6374d59577f1ec28da8b746b4d3fbc5f80b298f73ab59f7a2e90abdf3e4"
+    },
+    "complete": true,
+    "sectors": [
+        {
+            "levels": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "parity": 1,
+            "dimension": 2,
+            "seconds": 7.867813110351562e-6,
+            "q": 0
+        },
+        {
+            "levels": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 5.0067901611328125e-6,
+            "q": 0
+        },
+        {
+            "levels": 1,
+            "k": 0,
+            "multiplicity": 1,
+            "parity": -1,
+            "dimension": 1,
+            "seconds": 9.5367431640625e-7,
+            "q": 0
+        },
+        {
+            "levels": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "parity": -1,
+            "dimension": 1,
+            "seconds": 1.1920928955078125e-6,
+            "q": 0
+        },
+        {
+            "levels": 2,
+            "k": 0,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 2,
+            "seconds": 9.5367431640625e-7,
+            "q": 1
+        },
+        {
+            "levels": 2,
+            "k": 1,
+            "multiplicity": 4,
+            "parity": 1,
+            "dimension": 2,
+            "seconds": 1.1920928955078125e-5,
+            "q": 1
+        },
+        {
+            "levels": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 9.5367431640625e-7,
+            "q": 2
+        },
+        {
+            "levels": 1,
+            "k": 1,
+            "multiplicity": 4,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 0,
+            "q": 2
+        },
+        {
+            "levels": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 0,
+            "q": 3
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "numerical, not certified",
+        "config": {
+            "D": "13//4",
+            "L": 3
+        },
+        "created_utc": "2026-10-11T04:48:06.043",
+        "certified": false,
+        "source_sha256": {
+            "test/small.jl": "23dad0c38b533fecb021865debe4c5bc2dfb02388056e4a8eafac38028e96298",
+            "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+            "scan.jl": "6498f6374d59577f1ec28da8b746b4d3fbc5f80b298f73ab59f7a2e90abdf3e4"
+        },
+        "blas_threads": 1
+    }
+}

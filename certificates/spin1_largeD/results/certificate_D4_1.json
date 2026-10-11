@@ -1,0 +1,101 @@
+{
+    "eps_s": "577405872923865//9007199254740992",
+    "validity": "every even L >= 6 cells = sites",
+    "ratio_to_ED_gap": 0.306105644596623,
+    "bound": 0.6946941929576096,
+    "enclosure_hashes": {
+        "results/enclosed_D4_1_L6.json": "f8b26052c9c4b592ed0d4c2f7970c74fb0a8b9b4eb5d6d6cb8a227a09288a33a",
+        "results/enclosed_D4_1_L12.json": "c874d522752d0ebe597f0e7c8b13eb45b3c897be29f57f4eb1b2448752f6712d"
+    },
+    "logZ": [
+        [
+            3.7223195884129954,
+            3.722319588519411
+        ],
+        [
+            7.378387264118317,
+            7.378392905500666
+        ],
+        [
+            14.715412212640409,
+            14.715422970414602
+        ]
+    ],
+    "core_hashes": {
+        "src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+        "src/CertifiedMPO/SchattenBridge.jl": "f826199d1be8e6632bdbcdd5eed279ac37a72cbf6051a0ff3942946de52b06a9",
+        "src/CertifiedMPO/PolynomialBounds.jl": "687a589d85dc527177281a0e1283b8d428df93f962c465ed2221a539b14fa1b9",
+        "src/Results.jl": "cc886dd20458799780935386400a5594e69d6231aada6d68f5a59f29f6ecb677",
+        "src/Seeds.jl": "eabb710e3aa6d870e84b6b8bd8e0df4c54dd56e2a7b95495be61388ba1f3f2be",
+        "src/ExactDiagonalization.jl": "936f5c6764ca892769024711bdc0842c299e5c8b5d32fba976199212384551bb",
+        "src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8",
+        "src/ExactArithmetic.jl": "b0b11c2d5e19ea24f00fed6e93b4949ae86d323117e4344f21e682ea7e778642",
+        "src/CertifiedMPO/Norms.jl": "6ec3509571238504acdb9eb2052e44794075f69850503a27ea7a0e79f53fae93",
+        "src/CertifiedMPO/Products.jl": "7d15b0e27c8dcefc9fb5f876efa4fec4edc6cca3be8caecfd867e8c72b773b5e",
+        "src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
+        "Project.toml": "aad0eff0d3aeaeb0afb0e967ccaa245c0d24c2cddafef2289a2e41eacad0e1f3",
+        "src/CertifiedMPO/AdjointTrace.jl": "1596f1cf3045f3dd8f8d6aa8445ea2268811228e9c77d3b4c186510d33eb5aa9",
+        "src/CertifiedMPO/GaugeSearch.jl": "fc8d1d96088434191c4c09520cb91ca8054ccc1d7b552e9e57448cbb03b3edc8",
+        "src/Purification.jl": "f9acd3caf3d413aa540d108af79aa1acff8956b7281fed4009e18eeecaf8c884",
+        "src/ReflectionPositivity.jl": "653dd5cb1da456a0cb7db215c38c2e394d3658eccfd0e5b93d0fb1581b22c06f",
+        "src/recurrence/rational.jl": "be93e303d0a89d36dca4ee284a72a34b2efcf5c0dec93476352f69cacec1f67c",
+        "Manifest.toml": "6f67f2d98c66ab6a36b577346a4dc78bf4d3187489e736759967b94f03899d80",
+        "src/Recurrence.jl": "5c70fbae608abd2d0f26ad529b477967bf4153e7ae1dde603f4e4644252924ed",
+        "src/CertifiedMPO/CertifiedMPO.jl": "67678a11ecd30c3add4fe85c09373d75b5eee63d70b8766a805b12976cae3e9a",
+        "src/Spins.jl": "a43d59bd120bb765ee50a49001cbb9792aa26bc23838fd4dbcb9e5943aab2090",
+        "src/CertifiedMPO/MPOAlgebra.jl": "9106a106a0cf33fc7cec095e803db2ba4a0743169a849da264c71d4336f6856a",
+        "src/Models.jl": "03c2ea4f68d313d4dc4b468b66dbe91999929c50c4b71ca8db805792018a30fc",
+        "src/CertifiedMPO/Squaring.jl": "e9db2558c5f0472ba82f02139114d53cb2701fa34cdfdceb6bb9b53f4f7f45d8",
+        "src/CertifiedMPO/OperatorError.jl": "7094b07e0d22d8836178d5aab398c7d1f52a6a516e06e6bf0e5374ed6d02b78d",
+        "src/ThermalMPOGap.jl": "06d393ef52eeb6966404ed21beeeec0ac84182e8d780c6206d7a1e47c1cae5f9",
+        "src/CertifiedMPO/PositiveBounds.jl": "97f605694d77949738837020f7a5ef3b54373369317399705a20e32e22b9bcbb"
+    },
+    "certified": true,
+    "bound_upper": 0.694694192957641,
+    "finite_gap_intervals": {
+        "12": [
+            2.2694508116060477,
+            2.2694670765175586
+        ],
+        "6": [
+            2.292266241989862,
+            2.2922662421375386
+        ]
+    },
+    "D": "4//1",
+    "beta": "9//4",
+    "eps_t": "45632040552745//1125899906842624",
+    "log_rJ_upper": -4.399628215134867e14,
+    "ED_gap_L2n": 2.269458944061803,
+    "source_hashes": {
+        "test/symmetry.jl": "a4135c7827c6cf866ba3f35415149f5852f47ed50c5814bc13025dc9a9a0e83a",
+        "test/small.jl": "23dad0c38b533fecb021865debe4c5bc2dfb02388056e4a8eafac38028e96298",
+        "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+        "seed.jl": "144ab9c8a528f36cd55af3d21c409548fe1364a5409c8c61377e56b9c6b0ce0e",
+        "test/runtests.jl": "5f811cde3e90ee95ac7680b630c3b8f9ea725981bab8343134b233b4a7583a02"
+    },
+    "j_admissible": 0,
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "IntervalArithmetic": "1.0.12",
+        "ThermalMPOGap": "0.2.0",
+        "status": "certified uniform gap under the repository two-purity theorem",
+        "config": {
+            "beta": "9//4",
+            "D": "4//1",
+            "n0": 6
+        },
+        "created_utc": "2026-10-11T05:25:00.598",
+        "certified": true,
+        "source_sha256": {
+            "test/symmetry.jl": "a4135c7827c6cf866ba3f35415149f5852f47ed50c5814bc13025dc9a9a0e83a",
+            "test/small.jl": "23dad0c38b533fecb021865debe4c5bc2dfb02388056e4a8eafac38028e96298",
+            "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+            "seed.jl": "144ab9c8a528f36cd55af3d21c409548fe1364a5409c8c61377e56b9c6b0ce0e",
+            "test/runtests.jl": "5f811cde3e90ee95ac7680b630c3b8f9ea725981bab8343134b233b4a7583a02"
+        },
+        "blas_threads": 1
+    },
+    "n0": 6
+}

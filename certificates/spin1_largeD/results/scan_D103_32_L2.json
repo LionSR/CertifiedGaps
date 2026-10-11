@@ -1,0 +1,101 @@
+{
+    "rigorous": false,
+    "L": 2,
+    "radii": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+    ],
+    "dimension": 9,
+    "D": "103//32",
+    "seconds": 0.0997610092163086,
+    "energies": [
+        -1.37608679219238,
+        1.21875,
+        1.21875,
+        4.4375,
+        5.21875,
+        5.21875,
+        5.81358679219238,
+        8.4375,
+        8.4375
+    ],
+    "source_hashes": {
+        "test/small.jl": "23dad0c38b533fecb021865debe4c5bc2dfb02388056e4a8eafac38028e96298",
+        "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+        "scan.jl": "6498f6374d59577f1ec28da8b746b4d3fbc5f80b298f73ab59f7a2e90abdf3e4",
+        "test/runtests.jl": "5f811cde3e90ee95ac7680b630c3b8f9ea725981bab8343134b233b4a7583a02"
+    },
+    "complete": true,
+    "sectors": [
+        {
+            "levels": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "parity": 1,
+            "dimension": 2,
+            "seconds": 0.0001900196075439453,
+            "q": 0
+        },
+        {
+            "levels": 1,
+            "k": 1,
+            "multiplicity": 1,
+            "parity": -1,
+            "dimension": 1,
+            "seconds": 6.9141387939453125e-6,
+            "q": 0
+        },
+        {
+            "levels": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 1.811981201171875e-5,
+            "q": 1
+        },
+        {
+            "levels": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 0,
+            "q": 1
+        },
+        {
+            "levels": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "parity": 1,
+            "dimension": 1,
+            "seconds": 1.9073486328125e-6,
+            "q": 2
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "numerical, not certified",
+        "config": {
+            "D": "103//32",
+            "L": 2
+        },
+        "created_utc": "2026-10-11T04:52:59.697",
+        "certified": false,
+        "source_sha256": {
+            "test/small.jl": "23dad0c38b533fecb021865debe4c5bc2dfb02388056e4a8eafac38028e96298",
+            "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+            "scan.jl": "6498f6374d59577f1ec28da8b746b4d3fbc5f80b298f73ab59f7a2e90abdf3e4",
+            "test/runtests.jl": "5f811cde3e90ee95ac7680b630c3b8f9ea725981bab8343134b233b4a7583a02"
+        },
+        "blas_threads": 1
+    }
+}
