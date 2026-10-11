@@ -1,0 +1,32 @@
+Audited g1_1_h1_1.json
+Audited g1_1_h1_10.json
+Audited g1_1_h1_2.json
+Audited g1_1_h1_20.json
+Audited g1_1_h1_4.json
+Audited g1_2_h1_1.json
+Audited g1_2_h1_10.json
+Audited g1_2_h1_2.json
+Audited g1_2_h1_20.json
+Audited g1_2_h1_4.json
+Audited g1_4_h1_1.json
+Audited g1_4_h1_10.json
+Audited g1_4_h1_2.json
+Audited g1_4_h1_20.json
+Audited g1_4_h1_4.json
+Audited g2_1_h1_1.json
+Audited g2_1_h1_10.json
+Audited g2_1_h1_2.json
+Audited g2_1_h1_20.json
+Audited g2_1_h1_4.json
+Audited g3_2_h1_1.json
+Audited g3_2_h1_10.json
+Audited g3_2_h1_2.json
+Audited g3_2_h1_20.json
+Audited g3_2_h1_4.json
+Audited g3_4_h1_1.json
+Audited g3_4_h1_10.json
+Audited g3_4_h1_2.json
+Audited g3_4_h1_20.json
+Audited g3_4_h1_4.json
+Test Summary:                    | Pass  Total  Time
+Independent final artifact audit | 1592   1592  9.9s
