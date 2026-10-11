@@ -1,0 +1,9 @@
+name = "BLBQHaldaneSurvey"
+uuid = "713021af-ef52-4624-9911-b7a582af71bd"
+version = "0.1.0"
+
+[deps]
+CertifiedGaps = "5b0c3f0e-7a51-4c55-9b1e-2f7f3d6a8c11"
+
+[sources]
+CertifiedGaps = {path = "../../julia"}

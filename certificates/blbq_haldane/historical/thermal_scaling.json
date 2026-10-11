@@ -1,0 +1,1448 @@
+{
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "numerical negative grid survey, not certified",
+        "config": {
+            "thetas": [
+                0,
+                -0.1,
+                -0.3,
+                -0.5,
+                -0.6,
+                -0.7
+            ],
+            "beta_grid": "1//8:1//8:64//1",
+            "n_grid": [
+                2,
+                3,
+                4,
+                5,
+                6
+            ]
+        },
+        "created_utc": "2026-10-11T05:11:41.419",
+        "certified": false,
+        "source_sha256": {
+            "model.jl": "e76cb7a5281428b1cc4c31c83f9f2adea99745216fe1f1d8a2f239fb045b9e3c",
+            "analyze.jl": "b11086bc1bf455a1d829ee75559e2f6da02d059328bc981c0e96a5d6228ca2a5",
+            "reference.jl": "1390512eb320790f9b8ad55fd20ffb35c4be77d900798378aa37a9afdf14806f",
+            "scan.jl": "d5a006d64e193c93f3b0f21561b32fd2de788a77240432de9c426271963845a5",
+            "sectors.jl": "0fb18eadcb0893d111d19d73f66109127d16b1f88d7e7e5a81bd509dc15b66a9",
+            "test/runtests.jl": "6beba133de4471d9ae7ab2b20d413e4640a7daa86d6122f150a31ecaf0f596f0"
+        },
+        "blas_threads": 1
+    },
+    "input_hashes": {
+        "spectrum_L4.json": "0848b764465d655a6aeef86dd6e7ae29dc52bb04e66417d0bc6edf1d278fb20c",
+        "spectrum_L7.json": "c820e545192851539479f8234673c694d729f58b996a463e986139311d088c23",
+        "spectrum_L3.json": "284552d4005c423244b95ec19f90ceab63dc761dc3554c86df8c16946fe2a569",
+        "reference_L14.json": "3a0800b5df07057e182640d93d1f8cac491ab6bcdb81db811a565a2dd1ce1548",
+        "spectrum_L2.json": "34508f88a13da48be64e4f4318d62b68ec02884fd4ca3e85ac40b344c80bb537",
+        "spectrum_L6.json": "b164bb84f8cc3f1ee3cf5f624a34cf476b855cda0b15e6c4227287d683f2c30d",
+        "reference_L16.json": "e884e9e85b67e781a6d86cc3efba6cdb08a7b4e05b047550be3c002f9f29acab",
+        "spectrum_L10.json": "3d65a1282b070c11ca3d5d5461e0703d2a0993b8c33527c49d86286daca3f440",
+        "spectrum_L5.json": "52aa1fd54121d029a470faf32d75bf2586bfa0104ccf366a9f211f5d71ee35b0",
+        "spectrum_L12.json": "62b79ed6a26b72761116e46b6cca428379e73ddea5e85d8ae73123eb443eeba6",
+        "spectrum_L8.json": "1fcb3c61d28365f16182aea2e3721c93867f3cb1e8e669e5a86ef68bb526b48b"
+    },
+    "seconds": 31.4604389667511,
+    "certified_gap": null,
+    "validity_range": null,
+    "best_even": [
+        {
+            "theta": 0,
+            "n": 6,
+            "beta": 3.25,
+            "epsilon_s_rational": "167806529617609//250000000000000",
+            "epsilon_t_rational": "655412896527563//1000000000000000",
+            "beta_rational": "13//4",
+            "bound": null,
+            "seed_status": "numerical decimals rounded upward, NOT eigenvalue enclosures"
+        },
+        {
+            "theta": -0.1,
+            "n": 6,
+            "beta": 2.875,
+            "epsilon_s_rational": "708209229326509//1000000000000000",
+            "epsilon_t_rational": "697959185079679//1000000000000000",
+            "beta_rational": "23//8",
+            "bound": null,
+            "seed_status": "numerical decimals rounded upward, NOT eigenvalue enclosures"
+        },
+        {
+            "theta": -0.3,
+            "n": 6,
+            "beta": 2.375,
+            "epsilon_s_rational": "736294903548947//1000000000000000",
+            "epsilon_t_rational": "733525378728861//1000000000000000",
+            "beta_rational": "19//8",
+            "bound": null,
+            "seed_status": "numerical decimals rounded upward, NOT eigenvalue enclosures"
+        },
+        {
+            "theta": -0.5,
+            "n": 6,
+            "beta": 2.125,
+            "epsilon_s_rational": "187854195229087//250000000000000",
+            "epsilon_t_rational": "367040343114593//500000000000000",
+            "beta_rational": "17//8",
+            "bound": null,
+            "seed_status": "numerical decimals rounded upward, NOT eigenvalue enclosures"
+        },
+        {
+            "theta": -0.6,
+            "n": 6,
+            "beta": 2,
+            "epsilon_s_rational": "371887996489099//500000000000000",
+            "epsilon_t_rational": "185603260026111//250000000000000",
+            "beta_rational": "2//1",
+            "bound": null,
+            "seed_status": "numerical decimals rounded upward, NOT eigenvalue enclosures"
+        },
+        {
+            "theta": -0.7,
+            "n": 6,
+            "beta": 1.875,
+            "epsilon_s_rational": "724919880870063//1000000000000000",
+            "epsilon_t_rational": "758488383533373//1000000000000000",
+            "beta_rational": "15//8",
+            "bound": null,
+            "seed_status": "numerical decimals rounded upward, NOT eigenvalue enclosures"
+        }
+    ],
+    "grid_maxima": [
+        {
+            "theta": 0,
+            "n": 2,
+            "beta": 1,
+            "spatial": 0.19012588146512777,
+            "thermal": 0.1795562876844824,
+            "max_min": 0.1795562876844824,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": 0,
+            "n": 3,
+            "beta": 44.875,
+            "spatial": 1.0253413086541977e51,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": 0,
+            "n": 4,
+            "beta": 2.25,
+            "spatial": 0.26192110227562226,
+            "thermal": 0.28595287291518323,
+            "max_min": 0.26192110227562226,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": 0,
+            "n": 5,
+            "beta": 60.25,
+            "spatial": 1.0005030653796009e27,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": 0,
+            "n": 6,
+            "beta": 3.25,
+            "spatial": 0.3287738815295649,
+            "thermal": 0.34458710347243793,
+            "max_min": 0.3287738815295649,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.1,
+            "n": 2,
+            "beta": 0.875,
+            "spatial": 0.17951667039703945,
+            "thermal": 0.17494439410352758,
+            "max_min": 0.17494439410352758,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.1,
+            "n": 3,
+            "beta": 40.25,
+            "spatial": 4.4088512529579476e61,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.1,
+            "n": 4,
+            "beta": 1.875,
+            "spatial": 0.2648271126014925,
+            "thermal": 0.2430321927346094,
+            "max_min": 0.2430321927346094,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.1,
+            "n": 5,
+            "beta": 59,
+            "spatial": 3.6631707035166435e39,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.1,
+            "n": 6,
+            "beta": 2.875,
+            "spatial": 0.29179077067349146,
+            "thermal": 0.3020408149203213,
+            "max_min": 0.29179077067349146,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.3,
+            "n": 2,
+            "beta": 0.75,
+            "spatial": 0.14466070688727306,
+            "thermal": 0.18516232440891633,
+            "max_min": 0.14466070688727306,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.3,
+            "n": 3,
+            "beta": 32,
+            "spatial": 5.299784433872661e58,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.3,
+            "n": 4,
+            "beta": 1.625,
+            "spatial": 0.2277250727514193,
+            "thermal": 0.25460722285395876,
+            "max_min": 0.2277250727514193,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.3,
+            "n": 5,
+            "beta": 50.75,
+            "spatial": 2.2115125703679403e59,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.3,
+            "n": 6,
+            "beta": 2.375,
+            "spatial": 0.2637050964510539,
+            "thermal": 0.2664746212711393,
+            "max_min": 0.2637050964510539,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.5,
+            "n": 2,
+            "beta": 0.625,
+            "spatial": 0.15869785078077003,
+            "thermal": 0.15793730517242344,
+            "max_min": 0.15793730517242344,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.5,
+            "n": 3,
+            "beta": 26,
+            "spatial": 1.82802100611445e44,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.5,
+            "n": 4,
+            "beta": 1.375,
+            "spatial": 0.2409747079071065,
+            "thermal": 0.23211132340610452,
+            "max_min": 0.23211132340610452,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.5,
+            "n": 5,
+            "beta": 42.375,
+            "spatial": 1.313803728624147e49,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.5,
+            "n": 6,
+            "beta": 2.125,
+            "spatial": 0.24858321908365266,
+            "thermal": 0.2659193137708147,
+            "max_min": 0.24858321908365266,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.6,
+            "n": 2,
+            "beta": 0.625,
+            "spatial": 0.1340154714359727,
+            "thermal": 0.17497870442038788,
+            "max_min": 0.1340154714359727,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.6,
+            "n": 3,
+            "beta": 23.75,
+            "spatial": 3.474979314925321e38,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.6,
+            "n": 4,
+            "beta": 1.375,
+            "spatial": 0.21723648608636714,
+            "thermal": 0.2571727515887696,
+            "max_min": 0.21723648608636714,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.6,
+            "n": 5,
+            "beta": 39,
+            "spatial": 3.3211356237003185e42,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.6,
+            "n": 6,
+            "beta": 2,
+            "spatial": 0.2562240070218025,
+            "thermal": 0.25758695989555647,
+            "max_min": 0.2562240070218025,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.7,
+            "n": 2,
+            "beta": 0.625,
+            "spatial": 0.11659279114869392,
+            "thermal": 0.18923733578727187,
+            "max_min": 0.11659279114869392,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.7,
+            "n": 3,
+            "beta": 21.875,
+            "spatial": 3.6137251832856217e33,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.7,
+            "n": 4,
+            "beta": 1.25,
+            "spatial": 0.2511817856145536,
+            "thermal": 0.22199565913379526,
+            "max_min": 0.22199565913379526,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.7,
+            "n": 5,
+            "beta": 36.125,
+            "spatial": 6.492999810932509e36,
+            "thermal": 1,
+            "max_min": 1,
+            "eligible": false,
+            "bound": null,
+            "grid_boundary": false
+        },
+        {
+            "theta": -0.7,
+            "n": 6,
+            "beta": 1.875,
+            "spatial": 0.2750801191299379,
+            "thermal": 0.2415116164666279,
+            "max_min": 0.2415116164666279,
+            "eligible": true,
+            "bound": null,
+            "grid_boundary": false
+        }
+    ],
+    "energy_scaling": [
+        {
+            "theta": 0,
+            "n": 2,
+            "delta": 2.000000000000001,
+            "ground_n": -4,
+            "ground_2n": -5.999999999999999,
+            "gap_2n": 0.9999999999999991,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": 0,
+            "n": 3,
+            "delta": -2.6174231818142095,
+            "ground_n": -2.9999999999999996,
+            "ground_2n": -8.617423181814209,
+            "gap_2n": 0.7206273626238815,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": 0,
+            "n": 4,
+            "delta": 0.6630439221026379,
+            "ground_n": -5.999999999999999,
+            "ground_2n": -11.33695607789736,
+            "gap_2n": 0.5935552543752678,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": 0,
+            "n": 5,
+            "delta": -1.0318722066344215,
+            "ground_n": -6.531128874149273,
+            "ground_2n": -14.094129954932967,
+            "gap_2n": 0.5248079504136225,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": 0,
+            "n": 6,
+            "delta": 0.36529022415043144,
+            "ground_n": -8.617423181814209,
+            "ground_2n": -16.869556139477986,
+            "gap_2n": 0.48419646991241194,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": 0,
+            "n": 7,
+            "delta": -0.5107368078787644,
+            "ground_n": -9.57219834602882,
+            "ground_2n": -19.655133499936404,
+            "gap_2n": 0.45896534693753566,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": 0,
+            "n": 8,
+            "delta": 0.22710487462170548,
+            "ground_n": -11.33695607789736,
+            "ground_2n": -22.446807281173015,
+            "gap_2n": 0.4427955613584835,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.1,
+            "n": 2,
+            "delta": 2.5088571342410644,
+            "ground_n": -4.7786839942867285,
+            "ground_2n": -7.048510854332393,
+            "gap_2n": 1.1749892781208109,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.1,
+            "n": 3,
+            "delta": -3.5264920460673306,
+            "ground_n": -3.2845127457745615,
+            "ground_2n": -10.095517537616454,
+            "gap_2n": 0.8037290756844815,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.1,
+            "n": 4,
+            "delta": 0.8333912594425605,
+            "ground_n": -7.048510854332393,
+            "ground_2n": -13.263630449222225,
+            "gap_2n": 0.6321100724339441,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.1,
+            "n": 5,
+            "delta": -1.544053351043818,
+            "ground_n": -7.465763317707912,
+            "ground_2n": -16.475579986459643,
+            "gap_2n": 0.5358976388884464,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.1,
+            "n": 6,
+            "delta": 0.4822964477001044,
+            "ground_n": -10.095517537616454,
+            "ground_2n": -19.708738627532803,
+            "gap_2n": 0.47621802305457805,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.1,
+            "n": 7,
+            "delta": -0.8352428778699839,
+            "ground_n": -11.05930754207996,
+            "ground_2n": -22.953857962029904,
+            "gap_2n": 0.43686137911765854,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.1,
+            "n": 8,
+            "delta": 0.32087655329985765,
+            "ground_n": -13.263630449222225,
+            "ground_2n": -26.206384345144592,
+            "gap_2n": 0.40984911544860125,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.3,
+            "n": 2,
+            "delta": 3.382059037894848,
+            "ground_n": -6.18550760979314,
+            "ground_2n": -8.988956181691432,
+            "gap_2n": 1.5525918761113466,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.3,
+            "n": 3,
+            "delta": -4.294213317333234,
+            "ground_n": -4.274834631541928,
+            "ground_2n": -12.843882580417091,
+            "gap_2n": 1.0118537969979382,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.3,
+            "n": 4,
+            "delta": 1.1247216855645021,
+            "ground_n": -8.988956181691432,
+            "ground_2n": -16.85319067781836,
+            "gap_2n": 0.7574807259330427,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.3,
+            "n": 5,
+            "delta": -2.692567790962979,
+            "ground_n": -9.112214316417452,
+            "ground_2n": -20.916996423797883,
+            "gap_2n": 0.6102278240186365,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.3,
+            "n": 6,
+            "delta": 0.6809905055335079,
+            "ground_n": -12.843882580417091,
+            "ground_2n": -25.006774655300674,
+            "gap_2n": 0.5149986325551659,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.3,
+            "n": 7,
+            "delta": -1.637477557600345,
+            "ground_n": -13.736803030661605,
+            "ground_2n": -29.111083618923555,
+            "gap_2n": 0.44896734437857333,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.3,
+            "n": 8,
+            "delta": 0.48198999408089804,
+            "ground_n": -16.85319067781836,
+            "ground_2n": -33.224391361555824,
+            "gap_2n": 0.4009343429247636,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.5,
+            "n": 2,
+            "delta": 4.059099327640443,
+            "ground_n": -7.345734556395115,
+            "ground_2n": -10.632369785149788,
+            "gap_2n": 1.9296271282600976,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.5,
+            "n": 3,
+            "delta": -4.004392408975001,
+            "ground_n": -5.59056943261437,
+            "ground_2n": -15.18553127420374,
+            "gap_2n": 1.245931370693679,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.5,
+            "n": 4,
+            "delta": 1.3451253757220627,
+            "ground_n": -10.632369785149788,
+            "ground_2n": -19.919614194577512,
+            "gap_2n": 0.9213337087657436,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.5,
+            "n": 5,
+            "delta": -2.7208689244500377,
+            "ground_n": -10.99788020590072,
+            "ground_2n": -24.71662933625148,
+            "gap_2n": 0.7308624640635344,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.5,
+            "n": 6,
+            "delta": 0.8277349684313897,
+            "ground_n": -15.18553127420374,
+            "ground_2n": -29.54332757997609,
+            "gap_2n": 0.605660916057662,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.5,
+            "n": 7,
+            "delta": -2.0958706980205903,
+            "ground_n": -16.145310983040105,
+            "ground_2n": -34.3864926641008,
+            "gap_2n": 0.5172281407444927,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.5,
+            "n": 8,
+            "delta": 0.5994478186891214,
+            "ground_n": -19.919614194577512,
+            "ground_2n": -39.2397805704659,
+            "gap_2n": 0.4515700547416728,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.6,
+            "n": 2,
+            "delta": 4.320848911199141,
+            "ground_n": -7.818482246798996,
+            "ground_2n": -11.31611558239885,
+            "gap_2n": 2.10765524729514,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.6,
+            "n": 3,
+            "delta": -3.8290967005292416,
+            "ground_n": -6.167811016979639,
+            "ground_2n": -16.16471873448852,
+            "gap_2n": 1.3640747521532255,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.6,
+            "n": 4,
+            "delta": 1.427431630876633,
+            "ground_n": -11.31611558239885,
+            "ground_2n": -21.20479953392107,
+            "gap_2n": 1.0099220502230608,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.6,
+            "n": 5,
+            "delta": -2.5668232118681615,
+            "ground_n": -11.872173247680077,
+            "ground_2n": -26.311169707228316,
+            "gap_2n": 0.8013427461706399,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.6,
+            "n": 6,
+            "delta": 0.8807388944588439,
+            "ground_n": -16.16471873448852,
+            "ground_2n": -31.448698574518197,
+            "gap_2n": 0.6636737752126614,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.6,
+            "n": 7,
+            "delta": -1.9528216623821137,
+            "ground_n": -17.32532082609923,
+            "ground_2n": -36.60346331458057,
+            "gap_2n": 0.5659979289513899,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.6,
+            "n": 8,
+            "delta": 0.6408027493622583,
+            "ground_n": -21.20479953392107,
+            "ground_2n": -41.76879631847988,
+            "gap_2n": 0.4931268498685384,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.7,
+            "n": 2,
+            "delta": 4.529501823183413,
+            "ground_n": -8.213110247039483,
+            "ground_2n": -11.896718670895552,
+            "gap_2n": 2.2745485493338897,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.7,
+            "n": 3,
+            "delta": -3.632789567687409,
+            "ground_n": -6.683425872470505,
+            "ground_2n": -16.99964131262842,
+            "gap_2n": 1.479350508970473,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.7,
+            "n": 4,
+            "delta": 1.4907899029922334,
+            "ground_n": -11.896718670895552,
+            "ground_2n": -22.30264743879887,
+            "gap_2n": 1.099528829425033,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.7,
+            "n": 5,
+            "delta": -2.4072252614402565,
+            "ground_n": -12.633732736926511,
+            "ground_2n": -27.67469073529328,
+            "gap_2n": 0.8752506596016723,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.7,
+            "n": 6,
+            "delta": 0.9201763087985597,
+            "ground_n": -16.99964131262842,
+            "ground_2n": -33.07910631645828,
+            "gap_2n": 0.7268330989886351,
+            "complete_spectrum_2n": true
+        },
+        {
+            "theta": -0.7,
+            "n": 7,
+            "delta": -1.8129992917858715,
+            "ground_n": -18.344197540861416,
+            "ground_2n": -38.5013943735087,
+            "gap_2n": 0.6212467507108386,
+            "complete_spectrum_2n": false
+        },
+        {
+            "theta": -0.7,
+            "n": 8,
+            "delta": 0.6706724084258937,
+            "ground_n": -22.30264743879887,
+            "ground_2n": -43.93462246917185,
+            "gap_2n": 0.5422529442648596,
+            "complete_spectrum_2n": false
+        }
+    ],
+    "extrapolations": [
+        {
+            "theta": 0,
+            "estimates": [
+                {
+                    "method": "gap intercept vs L^(-1)",
+                    "gap": 0.3175509493959017,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.48419646991241194,
+                        0.45896534693753566,
+                        0.4427955613584835
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 22,
+                            "beta": 23.618257209646984,
+                            "epsilon_s": 0.11629229491646796,
+                            "epsilon_t": 0.13571516221325378,
+                            "conditional_bound": 0.0036498145337984624,
+                            "correlation_length": 3.7333307180905284,
+                            "log_amplitude": 0.64037047775877,
+                            "gap_assumed": 0.3175509493959017,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                0.6630439221026379,
+                                0.36529022415043144,
+                                0.22710487462170548
+                            ]
+                        },
+                        {
+                            "n": 24,
+                            "beta": 25.586445310450898,
+                            "epsilon_s": 0.1670688318516592,
+                            "epsilon_t": 0.08168097099973826,
+                            "conditional_bound": 0.00185082076491908,
+                            "correlation_length": 5.518339477891271,
+                            "log_amplitude": 0.9967593210101082,
+                            "gap_assumed": 0.3175509493959017,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                0.6630439221026379,
+                                0.36529022415043144,
+                                0.22710487462170548
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "method": "gap intercept vs L^(-2)",
+                    "gap": 0.3894935562388349,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.48419646991241194,
+                        0.45896534693753566,
+                        0.4427955613584835
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 20,
+                            "beta": 20.53949255862516,
+                            "epsilon_s": 0.16781834691585384,
+                            "epsilon_t": 0.07730545921024105,
+                            "conditional_bound": 0.006109355352006344,
+                            "correlation_length": 3.7333307180905284,
+                            "log_amplitude": 0.64037047775877,
+                            "gap_assumed": 0.3894935562388349,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                0.6630439221026379,
+                                0.36529022415043144,
+                                0.22710487462170548
+                            ]
+                        },
+                        {
+                            "n": 24,
+                            "beta": 19.897633416168123,
+                            "epsilon_s": 0.13251766423446454,
+                            "epsilon_t": 0.11657338303504257,
+                            "conditional_bound": 0.00857139002056037,
+                            "correlation_length": 5.518339477891271,
+                            "log_amplitude": 0.9967593210101082,
+                            "gap_assumed": 0.3894935562388349,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                0.6630439221026379,
+                                0.36529022415043144,
+                                0.22710487462170548
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "theta": -0.1,
+            "estimates": [
+                {
+                    "method": "gap intercept vs L^(-1)",
+                    "gap": 0.20979447182064825,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.47621802305457805,
+                        0.43686137911765854,
+                        0.40984911544860125
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 26,
+                            "beta": 38.13255864453445,
+                            "epsilon_s": 0.1504259949553331,
+                            "epsilon_t": 0.09931000949165798,
+                            "conditional_bound": 0.0033046190535412846,
+                            "correlation_length": 4.190909545657233,
+                            "log_amplitude": 0.7489544052734299,
+                            "gap_assumed": 0.20979447182064825,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                0.8333912594425605,
+                                0.4822964477001044,
+                                0.32087655329985765
+                            ]
+                        },
+                        {
+                            "n": 32,
+                            "beta": 39.324201102176154,
+                            "epsilon_s": 0.14976407732459585,
+                            "epsilon_t": 0.09540765646924967,
+                            "conditional_bound": 0.0051441262484869105,
+                            "correlation_length": 6.5803201355595276,
+                            "log_amplitude": 1.1053432485247678,
+                            "gap_assumed": 0.20979447182064825,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                0.8333912594425605,
+                                0.4822964477001044,
+                                0.32087655329985765
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "method": "gap intercept vs L^(-2)",
+                    "gap": 0.3250322847920319,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.47621802305457805,
+                        0.43686137911765854,
+                        0.40984911544860125
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 24,
+                            "beta": 24.612939619578732,
+                            "epsilon_s": 0.155977433635915,
+                            "epsilon_t": 0.09203409366099202,
+                            "conditional_bound": 0.005557689954015352,
+                            "correlation_length": 4.190909545657233,
+                            "log_amplitude": 0.7489544052734299,
+                            "gap_assumed": 0.3250322847920319,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                0.8333912594425605,
+                                0.4822964477001044,
+                                0.32087655329985765
+                            ]
+                        },
+                        {
+                            "n": 30,
+                            "beta": 24.612939619578732,
+                            "epsilon_s": 0.13248922179555492,
+                            "epsilon_t": 0.11368739337895513,
+                            "conditional_bound": 0.008823161068614808,
+                            "correlation_length": 6.5803201355595276,
+                            "log_amplitude": 1.1053432485247678,
+                            "gap_assumed": 0.3250322847920319,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                0.8333912594425605,
+                                0.4822964477001044,
+                                0.32087655329985765
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "theta": -0.3,
+            "estimates": [
+                {
+                    "method": "gap intercept vs L^(-1)",
+                    "gap": 0.058177514425425125,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.5149986325551659,
+                        0.44896734437857333,
+                        0.4009343429247636
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 36,
+                            "beta": 148.2531539063251,
+                            "epsilon_s": 0.16872612203687987,
+                            "epsilon_t": 0.07461199010953087,
+                            "conditional_bound": 0.001005728422586371,
+                            "correlation_length": 4.720501809487847,
+                            "log_amplitude": 0.9388835665503306,
+                            "gap_assumed": 0.058177514425425125,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.1247216855645021,
+                                0.6809905055335079,
+                                0.48198999408089804
+                            ]
+                        },
+                        {
+                            "n": 48,
+                            "beta": 158.99613607345012,
+                            "epsilon_s": 0.1859831815043071,
+                            "epsilon_t": 0.05384575314618473,
+                            "conditional_bound": 0.00041570547753565646,
+                            "correlation_length": 7.987316963734672,
+                            "log_amplitude": 1.295272409801669,
+                            "gap_assumed": 0.058177514425425125,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.1247216855645021,
+                                0.6809905055335079,
+                                0.48198999408089804
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "method": "gap intercept vs L^(-2)",
+                    "gap": 0.2560944531030638,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.5149986325551659,
+                        0.44896734437857333,
+                        0.4009343429247636
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 30,
+                            "beta": 31.23847433267305,
+                            "epsilon_s": 0.1295977567406156,
+                            "epsilon_t": 0.11368739337895513,
+                            "conditional_bound": 0.008287474861235052,
+                            "correlation_length": 4.720501809487847,
+                            "log_amplitude": 0.9388835665503306,
+                            "gap_assumed": 0.2560944531030638,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.1247216855645021,
+                                0.6809905055335079,
+                                0.48198999408089804
+                            ]
+                        },
+                        {
+                            "n": 38,
+                            "beta": 33.190878978465115,
+                            "epsilon_s": 0.1553582013830051,
+                            "epsilon_t": 0.08857305078237596,
+                            "conditional_bound": 0.006076396361516093,
+                            "correlation_length": 7.987316963734672,
+                            "log_amplitude": 1.295272409801669,
+                            "gap_assumed": 0.2560944531030638,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.1247216855645021,
+                                0.6809905055335079,
+                                0.48198999408089804
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "theta": -0.5,
+            "estimates": [
+                {
+                    "method": "gap intercept vs L^(-1)",
+                    "gap": -0.010954716685991503,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.605660916057662,
+                        0.5172281407444927,
+                        0.4515700547416728
+                    ],
+                    "forecasts": [
+                        null,
+                        null
+                    ]
+                },
+                {
+                    "method": "gap intercept vs L^(-2)",
+                    "gap": 0.256348925683,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.605660916057662,
+                        0.5172281407444927,
+                        0.4515700547416728
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 32,
+                            "beta": 31.207464508327085,
+                            "epsilon_s": 0.13290868805961592,
+                            "epsilon_t": 0.12078979213689384,
+                            "conditional_bound": 0.0020658058860360444,
+                            "correlation_length": 4.949064386782492,
+                            "log_amplitude": 1.0775765661227303,
+                            "gap_assumed": 0.256348925683,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.3451253757220627,
+                                0.8277349684313897,
+                                0.5994478186891214
+                            ]
+                        },
+                        {
+                            "n": 42,
+                            "beta": 33.15793104009753,
+                            "epsilon_s": 0.15504058215424787,
+                            "epsilon_t": 0.09742757270099571,
+                            "conditional_bound": 0.0006076061514817422,
+                            "correlation_length": 8.664385340517597,
+                            "log_amplitude": 1.4339654093740681,
+                            "gap_assumed": 0.256348925683,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.3451253757220627,
+                                0.8277349684313897,
+                                0.5994478186891214
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "theta": -0.6,
+            "estimates": [
+                {
+                    "method": "gap intercept vs L^(-1)",
+                    "gap": -0.01865990666608487,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.6636737752126614,
+                        0.5659979289513899,
+                        0.4931268498685384
+                    ],
+                    "forecasts": [
+                        null,
+                        null
+                    ]
+                },
+                {
+                    "method": "gap intercept vs L^(-2)",
+                    "gap": 0.27717338000198,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.6636737752126614,
+                        0.5659979289513899,
+                        0.4931268498685384
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 32,
+                            "beta": 29.31378186441266,
+                            "epsilon_s": 0.138932260031831,
+                            "epsilon_t": 0.10739747393910194,
+                            "conditional_bound": 0.007115061003693236,
+                            "correlation_length": 4.99431671844032,
+                            "log_amplitude": 1.1293152408387404,
+                            "gap_assumed": 0.27717338000198,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.427431630876633,
+                                0.8807388944588439,
+                                0.6408027493622583
+                            ]
+                        },
+                        {
+                            "n": 42,
+                            "beta": 31.568688161675173,
+                            "epsilon_s": 0.16673995896011548,
+                            "epsilon_t": 0.07673520734072359,
+                            "conditional_bound": 0.00501099438898205,
+                            "correlation_length": 8.804041997496203,
+                            "log_amplitude": 1.4857040840900786,
+                            "gap_assumed": 0.27717338000198,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.427431630876633,
+                                0.8807388944588439,
+                                0.6408027493622583
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "theta": -0.7,
+            "estimates": [
+                {
+                    "method": "gap intercept vs L^(-1)",
+                    "gap": -0.011561664951687296,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.7268330989886351,
+                        0.6212467507108386,
+                        0.5422529442648596
+                    ],
+                    "forecasts": [
+                        null,
+                        null
+                    ]
+                },
+                {
+                    "method": "gap intercept vs L^(-2)",
+                    "gap": 0.30860321398356116,
+                    "lengths": [
+                        12,
+                        14,
+                        16
+                    ],
+                    "finite_gaps": [
+                        0.7268330989886351,
+                        0.6212467507108386,
+                        0.5422529442648596
+                    ],
+                    "forecasts": [
+                        {
+                            "n": 32,
+                            "beta": 25.923255615951387,
+                            "epsilon_s": 0.13081145301627076,
+                            "epsilon_t": 0.12078979213689384,
+                            "conditional_bound": 0.004689823458053903,
+                            "correlation_length": 5.007632941364743,
+                            "log_amplitude": 1.170384770783847,
+                            "gap_assumed": 0.30860321398356116,
+                            "style": "exponential",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.4907899029922334,
+                                0.9201763087985597,
+                                0.6706724084258937
+                            ]
+                        },
+                        {
+                            "n": 42,
+                            "beta": 27.94850996094759,
+                            "epsilon_s": 0.15807731412856132,
+                            "epsilon_t": 0.0864944726858167,
+                            "conditional_bound": 0.0065354813274512286,
+                            "correlation_length": 8.845506580753918,
+                            "log_amplitude": 1.5267736140351849,
+                            "gap_assumed": 0.30860321398356116,
+                            "style": "exponential_sqrt",
+                            "fit_ns": [
+                                4,
+                                6,
+                                8
+                            ],
+                            "fit_deltas": [
+                                1.4907899029922334,
+                                0.9201763087985597,
+                                0.6706724084258937
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "rp": {
+        "identity": "-X=A; -X^2=-A/2-B",
+        "coefficient_G": "cos(theta)-sin(theta)/2",
+        "coefficient_Q": "-sin(theta)",
+        "theta_exact": [
+            "0//1",
+            "-1//10",
+            "-3//10",
+            "-1//2",
+            "-3//5",
+            "-7//10"
+        ],
+        "identity_arithmetic": "Rational{BigInt} coefficient comparison; trigonometric parameters symbolic"
+    }
+}

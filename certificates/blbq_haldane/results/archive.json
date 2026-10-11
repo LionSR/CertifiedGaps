@@ -1,0 +1,40 @@
+{
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "lossless storage conversion",
+        "config": {
+            "method": "lossless gzip, original JSON written by Results.write_result"
+        },
+        "created_utc": "2026-10-11T05:37:31.795",
+        "certified": false,
+        "source_sha256": {
+            "archive_spectra.jl": "66108a466ffe8c965602a96adda0f34d4f85a321e4cc2e0d2ebe8da0e817dafa",
+            "result_io.jl": "c5f18e2baa5989307226825a7b283c3dcd03075b4b8356fa406a07864fb4c33f"
+        },
+        "blas_threads": 1
+    },
+    "rows": [
+        {
+            "file": "spectrum_L12.json.gz",
+            "original_sha256": "62b79ed6a26b72761116e46b6cca428379e73ddea5e85d8ae73123eb443eeba6",
+            "compressed_sha256": "f8ed7fb5be7e0720deab73470aea698c7030bf78578ff0df65f5274261d5ca55",
+            "original_bytes": 115658456,
+            "compressed_bytes": 5759432
+        },
+        {
+            "file": "spectrum_L10.json.gz",
+            "original_sha256": "3d65a1282b070c11ca3d5d5461e0703d2a0993b8c33527c49d86286daca3f440",
+            "compressed_sha256": "850f54d32ea401e527d49b2a7bfce37858b37a0e595680e615bad9a2bbbfba15",
+            "original_bytes": 12881208,
+            "compressed_bytes": 697040
+        },
+        {
+            "file": "spectrum_L8.json.gz",
+            "original_sha256": "1fcb3c61d28365f16182aea2e3721c93867f3cb1e8e669e5a86ef68bb526b48b",
+            "compressed_sha256": "141d241ca7af4c4a56d4938bf7f4b617c477aeb90f8503ed42514d2d95ba4b02",
+            "original_bytes": 1456489,
+            "compressed_bytes": 90353
+        }
+    ]
+}
