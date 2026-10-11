@@ -1,0 +1,46 @@
+{
+    "status": "numerical, not certified",
+    "out": [
+        {
+            "g": "2//1",
+            "fit_lengths": [
+                3,
+                4
+            ],
+            "xi_delta": 2.465542795550351,
+            "delta4": 0.26246035743886864,
+            "ed_reference_gap": 0.5286394601820703,
+            "first_predicted_even_seed": {
+                "n₀": 10,
+                "β₀": 8.25,
+                "εₛ": 0.17320517354722698,
+                "εₜ": 0.06049931571319578,
+                "bound": 0.029533270845050117
+            },
+            "caveat": "Uncontrolled extrapolation; finite-size gap and dilute-gas ansatz may be biased near criticality."
+        },
+        {
+            "g": "5//2",
+            "fit_lengths": [
+                3,
+                4
+            ],
+            "xi_delta": 1.3942734179847511,
+            "delta4": 0.14280287483760645,
+            "ed_reference_gap": 1.5792074088630557,
+            "first_predicted_even_seed": {
+                "n₀": 6,
+                "β₀": 2.5,
+                "εₛ": 0.08175867953064309,
+                "εₜ": 0.05937139002996694,
+                "bound": 0.47926261073996373
+            },
+            "caveat": "Uncontrolled extrapolation; finite-size gap and dilute-gas ansatz may be biased near criticality."
+        }
+    ],
+    "source_hashes": {
+        "src/Ladder.jl": "4ba53549f2095c5feb07228a679d692f98487faed7daf423627664cf85739b71",
+        "extrapolate.jl": "bf407725b963e55ec92f9416a0b50eddac04c908922dc1bf04971beee266a4b1",
+        "test/runtests.jl": "037e591f9ebbc2a324471800f51d287b1533d9e427015ddc37704e3cb72989d8"
+    }
+}

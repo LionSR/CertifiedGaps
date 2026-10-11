@@ -1,0 +1,5 @@
+[deps]
+ThermalMPOGap = "5b0c3f0e-7a51-4c55-9b1e-2f7f3d6a8c11"
+
+[sources]
+ThermalMPOGap = {path = "../../julia"}
