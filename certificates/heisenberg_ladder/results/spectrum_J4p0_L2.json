@@ -1,0 +1,672 @@
+{
+    "J": "4//1",
+    "lowest_32_numerical_levels": [
+        -6.464101615137755,
+        -3.0,
+        -3.0,
+        -3.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        0.4641016151377547,
+        1.0,
+        1.0,
+        1.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0,
+        3.0000000000000004
+    ],
+    "logZ_grid": [
+        {
+            "logZ": 3.0361450738666123,
+            "beta": "1//4"
+        },
+        {
+            "logZ": 3.8596961986153158,
+            "beta": "1//2"
+        },
+        {
+            "logZ": 5.105698346212402,
+            "beta": "3//4"
+        },
+        {
+            "logZ": 6.568190758355147,
+            "beta": "1//1"
+        },
+        {
+            "logZ": 8.122434952171634,
+            "beta": "5//4"
+        },
+        {
+            "logZ": 9.713516682171479,
+            "beta": "3//2"
+        },
+        {
+            "logZ": 11.31936305528074,
+            "beta": "7//4"
+        },
+        {
+            "logZ": 12.931193843821358,
+            "beta": "2//1"
+        },
+        {
+            "logZ": 14.54547823212772,
+            "beta": "9//4"
+        },
+        {
+            "logZ": 16.160777479417373,
+            "beta": "5//2"
+        },
+        {
+            "logZ": 17.77649905157306,
+            "beta": "11//4"
+        },
+        {
+            "logZ": 19.392397073427222,
+            "beta": "3//1"
+        },
+        {
+            "logZ": 21.008369005062175,
+            "beta": "13//4"
+        },
+        {
+            "logZ": 22.62437194496525,
+            "beta": "7//2"
+        },
+        {
+            "logZ": 24.240387907066005,
+            "beta": "15//4"
+        },
+        {
+            "logZ": 25.856409341301333,
+            "beta": "4//1"
+        },
+        {
+            "logZ": 27.472433075877547,
+            "beta": "17//4"
+        },
+        {
+            "logZ": 29.0884577776781,
+            "beta": "9//2"
+        },
+        {
+            "logZ": 30.704482886224337,
+            "beta": "19//4"
+        },
+        {
+            "logZ": 32.32050816583341,
+            "beta": "5//1"
+        },
+        {
+            "logZ": 33.93653351738917,
+            "beta": "21//4"
+        },
+        {
+            "logZ": 35.55255889920569,
+            "beta": "11//2"
+        },
+        {
+            "logZ": 37.168584293750115,
+            "beta": "23//4"
+        },
+        {
+            "logZ": 38.784609693648044,
+            "beta": "6//1"
+        },
+        {
+            "logZ": 40.40063509579775,
+            "beta": "25//4"
+        },
+        {
+            "logZ": 42.016660498894595,
+            "beta": "13//2"
+        },
+        {
+            "logZ": 43.63268590238982,
+            "beta": "27//4"
+        },
+        {
+            "logZ": 45.2487113060526,
+            "beta": "7//1"
+        },
+        {
+            "logZ": 46.86473670978587,
+            "beta": "29//4"
+        },
+        {
+            "logZ": 48.48076211354879,
+            "beta": "15//2"
+        },
+        {
+            "logZ": 50.096787517324174,
+            "beta": "31//4"
+        },
+        {
+            "logZ": 51.712812921104806,
+            "beta": "8//1"
+        },
+        {
+            "logZ": 53.32883832488765,
+            "beta": "33//4"
+        },
+        {
+            "logZ": 54.94486372867141,
+            "beta": "17//2"
+        },
+        {
+            "logZ": 56.560889132455564,
+            "beta": "35//4"
+        },
+        {
+            "logZ": 58.176914536239885,
+            "beta": "9//1"
+        },
+        {
+            "logZ": 59.79293994002427,
+            "beta": "37//4"
+        },
+        {
+            "logZ": 61.40896534380869,
+            "beta": "19//2"
+        },
+        {
+            "logZ": 63.02499074759312,
+            "beta": "39//4"
+        },
+        {
+            "logZ": 64.64101615137756,
+            "beta": "10//1"
+        },
+        {
+            "logZ": 66.25704155516199,
+            "beta": "41//4"
+        },
+        {
+            "logZ": 67.87306695894642,
+            "beta": "21//2"
+        },
+        {
+            "logZ": 69.48909236273087,
+            "beta": "43//4"
+        },
+        {
+            "logZ": 71.1051177665153,
+            "beta": "11//1"
+        },
+        {
+            "logZ": 72.72114317029974,
+            "beta": "45//4"
+        },
+        {
+            "logZ": 74.33716857408419,
+            "beta": "23//2"
+        },
+        {
+            "logZ": 75.95319397786862,
+            "beta": "47//4"
+        },
+        {
+            "logZ": 77.56921938165306,
+            "beta": "12//1"
+        },
+        {
+            "logZ": 79.1852447854375,
+            "beta": "49//4"
+        },
+        {
+            "logZ": 80.80127018922194,
+            "beta": "25//2"
+        },
+        {
+            "logZ": 82.41729559300639,
+            "beta": "51//4"
+        },
+        {
+            "logZ": 84.03332099679082,
+            "beta": "13//1"
+        },
+        {
+            "logZ": 85.64934640057525,
+            "beta": "53//4"
+        },
+        {
+            "logZ": 87.2653718043597,
+            "beta": "27//2"
+        },
+        {
+            "logZ": 88.88139720814414,
+            "beta": "55//4"
+        },
+        {
+            "logZ": 90.49742261192857,
+            "beta": "14//1"
+        },
+        {
+            "logZ": 92.11344801571302,
+            "beta": "57//4"
+        },
+        {
+            "logZ": 93.72947341949745,
+            "beta": "29//2"
+        },
+        {
+            "logZ": 95.34549882328189,
+            "beta": "59//4"
+        },
+        {
+            "logZ": 96.96152422706633,
+            "beta": "15//1"
+        },
+        {
+            "logZ": 98.57754963085077,
+            "beta": "61//4"
+        },
+        {
+            "logZ": 100.1935750346352,
+            "beta": "31//2"
+        },
+        {
+            "logZ": 101.80960043841965,
+            "beta": "63//4"
+        },
+        {
+            "logZ": 103.42562584220408,
+            "beta": "16//1"
+        },
+        {
+            "logZ": 105.04165124598852,
+            "beta": "65//4"
+        },
+        {
+            "logZ": 106.65767664977297,
+            "beta": "33//2"
+        },
+        {
+            "logZ": 108.2737020535574,
+            "beta": "67//4"
+        },
+        {
+            "logZ": 109.88972745734183,
+            "beta": "17//1"
+        },
+        {
+            "logZ": 111.50575286112628,
+            "beta": "69//4"
+        },
+        {
+            "logZ": 113.12177826491072,
+            "beta": "35//2"
+        },
+        {
+            "logZ": 114.73780366869515,
+            "beta": "71//4"
+        },
+        {
+            "logZ": 116.3538290724796,
+            "beta": "18//1"
+        },
+        {
+            "logZ": 117.96985447626403,
+            "beta": "73//4"
+        },
+        {
+            "logZ": 119.58587988004847,
+            "beta": "37//2"
+        },
+        {
+            "logZ": 121.20190528383291,
+            "beta": "75//4"
+        },
+        {
+            "logZ": 122.81793068761735,
+            "beta": "19//1"
+        },
+        {
+            "logZ": 124.43395609140178,
+            "beta": "77//4"
+        },
+        {
+            "logZ": 126.04998149518623,
+            "beta": "39//2"
+        },
+        {
+            "logZ": 127.66600689897066,
+            "beta": "79//4"
+        },
+        {
+            "logZ": 129.2820323027551,
+            "beta": "20//1"
+        },
+        {
+            "logZ": 130.89805770653953,
+            "beta": "81//4"
+        },
+        {
+            "logZ": 132.51408311032398,
+            "beta": "41//2"
+        },
+        {
+            "logZ": 134.13010851410843,
+            "beta": "83//4"
+        },
+        {
+            "logZ": 135.74613391789285,
+            "beta": "21//1"
+        },
+        {
+            "logZ": 137.3621593216773,
+            "beta": "85//4"
+        },
+        {
+            "logZ": 138.97818472546174,
+            "beta": "43//2"
+        },
+        {
+            "logZ": 140.59421012924616,
+            "beta": "87//4"
+        },
+        {
+            "logZ": 142.2102355330306,
+            "beta": "22//1"
+        },
+        {
+            "logZ": 143.82626093681506,
+            "beta": "89//4"
+        },
+        {
+            "logZ": 145.44228634059948,
+            "beta": "45//2"
+        },
+        {
+            "logZ": 147.05831174438393,
+            "beta": "91//4"
+        },
+        {
+            "logZ": 148.67433714816838,
+            "beta": "23//1"
+        },
+        {
+            "logZ": 150.2903625519528,
+            "beta": "93//4"
+        },
+        {
+            "logZ": 151.90638795573724,
+            "beta": "47//2"
+        },
+        {
+            "logZ": 153.5224133595217,
+            "beta": "95//4"
+        },
+        {
+            "logZ": 155.1384387633061,
+            "beta": "24//1"
+        },
+        {
+            "logZ": 156.75446416709056,
+            "beta": "97//4"
+        },
+        {
+            "logZ": 158.370489570875,
+            "beta": "49//2"
+        },
+        {
+            "logZ": 159.98651497465946,
+            "beta": "99//4"
+        },
+        {
+            "logZ": 161.60254037844388,
+            "beta": "25//1"
+        },
+        {
+            "logZ": 163.21856578222832,
+            "beta": "101//4"
+        },
+        {
+            "logZ": 164.83459118601277,
+            "beta": "51//2"
+        },
+        {
+            "logZ": 166.4506165897972,
+            "beta": "103//4"
+        },
+        {
+            "logZ": 168.06664199358164,
+            "beta": "26//1"
+        },
+        {
+            "logZ": 169.6826673973661,
+            "beta": "105//4"
+        },
+        {
+            "logZ": 171.2986928011505,
+            "beta": "53//2"
+        },
+        {
+            "logZ": 172.91471820493496,
+            "beta": "107//4"
+        },
+        {
+            "logZ": 174.5307436087194,
+            "beta": "27//1"
+        },
+        {
+            "logZ": 176.14676901250382,
+            "beta": "109//4"
+        },
+        {
+            "logZ": 177.76279441628827,
+            "beta": "55//2"
+        },
+        {
+            "logZ": 179.37881982007272,
+            "beta": "111//4"
+        },
+        {
+            "logZ": 180.99484522385714,
+            "beta": "28//1"
+        },
+        {
+            "logZ": 182.6108706276416,
+            "beta": "113//4"
+        },
+        {
+            "logZ": 184.22689603142604,
+            "beta": "57//2"
+        },
+        {
+            "logZ": 185.84292143521046,
+            "beta": "115//4"
+        },
+        {
+            "logZ": 187.4589468389949,
+            "beta": "29//1"
+        },
+        {
+            "logZ": 189.07497224277935,
+            "beta": "117//4"
+        },
+        {
+            "logZ": 190.69099764656377,
+            "beta": "59//2"
+        },
+        {
+            "logZ": 192.30702305034822,
+            "beta": "119//4"
+        },
+        {
+            "logZ": 193.92304845413267,
+            "beta": "30//1"
+        },
+        {
+            "logZ": 195.5390738579171,
+            "beta": "121//4"
+        },
+        {
+            "logZ": 197.15509926170154,
+            "beta": "61//2"
+        },
+        {
+            "logZ": 198.77112466548598,
+            "beta": "123//4"
+        },
+        {
+            "logZ": 200.3871500692704,
+            "beta": "31//1"
+        },
+        {
+            "logZ": 202.00317547305485,
+            "beta": "125//4"
+        },
+        {
+            "logZ": 203.6192008768393,
+            "beta": "63//2"
+        },
+        {
+            "logZ": 205.23522628062372,
+            "beta": "127//4"
+        },
+        {
+            "logZ": 206.85125168440817,
+            "beta": "32//1"
+        }
+    ],
+    "gap": 3.4641016151377553,
+    "storage_note": "Full spectrum computed; retained logZ grid and low levels. Rerun scan.jl to regenerate all levels.",
+    "dimension": 16,
+    "sectors": [
+        {
+            "spin_parity": 0,
+            "m": 0,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 7.486343383789062e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 2.002716064453125e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 2.86102294921875e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.1920928955078125e-6
+        },
+        {
+            "spin_parity": 1,
+            "m": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 3,
+            "leg_parity": 1,
+            "seconds": 7.891654968261719e-5
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 3.0994415283203125e-6
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 1,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 2.1457672119140625e-6
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 1,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "IntervalArithmetic": "1.0.12",
+        "ThermalMPOGap": "0.2.0",
+        "status": "numerical, not certified",
+        "config": {
+            "J": "4//1",
+            "L": 2
+        },
+        "created_utc": "2026-10-11T04:46:49.881",
+        "certified": false,
+        "source_sha256": {
+            "certificates/heisenberg_ladder/certify.jl": "3c7c9eeaa9db063db6d200bd413f8dcf141d7188afe483ab8c4421a9af77ed64",
+            "julia/src/ExactDiagonalization.jl": "936f5c6764ca892769024711bdc0842c299e5c8b5d32fba976199212384551bb",
+            "julia/src/ReflectionPositivity.jl": "653dd5cb1da456a0cb7db215c38c2e394d3658eccfd0e5b93d0fb1581b22c06f",
+            "julia/src/Recurrence.jl": "5c70fbae608abd2d0f26ad529b477967bf4153e7ae1dde603f4e4644252924ed",
+            "julia/src/Seeds.jl": "eabb710e3aa6d870e84b6b8bd8e0df4c54dd56e2a7b95495be61388ba1f3f2be",
+            "outputs/thermal-mpo-gap-scope.tex": "4e77e5d839d79efc4472b6b75a505726b54fb79de5fd4604c27d8927b8d809e7",
+            "certificates/heisenberg_ladder/rp.jl": "544abac201bbeb621e720b08018f0b3f3297846c6571792dc8d5251edbd4b152",
+            "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
+            "julia/src/CertifiedMPO/GaugeSearch.jl": "fc8d1d96088434191c4c09520cb91ca8054ccc1d7b552e9e57448cbb03b3edc8",
+            "julia/src/CertifiedMPO/CertifiedMPO.jl": "67678a11ecd30c3add4fe85c09373d75b5eee63d70b8766a805b12976cae3e9a",
+            "julia/src/CertifiedMPO/SchattenBridge.jl": "f826199d1be8e6632bdbcdd5eed279ac37a72cbf6051a0ff3942946de52b06a9",
+            "julia/src/recurrence/rational.jl": "be93e303d0a89d36dca4ee284a72a34b2efcf5c0dec93476352f69cacec1f67c",
+            "julia/src/CertifiedMPO/AdjointTrace.jl": "1596f1cf3045f3dd8f8d6aa8445ea2268811228e9c77d3b4c186510d33eb5aa9",
+            "julia/src/CertifiedMPO/Norms.jl": "6ec3509571238504acdb9eb2052e44794075f69850503a27ea7a0e79f53fae93",
+            "certificates/heisenberg_ladder/ladder.jl": "55e1f3a468995b6bf0f7d9d2a69a3066a4fbaa2c91a80a67a52ce4fbcc62f4ea",
+            "julia/src/CertifiedMPO/MPOAlgebra.jl": "9106a106a0cf33fc7cec095e803db2ba4a0743169a849da264c71d4336f6856a",
+            "julia/src/Models.jl": "03c2ea4f68d313d4dc4b468b66dbe91999929c50c4b71ca8db805792018a30fc",
+            "certificates/heisenberg_ladder/scan.jl": "51659795bc7b0a86c825496cac385a2ef91de2dc135e562b3550d7dc25e8934f",
+            "julia/src/Purification.jl": "f9acd3caf3d413aa540d108af79aa1acff8956b7281fed4009e18eeecaf8c884",
+            "julia/src/ExactArithmetic.jl": "b0b11c2d5e19ea24f00fed6e93b4949ae86d323117e4344f21e682ea7e778642",
+            "julia/src/Results.jl": "cc886dd20458799780935386400a5594e69d6231aada6d68f5a59f29f6ecb677",
+            "julia/src/CertifiedMPO/Products.jl": "7d15b0e27c8dcefc9fb5f876efa4fec4edc6cca3be8caecfd867e8c72b773b5e",
+            "julia/src/CertifiedMPO/Squaring.jl": "e9db2558c5f0472ba82f02139114d53cb2701fa34cdfdceb6bb9b53f4f7f45d8",
+            "julia/src/Spins.jl": "a43d59bd120bb765ee50a49001cbb9792aa26bc23838fd4dbcb9e5943aab2090",
+            "julia/src/ThermalMPOGap.jl": "06d393ef52eeb6966404ed21beeeec0ac84182e8d780c6206d7a1e47c1cae5f9",
+            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+            "certificates/heisenberg_ladder/smoke.jl": "19706a61f05568c3cecf4e1dff3ea93348a4563ab37fbb388c167de1a501df6d",
+            "julia/src/CertifiedMPO/OperatorError.jl": "7094b07e0d22d8836178d5aab398c7d1f52a6a516e06e6bf0e5374ed6d02b78d",
+            "julia/Manifest.toml": "6f67f2d98c66ab6a36b577346a4dc78bf4d3187489e736759967b94f03899d80",
+            "julia/src/CertifiedMPO/PolynomialBounds.jl": "687a589d85dc527177281a0e1283b8d428df93f962c465ed2221a539b14fa1b9",
+            "julia/Project.toml": "aad0eff0d3aeaeb0afb0e967ccaa245c0d24c2cddafef2289a2e41eacad0e1f3",
+            "julia/src/CertifiedMPO/PositiveBounds.jl": "97f605694d77949738837020f7a5ef3b54373369317399705a20e32e22b9bcbb",
+            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
+        },
+        "blas_threads": 1
+    },
+    "L": 2,
+    "seconds": 0.4159820079803467
+}

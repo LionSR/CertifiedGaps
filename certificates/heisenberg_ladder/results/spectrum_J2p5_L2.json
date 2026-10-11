@@ -1,0 +1,675 @@
+{
+    "J": "5//2",
+    "lowest_32_numerical_levels": [
+        -4.54128784747792,
+        -2.25,
+        -2.25,
+        -2.25,
+        -0.25,
+        -0.25,
+        -0.25,
+        0.04128784747792002,
+        0.25,
+        0.25,
+        0.25,
+        2.25,
+        2.25,
+        2.25,
+        2.25,
+        2.25
+    ],
+    "logZ_grid": [
+        {
+            "logZ": 2.9029428084226767,
+            "beta": "1//4"
+        },
+        {
+            "logZ": 3.316947724736835,
+            "beta": "1//2"
+        },
+        {
+            "logZ": 3.9956550286888204,
+            "beta": "3//4"
+        },
+        {
+            "logZ": 4.867148009838895,
+            "beta": "1//1"
+        },
+        {
+            "logZ": 5.856382740049485,
+            "beta": "5//4"
+        },
+        {
+            "logZ": 6.91158304183626,
+            "beta": "3//2"
+        },
+        {
+            "logZ": 8.002787918265886,
+            "beta": "7//4"
+        },
+        {
+            "logZ": 9.11365302086219,
+            "beta": "2//1"
+        },
+        {
+            "logZ": 10.235338311879328,
+            "beta": "9//4"
+        },
+        {
+            "logZ": 11.363025359199806,
+            "beta": "5//2"
+        },
+        {
+            "logZ": 12.4940610797931,
+            "beta": "11//4"
+        },
+        {
+            "logZ": 13.626972608371,
+            "beta": "3//1"
+        },
+        {
+            "logZ": 14.760937575442336,
+            "beta": "13//4"
+        },
+        {
+            "logZ": 15.895495089203509,
+            "beta": "7//2"
+        },
+        {
+            "logZ": 17.030386232759135,
+            "beta": "15//4"
+        },
+        {
+            "logZ": 18.165465338786593,
+            "beta": "4//1"
+        },
+        {
+            "logZ": 19.300650379866283,
+            "beta": "17//4"
+        },
+        {
+            "logZ": 20.435895139296147,
+            "beta": "9//2"
+        },
+        {
+            "logZ": 21.571173568255357,
+            "beta": "19//4"
+        },
+        {
+            "logZ": 22.70647098191841,
+            "beta": "5//1"
+        },
+        {
+            "logZ": 23.841779100753858,
+            "beta": "21//4"
+        },
+        {
+            "logZ": 24.977093256262595,
+            "beta": "11//2"
+        },
+        {
+            "logZ": 26.112410815934627,
+            "beta": "23//4"
+        },
+        {
+            "logZ": 27.24773029528493,
+            "beta": "6//1"
+        },
+        {
+            "logZ": 28.383050857189815,
+            "beta": "25//4"
+        },
+        {
+            "logZ": 29.51837202957713,
+            "beta": "13//2"
+        },
+        {
+            "logZ": 30.653693546233338,
+            "beta": "27//4"
+        },
+        {
+            "logZ": 31.78901525703318,
+            "beta": "7//1"
+        },
+        {
+            "logZ": 32.924337077316615,
+            "beta": "29//4"
+        },
+        {
+            "logZ": 34.05965895934125,
+            "beta": "15//2"
+        },
+        {
+            "logZ": 35.1949808761837,
+            "beta": "31//4"
+        },
+        {
+            "logZ": 36.330302812661,
+            "beta": "8//1"
+        },
+        {
+            "logZ": 37.46562476021103,
+            "beta": "33//4"
+        },
+        {
+            "logZ": 38.60094671400532,
+            "beta": "17//2"
+        },
+        {
+            "logZ": 39.736268671320936,
+            "beta": "35//4"
+        },
+        {
+            "logZ": 40.87159063062235,
+            "beta": "9//1"
+        },
+        {
+            "logZ": 42.006912591043616,
+            "beta": "37//4"
+        },
+        {
+            "logZ": 43.14223455209641,
+            "beta": "19//2"
+        },
+        {
+            "logZ": 44.27755651350533,
+            "beta": "39//4"
+        },
+        {
+            "logZ": 45.412878475115086,
+            "beta": "10//1"
+        },
+        {
+            "logZ": 46.5482004368381,
+            "beta": "41//4"
+        },
+        {
+            "logZ": 47.68352239862498,
+            "beta": "21//2"
+        },
+        {
+            "logZ": 48.81884436044788,
+            "beta": "43//4"
+        },
+        {
+            "logZ": 49.954166322291094,
+            "beta": "11//1"
+        },
+        {
+            "logZ": 51.08948828414576,
+            "beta": "45//4"
+        },
+        {
+            "logZ": 52.22481024600688,
+            "beta": "23//2"
+        },
+        {
+            "logZ": 53.36013220787165,
+            "beta": "47//4"
+        },
+        {
+            "logZ": 54.49545416973847,
+            "beta": "12//1"
+        },
+        {
+            "logZ": 55.63077613160647,
+            "beta": "49//4"
+        },
+        {
+            "logZ": 56.7660980934751,
+            "beta": "25//2"
+        },
+        {
+            "logZ": 57.901420055344104,
+            "beta": "51//4"
+        },
+        {
+            "logZ": 59.036742017213314,
+            "beta": "13//1"
+        },
+        {
+            "logZ": 60.172063979082644,
+            "beta": "53//4"
+        },
+        {
+            "logZ": 61.30738594095204,
+            "beta": "27//2"
+        },
+        {
+            "logZ": 62.44270790282147,
+            "beta": "55//4"
+        },
+        {
+            "logZ": 63.57802986469092,
+            "beta": "14//1"
+        },
+        {
+            "logZ": 64.71335182656038,
+            "beta": "57//4"
+        },
+        {
+            "logZ": 65.84867378842986,
+            "beta": "29//2"
+        },
+        {
+            "logZ": 66.98399575029933,
+            "beta": "59//4"
+        },
+        {
+            "logZ": 68.11931771216881,
+            "beta": "15//1"
+        },
+        {
+            "logZ": 69.25463967403829,
+            "beta": "61//4"
+        },
+        {
+            "logZ": 70.38996163590777,
+            "beta": "31//2"
+        },
+        {
+            "logZ": 71.52528359777725,
+            "beta": "63//4"
+        },
+        {
+            "logZ": 72.66060555964673,
+            "beta": "16//1"
+        },
+        {
+            "logZ": 73.7959275215162,
+            "beta": "65//4"
+        },
+        {
+            "logZ": 74.93124948338568,
+            "beta": "33//2"
+        },
+        {
+            "logZ": 76.06657144525516,
+            "beta": "67//4"
+        },
+        {
+            "logZ": 77.20189340712464,
+            "beta": "17//1"
+        },
+        {
+            "logZ": 78.33721536899412,
+            "beta": "69//4"
+        },
+        {
+            "logZ": 79.4725373308636,
+            "beta": "35//2"
+        },
+        {
+            "logZ": 80.60785929273308,
+            "beta": "71//4"
+        },
+        {
+            "logZ": 81.74318125460256,
+            "beta": "18//1"
+        },
+        {
+            "logZ": 82.87850321647204,
+            "beta": "73//4"
+        },
+        {
+            "logZ": 84.01382517834152,
+            "beta": "37//2"
+        },
+        {
+            "logZ": 85.14914714021101,
+            "beta": "75//4"
+        },
+        {
+            "logZ": 86.2844691020805,
+            "beta": "19//1"
+        },
+        {
+            "logZ": 87.41979106394997,
+            "beta": "77//4"
+        },
+        {
+            "logZ": 88.55511302581945,
+            "beta": "39//2"
+        },
+        {
+            "logZ": 89.69043498768893,
+            "beta": "79//4"
+        },
+        {
+            "logZ": 90.82575694955841,
+            "beta": "20//1"
+        },
+        {
+            "logZ": 91.96107891142789,
+            "beta": "81//4"
+        },
+        {
+            "logZ": 93.09640087329737,
+            "beta": "41//2"
+        },
+        {
+            "logZ": 94.23172283516685,
+            "beta": "83//4"
+        },
+        {
+            "logZ": 95.36704479703633,
+            "beta": "21//1"
+        },
+        {
+            "logZ": 96.50236675890581,
+            "beta": "85//4"
+        },
+        {
+            "logZ": 97.63768872077529,
+            "beta": "43//2"
+        },
+        {
+            "logZ": 98.77301068264477,
+            "beta": "87//4"
+        },
+        {
+            "logZ": 99.90833264451425,
+            "beta": "22//1"
+        },
+        {
+            "logZ": 101.04365460638373,
+            "beta": "89//4"
+        },
+        {
+            "logZ": 102.1789765682532,
+            "beta": "45//2"
+        },
+        {
+            "logZ": 103.31429853012268,
+            "beta": "91//4"
+        },
+        {
+            "logZ": 104.44962049199216,
+            "beta": "23//1"
+        },
+        {
+            "logZ": 105.58494245386164,
+            "beta": "93//4"
+        },
+        {
+            "logZ": 106.72026441573112,
+            "beta": "47//2"
+        },
+        {
+            "logZ": 107.8555863776006,
+            "beta": "95//4"
+        },
+        {
+            "logZ": 108.99090833947008,
+            "beta": "24//1"
+        },
+        {
+            "logZ": 110.12623030133958,
+            "beta": "97//4"
+        },
+        {
+            "logZ": 111.26155226320905,
+            "beta": "49//2"
+        },
+        {
+            "logZ": 112.39687422507853,
+            "beta": "99//4"
+        },
+        {
+            "logZ": 113.53219618694801,
+            "beta": "25//1"
+        },
+        {
+            "logZ": 114.66751814881749,
+            "beta": "101//4"
+        },
+        {
+            "logZ": 115.80284011068697,
+            "beta": "51//2"
+        },
+        {
+            "logZ": 116.93816207255645,
+            "beta": "103//4"
+        },
+        {
+            "logZ": 118.07348403442593,
+            "beta": "26//1"
+        },
+        {
+            "logZ": 119.20880599629541,
+            "beta": "105//4"
+        },
+        {
+            "logZ": 120.34412795816489,
+            "beta": "53//2"
+        },
+        {
+            "logZ": 121.47944992003437,
+            "beta": "107//4"
+        },
+        {
+            "logZ": 122.61477188190385,
+            "beta": "27//1"
+        },
+        {
+            "logZ": 123.75009384377333,
+            "beta": "109//4"
+        },
+        {
+            "logZ": 124.88541580564281,
+            "beta": "55//2"
+        },
+        {
+            "logZ": 126.02073776751229,
+            "beta": "111//4"
+        },
+        {
+            "logZ": 127.15605972938177,
+            "beta": "28//1"
+        },
+        {
+            "logZ": 128.29138169125125,
+            "beta": "113//4"
+        },
+        {
+            "logZ": 129.42670365312074,
+            "beta": "57//2"
+        },
+        {
+            "logZ": 130.5620256149902,
+            "beta": "115//4"
+        },
+        {
+            "logZ": 131.6973475768597,
+            "beta": "29//1"
+        },
+        {
+            "logZ": 132.83266953872916,
+            "beta": "117//4"
+        },
+        {
+            "logZ": 133.96799150059866,
+            "beta": "59//2"
+        },
+        {
+            "logZ": 135.10331346246812,
+            "beta": "119//4"
+        },
+        {
+            "logZ": 136.23863542433762,
+            "beta": "30//1"
+        },
+        {
+            "logZ": 137.37395738620708,
+            "beta": "121//4"
+        },
+        {
+            "logZ": 138.50927934807657,
+            "beta": "61//2"
+        },
+        {
+            "logZ": 139.64460130994604,
+            "beta": "123//4"
+        },
+        {
+            "logZ": 140.77992327181553,
+            "beta": "31//1"
+        },
+        {
+            "logZ": 141.915245233685,
+            "beta": "125//4"
+        },
+        {
+            "logZ": 143.0505671955545,
+            "beta": "63//2"
+        },
+        {
+            "logZ": 144.18588915742396,
+            "beta": "127//4"
+        },
+        {
+            "logZ": 145.32121111929345,
+            "beta": "32//1"
+        }
+    ],
+    "gap": 2.2912878474779204,
+    "storage_note": "Full spectrum computed; retained logZ grid and low levels. Rerun scan.jl to regenerate all levels.",
+    "dimension": 16,
+    "sectors": [
+        {
+            "spin_parity": 0,
+            "m": 0,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 5.602836608886719e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 2.09808349609375e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 2.86102294921875e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 2.86102294921875e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": 1,
+            "m": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 3,
+            "leg_parity": 1,
+            "seconds": 6.890296936035156e-5
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 1,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 1,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 2.1457672119140625e-6
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "IntervalArithmetic": "1.0.12",
+        "ThermalMPOGap": "0.2.0",
+        "status": "numerical, not certified",
+        "config": {
+            "J": "5//2",
+            "L": 2
+        },
+        "created_utc": "2026-10-11T04:48:31.616",
+        "certified": false,
+        "source_sha256": {
+            "certificates/heisenberg_ladder/recheck_seeds.jl": "cbf1b0d32bc81bee13212319f5f44726e68d58495a7240853d833c141a4d306c",
+            "certificates/heisenberg_ladder/certify.jl": "3c7c9eeaa9db063db6d200bd413f8dcf141d7188afe483ab8c4421a9af77ed64",
+            "julia/src/ExactDiagonalization.jl": "936f5c6764ca892769024711bdc0842c299e5c8b5d32fba976199212384551bb",
+            "julia/src/ReflectionPositivity.jl": "653dd5cb1da456a0cb7db215c38c2e394d3658eccfd0e5b93d0fb1581b22c06f",
+            "julia/src/Recurrence.jl": "5c70fbae608abd2d0f26ad529b477967bf4153e7ae1dde603f4e4644252924ed",
+            "julia/src/Seeds.jl": "eabb710e3aa6d870e84b6b8bd8e0df4c54dd56e2a7b95495be61388ba1f3f2be",
+            "outputs/thermal-mpo-gap-scope.tex": "4e77e5d839d79efc4472b6b75a505726b54fb79de5fd4604c27d8927b8d809e7",
+            "certificates/heisenberg_ladder/rp.jl": "544abac201bbeb621e720b08018f0b3f3297846c6571792dc8d5251edbd4b152",
+            "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
+            "certificates/heisenberg_ladder/test/runtests.jl": "963fb47890c5a0a9a539f6dee35941a89aba85962fe3188da721d79382905e68",
+            "julia/src/CertifiedMPO/GaugeSearch.jl": "fc8d1d96088434191c4c09520cb91ca8054ccc1d7b552e9e57448cbb03b3edc8",
+            "julia/src/CertifiedMPO/CertifiedMPO.jl": "67678a11ecd30c3add4fe85c09373d75b5eee63d70b8766a805b12976cae3e9a",
+            "julia/src/CertifiedMPO/SchattenBridge.jl": "f826199d1be8e6632bdbcdd5eed279ac37a72cbf6051a0ff3942946de52b06a9",
+            "julia/src/recurrence/rational.jl": "be93e303d0a89d36dca4ee284a72a34b2efcf5c0dec93476352f69cacec1f67c",
+            "certificates/heisenberg_ladder/check.jl": "c4637091abde17ea83b862796f384041105515c1fd0a2e21b7ec5512e04ceef9",
+            "julia/src/CertifiedMPO/AdjointTrace.jl": "1596f1cf3045f3dd8f8d6aa8445ea2268811228e9c77d3b4c186510d33eb5aa9",
+            "julia/src/CertifiedMPO/Norms.jl": "6ec3509571238504acdb9eb2052e44794075f69850503a27ea7a0e79f53fae93",
+            "certificates/heisenberg_ladder/ladder.jl": "55e1f3a468995b6bf0f7d9d2a69a3066a4fbaa2c91a80a67a52ce4fbcc62f4ea",
+            "julia/src/CertifiedMPO/MPOAlgebra.jl": "9106a106a0cf33fc7cec095e803db2ba4a0743169a849da264c71d4336f6856a",
+            "julia/src/Models.jl": "03c2ea4f68d313d4dc4b468b66dbe91999929c50c4b71ca8db805792018a30fc",
+            "certificates/heisenberg_ladder/scan.jl": "51659795bc7b0a86c825496cac385a2ef91de2dc135e562b3550d7dc25e8934f",
+            "julia/src/Purification.jl": "f9acd3caf3d413aa540d108af79aa1acff8956b7281fed4009e18eeecaf8c884",
+            "julia/src/ExactArithmetic.jl": "b0b11c2d5e19ea24f00fed6e93b4949ae86d323117e4344f21e682ea7e778642",
+            "julia/src/Results.jl": "cc886dd20458799780935386400a5594e69d6231aada6d68f5a59f29f6ecb677",
+            "julia/src/CertifiedMPO/Products.jl": "7d15b0e27c8dcefc9fb5f876efa4fec4edc6cca3be8caecfd867e8c72b773b5e",
+            "julia/src/CertifiedMPO/Squaring.jl": "e9db2558c5f0472ba82f02139114d53cb2701fa34cdfdceb6bb9b53f4f7f45d8",
+            "julia/src/Spins.jl": "a43d59bd120bb765ee50a49001cbb9792aa26bc23838fd4dbcb9e5943aab2090",
+            "julia/src/ThermalMPOGap.jl": "06d393ef52eeb6966404ed21beeeec0ac84182e8d780c6206d7a1e47c1cae5f9",
+            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+            "certificates/heisenberg_ladder/smoke.jl": "19706a61f05568c3cecf4e1dff3ea93348a4563ab37fbb388c167de1a501df6d",
+            "julia/src/CertifiedMPO/OperatorError.jl": "7094b07e0d22d8836178d5aab398c7d1f52a6a516e06e6bf0e5374ed6d02b78d",
+            "julia/Manifest.toml": "6f67f2d98c66ab6a36b577346a4dc78bf4d3187489e736759967b94f03899d80",
+            "julia/src/CertifiedMPO/PolynomialBounds.jl": "687a589d85dc527177281a0e1283b8d428df93f962c465ed2221a539b14fa1b9",
+            "julia/Project.toml": "aad0eff0d3aeaeb0afb0e967ccaa245c0d24c2cddafef2289a2e41eacad0e1f3",
+            "julia/src/CertifiedMPO/PositiveBounds.jl": "97f605694d77949738837020f7a5ef3b54373369317399705a20e32e22b9bcbb",
+            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
+        },
+        "blas_threads": 1
+    },
+    "L": 2,
+    "seconds": 0.4351339340209961
+}

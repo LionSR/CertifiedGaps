@@ -1,0 +1,1429 @@
+{
+    "J": "5//2",
+    "lowest_32_numerical_levels": [
+        -16.38562851346736,
+        -14.659695833137457,
+        -14.659695833137457,
+        -14.659695833137436,
+        -14.196089407445768,
+        -14.196089407445768,
+        -14.196089407445763,
+        -14.196089407445763,
+        -14.196089407445763,
+        -14.196089407445763,
+        -13.424594133835274,
+        -13.424594133835274,
+        -13.424594133835274,
+        -13.424594133835274,
+        -13.424594133835274,
+        -13.424594133835274,
+        -12.904246231974728,
+        -12.904246231974728,
+        -12.904246231974728,
+        -12.904246231974728,
+        -12.904246231974717,
+        -12.904246231974717,
+        -12.737072923405842,
+        -12.737072923405842,
+        -12.737072923405826,
+        -12.735993737939596,
+        -12.665563629414374,
+        -12.665563629414365,
+        -12.665563629414365,
+        -12.665563629414361,
+        -12.665563629414361,
+        -12.574846560731316
+    ],
+    "logZ_grid": [
+        {
+            "logZ": 11.508061801329285,
+            "beta": "1//4"
+        },
+        {
+            "logZ": 12.83979874284341,
+            "beta": "1//2"
+        },
+        {
+            "logZ": 15.065530994794152,
+            "beta": "3//4"
+        },
+        {
+            "logZ": 18.00259555366998,
+            "beta": "1//1"
+        },
+        {
+            "logZ": 21.418219915378984,
+            "beta": "5//4"
+        },
+        {
+            "logZ": 25.123521161129943,
+            "beta": "3//2"
+        },
+        {
+            "logZ": 28.9955395075386,
+            "beta": "7//4"
+        },
+        {
+            "logZ": 32.962096826039016,
+            "beta": "2//1"
+        },
+        {
+            "logZ": 36.982454686528065,
+            "beta": "9//4"
+        },
+        {
+            "logZ": 41.03377391433602,
+            "beta": "5//2"
+        },
+        {
+            "logZ": 45.10314893794609,
+            "beta": "11//4"
+        },
+        {
+            "logZ": 49.18319005288788,
+            "beta": "3//1"
+        },
+        {
+            "logZ": 53.269605224825945,
+            "beta": "13//4"
+        },
+        {
+            "logZ": 57.35986799960805,
+            "beta": "7//2"
+        },
+        {
+            "logZ": 61.452473435364844,
+            "beta": "15//4"
+        },
+        {
+            "logZ": 65.5465158044599,
+            "beta": "4//1"
+        },
+        {
+            "logZ": 69.64144516998971,
+            "beta": "17//4"
+        },
+        {
+            "logZ": 73.73692508131808,
+            "beta": "9//2"
+        },
+        {
+            "logZ": 77.83274834884688,
+            "beta": "19//4"
+        },
+        {
+            "logZ": 81.92878665793774,
+            "beta": "5//1"
+        },
+        {
+            "logZ": 86.02496014750588,
+            "beta": "21//4"
+        },
+        {
+            "logZ": 90.12121889613314,
+            "beta": "11//2"
+        },
+        {
+            "logZ": 94.21753157707123,
+            "beta": "23//4"
+        },
+        {
+            "logZ": 98.31387846438561,
+            "beta": "6//1"
+        },
+        {
+            "logZ": 102.41024709867656,
+            "beta": "25//4"
+        },
+        {
+            "logZ": 106.50662958846911,
+            "beta": "13//2"
+        },
+        {
+            "logZ": 110.6030209230239,
+            "beta": "27//4"
+        },
+        {
+            "logZ": 114.6994179135746,
+            "beta": "7//1"
+        },
+        {
+            "logZ": 118.79581852670209,
+            "beta": "29//4"
+        },
+        {
+            "logZ": 122.89222146334392,
+            "beta": "15//2"
+        },
+        {
+            "logZ": 126.98862589220374,
+            "beta": "31//4"
+        },
+        {
+            "logZ": 131.08503128051683,
+            "beta": "8//1"
+        },
+        {
+            "logZ": 135.1814372863777,
+            "beta": "33//4"
+        },
+        {
+            "logZ": 139.277843690096,
+            "beta": "17//2"
+        },
+        {
+            "logZ": 143.37425035035363,
+            "beta": "35//4"
+        },
+        {
+            "logZ": 147.47065717615507,
+            "beta": "9//1"
+        },
+        {
+            "logZ": 151.5670641088548,
+            "beta": "37//4"
+        },
+        {
+            "logZ": 155.6634711106258,
+            "beta": "19//2"
+        },
+        {
+            "logZ": 159.75987815705133,
+            "beta": "39//4"
+        },
+        {
+            "logZ": 163.85628523236034,
+            "beta": "10//1"
+        },
+        {
+            "logZ": 167.95269232636014,
+            "beta": "41//4"
+        },
+        {
+            "logZ": 172.0490994324598,
+            "beta": "21//2"
+        },
+        {
+            "logZ": 176.14550654639535,
+            "beta": "43//4"
+        },
+        {
+            "logZ": 180.24191366540705,
+            "beta": "11//1"
+        },
+        {
+            "logZ": 184.3383207877081,
+            "beta": "45//4"
+        },
+        {
+            "logZ": 188.4347279121412,
+            "beta": "23//2"
+        },
+        {
+            "logZ": 192.53113503795646,
+            "beta": "47//4"
+        },
+        {
+            "logZ": 196.62754216466806,
+            "beta": "12//1"
+        },
+        {
+            "logZ": 200.72394929196093,
+            "beta": "49//4"
+        },
+        {
+            "logZ": 204.82035641963088,
+            "beta": "25//2"
+        },
+        {
+            "logZ": 208.9167635475455,
+            "beta": "51//4"
+        },
+        {
+            "logZ": 213.0131706756188,
+            "beta": "13//1"
+        },
+        {
+            "logZ": 217.1095778037951,
+            "beta": "53//4"
+        },
+        {
+            "logZ": 221.20598493203826,
+            "beta": "27//2"
+        },
+        {
+            "logZ": 225.30239206032482,
+            "beta": "55//4"
+        },
+        {
+            "logZ": 229.39879918863954,
+            "beta": "14//1"
+        },
+        {
+            "logZ": 233.49520631697254,
+            "beta": "57//4"
+        },
+        {
+            "logZ": 237.59161344531742,
+            "beta": "29//2"
+        },
+        {
+            "logZ": 241.68802057367,
+            "beta": "59//4"
+        },
+        {
+            "logZ": 245.78442770202756,
+            "beta": "15//1"
+        },
+        {
+            "logZ": 249.88083483038838,
+            "beta": "61//4"
+        },
+        {
+            "logZ": 253.97724195875134,
+            "beta": "31//2"
+        },
+        {
+            "logZ": 258.07364908711565,
+            "beta": "63//4"
+        },
+        {
+            "logZ": 262.1700562154808,
+            "beta": "16//1"
+        },
+        {
+            "logZ": 266.26646334384657,
+            "beta": "65//4"
+        },
+        {
+            "logZ": 270.36287047221276,
+            "beta": "33//2"
+        },
+        {
+            "logZ": 274.4592776005791,
+            "beta": "67//4"
+        },
+        {
+            "logZ": 278.55568472894566,
+            "beta": "17//1"
+        },
+        {
+            "logZ": 282.6520918573123,
+            "beta": "69//4"
+        },
+        {
+            "logZ": 286.748498985679,
+            "beta": "35//2"
+        },
+        {
+            "logZ": 290.8449061140458,
+            "beta": "71//4"
+        },
+        {
+            "logZ": 294.9413132424126,
+            "beta": "18//1"
+        },
+        {
+            "logZ": 299.03772037077937,
+            "beta": "73//4"
+        },
+        {
+            "logZ": 303.1341274991462,
+            "beta": "37//2"
+        },
+        {
+            "logZ": 307.230534627513,
+            "beta": "75//4"
+        },
+        {
+            "logZ": 311.32694175587983,
+            "beta": "19//1"
+        },
+        {
+            "logZ": 315.42334888424665,
+            "beta": "77//4"
+        },
+        {
+            "logZ": 319.5197560126135,
+            "beta": "39//2"
+        },
+        {
+            "logZ": 323.61616314098035,
+            "beta": "79//4"
+        },
+        {
+            "logZ": 327.7125702693472,
+            "beta": "20//1"
+        },
+        {
+            "logZ": 331.80897739771405,
+            "beta": "81//4"
+        },
+        {
+            "logZ": 335.90538452608087,
+            "beta": "41//2"
+        },
+        {
+            "logZ": 340.00179165444774,
+            "beta": "83//4"
+        },
+        {
+            "logZ": 344.09819878281456,
+            "beta": "21//1"
+        },
+        {
+            "logZ": 348.1946059111814,
+            "beta": "85//4"
+        },
+        {
+            "logZ": 352.29101303954826,
+            "beta": "43//2"
+        },
+        {
+            "logZ": 356.3874201679151,
+            "beta": "87//4"
+        },
+        {
+            "logZ": 360.4838272962819,
+            "beta": "22//1"
+        },
+        {
+            "logZ": 364.5802344246488,
+            "beta": "89//4"
+        },
+        {
+            "logZ": 368.6766415530156,
+            "beta": "45//2"
+        },
+        {
+            "logZ": 372.7730486813824,
+            "beta": "91//4"
+        },
+        {
+            "logZ": 376.8694558097493,
+            "beta": "23//1"
+        },
+        {
+            "logZ": 380.9658629381161,
+            "beta": "93//4"
+        },
+        {
+            "logZ": 385.06227006648294,
+            "beta": "47//2"
+        },
+        {
+            "logZ": 389.1586771948498,
+            "beta": "95//4"
+        },
+        {
+            "logZ": 393.25508432321664,
+            "beta": "24//1"
+        },
+        {
+            "logZ": 397.35149145158346,
+            "beta": "97//4"
+        },
+        {
+            "logZ": 401.44789857995033,
+            "beta": "49//2"
+        },
+        {
+            "logZ": 405.54430570831715,
+            "beta": "99//4"
+        },
+        {
+            "logZ": 409.640712836684,
+            "beta": "25//1"
+        },
+        {
+            "logZ": 413.73711996505085,
+            "beta": "101//4"
+        },
+        {
+            "logZ": 417.8335270934177,
+            "beta": "51//2"
+        },
+        {
+            "logZ": 421.9299342217845,
+            "beta": "103//4"
+        },
+        {
+            "logZ": 426.02634135015137,
+            "beta": "26//1"
+        },
+        {
+            "logZ": 430.1227484785182,
+            "beta": "105//4"
+        },
+        {
+            "logZ": 434.219155606885,
+            "beta": "53//2"
+        },
+        {
+            "logZ": 438.3155627352519,
+            "beta": "107//4"
+        },
+        {
+            "logZ": 442.4119698636187,
+            "beta": "27//1"
+        },
+        {
+            "logZ": 446.50837699198553,
+            "beta": "109//4"
+        },
+        {
+            "logZ": 450.6047841203524,
+            "beta": "55//2"
+        },
+        {
+            "logZ": 454.7011912487192,
+            "beta": "111//4"
+        },
+        {
+            "logZ": 458.79759837708605,
+            "beta": "28//1"
+        },
+        {
+            "logZ": 462.8940055054529,
+            "beta": "113//4"
+        },
+        {
+            "logZ": 466.99041263381974,
+            "beta": "57//2"
+        },
+        {
+            "logZ": 471.0868197621866,
+            "beta": "115//4"
+        },
+        {
+            "logZ": 475.18322689055344,
+            "beta": "29//1"
+        },
+        {
+            "logZ": 479.27963401892026,
+            "beta": "117//4"
+        },
+        {
+            "logZ": 483.37604114728714,
+            "beta": "59//2"
+        },
+        {
+            "logZ": 487.47244827565396,
+            "beta": "119//4"
+        },
+        {
+            "logZ": 491.5688554040208,
+            "beta": "30//1"
+        },
+        {
+            "logZ": 495.66526253238766,
+            "beta": "121//4"
+        },
+        {
+            "logZ": 499.7616696607545,
+            "beta": "61//2"
+        },
+        {
+            "logZ": 503.8580767891213,
+            "beta": "123//4"
+        },
+        {
+            "logZ": 507.9544839174882,
+            "beta": "31//1"
+        },
+        {
+            "logZ": 512.050891045855,
+            "beta": "125//4"
+        },
+        {
+            "logZ": 516.1472981742219,
+            "beta": "63//2"
+        },
+        {
+            "logZ": 520.2437053025886,
+            "beta": "127//4"
+        },
+        {
+            "logZ": 524.3401124309555,
+            "beta": "32//1"
+        }
+    ],
+    "gap": 1.7259326803299029,
+    "storage_note": "Full spectrum computed; retained logZ grid and low levels. Rerun scan.jl to regenerate all levels.",
+    "dimension": 65536,
+    "sectors": [
+        {
+            "spin_parity": 0,
+            "m": 0,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 1.2159347534179688e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 5.0067901611328125e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 3.0994415283203125e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 5.9604644775390625e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 2.1457672119140625e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 2.86102294921875e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 2.1457672119140625e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 2.86102294921875e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 9,
+            "leg_parity": 1,
+            "seconds": 3.2901763916015625e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 7,
+            "leg_parity": -1,
+            "seconds": 1.5020370483398438e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 7,
+            "leg_parity": 1,
+            "seconds": 2.5033950805664062e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 7,
+            "leg_parity": -1,
+            "seconds": 1.5020370483398438e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 9,
+            "leg_parity": 1,
+            "seconds": 2.09808349609375e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 7,
+            "leg_parity": -1,
+            "seconds": 1.4066696166992188e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 7,
+            "leg_parity": 1,
+            "seconds": 1.4066696166992188e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 7,
+            "leg_parity": -1,
+            "seconds": 3.0994415283203125e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 9,
+            "leg_parity": 1,
+            "seconds": 1.4066696166992188e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 2,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 7,
+            "leg_parity": -1,
+            "seconds": 1.0967254638671875e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 35,
+            "leg_parity": 1,
+            "seconds": 0.0001220703125
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 35,
+            "leg_parity": -1,
+            "seconds": 0.00010800361633300781
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 35,
+            "leg_parity": 1,
+            "seconds": 0.00015282630920410156
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 35,
+            "leg_parity": -1,
+            "seconds": 0.0001609325408935547
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 35,
+            "leg_parity": 1,
+            "seconds": 0.00013589859008789062
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 35,
+            "leg_parity": -1,
+            "seconds": 0.0001590251922607422
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 35,
+            "leg_parity": 1,
+            "seconds": 0.00013494491577148438
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 35,
+            "leg_parity": -1,
+            "seconds": 0.00013208389282226562
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 35,
+            "leg_parity": 1,
+            "seconds": 0.00011205673217773438
+        },
+        {
+            "spin_parity": 0,
+            "m": 3,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 35,
+            "leg_parity": -1,
+            "seconds": 0.00010013580322265625
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 120,
+            "leg_parity": 1,
+            "seconds": 0.0008139610290527344
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 112,
+            "leg_parity": -1,
+            "seconds": 0.0007138252258300781
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 112,
+            "leg_parity": 1,
+            "seconds": 0.0012199878692626953
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 112,
+            "leg_parity": -1,
+            "seconds": 0.001302957534790039
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 118,
+            "leg_parity": 1,
+            "seconds": 0.001600027084350586
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 112,
+            "leg_parity": -1,
+            "seconds": 0.0013279914855957031
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 112,
+            "leg_parity": 1,
+            "seconds": 0.001371145248413086
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 112,
+            "leg_parity": -1,
+            "seconds": 0.0014379024505615234
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 120,
+            "leg_parity": 1,
+            "seconds": 0.0009160041809082031
+        },
+        {
+            "spin_parity": 0,
+            "m": 4,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 112,
+            "leg_parity": -1,
+            "seconds": 0.0007350444793701172
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 273,
+            "leg_parity": 1,
+            "seconds": 0.005466938018798828
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 273,
+            "leg_parity": -1,
+            "seconds": 0.004319906234741211
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 273,
+            "leg_parity": 1,
+            "seconds": 0.010093927383422852
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 273,
+            "leg_parity": -1,
+            "seconds": 0.01026606559753418
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 273,
+            "leg_parity": 1,
+            "seconds": 0.009886980056762695
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 273,
+            "leg_parity": -1,
+            "seconds": 0.027640104293823242
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 273,
+            "leg_parity": 1,
+            "seconds": 0.009035110473632812
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 273,
+            "leg_parity": -1,
+            "seconds": 0.008809089660644531
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 273,
+            "leg_parity": 1,
+            "seconds": 0.003757953643798828
+        },
+        {
+            "spin_parity": 0,
+            "m": 5,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 273,
+            "leg_parity": -1,
+            "seconds": 0.00351715087890625
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 511,
+            "leg_parity": 1,
+            "seconds": 0.014784097671508789
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 497,
+            "leg_parity": -1,
+            "seconds": 0.016116857528686523
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 497,
+            "leg_parity": 1,
+            "seconds": 0.05056905746459961
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 497,
+            "leg_parity": -1,
+            "seconds": 0.039222002029418945
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 511,
+            "leg_parity": 1,
+            "seconds": 0.04656219482421875
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 497,
+            "leg_parity": -1,
+            "seconds": 0.043599843978881836
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 497,
+            "leg_parity": 1,
+            "seconds": 0.04089784622192383
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 497,
+            "leg_parity": -1,
+            "seconds": 0.04278111457824707
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 511,
+            "leg_parity": 1,
+            "seconds": 0.014955997467041016
+        },
+        {
+            "spin_parity": 0,
+            "m": 6,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 497,
+            "leg_parity": -1,
+            "seconds": 0.013103008270263672
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 715,
+            "leg_parity": 1,
+            "seconds": 0.03188300132751465
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 715,
+            "leg_parity": -1,
+            "seconds": 0.0332331657409668
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 715,
+            "leg_parity": 1,
+            "seconds": 0.11012983322143555
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 1,
+            "multiplicity": 4,
+            "dimension": 715,
+            "leg_parity": -1,
+            "seconds": 0.11002898216247559
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 715,
+            "leg_parity": 1,
+            "seconds": 0.11022400856018066
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 2,
+            "multiplicity": 4,
+            "dimension": 715,
+            "leg_parity": -1,
+            "seconds": 0.14407801628112793
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 715,
+            "leg_parity": 1,
+            "seconds": 0.11132192611694336
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 3,
+            "multiplicity": 4,
+            "dimension": 715,
+            "leg_parity": -1,
+            "seconds": 0.1484079360961914
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 715,
+            "leg_parity": 1,
+            "seconds": 0.034420013427734375
+        },
+        {
+            "spin_parity": 0,
+            "m": 7,
+            "k": 4,
+            "multiplicity": 2,
+            "dimension": 715,
+            "leg_parity": -1,
+            "seconds": 0.030530929565429688
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 437,
+            "leg_parity": 1,
+            "seconds": 0.00974893569946289
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 383,
+            "leg_parity": 1,
+            "seconds": 0.007258176803588867
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 392,
+            "leg_parity": -1,
+            "seconds": 0.008050918579101562
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 408,
+            "leg_parity": -1,
+            "seconds": 0.008198022842407227
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 392,
+            "leg_parity": 1,
+            "seconds": 0.02134394645690918
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 408,
+            "leg_parity": 1,
+            "seconds": 0.02387690544128418
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 392,
+            "leg_parity": -1,
+            "seconds": 0.021219968795776367
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 408,
+            "leg_parity": -1,
+            "seconds": 0.02416396141052246
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 2,
+            "multiplicity": 2,
+            "dimension": 430,
+            "leg_parity": 1,
+            "seconds": 0.026391029357910156
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 2,
+            "multiplicity": 2,
+            "dimension": 386,
+            "leg_parity": 1,
+            "seconds": 0.02007889747619629
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 2,
+            "multiplicity": 2,
+            "dimension": 392,
+            "leg_parity": -1,
+            "seconds": 0.0271759033203125
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 2,
+            "multiplicity": 2,
+            "dimension": 408,
+            "leg_parity": -1,
+            "seconds": 0.04098987579345703
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 3,
+            "multiplicity": 2,
+            "dimension": 392,
+            "leg_parity": 1,
+            "seconds": 0.02553701400756836
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 3,
+            "multiplicity": 2,
+            "dimension": 408,
+            "leg_parity": 1,
+            "seconds": 0.0240480899810791
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 3,
+            "multiplicity": 2,
+            "dimension": 392,
+            "leg_parity": -1,
+            "seconds": 0.023495197296142578
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 3,
+            "multiplicity": 2,
+            "dimension": 408,
+            "leg_parity": -1,
+            "seconds": 0.04070711135864258
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 4,
+            "multiplicity": 1,
+            "dimension": 434,
+            "leg_parity": 1,
+            "seconds": 0.013446807861328125
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 4,
+            "multiplicity": 1,
+            "dimension": 384,
+            "leg_parity": 1,
+            "seconds": 0.010676860809326172
+        },
+        {
+            "spin_parity": 1,
+            "m": 8,
+            "k": 4,
+            "multiplicity": 1,
+            "dimension": 392,
+            "leg_parity": -1,
+            "seconds": 0.011069059371948242
+        },
+        {
+            "spin_parity": -1,
+            "m": 8,
+            "k": 4,
+            "multiplicity": 1,
+            "dimension": 408,
+            "leg_parity": -1,
+            "seconds": 0.011282920837402344
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "IntervalArithmetic": "1.0.12",
+        "ThermalMPOGap": "0.2.0",
+        "status": "numerical, not certified",
+        "config": {
+            "J": "5//2",
+            "L": 8
+        },
+        "created_utc": "2026-10-11T04:48:36.547",
+        "certified": false,
+        "source_sha256": {
+            "certificates/heisenberg_ladder/recheck_seeds.jl": "cbf1b0d32bc81bee13212319f5f44726e68d58495a7240853d833c141a4d306c",
+            "certificates/heisenberg_ladder/certify.jl": "3c7c9eeaa9db063db6d200bd413f8dcf141d7188afe483ab8c4421a9af77ed64",
+            "julia/src/ExactDiagonalization.jl": "936f5c6764ca892769024711bdc0842c299e5c8b5d32fba976199212384551bb",
+            "julia/src/ReflectionPositivity.jl": "653dd5cb1da456a0cb7db215c38c2e394d3658eccfd0e5b93d0fb1581b22c06f",
+            "julia/src/Recurrence.jl": "5c70fbae608abd2d0f26ad529b477967bf4153e7ae1dde603f4e4644252924ed",
+            "julia/src/Seeds.jl": "eabb710e3aa6d870e84b6b8bd8e0df4c54dd56e2a7b95495be61388ba1f3f2be",
+            "outputs/thermal-mpo-gap-scope.tex": "4e77e5d839d79efc4472b6b75a505726b54fb79de5fd4604c27d8927b8d809e7",
+            "certificates/heisenberg_ladder/rp.jl": "544abac201bbeb621e720b08018f0b3f3297846c6571792dc8d5251edbd4b152",
+            "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
+            "certificates/heisenberg_ladder/test/runtests.jl": "963fb47890c5a0a9a539f6dee35941a89aba85962fe3188da721d79382905e68",
+            "julia/src/CertifiedMPO/GaugeSearch.jl": "fc8d1d96088434191c4c09520cb91ca8054ccc1d7b552e9e57448cbb03b3edc8",
+            "julia/src/CertifiedMPO/CertifiedMPO.jl": "67678a11ecd30c3add4fe85c09373d75b5eee63d70b8766a805b12976cae3e9a",
+            "julia/src/CertifiedMPO/SchattenBridge.jl": "f826199d1be8e6632bdbcdd5eed279ac37a72cbf6051a0ff3942946de52b06a9",
+            "julia/src/recurrence/rational.jl": "be93e303d0a89d36dca4ee284a72a34b2efcf5c0dec93476352f69cacec1f67c",
+            "certificates/heisenberg_ladder/check.jl": "c4637091abde17ea83b862796f384041105515c1fd0a2e21b7ec5512e04ceef9",
+            "julia/src/CertifiedMPO/AdjointTrace.jl": "1596f1cf3045f3dd8f8d6aa8445ea2268811228e9c77d3b4c186510d33eb5aa9",
+            "julia/src/CertifiedMPO/Norms.jl": "6ec3509571238504acdb9eb2052e44794075f69850503a27ea7a0e79f53fae93",
+            "certificates/heisenberg_ladder/ladder.jl": "55e1f3a468995b6bf0f7d9d2a69a3066a4fbaa2c91a80a67a52ce4fbcc62f4ea",
+            "julia/src/CertifiedMPO/MPOAlgebra.jl": "9106a106a0cf33fc7cec095e803db2ba4a0743169a849da264c71d4336f6856a",
+            "julia/src/Models.jl": "03c2ea4f68d313d4dc4b468b66dbe91999929c50c4b71ca8db805792018a30fc",
+            "certificates/heisenberg_ladder/scan.jl": "51659795bc7b0a86c825496cac385a2ef91de2dc135e562b3550d7dc25e8934f",
+            "julia/src/Purification.jl": "f9acd3caf3d413aa540d108af79aa1acff8956b7281fed4009e18eeecaf8c884",
+            "julia/src/ExactArithmetic.jl": "b0b11c2d5e19ea24f00fed6e93b4949ae86d323117e4344f21e682ea7e778642",
+            "julia/src/Results.jl": "cc886dd20458799780935386400a5594e69d6231aada6d68f5a59f29f6ecb677",
+            "julia/src/CertifiedMPO/Products.jl": "7d15b0e27c8dcefc9fb5f876efa4fec4edc6cca3be8caecfd867e8c72b773b5e",
+            "julia/src/CertifiedMPO/Squaring.jl": "e9db2558c5f0472ba82f02139114d53cb2701fa34cdfdceb6bb9b53f4f7f45d8",
+            "julia/src/Spins.jl": "a43d59bd120bb765ee50a49001cbb9792aa26bc23838fd4dbcb9e5943aab2090",
+            "julia/src/ThermalMPOGap.jl": "06d393ef52eeb6966404ed21beeeec0ac84182e8d780c6206d7a1e47c1cae5f9",
+            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+            "certificates/heisenberg_ladder/smoke.jl": "19706a61f05568c3cecf4e1dff3ea93348a4563ab37fbb388c167de1a501df6d",
+            "julia/src/CertifiedMPO/OperatorError.jl": "7094b07e0d22d8836178d5aab398c7d1f52a6a516e06e6bf0e5374ed6d02b78d",
+            "julia/Manifest.toml": "6f67f2d98c66ab6a36b577346a4dc78bf4d3187489e736759967b94f03899d80",
+            "julia/src/CertifiedMPO/PolynomialBounds.jl": "687a589d85dc527177281a0e1283b8d428df93f962c465ed2221a539b14fa1b9",
+            "julia/Project.toml": "aad0eff0d3aeaeb0afb0e967ccaa245c0d24c2cddafef2289a2e41eacad0e1f3",
+            "julia/src/CertifiedMPO/PositiveBounds.jl": "97f605694d77949738837020f7a5ef3b54373369317399705a20e32e22b9bcbb",
+            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
+        },
+        "blas_threads": 1
+    },
+    "L": 8,
+    "seconds": 1.7026290893554688
+}
