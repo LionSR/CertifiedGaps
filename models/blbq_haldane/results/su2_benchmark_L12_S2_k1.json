@@ -1,0 +1,43 @@
+{
+    "metadata": {
+        "julia_threads": 4,
+        "julia": "1.12.4",
+        "status": "numerical highest-weight construction benchmark, not certified",
+        "config": {
+            "L": 12,
+            "S": 2,
+            "k": 1
+        },
+        "created_utc": "2026-10-11T05:20:36.179",
+        "certified": false,
+        "source_sha256": {
+            "model.jl": "e76cb7a5281428b1cc4c31c83f9f2adea99745216fe1f1d8a2f239fb045b9e3c",
+            "su2_benchmark.jl": "e02d18effcb8822b627402de409ac4c170801a42a7c00d5c81e68e6a21754017",
+            "su2.jl": "eab6765979695e59ea065522de1391888c34ddf66da69b7dad87d755509d000d",
+            "sectors.jl": "0fb18eadcb0893d111d19d73f66109127d16b1f88d7e7e5a81bd509dc15b66a9"
+        },
+        "blas_threads": 1
+    },
+    "row": {
+        "L": 12,
+        "S": 2,
+        "k": 1,
+        "dimension": 1243,
+        "build_seconds": 8.003684043884277,
+        "eigensolve_seconds": 0.515281101,
+        "diagnostics": {
+            "rank": 1243,
+            "seconds": 2.735584020614624,
+            "projection_seconds": 1.423775798,
+            "qr_seconds": 0.838846543,
+            "residual": 1.3094551318677787e-12,
+            "orthogonality": 6.687112564560514e-16,
+            "amplification": 27.212454212454215,
+            "estimated_peak_bytes": 144565872,
+            "min_qr_diagonal": 0.2809743583907828,
+            "max_qr_diagonal": 36.83113578129539
+        },
+        "ground": -21.872491542625987,
+        "total_seconds": 8.560018062591553
+    }
+}
