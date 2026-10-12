@@ -43,6 +43,8 @@ function certify()
             "L"=>L,"dimension"=>s.dimension,"seconds"=>s.seconds,"sectors"=>s.rows,
             "energies"=>string.(Rational{BigInt}.(s.energies)),
             "radii"=>string.(Rational{BigInt}.(s.radii))))
+        # The 8-rung file is ~6.5 MB of exact dyadic strings; store it gzipped.
+        L==2n && compress_result(joinpath(@__DIR__,"results","verified_L$(L).json"))
     end
     gap=b.energies[2]-b.energies[1]
     write_result(joinpath(@__DIR__,"results","certificate.json"),Dict(

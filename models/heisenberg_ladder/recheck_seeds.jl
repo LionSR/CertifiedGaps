@@ -5,7 +5,7 @@ function recheck()
     parseq(s)=parse(Rational{BigInt},s)
     specs=Dict()
     for L in (Int(c.n0),2Int(c.n0))
-        s=JSON3.read(read(joinpath(@__DIR__,"results/verified_L$(L).json"),String))
+        s=JSON3.read(read_result_text(joinpath(@__DIR__,"results/verified_L$(L).json")))
         specs[L]=(;energies=Float64.(parseq.(s.energies)),radii=Float64.(parseq.(s.radii)))
     end
     beta=parseq(c.beta)

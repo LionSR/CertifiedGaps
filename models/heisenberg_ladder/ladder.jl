@@ -7,7 +7,7 @@ const ROOT = normpath(joinpath(@__DIR__, "../.."))
 
 "Record all executable sources and the unchanged core/environment manifests."
 function provenance(config; certified=false)
-    hashes = source_hashes(ROOT; dirs=("julia/src", "certificates/heisenberg_ladder"),
+    hashes = source_hashes(ROOT; dirs=("julia/src", "models/heisenberg_ladder"),
         files=("julia/Project.toml", "julia/Manifest.toml", "outputs/thermal-mpo-gap-scope.tex"))
     run_metadata(config; source_sha256=hashes, packages=(CertifiedGaps,IntervalArithmetic),
                  status=certified ? "certified" : "numerical, not certified", certified)
@@ -221,3 +221,19 @@ function realify!(H,o,k,p,q)
     @assert maximum(abs,imag(H);init=0.0)<1e-9
     real.(H)
 end
+
+"""
+    read_result_text(path)
+
+Read a result file, falling back to `path * ".gz"` (decompressed with the system `gzip`).
+The 8-rung verified spectrum is stored gzipped to keep the repository small.
+"""
+function read_result_text(path)
+    isfile(path) && return read(path, String)
+    gz = path * ".gz"
+    isfile(gz) || error("missing result file $path (or $gz)")
+    return read(pipeline(`gzip -dc $gz`), String)
+end
+
+"Compress a large result file in place (deterministic header, no timestamp)."
+compress_result(path) = run(`gzip -9 -n -f $path`)

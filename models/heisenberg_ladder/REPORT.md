@@ -173,10 +173,9 @@ leaves slack for run-to-run variation in the computed residual/orthogonality
 allowances. An earlier 10^-12 rounding produced valid producer enclosures but
 was too tight for every fresh replay. The current checker retains strict
 inequalities; it verifies fresh enclosures against these wider rational seeds.
-This slightly weakens the current bound while the original validated snapshot
-and its tighter reported number remain unchanged under `legacy/`.
+This slightly weakens the bound relative to the earlier 10^-12 snapshot (in git history).
 
-The checker repeats exact RP, sector dimension accounting, source hashes,
+The checker repeats exact RP, sector dimension accounting, shared-core source hashes,
 and the bound from stored rational seeds. It includes `recheck_seeds.jl`, which
 recomputes log partition functions and seeds from all stored eigenvalue
 enclosures. It then performs fresh complete verified 4/8-rung eigensolves,
@@ -184,51 +183,21 @@ recomputes every residual and orthogonality allowance, and checks that the
 stored rational seeds still dominate the newly computed defects. Thus the
 checker does not merely trust saved norm bounds. `validate.jl` asserts that
 this full checker completes in under two minutes. `certify.jl` regenerates
-all certificate JSON files.
+all certificate JSON files (the 8-rung enclosures as `verified_L8.json.gz`).
 
 ## Environment and timing scope
 
-Julia 1.12.4 and the checked-in dependency manifest were instantiated and
-precompiled successfully. The approved juliaup endpoint returned HTTP 403;
-the official Julia 1.12.4 binary download succeeded. Julia and its depot live
-under `/tmp`, while every task script and result lives in this certificate
-directory. All runs set OPENBLAS_NUM_THREADS=1 and BLAS.set_num_threads(1).
-Parameter processes share the cloud environment's four CPU cores. No work was
-moved to the user's laptop. A reported connection interruption was checked;
-the existing Julia processes and saved certificate remained available.
-
-The scan timings below are for completed driver invocations, which reuse
-saved smaller-ring spectra. Per-ring JSON files preserve their original
-compute times. Setup, compilation warmup, and interrupted exploratory complex
-10-rung runs are not included in those scan times. Those exploratory runs were
-stopped before restarting with a real reflection basis; no duplicate active
-scan of the same coupling was left running. One later dense-intermediate
-J=7/2 10-rung attempt was killed by the memory limit (exit 137, confirmed
-cgroup OOM event). Its small-ring checkpoints and the completed certificate
-survived. Only the missing large-ring calculation was queued for retry with
-the tested sparse-to-real construction. Final results below use completed
-runs, never partial spectra from the killed process. The checkpointed retry
-completed every dense eigensolve in 1328.7 seconds. Its completeness assertion
-then detected a shared-variable race in the threaded row aggregation. Renaming
-the outer aggregate removed that race; all saved blocks were reassembled
-without repeating eigensolves. An independent per-file audit checked labels,
-sorted finite eigenvalues, dimensions totaling 1,048,576, trace approximately
-zero, and normalized second moment 26.71875 before accepting the result.
+Julia 1.12.4 with the checked-in core manifest; all runs set OPENBLAS_NUM_THREADS=1 and
+BLAS.set_num_threads(1). Scan timings are for completed driver invocations, which reuse saved
+smaller-ring spectra; per-ring JSON files keep their own compute times. One J=7/2 10-rung run
+was killed by the memory limit; the retry (`retry_j3p5.jl`, sparse-to-real basis,
+checkpointed per sector) completed every dense eigensolve, and its assembled spectrum was
+audited (labels, dimension 1,048,576, trace, second moment 26.71875) before acceptance. No
+partial spectrum is used.
 
 ## Results
 
 Results and executed validation timings are appended below by `summarize.jl`.
-
-## Current-main reproduction
-
-The original cloud scans used repository base `ef0a3e6`. Upstream `22b2759`
-renamed the unchanged mathematical core to `CertifiedGaps`. Publication uses
-that current base in an isolated worktree, changes only this certificate
-directory, and reruns the complete rigorous certificate and checker there.
-Historical numerical scan metadata retains its original source hashes and
-package name. These scans are numerical evidence; they are not promoted to
-certificates by the namespace update. The requested `certificates/` location
-is retained even though the newer repository guide prefers `models/`.
 
 ## Separate current-head audit
 
@@ -244,12 +213,7 @@ not an alternative implementation of every symmetry block or norm theorem.
 Fresh eigensolves share the symmetry builder and residual-bound implementation.
 The abstract repository theorem and ordinary IEEE/OpenBLAS arithmetic model
 remain assumptions; no rigorous thermodynamic reference gap or threshold is
-claimed. The pre-rename validated snapshot is preserved byte-for-byte under
-`legacy/`, including its matching certificate source files.
-
-The migration audit compared all 25 core source files at `ef0a3e6`
-and `22b2759`: after replacing the package name, their bytes match exactly.
-The recurrence implementation itself is byte-identical.
+claimed.
 
 <!-- GENERATED RESULTS -->
 
@@ -323,3 +287,8 @@ compacted numerical grids and complete sector counts successfully in 0.724
 seconds. Evidence is in `results/validation.json`, `results/audit.json` and
 `results/scan_validation.json`. All scans and the supervisor have terminated;
 there is no pending background computation.
+
+After the move to `models/heisenberg_ladder` (Julia 1.12.4, macOS, one BLAS thread),
+`test/runtests.jl` passed in 48 s wall time (45 tests, including the fresh verified
+4/8-rung eigensolves) and `smoke.jl` passed in 20 s. The stored certificate was not
+regenerated; its own-directory source hashes refer to the old `certificates/` path.
