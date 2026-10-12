@@ -1,4 +1,6 @@
 using CertifiedGaps.Results, Printf
+include("src/Provenance.jl")
+using .Provenance
 root=@__DIR__; fields=["2_1","5_2","3_1","4_1"]
 io=IOBuffer()
 println(io,"All scan values below are **numerical, not certified**. The grid is β=1/8,2/8,…,32; n0=2,3,4.\n")
@@ -40,11 +42,11 @@ for rec in s["records"]
 end
 println(io,"\n### Certified results\n")
 for tag in fields
-    p=joinpath(root,"results","certificate_g$tag.json"); isfile(p)||continue
-    c=read_exact_json(p); e=c["spectra"][end]["energies"]
+    p=joinpath(root,"results","certificate_g$tag.json.gz"); isfile(p)||continue
+    c=read_certificate(p); e=c["spectra"][end]["energies"]
     @printf(io,"- **g=%s: Δ_L ≥ %.9f**, %s. Seed (n0,β)=(%s,%s); verification %.2f s; bound / 8-rung ED gap = %.6f.\n",c["g"],Float64(floor(BigInt,BigFloat(c["bound"])*big(10)^9))/1e9,c["validity"],c["n0"],c["beta"],c["seconds"],c["bound"]/(e[2]-e[1]))
     println(io,"  Returned `.bound` = `",repr(c["bound"]),"` (exact binary rational `",Rational{BigInt}(c["bound"]),"`); the displayed decimal lower bound is rounded downward.")
-    println(io,"  Exact rational seeds and per-sector eigenvalue radii are in `results/certificate_g",tag,".json`.")
+    println(io,"  Exact rational seeds and per-sector eigenvalue radii are in `results/certificate_g",tag,".json.gz`.")
 end
 println(io,"\nCertified: the exact RP identity, whole-spectrum eigenvalue enclosures for the selected parameter/seed, outward log-partition and rational defect bounds, and the resulting uniform gap under the repository's two-purity theorem. Numerical: seed optimization, all nonverified scan spectra and finite-size gaps, the literature critical point, and comparisons to finite-ring reference gaps. The ED reference gap is not claimed to be an infinite-volume limit.\n")
 p=joinpath(root,"REPORT.md"); old=read(p,String)

@@ -1,0 +1,11 @@
+{
+    "status": "passed",
+    "seconds": 18.411146,
+    "julia": "1.12.4",
+    "source_hashes": {
+        "src/Ladder.jl": "3e43a235c83cdaa219e2dd126c2fb0da154abfe06adf3eb78f8ff28ed873271f",
+        "src/Provenance.jl": "2e9ee2f380ef552c9b8c479d28f26aaf2019cc7d715865d0aaa540c0e89e03e8",
+        "run_tests.jl": "00444dbfaa6799a0c49d003cc27dceaff0ea97f7d61182c6d522f0fb50763041",
+        "test/runtests.jl": "3f788aaa74ac98566a22ad9186f4ed25529a2f59f2f86165539abe9db2118fe3"
+    }
+}

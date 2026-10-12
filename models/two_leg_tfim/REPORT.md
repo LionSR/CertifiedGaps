@@ -137,25 +137,31 @@ For the unsuccessful fields, a two-point fit δ(n)=δ(4)exp(−(n−4)/ξδ) to 
 
 - **g=3//1: Δ_L ≥ 0.636386863**, even L >= 4 rungs (2L spin sites, multiples of four, >= 8 sites). Seed (n0,β)=(4,3//2); verification 645.83 s; bound / 8-rung ED gap = 0.239083.
   Returned `.bound` = `0.6363868632722607` (exact binary rational `179126977518527//281474976710656`); the displayed decimal lower bound is rounded downward.
-  Exact rational seeds and per-sector eigenvalue radii are in `results/certificate_g3_1.json`.
+  Exact rational seeds and per-sector eigenvalue radii are in `results/certificate_g3_1.json.gz` (gzip of the original JSON; SHA-256 of the uncompressed bytes `aba98d98…a74928`).
 
 Certified: the exact RP identity, whole-spectrum eigenvalue enclosures for the selected parameter/seed, outward log-partition and rational defect bounds, and the resulting uniform gap under the repository's two-purity theorem. Numerical: seed optimization, all nonverified scan spectra and finite-size gaps, the literature critical point, and comparisons to finite-ring reference gaps. The ED reference gap is not claimed to be an infinite-volume limit.
 
 
 ## Validation and environment
 
-Julia 1.12.4 was verified; `Pkg.instantiate()` and `Pkg.precompile()` succeeded with the existing `julia/` project. The juliaup endpoint returned HTTP 403, so the official versioned Julia tarball was used. A writable temporary depot resolved the read-only home directory. `results/environment.json` records package versions, BLAS configuration, and hashes of the project, manifest, repository instructions, and scope note.
+The certificate was produced with Julia 1.12.4 (official versioned tarball);
+`results/environment.json` records package versions, BLAS configuration, and hashes of the
+project, manifest, repository instructions, and scope note at that time.
 
-`julia --project=julia certificates/two_leg_tfim/run_tests.jl` passed **69 tests in 19.93 seconds**: 10 exact-RP/symmetry checks, 57 stored-seed/recurrence/provenance checks, and 2 enclosure checks on an exactly soluble matrix. `results/tests.json` records the measured runtime and source hashes. The fast checker recomputes log Z and rational seeds from stored eigenvalue radii, not the expensive residuals; rerun `certify.jl 3//1` to reproduce those.
+The fast checker (`run_tests.jl`, or `test/runtests.jl` directly) passes **70 tests in about
+16 s** on the current `CertifiedGaps` core: 10 exact-RP/symmetry checks, 58 stored-seed,
+recurrence and provenance checks (including the SHA-256 of the uncompressed certificate), and
+2 enclosure checks on an exactly soluble matrix. `results/tests.json` records the runtime and
+source hashes. The fast checker recomputes log Z and the rational seeds from the stored
+eigenvalues and radii; it does not regenerate the residual bounds. `replay_audit.jl` does, in
+about 8 minutes (see AUDIT-2026-10-11.md).
 
-The completed verification kernel took 645.83 seconds; including final JSON serialization the script reported 652.22 seconds. Maximum eigenvalue enclosure radii were approximately 1.50e-10 for four rungs and 3.94e-5 for eight rungs. The outward rational defect bounds have decimal approximations εs≈0.11240836635 and εt≈0.05161523886; exact fractions are in the certificate.
+The completed verification kernel took 645.83 seconds; including final JSON serialization the
+script reported 652.22 seconds. Maximum eigenvalue enclosure radii were approximately 1.50e-10
+for four rungs and 3.94e-5 for eight rungs. The outward rational defect bounds have decimal
+approximations εs≈0.11240836635 and εt≈0.05161523886; exact fractions are in the certificate.
 
-No numerical or dependency blocker remains. Search scope is n0≤4, with doubled rings through eight rungs. This covers every even seed permitted by the scope-note theorem whose doubled ring fits the requested ten-rung cap. The odd n0=5 / ten-rung diagnostic was not computed. No conclusion of impossibility at larger sizes or other temperatures is claimed.
-
-## Current package integration
-
-The certificate scripts now use **CertifiedGaps** after integrating upstream main
-`22b2759`. Historical numerical and certified JSONs retain their original bytes and
-source fingerprints. [MIGRATION-2026-10-11.md](MIGRATION-2026-10-11.md) documents the
-namespace-only mathematical comparison, explicit historical Git provenance, and fresh
-validation on the renamed package. Use the current README reproduction commands.
+Search scope is n0≤4, with doubled rings through eight rungs. This covers every even seed
+permitted by the scope-note theorem whose doubled ring fits the ten-rung cap. The odd
+n0=5 / ten-rung diagnostic was not computed. No conclusion of impossibility at larger sizes or
+other temperatures is claimed.

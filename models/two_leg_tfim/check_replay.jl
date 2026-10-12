@@ -1,19 +1,20 @@
-using Test, CertifiedGaps, CertifiedGaps.Results
+using Test, SHA, CertifiedGaps, CertifiedGaps.Results
 include("src/Ladder.jl")
 using .Ladder
 include("src/Provenance.jl")
 using .Provenance
 root=@__DIR__
-p=joinpath(root,get(ARGS,1,"results/migration_2026-10-11_replay.json"))
+length(ARGS)>=1 || error("usage: check_replay.jl <replay.json> [<check-output.json>]")
+p=joinpath(root,ARGS[1])
 c=read_exact_json(p)
 started=time()
-original=joinpath(root,"results","certificate_g3_1.json")
-old=read_exact_json(original)
+original=joinpath(root,ORIGINAL_CERTIFICATE)
+old=read_certificate(original)
 checks=@testset "Fresh spectral replay artifact" begin
-    @test sha256_file(joinpath(root,"results","certificate_g3_1.json"))==c["original_certificate_sha256"]
+    @test bytes2hex(sha256(certificate_bytes(original)))==c["original_certificate_sha256"]
+    # A replay records the hashes of the sources it ran with; compare with current files.
     for (path,hash) in c["source_hashes"]
-        snapshot=basename(p)=="audit_2026-10-11_replay.json" ? HISTORICAL_SNAPSHOT : nothing
-        @test source_sha256(root,path;snapshot)==hash
+        @test source_sha256(root,path)==hash
     end
     @test all(c["agreement"][key] for key in (
         "all_eigenvalues_identical","all_radii_identical","all_residual_bounds_identical",
@@ -58,10 +59,11 @@ checks=@testset "Fresh spectral replay artifact" begin
     end
 end
 
-result_path=joinpath(root,get(ARGS,2,"results/migration_2026-10-11_check.json"))
+result_path=joinpath(root,get(ARGS,2,"results/replay_check.json"))
 @assert !isfile(result_path) "Choose a new checker-result filename"
 write_result(result_path,(;status="passed",seconds=time()-started,
     test_counts=string(Test.get_test_counts(checks)),
-    original_certificate_sha256=sha256_file(original),replay_sha256=sha256_file(p),
+    original_certificate_sha256=bytes2hex(sha256(certificate_bytes(original))),
+    replay_sha256=sha256_file(p),
     source_hashes=source_hashes(root;dirs=("src",),files=["check_replay.jl","replay_audit.jl"]),
     julia=string(VERSION)))

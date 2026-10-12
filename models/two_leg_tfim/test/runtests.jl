@@ -1,4 +1,4 @@
-using SparseArrays, Test, LinearAlgebra, CertifiedGaps, CertifiedGaps.Results
+using SparseArrays, Test, LinearAlgebra, SHA, CertifiedGaps, CertifiedGaps.Results
 include(joinpath(@__DIR__, "../src/Ladder.jl"))
 using .Ladder
 include(joinpath(@__DIR__, "../src/Provenance.jl"))
@@ -31,11 +31,12 @@ BLAS.set_num_threads(1)
     end
 end
 @testset "Stored rational seed and outward recurrence" begin
-    paths=filter(p->startswith(basename(p),"certificate_g") && endswith(p,".json"),
+    paths=filter(p->startswith(basename(p),"certificate_g") &&
+        (endswith(p,".json") || endswith(p,".json.gz")),
         readdir(joinpath(@__DIR__,"../results");join=true))
     @test !isempty(paths)
     for p in paths
-        c=read_exact_json(p)
+        c=read_certificate(p)
         @test rp_identity(parse(Rational{BigInt},c["g"]))
         es=parse(Rational{BigInt},c["epsilon_s"])
         et=parse(Rational{BigInt},c["epsilon_t"])
@@ -50,9 +51,23 @@ end
         ls=Ladder.down(()->l2[1]-2ln[2]); lt=Ladder.down(()->l22[1]-2l2[2])
         @test Rational{BigInt}(-Ladder.down(()->expm1(ls))) == es
         @test Rational{BigInt}(-Ladder.down(()->expm1(lt))) == et
-        for (rel,hash) in c["metadata"]["source_sha256"]
-            snapshot=basename(p)=="certificate_g3_1.json" ? HISTORICAL_SNAPSHOT : nothing
-            @test source_sha256(joinpath(@__DIR__,".."),rel;snapshot)==hash
+        # The original certificate's source hashes describe the audited historical snapshot
+        # (when this directory was certificates/two_leg_tfim and the core was ThermalMPOGap).
+        # They are provenance, not part of the mathematical check: verify them when that
+        # commit is in the local object store, and say loudly when it is not.
+        historical=basename(p)=="certificate_g3_1.json.gz"
+        if historical
+            @test certificate_bytes(p) |> sha256 |> bytes2hex == ORIGINAL_CERTIFICATE_SHA256
+        end
+        if historical && !snapshot_available(joinpath(@__DIR__,".."))
+            @warn "Historical snapshot $(HISTORICAL_SNAPSHOT) not in the Git object store; " *
+                "skipping $(length(c["metadata"]["source_sha256"])) provenance hashes"
+            @test_skip false
+        else
+            for (rel,hash) in c["metadata"]["source_sha256"]
+                snapshot=historical ? HISTORICAL_SNAPSHOT : nothing
+                @test source_sha256(joinpath(@__DIR__,".."),rel;snapshot)==hash
+            end
         end
 
         for spec in c["spectra"]
