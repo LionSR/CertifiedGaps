@@ -1,9 +1,9 @@
 # Core rename and historical evidence
 
 This branch is based on current main, where the shared package is named `CertifiedGaps`
-(UUID unchanged). Imports and the certificate Project.toml were migrated only inside
-`certificates/blbq_haldane/`. The user explicitly selected this certificate directory, so
-it is retained despite the newer repository default of `models/<slug>/`.
+(UUID unchanged). Imports and the certificate Project.toml were migrated only inside this directory, which
+was first developed as `certificates/blbq_haldane/` and later moved to `models/blbq_haldane/`
+to follow the repository layout.
 
 `migration_audit.jl` compares the old core at ef0a3e6 against current core sources after
 normalizing the package name. It asserts equality for recurrence, ED, seed, RP, spin and

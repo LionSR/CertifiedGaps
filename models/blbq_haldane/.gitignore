@@ -1,3 +1,5 @@
 runtime/
 *.log
 results/*.tmp
+results/spectrum_L*
+results/su2_L14_S*

@@ -1,4 +1,4 @@
-using Test, LinearAlgebra, CertifiedGaps, CertifiedGaps.Results, JSON3
+using Test, LinearAlgebra, CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds, JSON3
 using CertifiedGaps.ExactDiagonalization
 include("../sectors.jl")
 include("../result_io.jl")
@@ -38,48 +38,68 @@ include("su2_small.jl")
     end
 end
 qparse(s)=let a=split(s,"//");parse(BigInt,a[1])//parse(BigInt,a[2]);end
-@testset "Stored rejected rational inputs" begin
-    path=joinpath(@__DIR__,"../results/scaling.json")
+const RESULTS=joinpath(@__DIR__,"../results")
+const THETAS=[0.0,-0.1,-0.3,-0.5,-0.6,-0.7]
+@testset "Stored rejected rational inputs and summary tables" begin
+    path=joinpath(RESULTS,"scaling.json")
     @test isfile(path)
-    if isfile(path)
-        data=JSON3.read(read(path,String))
-        for row in data.best_even
-            got=certified_gap_bound(qparse(row.epsilon_s_rational),
-                qparse(row.epsilon_t_rational),qparse(row.beta_rational)).bound
-            @test got===nothing
-            @test row.bound===nothing
+    data=JSON3.read(read(path,String))
+    for row in data.best_even
+        got=certified_gap_bound(qparse(row.epsilon_s_rational),
+            qparse(row.epsilon_t_rational),qparse(row.beta_rational)).bound
+        @test got===nothing
+        @test row.bound===nothing
+    end
+    @test data.certified_gap===nothing
+    @test all(r->r.bound===nothing,data.grid_maxima)
+    # Complete spectra (spectrum_L*.json[.gz]) were removed from the repository to keep the
+    # negative result small; their hashes stay in scaling.json and archive.json. Files that
+    # are still present must match their recorded hashes.
+    for (name,hash) in pairs(data.input_hashes)
+        file=joinpath(RESULTS,string(name))
+        if startswith(string(name),"spectrum_L")
+            @test !isfile(file) || sha256_file(file)==hash
+        else
+            @test sha256_file(file)==hash
         end
-        @test data.certified_gap===nothing
-        for (name,hash) in pairs(data.input_hashes)
-            @test sha256_file(joinpath(@__DIR__,"../results",string(name)))==hash
+    end
+    # The L14 multiplet-resolved ground energies and gaps must agree with the independent
+    # low-energy reference (numerical consistency only, no enclosure claim).
+    reference=JSON3.read(read(joinpath(RESULTS,"reference_L14.json"),String))
+    for (t,theta) in enumerate(THETAS)
+        row=only(filter(r->r.theta==theta && r.n==7,data.energy_scaling))
+        @test row.complete_spectrum_2n
+        @test row.ground_2n ≈ reference.summary[t].ground atol=1e-8
+        @test row.gap_2n ≈ reference.summary[t].gap atol=1e-8
+    end
+end
+
+@testset "Small-ring rows of the summary tables reproduced from scratch" begin
+    data=JSON3.read(read(joinpath(RESULTS,"scaling.json"),String))
+    X=sz_bond()
+    for (t,theta) in enumerate(THETAS)
+        h=cos(theta)*X+sin(theta)*X^2
+        specs=Dict(L=>spectrum(Chain(3,ring_bonds(h);charge=[-1,0,1]),L;dense_max=1000)
+            for L in 2:6)
+        for (L,s) in specs
+            # Analytic infinite-temperature moments of the complete spectrum.
+            c,si=cos(theta),sin(theta)
+            mean=L*4si/3
+            variance=L*(4c^2/3-4c*si/3+8si^2/9)
+            L==2 && (variance*=2) # the two directed bonds coincide
+            @test sum(s.E)/3^L ≈ mean atol=1e-10
+            @test sum(abs2,s.E)/3^L ≈ variance+mean^2 rtol=1e-10
         end
-        for f in filter(x->startswith(x,"spectrum_L"),readdir(joinpath(@__DIR__,"../results")))
-            d=read_result_json(joinpath(@__DIR__,"../results",f))
-            if hasproperty(d,:input_hashes)
-                for (name,hash) in pairs(d.input_hashes)
-                    @test sha256_file(joinpath(@__DIR__,"../results",string(name)))==hash
-                end
-            end
-            @test sum(s.dimension*s.multiplicity for s in d.sectors)==3^d.L
-            refpath=joinpath(@__DIR__,"../results/reference_L14.json")
-            reference=d.L==14 && isfile(refpath) ? JSON3.read(read(refpath,String)) : nothing
-            for (t,spectrum) in enumerate(d.spectra)
-                spec=result_spectrum(d,t)
-                @test spec.N==3^d.L
-                c,s=cos(spectrum.theta),sin(spectrum.theta)
-                mean=d.L*4s/3
-                variance=d.L*(4c^2/3-4c*s/3+8s^2/9)
-                d.L==2 && (variance*=2) # the two directed bonds coincide
-                @test spectrum_moment(spec,1) ≈ mean atol=1e-10
-                @test spectrum_moment(spec,2) ≈ variance+mean^2 rtol=1e-10
-                if reference!==nothing
-                    # Multiplet weight one plus the positive next-level spacing checks
-                    # the singlet interpretation numerically, without an enclosure claim.
-                    @test spec.weights[1]==1
-                    @test spec.E[1] ≈ reference.summary[t].ground atol=1e-8
-                    @test spectrum_gap(spec) ≈ reference.summary[t].gap atol=1e-8
-                end
-            end
+        results=scan_seeds(spectral_defects(specs),2:3,0.125:0.125:64.0)
+        for n in 2:3
+            best=argmax(r->min(1-r.εₛ,1-r.εₜ),filter(r->r.n₀==n,results))
+            row=only(filter(r->r.theta==theta && r.n==n,data.grid_maxima))
+            @test best.β₀==row.beta
+            @test 1-best.εₛ ≈ row.spatial rtol=1e-9
+            @test 1-best.εₜ ≈ row.thermal rtol=1e-9
+            @test best.bound===nothing
+            srow=only(filter(r->r.theta==theta && r.n==n,data.energy_scaling))
+            @test specs[2n].E[1]-2specs[n].E[1] ≈ srow.delta atol=1e-9
         end
     end
 end

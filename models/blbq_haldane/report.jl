@@ -239,7 +239,7 @@ L=14, S=2, k=1 produced an 8,106-state dense block in 649.6 seconds including on
 eigensolve. The faster CholeskyQR2 version passed the same small tests; its first full
 L=14, S=0, k=0 block took 61.8 seconds for all six angles. No incomplete sector collection
 is used for Z14. The full sweep is resumable with `run_su2_grid.sh`, with a
-45-minute timeout per sector process. See `review_notes.md` and the SU2 pilot JSON.
+45-minute timeout per sector process. See the SU2 benchmark JSON in `results/`.
 The exact character counts give largest `(S,k)` highest-weight multiplicities **8,482**
 at L=14 (0.536 GiB per dense matrix) and **59,143** at L=16 (26.06 GiB). These counts use
 `d(S,k)=d(M=S,k)-d(M=S+1,k)` and assert `sum_(S,k) (2S+1)d(S,k)=3^L`.
@@ -278,20 +278,20 @@ The numerical `PartialSpectrum.exact=true` flag here means *complete*, not *cert
 From the repository root (the wrapper selects the downloaded Julia and private depot):
 
 ```sh
-certificates/blbq_haldane/run.sh -t 4 certificates/blbq_haldane/scan.jl 2 3 4 5 6 7 8 10 12
-certificates/blbq_haldane/run.sh certificates/blbq_haldane/reference.jl 14
-certificates/blbq_haldane/run.sh certificates/blbq_haldane/reference.jl 16
-certificates/blbq_haldane/run.sh certificates/blbq_haldane/preflight.jl
-certificates/blbq_haldane/run_su2_grid.sh
-certificates/blbq_haldane/finalize_su2.sh
-certificates/blbq_haldane/run.sh certificates/blbq_haldane/test/runtests.jl
+models/blbq_haldane/run.sh -t 4 models/blbq_haldane/scan.jl 2 3 4 5 6 7 8 10 12
+models/blbq_haldane/run.sh models/blbq_haldane/reference.jl 14
+models/blbq_haldane/run.sh models/blbq_haldane/reference.jl 16
+models/blbq_haldane/run.sh models/blbq_haldane/preflight.jl
+models/blbq_haldane/run_su2_grid.sh
+models/blbq_haldane/finalize_su2.sh
+models/blbq_haldane/run.sh models/blbq_haldane/test/runtests.jl
 ```
 
 Each invocation runs `julia --project=julia`; each completed numerical run is below the
 45-minute cap. Stored timers cover the calculation functions, excluding environment setup
 and initial package imports. Result JSON uses the shared core's `Results.write_result`
-(ThermalMPOGap historically, CertifiedGaps after the rename). Large complete spectra are
-losslessly gzip-compressed; `archive.json` records original and compressed hashes.
+(ThermalMPOGap historically, CertifiedGaps after the rename). Complete spectra were
+losslessly gzip-compressed when produced; `archive.json` records their hashes.
 Result metadata contains source hashes and run metadata. Exact rational tokens are strings. Spectrum
 files retain every eigenvalue and every sector dimension, enabling independent numerical
 reanalysis without repeating ED. `scaling.json` hashes its spectrum/reference inputs.
@@ -299,8 +299,8 @@ The fast test recomputes exact RP, small-system spectrum crosschecks, complete d
 counts, and the failed recurrence outputs from stored exact rational tokens. It does not
 pretend to certify the rejected numerical input defects. See `validation_current_main.json`
 for current-main test timing and `historical/thermal_validation.json` for the original
-snapshot. `MIGRATION.md` describes the independent source/dependency comparison. No merge
-has been performed; draft publication is tracked in `PR.md` when available.
+snapshot. `MIGRATION.md` describes the independent source/dependency comparison. The complete spectra are
+not stored in the repository; see `README.md` for what was removed and how to regenerate it.
 """)
     print(io,"\n### Larger-ring reference runtimes\n\n| L | Wall seconds |\n|---:|---:|\n")
     for L in (14,16)
