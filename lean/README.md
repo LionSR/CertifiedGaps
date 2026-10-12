@@ -44,9 +44,8 @@ A gap certificate enters Lean in exactly this form:
 1. **The model as an `RPRing d ι`**: real matrices `C_α` (each symmetric or antisymmetric), a
    real symmetric on-site term `o` and optionally an internal reflection `refl` of the cell (a
    real symmetric involution commuting with `o`), with bond `h = −∑_α C_α ⊗ (refl C_α refl)`.
-   A multi-site unit cell is a
-   bigger local space `d` with the intra-cell terms in `o`. Proving the two symmetry conditions
-   is a finite matrix computation.
+   A multi-site unit cell is a bigger local space `d` with the intra-cell terms in `o`. Proving
+   the symmetry conditions is a finite matrix computation.
 2. **The seeds**: `1 − εₛ ≤ R.spatialPurity n₀ β₀` and `1 − εₜ ≤ R.thermalPurity (2 n₀) β₀` with
    rational `εₛ, εₜ`, `n₀ ≥ 2` even. These are the only statements left to numerics.
 3. **A `ChainCertificate`**: generate it with
