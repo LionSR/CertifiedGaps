@@ -12,3 +12,6 @@ import CertifiedGaps.Ring.Transfer
 import CertifiedGaps.Ring.Gap
 import CertifiedGaps.Models.SpinOneLargeD
 import CertifiedGaps.Models.TwoLegLadder
+import CertifiedGaps.Models.SpinHalf
+import CertifiedGaps.Models.StaggeredHeisenberg
+import CertifiedGaps.Models.IsingLadder

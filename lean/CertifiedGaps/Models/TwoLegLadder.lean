@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
 import CertifiedGaps.Ring.Gap
+import CertifiedGaps.Models.SpinHalf
 
 /-!
 # The spin-one-half two-leg Heisenberg ladder
@@ -33,19 +34,11 @@ open scoped Kronecker
 
 namespace CertifiedGaps.TwoLegLadder
 
-/-- The real one-site factors `Sˣ, iSʸ, Sᶻ` of spin one-half. -/
-noncomputable def P : Fin 3 → Matrix (Fin 2) (Fin 2) ℝ :=
-  ![!![0, 1 / 2; 1 / 2, 0], !![0, 1 / 2; -1 / 2, 0], !![1 / 2, 0; 0, -1 / 2]]
+open SpinHalf
 
 /-- The rotated exchange `Sˣ ⊗ Sˣ + iSʸ ⊗ iSʸ + Sᶻ ⊗ Sᶻ = SˣSˣ - SʸSʸ + SᶻSᶻ` on the two legs of
 a rung. -/
 noncomputable def rungExchange : Matrix (Fin 2 × Fin 2) (Fin 2 × Fin 2) ℝ := ∑ k, P k ⊗ₖ P k
-
-theorem P_symm (k : Fin 3) : (P k)ᵀ = P k ∨ (P k)ᵀ = -P k := by
-  fin_cases k
-  · left; ext i j; fin_cases i <;> fin_cases j <;> norm_num [P]
-  · right; ext i j; fin_cases i <;> fin_cases j <;> norm_num [P]
-  · left; ext i j; fin_cases i <;> fin_cases j <;> norm_num [P]
 
 /-- The rotated two-leg ladder with rung coupling `J⊥`, as a reflection-positive ring of rungs. -/
 noncomputable def model (Jperp : ℝ) : RPRing (Fin 2 × Fin 2) (Fin 2 × Fin 3) where

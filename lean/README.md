@@ -13,6 +13,8 @@ which are two numbers per model, stated as named `sorry` lemmas.
 | `SpinOneLargeD.gap_D4` | spin-1, `+ 4 ∑ (Sᶻ)²` | `Δ_L > log 4.755 / (9/4) ≈ 0.693` for even `L ≥ 6` | `P_s(6, 9/4) ≥ 1 − 0.06411`, `P_τ(12, 9/4) ≥ 1 − 0.04053` |
 | `SpinOneLargeD.gap_D3206` | spin-1, `+ (1603/500) ∑ (Sᶻ)²` | `Δ_L > log 1.0065429 / (381/125) ≈ 0.00214` for even `L ≥ 6` | two seeds at `(6, 381/125)` |
 | `TwoLegLadder.gap_J4` | spin-½ ladder, `J_⊥ = 4` (sublattice-rotated) | `Δ_L > log 9.033 / 2 ≈ 1.100` for even `L ≥ 4` rungs | `P_s(4, 2) ≥ 1 − 0.03509`, `P_τ(8, 2) ≥ 1 − 0.02463` |
+| `StaggeredHeisenberg.gap_h1`, `_h34`, `_h12`, `_h720`, `_h14` | spin-½ chain, staggered field `h = 1, 3/4, 1/2, 7/20, 1/4` (rotated) | `Δ_L > 1.147, 0.890, 0.594, 0.383, 0.214` for even `L ≥ 8` | two seeds at `(8, β₀)` each |
+| `IsingLadder.gap_G3` | two-leg TFIM, `g = 3` | `Δ_L > log 2.585 / (3/2) ≈ 0.633` for even `L ≥ 4` rungs | `P_s(4, 3/2) ≥ 1 − 0.1125`, `P_τ(8, 3/2) ≥ 1 − 0.05162` |
 
 `GapGT e c` says that the lowest level is nondegenerate and every other level lies more than
 `c` above it. `#print axioms` on each theorem lists `sorryAx` (from its seeds) besides
@@ -20,7 +22,7 @@ which are two numbers per model, stated as named `sorry` lemmas.
 transfer-operator input for every reflection-positive ring, the recurrence certificates checked
 by `decide`) uses only the three standard axioms.
 
-The seeds of the new models come from the certificates of PRs #6 and #7 (complete spectra of the
+The seeds of the new models come from the certificates of PRs #1, #2, #6 and #7 (complete spectra of the
 seed rings with rigorous eigenvalue enclosures, floating-point arithmetic trusted). The
 spin-1 Heisenberg seeds are OpenAI's Proposition 5.5, reproduced in `../models/spin1/`.
 
@@ -30,7 +32,7 @@ lake exe cache get   # prebuilt Mathlib; never build Mathlib from source
 lake build
 ```
 
-Lean and Mathlib are pinned at `v4.35.0-rc3`. The project has about 2900 lines.
+Lean and Mathlib are pinned at `v4.35.0-rc3`. The project has about 3200 lines.
 
 ## Adding a model
 
@@ -67,7 +69,10 @@ The seeds of a certificate should therefore be reported as exact rationals toget
 | `Heisenberg/Hamiltonian.lean` | The spin-1 ring `H_L = ∑ⱼ Sⱼ·Sⱼ₊₁` in the Cartesian basis |
 | `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Theorem 1 of the note, with the two seed `sorry`s |
 | `Models/SpinOneLargeD.lean` | `∑ Sⱼ·Sⱼ₊₁ + D ∑ (Sᶻⱼ)²` as an `RPRing` (`D = 0` is the Heisenberg ring); `D = 4`, `D = 1603/500` |
+| `Models/SpinHalf.lean` | The real spin-½ factors `Sˣ, iSʸ, Sᶻ` |
 | `Models/TwoLegLadder.lean` | The rotated two-leg ladder as a ring of rungs; `J_⊥ = 4` |
+| `Models/StaggeredHeisenberg.lean` | The rotated staggered-field chain; five fields |
+| `Models/IsingLadder.lean` | The two-leg transverse-field Ising ladder; `g = 3` |
 | `scripts/chain_certificate.jl` | Searches a `ChainCertificate` from the seeds (exact rationals; Lean re-checks) |
 
 ## Why each piece is needed in Lean
