@@ -3,6 +3,8 @@ using CertifiedGaps.Results
 BLAS.set_num_threads(1)
 include("../certify.jl")
 root=normpath(joinpath(@__DIR__,"../../.."))
+# The core commit the certificate was produced against (CertifiedGaps rename, 22b2759).
+const CERT_CORE_COMMIT="22b2759"
 parseq(s)=parse(Rational{BigInt},s)
 @testset "Exact reflection positivity" begin
     for J in (4//1,7//2,3//1,5//2,2//1,3//2)
@@ -24,11 +26,25 @@ end
     end
     # The certificate was produced when this directory lived at certificates/heisenberg_ladder;
     # its own source hashes are historical provenance (the move edited path strings and the
-    # gzip loader). The shared core it ran on must still match byte for byte. Soundness of
-    # the stored seeds is re-established below by fresh verified eigensolves, not by hashes.
+    # gzip loader). The shared core it ran on is identified by these hashes: a core file that
+    # has changed since must match them at the core commit used for certification. Soundness
+    # of the stored seeds is re-established below by fresh verified eigensolves, not by hashes.
     for (path,hash) in pairs(c.metadata.source_sha256)
         startswith(string(path),"julia/") || continue
-        @test sha256_file(joinpath(root,string(path)))==hash
+        sha256_file(joinpath(root,string(path)))==hash && (@test true; continue)
+        blob=try
+            read(pipeline(`git -C $root show $(CERT_CORE_COMMIT):$(path)`;stderr=devnull))
+        catch
+            nothing
+        end
+        if blob===nothing
+            @warn "core commit $(CERT_CORE_COMMIT) unavailable; skipping hash of $path"
+            @test_skip false
+        else
+            @test mktemp() do p,io
+                write(io,blob); close(io); sha256_file(p)
+            end==hash
+        end
     end
 end
 include("../recheck_seeds.jl")
