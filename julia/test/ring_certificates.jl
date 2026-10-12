@@ -29,6 +29,33 @@ levels(spec) = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spe
     @test verify_rp(decode_model(record["m"]), decode_rp(record["rp"]))
 end
 
+@testset "reflected RP form: dimerised Heisenberg in two-site cells" begin
+    # Cell (a, b): rotated-frame bond J₁ inside the cell (on-site term), J₂ from b to the next a.
+    rotated(J) = J * (-kron(SX, SX) - kron(ISY, ISY) - kron(SZ, SZ))
+    one = [1 0; 0 1]
+    J1, J2 = 3 // 2, 1 // 2
+    bond = kron(one, rotated(J2), one)          # site b of the left cell, site a of the right
+    swap = [1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1]
+    cell = RingModel(4, bond, rotated(J1); name = "dimerised Heisenberg cells")
+    # −h = J₂ Σ (1 ⊗ S) ⊗ (S ⊗ 1), and S ⊗ 1 = R (1 ⊗ S) R with R the swap of the cell.
+    factors = [kron(one, A) for A in (SX, ISY, SZ)]
+    cert = rp_certificate(cell; factors, weights = fill(J2, 3), reflection = swap)
+    @test verify_rp(cell, cert)
+    record = encode_rp(cert)
+    @test record["form"] == "reflected" && decode_rp(record).reflection == swap
+    @test verify_rp(cell, rp_certificate(cell; reflection = swap))     # exact LDL† with R
+    # Without the reflection the bond is not RP in this basis.
+    @test_throws ArgumentError rp_certificate(cell)
+    # A reflection that does not commute with the on-site term is refused.
+    @test !verify_rp(RingModel(4, bond, kron(SZ, one)), RPCertificate(cert.weights,
+        cert.factors, cert.reflection))
+    # Spectrum against ED of the alternating chain in the physical frame.
+    heis = real(kron(SZ, SZ) + kron(SX, SX) - kron(ISY, ISY))
+    chain = Chain(2, L -> [(j, mod1(j + 1, L), Float64.(isodd(j) ? J1 : J2) * heis) for j in 1:L])
+    E = sort(spectrum(chain, 8; dense_max = 10^6).E)
+    @test maximum(abs, levels(verified_ring_spectrum(cell, 4)) - E) < 1e-12
+end
+
 @testset "verified spectra" begin
     # Against independent dense ED in the physical frame (unitarily equivalent for even L).
     m = rotated_staggered(1)

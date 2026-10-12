@@ -169,7 +169,8 @@ function _sector_table(model::RingModel, L, codes, n, top)
                        Complex{Rational{Int}}(Rational{Int}(real(x)), Rational{Int}(imag(x)))
     bond_cols = [[(i, convert_entry(model.bond[i, j])) for i in 1:d^2 if !iszero(model.bond[i, j])]
                  for j in 1:d^2]
-    site_cols = [[(i, convert_entry(model.onsite[i, j])) for i in 1:d if !iszero(model.onsite[i, j])]
+    site_cols = [[(i, convert_entry(model.onsite[i, j])) for i in 1:d
+                  if !iszero(model.onsite[i, j])]
                  for j in 1:d]
     powers = [d^x for x in 0:(L-1)]
     columns = Vector{Dict{Tuple{Int,Int},T}}(undef, length(reps))
