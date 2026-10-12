@@ -1,5 +1,34 @@
 # Spin-2: reassessing the thermal starting point
 
+## Big-picture decision, 2026-10-11
+
+The objective is one admissible, independently checked finite seed for the uniform-gap
+criterion. The immediate deliverable is a measured feasibility decision for producing that
+seed, not another long high-temperature trajectory.
+
+| Route | Reason to consider it | Scaling risk and decision |
+|---|---|---|
+| Local gates, final-trace certification, and charge blocks | Reuses implemented rigorous ingredients and avoids the extensive initial Taylor restriction | At fixed retained ranks, work grows with chain length and the number of product steps; ranks and certified residuals may grow with both length and beta. Chosen first, subject to measured error and verification budgets |
+| Joint certification of purity ratios or spatial transfer contraction | Could exploit cancellation of the extensive free energy and reduce dependence on ring length | A new correlated error or contraction theorem is required; a compressed transfer spectrum alone does not certify the exact quantum model. Develop only with an explicit checkable remainder |
+| More accurate trial states or symmetry alone | Improves the energy shift or cost of existing contractions | Neither controls the unaccounted thermal states; support the selected route rather than serve as the main proof strategy |
+
+First map promising seed sizes and temperatures with exploratory Julia/ITensors calculations
+and evaluate the rigorous criterion conditionally. Then test the chosen certificate at
+meaningful temperatures on small exact references and increasing MPO lengths. Track total
+trace overestimation, rank, memory, and independent checker time separately. Calibrate the
+same construction on spin 1 using its existing certificate as a reference; success there is
+necessary evidence of practicality, not evidence that spin 2 will follow automatically.
+
+For log partition-function errors, spatial cancellation is potentially useful:
+`log(P_s) = log(Z_2n) - 2log(Z_n)`. Independent interval errors still add, however, and
+thermal purity compares different temperatures, so its extensive free-energy terms do not
+cancel in the same way. Any proposed cancellation must be proved in the certificate.
+
+Proceed to a large seed only after the combined splitting and compression budget and the
+observed rank growth support it. If they do not, record the failure and prioritize a
+transfer/contraction or correlated-ratio bound instead of extending the quadratic run.
+No spin-2 gap certificate is claimed by this strategy memo.
+
 Date: 2026-10-11. Scope: strategy and small rigorous scalar diagnostics; no new large-ring
 contractions. Existing `results/` files remain read-only. No spin-2 gap is certified.
 
