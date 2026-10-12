@@ -1,5 +1,0 @@
-Test Summary:                                 | Pass  Total  Time
-Independent Cartesian to normalized Sz bridge |  129    129  4.5s
-Test Summary:                                                  | Pass  Total  Time
-Residual and orthogonality bounds against 256-bit accumulation |   90     90  5.4s
-Independent reviewer checks passed. BigFloat comparisons are diagnostics, not new enclosures.

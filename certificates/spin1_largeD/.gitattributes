@@ -1,7 +1,0 @@
-results/*.json linguist-generated=true
-results/*.log linguist-generated=true
-results/*.svg linguist-generated=true
-results/*.png binary
-audit/results/**/*.json linguist-generated=true
-audit/*.log linguist-generated=true
-audit/initial-driver-failure/** linguist-generated=true
