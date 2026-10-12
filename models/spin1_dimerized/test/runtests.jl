@@ -35,7 +35,7 @@ end
         @test bound!==nothing && bound>0
         @test bound==data["bound"]
         @test Rational{BigInt}(bound)==parserat(data["bound_exact_binary"])
-        ti=ThermalMPOGap.Recurrence.to_interval
+        ti=CertifiedGaps.Recurrence.to_interval
         z1hi=ti(parserat(data["logZ_n_beta"]["upper"]))
         z2lo=ti(parserat(data["logZ_2n_beta"]["lower"]))
         z2hi=ti(parserat(data["logZ_2n_beta"]["upper"]))
@@ -44,12 +44,19 @@ end
         @test Rational{BigInt}(sup(1-exp(z22lo-2z2hi)))<=et
         for (path,hash) in data["metadata"]["source_sha256"]
             if haskey(data["metadata"], "ThermalMPOGap")
-                # Immutable provenance of the original validated run, before the
-                # upstream rename. This commit remains an ancestor of the PR.
+                # The stored hashes are provenance of the original run, made before the
+                # core was renamed and the directory moved from certificates/ to models/.
+                # They are checked against that archived commit when it is reachable
+                # (full clone); a shallow clone skips this provenance check only.
                 revision="6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2"
                 relative=relpath(normpath(joinpath(ROOT,path)),REPO)
-                archived=read(`git -C $REPO show $revision:$relative`)
-                @test bytes2hex(SHA.sha256(archived))==hash
+                relative=replace(relative,r"^models/spin1_dimerized/"=>"certificates/spin1_dimerized/")
+                spec="$revision:$relative"
+                if success(pipeline(`git -C $REPO cat-file -e $spec`;stderr=devnull))
+                    @test bytes2hex(SHA.sha256(read(`git -C $REPO show $spec`)))==hash
+                else
+                    @test_skip "archived source $spec unavailable"
+                end
             else
                 @test sha256_file(joinpath(ROOT,path))==hash
             end

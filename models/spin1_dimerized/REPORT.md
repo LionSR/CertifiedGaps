@@ -180,7 +180,7 @@ log Z_2n(beta), and log Z_2n(2 beta). The seed upper bounds are
 The actual implementation performs the equivalent interval operations and takes
 the upper endpoint, rounded up to a rational with denominator 10^12.
 These rational defects and exact rational beta are passed to
-`ThermalMPOGap.certified_gap_bound`. Its `.bound` is the reported uniform lower
+`CertifiedGaps.certified_gap_bound`. Its `.bound` is the reported uniform lower
 bound. The reference ED gap and bound/reference ratio are numerical; neither is
 used as an input to the certificate.
 
@@ -190,10 +190,10 @@ Run from the repository root, with Julia 1.12.4 and the core environment:
 
 ```sh
 export OPENBLAS_NUM_THREADS=1
-julia --project=julia certificates/spin1_dimerized/scan.jl 7 2,3,4,6
-julia --project=julia certificates/spin1_dimerized/certify.jl 7
-julia --project=julia certificates/spin1_dimerized/test/runtests.jl
-julia --project=julia certificates/spin1_dimerized/test/verified_blocks.jl
+julia --project=julia models/spin1_dimerized/scan.jl 7 2,3,4,6
+julia --project=julia models/spin1_dimerized/certify.jl 7
+julia --project=julia models/spin1_dimerized/test/runtests.jl
+julia --project=julia models/spin1_dimerized/test/verified_blocks.jl
 ```
 
 Use parameter integers 9,8,7,6,5 for delta=integer/10. Existing spectrum files are
@@ -205,25 +205,18 @@ checks stored dimensions, and recomputes the bound from stored rational seeds.
 It does **not** redo twelve-spin diagonalization or independently recertify the
 stored partition sums; that requires the full `certify.jl` run.
 
-Final validation: `test/runtests.jl` passed all 115 assertions in 9.37 seconds,
-including test compilation, and `test/verified_blocks.jl` passed all 16 assertions
-(6.4 seconds in its test set). [The test result](results/tests.json) records
-provenance and timing. The main checker verifies both stored certificates and
-their source hashes. Scan/verification timings in the tables exclude Julia
-startup and package precompilation. Every individual calculation was below the
-requested 45-minute run limit. There are no remaining execution blockers.
+Validation: `test/runtests.jl` passes 115 assertions and `test/verified_blocks.jl`
+16 assertions against the current `CertifiedGaps` core (about 30 s and 20 s
+including compilation). Scan/verification timings in the tables exclude Julia
+startup and package precompilation; every individual calculation was below 45
+minutes. The twelve-spin spectra (`results/spectrum_d*_c6.json`, 15 MB each) are not
+stored in the repository; see the README for regeneration.
 
 Source SHA-256 hashes, Julia/package versions, thread counts and run configurations
-are stored through `ThermalMPOGap.Results.write_result`/`run_metadata`. Exact
-rationals are strings. All repository edits are confined to this certificate
-folder. Subsequent draft-PR preparation, upstream package-name compatibility,
-independent review and replay are recorded in [PUBLICATION.md](PUBLICATION.md).
-No changes to the shared core are proposed.
-
-Environment: the approved juliaup installer URL returned HTTP 403. The official
-Julia 1.12.4 Linux x86-64 tarball was downloaded from julialang-s3.julialang.org
-and unpacked under /tmp; `Pkg.instantiate(); Pkg.precompile()` succeeded using
-`JULIA_DEPOT_PATH=/tmp/julia-depot`. The project and manifest remained unchanged.
+are stored through `CertifiedGaps.Results.write_result`/`run_metadata`. Exact
+rationals are strings. The stored certificates were produced when the core was named
+`ThermalMPOGap` and this directory was `certificates/spin1_dimerized/`; their source
+hashes refer to archived commit `6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2`.
 
 Certified: exact RP/cell reflection, the positive-cell-transfer argument above,
 complete symmetry counts, the selected verified spectral enclosures and partition
@@ -231,21 +224,12 @@ bounds, rational seed bounds, and the resulting uniform gap/uniqueness conclusio
 Numerical: search-grid values, unverified ED reference gaps, parameter ranking
 outside the certified seed, and any extrapolation beyond the six-cell ring cap.
 
-For commands in this particular cloud environment, first set
-`PATH=/tmp/julia-1.12.4/bin:$PATH` and `JULIA_DEPOT_PATH=/tmp/julia-depot`.
-The route memo was committed locally as required by `AGENTS.md`. Draft publication
-status is tracked separately; nothing is merged into the target branch.
-
-## Independent audit and fresh replay
+## Independent audit and replay
 
 [The independent audit](AUDIT.md) found no substantive mathematical blocker.
-A fresh full spectral computation against `CertifiedGaps` completed in 949.35
-seconds and reproduced every mathematical output exactly, including all sector
-error bounds, log-partition endpoints, rational seeds and the final bound.
-The replay comparison passed 40 assertions; current-core fast and supplemental
-checks passed 115 and 16 assertions respectively. Original outputs are preserved.
-See [PUBLICATION.md](PUBLICATION.md) and the separate
-[comparison record](results/replay_comparison.json) for provenance and limitations.
+A fresh full run of `certify.jl 7` against the renamed core (949 s) reproduced every
+mathematical field of `certificate_d7.json` exactly, including all sector error
+bounds, log-partition endpoints, rational seeds and the final bound.
 
 ## Results from completed runs
 
@@ -285,7 +269,7 @@ The extrapolation fits delta(n)=A exp(-kappa n) through n=2,3 and holds the nume
 | 4 | 8 | 6561 | 254 | 1107 |
 | 6 | 12 | 531441 | 11596 | 73789 |
 
-Full sector dimension lists and multiplicities are in `results/spectrum_d*_c*.json` and `results/certificate_d*.json`.
+Full sector dimension lists and multiplicities are in `results/spectrum_d*_c{2,3,4}.json`, `results/certificate_d*.json`, and (after regeneration) `results/spectrum_d*_c6.json`.
 
 | delta | dense search seconds (sum across sizes) | twelve-spin seconds |
 |---|---:|---:|

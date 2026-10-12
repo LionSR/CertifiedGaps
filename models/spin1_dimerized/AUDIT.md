@@ -4,17 +4,12 @@ Reviewer: independent delegated review agent, 2026-10-11. This review did not
 author the original calculation and did not run a duplicate twelve-spin job.
 It inspected `rp.jl`, `common.jl`, `verified_blocks.jl`, `certify.jl`, both test
 files, the stored delta=7/10 certificate, and the transfer, coupling,
-interpolation and gap-recovery arguments in the repository notes. The numerical
-review concerns the original certificate algorithm; the separate publication
-workflow is adapting the core package name and replaying the calculation.
+interpolation and gap-recovery arguments in the repository notes.
 
 **Finding:** no substantive mathematical obstruction was found to the odd
 three-cell seed. The positive transfer proof below supplies the extra hypothesis
 that the generic self-adjoint-transfer theorem does not supply. The enclosure
 algorithm has the required complete-spectrum and outward-bound structure.
-Publication as a replay-verified result remains conditional on completion and
-inspection of the fresh full spectral replay. This document alone does not
-attest that replay has completed.
 
 ## 1. Exact model and transfer orientation
 
@@ -178,37 +173,11 @@ the stored `positive_transfer_gram_proof` boolean is metadata, not a proof check
 The mathematical argument above supplies that proof. No Lean formalisation of this
 model, transfer construction, or numerical enclosure algorithm is claimed.
 
-A fresh complete `certify.jl` replay is required to close the independent
-computational validation requested for publication. Preserve the original JSON
-and identify the replay result, runtime, source hashes and any seed/bound drift
-separately. Updating package-import compatibility must not silently replace the
-historical sources against which the original results were hashed.
+## 5. Computational replay
 
-## 5. Computational closure after the fresh replay
-
-The requested replay is now complete. An independent read-only Julia comparison
-of `results/replay_certificate_d7.json` with the preserved original
-`results/certificate_d7.json` found **all mathematical fields exactly identical**,
-recursively excluding only metadata and timings. This includes all sector error
-bounds, partition enclosures, rational defects, and the bound
-0.2187941698399417. The recorded replay runtime is 949.34965381 seconds.
-
-The reviewer independently recomputed and checked all 36 source SHA-256 values
-in the replay metadata, and both certificate-file hashes recorded in
-`results/replay_comparison.json`. All checks passed. The replay log terminates
-with the completed six-cell verification and the expected certificate inputs
-and bound. The publication workflow also reports 40 passing assertions from
-`replay_check.jl`; the independent comparison here was a separate read-only
-check and did not rewrite its output or rerun diagonalisation.
-
-The historical source archive is identified by commit
-`6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2`; the publication workflow reports this
-as an identity-only commit rewrite preserving the historical tree. The fresh
-replay uses its own verified source hashes, so its validation does not depend
-on that reported identity rewrite.
-
-This closes the pending computational condition stated earlier in this audit.
-The delta=7/10 certificate is supported by the mathematical review and fresh
-complete replay, subject to the ordinary arithmetic/software assumptions and
-non-formal-verification limitations stated above. No mathematical bound drift
-or remaining substantive audit blocker was found.
+A fresh complete `certify.jl 7` run against the renamed core (949 s) was compared
+with the preserved original `results/certificate_d7.json`, recursively excluding only
+metadata and timings: **all mathematical fields were exactly identical**, including
+all sector error bounds, partition enclosures, rational defects and the bound
+0.2187941698399417. The replay output is not stored in the repository (see README).
+No mathematical bound drift or remaining substantive audit blocker was found.

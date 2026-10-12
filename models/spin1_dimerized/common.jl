@@ -1,6 +1,5 @@
 using CertifiedGaps, LinearAlgebra, SparseArrays, JSON3
-const ThermalMPOGap = CertifiedGaps  # Historical name retained for stored certificate compatibility.
-using .ThermalMPOGap.Results, .ThermalMPOGap.ExactDiagonalization, .ThermalMPOGap.Seeds
+using CertifiedGaps.Results, CertifiedGaps.ExactDiagonalization, CertifiedGaps.Seeds
 using IntervalArithmetic
 BLAS.set_num_threads(1)
 const ROOT = @__DIR__
@@ -11,7 +10,7 @@ parserat(s) = (a=split(s,"//");parse(BigInt,a[1])//parse(BigInt,a[2]))
 function provenance(config; certified=false)
     hashes = source_hashes(ROOT; dirs=("test",), files=("common.jl","scan.jl","certify.jl","rp.jl","verified_blocks.jl","check.jl","Project.toml"))
     merge!(hashes, Dict("../../"*k=>v for (k,v) in source_hashes(REPO;dirs=("julia/src",),files=("julia/Project.toml","julia/Manifest.toml"))))
-    run_metadata(config;source_sha256=hashes,packages=(ThermalMPOGap,IntervalArithmetic,JSON3),status=certified ? "certified" : "numerical",certified)
+    run_metadata(config;source_sha256=hashes,packages=(CertifiedGaps,IntervalArithmetic,JSON3),status=certified ? "certified" : "numerical",certified)
 end
 "Exact spin-1 Sz-basis Hamiltonian, scaled to an integer matrix."
 function integer_hamiltonian(cells, delta, states)

@@ -59,10 +59,10 @@ function verified_spectrum(cells,delta)
 end
 "Outward log-partition enclosure; all levels and multiplicities are included."
 function verified_logz(vals,radii,beta)
-    shift=minimum(vals); b=ThermalMPOGap.Recurrence.to_interval(beta)
+    shift=minimum(vals); b=CertifiedGaps.Recurrence.to_interval(beta)
     total=interval(0)
     for (e,r) in zip(vals,radii)
-        ri=ThermalMPOGap.Recurrence.to_interval(r)
+        ri=CertifiedGaps.Recurrence.to_interval(r)
         ei=interval(e)+interval(-sup(ri),sup(ri))
         total+=exp(-b*(ei-interval(shift)))
     end
