@@ -36,3 +36,21 @@ end
         @test bound.bound>0
     end
 end
+@testset "published bounds follow from both stored and replayed seeds" begin
+    summary=JSON3.read(read(joinpath(ROOT,"results","spectral_replay_summary.json"),String),Dict{String,Any})
+    @test summary["status"]=="complete" && length(summary["records"])==length(FIELDS)
+    for r in summary["records"]
+        h=rat(r["h"]);beta=rat(r["beta"])
+        c=JSON3.read(read(joinpath(ROOT,"results","certificate_$(tag(h)).json"),String),Dict{String,Any})
+        @test r["n0"]==c["n0"] && iseven(r["n0"]) && beta==rat(c["beta"])
+        @test r["original_epsilon_s"]==c["epsilon_s"] && r["original_epsilon_t"]==c["epsilon_t"]
+        published=rat(r["published_bound_rational"])
+        # Each rigorous seed pair (original certificate and fresh replay) proves the claim.
+        for (s,t) in ((c["epsilon_s"],c["epsilon_t"]),(r["epsilon_s"],r["epsilon_t"]))
+            gap=certified_gap_bound(rat(s),rat(t),beta).bound
+            @test gap!==nothing && Rational{BigInt}(gap)>=published>0
+        end
+        @test published==floor(BigInt,min(Rational{BigInt}(r["bound"]),
+            Rational{BigInt}(c["bound"]))*10^6)//big(10)^6
+    end
+end

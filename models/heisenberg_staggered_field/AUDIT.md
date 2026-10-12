@@ -73,7 +73,7 @@ The reviewer reran the saved checker without overwriting artifacts:
 
 The coordinating agent also ran the separate `audit_bounds.jl` audit:
 **17/17 exact-normalization and direct scalar interval residual checks passed**.
-Its evidence is in `results/audit_bounds.json` and `results/audit_bounds.log`.
+Its evidence is in `results/audit_bounds.json`.
 These checks supplement the mathematical rounding analysis; finite test cases
 alone would not establish a general rounding theorem.
 
@@ -94,19 +94,11 @@ Original eigenvalues, radii and seeds were comparison data, not inputs to these
 fresh spectral stages. This is fresh execution of the same reviewed verifier,
 **not an independently implemented second spectral verifier**. No search ran.
 
-Attempt 1 stopped at an exact seed-equality assertion for h=3/4. Attempt 2 saved
-fresh witnesses before comparison and stopped because the h=3/4 fresh bound
-did not support the original nine-decimal displayed bound. Those attempts and
-their scripts are retained as `spectral_replay_attempt1.*` and
-`spectral_replay_attempt2.*`. These failures were not silently discarded.
-
-The final execution resumed the two already completed attempt-2 spectral
-witnesses after verifying archived source/original-certificate hashes and
-recomputing enclosure propagation; it then performed the remaining three full
-spectral stages. `results/spectral_replay.json` has status `complete` and explicit
-per-row execution provenance; its log is `results/spectral_replay.log`.
-Attempt 2 took 84.068 seconds and the resumed execution 116.027 seconds.
-These timings exclude the earlier aborted attempt 1.
+A first replay asserted bitwise equality with the original certificates and stopped at
+h=3/4, where the fresh seeds differ in the last bits; a second stopped because the fresh
+h=3/4 bound did not support the original nine-decimal display. The replay was then completed
+with the acceptance rule below (positive fresh bound, overlapping enclosures). Those attempts
+are in branch history (commit `cb635a1`), not in the tree.
 
 | h | fresh raw bound | full spectral stage seconds | accepted bound |
 |---|---:|---:|---:|
@@ -154,10 +146,7 @@ threshold is established.
 
 ## CertifiedGaps migration review
 
-The independent reviewer subsequently inspected the rename-only source changes,
-archived source hash checks, and the completed five-field migration replay.
-All five fresh bounds exactly match the prior full replay and support the
-accepted six-decimal claims. The migration replay took 189.418 seconds and
-recomputed all 270 blocks without resuming old witnesses. The reviewer accepted
-the migration; no additional computation was executed by the reviewer during
-this migration review. See MIGRATION.md and the separate migration_ results.
+After the core was renamed from `ThermalMPOGap` to `CertifiedGaps`, the reviewer checked that
+every hashed source changed only by the package name, and a fresh 270-block replay on the
+renamed core (189.418 seconds, no resumed witnesses) reproduced the preceding replay's raw
+bounds exactly. Its compact summary is `results/spectral_replay_summary.json`.

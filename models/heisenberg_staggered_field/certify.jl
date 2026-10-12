@@ -1,8 +1,16 @@
+# Usage: certify.jl [h] [maxL]          (seed read from results/scan_<h>_<maxL>.json)
+#        certify.jl h n0 beta           (seed given explicitly, e.g. '1//1' 8 '21//4')
 include("common.jl")
-h=isempty(ARGS) ? 1//1 : rat(ARGS[1]); maxL=length(ARGS)>1 ? parse(Int,ARGS[2]) : 16
-scan=JSON3.read(read(joinpath(ROOT,"results","scan_$(tag(h))_$(maxL).json"),String),Dict{String,Any})
-best=scan["best"];@assert best!==nothing
-n=best["n0"];beta=Rational{BigInt}(best["beta"]);exact_rp(h)
+h=isempty(ARGS) ? 1//1 : rat(ARGS[1])
+if length(ARGS)>=3
+    n=parse(Int,ARGS[2]);beta=rat(ARGS[3])
+else
+    maxL=length(ARGS)>1 ? parse(Int,ARGS[2]) : 16
+    scan=JSON3.read(read(joinpath(ROOT,"results","scan_$(tag(h))_$(maxL).json"),String),Dict{String,Any})
+    best=scan["best"];@assert best!==nothing
+    n=best["n0"];beta=Rational{BigInt}(best["beta"])
+end
+exact_rp(h)
 start=time();a=all_spectra(n,h;verified=true);b=all_spectra(2n,h;verified=true)
 seeds=enclosed_seeds(a.records,b.records,beta)
 bound=certified_gap_bound(seeds.s,seeds.t,beta);@assert bound.bound!==nothing
