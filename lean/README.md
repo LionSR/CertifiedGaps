@@ -16,6 +16,8 @@ which are two numbers per model, stated as named `sorry` lemmas.
 | `StaggeredHeisenberg.gap_h1`, `_h34`, `_h12`, `_h720`, `_h14` | spin-½ chain, staggered field `h = 1, 3/4, 1/2, 7/20, 1/4` (rotated) | `Δ_L > 1.147, 0.890, 0.594, 0.383, 0.214` for even `L ≥ 8` | two seeds at `(8, β₀)` each |
 | `IsingLadder.gap_G3` | two-leg TFIM, `g = 3` | `Δ_L > log 2.585 / (3/2) ≈ 0.633` for even `L ≥ 4` rungs | `P_s(4, 3/2) ≥ 1 − 0.1125`, `P_τ(8, 3/2) ≥ 1 − 0.05162` |
 | `IsingLongitudinal.gap` | Ising chain `-ZZ - gX - hZ`, 30 points `g ∈ {1/4, …, 2}`, `h ∈ {1/20, …, 1}` | `Δ_L > log r / β₀` for even `L ≥ 6` (from `0.075` at `g = 1, h = 1/20` to `3.70`) | `seeds` (one lemma for all 30 points) |
+| `DimerizedHeisenberg.gap_d12`, `_d310`, `_d14` | spin-½ dimerized chain `δ = 1/2, 3/10, 1/4` (rotated, cells = strong pairs) | `Δ_L > 0.532, 0.172, 0.057` for even `L ≥ 4` cells | two seeds at `(4, β₀)` each |
+| `SpinOneDimerized.gap_d910` | spin-1 dimerized chain `δ = 9/10` (cells = weak pairs) | `Δ_L > log 6.339 / (7/2) ≈ 0.528` for even `L ≥ 2` cells | `P_s(2, 7/2) ≥ 1 − 0.04972`, `P_τ(4, 7/2) ≥ 1 − 0.03206` |
 
 `GapGT e c` says that the lowest level is nondegenerate and every other level lies more than
 `c` above it. `#print axioms` on each theorem lists `sorryAx` (from its seeds) besides
@@ -23,7 +25,7 @@ which are two numbers per model, stated as named `sorry` lemmas.
 transfer-operator input for every reflection-positive ring, the recurrence certificates checked
 by `decide`) uses only the three standard axioms.
 
-The seeds of the new models come from the certificates of PRs #1, #2, #5, #6 and #7 (complete spectra of the
+The seeds of the new models come from the certificates of PRs #1–#7 (complete spectra of the
 seed rings with rigorous eigenvalue enclosures, floating-point arithmetic trusted). The
 spin-1 Heisenberg seeds are OpenAI's Proposition 5.5, reproduced in `../models/spin1/`.
 
@@ -39,8 +41,10 @@ Lean and Mathlib are pinned at `v4.35.0-rc3`. The project has about 3200 lines.
 
 A gap certificate enters Lean in exactly this form:
 
-1. **The model as an `RPRing d ι`**: real matrices `C_α` (each symmetric or antisymmetric) and a
-   real symmetric on-site term `o`, with bond `h = −∑_α C_α ⊗ C_α`. A multi-site unit cell is a
+1. **The model as an `RPRing d ι`**: real matrices `C_α` (each symmetric or antisymmetric), a
+   real symmetric on-site term `o` and optionally an internal reflection `refl` of the cell (a
+   real symmetric involution commuting with `o`), with bond `h = −∑_α C_α ⊗ (refl C_α refl)`.
+   A multi-site unit cell is a
    bigger local space `d` with the intra-cell terms in `o`. Proving the two symmetry conditions
    is a finite matrix computation.
 2. **The seeds**: `1 − εₛ ≤ R.spatialPurity n₀ β₀` and `1 − εₜ ≤ R.thermalPurity (2 n₀) β₀` with
@@ -75,6 +79,9 @@ The seeds of a certificate should therefore be reported as exact rationals toget
 | `Models/StaggeredHeisenberg.lean` | The rotated staggered-field chain; five fields |
 | `Models/IsingLadder.lean` | The two-leg transverse-field Ising ladder; `g = 3` |
 | `Models/IsingLongitudinal.lean` | The Ising chain in transverse and longitudinal fields; 30 grid points |
+| `Models/CellSwap.lean` | The swap `F` of a two-site cell, `F (A ⊗ B) F = B ⊗ A` |
+| `Models/DimerizedHeisenberg.lean` | The rotated dimerized spin-½ chain, internal reflection `F` |
+| `Models/SpinOneDimerized.lean` | The dimerized spin-1 chain, internal reflection `F` |
 | `scripts/chain_certificate.jl` | Searches a `ChainCertificate` from the seeds (exact rationals; Lean re-checks) |
 
 ## Why each piece is needed in Lean
@@ -125,7 +132,10 @@ The proof also needs positivity, `T = FᵀF ⪰ 0`. Summing the even-bond labels
 odd cells into `FᵀF`, and `Fᵀ = Fᴴ` because `C_α` and `o` are real, so `F` is. That is why the
 model must be written in a real basis (the Cartesian basis `G_α = iS^α` for spin one, `iSʸ` for
 spin one-half). This is the reflection positivity the note appeals to when it says the transfer
-operator is self-adjoint.
+operator is self-adjoint. With an internal reflection `R` of the cell (dimerized
+chains, where a bond joins the second site of a cell to the first site of the next), the word
+on an odd cell is `R W R` for the word `W` on an even cell, so it has the same trace and the
+transfer matrix is still `FᵀF`.
 
 **Moment form from positivity (`Transfer/MomentForm`).** A PSD `T` has eigenvalues `λᵢ ≥ 0`, so
 `Tr T^N = ∑ (√λᵢ)^{2N}`, which is the moment form at even lengths `2N`. The note uses

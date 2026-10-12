@@ -170,18 +170,75 @@ theorem one_sub_smul_siteOp {L : ℕ} (j : Fin L) (A : Matrix d d ℂ) (c : ℂ)
   simp only [ite_true, Matrix.sub_apply, Matrix.smul_apply, smul_eq_mul]
   ring
 
+/-! ### Which end of which bond a site is -/
+
+theorem evenSite_eq_evenSite_iff {N : ℕ} (m k : Fin N) : evenSite' N m = evenSite' N k ↔ k = m := by
+  simp only [Fin.ext_iff, evenSite']; omega
+
+theorem evenSite_ne_rot_evenSite {N : ℕ} (m k : Fin N) :
+    evenSite' N m ≠ finRotate (2 * N) (evenSite' N k) := by
+  simp only [ne_eq, Fin.ext_iff, evenSite', val_finRotate']
+  have := m.isLt; have := k.isLt
+  split_ifs <;> omega
+
+theorem evenSite_ne_oddSite {N : ℕ} (m k : Fin N) : evenSite' N m ≠ oddSite' N k := by
+  simp only [ne_eq, Fin.ext_iff, evenSite', oddSite']; omega
+
+theorem evenSite_eq_rot_oddSite_iff {N : ℕ} (m k : Fin N) :
+    evenSite' N m = finRotate (2 * N) (oddSite' N k) ↔ k = (finRotate N).symm m := by
+  rw [Equiv.eq_symm_apply]
+  simp only [Fin.ext_iff, evenSite', oddSite', val_finRotate']
+  have := m.isLt; have := k.isLt
+  split_ifs <;> omega
+
+theorem oddSite_ne_evenSite {N : ℕ} (m k : Fin N) : oddSite' N m ≠ evenSite' N k := by
+  simp only [ne_eq, Fin.ext_iff, evenSite', oddSite']; omega
+
+theorem oddSite_eq_rot_evenSite_iff {N : ℕ} (m k : Fin N) :
+    oddSite' N m = finRotate (2 * N) (evenSite' N k) ↔ k = m := by
+  simp only [Fin.ext_iff, evenSite', oddSite', val_finRotate']
+  have := m.isLt; have := k.isLt
+  split_ifs <;> omega
+
+theorem oddSite_eq_oddSite_iff {N : ℕ} (m k : Fin N) : oddSite' N m = oddSite' N k ↔ k = m := by
+  simp only [Fin.ext_iff, oddSite']; omega
+
+theorem oddSite_ne_rot_oddSite {N : ℕ} (m k : Fin N) :
+    oddSite' N m ≠ finRotate (2 * N) (oddSite' N k) := by
+  simp only [ne_eq, Fin.ext_iff, oddSite', val_finRotate']
+  have := m.isLt; have := k.isLt
+  split_ifs <;> first | exact not_false | omega
+
+/-- A product of conjugates by an involution is the conjugate of the product. -/
+theorem list_prod_map_conj {M X : Type*} [Monoid M] {r : M} (hr : r * r = 1) (f : X → M) :
+    ∀ l : List X, (l.map fun x ↦ r * f x * r).prod = r * (l.map f).prod * r
+  | [] => by simp [hr]
+  | x :: l => by
+    rw [List.map_cons, List.prod_cons, list_prod_map_conj hr f l, List.map_cons, List.prod_cons]
+    simp only [mul_assoc]
+    rw [← mul_assoc r r, hr, one_mul]
+
 namespace RPRing
 
 variable {ι : Type} [Fintype ι] (R : RPRing d ι)
 
-/-- The real local factors of one Trotter bond factor: `C_none = 1`, `C_α = √τ C_α`. -/
+/-- The real local factors of one Trotter bond factor at the left end of the bond:
+`C_none = 1`, `C_α = √τ C_α`. -/
 noncomputable def realSiteFactor (τ : ℝ) : Option ι → Matrix d d ℝ
   | none => 1
   | some α => Real.sqrt τ • R.C α
 
-/-- The local factors of one Trotter bond factor, as complex matrices with real entries. -/
+/-- The left local factors as complex matrices with real entries. -/
 noncomputable def siteFactor (τ : ℝ) (γ : Option ι) : Matrix d d ℂ :=
   (R.realSiteFactor τ γ).map (↑)
+
+/-- The real local factors at the right end of a bond: `refl C_γ refl`. -/
+noncomputable def realRightFactor (τ : ℝ) (γ : Option ι) : Matrix d d ℝ :=
+  R.refl * R.realSiteFactor τ γ * R.refl
+
+/-- The right local factors as complex matrices with real entries. -/
+noncomputable def rightFactor (τ : ℝ) (γ : Option ι) : Matrix d d ℂ :=
+  (R.realRightFactor τ γ).map (↑)
 
 /-- The real on-site factor `O = 1 - τ o`. -/
 def realOnsite (τ : ℝ) : Matrix d d ℝ := 1 - τ • R.o
@@ -189,46 +246,56 @@ def realOnsite (τ : ℝ) : Matrix d d ℝ := 1 - τ • R.o
 /-- The on-site factor `O = 1 - τ o`, as a complex matrix with real entries. -/
 def onsite (τ : ℝ) : Matrix d d ℂ := (R.realOnsite τ).map (↑)
 
-omit [Fintype d] in
 theorem onsite_eq (τ : ℝ) : R.onsite τ = 1 - (τ : ℂ) • R.oc := by
   ext a b
   simp [onsite, realOnsite, oc, one_apply, apply_ite]
 
-omit [Fintype d] in
+theorem Rc_mul_Rc : R.Rc * R.Rc = 1 := by
+  change Complex.ofRealHom.mapMatrix R.refl * Complex.ofRealHom.mapMatrix R.refl = 1
+  rw [← map_mul, R.refl_sq, map_one]
+
+theorem rightFactor_eq (τ : ℝ) (γ : Option ι) :
+    R.rightFactor τ γ = R.Rc * R.siteFactor τ γ * R.Rc := by
+  change Complex.ofRealHom.mapMatrix (R.refl * R.realSiteFactor τ γ * R.refl) = _
+  rw [map_mul, map_mul]
+  rfl
+
 @[simp] theorem siteFactor_none (τ : ℝ) : R.siteFactor τ none = 1 := by
   simp [siteFactor, realSiteFactor]
 
-omit [Fintype d] in
-/-- `C_α ⊗ C_α = τ (C_α ⊗ C_α)` for the scaled factors. -/
+@[simp] theorem rightFactor_none (τ : ℝ) : R.rightFactor τ none = 1 := by
+  rw [rightFactor_eq, siteFactor_none, mul_one, Rc_mul_Rc]
+
+/-- `C_α ⊗ (refl C_α refl) = τ (C_α ⊗ D_α)` for the scaled factors. -/
 theorem kronecker_siteFactor_some {τ : ℝ} (hτ : 0 ≤ τ) (α : ι) :
-    R.siteFactor τ (some α) ⊗ₖ R.siteFactor τ (some α) = (τ : ℂ) • (R.Cc α ⊗ₖ R.Cc α) := by
-  ext ⟨a, b⟩ ⟨c, e⟩
+    R.siteFactor τ (some α) ⊗ₖ R.rightFactor τ (some α) = (τ : ℂ) • (R.Cc α ⊗ₖ R.Dc α) := by
+  have hs : R.siteFactor τ (some α) = (Real.sqrt τ : ℂ) • R.Cc α := by
+    ext a b; simp [siteFactor, realSiteFactor, Cc]
   have h : (Real.sqrt τ : ℂ) * Real.sqrt τ = τ := by
     rw [← Complex.ofReal_mul, Real.mul_self_sqrt hτ]
-  simp only [kroneckerMap_apply, siteFactor, realSiteFactor, map_apply, Matrix.smul_apply,
-    smul_eq_mul, Complex.ofReal_mul, Cc]
-  linear_combination (R.C α a c : ℂ) * R.C α b e * h
+  rw [rightFactor_eq, hs, Dc, Matrix.mul_smul, Matrix.smul_mul, smul_kronecker, kronecker_smul,
+    smul_smul, h]
 
-/-- The tensor-product factor of label `γ` of the bond `j`. -/
+/-- The tensor-product factor of label `γ` of the bond `j`: `C_γ` at `j`, `refl C_γ refl` at
+`j + 1`. -/
 noncomputable def bondSite (L : ℕ) (τ : ℝ) (j : Fin L) (γ : Option ι) :
     Fin L → Matrix d d ℂ :=
-  fun i ↦ if i = j ∨ i = finRotate L j then R.siteFactor τ γ else 1
+  fun i ↦ if i = j then R.siteFactor τ γ else if i = finRotate L j then R.rightFactor τ γ else 1
 
-omit [Fintype d] in
-/-- A first-order bond factor as a sum over the bond label: `1 - τ h = ∑_γ C_γ ⊗ C_γ`. -/
+/-- A first-order bond factor as a sum over the bond label: `1 - τ h = ∑_γ C_γ ⊗ D_γ`. -/
 theorem one_sub_smul_bond {L : ℕ} (hL : 2 ≤ L) {τ : ℝ} (hτ : 0 ≤ τ) (j : Fin L) :
     1 - (τ : ℂ) • R.bond L j = ∑ γ, piTensor (R.bondSite L τ j γ) := by
   have hjk := ne_finRotate' hL j
   have h1 : R.bondSite L τ j none = fun _ ↦ 1 := funext fun i ↦ by
-    unfold bondSite; rw [siteFactor_none, ite_self]
+    unfold bondSite; rw [siteFactor_none, rightFactor_none, ite_self, ite_self]
   rw [Fintype.sum_option, h1, piTensor_one]
   rw [bond, bondMatrix, bondOp_neg, bondOp_sum, smul_neg, sub_neg_eq_add, Finset.smul_sum]
   congr 1
   refine Finset.sum_congr rfl fun α _ ↦ ?_
-  change _ = piTensor fun i ↦ if i = j ∨ i = finRotate L j then R.siteFactor τ (some α) else 1
-  rw [← bondOp_kronecker_self' hjk, kronecker_siteFactor_some R hτ, bondOp_smul]
+  change _ = piTensor fun i ↦ if i = j then R.siteFactor τ (some α) else
+    if i = finRotate L j then R.rightFactor τ (some α) else 1
+  rw [← bondOp_kronecker hjk, kronecker_siteFactor_some R hτ, bondOp_smul]
 
-omit [Fintype d] in
 /-- A first-order on-site factor as a tensor product. -/
 theorem one_sub_smul_site (L : ℕ) (τ : ℝ) (i : Fin L) :
     1 - (τ : ℂ) • R.site L i = piTensor fun k ↦ if k = i then R.onsite τ else 1 := by
@@ -270,34 +337,65 @@ theorem trotterSlice_eq_sum {N : ℕ} (hN : 1 ≤ N) {τ : ℝ} (hτ : 0 ≤ τ)
   rw [list_prod_ofFn_piTensor, list_prod_ofFn_piTensor, piTensor_mul, piTensor_mul]
   rfl
 
-/-- The word of a slice at the even cell `2 m`. -/
+/-- The word of a slice at the even cell `2 m`: the left factor of its even bond, the on-site
+factor, the right factor of its odd bond. -/
 theorem sliceSite_evenSite (N : ℕ) (τ : ℝ) (bc : (Fin N → Option ι) × (Fin N → Option ι))
     (m : Fin N) :
     R.sliceSite N τ bc (evenSite' N m) =
-      R.siteFactor τ (bc.1 m) * R.onsite τ * R.siteFactor τ (bc.2 ((finRotate N).symm m)) := by
-  simp only [sliceSite, bondSite]
-  rw [list_prod_ofFn_ite _ _ m (evenSite_mem_evenBond_iff' m),
-    list_prod_ofFn_ite _ _ _ (evenSite_mem_oddBond_iff' m)]
+      R.siteFactor τ (bc.1 m) * R.onsite τ * R.rightFactor τ (bc.2 ((finRotate N).symm m)) := by
+  simp only [sliceSite, bondSite, evenSite_ne_rot_evenSite, evenSite_ne_oddSite, ite_false]
+  rw [list_prod_ofFn_ite _ _ m (evenSite_eq_evenSite_iff m),
+    list_prod_ofFn_ite _ _ _ (evenSite_eq_rot_oddSite_iff m)]
 
-/-- The word of a slice at the odd cell `2 m + 1`. -/
+/-- The word of a slice at the odd cell `2 m + 1`: the right factor of its even bond, the on-site
+factor, the left factor of its odd bond. -/
 theorem sliceSite_oddSite (N : ℕ) (τ : ℝ) (bc : (Fin N → Option ι) × (Fin N → Option ι))
     (m : Fin N) :
     R.sliceSite N τ bc (oddSite' N m) =
-      R.siteFactor τ (bc.1 m) * R.onsite τ * R.siteFactor τ (bc.2 m) := by
-  simp only [sliceSite, bondSite]
-  rw [list_prod_ofFn_ite _ _ m (oddSite_mem_evenBond_iff' m),
-    list_prod_ofFn_ite _ _ m (oddSite_mem_oddBond_iff' m)]
+      R.rightFactor τ (bc.1 m) * R.onsite τ * R.siteFactor τ (bc.2 m) := by
+  simp only [sliceSite, bondSite, oddSite_ne_evenSite, oddSite_ne_rot_oddSite, ite_false]
+  rw [list_prod_ofFn_ite _ _ m (oddSite_eq_rot_evenSite_iff m),
+    list_prod_ofFn_ite _ _ m (oddSite_eq_oddSite_iff m)]
 
 /-! ### Many slices and the transfer matrix -/
 
-/-- The time-ordered word on one cell over `M` slices, `∏ₜ C_{p t} O C_{q t}`. -/
+/-- The time-ordered word on an even cell over `M` slices, `∏ₜ C_{p t} O D_{q t}`. -/
 noncomputable def timeWord (M : ℕ) (τ : ℝ) (p q : Fin M → Option ι) : Matrix d d ℂ :=
-  (List.ofFn fun t ↦ R.siteFactor τ (p t) * R.onsite τ * R.siteFactor τ (q t)).prod
+  (List.ofFn fun t ↦ R.siteFactor τ (p t) * R.onsite τ * R.rightFactor τ (q t)).prod
 
 /-- The one-cell transfer matrix `F p q = Tr (timeWord p q)` on time labels. -/
 noncomputable def cellTransfer (M : ℕ) (τ : ℝ) :
     Matrix (Fin M → Option ι) (Fin M → Option ι) ℂ :=
   of fun p q ↦ trace (R.timeWord M τ p q)
+
+/-- The word on an odd cell is the reflection of the word on an even cell, so it has the same
+trace: `Tr ∏ₜ D_{p t} O C_{q t} = F p q`. -/
+theorem trace_oddWord (M : ℕ) (τ : ℝ) (p q : Fin M → Option ι) :
+    trace (List.ofFn fun t ↦ R.rightFactor τ (p t) * R.onsite τ * R.siteFactor τ (q t)).prod =
+      R.cellTransfer M τ p q := by
+  have hreal : R.refl * R.o = R.o * R.refl := by
+    have h := congrArg (· * R.refl) R.refl_o
+    simp only [Matrix.mul_assoc, R.refl_sq, Matrix.mul_one] at h
+    exact h
+  have hO : R.Rc * R.onsite τ = R.onsite τ * R.Rc := by
+    change Complex.ofRealHom.mapMatrix R.refl * Complex.ofRealHom.mapMatrix (1 - τ • R.o) =
+      Complex.ofRealHom.mapMatrix (1 - τ • R.o) * Complex.ofRealHom.mapMatrix R.refl
+    rw [← map_mul, ← map_mul, Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_one, Matrix.one_mul,
+      Matrix.mul_smul, Matrix.smul_mul, hreal]
+  have hword : ∀ t, R.rightFactor τ (p t) * R.onsite τ * R.siteFactor τ (q t) =
+      R.Rc * (R.siteFactor τ (p t) * R.onsite τ * R.rightFactor τ (q t)) * R.Rc := by
+    intro t
+    rw [rightFactor_eq, rightFactor_eq]
+    calc R.Rc * R.siteFactor τ (p t) * R.Rc * R.onsite τ * R.siteFactor τ (q t)
+        = R.Rc * R.siteFactor τ (p t) * (R.Rc * R.onsite τ) * R.siteFactor τ (q t) := by
+          simp only [Matrix.mul_assoc]
+      _ = R.Rc * R.siteFactor τ (p t) * (R.onsite τ * R.Rc) * R.siteFactor τ (q t) := by rw [hO]
+      _ = R.Rc * (R.siteFactor τ (p t) * R.onsite τ * (R.Rc * R.siteFactor τ (q t) * R.Rc)) *
+            R.Rc := by
+          simp only [Matrix.mul_assoc, R.Rc_mul_Rc, Matrix.mul_one]
+  simp only [hword, List.ofFn_eq_map]
+  rw [list_prod_map_conj R.Rc_mul_Rc, trace_mul_cycle, R.Rc_mul_Rc, Matrix.one_mul]
+  simp only [cellTransfer, of_apply, timeWord, List.ofFn_eq_map]
 
 /-- The trace of `M` Trotter slices as a sum over space-time bond labels. -/
 theorem trace_trotterSlice_pow_eq_sum {N : ℕ} (hN : 1 ≤ N) {τ : ℝ} (hτ : 0 ≤ τ) (M : ℕ) :
@@ -309,9 +407,10 @@ theorem trace_trotterSlice_pow_eq_sum {N : ℕ} (hN : 1 ≤ N) {τ : ℝ} (hτ :
     trace_sum]
   refine Finset.sum_congr rfl fun a _ ↦ ?_
   rw [list_prod_ofFn_piTensor, trace_piTensor, prod_fin_two_mul']
+  refine Finset.prod_congr rfl fun m _ ↦ ?_
   simp only [sliceSite_evenSite, sliceSite_oddSite]
+  rw [R.trace_oddWord]
   rfl
-
 /-- **Transfer factorization.** `Tr (slice)^M = Tr (Fᵀ F)^N` on a ring of `2 N` cells. -/
 theorem trace_trotterSlice_pow_eq_trace_transfer [DecidableEq ι] {N : ℕ} (hN : 1 ≤ N) {τ : ℝ}
     (hτ : 0 ≤ τ) (M : ℕ) :
@@ -337,11 +436,11 @@ theorem trace_trotterSlice_pow_eq_trace_transfer [DecidableEq ι] {N : ℕ} (hN 
 theorem star_cellTransfer_apply (M : ℕ) (τ : ℝ) (p q : Fin M → Option ι) :
     star (R.cellTransfer M τ p q) = R.cellTransfer M τ p q := by
   have h : R.timeWord M τ p q = (List.ofFn fun t ↦ R.realSiteFactor τ (p t) *
-      R.realOnsite τ * R.realSiteFactor τ (q t)).prod.map (↑) := by
+      R.realOnsite τ * R.realRightFactor τ (q t)).prod.map (↑) := by
     change _ = (Complex.ofRealHom.mapMatrix : Matrix d d ℝ →+* _) _
     rw [map_list_prod, List.map_ofFn]
-    simp only [timeWord, siteFactor, onsite, Function.comp_def, RingHom.mapMatrix_apply,
-      Matrix.map_mul]
+    simp only [timeWord, siteFactor, rightFactor, onsite, Function.comp_def,
+      RingHom.mapMatrix_apply, Matrix.map_mul]
     rfl
   simp only [cellTransfer, of_apply, h, trace, diag_apply, map_apply, ← Complex.ofReal_sum]
   exact Complex.conj_ofReal _

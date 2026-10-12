@@ -152,9 +152,11 @@ theorem trace_exp_smul_eq_sum_of_isHermitian {n : Type*} [Fintype n] [DecidableE
 
 /-! ### Reflection-positive rings -/
 
-/-- A reflection-positive ring: real bond factors `C_α`, each symmetric or antisymmetric, and a
-real symmetric on-site term `o`. The bond is `h = -∑_α C_α ⊗ C_α`. -/
-structure RPRing (d ι : Type) [Fintype ι] where
+/-- A reflection-positive ring: real bond factors `C_α`, each symmetric or antisymmetric, a real
+symmetric on-site term `o`, and an internal reflection `refl` of the cell (a real symmetric
+involution commuting with `o`, the identity unless the cell has several sites). The bond is
+`h = -∑_α C_α ⊗ (refl C_α refl)`. -/
+structure RPRing (d ι : Type) [Fintype d] [DecidableEq d] [Fintype ι] where
   /-- The real bond factors. -/
   C : ι → Matrix d d ℝ
   /-- The real on-site term. -/
@@ -163,6 +165,14 @@ structure RPRing (d ι : Type) [Fintype ι] where
   C_symm : ∀ α, (C α)ᵀ = C α ∨ (C α)ᵀ = -C α
   /-- The on-site term is symmetric. -/
   o_symm : oᵀ = o
+  /-- The internal reflection of a cell. -/
+  refl : Matrix d d ℝ := 1
+  /-- The reflection is symmetric. -/
+  refl_symm : reflᵀ = refl := by simp
+  /-- The reflection is an involution. -/
+  refl_sq : refl * refl = 1 := by simp
+  /-- The reflection commutes with the on-site term. -/
+  refl_o : refl * o * refl = o := by simp
 
 namespace RPRing
 
@@ -174,8 +184,18 @@ def Cc (α : ι) : Matrix d d ℂ := (R.C α).map (↑)
 /-- The on-site term as a complex matrix. -/
 def oc : Matrix d d ℂ := R.o.map (↑)
 
-/-- The two-site bond `h = -∑_α C_α ⊗ C_α`. -/
-def bondMatrix : Matrix (d × d) (d × d) ℂ := -∑ α, R.Cc α ⊗ₖ R.Cc α
+/-- The reflection as a complex matrix. -/
+def Rc : Matrix d d ℂ := R.refl.map (↑)
+
+/-- The reflected bond factors `refl C_α refl` as complex matrices. -/
+def Dc (α : ι) : Matrix d d ℂ := R.Rc * R.Cc α * R.Rc
+
+/-- The two-site bond `h = -∑_α C_α ⊗ (refl C_α refl)`. -/
+def bondMatrix : Matrix (d × d) (d × d) ℂ := -∑ α, R.Cc α ⊗ₖ R.Dc α
+
+/-- Without an internal reflection the reflected factors are the factors. -/
+theorem Dc_eq_of_refl (h : R.refl = 1) (α : ι) : R.Dc α = R.Cc α := by
+  simp [Dc, Rc, h, Matrix.map_one]
 
 /-- The bond term `hⱼ,ⱼ₊₁` of the ring. -/
 def bond (L : ℕ) (j : Fin L) : Matrix (Fin L → d) (Fin L → d) ℂ :=
@@ -189,7 +209,6 @@ def site (L : ℕ) (j : Fin L) : Matrix (Fin L → d) (Fin L → d) ℂ :=
 def hamiltonian (L : ℕ) : Matrix (Fin L → d) (Fin L → d) ℂ :=
   ∑ j, R.bond L j + ∑ j, R.site L j
 
-omit [Fintype d] [DecidableEq d] in
 theorem conjTranspose_Cc (α : ι) : (R.Cc α)ᴴ = R.Cc α ∨ (R.Cc α)ᴴ = -R.Cc α := by
   have h : (R.Cc α)ᴴ = ((R.C α)ᵀ).map (↑) := by
     ext a b; simp [Cc, conjTranspose_apply]
@@ -197,22 +216,25 @@ theorem conjTranspose_Cc (α : ι) : (R.Cc α)ᴴ = R.Cc α ∨ (R.Cc α)ᴴ = -
   · exact Or.inl (by rw [h, hC]; rfl)
   · exact Or.inr (by rw [h, hC]; ext; simp [Cc])
 
-omit [Fintype d] [DecidableEq d] in
+theorem conjTranspose_Rc : R.Rcᴴ = R.Rc := by
+  ext a b
+  simp only [conjTranspose_apply, Rc, map_apply, Complex.star_def, Complex.conj_ofReal]
+  rw [← transpose_apply R.refl, R.refl_symm]
+
 theorem bondMatrix_isHermitian : R.bondMatrix.IsHermitian := by
   refine IsHermitian.neg (isSelfAdjoint_sum _ fun α _ ↦ ?_)
-  change (R.Cc α ⊗ₖ R.Cc α)ᴴ = R.Cc α ⊗ₖ R.Cc α
-  rw [conjTranspose_kronecker]
+  change (R.Cc α ⊗ₖ R.Dc α)ᴴ = R.Cc α ⊗ₖ R.Dc α
+  rw [conjTranspose_kronecker, Dc, conjTranspose_mul, conjTranspose_mul, conjTranspose_Rc,
+    ← Matrix.mul_assoc]
   rcases R.conjTranspose_Cc α with h | h <;> rw [h]
   ext ⟨a, b⟩ ⟨c, e⟩
   simp [kroneckerMap_apply]
 
-omit [Fintype d] [DecidableEq d] in
 theorem oc_isHermitian : R.oc.IsHermitian := by
   ext a b
   simp only [conjTranspose_apply, oc, map_apply, Complex.star_def, Complex.conj_ofReal]
   rw [← transpose_apply R.o, R.o_symm]
 
-omit [Fintype d] in
 /-- The ring Hamiltonian is Hermitian. -/
 theorem hamiltonian_isHermitian (L : ℕ) : (R.hamiltonian L).IsHermitian :=
   (isSelfAdjoint_sum _ fun j _ ↦ bondOp_isHermitian j _ R.bondMatrix_isHermitian).add

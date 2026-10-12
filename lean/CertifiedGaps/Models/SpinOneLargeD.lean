@@ -49,7 +49,9 @@ noncomputable def model (D : ℝ) : RPRing (Fin 3) (Fin 3) where
 
 /-- The bond of the ring is the exchange `S · S`. -/
 theorem bondMatrix_eq (D : ℝ) : (model D).bondMatrix = SpinOneHeisenberg.exchange := by
-  rw [RPRing.bondMatrix, ← Finset.sum_neg_distrib]
+  rw [RPRing.bondMatrix]
+  simp_rw [(model D).Dc_eq_of_refl rfl]
+  rw [← Finset.sum_neg_distrib]
   ext ⟨a, b⟩ ⟨c, e⟩
   simp only [RPRing.Cc, model, G, SpinOneHeisenberg.exchange, SpinOneHeisenberg.spinOne,
     Matrix.neg_apply, Matrix.sum_apply, kroneckerMap_apply, map_apply, of_apply]

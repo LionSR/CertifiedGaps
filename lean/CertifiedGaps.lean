@@ -16,3 +16,6 @@ import CertifiedGaps.Models.SpinHalf
 import CertifiedGaps.Models.StaggeredHeisenberg
 import CertifiedGaps.Models.IsingLadder
 import CertifiedGaps.Models.IsingLongitudinal
+import CertifiedGaps.Models.CellSwap
+import CertifiedGaps.Models.DimerizedHeisenberg
+import CertifiedGaps.Models.SpinOneDimerized
