@@ -30,7 +30,9 @@ function rational_gap_chain(p::RationalBig, q::RationalBig, n::Int, beta::Ration
     initial_n = n
     initial_beta = beta
     intervals = Any[]
-    gap_lower = frac(1)
+    # The running minimum starts at the first scale (spin1 started it at 1, which capped the
+    # certified gap at 1; every spin-1 bound is far below that, so its records are unchanged).
+    gap_lower = nothing
     for j in 0:(steps-1)
         @assert 0 < p < 1 && 0 < q < 1
         A = (1 - p)^2 * (1 - q)
@@ -38,7 +40,7 @@ function rational_gap_chain(p::RationalBig, q::RationalBig, n::Int, beta::Ration
         # The paper's interpolation gives T(L,beta) >= A for n <= L <= 2n.
         # Hence the ground state is unique and gamma_L >= log(A/(1-A))/beta.
         loglo, loghi = log_enclosure(A / (1 - A))
-        gap_lower = min(gap_lower, loglo / beta)
+        gap_lower = isnothing(gap_lower) ? loglo / beta : min(gap_lower, loglo / beta)
         exact_p = _checked_squaring_defect(1 - (1 - p)^2 * (1 - q))
         next_p = round_up(exact_p, grid)
         exact_q = _checked_squaring_defect(1 - (1 - q)^2 * (1 - next_p))
