@@ -1,6 +1,6 @@
 # This produces an exact obstruction audit, NOT a gap certificate.
-using ThermalMPOGap, LinearAlgebra
-using ThermalMPOGap.Results
+using CertifiedGaps, LinearAlgebra
+using CertifiedGaps.Results
 BLAS.set_num_threads(1)
 include("rp.jl")
 using .DimerizedRP
@@ -26,17 +26,17 @@ function main()
             "seed_scan" => "see_separate_numerical_delta_results",
         ))
     end
-    hashes = source_hashes(ROOT; dirs=("julia/src", "certificates/dimerized_heisenberg/test"),
-        files=("certificates/dimerized_heisenberg/rp.jl",
-            "certificates/dimerized_heisenberg/certify.jl",
-            "certificates/dimerized_heisenberg/check.jl",
-            "certificates/dimerized_heisenberg/reflection_conventions.jl",
-            "certificates/dimerized_heisenberg/numerical_ed.jl",
+    hashes = source_hashes(ROOT; dirs=("julia/src", "models/dimerized_heisenberg/test"),
+        files=("models/dimerized_heisenberg/rp.jl",
+            "models/dimerized_heisenberg/certify.jl",
+            "models/dimerized_heisenberg/check.jl",
+            "models/dimerized_heisenberg/reflection_conventions.jl",
+            "models/dimerized_heisenberg/numerical_ed.jl",
             "julia/Project.toml", "julia/Manifest.toml",
             "outputs/thermal-mpo-gap-scope.tex"))
     data = Dict(
         "metadata" => run_metadata(Dict("model"=>"dimerized_heisenberg", "sites_per_cell"=>2);
-            source_sha256=hashes, packages=(ThermalMPOGap,),
+            source_sha256=hashes, packages=(CertifiedGaps,),
             status="exact_obstruction_to_requested_real_RP_form", certified=false),
         "exact_algebraic_audit" => true, "gap_certificate" => false,
         "arithmetic" => "Complex{Rational{BigInt}}; normalized basis evaluated with exact denominators",

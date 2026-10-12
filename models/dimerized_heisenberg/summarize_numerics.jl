@@ -1,4 +1,4 @@
-using ThermalMPOGap, ThermalMPOGap.Results, ThermalMPOGap.Seeds, JSON3, LinearAlgebra
+using CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds, JSON3, LinearAlgebra
 BLAS.set_num_threads(1)
 function summarize()
     rows=Any[]
@@ -47,7 +47,7 @@ function summarize()
     root=normpath(joinpath(@__DIR__,"../.."))
     write_result(joinpath(@__DIR__,"results","numerical_summary.json"),Dict(
         "metadata"=>run_metadata(Dict("fit"=>"two-point exponential ground-energy defect plus independent excitations");
-            source_sha256=source_hashes(root;dirs=(),files=("certificates/dimerized_heisenberg/summarize_numerics.jl",)),
+            source_sha256=source_hashes(root;dirs=(),files=("models/dimerized_heisenberg/summarize_numerics.jl",)),
             status="heuristic_extrapolation_not_certified",certified=false),
         "input_hashes"=>Dict(relpath(p,root)=>sha256_file(p) for p in paths),
         "rows"=>rows,"limitations"=>"Finite-ring gaps, short-size exponential fits, and independent excitation ansatz; extrapolated seeds are not validated or guaranteed. Odd n=3 used only for fitting, never as theorem seed."))

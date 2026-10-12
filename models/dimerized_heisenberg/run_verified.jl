@@ -1,4 +1,4 @@
-using ThermalMPOGap, ThermalMPOGap.Results, IntervalArithmetic, LinearAlgebra
+using CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic, LinearAlgebra
 include("verified_spectra.jl")
 include("rp.jl")
 using .VerifiedSpectra, .DimerizedRP
@@ -19,17 +19,17 @@ function run_verified(delta::Rational{BigInt},beta::Rational{BigInt})
     @assert bound.bound!==nothing
     root=normpath(joinpath(@__DIR__,"../.."))
     sources=source_hashes(root;dirs=("julia/src",),files=(
-        "certificates/dimerized_heisenberg/rp.jl",
-        "certificates/dimerized_heisenberg/numerical_ed.jl",
-        "certificates/dimerized_heisenberg/verified_spectra.jl",
-        "certificates/dimerized_heisenberg/run_verified.jl",
-        "certificates/dimerized_heisenberg/check_verified.jl",
-        "certificates/dimerized_heisenberg/test/verified_independent.jl",
-        "certificates/dimerized_heisenberg/ENCLOSURE_PROOF.md",
+        "models/dimerized_heisenberg/rp.jl",
+        "models/dimerized_heisenberg/numerical_ed.jl",
+        "models/dimerized_heisenberg/verified_spectra.jl",
+        "models/dimerized_heisenberg/run_verified.jl",
+        "models/dimerized_heisenberg/check_verified.jl",
+        "models/dimerized_heisenberg/test/verified_independent.jl",
+        "models/dimerized_heisenberg/ENCLOSURE_PROOF.md",
         "julia/Project.toml","julia/Manifest.toml",
         "outputs/thermal-mpo-gap-note.tex","outputs/thermal-mpo-gap-scope.tex"))
     record=Dict("metadata"=>run_metadata(Dict("delta"=>string(delta),"beta0"=>string(beta),"n0_cells"=>4);
-            source_sha256=sources,packages=(ThermalMPOGap,IntervalArithmetic),
+            source_sha256=sources,packages=(CertifiedGaps,IntervalArithmetic),
             status="verified_spectral_seeds_general_reflected_RP",certified=true),
         "certification_scope"=>"General reflected RP theorem Theta=F_cell K; NOT the original stronger real identical-factor representation",
         "original_stronger_RP_condition_satisfied"=>false,
@@ -43,6 +43,8 @@ function run_verified(delta::Rational{BigInt},beta::Rational{BigInt})
         "seconds_total"=>time()-t,"rings"=>[small,large])
     path=joinpath(@__DIR__,"results","verified_delta_$(numerator(delta))_$(denominator(delta)).json")
     write_result(path,record)
+    # Stored compressed (about 0.5 MB instead of 2.7 MB); check_verified.jl reads the .gz.
+    run(`gzip -9 -n -f $path`); path*=".gz"
     println("SAVED $path epsilon_s=$(Float64(epss)) epsilon_t=$(Float64(epst)) bound=$(bound.bound) seconds=$(time()-t)")
 end
 if abspath(PROGRAM_FILE)==@__FILE__

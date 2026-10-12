@@ -27,10 +27,10 @@ end
 reviewrecords=Any[]
 elapsed=@elapsed @testset "Independent acceptance: containment from fresh full spectra" begin
     check_verified_results()
-    paths=sort(filter(p->startswith(basename(p),"verified_delta_")&&endswith(p,".json"),
+    paths=sort(filter(p->startswith(basename(p),"verified_delta_")&&endswith(p,".json.gz"),
         readdir(joinpath(@__DIR__,"../results");join=true)))
     for path in paths
-        data=JSON3.read(read(path,String)); delta=parseq(data.delta); beta=parseq(data.beta0)
+        data=JSON3.read(read_json_text(path)); delta=parseq(data.delta); beta=parseq(data.beta0)
         println("ACCEPTANCE RERUN delta=",delta); flush(stdout)
         fresh=Dict{Int,Any}(); rings=Any[]; mismatches=Dict{String,Int}()
         for stored in data.rings
@@ -111,14 +111,14 @@ elapsed=@elapsed @testset "Independent acceptance: containment from fresh full s
     end
 end
 root=normpath(joinpath(@__DIR__,"../../.."))
-files=vcat(["certificates/dimerized_heisenberg/review/independent_review.jl",
-    "certificates/dimerized_heisenberg/verified_spectra.jl",
-    "certificates/dimerized_heisenberg/ENCLOSURE_PROOF.md"],
-    ["certificates/dimerized_heisenberg/results/"*r["production_certificate"] for r in reviewrecords])
+files=vcat(["models/dimerized_heisenberg/review/independent_review.jl",
+    "models/dimerized_heisenberg/verified_spectra.jl",
+    "models/dimerized_heisenberg/ENCLOSURE_PROOF.md"],
+    ["models/dimerized_heisenberg/results/"*r["production_certificate"] for r in reviewrecords])
 write_result(joinpath(@__DIR__,"acceptance.json"),Dict(
     "metadata"=>run_metadata(Dict("scope"=>"independent_general_reflected_RP_acceptance");
         source_sha256=source_hashes(root;dirs=(),files=Tuple(files)),
-        packages=(ThermalMPOGap,IntervalArithmetic),status="pass",certified=true),
+        packages=(CertifiedGaps,IntervalArithmetic),status="pass",certified=true),
     "original_strict_real_identical_hypothesis"=>"FAIL",
     "general_reflected_RP_certificates"=>"PASS",
     "backend_assumption"=>"Classical binary64 CPU OpenBLAS GEMM with ordinary multiply/add/FMA",

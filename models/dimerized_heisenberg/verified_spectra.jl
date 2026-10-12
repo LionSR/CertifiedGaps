@@ -1,8 +1,8 @@
 # Verified spectral enclosures; all scalar error bounds are exact rationals.
 module VerifiedSpectra
 using LinearAlgebra, IntervalArithmetic
-using ThermalMPOGap.Recurrence: to_interval
-using ThermalMPOGap.Results
+using CertifiedGaps.Recurrence: to_interval
+using CertifiedGaps.Results
 include("numerical_ed.jl") # Exact orbit/stabilizer enumeration; no run on include.
 export verified_ring, scalar_witness, enclosed_logZ, rational_upper, rational_lower
 const QQ=Rational{BigInt}

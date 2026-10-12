@@ -1,6 +1,6 @@
 # Full dense symmetry-block spectra. These Float64 eigenvalues are NOT certified.
-using ThermalMPOGap, LinearAlgebra
-using ThermalMPOGap.Results, ThermalMPOGap.ExactDiagonalization, ThermalMPOGap.Seeds
+using CertifiedGaps, LinearAlgebra
+using CertifiedGaps.Results, CertifiedGaps.ExactDiagonalization, CertifiedGaps.Seeds
 BLAS.set_num_threads(1)
 const ROOT_ED = normpath(joinpath(@__DIR__, "../.."))
 rotate_cell(s,L) = ((s << 2) & ((1<<L)-1)) | (s >> (L-2))
@@ -115,8 +115,8 @@ function run_numerics(; maxseed=4)
         refgap=specs[maximum(lengths)].E[2]-specs[maximum(lengths)].E[1]
         data=Dict("metadata"=>run_metadata(Dict("delta"=>string(d),"maxseed"=>maxseed,
                 "beta_grid"=>"0.25:0.25:32.0");
-                source_sha256=source_hashes(ROOT_ED;dirs=("julia/src",),files=("certificates/dimerized_heisenberg/numerical_ed.jl",)),
-                packages=(ThermalMPOGap,),status="numerical_not_certified",certified=false),
+                source_sha256=source_hashes(ROOT_ED;dirs=("julia/src",),files=("models/dimerized_heisenberg/numerical_ed.jl",)),
+                packages=(CertifiedGaps,),status="numerical_not_certified",certified=false),
             "delta"=>string(d),"seconds_spectra"=>total,"sizes"=>sizes,
             "diagnostics"=>diagnostics,"best_even_seed"=>seedrow(best),
             "smallest_successful_even_n0"=>(smallest==typemax(Int) ? nothing : smallest),

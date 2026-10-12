@@ -1,5 +1,5 @@
 include("../numerical_ed.jl")
-using ThermalMPOGap.Models
+using CertifiedGaps.Models
 @testset "Numerical sector implementation vs core dense ED" begin
     for L in (4,6,8,10)
         d=0.3

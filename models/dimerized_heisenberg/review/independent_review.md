@@ -148,8 +148,8 @@ stored radii.
 ### Independent interval containment despite floating-point differences
 
 An initial bitwise-reproduction probe did **not** pass: 5999 checks passed
-and 545 exact-equality checks failed (166.5 seconds). Its script and full log
-are preserved as `bitwise_probe.jl` and `bitwise_probe.log`. Those checks
+and 545 exact-equality checks failed (166.5 seconds). (Its script and log were kept on the original branch and removed
+when the certificate moved to `models/`; see README.) Those checks
 demanded equal approximate eigenvalues, eigenvector-dependent raw maxima,
 and resulting radii/seeds; they were too strong as an acceptance condition.
 The probe's printed `ACCEPTED` progress lines were unconditional progress
@@ -198,23 +198,25 @@ stored rational seeds, and their computed bound is at least the stored bound.
 
 An intermediate review-only implementation used the Cauchy bound without
 taking the minimum and therefore failed containment for small blocks; that
-run was interrupted and is preserved as `refinement_probe.jl/.log`.
+run was interrupted (its script and log were later removed to cut size).
 This was an overly large alternative error bound, not a failed enclosure of
 the spectrum. The final implementation uses both rigorously valid bounds
 and the improved Frobenius factor as just described. Neither exploratory
 review run modified the production code or certificates.
 
-Commands actually run from the repository root (logs are review-local):
+Commands run from the repository root (originally under `certificates/`, with a
+locally installed Julia 1.12.4; the paths below are the current ones):
 
 ```sh
-OPENBLAS_NUM_THREADS=1 JULIA_DEPOT_PATH=/workspace/haldane-gap-diagrams/certificates/dimerized_heisenberg/depot certificates/dimerized_heisenberg/julia-1.12.4/bin/julia --project=julia certificates/dimerized_heisenberg/review/independent_review.jl > certificates/dimerized_heisenberg/review/independent_review.log 2>&1
-OPENBLAS_NUM_THREADS=1 JULIA_DEPOT_PATH=/workspace/haldane-gap-diagrams/certificates/dimerized_heisenberg/depot certificates/dimerized_heisenberg/julia-1.12.4/bin/julia --project=julia certificates/dimerized_heisenberg/test/verified_independent.jl > certificates/dimerized_heisenberg/review/analytic_and_checker.log 2>&1
+OPENBLAS_NUM_THREADS=1 julia --project=julia models/dimerized_heisenberg/review/independent_review.jl
+OPENBLAS_NUM_THREADS=1 julia --project=julia models/dimerized_heisenberg/test/verified_independent.jl
 ```
 
 The four-spin analytic/exact-residual tests passed **108/108**, followed by
 **2167/2167** stored witness/partition/recurrence checks. The final full-rerun
 acceptance passed **4012/4012** checks in **145.5 seconds**, and successfully
-wrote `acceptance.json` with `Results.write_result`. All 63 eight-spin blocks
+wrote `acceptance.json` (about 10 MB, no longer committed;
+regenerate with the first command above) with `Results.write_result`. All 63 eight-spin blocks
 also passed exact rational residual/Gram checks against the refined bounds.
 The final run reproduced delta=1/4 and 3/10 witnesses bitwise. Delta=1/2 had
 73 blocks with changed eigenvalue arrays/radii, all independently validated
@@ -222,8 +224,7 @@ by strict interval containment; exact per-field counts are in the JSON.
 Production result files were never overwritten by either review command.
 A subsequent Julia `sha256_file` audit verified all six hashes in the review
 JSON (three production certificates, the review script, production enclosure
-source, and enclosure proof). Its output is in `acceptance_hash_check.log`;
-the JSON records 145.782 seconds for the complete acceptance computation.
+source, and enclosure proof). The JSON recorded 145.782 seconds for the complete acceptance computation.
 
 ## Limitations
 

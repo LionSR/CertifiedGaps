@@ -1,5 +1,6 @@
-using ThermalMPOGap, LinearAlgebra, Test
-using ThermalMPOGap.Results
+using CertifiedGaps, LinearAlgebra, Test
+using CertifiedGaps.Results
+isdefined(@__MODULE__, :check_historical_hashes) || include("provenance.jl")
 BLAS.set_num_threads(1)
 include("rp.jl")
 using .DimerizedRP
@@ -28,10 +29,7 @@ function check_audit()
         @test row["rational_seeds"] === nothing
         @test row["certified_gap_bound"] === nothing
     end
-    root = normpath(joinpath(@__DIR__, "../.."))
-    for (file, digest) in data["metadata"]["source_sha256"]
-        @test sha256_file(joinpath(root,file)) == digest
-    end
+    check_source_hashes(data["metadata"])
 end
 if abspath(PROGRAM_FILE) == @__FILE__
     @testset "Exact RP obstruction audit (not a gap certificate)" begin
