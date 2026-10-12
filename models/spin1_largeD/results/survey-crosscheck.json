@@ -1,0 +1,15 @@
+{
+    "n0": 6,
+    "quoted_survey_bound": 0.543842,
+    "difference": 2.1733039029636636e-5,
+    "source_hashes": {
+        "model.jl": "f80ad74d7984a84a4e531c6add52c522badc103bb75ae71495b32ef60e00da63",
+        "scan.jl": "6498f6374d59577f1ec28da8b746b4d3fbc5f80b298f73ab59f7a2e90abdf3e4",
+        "survey_check.jl": "e021b9e9a88e09fc31b6db485b683aab738590e286d61e812f9ce65aa85407e0"
+    },
+    "interpretation": "The numerical rerun does not reproduce the quoted survey value to six decimals. The quoted value is not used as a certificate input; complete dense enclosures are computed independently.",
+    "D": "4//1",
+    "certified": false,
+    "bound": 0.5438637330390297,
+    "beta": "3//1"
+}
