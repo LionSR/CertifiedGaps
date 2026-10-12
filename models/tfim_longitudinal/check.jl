@@ -2,7 +2,7 @@ include("certify.jl")
 using .LongitudinalCertificate, CertifiedGaps, JSON3, CertifiedGaps.Results
 const C=LongitudinalCertificate
 function check_result(path; partitions=true)
-    d=JSON3.read(read(path,String),Dict{String,Any}); g=C.rat(d["g"]); h=C.rat(d["h"])
+    d=C.read_point(path); g=C.rat(d["g"]); h=C.rat(d["h"])
     @assert C.rp_check(g,h)
     haskey(d,"certificate") || return false
     c=d["certificate"]; n=c["n"]; @assert iseven(n)
@@ -36,8 +36,7 @@ function check_result(path; partitions=true)
     true
 end
 if abspath(PROGRAM_FILE)==@__FILE__
-    for path in sort(readdir(joinpath(C.ROOT,"results");join=true))
-        endswith(path,".json") && occursin("/g",path) || continue
+    for path in C.result_paths()
         println(basename(path),": ",check_result(path))
     end
 end

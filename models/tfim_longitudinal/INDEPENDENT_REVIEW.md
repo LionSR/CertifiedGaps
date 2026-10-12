@@ -107,7 +107,7 @@ The executable body used for this check is reproduced here; save it to a tempora
 Julia file and run from the repository root with the same project/depot as the README:
 
 ```julia
-include(joinpath(pwd(), "certificates/tfim_longitudinal/certify.jl"))
+include(joinpath(pwd(), "models/tfim_longitudinal/certify.jl"))
 using .LongitudinalCertificate, LinearAlgebra
 const C = LongitudinalCertificate
 q(x) = Rational{BigInt}(x)
@@ -170,7 +170,7 @@ The exact-residual audit is also preserved as
 360/360 exact inequalities passed in 5.911134 seconds. The JSON records the maximum
 squared ratios as exact rationals. This is a validation artifact, not a standalone
 uniform-gap certificate. Run it with `julia --project=julia
-certificates/tfim_longitudinal/independent_residual_audit.jl`.
+models/tfim_longitudinal/independent_residual_audit.jl`.
 
 The complementary stored-artifact audit reported by the parent passed 1,592 checks
 covering all 30 points, using independent character/Ramanujan dimension formulas,
@@ -178,32 +178,7 @@ Pauli trace and trace(H²) identities, and 256-bit interval partition ratios:
 [results/final_audit.json](results/final_audit.json). These augment the existing full
 spectral replay; they do not replace the enclosure theorem reviewed above.
 
-## Review of upstream package-namespace adaptation
-
-After upstream renamed `ThermalMPOGap` to `CertifiedGaps`, I independently inspected
-`archive_generation.jl`, the updated `verify_all.jl`, the namespace-migration record,
-and the package/manifest diff. I then independently compared all 29 listed mathematical
-and core sources against the archived generation sources, allowing only the literal
-namespace replacement, and recomputed their current SHA-256 hashes. **All 29 byte-equality
-checks and all 29 current-hash comparisons passed.** The package UUID and dependency
-versions are unchanged; the manifest changes the root package/extension name and
-project hash, not the interval or linear-algebra dependency versions.
-
-**The earlier mathematical acceptance carries over to this adaptation.** The residual,
-interval, symmetry, partition, and recurrence algorithms have not changed. The original
-per-point fingerprints describe historical generation sources, now preserved exactly
-in `results/original_generation_sources.json`; they must not be described as current-source
-hashes. The migration record supplies the separately verified current fingerprints.
-The updated verifier accepts matching historical fingerprints and independently replays
-the spectra using the current renamed package. That historical provenance check alone
-would not establish arbitrary future source equivalence; the namespace-equivalence
-check and current-source hashes are the evidence for this specific adaptation.
-
-The all-30 deep replay under the renamed package was still running when this addendum
-was written. This addendum does not claim that pending run has passed; its completion
-must be established by the final validation record before publishing the draft PR.
-
-Publication verification update (primary agent): the previously pending current-core replay
-has now passed all 30 cases in 251.85 s; fast checks passed in 8.84 s. The final evidence is
-`results/validation.json`, separately from the original `results/validation_original.json`.
-Independent artifact, rational-residual and free-fermion audits also passed on the current core.
+The fingerprint table above refers to the sources as reviewed, before the core package was
+renamed from `ThermalMPOGap` to `CertifiedGaps` and the directory moved to
+`models/tfim_longitudinal/`; the algorithms are unchanged, and the deep replay
+(`DEEP_CHECK=1 check.jl`) re-derives every enclosure with the current core.

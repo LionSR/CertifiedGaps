@@ -37,5 +37,7 @@ for (g,h) in points
     data["seconds"]=time()-start
     certified=haskey(data,"certificate") && data["certificate"]["bound"]!==nothing
     data["metadata"]=C.metadata(Dict("g"=>C.str(g),"h"=>C.str(h),"nmax"=>nmax);certified)
-    write_result(joinpath(C.ROOT,"results",tag*".json"),data)
+    out=joinpath(C.ROOT,"results",tag*".json"); write_result(out,data)
+    # Spectra make each file ~260 kB; store compressed (`gzip -dc` restores the JSON).
+    run(`gzip -9 -n -f $out`)
 end

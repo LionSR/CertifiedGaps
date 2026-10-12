@@ -42,12 +42,12 @@ function independent_logz(blocks,beta)
 end
 
 started=time(); rows=Any[]; pairs=Set{Tuple{Rational{BigInt},Rational{BigInt}}}()
-paths=sort(filter(p->startswith(basename(p),"g") && endswith(p,".json"),
+paths=sort(filter(p->startswith(basename(p),"g") && endswith(p,".json.gz"),
     readdir(joinpath(AUDIT_ROOT,"results");join=true)))
 @testset "Independent final artifact audit" begin
     @test length(paths)==30
     for path in paths
-        data=JSON3.read(read(path,String),Dict{String,Any})
+        data=JSON3.read(read(`gzip -dc $path`,String),Dict{String,Any})
         g=parseq(data["g"]); h=parseq(data["h"]); push!(pairs,(g,h))
         cert=data["certificate"]; n=cert["n"]; beta=parseq(cert["beta"])
         @test n==6 && iseven(n) && beta>0 && g>0 && h>0

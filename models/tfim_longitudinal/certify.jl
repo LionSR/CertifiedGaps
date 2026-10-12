@@ -164,6 +164,12 @@ function seed_enclosure(small,large,b)
     @assert 0<=es<1 && 0<=et<1
     (;es,et,logs=[a,c,d])
 end
+"Paths of the 30 per-point certificates (gzip-compressed JSON, `results/g*.json.gz`)."
+result_paths()=sort(filter(p->startswith(basename(p),"g") && endswith(p,".json.gz"),
+    readdir(joinpath(ROOT,"results");join=true)))
+"Read a per-point certificate; `.gz` files are decompressed with the system `gzip`."
+read_point(path)=JSON3.read(endswith(path,".gz") ? read(`gzip -dc $path`,String) :
+    read(path,String),Dict{String,Any})
 function hashes()
     merge(source_hashes(ROOT;dirs=("test",),files=Tuple(filter(p->endswith(p,".jl"),readdir(ROOT)))),
         Dict("../../julia/"*k=>v for (k,v) in source_hashes(joinpath(ROOT,"../../julia");

@@ -147,7 +147,7 @@ assembly bounds ||A−H||, BigFloat upward accumulation plus explicit dot-produc
 bounds encloses R=HQ−QΛ and E=Q*Q−I. The polar factor of Q and Weyl's min-max inequality
 then enclose every eigenvalue with multiplicity. Interval sums enclose all three log Z values;
 outward rational defect bounds feed the unmodified `certified_gap_bound`. Source hashes, Julia
-and package versions, dimensions, radii, all eigenvalues and rational seeds are stored in `results/*.json`.
+and package versions, dimensions, radii, all eigenvalues and rational seeds are stored in `results/g*.json.gz`.
 
 For an exact Hermitian block A, a ≥ ||A−H||₂, r ≥ ||HQ−QΛ||₂ and e ≥ ||Q*Q−I||₂ < 1/2,
 the polar factor U obeys ||Q−U||₂ ≤ e. Hence Weyl gives, for every ordered eigenvalue,
@@ -170,17 +170,11 @@ Test commands and measured outcomes are in [README.md](README.md).
 
 Julia 1.12.4; dependencies instantiated and precompiled from the existing Julia project without
 modifying its Project or Manifest. OPENBLAS_NUM_THREADS=1 and BLAS.set_num_threads(1).
-The approved installer endpoint returned HTTP 403; the official Linux x86_64 archive was used
-in /tmp and its SHA-256 checked against the official checksum:
-`c57baf178fe140926acb1a25396d482f325af9d7908d9b066d2fbc0d6639985d`.
 Sum of per-point measured runtimes: 268.320931 seconds;
 audit: 17.481193 seconds. Startup compilation is additional.
-All deliverables are confined to this certificate directory. No merge or publication performed.
 
-Final verification: **72/72 fast checks passed in 8.73 s including compilation**;
-**30/30 independent spectral replays passed in 248.67 s**; all **1,000 source-hash
-comparisons passed**. See [results/validation.json](results/validation.json) for the
-machine-readable record and individual certificate fingerprints.
+Final verification: **72/72 fast checks passed** and **30/30 independent spectral replays
+passed** (`DEEP_CHECK=1 check.jl`, about six CPU minutes); see [README.md](README.md).
 
 ## Independent final audit
 
@@ -201,20 +195,3 @@ Additional independent checks passed:
 The smallest certified bound is exactly **2749898627347949/36028797018963968**,
 approximately **0.07632501928667015**, at **g=1, h=1/20**, with **n₀=6, β₀=13/2**.
 It applies to every even L≥6 cells=sites. No larger scan was required for this audit.
-
-## Draft PR integration
-
-Upstream subsequently renamed the shared package to `CertifiedGaps`. Certificate imports
-now use that package. Exact namespace-only equivalence passed for 29 mathematical/core
-sources; original generation sources and hashes are preserved in
-[results/original_generation_sources.json](results/original_generation_sources.json), with migration evidence
-in [results/namespace_migration.json](results/namespace_migration.json). Original per-point
-JSONs and their bounds are unchanged. Complete replay and independent audits run against
-the current core. The original independent-review fingerprints refer to the archived
-pre-rename sources. This PR changes only the explicitly requested certificate directory
-relative to upstream; no core modifications, CI additions, or PR merge are included.
-
-Current-core replay completed successfully before draft PR publication: 72 fast tests
-passed in 8.84 s including compilation, all 30 deep spectral replays passed in 251.85 s,
-and 1,000 historical/current source-hash comparisons passed. The independent 1,592-check
-artifact audit, 360 exact-rational checks and 42 cross-checks also passed on CertifiedGaps.

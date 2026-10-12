@@ -1,105 +1,81 @@
 # Longitudinal-field TFIM certificates
 
-See [REPORT.md](REPORT.md) for the parameter table and certified region, and
-[METHOD.md](METHOD.md) for the rigorous eigenvalue and partition-function enclosure proof.
-One site is one cell. RP uses the standard Z basis, coefficient 1 and C=Z.
-All 30 requested (g,h) points were scanned; certificate JSONs store the exact rational
-seeds, full enclosed spectra, source fingerprints and the unmodified core recurrence output.
+Model: H_L = −Σ Z_j Z_{j+1} − g Σ X_j − h Σ Z_j (Pauli matrices, periodic ring, one site per
+cell), on the grid g ∈ {1/4, 1/2, 3/4, 1, 3/2, 2} × h ∈ {1/20, 1/10, 1/4, 1/2, 1}.
 
-Run from the repository root with Julia 1.12.4 and the existing `julia` project:
+**All 30 points are certified**: for every even L ≥ 6 the ground state is unique and the gap
+is at least the stored bound. The smallest bound is 2749898627347949/36028797018963968
+≈ 0.0763 (g = 1, h = 1/20). See [REPORT.md](REPORT.md) for the table and region map,
+[METHOD.md](METHOD.md) for the enclosure theorem, [IDEAS.md](IDEAS.md) for the route
+choice and [INDEPENDENT_REVIEW.md](INDEPENDENT_REVIEW.md) for the independent review.
+
+- **RP basis**: σᶻ basis, −h_bond = Z ⊗ Z (one term, C = Z, real), on-site
+  o = −gX − hZ real symmetric. `rp_check` verifies this in `Rational{BigInt}`.
+- **Seed**: n₀ = 6 at every point, β₀ ∈ (1/4)ℤ chosen per point by a numerical scan
+  (n₀ ∈ {2, 4, 6}, β₀ ∈ {1/4, …, 64}). Rings of 6 and 12 sites are diagonalised densely in
+  every momentum sector (no spin-flip or reflection-parity reduction); a polar-factor/Weyl
+  argument with explicit rounding allowances encloses every eigenvalue with multiplicity;
+  interval partition sums give exact rational εₛ ≥ 1 − Pₛ(6, β₀), εₜ ≥ 1 − P_τ(12, β₀).
+- **Bound**: `CertifiedGaps.certified_gap_bound(εₛ, εₜ, β₀)`; exact binary value stored.
+
+Rigorous: RP identity, sector dimensions, eigenvalue enclosures (under the IEEE binary64 /
+MPFR / IntervalArithmetic model with gradual underflow and single-threaded BLAS, see
+METHOD.md), partition-function and seed enclosures, the resulting uniform gap on the
+discrete grid. Numerical only: seed ranking, 12-site ED reference gaps, bound/ED ratios,
+finite-size diagnostics. Nothing is claimed between grid points, for odd L, or as h → 0.
+
+## Files
+
+| file | role |
+|---|---|
+| `certify.jl` | module: momentum blocks, rigorous enclosures, seed enclosure, I/O |
+| `scan.jl` | numerical seed scan + rigorous best seed; writes `results/g*_h*.json.gz` |
+| `check.jl` | checker; `DEEP_CHECK=1` also regenerates and contains all enclosures |
+| `test/runtests.jl` | fast tests (RP, sector counts, partition intervals, recurrence, seed table) |
+| `seeds.jl` | writes `results/seeds.json`, the exact seed table of all 30 points |
+| `audit.jl`, `final_audit.jl`, `independent_residual_audit.jl` | independent cross-checks |
+| `report.jl` | regenerates the body of `REPORT.md` |
+| `results/g<g>_h<h>.json.gz` | per-point certificate: exact seeds, bound, full enclosed spectra |
+| `results/seeds.json` | g, h, n₀, β₀, εₛ, εₜ, bound for every point (exact rationals) |
+| `results/*audit*.json` | outputs of the audit scripts |
+
+The per-point certificates are gzip-compressed JSON (each ~260 kB uncompressed, almost all
+of it the 4096 + 64 stored eigenvalue midpoints and radii, which the checker needs to
+recompute the partition intervals). `C.read_point` decompresses with the system `gzip`;
+`gzip -dc results/g1_1_h1_20.json.gz` shows one. Exact numbers are `"num//den"` strings.
+
+## Commands
+
+From the repository root (Julia 1.12):
 
 ```sh
 export OPENBLAS_NUM_THREADS=1
-julia --project=julia certificates/tfim_longitudinal/scan.jl
-julia --project=julia certificates/tfim_longitudinal/audit.jl
-julia --project=julia certificates/tfim_longitudinal/test/runtests.jl
-DEEP_CHECK=1 julia --project=julia certificates/tfim_longitudinal/check.jl
-julia --project=julia certificates/tfim_longitudinal/report.jl
+julia --project=julia -e 'using Pkg; Pkg.instantiate()'
+julia --project=julia models/tfim_longitudinal/test/runtests.jl          # ~20 s
+DEEP_CHECK=1 julia --project=julia models/tfim_longitudinal/check.jl     # ~6 min CPU, full replay
+julia --project=julia models/tfim_longitudinal/final_audit.jl            # ~30 s
+julia --project=julia models/tfim_longitudinal/independent_residual_audit.jl
+julia --project=julia models/tfim_longitudinal/audit.jl
+julia --project=julia models/tfim_longitudinal/scan.jl                   # ~5 min, rewrites results
+julia --project=julia models/tfim_longitudinal/seeds.jl
 ```
 
-In this cloud session Julia and its depot are temporary; prefix the commands with:
+The directory's own `Project.toml` points at `../../julia`. Measured on the current core:
+fast tests 74/74 in about 20 s, deep replay 30/30 (330 s CPU), final artifact audit 1592/1592
+in about 30 s.
 
-```sh
-export PATH="/tmp/julia-1.12.4/bin:$PATH"
-export JULIA_DEPOT_PATH=/tmp/tfim-julia-depot
-```
+`scan.jl` takes `NMAX` (default 6) and optional parameter indices 1–30 (g-major). Larger rings
+are expensive: a single generic momentum block at L = 20 is 52,377-dimensional (~41 GiB as a
+complex dense matrix), so the dense route stops well short of L = 20.
 
-`scan.jl` defaults to even n₀=2,4,6, and β₀=1/4,2/4,…,64. It uses `scan_seeds`
-and `best_seed`, then rigorously recomputes only the best seed for each parameter.
-Set `NMAX=8` to request larger rings, or pass parameter indices 1–30 to run a subset
-(g-major, h-minor order). Such extensions can be much more expensive; the 20–24-site
-full dense sectors exceed this machine's memory. Existing results are replaced per point.
-The implementation uses complete momentum blocks, with both k and −k computed,
-without additional reflection-parity splitting. Spin-flip parity cannot be used for h>0.
+## Removed when moving to `models/`
 
-The fast checker verifies RP, dimensions, the partition-function intervals from the stored
-spectral enclosures, and the bound from rational seeds. It does not merely compare decimal
-seeds. The deep checker regenerates all rigorous dense eigensystem enclosures and checks
-containment in the stored spectral intervals with exact rational comparisons. The numerical audit compares independent computational-basis ED,
-the free-fermion formula at h=0,g=2, and exact rational classical spectra.
-
-The bound is uniform for **every even L≥6 sites** for the default result set. A finite-ring
-ED reference gap, its ratio to the bound, scan diagnostics and the free-fermion comparison
-are numerical. The JSON eigenvalue enclosures, seed bounds and recurrence lower bound
-are certified under IEEE/MPFR/IntervalArithmetic arithmetic as detailed in METHOD.md.
-The reported parameter grid is discrete; no interpolation between parameters is certified.
-
-No source outside this directory was changed. No changes were merged or published.
-
-## Verified execution results
-
-- Fast suite: **72/72 passed**, 8.73 seconds including loading and compilation
-  (2.6 seconds in the test body), below the requested two-minute limit.
-- Deep replay: **30/30 passed**, 248.67 seconds, independently regenerating all
-  spectral enclosures and proving containment in the stored intervals.
-- Provenance: **1,000 source-hash comparisons passed**.
-- Independent audit: **42/42 passed**, including the h=0,g=2 free-fermion cross-check.
-- Final full grid scan: 268.32 seconds summed over all parameter points.
-
-The complete verifier is:
-
-```sh
-julia --project=julia certificates/tfim_longitudinal/verify_all.jl
-```
-
-Machine-readable verification, BLAS configuration and SHA-256 fingerprints of all 30
-certificate files are in [results/validation.json](results/validation.json).
-
-## Independent final review
-
-[INDEPENDENT_REVIEW.md](INDEPENDENT_REVIEW.md) records the separate reviewer's acceptance
-with no unresolved theorem gap. Additional reproducible audits are:
-
-```sh
-julia --project=julia certificates/tfim_longitudinal/final_audit.jl
-julia --project=julia certificates/tfim_longitudinal/independent_residual_audit.jl
-```
-
-These passed 1,592 independent stored-artifact checks and 360 exact rational residual/
-orthogonality checks, respectively. `results/audit_manifest.json` fingerprints the final
-source, documentation, data, logs and the unchanged core/theorem sources.
-
-## Current upstream compatibility
-
-The PR targets upstream's `CertifiedGaps` package rename. All mathematical generation
-sources and core Julia sources were checked for exact byte equality to the reviewed
-version after replacing only `ThermalMPOGap` with `CertifiedGaps` (29 sources).
-`results/namespace_migration.json` records that check. The original per-point certificates
-are unchanged; `results/original_generation_sources.json` preserves their exact generation sources
-and original hashes at commit `e67c0925f6d069d2dccf34bfbb3dbfc9971c6d0e`.
-The verifier checks historical fingerprints against that archive while independently
-regenerating spectral enclosures with the current core. Freshly generated results may
-instead match the live source hashes. Deep replay and the independent audits were rerun
-on the renamed core; current runtime evidence is in their JSON results and logs.
-
-The task's explicit `certificates/tfim_longitudinal/` destination is retained. The PR
-changes only this directory relative to current upstream; no core or CI changes are added.
-The original no-publication statements describe the earlier local-only audit stage.
-
-The pre-migration validation record is preserved byte-for-byte in
-`results/validation_original.json`. `results/validation.json` records the replay on the
-current `CertifiedGaps` core, with fresh runtime/source metadata. The original reviewed
-commit ID identifies a local audit snapshot; its exact generation sources are portable
-in the archive above. The published branch uses a GitHub noreply identity and does not
-include the unpublished local commit history. `archive_generation.jl` validates the
-archived sources without requiring that historical Git object.
+The draft PR lived in `certificates/tfim_longitudinal/` and carried migration and provenance
+records that are no longer needed: uncompressed per-point JSONs (now gzipped, content
+unchanged), `results/original_generation_sources.json` and `archive_generation.jl` (archive of
+the pre-rename `ThermalMPOGap` sources), `results/namespace_migration.json`,
+`results/validation.json` and `results/validation_original.json` with `verify_all.jl`
+(replaced by `DEEP_CHECK=1 check.jl`), `results/audit_manifest.json` with `seal.jl`, and run
+logs. All remain in the git history of this branch. The per-point `metadata.source_sha256`
+values are historical (they fingerprint the generating sources at run time); rerun `scan.jl`
+to obtain fingerprints of the current sources.

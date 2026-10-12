@@ -1,9 +1,8 @@
 include("certify.jl")
 using .LongitudinalCertificate, JSON3, Printf
 const C=LongitudinalCertificate
-paths=filter(p->startswith(basename(p),"g") && endswith(p,".json"),
-    readdir(joinpath(C.ROOT,"results");join=true))
-data=sort([JSON3.read(read(p,String),Dict{String,Any}) for p in paths];
+paths=C.result_paths()
+data=sort([C.read_point(p) for p in paths];
     by=d->(C.rat(d["g"]),C.rat(d["h"])))
 audit=JSON3.read(read(joinpath(C.ROOT,"results","audit.json"),String),Dict{String,Any})
 fmt(x)=@sprintf("%.6f",x)
@@ -96,7 +95,7 @@ open(joinpath(C.ROOT,"REPORT.md"),"w") do io
     println(io,"bounds encloses R=HQ−QΛ and E=Q*Q−I. The polar factor of Q and Weyl's min-max inequality")
     println(io,"then enclose every eigenvalue with multiplicity. Interval sums enclose all three log Z values;")
     println(io,"outward rational defect bounds feed the unmodified `certified_gap_bound`. Source hashes, Julia")
-    println(io,"and package versions, dimensions, radii, all eigenvalues and rational seeds are stored in `results/*.json`.\n")
+    println(io,"and package versions, dimensions, radii, all eigenvalues and rational seeds are stored in `results/g*.json.gz`.\n")
     println(io,"For an exact Hermitian block A, a ≥ ||A−H||₂, r ≥ ||HQ−QΛ||₂ and e ≥ ||Q*Q−I||₂ < 1/2,")
     println(io,"the polar factor U obeys ||Q−U||₂ ≤ e. Hence Weyl gives, for every ordered eigenvalue,")
     println(io,"**|λᵢ(A)−Λᵢ| ≤ a + r + (||H||F + max|Λᵢ|)e**. This is the theorem implemented;")
@@ -114,10 +113,6 @@ open(joinpath(C.ROOT,"REPORT.md"),"w") do io
     println(io,"## Environment and runtime\n")
     println(io,"Julia 1.12.4; dependencies instantiated and precompiled from the existing Julia project without")
     println(io,"modifying its Project or Manifest. OPENBLAS_NUM_THREADS=1 and BLAS.set_num_threads(1).")
-    println(io,"The approved installer endpoint returned HTTP 403; the official Linux x86_64 archive was used")
-    println(io,"in /tmp and its SHA-256 checked against the official checksum:")
-    println(io,"`c57baf178fe140926acb1a25396d482f325af9d7908d9b066d2fbc0d6639985d`.")
     println(io,"Sum of per-point measured runtimes: ",fmt(sum(d["seconds"] for d in data))," seconds;")
     println(io,"audit: ",fmt(audit["seconds"])," seconds. Startup compilation is additional.")
-    println(io,"All deliverables are confined to this certificate directory. No merge or publication performed.")
 end
