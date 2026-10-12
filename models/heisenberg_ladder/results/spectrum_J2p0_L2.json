@@ -1,0 +1,680 @@
+{
+    "J": "2//1",
+    "lowest_32_numerical_levels": [
+        -4,
+        -2,
+        -2,
+        -2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        2,
+        2,
+        2,
+        2,
+        2.0000000000000004
+    ],
+    "logZ_grid": [
+        {
+            "logZ": 2.8734007244019386,
+            "beta": "1//4"
+        },
+        {
+            "logZ": 3.193898422125729,
+            "beta": "1//2"
+        },
+        {
+            "logZ": 3.7292114470416733,
+            "beta": "3//4"
+        },
+        {
+            "logZ": 4.436064845937941,
+            "beta": "1//1"
+        },
+        {
+            "logZ": 5.259426142191953,
+            "beta": "5//4"
+        },
+        {
+            "logZ": 6.154718677937805,
+            "beta": "3//2"
+        },
+        {
+            "logZ": 7.092682189909662,
+            "beta": "7//4"
+        },
+        {
+            "logZ": 8.055742962232792,
+            "beta": "2//1"
+        },
+        {
+            "logZ": 9.033625969643916,
+            "beta": "9//4"
+        },
+        {
+            "logZ": 10.02032520643105,
+            "beta": "5//2"
+        },
+        {
+            "logZ": 11.01230159170045,
+            "beta": "11//4"
+        },
+        {
+            "logZ": 12.00745151057526,
+            "beta": "3//1"
+        },
+        {
+            "logZ": 13.004515944631308,
+            "beta": "13//4"
+        },
+        {
+            "logZ": 14.002737719412927,
+            "beta": "7//2"
+        },
+        {
+            "logZ": 15.001660016682221,
+            "beta": "15//4"
+        },
+        {
+            "logZ": 16.001006668957427,
+            "beta": "4//1"
+        },
+        {
+            "logZ": 17.000610508546515,
+            "beta": "17//4"
+        },
+        {
+            "logZ": 18.000370267474054,
+            "beta": "9//2"
+        },
+        {
+            "logZ": 19.000224569493717,
+            "beta": "19//4"
+        },
+        {
+            "logZ": 20.000136204941516,
+            "beta": "5//1"
+        },
+        {
+            "logZ": 21.000082611243545,
+            "beta": "21//4"
+        },
+        {
+            "logZ": 22.000050105799705,
+            "beta": "11//2"
+        },
+        {
+            "logZ": 23.000030390537336,
+            "beta": "23//4"
+        },
+        {
+            "logZ": 24.000018432731437,
+            "beta": "6//1"
+        },
+        {
+            "logZ": 25.000011179994235,
+            "beta": "25//4"
+        },
+        {
+            "logZ": 26.000006781000994,
+            "beta": "13//2"
+        },
+        {
+            "logZ": 27.00000411288196,
+            "beta": "27//4"
+        },
+        {
+            "logZ": 28.000002494587886,
+            "beta": "7//1"
+        },
+        {
+            "logZ": 29.000001513043625,
+            "beta": "29//4"
+        },
+        {
+            "logZ": 30.000000917707194,
+            "beta": "15//2"
+        },
+        {
+            "logZ": 31.000000556617493,
+            "beta": "31//4"
+        },
+        {
+            "logZ": 32.000000337605556,
+            "beta": "8//1"
+        },
+        {
+            "logZ": 33.000000204768114,
+            "beta": "33//4"
+        },
+        {
+            "logZ": 34.00000012419814,
+            "beta": "17//2"
+        },
+        {
+            "logZ": 35.00000007532998,
+            "beta": "35//4"
+        },
+        {
+            "logZ": 36.00000004568994,
+            "beta": "9//1"
+        },
+        {
+            "logZ": 37.000000027712346,
+            "beta": "37//4"
+        },
+        {
+            "logZ": 38.000000016808386,
+            "beta": "19//2"
+        },
+        {
+            "logZ": 39.0000000101948,
+            "beta": "39//4"
+        },
+        {
+            "logZ": 40.00000000618346,
+            "beta": "10//1"
+        },
+        {
+            "logZ": 41.00000000375046,
+            "beta": "41//4"
+        },
+        {
+            "logZ": 42.00000000227477,
+            "beta": "21//2"
+        },
+        {
+            "logZ": 43.00000000137972,
+            "beta": "43//4"
+        },
+        {
+            "logZ": 44.00000000083684,
+            "beta": "11//1"
+        },
+        {
+            "logZ": 45.00000000050757,
+            "beta": "45//4"
+        },
+        {
+            "logZ": 46.00000000030786,
+            "beta": "23//2"
+        },
+        {
+            "logZ": 47.00000000018672,
+            "beta": "47//4"
+        },
+        {
+            "logZ": 48.00000000011325,
+            "beta": "12//1"
+        },
+        {
+            "logZ": 49.00000000006869,
+            "beta": "49//4"
+        },
+        {
+            "logZ": 50.000000000041666,
+            "beta": "25//2"
+        },
+        {
+            "logZ": 51.00000000002527,
+            "beta": "51//4"
+        },
+        {
+            "logZ": 52.000000000015326,
+            "beta": "13//1"
+        },
+        {
+            "logZ": 53.000000000009294,
+            "beta": "53//4"
+        },
+        {
+            "logZ": 54.00000000000564,
+            "beta": "27//2"
+        },
+        {
+            "logZ": 55.00000000000342,
+            "beta": "55//4"
+        },
+        {
+            "logZ": 56.000000000002075,
+            "beta": "14//1"
+        },
+        {
+            "logZ": 57.00000000000126,
+            "beta": "57//4"
+        },
+        {
+            "logZ": 58.00000000000076,
+            "beta": "29//2"
+        },
+        {
+            "logZ": 59.00000000000046,
+            "beta": "59//4"
+        },
+        {
+            "logZ": 60.00000000000028,
+            "beta": "15//1"
+        },
+        {
+            "logZ": 61.00000000000017,
+            "beta": "61//4"
+        },
+        {
+            "logZ": 62.00000000000011,
+            "beta": "31//2"
+        },
+        {
+            "logZ": 63.000000000000064,
+            "beta": "63//4"
+        },
+        {
+            "logZ": 64.00000000000004,
+            "beta": "16//1"
+        },
+        {
+            "logZ": 65.00000000000003,
+            "beta": "65//4"
+        },
+        {
+            "logZ": 66.00000000000001,
+            "beta": "33//2"
+        },
+        {
+            "logZ": 67.00000000000001,
+            "beta": "67//4"
+        },
+        {
+            "logZ": 68,
+            "beta": "17//1"
+        },
+        {
+            "logZ": 69,
+            "beta": "69//4"
+        },
+        {
+            "logZ": 70,
+            "beta": "35//2"
+        },
+        {
+            "logZ": 71,
+            "beta": "71//4"
+        },
+        {
+            "logZ": 72,
+            "beta": "18//1"
+        },
+        {
+            "logZ": 73,
+            "beta": "73//4"
+        },
+        {
+            "logZ": 74,
+            "beta": "37//2"
+        },
+        {
+            "logZ": 75,
+            "beta": "75//4"
+        },
+        {
+            "logZ": 76,
+            "beta": "19//1"
+        },
+        {
+            "logZ": 77,
+            "beta": "77//4"
+        },
+        {
+            "logZ": 78,
+            "beta": "39//2"
+        },
+        {
+            "logZ": 79,
+            "beta": "79//4"
+        },
+        {
+            "logZ": 80,
+            "beta": "20//1"
+        },
+        {
+            "logZ": 81,
+            "beta": "81//4"
+        },
+        {
+            "logZ": 82,
+            "beta": "41//2"
+        },
+        {
+            "logZ": 83,
+            "beta": "83//4"
+        },
+        {
+            "logZ": 84,
+            "beta": "21//1"
+        },
+        {
+            "logZ": 85,
+            "beta": "85//4"
+        },
+        {
+            "logZ": 86,
+            "beta": "43//2"
+        },
+        {
+            "logZ": 87,
+            "beta": "87//4"
+        },
+        {
+            "logZ": 88,
+            "beta": "22//1"
+        },
+        {
+            "logZ": 89,
+            "beta": "89//4"
+        },
+        {
+            "logZ": 90,
+            "beta": "45//2"
+        },
+        {
+            "logZ": 91,
+            "beta": "91//4"
+        },
+        {
+            "logZ": 92,
+            "beta": "23//1"
+        },
+        {
+            "logZ": 93,
+            "beta": "93//4"
+        },
+        {
+            "logZ": 94,
+            "beta": "47//2"
+        },
+        {
+            "logZ": 95,
+            "beta": "95//4"
+        },
+        {
+            "logZ": 96,
+            "beta": "24//1"
+        },
+        {
+            "logZ": 97,
+            "beta": "97//4"
+        },
+        {
+            "logZ": 98,
+            "beta": "49//2"
+        },
+        {
+            "logZ": 99,
+            "beta": "99//4"
+        },
+        {
+            "logZ": 100,
+            "beta": "25//1"
+        },
+        {
+            "logZ": 101,
+            "beta": "101//4"
+        },
+        {
+            "logZ": 102,
+            "beta": "51//2"
+        },
+        {
+            "logZ": 103,
+            "beta": "103//4"
+        },
+        {
+            "logZ": 104,
+            "beta": "26//1"
+        },
+        {
+            "logZ": 105,
+            "beta": "105//4"
+        },
+        {
+            "logZ": 106,
+            "beta": "53//2"
+        },
+        {
+            "logZ": 107,
+            "beta": "107//4"
+        },
+        {
+            "logZ": 108,
+            "beta": "27//1"
+        },
+        {
+            "logZ": 109,
+            "beta": "109//4"
+        },
+        {
+            "logZ": 110,
+            "beta": "55//2"
+        },
+        {
+            "logZ": 111,
+            "beta": "111//4"
+        },
+        {
+            "logZ": 112,
+            "beta": "28//1"
+        },
+        {
+            "logZ": 113,
+            "beta": "113//4"
+        },
+        {
+            "logZ": 114,
+            "beta": "57//2"
+        },
+        {
+            "logZ": 115,
+            "beta": "115//4"
+        },
+        {
+            "logZ": 116,
+            "beta": "29//1"
+        },
+        {
+            "logZ": 117,
+            "beta": "117//4"
+        },
+        {
+            "logZ": 118,
+            "beta": "59//2"
+        },
+        {
+            "logZ": 119,
+            "beta": "119//4"
+        },
+        {
+            "logZ": 120,
+            "beta": "30//1"
+        },
+        {
+            "logZ": 121,
+            "beta": "121//4"
+        },
+        {
+            "logZ": 122,
+            "beta": "61//2"
+        },
+        {
+            "logZ": 123,
+            "beta": "123//4"
+        },
+        {
+            "logZ": 124,
+            "beta": "31//1"
+        },
+        {
+            "logZ": 125,
+            "beta": "125//4"
+        },
+        {
+            "logZ": 126,
+            "beta": "63//2"
+        },
+        {
+            "logZ": 127,
+            "beta": "127//4"
+        },
+        {
+            "logZ": 128,
+            "beta": "32//1"
+        }
+    ],
+    "gap": 2,
+    "storage_note": "Full spectrum computed; retained logZ grid and low levels. Rerun scan.jl to regenerate all levels.",
+    "dimension": 16,
+    "sectors": [
+        {
+            "spin_parity": 0,
+            "m": 0,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 6.29425048828125e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 2.288818359375e-5
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 0,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 1.1920928955078125e-6
+        },
+        {
+            "spin_parity": 0,
+            "m": 1,
+            "k": 1,
+            "multiplicity": 2,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": 1,
+            "m": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 3,
+            "leg_parity": 1,
+            "seconds": 6.890296936035156e-5
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 0,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 1.9073486328125e-6
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 1,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": 1,
+            "seconds": 9.5367431640625e-7
+        },
+        {
+            "spin_parity": -1,
+            "m": 2,
+            "k": 1,
+            "multiplicity": 1,
+            "dimension": 1,
+            "leg_parity": -1,
+            "seconds": 2.1457672119140625e-6
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "IntervalArithmetic": "1.0.12",
+        "ThermalMPOGap": "0.2.0",
+        "status": "numerical, not certified",
+        "config": {
+            "J": "2//1",
+            "L": 2
+        },
+        "created_utc": "2026-10-11T04:56:22.321",
+        "certified": false,
+        "source_sha256": {
+            "certificates/heisenberg_ladder/recheck_seeds.jl": "cbf1b0d32bc81bee13212319f5f44726e68d58495a7240853d833c141a4d306c",
+            "certificates/heisenberg_ladder/certify.jl": "cd8c95a1d594edf3d813cc67dc2f3595c743934065d2ae42a1ba773ef7640ef7",
+            "julia/src/ExactDiagonalization.jl": "936f5c6764ca892769024711bdc0842c299e5c8b5d32fba976199212384551bb",
+            "julia/src/ReflectionPositivity.jl": "653dd5cb1da456a0cb7db215c38c2e394d3658eccfd0e5b93d0fb1581b22c06f",
+            "julia/src/Recurrence.jl": "5c70fbae608abd2d0f26ad529b477967bf4153e7ae1dde603f4e4644252924ed",
+            "julia/src/Seeds.jl": "eabb710e3aa6d870e84b6b8bd8e0df4c54dd56e2a7b95495be61388ba1f3f2be",
+            "outputs/thermal-mpo-gap-scope.tex": "4e77e5d839d79efc4472b6b75a505726b54fb79de5fd4604c27d8927b8d809e7",
+            "certificates/heisenberg_ladder/rp.jl": "544abac201bbeb621e720b08018f0b3f3297846c6571792dc8d5251edbd4b152",
+            "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
+            "certificates/heisenberg_ladder/test/runtests.jl": "68ec724aa619c7de411b96970ffd21172dccded71d1a4649222da34b85860ea0",
+            "julia/src/CertifiedMPO/GaugeSearch.jl": "fc8d1d96088434191c4c09520cb91ca8054ccc1d7b552e9e57448cbb03b3edc8",
+            "julia/src/CertifiedMPO/CertifiedMPO.jl": "67678a11ecd30c3add4fe85c09373d75b5eee63d70b8766a805b12976cae3e9a",
+            "julia/src/CertifiedMPO/SchattenBridge.jl": "f826199d1be8e6632bdbcdd5eed279ac37a72cbf6051a0ff3942946de52b06a9",
+            "julia/src/recurrence/rational.jl": "be93e303d0a89d36dca4ee284a72a34b2efcf5c0dec93476352f69cacec1f67c",
+            "certificates/heisenberg_ladder/check.jl": "c4637091abde17ea83b862796f384041105515c1fd0a2e21b7ec5512e04ceef9",
+            "julia/src/CertifiedMPO/AdjointTrace.jl": "1596f1cf3045f3dd8f8d6aa8445ea2268811228e9c77d3b4c186510d33eb5aa9",
+            "julia/src/CertifiedMPO/Norms.jl": "6ec3509571238504acdb9eb2052e44794075f69850503a27ea7a0e79f53fae93",
+            "certificates/heisenberg_ladder/ladder.jl": "23707cbb4ecb643c16785e1f22494a9df6ba2c6f736477a640a370c5ca9b2d68",
+            "julia/src/CertifiedMPO/MPOAlgebra.jl": "9106a106a0cf33fc7cec095e803db2ba4a0743169a849da264c71d4336f6856a",
+            "julia/src/Models.jl": "03c2ea4f68d313d4dc4b468b66dbe91999929c50c4b71ca8db805792018a30fc",
+            "certificates/heisenberg_ladder/prepare_small.jl": "52062b8b65b826153e69e60ac1d91bd8043d6f3e55d5b678b645352016ec37b8",
+            "certificates/heisenberg_ladder/scan.jl": "b97a8996a169d6332af120209578aa257973c369b01361bd70556fa6312cb515",
+            "certificates/heisenberg_ladder/threshold.jl": "c3051e516146b83bebca99a46f76353a5062be71d0148df2f982df7298784f27",
+            "julia/src/Purification.jl": "f9acd3caf3d413aa540d108af79aa1acff8956b7281fed4009e18eeecaf8c884",
+            "julia/src/ExactArithmetic.jl": "b0b11c2d5e19ea24f00fed6e93b4949ae86d323117e4344f21e682ea7e778642",
+            "certificates/heisenberg_ladder/compact_results.jl": "9a110caec9069d1d8c6bbd7d560ebded98ff82f7243a82be53c6d25729eb09c4",
+            "julia/src/Results.jl": "cc886dd20458799780935386400a5594e69d6231aada6d68f5a59f29f6ecb677",
+            "julia/src/CertifiedMPO/Products.jl": "7d15b0e27c8dcefc9fb5f876efa4fec4edc6cca3be8caecfd867e8c72b773b5e",
+            "julia/src/CertifiedMPO/Squaring.jl": "e9db2558c5f0472ba82f02139114d53cb2701fa34cdfdceb6bb9b53f4f7f45d8",
+            "julia/src/Spins.jl": "a43d59bd120bb765ee50a49001cbb9792aa26bc23838fd4dbcb9e5943aab2090",
+            "julia/src/ThermalMPOGap.jl": "06d393ef52eeb6966404ed21beeeec0ac84182e8d780c6206d7a1e47c1cae5f9",
+            "certificates/heisenberg_ladder/validate.jl": "71c5502137afa44f4347bc5c9597fa44af218b019afddbbb0c49ef7a708c1b97",
+            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+            "certificates/heisenberg_ladder/smoke.jl": "e1dbb2d9c7cab13a4f179f2ba82d0d2a06695c2f2e6b5c031db4553289998ce9",
+            "julia/src/CertifiedMPO/OperatorError.jl": "7094b07e0d22d8836178d5aab398c7d1f52a6a516e06e6bf0e5374ed6d02b78d",
+            "certificates/heisenberg_ladder/summarize.jl": "1e018a7132a27c9d9e8de973b5bde45d2629830e3be2da80eb5539fe5381ca2f",
+            "julia/Manifest.toml": "6f67f2d98c66ab6a36b577346a4dc78bf4d3187489e736759967b94f03899d80",
+            "julia/Project.toml": "aad0eff0d3aeaeb0afb0e967ccaa245c0d24c2cddafef2289a2e41eacad0e1f3",
+            "julia/src/CertifiedMPO/PolynomialBounds.jl": "687a589d85dc527177281a0e1283b8d428df93f962c465ed2221a539b14fa1b9",
+            "julia/src/CertifiedMPO/PositiveBounds.jl": "97f605694d77949738837020f7a5ef3b54373369317399705a20e32e22b9bcbb",
+            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
+        },
+        "blas_threads": 1
+    },
+    "L": 2,
+    "seconds": 0.6291208267211914
+}
