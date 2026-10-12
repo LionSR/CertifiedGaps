@@ -1,22 +1,28 @@
-# Lean check of the spin-1 Heisenberg gap
+# Lean checks of two-purity gap certificates
 
-A minimal Lean 4 project, with Mathlib as its only dependency, that checks Theorem 1 of the
-thermal-MPO note (`../outputs/thermal-mpo-gap-note.tex`). The periodic spin-1 Heisenberg ring
-has a unique ground state and gap `Δ_L > (log 20)/784` for every even `L ≥ 2304`. The proof is
-the note's two-purity doubling argument. It needs none of the twisted rings, symmetry sectors,
-polynomial filters or trial states of OpenAI's *The periodic spin-one Haldane gap*.
+A Lean 4 project, with Mathlib as its only dependency, that proves uniform spectral gaps of
+quantum spin rings with the two-purity doubling argument of the thermal-MPO note
+(`../outputs/thermal-mpo-gap-note.tex`). Everything is proved except the seed inequalities,
+which are two numbers per model, stated as named `sorry` lemmas.
 
 ## Status
 
-```lean
-theorem SpinOneHeisenberg.spin_one_heisenberg_gap {L : ℕ} (hL : 2304 ≤ L) (hLe : Even L) :
-    GapGT (spectrum L) (log 20 / 784)
-```
+| Theorem | Model | Statement | Open inputs |
+|---|---|---|---|
+| `SpinOneHeisenberg.spin_one_heisenberg_gap` | spin-1 Heisenberg ring | `Δ_L > log 20 / 784` for even `L ≥ 2304` | `P_s(2304, 784), P_τ(4608, 784) ≥ 0.99` |
+| `SpinOneLargeD.gap_D4` | spin-1, `+ 4 ∑ (Sᶻ)²` | `Δ_L > log 4.755 / (9/4) ≈ 0.693` for even `L ≥ 6` | `P_s(6, 9/4) ≥ 1 − 0.06411`, `P_τ(12, 9/4) ≥ 1 − 0.04053` |
+| `SpinOneLargeD.gap_D3206` | spin-1, `+ (1603/500) ∑ (Sᶻ)²` | `Δ_L > log 1.0065429 / (381/125) ≈ 0.00214` for even `L ≥ 6` | two seeds at `(6, 381/125)` |
+| `TwoLegLadder.gap_J4` | spin-½ ladder, `J_⊥ = 4` (sublattice-rotated) | `Δ_L > log 9.033 / 2 ≈ 1.100` for even `L ≥ 4` rungs | `P_s(4, 2) ≥ 1 − 0.03509`, `P_τ(8, 2) ≥ 1 − 0.02463` |
 
-Everything is proved except the two numerical seeds, `seed_spatial` and `seed_thermal` in
-`Heisenberg/Main.lean`. Until those are proved, `#print axioms` on this theorem shows `sorryAx`
-alongside `propext`, `Classical.choice` and `Quot.sound`. The transfer-operator input
-`spatialMomentBounds_partitionFunction` is proved and uses only the three standard axioms.
+`GapGT e c` says that the lowest level is nondegenerate and every other level lies more than
+`c` above it. `#print axioms` on each theorem lists `sorryAx` (from its seeds) besides
+`propext`, `Classical.choice` and `Quot.sound`. Everything else (the criterion, the
+transfer-operator input for every reflection-positive ring, the recurrence certificates checked
+by `decide`) uses only the three standard axioms.
+
+The seeds of the new models come from the certificates of PRs #6 and #7 (complete spectra of the
+seed rings with rigorous eigenvalue enclosures, floating-point arithmetic trusted). The
+spin-1 Heisenberg seeds are OpenAI's Proposition 5.5, reproduced in `../models/spin1/`.
 
 ```sh
 cd lean
@@ -24,22 +30,45 @@ lake exe cache get   # prebuilt Mathlib; never build Mathlib from source
 lake build
 ```
 
-Lean and Mathlib are pinned at `v4.35.0-rc3`. The project has about 1900 lines.
+Lean and Mathlib are pinned at `v4.35.0-rc3`. The project has about 2900 lines.
+
+## Adding a model
+
+A gap certificate enters Lean in exactly this form:
+
+1. **The model as an `RPRing d ι`**: real matrices `C_α` (each symmetric or antisymmetric) and a
+   real symmetric on-site term `o`, with bond `h = −∑_α C_α ⊗ C_α`. A multi-site unit cell is a
+   bigger local space `d` with the intra-cell terms in `o`. Proving the two symmetry conditions
+   is a finite matrix computation.
+2. **The seeds**: `1 − εₛ ≤ R.spatialPurity n₀ β₀` and `1 − εₜ ≤ R.thermalPurity (2 n₀) β₀` with
+   rational `εₛ, εₜ`, `n₀ ≥ 2` even. These are the only statements left to numerics.
+3. **A `ChainCertificate`**: generate it with
+   `julia lean/scripts/chain_certificate.jl εₛ εₜ β₀ [J] [digits]` and paste it in. Lean checks it
+   with `decide +kernel`. The resulting bound is `log r / β₀`.
+4. Apply `RPRing.gapGT_of_chainCertificate`. See `Models/TwoLegLadder.lean` for a complete
+   example (about 120 lines).
+
+The seeds of a certificate should therefore be reported as exact rationals together with
+`(n₀, β₀)` and the exact `C_α, o`.
 
 ## Files
 
 | File | Role |
 |---|---|
-| `PurityCriterion.lean` | The abstract two-purity criterion: squaring, coupling, doubling, interpolation, purity to gap |
-| `Heisenberg/Hamiltonian.lean` | The ring `H_L = ∑ⱼ Sⱼ·Sⱼ₊₁`, its Hermiticity, and `Re Tr e^{-βH} = ∑ e^{-βEₘ}` |
-| `Heisenberg/Gap.lean` | `ThermalMPOInputs` and the conditional theorem `gapGT_log_twenty` |
-| `Heisenberg/Main.lean` | The unconditional theorem, with the two seed `sorry`s |
-| `Transfer/Defs.lean` | Trotter slices `∏ⱼ (1 − τ hⱼ)` (even bonds, then odd) and their traces |
-| `Transfer/PiTensor.lean` | Site-wise tensor products of `3 × 3` matrices; trace of `T^N` as a sum over closed paths |
-| `Transfer/Factorization.lean` | `Tr S^M = Tr (FᴴF)^{L/2}` for a finite matrix `F` |
+| `PurityCriterion.lean` | The abstract two-purity criterion: squaring, coupling, doubling, interpolation, purity to gap, seeds `≤ 1/100` |
+| `Chain.lean` | The exact doubling recurrence with unequal defects; `gapGT_of_chain` with bound `log r / β₀` |
+| `ChainCheck.lean` | `ChainCertificate`: the rational conditions of `gapGT_of_chain`, decidable |
+| `Ring/Model.lean` | Reflection-positive rings `RPRing`: Hamiltonian, Hermiticity, `Re Tr e^{-βH} = ∑ e^{-βEₘ}` |
+| `Ring/Transfer.lean` | Trotter slices (even bonds, on-site terms, odd bonds) and `Tr S^M = Tr (FᵀF)^{L/2}` with real `F` |
+| `Ring/Gap.lean` | Moment inequalities for every `RPRing`; `RPRing.gapGT_of_chainCertificate` |
+| `Transfer/PiTensor.lean` | Site-wise tensor products; trace of `T^N` as a sum over closed paths |
 | `Transfer/MomentForm.lean` | Traces of powers of a PSD matrix have the moment form |
 | `Transfer/ProductLimit.lean` | Product formula: `(∏ₖ (1 + (c/M) hₖ))^M → e^{c ∑ hₖ}` |
-| `Transfer/Moments.lean` | Assembly: the moment inequalities for `Re Tr e^{-βH_L}` |
+| `Heisenberg/Hamiltonian.lean` | The spin-1 ring `H_L = ∑ⱼ Sⱼ·Sⱼ₊₁` in the Cartesian basis |
+| `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Theorem 1 of the note, with the two seed `sorry`s |
+| `Models/SpinOneLargeD.lean` | `∑ Sⱼ·Sⱼ₊₁ + D ∑ (Sᶻⱼ)²` as an `RPRing` (`D = 0` is the Heisenberg ring); `D = 4`, `D = 1603/500` |
+| `Models/TwoLegLadder.lean` | The rotated two-leg ladder as a ring of rungs; `J_⊥ = 4` |
+| `scripts/chain_certificate.jl` | Searches a `ChainCertificate` from the seeds (exact rationals; Lean re-checks) |
 
 ## Why each piece is needed in Lean
 
@@ -72,22 +101,24 @@ inequalities between traces:
 Stating exactly these makes the input smaller. They are also non-strict inequalities between
 finitely many numbers, so they survive limits. That is what allows the finite route below.
 
-**Trotter slices (`Transfer/Defs`).** These are the finite substitute for the continuous-time
-MPO. Replacing `e^{-βH}` by `M` slices of first-order bond factors `1 − τ hⱼ`, even bonds then
-odd bonds, gives an exact tensor network of finite bond dimension `4^M` for an approximate Gibbs
-operator.
+**Trotter slices (`Ring/Transfer`).** These are the finite substitute for the continuous-time
+MPO. Replacing `e^{-βH}` by `M` slices of first-order factors (even bonds `1 − τ hⱼ`, then the
+on-site factors `1 − τ oᵢ`, then odd bonds) gives an exact tensor network of finite bond
+dimension for an approximate Gibbs operator.
 
-**The factorization (`Transfer/PiTensor`, `Transfer/Factorization`).** The note draws the ring
+**The factorization (`Transfer/PiTensor`, `Ring/Transfer`).** The note draws the ring
 of transfer vertices and reads off `Tr X^n`. In Lean this picture is a theorem:
-* Every bond factor is expanded as `1 ⊗ 1 + τ ∑_α G_α ⊗ G_α`, with `G_α = iS^α`.
+* Every bond factor is expanded as `1 ⊗ 1 + τ ∑_α C_α ⊗ C_α`; every cell carries the word
+  `∏ₜ C_{p t} O C_{q t}` with `O = 1 − τ o` between its even-bond and odd-bond factors.
 * Products of site-wise tensors multiply site by site, and their trace factorizes over sites.
 * The labels are regrouped by bond.
 * "Sum over closed label paths = `Tr T^N`" turns the sum into a matrix power.
 
-The proof also needs positivity, `T = FᴴF ⪰ 0`. In the even/odd ordering, odd sites carry `F`
-and even sites carry `Fᵀ`, and `Fᵀ = Fᴴ` because the entries of `F` are real. That is why the
-Cartesian basis is used: `G_α = iS^α` is real. This is the reflection positivity the note
-appeals to when it says the transfer operator is self-adjoint.
+The proof also needs positivity, `T = FᵀF ⪰ 0`. Summing the even-bond labels pairs the even and
+odd cells into `FᵀF`, and `Fᵀ = Fᴴ` because `C_α` and `o` are real, so `F` is. That is why the
+model must be written in a real basis (the Cartesian basis `G_α = iS^α` for spin one, `iSʸ` for
+spin one-half). This is the reflection positivity the note appeals to when it says the transfer
+operator is self-adjoint.
 
 **Moment form from positivity (`Transfer/MomentForm`).** A PSD `T` has eigenvalues `λᵢ ≥ 0`, so
 `Tr T^N = ∑ (√λᵢ)^{2N}`, which is the moment form at even lengths `2N`. The note uses
@@ -114,3 +145,12 @@ at a single scale. It cannot produce those purities itself. They carry the physi
 The seeds `P_s(2304, 784), P_τ(4608, 784) ≥ 0.99` are Proposition 5.5 of the OpenAI preprint.
 They come from certified numerics, which `../models/spin1/` reproduces in Julia. Proving them in Lean
 is the remaining open problem, and the hard one.
+
+**Unequal seed defects (`Chain`, `ChainCheck`).** Certified seeds are rarely below `1/100`; for
+the large-D chain at `D = 4` they are `(0.064, 0.041)`. `gapGT_of_chain` follows the exact
+recurrence `s' ≥ f(z(s, t))`, `t' ≥ f(z(t, s'))` for `J` steps and then hands over to the
+`≤ 1/100` theorem. Writing the bound as `log r / β₀` turns every remaining condition into an
+inequality between rationals (`r^{2^j} z_j < 1 − z_j`, `r^{2^J} · 5ε ≤ 1`), so a certificate is a
+short list of decimals that `decide` checks in seconds, with no logarithms or interval
+arithmetic in the kernel. The loss against the floating-point infimum of the rates is about
+`0.2%` at `D = 4` and for the ladder, and `3%` at the borderline `D = 1603/500`.

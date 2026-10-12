@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
 import CertifiedGaps.Heisenberg.Gap
-import CertifiedGaps.Transfer.Moments
+import CertifiedGaps.Models.SpinOneLargeD
 
 /-!
 # The spin-one Heisenberg gap, unconditionally (with open inputs)
@@ -30,10 +30,12 @@ namespace SpinOneHeisenberg
 
 /-- **Input 1 (proved).** The spatial moment inequalities for the Heisenberg traces at every
 `β > 0`, from Trotterized finite transfer matrices and the product formula
-(`CertifiedGaps.Transfer.Moments`). -/
+(`CertifiedGaps.RPRing.spatialMomentBounds`, the Heisenberg ring being the reflection-positive
+ring `SpinOneLargeD.model 0`). -/
 theorem spatialMomentBounds (β : ℝ) (hβ : 0 < β) :
-    SpatialMomentBounds (fun L ↦ partitionFunction L β) 2 :=
-  spatialMomentBounds_partitionFunction β hβ
+    SpatialMomentBounds (fun L ↦ partitionFunction L β) 2 := by
+  have h := (CertifiedGaps.SpinOneLargeD.model 0).spatialMomentBounds β hβ
+  simpa only [CertifiedGaps.SpinOneLargeD.partitionFunction_zero] using h
 
 /-- **Open input 2.** The spatial seed `P_s(2304, 784) ≥ 0.99`. -/
 theorem seed_spatial : 99 / 100 ≤ spatialPurity 2304 784 := by

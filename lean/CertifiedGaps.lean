@@ -1,10 +1,14 @@
 import CertifiedGaps.PurityCriterion
+import CertifiedGaps.Chain
+import CertifiedGaps.ChainCheck
 import CertifiedGaps.Heisenberg.Hamiltonian
 import CertifiedGaps.Heisenberg.Gap
 import CertifiedGaps.Heisenberg.Main
-import CertifiedGaps.Transfer.Defs
 import CertifiedGaps.Transfer.PiTensor
 import CertifiedGaps.Transfer.ProductLimit
 import CertifiedGaps.Transfer.MomentForm
-import CertifiedGaps.Transfer.Factorization
-import CertifiedGaps.Transfer.Moments
+import CertifiedGaps.Ring.Model
+import CertifiedGaps.Ring.Transfer
+import CertifiedGaps.Ring.Gap
+import CertifiedGaps.Models.SpinOneLargeD
+import CertifiedGaps.Models.TwoLegLadder
