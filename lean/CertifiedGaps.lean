@@ -15,3 +15,4 @@ import CertifiedGaps.Models.TwoLegLadder
 import CertifiedGaps.Models.SpinHalf
 import CertifiedGaps.Models.StaggeredHeisenberg
 import CertifiedGaps.Models.IsingLadder
+import CertifiedGaps.Models.IsingLongitudinal

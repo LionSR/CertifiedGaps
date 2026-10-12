@@ -91,4 +91,6 @@ function main(args)
     println("  ε := ", lean(ε))
 end
 
-main(ARGS)
+if abspath(PROGRAM_FILE) == (@__FILE__)
+    main(ARGS)
+end

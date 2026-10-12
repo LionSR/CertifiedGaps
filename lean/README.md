@@ -15,6 +15,7 @@ which are two numbers per model, stated as named `sorry` lemmas.
 | `TwoLegLadder.gap_J4` | spin-½ ladder, `J_⊥ = 4` (sublattice-rotated) | `Δ_L > log 9.033 / 2 ≈ 1.100` for even `L ≥ 4` rungs | `P_s(4, 2) ≥ 1 − 0.03509`, `P_τ(8, 2) ≥ 1 − 0.02463` |
 | `StaggeredHeisenberg.gap_h1`, `_h34`, `_h12`, `_h720`, `_h14` | spin-½ chain, staggered field `h = 1, 3/4, 1/2, 7/20, 1/4` (rotated) | `Δ_L > 1.147, 0.890, 0.594, 0.383, 0.214` for even `L ≥ 8` | two seeds at `(8, β₀)` each |
 | `IsingLadder.gap_G3` | two-leg TFIM, `g = 3` | `Δ_L > log 2.585 / (3/2) ≈ 0.633` for even `L ≥ 4` rungs | `P_s(4, 3/2) ≥ 1 − 0.1125`, `P_τ(8, 3/2) ≥ 1 − 0.05162` |
+| `IsingLongitudinal.gap` | Ising chain `-ZZ - gX - hZ`, 30 points `g ∈ {1/4, …, 2}`, `h ∈ {1/20, …, 1}` | `Δ_L > log r / β₀` for even `L ≥ 6` (from `0.075` at `g = 1, h = 1/20` to `3.70`) | `seeds` (one lemma for all 30 points) |
 
 `GapGT e c` says that the lowest level is nondegenerate and every other level lies more than
 `c` above it. `#print axioms` on each theorem lists `sorryAx` (from its seeds) besides
@@ -22,7 +23,7 @@ which are two numbers per model, stated as named `sorry` lemmas.
 transfer-operator input for every reflection-positive ring, the recurrence certificates checked
 by `decide`) uses only the three standard axioms.
 
-The seeds of the new models come from the certificates of PRs #1, #2, #6 and #7 (complete spectra of the
+The seeds of the new models come from the certificates of PRs #1, #2, #5, #6 and #7 (complete spectra of the
 seed rings with rigorous eigenvalue enclosures, floating-point arithmetic trusted). The
 spin-1 Heisenberg seeds are OpenAI's Proposition 5.5, reproduced in `../models/spin1/`.
 
@@ -73,6 +74,7 @@ The seeds of a certificate should therefore be reported as exact rationals toget
 | `Models/TwoLegLadder.lean` | The rotated two-leg ladder as a ring of rungs; `J_⊥ = 4` |
 | `Models/StaggeredHeisenberg.lean` | The rotated staggered-field chain; five fields |
 | `Models/IsingLadder.lean` | The two-leg transverse-field Ising ladder; `g = 3` |
+| `Models/IsingLongitudinal.lean` | The Ising chain in transverse and longitudinal fields; 30 grid points |
 | `scripts/chain_certificate.jl` | Searches a `ChainCertificate` from the seeds (exact rationals; Lean re-checks) |
 
 ## Why each piece is needed in Lean
