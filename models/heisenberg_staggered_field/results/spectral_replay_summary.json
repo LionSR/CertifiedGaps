@@ -1,0 +1,191 @@
+{
+    "records": [
+        {
+            "n0": 8,
+            "original_bound": 1.1482614900945929,
+            "epsilon_t": "6599110342439//9007199254740992",
+            "original_epsilon_s": "3124087506499//4503599627370496",
+            "bound": 1.1482614900945929,
+            "h": "1//1",
+            "epsilon_s_difference": "0//1",
+            "published_bound_rational": "1148261//1000000",
+            "original_epsilon_t": "6599110342439//9007199254740992",
+            "epsilon_s": "3124087506499//4503599627370496",
+            "blocks_compared": 54,
+            "max_eigenvalue_difference_numerical": 0,
+            "max_radius_increase_numerical": 0,
+            "seconds": 47.926926136016846,
+            "beta": "21//4",
+            "logZ_intervals": [
+                [
+                    34.77946925122866,
+                    34.77946925146297
+                ],
+                [
+                    69.55824457543781,
+                    69.55824678488361
+                ],
+                [
+                    139.11576065282478,
+                    139.1157650721299
+                ]
+            ],
+            "supports_original_nine_decimal_bound": true,
+            "all_spectral_fields_and_seeds_identical": true,
+            "all_original_and_fresh_intervals_overlap": true,
+            "epsilon_t_difference": "0//1"
+        },
+        {
+            "n0": 8,
+            "original_bound": 0.8907822037452694,
+            "epsilon_t": "14061752751411//4503599627370496",
+            "original_epsilon_s": "21099541003483//9007199254740992",
+            "bound": 0.8907821437909684,
+            "h": "3//4",
+            "epsilon_s_difference": "2991185//9007199254740992",
+            "published_bound_rational": "445391//500000",
+            "original_epsilon_t": "7030873385583//2251799813685248",
+            "epsilon_s": "5274885998667//2251799813685248",
+            "blocks_compared": 54,
+            "max_eigenvalue_difference_numerical": 1.9539925233402755e-14,
+            "max_radius_increase_numerical": 1.9753391920702282e-10,
+            "seconds": 35.188703775405884,
+            "beta": "21//4",
+            "logZ_intervals": [
+                [
+                    30.099502673137245,
+                    30.09950267334336
+                ],
+                [
+                    60.19666007873933,
+                    60.196662026092504
+                ],
+                [
+                    120.39019683118832,
+                    120.39020072745076
+                ]
+            ],
+            "supports_original_nine_decimal_bound": false,
+            "all_spectral_fields_and_seeds_identical": false,
+            "all_original_and_fresh_intervals_overlap": true,
+            "epsilon_t_difference": "5980245//4503599627370496"
+        },
+        {
+            "n0": 8,
+            "original_bound": 0.5947852327675651,
+            "epsilon_t": "25123341981485//2251799813685248",
+            "original_epsilon_s": "48372473531709//4503599627370496",
+            "bound": 0.5947852422865794,
+            "h": "1//2",
+            "epsilon_s_difference": "-2009921//9007199254740992",
+            "published_bound_rational": "118957//200000",
+            "original_epsilon_t": "50246687990235//4503599627370496",
+            "epsilon_s": "96744945053497//9007199254740992",
+            "blocks_compared": 54,
+            "max_eigenvalue_difference_numerical": 1.5987211554602254e-14,
+            "max_radius_increase_numerical": 6.972132622843357e-11,
+            "seconds": 35.144026041030884,
+            "beta": "11//2",
+            "logZ_intervals": [
+                [
+                    26.872902669360435,
+                    26.872902669548868
+                ],
+                [
+                    53.73500639325574,
+                    53.735008174005344
+                ],
+                [
+                    107.45879663669469,
+                    107.45880020317455
+                ]
+            ],
+            "supports_original_nine_decimal_bound": true,
+            "all_spectral_fields_and_seeds_identical": false,
+            "all_original_and_fresh_intervals_overlap": true,
+            "epsilon_t_difference": "-4027265//4503599627370496"
+        },
+        {
+            "n0": 8,
+            "original_bound": 0.3835083070577823,
+            "epsilon_t": "247120705382817//9007199254740992",
+            "original_epsilon_s": "294115152970603//9007199254740992",
+            "bound": 0.38350830551700044,
+            "h": "7//20",
+            "epsilon_s_difference": "907975//9007199254740992",
+            "published_bound_rational": "95877//250000",
+            "original_epsilon_t": "123560350858071//4503599627370496",
+            "epsilon_s": "147057576939289//4503599627370496",
+            "blocks_compared": 54,
+            "max_eigenvalue_difference_numerical": 1.1546319456101628e-14,
+            "max_radius_increase_numerical": 6.508189645652259e-11,
+            "seconds": 33.365617990493774,
+            "beta": "23//4",
+            "logZ_intervals": [
+                [
+                    25.37446504242198,
+                    25.374465042603408
+                ],
+                [
+                    50.71573172598572,
+                    50.71573343715099
+                ],
+                [
+                    101.40364757126537,
+                    101.40365100504786
+                ]
+            ],
+            "supports_original_nine_decimal_bound": false,
+            "all_spectral_fields_and_seeds_identical": false,
+            "all_original_and_fresh_intervals_overlap": true,
+            "epsilon_t_difference": "3666675//9007199254740992"
+        },
+        {
+            "n0": 8,
+            "original_bound": 0.21448610639696292,
+            "epsilon_t": "201598552694997//4503599627370496",
+            "original_epsilon_s": "719373033844217//9007199254740992",
+            "bound": 0.21448610675192437,
+            "h": "1//4",
+            "epsilon_s_difference": "-431123//9007199254740992",
+            "published_bound_rational": "107243//500000",
+            "original_epsilon_t": "403197107212065//9007199254740992",
+            "epsilon_s": "359686516706547//4503599627370496",
+            "blocks_compared": 54,
+            "max_eigenvalue_difference_numerical": 1.9539925233402755e-14,
+            "max_radius_increase_numerical": 1.272968716119377e-10,
+            "seconds": 32.17100811004639,
+            "beta": "25//4",
+            "logZ_intervals": [
+                [
+                    25.761987774665513,
+                    25.76198777485202
+                ],
+                [
+                    51.44073909273106,
+                    51.4407408501728
+                ],
+                [
+                    102.83568498679298,
+                    102.83568852023828
+                ]
+            ],
+            "supports_original_nine_decimal_bound": true,
+            "all_spectral_fields_and_seeds_identical": false,
+            "all_original_and_fresh_intervals_overlap": true,
+            "epsilon_t_difference": "-1822071//9007199254740992"
+        }
+    ],
+    "julia": "1.12.4",
+    "note": "Compact summary of the full 270-block replay (results/migration_spectral_replay.json, 5.7 MB, removed from the tree; regenerate with spectral_replay.jl). Per-block fresh spectra omitted.",
+    "status": "complete",
+    "scope": "Reconstructed exact model blocks; recomputed complete dense eigenvectors, residuals, orthogonality defects, rigorous radii, logZ, rational seeds and recurrence. No parameter search; no saved eigenvalues or radii reused as verification inputs.",
+    "acceptance": "Every fresh outward bound must be positive. Published bounds are rounded DOWN to six decimals from min(original, fresh). Support of the original nine-decimal claim and binary equality are recorded separately, not assumed. Eigenvalue interval overlap is only a consistency check.",
+    "implementation": "Fresh execution of existing verifier, not a second independently implemented spectral verifier",
+    "source_sha256_at_run": {
+        "common.jl": "308ddae709853a1505962603f1f389c855033278b462610a2ef498c518592588",
+        "spectral_replay.jl": "e4eeff419686d485b4cb96e32c8907f2956cad4fec6e88cd69ea139cbc4acb61"
+    },
+    "seconds": 189.41769194602966,
+    "blas_threads": 1
+}
