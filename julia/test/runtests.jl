@@ -36,6 +36,9 @@ using ITensors, ITensorMPS, CertifiedGaps.Purification
         @test 0 < claim < certified_gap_bound(1 // 100, 1 // 100, 784).bound
         @test claim > log(20) / 784
         @test length(record["finite_intervals"]) == 6
+        # Gaps above 1 are certified (the running minimum once started at 1).
+        big_gap = rational_gap_chain(frac(1, 100), frac(1, 100), 2, frac(1); steps = 4)
+        @test parse_rational(big_gap["gap_strict_lower"]) > 3
         @test bootstrap_coefficient(frac(0)) == frac(9, 2)
         w = beta_window(1e-4, 0.4)
         @test w["window_nonempty"] && w["beta_min_from_thermal_purity"] ≈ log(99) / 0.4
@@ -159,4 +162,5 @@ using ITensors, ITensorMPS, CertifiedGaps.Purification
     end
 end
 
+include(joinpath(@__DIR__, "ring_certificates.jl"))
 include(joinpath(@__DIR__, "certified_mpo", "runtests.jl"))

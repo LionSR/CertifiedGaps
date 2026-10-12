@@ -20,6 +20,9 @@ Each submodule is used on its own, so generic names never collide with a project
 | `Spins` | `src/Spins.jl` | `spin_matrices(s)`, `integer_ladders(j)` and `binomial_weights(j)`, `cartesian_generators(s)` |
 | `ReflectionPositivity` | `src/ReflectionPositivity.jl` | `realign`, `rp_test`, `rp_decomposition` |
 | `ExactDiagonalization` | `src/ExactDiagonalization.jl` | `Chain` on any bond list (`ring_bonds`, `open_bonds`, `graph_bonds`), charge sectors, `spectrum` (dense or Lanczos, optional spin-flip doubling), `PartialSpectrum`, `logZ_bounds`, `log_partition` |
+| `RingModels` | `src/RingModels.jl` | `RingModel(d, bond, onsite; charge, modulus)` with exact entries, the exact RP certificate `rp_certificate` / `verify_rp` (−h = Σ w C ⊗ C̄, by given factors or exact LDL†), exact JSON encoding |
+| `VerifiedSpectra` | `src/VerifiedSpectra.jl` | `verified_ring_spectrum`: complete spectrum of a ring by charge and momentum blocks with rigorous eigenvalue radii (residual, Weyl and Ostrowski bounds with a priori rounding errors), `log_partition_enclosure` |
+| `GapCertificates` | `src/GapCertificates.jl` | `certify_gap(model; n0, β0, rp)` and `check_certificate`: RP identity, seed defects from verified spectra, exact `rational_gap_chain` |
 | `Models` | `src/Models.jl` | `tfim` (with exact `tfim_logZ`), `heisenberg(s)`, `staggered_heisenberg` |
 | `Seeds` | `src/Seeds.jl` | `seed_defects` from spectra, `scan_seeds`, `best_seed` |
 | `Purification` | `src/Purification.jl`, `ext/CertifiedGapsITensorsExt.jl` | `purified_log_partition`: thermal purification with ITensors; enabled by `using ITensors, ITensorMPS` |
@@ -51,12 +54,36 @@ spec = spectrum(heisenberg(1).chain, 8; spin_flip = true)
 certified_gap_bound(1 // 100, 1 // 100, 784)         # (bound = 0.0042911…, …)
 ```
 
+## Certify a new model
+
+Any translation-invariant ring whose seed rings n₀ and 2n₀ fit in dense exact diagonalisation
+(up to about 2¹⁶ states per ring) is certified end to end:
+
+```julia
+using CertifiedGaps.RingModels, CertifiedGaps.GapCertificates, CertifiedGaps.Results
+S = (x = [0 1//2; 1//2 0], iy = [0 1//2; -1//2 0], z = [1//2 0; 0 -1//2])
+bond = -kron(S.x, S.x) - kron(S.iy, S.iy) - kron(S.z, S.z)     # exact entries only
+model = RingModel(2, bond, -S.z; charge = [0, 1], modulus = 2)
+rp = rp_certificate(model; factors = [S.x, S.iy, S.z])          # or rp_certificate(model)
+cert = certify_gap(model; n0 = 8, β0 = 21 // 4, rp)
+write_result("certificate.json", cert)
+check_certificate(read_exact_json("certificate.json"))
+```
+
+The certificate stores the model, the RP factors, the seed (n₀, β₀, εₛ, εₜ) as exact strings,
+the log Z enclosures and the rational chain; these are the hypotheses of the Lean ring theorem.
+A unit cell of c sites is one site of dimension dᶜ with the intra-cell terms in `onsite`.
+Larger seeds need structure (closed forms, expansions, symmetry counting; see `AGENTS.md`).
+
 ## What is rigorous
 
 `certified_gap_bound` and `rational_gap_chain` are outward rounded: their output is a lower
-bound for the stated seed defects. `ExactArithmetic` returns exact rational enclosures. Seed
-defects from `spectrum` are floating point; they are exact enclosures when every sector is
-diagonalised densely (`PartialSpectrum.exact`), and not certificates when a sector falls back to
-Lanczos, which can miss degenerate partners. `purified_log_partition` is a numerical control.
+bound for the stated seed defects. `ExactArithmetic` returns exact rational enclosures.
+`GapCertificates` is rigorous end to end: the RP identity is exact, every eigenvalue comes
+with a proven radius, and log Z is enclosed in interval arithmetic. The radii assume only
+IEEE binary64 arithmetic with round-to-nearest in BLAS (the classical a priori error bound for
+dot products, valid for any summation order and with FMA). Seed defects from `spectrum`
+are floating point (screening only), and when a sector falls back to Lanczos they can miss
+degenerate partners. `purified_log_partition` is a numerical control.
 
 Run Julia with one BLAS thread (`OPENBLAS_NUM_THREADS=1`) when several jobs share the machine.

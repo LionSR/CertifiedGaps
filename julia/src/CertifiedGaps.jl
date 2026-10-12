@@ -18,6 +18,9 @@ Submodules, each used on its own (`using CertifiedGaps.ExactDiagonalization`):
 | `Spins` | spin operators in the standard, integer-ladder and Cartesian bases |
 | `ReflectionPositivity` | the realignment test and decomposition −h = Σ C ⊗ C̄ |
 | `ExactDiagonalization` | chains on any bond graph, charge sectors, spectra, log Z enclosures |
+| `RingModels` | exact ring models and the exact RP certificate −h = Σ w C ⊗ C̄ |
+| `VerifiedSpectra` | rigorous complete spectra of rings by symmetry blocks, and log Z enclosures |
+| `GapCertificates` | `certify_gap` and `check_certificate`: end-to-end certificates from small seeds |
 | `Models` | TFIM (with its exact log Z), spin-s Heisenberg, staggered-field Heisenberg |
 | `Seeds` | seed defects from spectra and scans over (n₀, β₀) |
 | `Purification` | thermal purification with ITensors (load ITensors and ITensorMPS to enable) |
@@ -33,6 +36,9 @@ include("Spins.jl")
 include("ReflectionPositivity.jl")
 include("ExactDiagonalization.jl")
 include("Recurrence.jl")
+include("RingModels.jl")
+include("VerifiedSpectra.jl")
+include("GapCertificates.jl")
 include("Models.jl")
 include("Seeds.jl")
 include("Purification.jl")
