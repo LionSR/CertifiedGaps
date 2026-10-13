@@ -1429,3 +1429,21 @@ is certified by these benchmarks.
 - [Schollwöck and Jolicoeur, spin-2 gap and hidden order](https://arxiv.org/abs/cond-mat/9501115)
   (numerical physical context, not an input certificate)
 - [Todo and Kato, Cluster Algorithms for General-S Quantum Spin Systems](https://arxiv.org/abs/cond-mat/9911047), Table I: spin-1 gap 0.41048(6), spin-2 gap 0.08917(4), and spin-2 correlation length 49.49(1). These are numerical benchmarks, not certificate inputs.
+
+## Scale analysis and route memo (October 12, 2026)
+
+[`IDEAS.md`](IDEAS.md) records every route considered for a spin-2 seed, why each fails or
+stalls, and the estimated seed scale. Its quantitative input is
+`experiments/seed_scale.jl`, which combines the certified D = 295 trial energies (for the
+ring-closure energy `δ_n = E₀(2n) − 2E₀(n)`, as an estimate) with an ideal triplet-magnon gas
+(`Δ = 0.08917`, `v = Δξ`) and pushes the resulting **float** defects through the rigorous
+recurrence. The map in `experiments/seed-scale.json` is empty for every `n ≤ 160` and opens at
+`n = 176–192`, `β ≈ 48–70`; the best grid point is `(256, 64–68)`. The same script bisects the
+exact admissible region of the recurrence (at most `εₛ ≈ 0.2176` for vanishing `εₜ`, at most
+`εₜ ≈ 0.2006` for vanishing `εₛ`). No spin-2 purity is certified by this; the file is labelled
+`certified=false`.
+
+```sh
+julia --startup-file=no --project=models/spin2 models/spin2/experiments/seed_scale.jl
+julia --startup-file=no --project=models/spin2 models/spin2/test/seed_scale.jl
+```
