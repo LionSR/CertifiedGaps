@@ -65,7 +65,7 @@ state and $\Delta_L>(\log20)/784\simeq0.003821$.
 
 The spectral gap of the chain~\eqref{eq:model} was established by OpenAI~\cite{source} using machine-assisted proof search over a thirty-page analytical construction. That proof relies on coordinate expansions, degree-12 polynomial spectral filters, and character decompositions across dihedral symmetry sectors. Automated theorem provers naturally explore such symbolic coordinate representations, which can accumulate intermediate algebraic machinery over long deduction horizons.
 
-Here, we show that the underlying mechanism is fundamentally geometric. Representing the partition function as a continuous-time spacetime tensor network makes the dual spatial transfer operator, reflection Hermiticity, and scale-doubling contraction immediately manifest. The derivation proceeds in three stages. First, an exact continuous-time thermal MPO yields a self-adjoint spatial transfer operator. Second, spacetime contraction identities couple spatial and temporal purities, while scale doubling quadratically suppresses purity defects under joint iteration. Third, $\ell^p$ moment monotonicity extends the bound from dyadic scales to all intermediate even lengths to establish Eq.~\eqref{eq:target}.
+Here, we show that the underlying mechanism is fundamentally geometric. Representing the partition function as a continuous-time spacetime tensor network makes the dual spatial transfer operator, reflection Hermiticity, and scale-doubling contraction immediately manifest. The derivation proceeds in three stages. First, an exact continuous-time thermal MPO yields a self-adjoint spatial transfer operator. Second, spacetime contraction identities couple spatial and temporal purities, while scale doubling quadratically suppresses purity defects under joint iteration; we call this self-improving iteration the \emph{spacetime bootstrap}. Third, $\ell^p$ moment monotonicity extends the bound from dyadic scales to all intermediate even lengths to establish Eq.~\eqref{eq:target}.
 
 Every step below is a contraction of one tensor network: horizontal
 legs \virtleg{} are virtual (space), vertical double legs \physleg{} are
@@ -75,7 +75,7 @@ traces~\cite{tang,pirvu}, and a labelled box \tnchain{A} is a product of
 tensors. Blue marks thermal objects \tikz[tn]{\node[gibbs]{$\rho$};} and red marks
 spatial ones \tikz[tn]{\node[xop]{$\sigma$};}.
 Appendix~\ref{app:open} applies the same networks to an open chain with
-boundary fields; it reuses every identity below and adds only boundary vectors.
+boundary fields, where the spacetime is a cylinder rather than a torus; it reuses every identity below and adds only boundary vectors.
 
 \emph{Thermal MPO.---}
 To obtain a real symmetric transfer operator, use the Cartesian spin
