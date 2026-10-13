@@ -223,3 +223,24 @@ relative HS residual of a rank-`D` compression is `√w(D)`:
 | 1/8 | 42 | 8·10⁻¹¹ | 0 | 0 | 2.4·10⁻⁶ |
 | 1/4 | 67 | 3.7·10⁻⁸ | 4.9·10⁻¹³ | 0 | 4.9·10⁻⁶ |
 | 1/2 | 155 | 5.8·10⁻⁶ | 1.4·10⁻⁸ | 5.2·10⁻¹¹ | 9.8·10⁻⁶ |
+| 1 | 200 (cap) | 2.2·10⁻⁴ | 3.8·10⁻⁶ | 1.5·10⁻⁷ | 2.0·10⁻⁵ |
+| 2 | 200 (cap) | 2.4·10⁻³ | 1.7·10⁻⁴ | 1.3·10⁻⁵ | 3.9·10⁻⁵ |
+
+Rows at the cap understate the tails. Up to `β = 1/2` the budget is met by `D ≈ 128`
+(`√w(128) ≈ 7·10⁻⁶` against `10⁻⁵`). From `β = 1` on it is not: the budget weight at `β = 1` is
+`4·10⁻¹⁰` and at `β = 2` it is `1.5·10⁻⁹`, while `w(128)` is `10⁻⁷` and `10⁻⁵`. Each doubling of
+`D` lowers `w` by a factor of about 13 in the measured range, so meeting the budget at
+`β = 1–2` needs `D` of a few thousand even on this optimistic extrapolation, and the
+product-form estimate from the ground state gives `10⁴–10⁵` for `β = 2–8`. The operator
+entanglement entropy is still rising at `β = 2` (0.62, 1.22, 1.78, 2.21 at `β = 1/4, 1/2, 1, 2`)
+toward its ground-state limit of about 2.4 (twice the state entropy).
+
+**Conclusion for route H.** The certified-squaring route needs bond dimensions of
+`2·10³–10⁵` on the six most expensive squarings (`β = 1` to `64`), against the `16–34` at
+which the exact-witness machinery has run at `N = 256` (about 160 s per squaring at
+`D = 16`). With the contraction cost growing like `D³`–`D⁴`, that is a factor `10⁵`–`10⁹` in
+time: two to four orders of magnitude beyond a feasible campaign, before symmetry blocks (one
+to two orders back). The route is not wrong, it is expensive. What would make it feasible is a
+compression certificate that charges errors against the thermal weight rather than in HS norm,
+which would let the late steps run at the state bond dimension `D ≈ 100–300` instead of its
+square. That is the one open problem this memo identifies as worth attacking.
