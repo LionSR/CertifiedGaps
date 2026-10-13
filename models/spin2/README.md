@@ -1443,7 +1443,16 @@ exact admissible region of the recurrence (at most `εₛ ≈ 0.2176` for vanish
 `εₜ ≈ 0.2006` for vanishing `εₛ`). No spin-2 purity is certified by this; the file is labelled
 `certified=false`.
 
+Section 6 of the memo reports two numerical bond-dimension measurements for the
+certified-squaring route: the DMRG ground-state Schmidt spectrum of an open 64-site chain
+(`experiments/ground_schmidt.jl`) and the operator Schmidt spectrum of `e^{−βH/2}` on an open
+32-site chain at `β = 2^k` (`experiments/operator_entanglement.jl`, `maxdim = 200`). Against the
+step-resolved error budget of a 16-squaring schedule, the six squarings from `β = 1` to `64`
+need operator bond dimensions of `2·10³–10⁵`; this is the cost that stalls the route.
+
 ```sh
 julia --startup-file=no --project=models/spin2 models/spin2/experiments/seed_scale.jl
 julia --startup-file=no --project=models/spin2 models/spin2/test/seed_scale.jl
+julia --startup-file=no --project=models/spin2 models/spin2/experiments/ground_schmidt.jl
+julia --startup-file=no --project=models/spin2 models/spin2/experiments/operator_entanglement.jl
 ```

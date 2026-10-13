@@ -168,7 +168,9 @@ by ideas. This session therefore did not attempt a certificate. It delivered
    `n`), the exact admissible region of the recurrence for unequal defects, and the error
    budget of the squaring route; output `experiments/seed-scale.json`, every float clearly
    labelled as an estimate;
-3. `test/seed_scale.jl`: fast checks of the model functions and of the admissibility table.
+3. `test/seed_scale.jl`: fast checks of the model functions and of the admissibility table;
+4. `experiments/ground_schmidt.jl` and `experiments/operator_entanglement.jl`: the numerical
+   bond-dimension measurements of section 6, which turn route H's cost into numbers.
 
 **Negative result.** At exact-diagonalisation sizes (`n ≤ 8`, `2n ≤ 16`) no admissible seed
 exists for the spin-2 Heisenberg ring: the spatial window `β ≤ 0.22/δ_n` and the thermal window

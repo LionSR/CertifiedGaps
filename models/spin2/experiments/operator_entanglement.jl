@@ -10,8 +10,12 @@ using ITensors, ITensorMPS, LinearAlgebra, JSON3, Dates
 using Spin2Gap
 using CertifiedGaps.Results: write_result
 
-function operator_entanglement(; n = 32, maxdim = 200, cutoff = 1e-12,
-    output = joinpath(@__DIR__, "operator-entanglement-n$(n)-d$(maxdim).json"))
+function operator_entanglement(;
+    n = 32,
+    maxdim = 200,
+    cutoff = 1e-12,
+    output = joinpath(@__DIR__, "operator-entanglement-n$(n)-d$(maxdim).json"),
+)
     sites = siteinds("S=2", n; conserve_qns = true)
     pairs = bonds(n; periodic = false)
     A = MPO(sites, "Id")
@@ -40,22 +44,42 @@ function operator_entanglement(; n = 32, maxdim = 200, cutoff = 1e-12,
             p = sort(eigs(spec); rev = true)            # squared operator Schmidt values
             p ./= sum(p)
             tail = reverse(cumsum(reverse(p)))           # tail[D+1] = Σ_{i>D} p_i
-            discarded = Dict(string(D) => (D < length(p) ? tail[D+1] : 0.0)
-                             for D in (8, 16, 32, 64, 128, 256, 512))
+            discarded = Dict(
+                string(D) => (D < length(p) ? tail[D+1] : 0.0) for
+                D in (8, 16, 32, 64, 128, 256, 512)
+            )
             entropy = -sum(x -> x > 0 ? x * log(x) : 0.0, p)
-            row = Dict("beta" => β, "logZ_estimate" => n * log(5.0) + 2lognorm,
-                "maxlinkdim" => maxlinkdim(A), "kept" => length(p),
-                "operator_entropy" => entropy, "discarded_weight_at_D" => discarded,
-                "seconds" => time() - start, "spectrum_top" => p[1:min(end, 40)])
+            row = Dict(
+                "beta" => β,
+                "logZ_estimate" => n * log(5.0) + 2lognorm,
+                "maxlinkdim" => maxlinkdim(A),
+                "kept" => length(p),
+                "operator_entropy" => entropy,
+                "discarded_weight_at_D" => discarded,
+                "seconds" => time() - start,
+                "spectrum_top" => p[1:min(end, 40)],
+            )
             push!(rows, row)
-            println("β=$β chi=$(maxlinkdim(A)) S_op=$(round(entropy; digits = 4)) ",
+            println(
+                "β=$β chi=$(maxlinkdim(A)) S_op=$(round(entropy; digits = 4)) ",
                 "w(32)=$(discarded["32"]) w(64)=$(discarded["64"]) w(128)=$(discarded["128"]) ",
-                "t=$(round(time() - start; digits = 1))s")
+                "t=$(round(time() - start; digits = 1))s",
+            )
             flush(stdout)
-            write_result(output, Dict("status" => "numerical-operator-entanglement",
-                "certified" => false, "n" => n, "maxdim" => maxdim, "cutoff" => cutoff,
-                "boundary" => "open", "rows" => rows, "created_utc" => string(now(UTC)),
-                "note" => "discarded weights at D >= maxlinkdim are understated"))
+            write_result(
+                output,
+                Dict(
+                    "status" => "numerical-operator-entanglement",
+                    "certified" => false,
+                    "n" => n,
+                    "maxdim" => maxdim,
+                    "cutoff" => cutoff,
+                    "boundary" => "open",
+                    "rows" => rows,
+                    "created_utc" => string(now(UTC)),
+                    "note" => "discarded weights at D >= maxlinkdim are understated",
+                ),
+            )
         end
     end
     return rows
@@ -63,6 +87,8 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     BLAS.set_num_threads(2)
-    operator_entanglement(; n = parse(Int, get(ENV, "OE_N", "32")),
-        maxdim = parse(Int, get(ENV, "OE_MAXDIM", "200")))
+    operator_entanglement(;
+        n = parse(Int, get(ENV, "OE_N", "32")),
+        maxdim = parse(Int, get(ENV, "OE_MAXDIM", "200")),
+    )
 end

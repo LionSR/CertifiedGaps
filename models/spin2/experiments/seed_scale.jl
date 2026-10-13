@@ -158,9 +158,14 @@ and backward errors in the signed trace correction). Each row gives the residual
 that step if the final error is shared equally over the `K` steps.
 """
 function squaring_schedule(K, β, final_relative_error)
-    [Dict("step" => j, "beta" => β * 2.0^(j - K),
-         "forward_budget" => final_relative_error / (K * 2.0^(K - j)),
-         "signed_budget" => final_relative_error / (K * 4.0^(K - j))) for j in 1:K]
+    [
+        Dict(
+            "step" => j,
+            "beta" => β * 2.0^(j - K),
+            "forward_budget" => final_relative_error / (K * 2.0^(K - j)),
+            "signed_budget" => final_relative_error / (K * 4.0^(K - j)),
+        ) for j in 1:K
+    ]
 end
 
 function main(output = joinpath(@__DIR__, "seed-scale.json"))
@@ -268,8 +273,9 @@ function main(output = joinpath(@__DIR__, "seed-scale.json"))
         "seed_plus_residual_budget" => squaring_budget(28, 0.02),
         "schedule_K28_degree2_seed" => squaring_schedule(28, 64.0, 0.02),
         "schedule_K16_degree12_seed" => squaring_schedule(16, 64.0, 0.02),
-        "note" => "relative HS error doubles per squaring; 0.02 is the slack between the " *
-                  "trial-based estimate of Ẑ_256(64) and the target 1.08",
+        "note" =>
+            "relative HS error doubles per squaring; 0.02 is the slack between the " *
+            "trial-based estimate of Ẑ_256(64) and the target 1.08",
     )
     result = Dict(
         "status" => "float-seed-scale-estimate",
@@ -278,10 +284,10 @@ function main(output = joinpath(@__DIR__, "seed-scale.json"))
             "gap" => GAP,
             "xi" => XI,
             "velocity" => VELOCITY,
-            "excitations" => "ideal triplet magnon gas, ε(k)=sqrt(Δ²+v²(k−π)²), " *
-                             "log(1+R)=Σ 3e^{−βε}",
-            "ring_closure" => "δ_n = E_trial(2n) − 2E_trial(n) from the D=295 certificate " *
-                              "(estimate)",
+            "excitations" =>
+                "ideal triplet magnon gas, ε(k)=sqrt(Δ²+v²(k−π)²), " * "log(1+R)=Σ 3e^{−βε}",
+            "ring_closure" =>
+                "δ_n = E_trial(2n) − 2E_trial(n) from the D=295 certificate " * "(estimate)",
         ),
         "trial_energies_per_bond_upper" => Dict(string(k) => v.upper for (k, v) in energies),
         "ring_closure_from_trial" =>
