@@ -185,3 +185,41 @@ scale is `(n₀, β₀) ≈ (192–256, 50–70)`.
 * Not a longer trial: `h = 4` in the one-trace scheme (a trial at `N = 2048`) would allow
   `β = 32` on the 256-ring, but there the excitation factor `1 + R_256(32) ≈ 1.28` already
   exceeds what that scheme tolerates. The thermal input must be taken at `β ≳ 50`.
+
+## 6. Measured bond dimensions for the squaring route (numerical, October 12)
+
+Two uncertified ITensors runs on open chains (`experiments/ground_schmidt.jl`,
+`experiments/operator_entanglement.jl`; outputs `ground-schmidt-n64.json` and
+`operator-entanglement-n32-d200.json`).
+
+**Large β.** For `β ≫ 1/Δ` the thermal amplitude is the ground-state projector and its
+operator Schmidt values at a cut are the products `λ_a λ_b` of the state's Schmidt values.
+DMRG on 64 open sites (8 sweeps to D = 400, energy not fully converged) gives centre-bond
+discarded weights `7.4·10⁻⁸` at D = 100, `5.5·10⁻⁹` at D = 200, `4.7·10⁻¹⁰` at D = 300 and
+entanglement entropy 1.22. Keeping `D` state values on each side gives an operator rank `D²` with
+discarded weight `≈ 2·tail(D)`. Against the step budget of route H (`K = 16`, slack 0.02):
+
+| step | β | allowed relative HS residual | state D | operator D² |
+|---|---|---|---|---|
+| 16 | 64 | 1.3·10⁻³ | 64 | 4 100 |
+| 15 | 32 | 6.3·10⁻⁴ | 81 | 6 600 |
+| 14 | 16 | 3.1·10⁻⁴ | 112 | 12 500 |
+| 13 | 8 | 1.6·10⁻⁴ | 162 | 26 000 |
+| 12 | 4 | 7.8·10⁻⁵ | 227 | 52 000 |
+| 11 | 2 | 3.9·10⁻⁵ | 283 | 80 000 |
+| 10 | 1 | 2.0·10⁻⁵ | 330 | 109 000 |
+
+The product form overestimates the operator rank at `β ≲ 8`, where the amplitude is still a
+thermal mixture; the thermal run below measures the true spectrum there. These ranks are for a
+dense bond; U(1) charge blocks (already implemented) and SU(2) multiplets reduce the arithmetic
+by one to two orders of magnitude.
+
+**Thermal run.** Open chain of 32 sites, `e^{−βH/2}` by second-order Trotter, `maxdim = 200`,
+central-cut operator Schmidt spectrum at `β = 2^k`; discarded weight `w(D) = Σ_{i>D} s_i²`, so the
+relative HS residual of a rank-`D` compression is `√w(D)`:
+
+| β | χ reached | w(32) | w(64) | w(128) | budget (√w) |
+|---|---|---|---|---|---|
+| 1/8 | 42 | 8·10⁻¹¹ | 0 | 0 | 2.4·10⁻⁶ |
+| 1/4 | 67 | 3.7·10⁻⁸ | 4.9·10⁻¹³ | 0 | 4.9·10⁻⁶ |
+| 1/2 | 155 | 5.8·10⁻⁶ | 1.4·10⁻⁸ | 5.2·10⁻¹¹ | 9.8·10⁻⁶ |
