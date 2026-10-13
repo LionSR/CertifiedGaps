@@ -19,3 +19,8 @@ import CertifiedGaps.Models.IsingLongitudinal
 import CertifiedGaps.Models.CellSwap
 import CertifiedGaps.Models.DimerizedHeisenberg
 import CertifiedGaps.Models.SpinOneDimerized
+import CertifiedGaps.Ring.Conjugation
+import CertifiedGaps.Models.SpinHalfRotation
+import CertifiedGaps.Models.StaggeredHeisenbergPhysical
+import CertifiedGaps.Models.DimerizedHeisenbergPhysical
+import CertifiedGaps.Models.TwoLegLadderPhysical
