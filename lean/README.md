@@ -12,11 +12,11 @@ which are two numbers per model, stated as named `sorry` lemmas.
 | `SpinOneHeisenberg.spin_one_heisenberg_gap` | spin-1 Heisenberg ring | `Δ_L > log 20 / 784` for even `L ≥ 2304` | `P_s(2304, 784), P_τ(4608, 784) ≥ 0.99` |
 | `SpinOneLargeD.gap_D4` | spin-1, `+ 4 ∑ (Sᶻ)²` | `Δ_L > log 4.755 / (9/4) ≈ 0.693` for even `L ≥ 6` | `P_s(6, 9/4) ≥ 1 − 0.06411`, `P_τ(12, 9/4) ≥ 1 − 0.04053` |
 | `SpinOneLargeD.gap_D3206` | spin-1, `+ (1603/500) ∑ (Sᶻ)²` | `Δ_L > log 1.0065429 / (381/125) ≈ 0.00214` for even `L ≥ 6` | two seeds at `(6, 381/125)` |
-| `TwoLegLadder.gap_J4` | spin-½ ladder, `J_⊥ = 4` (sublattice-rotated) | `Δ_L > log 9.033 / 2 ≈ 1.100` for even `L ≥ 4` rungs | `P_s(4, 2) ≥ 1 − 0.03509`, `P_τ(8, 2) ≥ 1 − 0.02463` |
-| `StaggeredHeisenberg.gap_h1`, `_h34`, `_h12`, `_h720`, `_h14` | spin-½ chain, staggered field `h = 1, 3/4, 1/2, 7/20, 1/4` (rotated) | `Δ_L > 1.147, 0.890, 0.594, 0.383, 0.214` for even `L ≥ 8` | two seeds at `(8, β₀)` each |
+| `TwoLegLadder.physical_gap_J4` | spin-½ ladder `∑_{legs} S·S + 4 ∑_{rungs} S·S` | `Δ_L > log 9.033 / 2 ≈ 1.100` for even `L ≥ 4` rungs | `P_s(4, 2) ≥ 1 − 0.03509`, `P_τ(8, 2) ≥ 1 − 0.02463` |
+| `StaggeredHeisenberg.physical_gap_h1`, `_h34`, `_h12`, `_h720`, `_h14` | `∑ S·S − h ∑ (−1)ʲ Sᶻⱼ`, `h = 1, 3/4, 1/2, 7/20, 1/4` | `Δ_L > 1.147, 0.890, 0.594, 0.383, 0.214` for even `L ≥ 8` | two seeds at `(8, β₀)` each |
 | `IsingLadder.gap_G3` | two-leg TFIM, `g = 3` | `Δ_L > log 2.585 / (3/2) ≈ 0.633` for even `L ≥ 4` rungs | `P_s(4, 3/2) ≥ 1 − 0.1125`, `P_τ(8, 3/2) ≥ 1 − 0.05162` |
 | `IsingLongitudinal.gap` | Ising chain `-ZZ - gX - hZ`, 30 points `g ∈ {1/4, …, 2}`, `h ∈ {1/20, …, 1}` | `Δ_L > log r / β₀` for even `L ≥ 6` (from `0.075` at `g = 1, h = 1/20` to `3.70`) | `seeds` (one lemma for all 30 points) |
-| `DimerizedHeisenberg.gap_d12`, `_d310`, `_d14` | spin-½ dimerized chain `δ = 1/2, 3/10, 1/4` (rotated, cells = strong pairs) | `Δ_L > 0.532, 0.172, 0.057` for even `L ≥ 4` cells | two seeds at `(4, β₀)` each |
+| `DimerizedHeisenberg.physical_gap_d12`, `_d310`, `_d14` | spin-½ dimerized chain `δ = 1/2, 3/10, 1/4` (cells = strong pairs) | `Δ_L > 0.532, 0.172, 0.057` for even `L ≥ 4` cells | two seeds at `(4, β₀)` each |
 | `SpinOneDimerized.gap_d910` | spin-1 dimerized chain `δ = 9/10` (cells = weak pairs) | `Δ_L > log 6.339 / (7/2) ≈ 0.528` for even `L ≥ 2` cells | `P_s(2, 7/2) ≥ 1 − 0.04972`, `P_τ(4, 7/2) ≥ 1 − 0.03206` |
 
 `GapGT e c` says that the lowest level is nondegenerate and every other level lies more than
@@ -80,6 +80,9 @@ The seeds of a certificate should therefore be reported as exact rationals toget
 | `Models/IsingLongitudinal.lean` | The Ising chain in transverse and longitudinal fields; 30 grid points |
 | `Models/CellSwap.lean` | The swap `F` of a two-site cell, `F (A ⊗ B) F = B ⊗ A` |
 | `Models/DimerizedHeisenberg.lean` | The rotated dimerized spin-½ chain, internal reflection `F` |
+| `Ring/Conjugation.lean` | Sitewise unitary conjugation; unitarily equivalent Hamiltonians have the same spectrum |
+| `Models/SpinHalfRotation.lean` | The rotation `e^{iπSʸ}` and the complex spin-½ matrices |
+| `Models/*Physical.lean` | The physical Hamiltonians of the three rotated models and their equivalence with the rotated ones |
 | `Models/SpinOneDimerized.lean` | The dimerized spin-1 chain, internal reflection `F` |
 | `scripts/chain_certificate.jl` | Searches a `ChainCertificate` from the seeds (exact rationals; Lean re-checks) |
 
@@ -170,3 +173,10 @@ inequality between rationals (`r^{2^j} z_j < 1 − z_j`, `r^{2^J} · 5ε ≤ 1`)
 short list of decimals that `decide` checks in seconds, with no logarithms or interval
 arithmetic in the kernel. The loss against the floating-point infimum of the rates is about
 `0.2%` at `D = 4` and for the ladder, and `3%` at the borderline `D = 1603/500`.
+
+**Rotated frames (`Ring/Conjugation`, `Models/*Physical`).** The ladder, the staggered-field
+chain and the dimerized spin-½ chain are reflection positive only after the rotation `e^{iπSʸ}`
+on a sublattice. Each `*Physical.lean` file defines the physical Hamiltonian, proves it equals
+the rotated one conjugated by that product of one-site unitaries (on even rings where the
+sublattice requires it), and transfers the gap: unitarily equivalent Hermitian matrices have
+the same characteristic polynomial, hence the same eigenvalues with multiplicity.
