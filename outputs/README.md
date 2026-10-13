@@ -35,8 +35,9 @@ inline with them rather than as one-off macros:
   `last=`, `item=`, `legs`, `ring`, `capl=`, `capr=`, `caps`, `nostubl`,
   `nostubr`, `name=`. Example: `\tnchain[node=mpo,legs,ring]{W,W,\cdots,W,W}`.
 - `\tncolumn[keys]{items}`: the same along imaginary time (physical double wire).
-- `proofmap` with `\mappoint`, `\mapmove`, `\mapedge`, `\mapbox`: bounds on a
-  grid of lengths and inverse temperatures, with the moves that derive them.
+- `prooflanes` with `\lanebound`, `\lanemove`, `\laneuse`, `\lanetag`: a proof
+  read top to bottom in two lanes, one box per bound with its full arguments and
+  one numbered circle per move; a thin grey arrow into a circle is a second input.
 - `\sparkline{min}{max}{data}`, `\specbars{data}` and the word-sized glyphs
   (`\levels`, `\decayglyph`, `\fcurve`, `\overlapglyph`, `\fieldsame`,
   `\fieldopp`, `\stackbar`, `\torusseq`, `\Zt`, `\Zbox`, `\virtleg`, `\physleg`).

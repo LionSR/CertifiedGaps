@@ -5,7 +5,7 @@
 \hypersetup{pdftitle={A Diagrammatic Proof of the Haldane Gap via Spacetime Tensor Networks}}
 
 % ------------------------------------------------ diagrams specific to this note
-% All other diagrams are written inline with \tnchain, \tncolumn and proofmap
+% All other diagrams are written inline with \tnchain, \tncolumn and prooflanes
 % from tnnotes.sty.
 % The local MPO tensor with its four legs named.
 \newcommand{\Wlegs}{\tikz[tn]{\draw (-.95,0)--(.95,0); \draw (0,-.95)--(0,.95);
@@ -233,25 +233,29 @@ roughly squares the purity defect. For even $n$ and $0\le\varepsilon\le1/100$,
  \end{gathered}
  \label{eq:update}
 \end{equation}
-The scale-doubling update~\eqref{eq:update} is established by four successive moves in the $(L,\beta)$ grid below, alternating between spacetime coupling and operator squaring. A point in column $L$ and row $\beta$ states a bound on a purity at that scale, red for $\Ps$ and blue for $\Pt$. The two filled points in the lower box are
-the hypotheses; each arrow is one move, labelled by the identity it uses;
-open points are intermediate bounds; the two filled points in the upper box
-are the conclusions:
+The scale-doubling update~\eqref{eq:update} is established by four moves, alternating
+between spacetime coupling and operator squaring. Read the diagram below from top to
+bottom: each box is one bound, red for $\Ps$ and blue for $\Pt$; solid boxes are given
+or proved, dashed boxes intermediate. Each move is a numbered circle labelled by the
+identity it uses; the grey arrow entering a circle is the second bound that move needs:
 \begin{proofdiagram}
-\begin{proofmap}{n,2n,4n}{\beta,2\beta}
- \mapbox{given}{0}{1}{0} \mapbox{proved}{1}{2}{1}
- \mappoint{s}{0}{0}{$\Ps\ge1-\varepsilon$}   \mappoint{t}{1}{0}{$\Pt\ge1-\varepsilon$}
- \mappoint{so}{0}{1}{$\Ps\ge1-3\varepsilon$} \mappoint{s}{1}{1}{$\Ps\ge1-5\varepsilon^2$}
- \mappoint{to}{2}{0}{$\Pt\ge1-3\varepsilon$} \mappoint{t}{2}{1}{$\Pt\ge1-5\varepsilon^2$}
- \mapmove{00}{01}{pos=.45,right}{1: \eqref{eq:couple1}} \mapedge{10}{01}
- \mapmove[mpored]{01}{11}{above}{2: square}
- \mapedge{10}{20} \mapmove{11}{20}{pos=.72}{3: \eqref{eq:couple2}}
- \mapmove[mpoblue]{20}{21}{pos=.55,right}{4: square}
-\end{proofmap}
+\begin{prooflanes}
+ \lanebound{s}{s0}{0}{0}{$\Ps(n,\beta)\ge1-\varepsilon$}
+ \lanebound{t}{t0}{1}{0}{$\Pt(2n,\beta)\ge1-\varepsilon$}
+ \lanebound{so}{s1}{0}{1}{$\Ps(n,2\beta)\ge1-3\varepsilon$}
+ \lanebound{s}{s2}{0}{2}{$\Ps(2n,2\beta)\ge1-5\varepsilon^2$}
+ \lanebound{to}{t1}{1}{3}{$\Pt(4n,\beta)\ge1-3\varepsilon$}
+ \lanebound{t}{t2}{1}{4}{$\Pt(4n,2\beta)\ge1-5\varepsilon^2$}
+ \lanemove{s0}{s1}{1}{\eqref{eq:couple1}} \laneuse{t0}{1}
+ \lanemove[mpored]{s1}{s2}{2}{square}
+ \lanemove{t0}{t1}{3}{\eqref{eq:couple2}} \laneuse{s2}{3}
+ \lanemove[mpoblue]{t1}{t2}{4}{square}
+ \lanetag[above]{s0}{given} \lanetag[above]{t0}{given}
+ \lanetag[below]{s2}{proved} \lanetag{t2}{proved}
+\end{prooflanes}
 \end{proofdiagram}
-The proved pair sits one column right and one row up from the given pair:
-with $(n,\beta)\to(2n,2\beta)$ it is the given pair of the next scale, which is
-why the estimate can be iterated.
+The proved pair is the given pair with $(n,\beta)\to(2n,2\beta)$, so it is
+the given pair of the next scale, which is why the estimate can be iterated.
 
 \emph{Move 1} (coupling). Since $\Pt(n,\beta)\le1$,
 Eq.~\eqref{eq:couple1} gives $\Ps(n,2\beta)\ge(1-\varepsilon)^3\ge1-3\varepsilon$.
@@ -289,7 +293,7 @@ After $j\ge0$ doublings, set
 Since $\varepsilon_0=1/100$ and $\varepsilon_{j+1}=5\varepsilon_j^2$,
 Eq.~\eqref{eq:update} gives
 $\Ps(n_j,\beta_j),\Pt(2n_j,\beta_j)\ge1-\varepsilon_j$ by induction on $j$:
-each application is one diagonal step in the diagram above.
+each application runs the four moves above once.
 The defect falls doubly exponentially in $j$,
 $\varepsilon_0=10^{-2}$\,\sparkline{-22}{-2}{-2,-3.30,-5.90,-11.11,-21.52}\,$\varepsilon_4\approx3\times10^{-22}$ (log scale),
 and so exponentially in inverse temperature,
@@ -565,28 +569,30 @@ with $k_2=142$, $k_{j+1}=M_j$, and with periodic error $\varepsilon_j$ bounded i
  \label{eq:b-x}
 \end{equation}
 For $j\ge3$, $k_j=M_j/2$, leaving $M_j/2$ sites to suppress remainders.
-One step $j\to j+1$ is three moves. In the map below, a point in column $L$
-and row $\beta$ states a bound at that length and inverse temperature: grey
-for the boundary defect $e_L$, blue for the opposite-field thermal purity
-$\Pt^{\opp}(L,\cdot)$. Filled points in the lower box are given at scale $j$,
-open points are intermediate, and filled points in the upper box are proved
-at scale $j+1$; the bounds shown hold for $j\ge5$ (Appendix~\ref{app:b-iteration}):
+One step $j\to j+1$ is three moves. In the diagram below, read from top to
+bottom, each box is one bound: grey for the boundary defect $e_k(j)$, blue
+for the opposite-field thermal purity $\Pt^{\opp}$. Solid boxes are given at
+scale $j$ or proved at scale $j+1$, the dashed box is intermediate, and the
+grey arrow entering a move is the second bound it uses; the bounds shown hold
+for $j\ge5$ (Appendix~\ref{app:b-iteration}):
 \begin{proofdiagram}
-\begin{proofmap}[2.6]{M_j/2,M_j,2M_j}{\beta_j,\beta_{j+1}}
- \mapbox{given}{0}{1}{0} \mapbox[1.15]{proved}{1}{2}{1}
- \mappoint{b}{0}{0}{$e\le x$}          \mappoint{t}{1}{0}{$\Pt^{\opp}\ge1-x$}
- \mappoint{b}{1}{1}{$e\le10x^2$}       \mappoint{to}{2}{0}{$\Pt^{\opp}\ge1-2x-16x^2$}
- \mappoint{t}{2}{1}{$\Pt^{\opp}\ge1-10x^2$}
- \mapmove{00}{11}{pos=.45}{1: \eqref{eq:b-new-e}} \mapedge{10}{11}
- \mapedge{10}{20} \mapmove{11}{20}{pos=.72}{2: \eqref{eq:b-coupling}}
- \mapmove[mpoblue]{20}{21}{pos=.55,right}{3: square}
-\end{proofmap}
+\begin{prooflanes}
+ \lanebound{b}{e0}{0}{0}{$e_{M_j/2}(j)\le x$}
+ \lanebound{t}{t0}{1}{0}{$\Pt^{\opp}(M_j,\beta_j)\ge1-x$}
+ \lanebound{b}{e1}{0}{1}{$e_{M_j}(j{+}1)\le10x^2$}
+ \lanebound{to}{t1}{1}{2}{$\Pt^{\opp}(2M_j,\beta_j)\ge1-2x-16x^2$}
+ \lanebound{t}{t2}{1}{3}{$\Pt^{\opp}(2M_j,\beta_{j+1})\ge1-10x^2$}
+ \lanemove{e0}{e1}{1}{\eqref{eq:b-new-e}} \laneuse{t0}{1}
+ \lanemove{t0}{t1}{2}{\eqref{eq:b-coupling}} \laneuse{e1}{2}
+ \lanemove[mpoblue]{t1}{t2}{3}{square}
+ \lanetag[above]{e0}{given} \lanetag[above]{t0}{given}
+ \lanetag[below]{e1}{proved} \lanetag{t2}{proved}
+\end{prooflanes}
 \end{proofdiagram}
-Move~1 is the overlap recurrence~\eqref{eq:b-new-e}--\eqref{eq:b-new-ratio}
-(it uses both given bounds), move~2 the length doubling~\eqref{eq:b-coupling},
-and move~3 the squaring~\eqref{eq:stack}. The proved pair sits one column
-right and one row up from the given pair: it is the given pair of scale
-$j+1$, so the step repeats. The defect falls doubly exponentially,
+Move~1 is the overlap recurrence~\eqref{eq:b-new-e}--\eqref{eq:b-new-ratio},
+move~2 the length doubling~\eqref{eq:b-coupling},
+and move~3 the squaring~\eqref{eq:stack}. Since $M_{j+1}=2M_j$, the proved
+pair is the given pair of scale $j+1$, so the step repeats. The defect falls doubly exponentially,
 $x_5=10^{-2}$\,\sparkline{-17}{-2}{-2,-3,-5,-9,-17}\,$x_9=10^{-17}$ (log scale); since
 $\beta_j=392\,2^{j-5}$, it decays exponentially in inverse temperature.
 
