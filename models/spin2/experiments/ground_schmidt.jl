@@ -21,7 +21,8 @@ function ground_schmidt(;
     E, ψ = dmrg(H, ψ0; nsweeps, maxdim = maxdims, cutoff, outputlevel = 1)
     centre = n ÷ 2
     ψ = orthogonalize(ψ, centre)
-    _, _, _, spec = svd(ψ[centre], uniqueinds(ψ[centre], ψ[centre+1]); cutoff = 0.0, maxdim = 10^6)
+    left = uniqueinds(ψ[centre], ψ[centre+1])
+    _, _, _, spec = svd(ψ[centre], left; cutoff = 0.0, maxdim = 10^6)
     p = sort(eigs(spec); rev = true)
     p ./= sum(p)
     tail = reverse(cumsum(reverse(p)))
