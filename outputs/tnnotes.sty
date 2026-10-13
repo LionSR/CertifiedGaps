@@ -44,12 +44,9 @@
  ring/.style={rounded corners=2pt},
  gap/.style={fill=white,inner sep=.5pt},
  flow/.style={-{Latex[length=1.4mm]},line width=.5pt},
- % proof maps: a point at (length, inverse temperature) states one bound
- mappt/.style={circle,draw,line width=.5pt,minimum size=5pt,inner sep=0pt},
+ % proof lanes: one box per bound, moves as numbered circles
  maprule/.style={font=\scriptsize,text=black!65,fill=white,inner sep=1pt},
- maptag/.style={font=\scriptsize,text=black!50},
- mapbox/.style={black!25,densely dashed,rounded corners=6pt},
- mapaxis/.style={text=black!55}}
+ maptag/.style={font=\scriptsize,text=black!50}}
 
 % Physical trace of one MPO tensor, and the transfer vertex it produces.
 \newcommand{\Wtrace}{\tikz[tn]{
@@ -246,45 +243,50 @@
   \xdef\tn@py{\tn@y}\xdef\tn@lx{\tn@i}}
  \fill[mpored] (\tn@lx,\tn@py) circle[radius=.11em];}}
 
-% ------------------------------------------------------------- proof maps
-% A proof map places one bound per point on a grid of lengths (columns) and
-% inverse temperatures (rows); arrows are the moves that derive them.
-%   \begin{proofmap}[column spacing]{col labels}{row labels} ... \end{proofmap}
-%   \mappoint{kind}{col}{row}{label}  kind: s, t, b (spatial, thermal,
-%       boundary), with suffix o for an open (intermediate) point; it is
-%       named m<col><row>, and labelled below in row 0, above otherwise
-%   \mapmove[color]{from}{to}{label options}{label}, \mapedge[color]{from}{to}
-%   \mapbox[margin]{tag}{first col}{last col}{row}
+% ------------------------------------------------------------- proof lanes
+% A proof drawn as two lanes read top to bottom, one per kind of bound. Each
+% box states one bound with its full arguments: solid boxes are given or
+% proved, dashed ones are intermediate. A move is a numbered circle on a
+% lane arrow, half a row above its conclusion; thin grey arrows into the
+% circle are the other bounds the move uses.
+%   \begin{prooflanes}[lane separation] ... \end{prooflanes}
+%   \lanebound{kind}{name}{lane}{row}{bound}  kind: s, t, b (spatial,
+%       thermal, boundary), suffix o for an intermediate bound; lane 0 or 1
+%   \lanemove[color]{from}{to}{number}{label}  label on the lane's outer side
+%   \laneuse{bound}{move number}
+%   \lanetag[side]{bound}{tag}  side: above, below or inner (default)
 \tikzset{
- map s/.style={mappt,fill=mpored},  map so/.style={mappt,draw=mpored,fill=white},
- map t/.style={mappt,fill=mpoblue}, map to/.style={mappt,draw=mpoblue,fill=white},
- map b/.style={mappt,fill=black!35},map bo/.style={mappt,draw=black!50,fill=white}}
-\def\mapdx{2.9}\def\mapdy{1.7}
-\newenvironment{proofmap}[3][2.9]{%
- \def\mapdx{#1}%
- \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
- \foreach \tn@l [count=\tn@c from 0] in {#2}{
-   \node[mapaxis] at ({\tn@c*\mapdx},-.95) {$\tn@l$};}
- \foreach \tn@l [count=\tn@r from 0] in {#3}{
-   \node[mapaxis,anchor=east] at (-.95,{\tn@r*\mapdy}) {$\tn@l$};}}
- {\end{tikzpicture}}
-\newcommand{\mappoint}[4]{%
- \ifnum#3=0 \node[map #1,label=below:{#4}] (m#2#3) at ({#2*\mapdx},0) {};
- \else\node[map #1,label=above:{#4}] (m#2#3) at ({#2*\mapdx},{#3*\mapdy}) {};\fi}
-\newcommand{\mapedge}[3][black!55]{\draw[flow,#1,shorten <=.5pt,shorten >=.5pt] (m#2)--(m#3);}
-\newcommand{\mapmove}[5][black!55]{%
- \draw[flow,#1,shorten <=.5pt,shorten >=.5pt] (m#2)--(m#3) node[maprule,pos=.5,#4] {#5};}
-\newcommand{\mapbox}[5][.85]{%
- \pgfmathsetmacro\tn@xa{#3*\mapdx-#1}\pgfmathsetmacro\tn@xb{#4*\mapdx+#1}%
- \pgfmathsetmacro\tn@xm{(\tn@xa+\tn@xb)/2}%
- \ifnum#5=0
-  \draw[mapbox] (\tn@xa,-.62) rectangle (\tn@xb,.28);
-  \node[maptag,anchor=north] at (\tn@xm,-.62) {#2};
- \else
-  \pgfmathsetmacro\tn@ya{#5*\mapdy-.28}\pgfmathsetmacro\tn@yb{#5*\mapdy+.62}%
-  \draw[mapbox] (\tn@xa,\tn@ya) rectangle (\tn@xb,\tn@yb);
-  \node[maptag,anchor=south] at (\tn@xm,\tn@yb) {#2};
- \fi}
+ lanebox/.style={draw,rounded corners=2pt,line width=.5pt,inner sep=2.5pt,
+   font=\footnotesize},
+ lane s/.style={lanebox,draw=mpored,fill=mpored!14},
+ lane so/.style={lanebox,draw=mpored,densely dashed,fill=white},
+ lane t/.style={lanebox,draw=mpoblue,fill=mpoblue!16},
+ lane to/.style={lanebox,draw=mpoblue,densely dashed,fill=white},
+ lane b/.style={lanebox,draw=black!50,fill=black!8},
+ lane bo/.style={lanebox,draw=black!50,densely dashed,fill=white},
+ lanemv/.style={circle,draw=black!55,fill=white,line width=.45pt,inner sep=0pt,
+   minimum size=1.2em,font=\scriptsize},
+ laneuse/.style={-{Latex[length=1.2mm]},black!40,line width=.4pt}}
+\def\lanedx{4}\def\lanedy{1.05}
+\newenvironment{prooflanes}[1][4]{%
+ \def\lanedx{#1}\begin{tikzpicture}[x=1cm,y=1cm]}{\end{tikzpicture}}
+\newcommand{\lanebound}[5]{%
+ \expandafter\xdef\csname tn@lane@#2\endcsname{#3}%
+ \node[lane #1] (#2) at ({#3*\lanedx},{-#4*\lanedy}) {#5};}
+\newcommand{\tn@outer}[1]{\ifnum\csname tn@lane@#1\endcsname=0 west\else east\fi}
+\newcommand{\tn@inner}[1]{\ifnum\csname tn@lane@#1\endcsname=0 east\else west\fi}
+\newcommand{\lanemove}[5][black!55]{%
+ \path (#3) ++(0,{.5*\lanedy}) node[lanemv] (mv#4) {#4};
+ \draw[#1,line width=.5pt,shorten <=.5pt] (#2)--(mv#4);
+ \draw[flow,#1,shorten >=.5pt] (mv#4)--(#3);
+ \node[maprule,anchor=\tn@inner{#2},inner sep=2pt] at (mv#4.\tn@outer{#2}) {#5};}
+\newcommand{\laneuse}[2]{\draw[laneuse,shorten <=1pt,shorten >=.5pt] (#1)--(mv#2);}
+\newcommand{\lanetag}[3][inner]{%
+ \def\tn@side{#1}\def\tn@inside{inner}%
+ \ifx\tn@side\tn@inside
+  \node[maptag,anchor=\tn@outer{#2},inner sep=3pt] at (#2.\tn@inner{#2}) {#3};
+ \else\def\tn@above{above}%
+  \node[maptag,#1,inner sep=1.5pt] at (#2.\ifx\tn@side\tn@above north\else south\fi) {#3};\fi}
 % A bare virtual leg and a bare physical leg, for the diagram conventions.
 \newcommand{\virtleg}{\tikz[tn]{\draw (0,0)--(1.1,0);}}
 \newcommand{\physleg}{\tikz[tn]{\draw[phys] (0,-.5)--(0,.5);}}
