@@ -1,0 +1,21 @@
+# Independent certificate of the h = 1 seed with the shared core (CertifiedGaps.GapCertificates):
+# its own exact RP identity, verified block spectra and exact rational chain, in the rotated
+# frame where only S^z parity is conserved. Produces results/core_certificate_1_1.json.
+#     julia --project=../../julia core_certificate.jl          (≈ 12 min)
+# Check it with `check_certificate(read_exact_json(path))` (≈ 5 min).
+
+using CertifiedGaps.RingModels, CertifiedGaps.GapCertificates, CertifiedGaps.Results
+
+const X, J, Z = [0 1//2; 1//2 0], [0 1//2; -1//2 0], [1//2 0; 0 -1//2]
+
+"Rotated-frame staggered Heisenberg ring: h = −(X⊗X + J⊗J + Z⊗Z), o = −h_s Z."
+staggered(hs) = RingModel(2, -(kron(X, X) + kron(J, J) + kron(Z, Z)), -hs * Z;
+    charge = [0, 1], modulus = 2, name = "spin-1/2 Heisenberg, staggered field $hs, rotated")
+
+if abspath(PROGRAM_FILE) == @__FILE__
+    model = staggered(1)
+    cert = certify_gap(model; n0 = 8, β0 = 21 // 4,
+        rp = rp_certificate(model; factors = [X, J, Z]), progress = true)
+    path = write_result(joinpath(@__DIR__, "results", "core_certificate_1_1.json"), cert)
+    println(path, ": gap > ", cert["gap_lower_bound_decimal"])
+end

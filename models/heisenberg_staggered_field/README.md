@@ -94,3 +94,13 @@ The `metadata.source_sha256` hashes inside the certificate JSONs refer to that p
 snapshot (recoverable from `cb635a1`). Since then `common.jl` and `scan.jl` changed only
 by the package name `ThermalMPOGap` → `CertifiedGaps`; `certify.jl` gained the explicit-seed
 option and `test/runtests.jl` gained the published-bound testset.
+
+## Cross-check with the shared core
+
+`core_certificate.jl` certifies the h = 1 seed independently with
+`CertifiedGaps.GapCertificates`: the same rotated basis and RP factors, its own verified block
+spectra (S^z parity and momentum blocks), and the exact rational chain instead of the interval
+bound. `results/core_certificate_1_1.json` gives gap > 1.147699 for every even L ≥ 8, with
+ε_s = 692723528103//10^15 and ε_t = 728796111263//10^15. Check it with
+`check_certificate(read_exact_json(path))` (≈ 5 min; `spectra = false` checks only the exact
+parts in seconds).
