@@ -227,6 +227,7 @@ relative HS residual of a rank-`D` compression is `√w(D)`:
 | 1/2 | 155 | 5.8·10⁻⁶ | 1.4·10⁻⁸ | 5.2·10⁻¹¹ | 9.8·10⁻⁶ |
 | 1 | 200 (cap) | 2.2·10⁻⁴ | 3.8·10⁻⁶ | 1.5·10⁻⁷ | 2.0·10⁻⁵ |
 | 2 | 200 (cap) | 2.4·10⁻³ | 1.7·10⁻⁴ | 1.3·10⁻⁵ | 3.9·10⁻⁵ |
+| 4 | 200 (cap) | 1.1·10⁻² | 1.8·10⁻³ | 1.5·10⁻⁴ | 7.8·10⁻⁵ |
 
 Rows at the cap understate the tails. Up to `β = 1/2` the budget is met by `D ≈ 128`
 (`√w(128) ≈ 7·10⁻⁶` against `10⁻⁵`). From `β = 1` on it is not: the budget weight at `β = 1` is
@@ -234,8 +235,9 @@ Rows at the cap understate the tails. Up to `β = 1/2` the budget is met by `D �
 `D` lowers `w` by a factor of about 13 in the measured range, so meeting the budget at
 `β = 1–2` needs `D` of a few thousand even on this optimistic extrapolation, and the
 product-form estimate from the ground state gives `10⁴–10⁵` for `β = 2–8`. The operator
-entanglement entropy is still rising at `β = 2` (0.62, 1.22, 1.78, 2.21 at `β = 1/4, 1/2, 1, 2`)
-toward its ground-state limit of about 2.4 (twice the state entropy).
+entanglement entropy keeps rising (0.62, 1.22, 1.78, 2.21, 2.55 at `β = 1/4, 1/2, 1, 2, 4`); on
+the open chain the free spin-1 edge modes add to the ground-state limit of about 2.4 (twice the
+state entropy), so the ring value will be somewhat lower.
 
 **Conclusion for route H.** The certified-squaring route needs bond dimensions of
 `2·10³–10⁵` on the six most expensive squarings (`β = 1` to `64`), against the `16–34` at
