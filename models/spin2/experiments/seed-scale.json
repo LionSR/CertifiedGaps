@@ -147,6 +147,274 @@
         "note": "relative HS error doubles per squaring; 0.02 is the slack between the trial-based estimate of Ẑ_256(64) and the target 1.08",
         "squarings": 28,
         "final_relative_error": 0.02,
+        "schedule_K28_degree2_seed": [
+            {
+                "step": 1,
+                "forward_budget": 5.32184328351702e-12,
+                "signed_budget": 3.9650822308041305e-20,
+                "beta": 4.76837158203125e-7
+            },
+            {
+                "step": 2,
+                "forward_budget": 1.064368656703404e-11,
+                "signed_budget": 1.5860328923216522e-19,
+                "beta": 9.5367431640625e-7
+            },
+            {
+                "step": 3,
+                "forward_budget": 2.128737313406808e-11,
+                "signed_budget": 6.344131569286609e-19,
+                "beta": 1.9073486328125e-6
+            },
+            {
+                "step": 4,
+                "forward_budget": 4.257474626813616e-11,
+                "signed_budget": 2.5376526277146435e-18,
+                "beta": 3.814697265625e-6
+            },
+            {
+                "step": 5,
+                "forward_budget": 8.514949253627232e-11,
+                "signed_budget": 1.0150610510858574e-17,
+                "beta": 7.62939453125e-6
+            },
+            {
+                "step": 6,
+                "forward_budget": 1.7029898507254464e-10,
+                "signed_budget": 4.0602442043434296e-17,
+                "beta": 1.52587890625e-5
+            },
+            {
+                "step": 7,
+                "forward_budget": 3.405979701450893e-10,
+                "signed_budget": 1.6240976817373719e-16,
+                "beta": 3.0517578125e-5
+            },
+            {
+                "step": 8,
+                "forward_budget": 6.811959402901786e-10,
+                "signed_budget": 6.496390726949487e-16,
+                "beta": 6.103515625e-5
+            },
+            {
+                "step": 9,
+                "forward_budget": 1.3623918805803571e-9,
+                "signed_budget": 2.598556290779795e-15,
+                "beta": 0.0001220703125
+            },
+            {
+                "step": 10,
+                "forward_budget": 2.7247837611607143e-9,
+                "signed_budget": 1.039422516311918e-14,
+                "beta": 0.000244140625
+            },
+            {
+                "step": 11,
+                "forward_budget": 5.4495675223214286e-9,
+                "signed_budget": 4.157690065247672e-14,
+                "beta": 0.00048828125
+            },
+            {
+                "step": 12,
+                "forward_budget": 1.0899135044642857e-8,
+                "signed_budget": 1.6630760260990688e-13,
+                "beta": 0.0009765625
+            },
+            {
+                "step": 13,
+                "forward_budget": 2.1798270089285714e-8,
+                "signed_budget": 6.652304104396275e-13,
+                "beta": 0.001953125
+            },
+            {
+                "step": 14,
+                "forward_budget": 4.359654017857143e-8,
+                "signed_budget": 2.66092164175851e-12,
+                "beta": 0.00390625
+            },
+            {
+                "step": 15,
+                "forward_budget": 8.719308035714286e-8,
+                "signed_budget": 1.064368656703404e-11,
+                "beta": 0.0078125
+            },
+            {
+                "step": 16,
+                "forward_budget": 1.7438616071428571e-7,
+                "signed_budget": 4.257474626813616e-11,
+                "beta": 0.015625
+            },
+            {
+                "step": 17,
+                "forward_budget": 3.4877232142857143e-7,
+                "signed_budget": 1.7029898507254464e-10,
+                "beta": 0.03125
+            },
+            {
+                "step": 18,
+                "forward_budget": 6.975446428571429e-7,
+                "signed_budget": 6.811959402901786e-10,
+                "beta": 0.0625
+            },
+            {
+                "step": 19,
+                "forward_budget": 1.3950892857142857e-6,
+                "signed_budget": 2.7247837611607143e-9,
+                "beta": 0.125
+            },
+            {
+                "step": 20,
+                "forward_budget": 2.7901785714285714e-6,
+                "signed_budget": 1.0899135044642857e-8,
+                "beta": 0.25
+            },
+            {
+                "step": 21,
+                "forward_budget": 5.580357142857143e-6,
+                "signed_budget": 4.359654017857143e-8,
+                "beta": 0.5
+            },
+            {
+                "step": 22,
+                "forward_budget": 1.1160714285714286e-5,
+                "signed_budget": 1.7438616071428571e-7,
+                "beta": 1
+            },
+            {
+                "step": 23,
+                "forward_budget": 2.232142857142857e-5,
+                "signed_budget": 6.975446428571429e-7,
+                "beta": 2
+            },
+            {
+                "step": 24,
+                "forward_budget": 4.464285714285714e-5,
+                "signed_budget": 2.7901785714285714e-6,
+                "beta": 4
+            },
+            {
+                "step": 25,
+                "forward_budget": 8.928571428571429e-5,
+                "signed_budget": 1.1160714285714286e-5,
+                "beta": 8
+            },
+            {
+                "step": 26,
+                "forward_budget": 0.00017857142857142857,
+                "signed_budget": 4.464285714285714e-5,
+                "beta": 16
+            },
+            {
+                "step": 27,
+                "forward_budget": 0.00035714285714285714,
+                "signed_budget": 0.00017857142857142857,
+                "beta": 32
+            },
+            {
+                "step": 28,
+                "forward_budget": 0.0007142857142857143,
+                "signed_budget": 0.0007142857142857143,
+                "beta": 64
+            }
+        ],
+        "schedule_K16_degree12_seed": [
+            {
+                "step": 1,
+                "forward_budget": 3.814697265625e-8,
+                "signed_budget": 1.1641532182693482e-12,
+                "beta": 0.001953125
+            },
+            {
+                "step": 2,
+                "forward_budget": 7.62939453125e-8,
+                "signed_budget": 4.656612873077393e-12,
+                "beta": 0.00390625
+            },
+            {
+                "step": 3,
+                "forward_budget": 1.52587890625e-7,
+                "signed_budget": 1.862645149230957e-11,
+                "beta": 0.0078125
+            },
+            {
+                "step": 4,
+                "forward_budget": 3.0517578125e-7,
+                "signed_budget": 7.450580596923828e-11,
+                "beta": 0.015625
+            },
+            {
+                "step": 5,
+                "forward_budget": 6.103515625e-7,
+                "signed_budget": 2.9802322387695313e-10,
+                "beta": 0.03125
+            },
+            {
+                "step": 6,
+                "forward_budget": 1.220703125e-6,
+                "signed_budget": 1.1920928955078125e-9,
+                "beta": 0.0625
+            },
+            {
+                "step": 7,
+                "forward_budget": 2.44140625e-6,
+                "signed_budget": 4.76837158203125e-9,
+                "beta": 0.125
+            },
+            {
+                "step": 8,
+                "forward_budget": 4.8828125e-6,
+                "signed_budget": 1.9073486328125e-8,
+                "beta": 0.25
+            },
+            {
+                "step": 9,
+                "forward_budget": 9.765625e-6,
+                "signed_budget": 7.62939453125e-8,
+                "beta": 0.5
+            },
+            {
+                "step": 10,
+                "forward_budget": 1.953125e-5,
+                "signed_budget": 3.0517578125e-7,
+                "beta": 1
+            },
+            {
+                "step": 11,
+                "forward_budget": 3.90625e-5,
+                "signed_budget": 1.220703125e-6,
+                "beta": 2
+            },
+            {
+                "step": 12,
+                "forward_budget": 7.8125e-5,
+                "signed_budget": 4.8828125e-6,
+                "beta": 4
+            },
+            {
+                "step": 13,
+                "forward_budget": 0.00015625,
+                "signed_budget": 1.953125e-5,
+                "beta": 8
+            },
+            {
+                "step": 14,
+                "forward_budget": 0.0003125,
+                "signed_budget": 7.8125e-5,
+                "beta": 16
+            },
+            {
+                "step": 15,
+                "forward_budget": 0.000625,
+                "signed_budget": 0.0003125,
+                "beta": 32
+            },
+            {
+                "step": 16,
+                "forward_budget": 0.00125,
+                "signed_budget": 0.00125,
+                "beta": 64
+            }
+        ],
         "seed_plus_residual_budget": 7.450580596923828e-11
     },
     "run_metadata": {
@@ -177,9 +445,9 @@
                 512
             ]
         },
-        "created_utc": "2026-10-12T04:21:16.752",
+        "created_utc": "2026-10-12T19:20:52.616",
         "certified": false,
-        "source_sha256": "2e5ba96dfb9f98023aeab07b362bb5b77077804c325c2bd5472e6bcd094e87ab",
+        "source_sha256": "a4b2c45afe0241261fd417a9c6b177057f2984b739e54276430fc055e46380a1",
         "blas_threads": 1
     },
     "trial_energies_per_bond_upper": {

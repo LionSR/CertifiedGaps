@@ -20,6 +20,7 @@ export magnon_sum,
     seed_window,
     max_defect,
     squaring_budget,
+    squaring_schedule,
     trial_energies
 
 # Numerical reference values (Todo–Kato, PRL 87, 047203; not certified).
@@ -148,6 +149,20 @@ the sum of all compression residuals must stay below `final_relative_error / 2^K
 """
 squaring_budget(K, final_relative_error) = final_relative_error / 2.0^K
 
+"""
+    squaring_schedule(K, β, final_relative_error) -> rows
+
+Step-resolved budget of the squaring route: step `j` produces `β_j = β 2^{j−K}` and its
+compression residual is amplified by `2^{K−j}` (forward error) or `4^{K−j}` (product of forward
+and backward errors in the signed trace correction). Each row gives the residual allowed at
+that step if the final error is shared equally over the `K` steps.
+"""
+function squaring_schedule(K, β, final_relative_error)
+    [Dict("step" => j, "beta" => β * 2.0^(j - K),
+         "forward_budget" => final_relative_error / (K * 2.0^(K - j)),
+         "signed_budget" => final_relative_error / (K * 4.0^(K - j))) for j in 1:K]
+end
+
 function main(output = joinpath(@__DIR__, "seed-scale.json"))
     energies = trial_energies()
     models = Dict(
@@ -251,6 +266,8 @@ function main(output = joinpath(@__DIR__, "seed-scale.json"))
         "squarings" => 28,
         "final_relative_error" => 0.02,
         "seed_plus_residual_budget" => squaring_budget(28, 0.02),
+        "schedule_K28_degree2_seed" => squaring_schedule(28, 64.0, 0.02),
+        "schedule_K16_degree12_seed" => squaring_schedule(16, 64.0, 0.02),
         "note" => "relative HS error doubles per squaring; 0.02 is the slack between the " *
                   "trial-based estimate of Ẑ_256(64) and the target 1.08",
     )

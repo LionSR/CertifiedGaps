@@ -115,20 +115,30 @@ gap: circular for the ring whose gap is the goal. Ruled out as a seed source (us
 for finite rings once a gap is known).
 
 **H. Certified thermal MPO (the repository's main programme).** Exact polynomial seed at
-`β/2^28`, 28 certified squarings of an `N = 256` MPO, signed backward trace correction. Status
-in `README.md`: two squarings completed at `β ≈ 10⁻⁶` with HS error `1.7·10⁻¹⁰` at bond
-dimension 16–32. Budget: the normalised relative HS error at least doubles per squaring (the
-`2b/κ ≥ 2` factor is intrinsic to norm-only error control), so 26 more squarings multiply
-today's error by `7·10⁷` even with no further compression loss, giving `≈ 10⁻²`. Each further
-step adds its own compression residual, and the bond dimension needed for a `10⁻¹⁰` HS residual
-grows with `β`: the operator Schmidt spectrum of `e^{−βH/2}` at `β ≫ 1/Δ` is the square of the
-ground-state Schmidt spectrum, so a `10⁻¹⁰` truncation needs `D ≈ D₀²` with `D₀` the MPS bond
-dimension for a `10⁻⁵` truncation, i.e. `D` of order `10⁴–10⁵` for spin 2. The mathematics is
-complete; the computation is out of reach of exact-rational or Arb witness verification by
-three to five orders of magnitude in `D`. **Not ruled out, but not feasible with norm-based
-error control.** The one change that would alter this: an error functional weighted by the
-thermal state (trace norm against `e^{−βH}`) instead of HS or operator norms, so that
-compression errors in high-energy components are not charged at full weight.
+`β/2^K`, `K` certified squarings of an `N = 256` MPO, signed backward trace correction.
+Status in `README.md`: two squarings completed at `β ≈ 10⁻⁶` with HS error `1.7·10⁻¹⁰` at bond
+dimension 16–32 (`K = 28`, degree-2 seed). The normalised relative HS error at least doubles
+per squaring (the `2b/κ ≥ 2` factor is intrinsic to norm-only error control), so the residual
+of step `j` is charged `2^{K−j}` times at the end. Two consequences:
+
+* The seed degree matters more than anything else: a degree-12 polynomial seed needs only
+  `K = 16` squarings for the same `β = 64` (README table), so the total amplification is
+  `2^16 ≈ 6.6·10⁴` instead of `2^28 ≈ 2.7·10⁸`. `experiments/seed-scale.json` lists the
+  step-resolved budget: with a final slack of 0.02, the residual allowed at step `j` is
+  `0.02/(16·2^{16−j})`, from `4·10⁻⁸` at `β = 0.002` to `1.3·10⁻³` at `β = 64`.
+* The expensive steps are the last ones (`β ≥ 1`), where the operator entanglement of
+  `e^{−βH/2}` is largest and then saturates at the square of the ground-state Schmidt
+  spectrum; there the budget is loose (`10⁻⁵`–`10⁻³`). What decides feasibility is therefore the
+  bond dimension at which the central-cut operator Schmidt spectrum of `e^{−βH/2}` has
+  discarded weight `10⁻¹⁰`–`10⁻⁶` for `β = 1…64`. `experiments/operator_entanglement.jl`
+  (open chain, numerical) and `experiments/ground_schmidt.jl` (DMRG) measure exactly this;
+  see section 6.
+
+The mathematics is complete; whether the computation is feasible is a question of bond
+dimension, answered in section 6. **Not ruled out.** The one methodological change that would
+relax the budget further: an error functional weighted by the thermal state (trace norm against
+`e^{−βH}`) instead of HS or operator norms, so that compression errors in high-energy
+components are not charged at full weight.
 
 **I. SU(2) sector resolution.** The leading spatial defect is the triplet magnon,
 `(λ₁/λ₀)^n = e^{−n/ξ}`. The singlet sector of `X_β` has the two-magnon gap, `ξ_eff ≈ ξ/2`, so
@@ -172,5 +182,6 @@ scale is `(n₀, β₀) ≈ (192–256, 50–70)`.
   with the matching trial at `2hn` (available for `2hn ≤ 1024`).
 * A compression error certificate measured against the thermal weight rather than in HS or
   operator norm (route H), bringing the required `D` back to the MPS scale `D₀ ≈ 300`.
-* A trial at `N = 2048` (same D = 295 machinery, about twice the 549 s run) to allow `h = 4`
-  in the one-trace scheme and thus `n = 256` with `β` as low as 32.
+* Not a longer trial: `h = 4` in the one-trace scheme (a trial at `N = 2048`) would allow
+  `β = 32` on the 256-ring, but there the excitation factor `1 + R_256(32) ≈ 1.28` already
+  exceeds what that scheme tolerates. The thermal input must be taken at `β ≳ 50`.
