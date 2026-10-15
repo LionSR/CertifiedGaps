@@ -3,5 +3,8 @@
 /results/acceptance.json
 # scripts/numerical_scan.jl (Float64 scans; condensed into results/numerical_summary.json)
 /results/numerical_delta_*.json
-# uncompressed copies; the committed form is results/verified_delta_*.json.gz
-/results/verified_delta_*.json
+# scripts/scan20.jl (20-spin Ritz values, ~390 kB each; condensed into diagnostic20_summary.json)
+/results/diagnostic20_[0-9]*.json
+# uncompressed copies; the committed form is results/seed_delta_*.json.gz
+/results/seed_delta_*.json
+*.log

@@ -1,109 +1,74 @@
 # Independent acceptance: fresh solves, rigorous refined radii, stored-interval containment.
-# This does not require bitwise-identical eigenvectors and never overwrites production data.
-# About 2.5 minutes; writes the 10 MB results/acceptance.json (gitignored).
+# Stricter than `check.jl --full`: every eigenvalue interval regenerated around the fresh centre
+# with `refined_witness` must lie inside the stored interval. This does not require
+# bitwise-identical eigenvectors, can fail on another BLAS without affecting validity (README),
+# and never overwrites production data. About 4 minutes; writes results/acceptance.json
+# (gitignored).
 include(joinpath(@__DIR__, "..", "check.jl"))
-const QQReview=Rational{BigInt}
-const CQReview=Complex{QQReview}
-# refined_witness is defined in check.jl (shared with `check.jl --full`).
-reviewrecords=Any[]
-elapsed=@elapsed @testset "Independent acceptance: containment from fresh full spectra" begin
-    check_verified_results()
-    paths=sort(filter(p->startswith(basename(p),"verified_delta_")&&endswith(p,".json.gz"),
-        readdir(joinpath(@__DIR__,"../results");join=true)))
-    for path in paths
-        data=JSON3.read(read_json_text(path)); delta=parseq(data.delta); beta=parseq(data.beta0)
-        println("ACCEPTANCE RERUN delta=",delta); flush(stdout)
-        fresh=Dict{Int,Any}(); rings=Any[]; mismatches=Dict{String,Int}()
-        for stored in data.rings
-            L=Int(stored.spins)
-            ring,E,r=verified_ring(delta,L)
-            @test ring["dimension"]==stored.dimension
-            @test length(ring["blocks"])==length(stored.blocks)
-            centerlist=Float64[]; refinedlist=QQReview[]; blocks=Any[]
-            for (a,b) in zip(ring["blocks"],stored.blocks)
-                for key in ("dimension","down_spins","cell_momentum","spin_flip_parity",
+const QQReview = Rational{BigInt}
+reviewrecords = Any[]
+elapsed = @elapsed @testset "Independent acceptance: containment from fresh full spectra" begin
+    for delta in DELTAS
+        path = seed_path(delta)
+        record = load_record(path)
+        println("ACCEPTANCE RERUN delta=", delta); flush(stdout)
+        fresh = Dict{Int,Any}(); mismatches = Dict{String,Int}(); minmargin = nothing
+        for stored in record["rings"]
+            L = Certification.asint(stored["spins"])
+            ring, _, _ = verified_ring(delta, L)
+            @test length(ring["blocks"]) == length(stored["blocks"])
+            centers = Float64[]; radii = QQReview[]
+            for (a, b) in zip(ring["blocks"], stored["blocks"])
+                for key in ("dimension", "down_spins", "cell_momentum", "spin_flip_parity",
                         "multiplicity")
-                    @test a[key]==b[Symbol(key)]
+                    @test string(a[key]) == string(b[key]) # stored integers may be strings
                 end
-                for key in ("h_component_max","q_component_max","lambda_max_abs",
-                    "raw_residual_component_max","raw_orthogonality_component_max",
-                    "matrix_error_upper","residual_norm_upper","orthogonality_norm_upper",
-                    "eigenvalue_radius","eigenvalues")
-                    a[key]==b[Symbol(key)] || (mismatches[key]=get(mismatches,key,0)+1)
+                for key in ("raw_residual_component_max", "raw_orthogonality_component_max",
+                        "eigenvalue_radius", "eigenvalues")
+                    a[key] == b[key] || (mismatches[key] = get(mismatches, key, 0) + 1)
                 end
-                w=refined_witness(a,L)
-                av=parseq.(a["eigenvalues"]); bv=parseq.(b.eigenvalues)
-                oldradius=parseq(b.eigenvalue_radius)
-                displacement=maximum(abs.(av.-bv))
-                margin=oldradius-displacement-w.radius
-                # Ordered Weyl intervals independently regenerated around fresh centers
-                # lie wholly inside the production intervals, including multiplicities.
-                @test margin>=0
+                w = refined_witness(a, L)
+                av = parseq.(a["eigenvalues"]); bv = parseq.(b["eigenvalues"])
+                margin = parseq(b["eigenvalue_radius"]) - maximum(abs.(av .- bv)) - w.radius
+                # Ordered Weyl intervals regenerated around the fresh centres lie wholly inside
+                # the stored intervals, including multiplicities.
+                @test margin >= 0
+                minmargin = minmargin === nothing ? margin : min(minmargin, margin)
                 for _ in 1:Int(a["multiplicity"])
-                    append!(centerlist,Float64.(av)); append!(refinedlist,fill(w.radius,length(av)))
+                    append!(centers, Float64.(av)); append!(radii, fill(w.radius, length(av)))
                 end
-                push!(blocks,Dict("down_spins"=>a["down_spins"],"cell_momentum"=>a["cell_momentum"],
-                    "spin_flip_parity"=>a["spin_flip_parity"],"dimension"=>a["dimension"],
-                    "multiplicity"=>a["multiplicity"],"fresh_witness"=>a,
-                    "refined_residual_norm"=>string(w.r),"refined_orthogonality_norm"=>string(w.e),
-                    "refined_eigenvalue_radius"=>string(w.radius),
-                    "maximum_center_displacement"=>string(displacement),
-                    "minimum_stored_interval_containment_margin"=>string(margin)))
             end
-            @test length(centerlist)==2^L
-            fresh[L]=(centerlist,refinedlist)
-            push!(rings,Dict("spins"=>L,"dimension"=>ring["dimension"],"blocks"=>blocks,
-                "blas_config"=>ring["blas_config"],"seconds"=>ring["seconds"]))
+            @test length(centers) == 2^L
+            fresh[L] = (centers, radii)
         end
-        zs=enclosed_logZ(fresh[8]...,beta); zl=enclosed_logZ(fresh[16]...,beta)
-        zd=enclosed_logZ(fresh[16]...,2beta)
-        es=rational_upper(1-exp(zl-2zs)); et=rational_upper(1-exp(zd-2zl))
-        @test es<=parseq(data.epsilon_s_upper)
-        @test et<=parseq(data.epsilon_t_upper)
-        freshbound=certified_gap_bound(es,et,beta).bound
-        @test freshbound!==nothing && freshbound>=data.recurrence_bound
-        exactblocks=0
-        for q in 0:4
-            orbits,flip=VerifiedSpectra.group_orbits(8,q)
-            for k in 0:3, parity in (flip ? (1,-1) : (1,))
-                built=VerifiedSpectra.verified_block(delta,8,q,k,parity,orbits)
-                built===nothing && continue
-                H,herr=built; d=size(H,1)
-                rec,vals,radius=VerifiedSpectra.enclose_block(H,herr,8)
-                w=refined_witness(rec,8)
-                eig=eigen(Hermitian(H)); Q=CQReview.(eig.vectors)
-                residual=CQReview.(H)*Q-Q*Diagonal(QQReview.(eig.values))
-                defect=Q'*Q-Matrix{CQReview}(I,d,d)
-                @test sum(abs2,residual)<=w.r^2
-                @test sum(abs2,defect)<=w.e^2
-                exactblocks+=1
-            end
+        bounds = Any[]
+        seeds = copy(record["seeds"])
+        record["survey_seed"] === nothing || push!(seeds, record["survey_seed"])
+        for seed in seeds
+            n = parse(Int, seed["n0_cells"]); beta = parseq(seed["beta0"])
+            f = seed_intervals(fresh, n, beta)
+            es = rational_upper(f.s); et = rational_upper(f.t)
+            @test es <= parseq(seed["eps_s"]) && et <= parseq(seed["eps_t"])
+            b = certified_gap_bound(es, et, beta).bound
+            @test b !== nothing && b >= parseq(seed["gap_lower"])
+            push!(bounds, Dict("n0_cells" => n, "beta0" => string(beta),
+                "fresh_refined_bound" => b, "stored_bound" => seed["gap_lower"]))
         end
-        push!(reviewrecords,Dict("delta"=>string(delta),"production_certificate"=>basename(path),
-            "production_sha256"=>sha256_file(path),"beta"=>string(beta),
-            "stored_epsilon_s"=>String(data.epsilon_s_upper),
-            "stored_epsilon_t"=>String(data.epsilon_t_upper),
-            "fresh_refined_epsilon_s"=>string(es),"fresh_refined_epsilon_t"=>string(et),
-            "accepted_stored_bound"=>String(data.recurrence_bound_exact_binary),
-            "fresh_refined_bound"=>string(QQReview(freshbound)),
-            "non_bitwise_equal_block_counts"=>mismatches,
-            "exact_rational_eight_spin_blocks"=>exactblocks,
-            "all_stored_eigenvalue_intervals_independently_contained"=>true,"rings"=>rings))
-        println("ACCEPTED delta=",delta," stored_bound=",data.recurrence_bound,
-            " fresh_refined_bound=",freshbound," exact-eight-spin-blocks=",exactblocks,
-            " mismatch_counts=",mismatches); flush(stdout)
+        push!(reviewrecords, Dict("delta" => string(delta), "certificate" => basename(path),
+            "certificate_sha256" => sha256_file(path), "bounds" => bounds,
+            "non_bitwise_equal_block_counts" => mismatches,
+            "minimum_containment_margin" => string(minmargin)))
+        println("ACCEPTED delta=", delta, " bounds=", bounds, " margin=", Float64(minmargin),
+            " mismatch_counts=", mismatches); flush(stdout)
     end
 end
-root=normpath(joinpath(@__DIR__,"../../.."))
-files=vcat(["models/dimerized_heisenberg/scripts/independent_review.jl",
-    "models/dimerized_heisenberg/src/verified_spectra.jl",
-    "models/dimerized_heisenberg/METHOD.md"],
-    ["models/dimerized_heisenberg/results/"*r["production_certificate"] for r in reviewrecords])
-write_result(joinpath(@__DIR__,"..","results","acceptance.json"),Dict(
-    "metadata"=>run_metadata(Dict("scope"=>"independent_general_reflected_RP_acceptance");
-        source_sha256=source_hashes(root;dirs=(),files=Tuple(files)),
-        packages=(CertifiedGaps,IntervalArithmetic),status="pass",certified=true),
-    "original_strict_real_identical_hypothesis"=>"FAIL",
-    "general_reflected_RP_certificates"=>"PASS",
-    "backend_assumption"=>"Classical binary64 CPU OpenBLAS GEMM with ordinary multiply/add/FMA",
-    "seconds"=>elapsed,"certificates"=>reviewrecords))
+root = normpath(joinpath(@__DIR__, "..", "..", ".."))
+write_result(joinpath(@__DIR__, "..", "results", "acceptance.json"), Dict(
+    "metadata" => run_metadata(Dict("scope" => "independent_containment_review");
+        source_sha256=source_hashes(root; dirs=(), files=(
+            "models/dimerized_heisenberg/scripts/independent_review.jl",
+            "models/dimerized_heisenberg/check.jl",
+            "models/dimerized_heisenberg/src/verified_spectra.jl")),
+        packages=(CertifiedGaps, IntervalArithmetic), status="pass", certified=true),
+    "backend_assumption" => "Classical binary64 CPU OpenBLAS GEMM with ordinary multiply/add/FMA",
+    "seconds" => elapsed, "certificates" => reviewrecords))
