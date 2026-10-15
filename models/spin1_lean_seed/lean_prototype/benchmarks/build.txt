@@ -1,3 +1,0 @@
-✔ [2/4] Built SeedPrototype.Packed (2.1s)
-✔ [3/4] Built SeedPrototype (706ms)
-Build completed successfully (4 jobs).

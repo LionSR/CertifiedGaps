@@ -1,6 +1,6 @@
 # Untrusted exact-integer generator and independent unpacked cross-check.
 # No Julia result is a Lean theorem. Float renderings are NON-CERTIFYING.
-using LinearAlgebra, SparseArrays, SHA, Printf
+using LinearAlgebra
 const ROOT = dirname(@__DIR__)
 repunit(w,d)=((big(1)<<(w*d))-1)÷((big(1)<<w)-1)
 pack(w,x)=sum(BigInt(x[i])<<(w*(i-1)) for i in eachindex(x);init=big(0))
@@ -55,7 +55,14 @@ function sector(n)
 end
 applyrows(rows,v)=[sum(a*v[j] for (j,a) in row) for row in rows]
 
-function generate(n,q)
+"""
+    generate(n, q; write=true)
+
+Power-filter trial (nI - H_M)^q e_Neel on the even untwisted n-ring: compute the exact
+moments G, A, C twice (sparse rows and packed lanes), derive the Ritz/residual witnesses, and
+(if `write`) emit `src/SeedPrototype/H<n>.lean`. Returns the witness row and the Lean text.
+"""
+function generate(n,q; write=true)
     basis,lookup,rows=sector(n)
     v=zeros(BigInt,length(basis)); v[lookup[neel(n)]]=1
     for _ in 1:q
@@ -80,21 +87,32 @@ function generate(n,q)
     epsden=10^6
     epsnum=isqrt(cld(epsden^2*(c*g-a*a),g*g))+1
     name="H$(n)"
-    open(joinpath(ROOT,"SeedPrototype","$name.lean"),"w") do io
-        println(io,"import SeedPrototype.Packed\nset_option maxRecDepth 100000\nset_option maxHeartbeats 0\nnamespace SeedPrototype")
-        println(io,"-- Arithmetic witnesses, NOT a theorem about ordered physical eigenvalues.")
-        println(io,"theorem h$(n)_ritz_witness : ritzCheck $width $n $q $num $den $epsnum $epsden = true := by\n  decide +kernel")
-        println(io,"theorem h$(n)_lane_bound : $((3^n)) * (($(4n) : Nat)^$(2*(q+1))) < 2^$width := by\n  decide +kernel")
-        println(io,"#print axioms h$(n)_ritz_witness\nend SeedPrototype")
-    end
-    return (n,q,width,num,den,epsnum,epsden,g,a,c)
+    text = """
+        import SeedPrototype.Packed
+        set_option maxRecDepth 100000
+        set_option maxHeartbeats 0
+        namespace SeedPrototype
+        -- Arithmetic witnesses, NOT a theorem about ordered physical eigenvalues.
+        theorem h$(n)_ritz_witness : ritzCheck $width $n $q $num $den $epsnum $epsden = true := by
+          decide +kernel
+        theorem h$(n)_lane_bound : $((3^n)) * (($(4n) : Nat)^$(2*(q+1))) < 2^$width := by
+          decide +kernel
+        #print axioms h$(n)_ritz_witness
+        end SeedPrototype
+        """
+    write && Base.write(joinpath(ROOT,"src","SeedPrototype","$name.lean"),text)
+    return (n,q,width,num,den,epsnum,epsden,g,a,c),text
 end
 
+"""(n, filter degree) pairs of the kernel-checked Ritz witnesses."""
+const WITNESS_SIZES = ((6,24),(8,32),(10,16))
+
 if abspath(PROGRAM_FILE) == @__FILE__
-open(joinpath(ROOT,"benchmarks","exact_witnesses.tsv"),"w") do io
-    println(io,"n\tdegree\tlane_bits\tritz_negative_num\tritz_den\tresidual_num\tresidual_den\tG\tA_filter\tC_filter")
-    for (n,q) in ((6,24),(8,32),(10,16))
-        row=generate(n,q)
+open(joinpath(ROOT,"results","exact_witnesses.tsv"),"w") do io
+    println(io,"n\tdegree\tlane_bits\tritz_negative_num\tritz_den\tresidual_num\tresidual_den",
+        "\tG\tA_filter\tC_filter")
+    for (n,q) in WITNESS_SIZES
+        row,_=generate(n,q)
         println(io,join(row,'\t')); flush(io)
         println("Generated H",n," degree ",q," lanes ",row[3]," bits")
     end

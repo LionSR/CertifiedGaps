@@ -1,2 +1,0 @@
-Test Summary:                      | Pass  Total  Time
-packed generator, independent rows |   22     22  3.4s

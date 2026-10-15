@@ -1,47 +1,30 @@
-# Task 4: Lean seed feasibility review
+# Lean seed feasibility review: method, audit and budget
 
-## Verdict and delivered scope
-
-**The packed-Nat primitive is viable. The proposed end-to-end certificate and its
-4.5–7.5k-line / 15–60-minute / 1.5–3-week estimates are not established.** The strongest
-negative finding is about the anchor, not GMP: for the untuned comparison with two open
-half chains minus 4I, a non-certifying full-spectrum scan of H6 and H8 finds **no rank**
-`1 <= k < 3^n` satisfying the separation needed by the proposed Weyl/counting argument,
-even with exact Ritz vectors and zero residual.
-
-This directory contains a separate, buildable Lake project, exact Julia generators and
-independent reference checks, kernel benchmarks, and precise open packing specifications.
-It does **not** contain a proved physical Rayleigh–Ritz eigenvalue enclosure or a
-Weyl/counting lower enclosure for H6/H8. The checked Ritz/residual quantities are integer
-arithmetic witnesses; the general packed-to-matrix and spectral implications remain open.
-In particular, no seed, shifted thermal table, or unconditional gap theorem is claimed.
-The requested low-level lower certificate was not obtained. This is a negative feasibility
-result, not a replacement of that requirement by a residual check.
-
-Original repository: `463c4a5b1e345c762133d4ee71bbe79943a7db47`.
-Toolchain: `leanprover/lean4:v4.35.0-rc3`.
-Mathlib: `c55e6e786f49471c72fbddbec5415808896aec1e` (same full manifest pins as `lean/`).
-Julia: 1.12.0, Float64 experiments use one BLAS thread. CPU: Intel Xeon Platinum 8573C;
-container memory limit: 16 GiB. All new artifacts are confined to this directory.
+The long companion to [README.md](README.md): the Mathlib audit, the packed arithmetic and its
+trust boundary, the packing and anchor experiments, a mathematical review of the proposed
+Peierls/Weyl/counting route, benchmarks, and the remaining implementation budget. Lean files
+named below live in `src/SeedPrototype/` (library) and `src/Bench/` (benchmark-only files).
 
 The paper excerpts were fetched from the repository-pinned OpenAI commit
-`adc7f1241b42e322a6451854ab7e4b4c146bf78a`; exact URLs are that commit's
-`preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/build/{initialization,transfer,thermal72,trials}.tex`.
-Locally downloaded (Git-ignored) copies and SHA-256 values are in `references/` and `benchmarks/paper-source-sha256.txt`.
-Their inputs confirm 18 tables, including **odd lengths**, and the pi twist about z.
-
-`lake exe cache get` was attempted before building. The environment denies
-`https://cache.mathlib.org/mathlib4-master` with HTTP 403. The prototype therefore uses
-`Std`; its declared Mathlib dependency is pinned and available as source, but no claim is
-made that Mathlib-importing spectral proofs were compiled here. The audit below is a source
-inspection at the exact commit, with reproducible searches, not fabricated `#check` output.
+`adc7f1241b42e322a6451854ab7e4b4c146bf78a`, files
+`preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/build/`
+`{initialization,transfer,thermal72,trials}.tex`
+(`scripts/fetch_references.sh` downloads them into the git-ignored `references/` and checks
+`results/paper-source-sha256.txt`). Their inputs confirm 18 thermal tables, including **odd
+lengths**, and the π twist about z.
 
 ## 1. Mathlib audit
 
-Paths below are relative to `.lake/packages/mathlib/Mathlib`. Declaration names are fully
-qualified. `benchmarks/mathlib-audit.txt` records matching source lines;
-`scripts/audit_mathlib.sh` reproduces the search. Negative search is evidence of an API gap,
-not a logical proof that no equivalent statement can be derived elsewhere.
+Paths below are relative to `Mathlib/` in the Mathlib checkout pinned by the repository's
+`lean/` project (commit `c55e6e78`, the same pin this prototype was written against).
+Declaration names are fully qualified. `results/mathlib-audit.txt` records matching source
+lines; `scripts/audit_mathlib.sh` reproduces the search (re-run in the cleanup with identical
+output; the negative search, `results/mathlib-negative-search.txt`, has zero hits). A wider
+manual search for interlacing, minimax and eigenvalue monotonicity also found nothing; the
+only related extras are `Matrix.eigenvalue_mem_ball` (Gershgorin, `LinearAlgebra/Matrix/
+Gershgorin.lean`) and `LinearMap.IsSymmetric.card_filter_eigenvalues_eq` (multiplicities).
+Negative search is evidence of an API gap, not a logical proof that no equivalent statement
+can be derived elsewhere.
 
 | Need | Exact declarations already present | Missing work and incremental Lean LoC estimate |
 |---|---|---|
@@ -76,7 +59,8 @@ they describe the same work from an API perspective.
 
 - little-endian base-3 configurations in a full `3^n`-lane Nat, radix `B = 2^w`;
 - digit-pattern masks via finite geometric series, avoiding per-configuration mask generation;
-- standard-Sz `H v` with two nonnegative limbs representing signed lanes, including a pi-twisted seam;
+- standard-Sz `H v` with two nonnegative limbs representing signed lanes, including a
+  pi-twisted seam;
 - coordinatewise signed floor using an aligned bias, with masking after the global shift;
 - butterfly reversal of vector lanes in O(log d) big operations;
 - one big multiplication for each nonnegative dot product (four for a signed pair);
@@ -86,8 +70,9 @@ they describe the same work from an API perspective.
 loop. It also provides reversal masks built by repeated doubling (shifts and ORs),
 avoiding the expensive big divisions in the initial reversal. `FastReverse8.lean` checks
 this against the original on a non-palindromic regenerated vector. General correctness
-is specified by `FastReverseCorrect` and remains open. This removes measured division work. It does not solve
-compact-sector addressing. `PreparedH8.lean` kernel-checks equality of all three optimized
+is specified by `FastReverseCorrect` and remains open. This removes measured division work.
+It does not solve compact-sector addressing.
+`PreparedH8.lean` kernel-checks equality of all three optimized
 and original H8 moment integers.
 
 The tested trial is
@@ -103,7 +88,7 @@ exact integer power filter, not a Chebyshev or tuned thermal certificate. Set
 The integer checker proves `G>0`, `den*A >= (den*n+num)*G`,
 `epsDen²*(C*G-A²) <= epsNum²*G²`, and `A²<=C*G`.
 That final inequality prevents a Nat subtraction from silently truncating a negative
-residual numerator. The raw exact G/A/C values are in `benchmarks/exact_witnesses.tsv`.
+residual numerator. The raw exact G/A/C values are in `results/exact_witnesses.tsv`.
 The Julia generator independently computes them using uncompressed sparse rows and BigInts;
 its agreement is a regression check, not part of Lean's trust base.
 
@@ -119,8 +104,9 @@ certificate are not delivered. The residuals are far too loose for the thermal t
 
 `PackingProofs.lean` proves `radixPack_head`, `radixPack_tail`, `radixPack_extract`,
 `add_noCarry`, and `pack_eq_radixPack`. `Obligations.lean` gives precise propositions
-`DotCorrect`, `ReverseCorrect`, `FastReverseCorrect`, `MaskCorrect`, `FloorCorrect`, `HApplyCorrect`, and
-`FilterCorrect`. These are `def ... : Prop`, never `axiom` or theorem-by-placeholder.
+`DotCorrect`, `ReverseCorrect`, `FastReverseCorrect`, `MaskCorrect`, `FloorCorrect`,
+`HApplyCorrect`, and `FilterCorrect`.
+These are `def ... : Prop`, never `axiom` or theorem-by-placeholder.
 They are not assumed by the checkers. The bitwise/matrix interpretations remain unproved.
 
 Important explicit bounds:
@@ -350,27 +336,34 @@ are also additional structure beyond the already-proved two-purity transfer ineq
 
 ## 5. Benchmark table and extrapolation
 
-| Check | Wall seconds | Peak RSS GiB | Exit |
-|---|---:|---:|---:|
-| Imports / trivial check | 4.205 | 0.798 | 0 |
-| n=6 dense matvec + dot | 2.265 | 0.800 | 0 |
-| n=8 dense matvec + dot | 2.500 | 0.800 | 0 |
-| n=10 dense matvec + dot | 6.457 | 1.118 | 0 |
-| n=12 dense matvec + dot | 72.996 | 5.548 | 0 |
-| H6, degree 24, 3 moments | 3.596 | 0.799 | 0 |
-| H8, degree 32, 3 moments | 6.584 | 1.557 | 0 |
-| H10, degree 16, 3 moments | 21.589 | 4.045 | 0 |
-| n=12 matvec + checksum | 27.960 | 3.761 | 0 |
-| n=12 reversal + dot | 56.997 | 2.617 | 0 |
-| n=12 prepared masks, matvec + dot | 60.279 | 4.694 | 0 |
-| H8 optimized/original equality | 8.111 | 2.352 | 0 |
-| n=6, four-vector Gram | 2.568 | 0.800 | 0 |
-| Signed/twisted/floor/Gram cases | 3.852 | 0.810 | 0 |
-| n=12 dot, reversed operand supplied | 5.307 | 0.823 | 0 |
-| n=12 dot with division-free reversal | 9.957 | 2.856 | 0 |
-| n=12 prepared matvec + fast dot | 30.369 | 5.105 | 0 |
-| n=8 fast/original reversal equality | 2.785 | 0.800 | 0 |
-| n=12 prepared matvec + checksum | 18.042 | 2.961 | 0 |
+Two serial runs, one fresh Lean process per check: the original PR run (Linux container, Intel
+Xeon Platinum 8573C, 16 GiB, `results/benchmarks_original_linux.tsv`) and the cleanup re-run
+(Apple M5, 32 GiB, `results/benchmarks.tsv`, `scripts/benchmark.jl`). Seconds / peak RSS GiB.
+
+| Check | file | Linux s | Linux GiB | M5 s | M5 GiB |
+|---|---|---:|---:|---:|---:|
+| Imports / trivial check | Baseline | 4.205 | 0.798 | 3.24 | 0.60 |
+| n=6 dense matvec + dot | Bench6 | 2.265 | 0.800 | 0.52 | 0.61 |
+| n=8 dense matvec + dot | Bench8 | 2.500 | 0.800 | 0.52 | 0.64 |
+| n=10 dense matvec + dot | Bench10 | 6.457 | 1.118 | 1.33 | 1.03 |
+| n=12 dense matvec + dot | Bench12 | 72.996 | 5.548 | 26.38 | 3.70 |
+| H6, degree 24, 3 moments | H6 | 3.596 | 0.799 | — | — |
+| H8, degree 32, 3 moments | H8 | 6.584 | 1.557 | — | — |
+| H10, degree 16, 3 moments | H10 | 21.589 | 4.045 | — | — |
+| n=12 matvec + checksum | Matvec12 | 27.960 | 3.761 | 11.34 | 2.51 |
+| n=12 reversal + dot | Dot12 | 56.997 | 2.617 | 20.64 | 2.28 |
+| n=12 prepared masks, matvec + dot | Prepared12 | 60.279 | 4.694 | 28.34 | 3.41 |
+| H8 optimized/original equality | PreparedH8 | 8.111 | 2.352 | 1.43 | 2.29 |
+| n=6, four-vector Gram | Gram6 | 2.568 | 0.800 | 1.36 | 0.61 |
+| Signed/twisted/floor/Gram cases | Tests | 3.852 | 0.810 | — | — |
+| n=12 dot, reversed operand supplied | PlainDot12 | 5.307 | 0.823 | 2.46 | 0.77 |
+| n=12 dot with division-free reversal | FastDot12 | 9.957 | 2.856 | 2.96 | 2.57 |
+| n=12 prepared matvec + fast dot | Fast12 | 30.369 | 5.105 | 9.63 | 3.56 |
+| n=8 fast/original reversal equality | FastReverse8 | 2.785 | 0.800 | 1.24 | 0.67 |
+| n=12 prepared matvec + checksum | PreparedMatvec12 | 18.042 | 2.961 | 6.98 | 2.99 |
+
+H6, H8, H10 and Tests are now library modules built by `lake build`; on the M5 a clean build
+of the whole library (all of them) takes 8.5 s, with H10 the largest module at 3.2 s.
 
 The dense microbenchmark computes one filter matvec on a full repunit vector, reverses a
 vector, multiplies, and checks the closed sum `17*n*3^(n-2)`. Every theorem is elaborated
@@ -383,7 +376,8 @@ is dominated by startup. The final serial run avoids concurrent eigensolvers or 
 One 4-million-bit multiplication does not characterize a whole matvec. At n=12 this
 prototype uses 68,024,448-bit full vectors at 128 bits per lane, repeated divisions for
 masks, many shifts/ands, and reversal. Peak resident memory is orders of magnitude larger
-than one packed vector. Hoisting masks and reversals is necessary. The optimized n=12 dense matvec-plus-dot takes **30.369 s** versus **72.996 s** initially
+than one packed vector. Hoisting masks and reversals is necessary. The optimized
+n=12 dense matvec-plus-dot takes **30.369 s** versus **72.996 s** initially
 (2.40x faster), while peak RSS is **5.105 GiB** versus **5.548 GiB**. A dot with a
 pre-reversed operand takes **5.307 s**; the division-free reversal-plus-dot takes **9.957 s**,
 versus **56.997 s** for the first reversal. Hoisting reversed vectors out of a Gram loop
@@ -392,7 +386,8 @@ is consequently a material optimization, not a cosmetic one.
 Single-check peak memory
 cannot be extrapolated linearly to thousands of theorems; checkpointed modules may be needed.
 
-For illustrative full-packing workloads with k=50 and q=200:
+For illustrative full-packing workloads with k=50 and q=200 (Linux timings; the M5 re-run
+is 2.8–3.2x faster at n=12, which divides the hours below but does not change the conclusion):
 
 - `q*k = 10000` matvecs. At roughly 30 seconds per n=12 matvec, this is about **83 hours**
   for one n/twist, before Gram work. This is a conditional workload calculation, not a
@@ -444,8 +439,9 @@ No 1.5–3-week completion promise is justified. Conditional on finding a usable
 representation, a planning range is **8–16 expert weeks** for this broader proof work,
 plus potentially unbounded mathematical/certificate search. The estimate corresponds to
 roughly 200 reviewed Lean lines per working day across the 8450–15200-line range;
-that throughput is an explicit planning assumption, not a measured productivity result. This is a staffing estimate,
-not evidence that an anchor exists. A first milestone should be a fully bridged H6
+that throughput is an explicit planning assumption, not a measured productivity result. This is
+a staffing estimate, not evidence that an anchor exists.
+A first milestone should be a fully bridged H6
 counted enclosure, before expanding to H8 or implementing all transfer/trial modules.
 
 ## 7. Plan changes and open risks
@@ -472,14 +468,25 @@ keeps all of these visible; none is hidden behind an extra axiom or an unchecked
 
 ## 8. Validation record
 
-The default `lake build` succeeds. `benchmarks/axioms.txt` records the axiom audit for
-all named main checks and elementary lemmas. The serial benchmark files record exit 0
-for every reported kernel computation, including n=12. The original Lake manifest differs
-only in the new project name; toolchain and all dependency revisions match. Git checks
-confirm that no tracked original file under `lean/` or `models/spin1/results/` was changed.
+Re-run in the cleanup (Apple M5, Julia 1.12, Lean v4.35.0-rc3):
 
-The Julia regression suite checks exact sparse-row/packed agreement, digit masks, reversal,
-and dots for n=2 through 6, plus a carry-overflow counterexample. Its results are in
-`benchmarks/julia-tests.txt`. `certificate.json` records exact rational witness endpoints,
-source hashes and versions; it is expressly an arithmetic inventory. `check.jl` verifies
-the hashes and runs the Lean build. The float eigenvalue/anchor tables remain non-certifying.
+- `lake build` in `src/` succeeds from clean in 8.5 s with no Mathlib dependency (the PR's
+  declared but unused Mathlib requirement was dropped; nothing imports it).
+- `#print axioms` for all 11 audited declarations (`src/AxiomAudit.lean`, also
+  `results/axioms.txt`) shows only subsets of `propext`, `Classical.choice`, `Quot.sound`;
+  no `sorryAx`, no `Lean.ofReduceBool` (no `native_decide`).
+- Every `src/Bench` file checks (exit 0), the slowest being Bench12 (26 s) and Prepared12
+  (28 s); none needed the 5-minute limit.
+- `scripts/generate.jl` regenerates `src/SeedPrototype/H{6,8,10}.lean` and
+  `results/exact_witnesses.tsv` byte-identically (105 s). The witnesses are tight: raising
+  the H6 Ritz numerator by 1 (8495447 to 8495448) makes `decide +kernel` report the
+  proposition false.
+- `scripts/experiments.jl` reproduces the structure and anchor tables exactly and the
+  Float64 level table to about 1e-13.
+- `test/runtests.jl` (24 exact tests, 2 s) checks sparse-row/packed agreement, digit masks,
+  reversal and dots for n = 2..6, the carry-overflow counterexample, and the H6 recipe.
+- `check.jl` verifies the source hashes in `results/witnesses.json`, regenerates the three
+  witnesses and their Lean files, rebuilds the library from clean, and checks the axiom
+  reports; `--full` adds the axiom audit and every benchmark file.
+
+The float eigenvalue/anchor tables remain non-certifying.

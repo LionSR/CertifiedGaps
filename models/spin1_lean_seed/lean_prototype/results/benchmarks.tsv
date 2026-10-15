@@ -1,0 +1,17 @@
+# arm64-apple-darwin24.0.0, Apple M5, leanprover/lean4:v4.35.0-rc3; exit 124 = over limit
+check	wall_seconds	peak_rss_kib	exit_code
+Baseline	3.24	631056	0
+Bench6	0.52	637168	0
+Bench8	0.52	675952	0
+Bench10	1.33	1078112	0
+Bench12	26.38	3883376	0
+Matvec12	11.34	2628032	0
+Dot12	20.64	2392688	0
+Prepared12	28.34	3573504	0
+PreparedH8	1.43	2400208	0
+Gram6	1.36	637584	0
+PlainDot12	2.46	807792	0
+FastDot12	2.96	2692224	0
+Fast12	9.63	3736864	0
+FastReverse8	1.24	703008	0
+PreparedMatvec12	6.98	3135168	0

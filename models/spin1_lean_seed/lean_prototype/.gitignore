@@ -1,6 +1,9 @@
-.lake/
-.tools/
+# Lake build products (never commit; `lake build` in src/ recreates them in seconds)
+src/.lake/
 *.olean
 *.ilean
 *.c
+# Raw Lean output of scripts/benchmark.jl
+results/bench/
+# Paper excerpts downloaded by scripts/fetch_references.sh
 references/

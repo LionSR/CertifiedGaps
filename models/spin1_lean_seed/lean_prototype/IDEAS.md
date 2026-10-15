@@ -26,3 +26,14 @@ required spectral precision and energy cutoff, not a single matvec directly.
 
 Experiments using Float64 are non-certifying. Julia is only a generator; no generated
 number is accepted as a theorem without a Lean kernel proof. No native_decide or sorry.
+
+## Outcome
+
+Route 1 (full base-3 packing) works as an arithmetic primitive: dense n = 12 matvec + dot
+checks by `decide +kernel` in tens of seconds, and power-filter Ritz/residual witnesses for
+H6, H8, H10 are kernel-checked. Route 2 fails as stated: compact Sz = 0 packing needs 3804
+distinct shifts at n = 12, not about 50. Route 4 is blocked by the anchor: with the untuned
+cut comparison (two open half chains minus 4I), a Float64 scan of the full H6 and H8 spectra
+finds no rank k with the separation the counting lemma needs, even for exact Ritz vectors.
+Routes 5 and 6 were not completed. No seed, eigenvalue enclosure or gap is certified; the
+long review and the implementation budget (8.5–15k Lean lines) are in METHOD.md.

@@ -1,1 +1,0 @@
-'SeedPrototype.h6_ritz_witness' depends on axioms: [propext]
