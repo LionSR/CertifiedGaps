@@ -1,0 +1,98 @@
+{
+    "rows": [
+        {
+            "v": -0.1,
+            "kind": "count_optimized",
+            "counts": [
+                34,
+                26,
+                13,
+                2,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "c": -2.0307364,
+            "cutoff": -9.644246899130856,
+            "samples": 438,
+            "k0": 34,
+            "u": -0.3,
+            "ktotal": 116,
+            "n": 8
+        },
+        {
+            "v": 0,
+            "kind": "count_optimized",
+            "counts": [
+                62,
+                50,
+                27,
+                8,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "c": -2.2154884,
+            "cutoff": -12.267845627511573,
+            "samples": 438,
+            "k0": 62,
+            "u": -0.2,
+            "ktotal": 234,
+            "n": 10
+        },
+        {
+            "v": 0.05,
+            "kind": "count_optimized",
+            "counts": [
+                121,
+                100,
+                56,
+                18,
+                3,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+            ],
+            "c": -2.42665,
+            "cutoff": -14.89144435589229,
+            "samples": 438,
+            "k0": 121,
+            "u": -0.2,
+            "ktotal": 475,
+            "n": 12
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.1",
+        "status": "NON-CERTIFYING Float64 experiment",
+        "config": {
+            "global_optimality": false,
+            "objective": "lexicographic (Sz=0 count, total count)"
+        },
+        "created_utc": "2026-10-15T01:43:26.702",
+        "certified": false,
+        "source_sha256": {
+            "common.jl": "93113635385a52f2a9b06cce174606fc37076132bb2252fde48a5ba9fd67aee8",
+            "certify.jl": "2227d915fb4a5bf7ef827ac14f2d3cfc8e9c92fe9275fbde9e4349d7b10debc5",
+            "scan.jl": "a66a1d35c1a9af9c38a7c916227066c1e4696cf60ed10477de079ee2f5cebbc9",
+            "spectra.jl": "7fe4c793fa116fe0939e24d929d63547a51d9984c4968162607e2c39cb27ddcd",
+            "exact.jl": "1cad6c76f59d65ba5b06b0c18a25cf5cb46fa15ee244519ed2dba194eac1cc1d",
+            "count_scan.jl": "78cc580d43d1be626dbc4be3537ec14e4f496af5534f919dbda17864d8a61ce3"
+        },
+        "Optim": "2.3.2",
+        "blas_threads": 1,
+        "Arpack": "0.5.4"
+    }
+}

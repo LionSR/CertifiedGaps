@@ -1,0 +1,72 @@
+SUMMARY
+n=8 g=I E0=-11.336956077897362 losses=0.6630441221026366,1.2277587969743315 counts=Dict{String, Any}("bare" => "162", "tail" => "4", "two" => "15", "ground" => "253", "count" => "116")
+n=8 g=P E0=-11.1561923225277 losses=0.8438078774722992,1.4085225523439941 counts=Dict{String, Any}("bare" => "162", "tail" => "7", "two" => "14", "ground" => "253", "count" => "116")
+n=10 g=I E0=-14.094129954932958 losses=0.5153825169226423,0.7437743939741654 counts=Dict{String, Any}("bare" => "322", "tail" => "15", "two" => "21", "ground" => "481", "count" => "234")
+n=10 g=P E0=-13.982141963487239 losses=0.6273705083683616,0.8557623854198848 counts=Dict{String, Any}("bare" => "322", "tail" => "14", "two" => "20", "ground" => "481", "count" => "234")
+n=12 g=I E0=-16.86955613947802 losses=0.6576594515708862,0.8206222558991705 counts=Dict{String, Any}("bare" => "773", "tail" => "22", "two" => "22", "ground" => "914", "count" => "475")
+n=12 g=P E0=-16.797640493587796 losses=0.7295750974611117,0.892537901789396 counts=Dict{String, Any}("bare" => "773", "tail" => "24", "two" => "24", "ground" => "914", "count" => "475")
+EXACT ANCHORS
+n=8 u=-3//10 v=-1//10 c=-5076841//2500000
+  m=0 k=34 rho=-48216829//5000000
+  m=1 k=26 rho=-48216829//5000000
+  m=2 k=13 rho=-48216829//5000000
+  m=3 k=2 rho=-6027103//625000
+  m=4 k=0 rho=-2989759//312500
+  binned counts=["28", "22", "11", "2", "0", "0", "0", "0", "0"]
+  binned tail=14899517338465683927//1000000000000000000000000
+n=10 u=-1//5 v=0//1 c=-5538721//2500000
+  m=0 k=62 rho=-30607897//2500000
+  m=1 k=50 rho=-30607897//2500000
+  m=2 k=27 rho=-30607897//2500000
+  m=3 k=8 rho=-30607897//2500000
+  m=4 k=1 rho=-7471823//625000
+  binned counts=["38", "32", "15", "4", "0", "0", "0", "0", "0", "0", "0"]
+  binned tail=932037580617792051//62500000000000000000000
+n=12 u=-1//5 v=1//20 c=-48533//20000
+  m=0 k=121 rho=-2978077//200000
+  m=1 k=100 rho=-2978077//200000
+  m=2 k=56 rho=-2978077//200000
+  m=3 k=18 rho=-2978077//200000
+  m=4 k=3 rho=-7427529//500000
+  binned counts=["49", "40", "20", "6", "1", "0", "0", "0", "0", "0", "0", "0", "0"]
+  binned tail=14938352839128124751//1000000000000000000000000
+ALTERNATIVES
+Dict{String, Any}("family" => "boundary", "lengths" => Any["3", "3", "2"], "ground" => -12.977581232156178, "k0" => "104", "ktotal" => "434", "n" => "8")
+Dict{String, Any}("family" => "boundary", "lengths" => Any["4", "3", "3"], "ground" => -15.405569958809696, "k0" => "207", "ktotal" => "901", "n" => "10")
+Dict{String, Any}("family" => "boundary", "lengths" => Any["4", "4", "4"], "ground" => -18.258183136000618, "k0" => "407", "ktotal" => "1819", "n" => "12")
+ANDERSON SCALARS (non-certifying)
+cluster=2 min=-2.0 per_bond=-2.0 max_Sz_dim=3
+cluster=3 min=-3.000000000000001 per_bond=-1.5000000000000004 max_Sz_dim=7
+cluster=4 min=-4.645751311064595 per_bond=-1.548583770354865 max_Sz_dim=19
+cluster=5 min=-5.8302125227708235 per_bond=-1.4575531306927059 max_Sz_dim=51
+cluster=6 min=-7.370274969424603 per_bond=-1.4740549938849206 max_Sz_dim=141
+HOMOTOPY
+homotopy_n10_gI_m0.json complete=true stages=73 attempts=84 k=62->7 sumK=2205 sumK2=85385 pair_products=131385 seconds=64.32420897483826 min_margin=2.3652096125204025e-5
+homotopy_n10_gI_m0_binned.json complete=true stages=51 attempts=56 k=38->2 sumK=950 sumK2=23848 pair_products=37197 seconds=54.8192880153656 min_margin=4.195834079467886e-5
+homotopy_n10_gI_m1_binned.json complete=true stages=48 attempts=54 k=32->1 sumK=728 sumK2=15142 pair_products=23805 seconds=23.257569074630737 min_margin=4.206770315740016e-5
+homotopy_n10_gI_m2_binned.json complete=true stages=23 attempts=23 k=15->0 sumK=167 sumK2=1699 pair_products=2799 seconds=6.234762907028198 min_margin=5.21202939349763e-5
+homotopy_n10_gI_m3_binned.json complete=true stages=5 attempts=5 k=4->0 sumK=13 sumK2=41 pair_products=81 seconds=0.27975893020629883 min_margin=0.0008770328663310067
+homotopy_n10_gP_m0_binned.json complete=true stages=42 attempts=42 k=38->3 sumK=820 sumK2=20740 pair_products=32340 seconds=68.0534520149231 min_margin=3.90941021866098e-5
+homotopy_n10_gP_m1_binned.json complete=true stages=29 attempts=32 k=32->2 sumK=470 sumK2=9964 pair_products=15651 seconds=41.21328902244568 min_margin=5.262602643441028e-5
+homotopy_n10_gP_m2_binned.json complete=true stages=21 attempts=21 k=15->0 sumK=155 sumK2=1565 pair_products=2580 seconds=7.335997819900513 min_margin=5.5901119580425984e-5
+homotopy_n10_gP_m3_binned.json complete=true stages=4 attempts=4 k=4->0 sumK=12 sumK2=40 pair_products=78 seconds=0.6250910758972168 min_margin=0.0029024493995937206
+homotopy_n12_gI_m0.json complete=false stages=2 attempts=2 k=121->121 sumK=242 sumK2=29282 pair_products=44286 seconds=124.29657793045044 min_margin=0.00023239434154476157
+homotopy_n12_gI_m0_binned.json complete=true stages=73 attempts=99 k=49->5 sumK=1748 sumK2=56032 pair_products=86670 seconds=666.1912760734558 min_margin=1.1825066854598276e-5
+homotopy_n12_gI_m1_binned.json complete=true stages=63 attempts=141 k=40->4 sumK=1171 sumK2=30747 pair_products=47877 seconds=361.2627549171448 min_margin=1.625984486075538e-5
+homotopy_n12_gI_m2_binned.json complete=true stages=25 attempts=25 k=20->1 sumK=249 sumK2=3429 pair_products=5517 seconds=56.61749196052551 min_margin=0.00014821982698087766
+homotopy_n12_gI_m3_binned.json complete=true stages=9 attempts=9 k=6->0 sumK=30 sumK2=132 pair_products=243 seconds=16.843552112579346 min_margin=0.0004302895458607736
+homotopy_n12_gI_m4_binned.json complete=true stages=2 attempts=2 k=1->0 sumK=2 sumK2=2 pair_products=6 seconds=1.5866899490356445 min_margin=0.01570863719789628
+homotopy_n12_gP_m0_binned.json complete=true stages=72 attempts=114 k=49->5 sumK=1654 sumK2=51654 pair_products=79962 seconds=675.454870223999 min_margin=1.1418299575183255e-5
+homotopy_n12_gP_m1_binned.json complete=true stages=33 attempts=33 k=40->4 sumK=712 sumK2=19592 pair_products=30456 seconds=222.09080004692078 min_margin=3.078480478535539e-5
+homotopy_n12_gP_m2_binned.json complete=true stages=24 attempts=24 k=20->0 sumK=222 sumK2=2884 pair_products=4659 seconds=46.71046805381775 min_margin=0.00015730960678439487
+homotopy_n12_gP_m3_binned.json complete=true stages=6 attempts=13 k=6->0 sumK=26 sumK2=132 pair_products=237 seconds=16.18033790588379 min_margin=0.00024326430273013955
+homotopy_n12_gP_m4_binned.json complete=true stages=2 attempts=2 k=1->0 sumK=2 sumK2=2 pair_products=6 seconds=0.5480058193206787 min_margin=0.012403205439458276
+homotopy_n8_gI_m0.json complete=true stages=75 attempts=79 k=34->2 sumK=1341 sumK2=31135 pair_products=48714 seconds=16.2600839138031 min_margin=1.6578368455810732e-6
+homotopy_n8_gI_m0_binned.json complete=true stages=28 attempts=31 k=28->2 sumK=396 sumK2=7512 pair_products=11862 seconds=21.013484954833984 min_margin=5.744415086361698e-5
+homotopy_n8_gI_m1_binned.json complete=true stages=24 attempts=25 k=22->1 sumK=267 sumK2=4143 pair_products=6615 seconds=29.97146701812744 min_margin=5.335810657136619e-5
+homotopy_n8_gI_m2_binned.json complete=true stages=14 attempts=14 k=11->0 sumK=79 sumK2=629 pair_products=1062 seconds=0.9398589134216309 min_margin=0.00014694612008092633
+homotopy_n8_gI_m3_binned.json complete=true stages=3 attempts=3 k=2->0 sumK=5 sumK2=9 pair_products=21 seconds=0.04704093933105469 min_margin=0.012109314896667556
+homotopy_n8_gP_m0_binned.json complete=true stages=25 attempts=27 k=28->3 sumK=372 sumK2=7412 pair_products=11676 seconds=48.44048500061035 min_margin=0.0002673963215560349
+homotopy_n8_gP_m1_binned.json complete=true stages=17 attempts=21 k=22->2 sumK=210 sumK2=3308 pair_products=5277 seconds=3.389072895050049 min_margin=0.0006076040721971765
+homotopy_n8_gP_m2_binned.json complete=true stages=13 attempts=13 k=11->0 sumK=73 sumK2=573 pair_products=969 seconds=1.699537992477417 min_margin=6.182758143147282e-5
+homotopy_n8_gP_m3_binned.json complete=true stages=2 attempts=2 k=2->0 sumK=4 sumK2=8 pair_products=18 seconds=0.03925919532775879 min_margin=0.025780151041336907

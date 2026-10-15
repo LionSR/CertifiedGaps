@@ -1,0 +1,70 @@
+{
+    "initial_k": 1,
+    "Sz": 4,
+    "twist": "P",
+    "target": -15.453,
+    "stages": [
+        {
+            "rho_in": -14.961897075253903,
+            "seconds": 0.20420312881469727,
+            "rho_out": -14.961897075253903,
+            "t": 0.07445934448794758,
+            "stage": 1,
+            "k_in": 1,
+            "k_out": 1,
+            "margin": 0.3346036237368697,
+            "residual": 1.8642780280952753e-11,
+            "max_lower_error": 1.0000000472132342e-7
+        },
+        {
+            "rho_in": -14.961897075253903,
+            "seconds": 0.31714677810668945,
+            "rho_out": -14.974300480693351,
+            "t": 0.14363958544398897,
+            "stage": 2,
+            "k_in": 1,
+            "k_out": 0,
+            "margin": 0.012403205439458276,
+            "residual": 4.8502937378114426e-11,
+            "max_lower_error": 9.99999905104687e-8
+        }
+    ],
+    "attempts": 2,
+    "D_norm": 7.4533000000000005,
+    "seconds": 0.5480058193206787,
+    "final_k": 0,
+    "complete": true,
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.1",
+        "status": "NON-CERTIFYING Float64 experiment",
+        "config": {
+            "sector": 4,
+            "mode": "binned",
+            "twist": "P",
+            "type": "Float64 generalized-eigenvalue continuation",
+            "n": 12
+        },
+        "created_utc": "2026-10-15T02:03:25.619",
+        "certified": false,
+        "source_sha256": {
+            "report_metrics.jl": "62a0b6d7b3778e9980a23dbad53e5f19b37292a2d7392df4bea60821b596fee5",
+            "certify.jl": "efba740898ee95aeb9bc68faa015b021687ad5ee6f5eb68bffe63ca9854949dd",
+            "analyze.jl": "fd032bef3b152606bfb8fed24cf8c02cc6fa971fddddf37e18fa1bacd45c5fca",
+            "homotopy_sectors.jl": "7a5110856be1f820e59ba7275f430e111a99c933bfa421b26a454908957d4248",
+            "count_scan.jl": "78cc580d43d1be626dbc4be3537ec14e4f496af5534f919dbda17864d8a61ce3",
+            "tail_bins.jl": "e8d39eeb537a71784d5141342c8f8b2ea7a6ad0903c8cd760b041879e62bbf8c",
+            "common.jl": "8011e72f62d854409c61bfed307140e95a23cb3fc57e7d8670549c41ed0c2479",
+            "homotopy.jl": "2722d04794f6d0d49a90a8d66ecfa8b4590c1162086c3a4a11aa2be511784955",
+            "scan.jl": "a66a1d35c1a9af9c38a7c916227066c1e4696cf60ed10477de079ee2f5cebbc9",
+            "spectra.jl": "7fe4c793fa116fe0939e24d929d63547a51d9984c4968162607e2c39cb27ddcd",
+            "check.jl": "67d12c0cabe394f78317e8e99ca847e72dffbd6bad9c65f9d3670ce9a8d9fa4e",
+            "exact.jl": "9182e3dd5eb58c923d66829e063d8e11ef88b2150e172cc2a643fe18389d61dd",
+            "test/runtests.jl": "b97950f27a63ced34ac4214a6993343d5d76661ab0df4911d2b72c2b9d4081d4"
+        },
+        "Optim": "2.3.2",
+        "blas_threads": 1,
+        "Arpack": "0.5.4"
+    },
+    "n": 12
+}

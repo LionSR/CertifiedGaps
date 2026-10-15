@@ -1,0 +1,94 @@
+{
+    "initial_k": 4,
+    "Sz": 3,
+    "twist": "P",
+    "target": -12.687,
+    "stages": [
+        {
+            "rho_in": -12.47361415594624,
+            "seconds": 0.16820406913757324,
+            "rho_out": -12.47361415594624,
+            "t": 0.029022041173304855,
+            "stage": 1,
+            "k_in": 4,
+            "k_out": 4,
+            "margin": 0.13261599740741303,
+            "residual": 5.92317661384323e-14,
+            "max_lower_error": 1.0000005090660125e-7
+        },
+        {
+            "rho_in": -12.47361415594624,
+            "seconds": 0.15137290954589844,
+            "rho_out": -12.477620237418353,
+            "t": 0.05838387836728202,
+            "stage": 2,
+            "k_in": 4,
+            "k_out": 2,
+            "margin": 0.004005881472131989,
+            "residual": 4.067266662998235e-14,
+            "max_lower_error": 1.0000003136667601e-7
+        },
+        {
+            "rho_in": -12.477620237418353,
+            "seconds": 0.14559507369995117,
+            "rho_out": -12.477620237418353,
+            "t": 0.25838387836728205,
+            "stage": 3,
+            "k_in": 2,
+            "k_out": 2,
+            "margin": 0.09683334682111777,
+            "residual": 2.842827950010033e-14,
+            "max_lower_error": 1.0000001182675078e-7
+        },
+        {
+            "rho_in": -12.477620237418353,
+            "seconds": 0.14652013778686523,
+            "rho_out": -12.480522886817987,
+            "t": 0.2831656971809827,
+            "stage": 4,
+            "k_in": 2,
+            "k_out": 0,
+            "margin": 0.0029024493995937206,
+            "residual": 4.1756609465991694e-14,
+            "max_lower_error": 1.0000004024846021e-7
+        }
+    ],
+    "attempts": 4,
+    "D_norm": 7.2309768000000005,
+    "seconds": 0.6250910758972168,
+    "final_k": 0,
+    "complete": true,
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.1",
+        "status": "NON-CERTIFYING Float64 experiment",
+        "config": {
+            "sector": 3,
+            "mode": "binned",
+            "twist": "P",
+            "type": "Float64 generalized-eigenvalue continuation",
+            "n": 10
+        },
+        "created_utc": "2026-10-15T02:05:10.462",
+        "certified": false,
+        "source_sha256": {
+            "report_metrics.jl": "62a0b6d7b3778e9980a23dbad53e5f19b37292a2d7392df4bea60821b596fee5",
+            "certify.jl": "efba740898ee95aeb9bc68faa015b021687ad5ee6f5eb68bffe63ca9854949dd",
+            "analyze.jl": "fd032bef3b152606bfb8fed24cf8c02cc6fa971fddddf37e18fa1bacd45c5fca",
+            "homotopy_sectors.jl": "7a5110856be1f820e59ba7275f430e111a99c933bfa421b26a454908957d4248",
+            "count_scan.jl": "78cc580d43d1be626dbc4be3537ec14e4f496af5534f919dbda17864d8a61ce3",
+            "tail_bins.jl": "e8d39eeb537a71784d5141342c8f8b2ea7a6ad0903c8cd760b041879e62bbf8c",
+            "common.jl": "8011e72f62d854409c61bfed307140e95a23cb3fc57e7d8670549c41ed0c2479",
+            "homotopy.jl": "9e31ef69685631ebfb2d3e41bce6ca327036890fefa4ff7e11b93e3167b51346",
+            "scan.jl": "a66a1d35c1a9af9c38a7c916227066c1e4696cf60ed10477de079ee2f5cebbc9",
+            "spectra.jl": "7fe4c793fa116fe0939e24d929d63547a51d9984c4968162607e2c39cb27ddcd",
+            "check.jl": "67d12c0cabe394f78317e8e99ca847e72dffbd6bad9c65f9d3670ce9a8d9fa4e",
+            "exact.jl": "9182e3dd5eb58c923d66829e063d8e11ef88b2150e172cc2a643fe18389d61dd",
+            "test/runtests.jl": "b97950f27a63ced34ac4214a6993343d5d76661ab0df4911d2b72c2b9d4081d4"
+        },
+        "Optim": "2.3.2",
+        "blas_threads": 1,
+        "Arpack": "0.5.4"
+    },
+    "n": 10
+}

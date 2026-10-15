@@ -1,0 +1,49 @@
+{
+    "rows": [
+        {
+            "v": 0,
+            "c": -3.0000001,
+            "ground": -12,
+            "u": -0.5,
+            "bare_ground": -13.29150262212919,
+            "n": 8
+        },
+        {
+            "v": -0.0345,
+            "c": -2.8698644,
+            "ground": -14.609512361351001,
+            "u": -0.5169,
+            "bare_ground": -15.660425045541672,
+            "n": 10
+        },
+        {
+            "v": -0.0338,
+            "c": -3.0299474,
+            "ground": -17.527215542669733,
+            "u": -0.5698,
+            "bare_ground": -18.740549938849206,
+            "n": 12
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.1",
+        "status": "NON-CERTIFYING Float64 experiment",
+        "config": {
+            "optimization": "four-start Nelder Mead ground energy"
+        },
+        "created_utc": "2026-10-15T01:43:24.749",
+        "certified": false,
+        "source_sha256": {
+            "common.jl": "93113635385a52f2a9b06cce174606fc37076132bb2252fde48a5ba9fd67aee8",
+            "certify.jl": "2227d915fb4a5bf7ef827ac14f2d3cfc8e9c92fe9275fbde9e4349d7b10debc5",
+            "scan.jl": "a66a1d35c1a9af9c38a7c916227066c1e4696cf60ed10477de079ee2f5cebbc9",
+            "spectra.jl": "7fe4c793fa116fe0939e24d929d63547a51d9984c4968162607e2c39cb27ddcd",
+            "exact.jl": "1cad6c76f59d65ba5b06b0c18a25cf5cb46fa15ee244519ed2dba194eac1cc1d",
+            "count_scan.jl": "78cc580d43d1be626dbc4be3537ec14e4f496af5534f919dbda17864d8a61ce3"
+        },
+        "Optim": "2.3.2",
+        "blas_threads": 1,
+        "Arpack": "0.5.4"
+    }
+}
