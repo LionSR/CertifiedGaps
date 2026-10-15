@@ -1,9 +1,11 @@
-# Seed search from exact diagonalisation for two models of the survey:
-#   * spin-½ Heisenberg ring with staggered field h_s = 1 (models/heisenberg_staggered_field):
-#     rings up to L = 16, sectors above `dense_max` states by Lanczos;
-#   * the spin-1 Heisenberg ring of the note (models/spin1_haldane_dmrg): rings up to L = 12,
-#     large sectors by Lanczos, where the survey found no seed with n₀ ≤ 6.
-# Run: julia --project=julia julia/scripts/ed_seeds.jl
+# Example: floating-point seed screening from exact diagonalisation with the core API
+# (`spectrum`, `spectral_defects`, `scan_seeds`, `best_seed`), for two models of the local
+# survey. Numerical only (Lanczos for large sectors), never a certificate:
+#   * spin-½ Heisenberg ring with staggered field h_s = 1: rings up to L = 16 (the certified
+#     version, with verified spectra, is models/heisenberg_staggered_field);
+#   * the spin-1 Heisenberg ring of the note: rings up to L = 12, where no seed with n₀ ≤ 6
+#     exists (the certificate itself is reproduced in models/spin1).
+# Run (≈15 min): julia --project=julia julia/examples/ed_seeds.jl
 
 using CertifiedGaps, Printf, LinearAlgebra
 using CertifiedGaps.ExactDiagonalization, CertifiedGaps.Models, CertifiedGaps.Seeds

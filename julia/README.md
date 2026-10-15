@@ -28,6 +28,9 @@ Each submodule is used on its own, so generic names never collide with a project
 | `Purification` | `src/Purification.jl`, `ext/CertifiedGapsITensorsExt.jl` | `purified_log_partition`: thermal purification with ITensors; enabled by `using ITensors, ITensorMPS` |
 | `CertifiedMPO` | `src/CertifiedMPO/` | certified MPO arithmetic with Nemo/Arb (norms, squaring, products, operator errors, gauges), moved from spin2 |
 
+Besides `src/`: `ext/` (the ITensors extension), `test/` (run by `Pkg.test()`) and `examples/`
+(two survey screens using the API, not loaded by the package; see "Use").
+
 ## Conventions
 
 * `spin_matrices(s)`: basis m = s, …, −s; `sz`, `sp`, `sm`, `sx` real, `sy` complex.
@@ -40,15 +43,17 @@ Each submodule is used on its own, so generic names never collide with a project
 
 ```sh
 julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
-julia --project=julia julia/scripts/constants.jl    # recurrence constants, outward rounded
-julia --project=julia julia/scripts/tfim.jl         # free-fermion TFIM seeds (BigFloat)
-julia --project=julia julia/scripts/ed_seeds.jl     # float ED seed scans (≈15 min)
+julia --project=julia julia/examples/tfim.jl        # free-fermion TFIM seeds (BigFloat, ~1 min)
+julia --project=julia julia/examples/ed_seeds.jl    # float ED seed scans (≈15 min)
 ```
 
-The scripts reproduce numbers of the local survey (its section numbers appear in their
-comments); `ed_seeds.jl` is floating-point screening for the staggered-field and spin-1
-Heisenberg rings, and `tfim.jl` pads BigFloat defects heuristically, so neither is a
-certificate.
+The two examples in `examples/` reproduce numbers of the local survey (its section numbers
+appear in their comments) with the core API; neither is a certificate. `ed_seeds.jl` is
+floating-point screening for the staggered-field and spin-1 Heisenberg rings (certified in
+`models/heisenberg_staggered_field` and reproduced in `models/spin1`), and `tfim.jl` pads
+BigFloat defects heuristically for the TFIM open targets of `AGENTS.md`. The recurrence
+constants that `scripts/constants.jl` used to print (threshold ε⋆, the note's seeds, odd
+lengths, the Theorem 2.22 closed forms) are now asserted in `test/runtests.jl`.
 
 From a project under `models/`: `Pkg.develop(path = "../../julia")`, then e.g.
 

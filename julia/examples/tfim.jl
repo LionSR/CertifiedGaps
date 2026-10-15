@@ -1,6 +1,8 @@
-# Transverse-field Ising ring: exact free-fermion seeds and the bound they certify
-# (survey Proposition 4.13 and models/tfim_g2, tfim_g125).
-# Run: julia --project=julia julia/scripts/tfim.jl
+# Example: transverse-field Ising ring seeds from the free-fermion formula
+# (`Models.tfim_seed_defects`, survey Proposition 4.13), at g = 2 and g = 1.25, the TFIM open
+# targets listed in AGENTS.md (no model directory yet). The BigFloat defects are padded
+# heuristically, so the table is screening, not a certificate.
+# Run: julia --project=julia julia/examples/tfim.jl
 
 using CertifiedGaps, Printf
 using CertifiedGaps.Models: tfim_seed_defects
