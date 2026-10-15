@@ -27,7 +27,7 @@
 
 # Editor and build caches
 outputs/.texpadtmp/
-lean/.lake/
+lean/.lake
 *.tmp
 *.jls
 
