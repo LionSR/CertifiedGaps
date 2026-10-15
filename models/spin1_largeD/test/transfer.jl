@@ -24,7 +24,8 @@ const TC = TransferCertificate
     @test_throws ArgumentError TC.logz(spec, 1//1; keep = 0)
 
     # At L=2 this compares independently enclosed spectra at different rational D.
-    specs = [TC.compute_spectrum(2, D; rigorous = true) for D in (3//1, 31//10)]
+    quiet(D) = redirect_stdout(() -> TC.compute_spectrum(2, D; rigorous = true), devnull)
+    specs = [quiet(D) for D in (3//1, 31//10)]
     z = [TC.logz((; E = s["energies"], R = s["radii"]), 2//1) for s in specs]
     moved = TC.transported_logz(z[1], 2, 2//1, 3//1, 31//10, 31//10)
     shifted = z[2] + TC.box(2//10)

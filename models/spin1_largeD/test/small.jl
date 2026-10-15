@@ -14,7 +14,7 @@ using Test
         @test data["complete"]
         @test data["energies"] ≈ eigvals(Symmetric(direct)) atol=1e-11
         if L<=4
-            cert=compute_spectrum(L,D;rigorous=true)
+            cert=redirect_stdout(() -> compute_spectrum(L,D;rigorous=true), devnull)
             @test all(abs.(cert["energies"].-eigvals(Symmetric(direct))) .<= cert["radii"])
         end
     end

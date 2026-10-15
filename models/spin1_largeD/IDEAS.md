@@ -1,95 +1,59 @@
-# Candidate routes
+# Route memo: spin-1 chain with single-ion anisotropy D
 
-## Follow-up plan (2026-10-14, before any new computation)
+Model H = Σ Sⱼ·Sⱼ₊₁ + D Σ (Sᶻⱼ)², one-site cells, Cartesian RP basis. This memo was written in
+two rounds, each before its computations: first for the ED baseline, then for the follow-up
+that goes beyond ED. The outcomes are recorded at the end.
 
-This checkout already contains the L=12 ED baseline and two certificates. Audit those
-inputs before using them. The goal of this follow-up is to extract larger seeds from
-the same finite inputs, with a documented failure if the bounds do not close.
+## Candidate routes
 
-* **Closed forms:** the exchange terms do not commute with the single-ion term or with
-  adjacent bonds. No free-particle or frustration-free partition function is known for
-  this D interval. The D=infinity product limit alone does not supply finite-D seeds.
-* **Cluster/low-temperature expansion:** the product vacuum is a natural reference, but
-  pair creation by exchange requires a polymer estimate uniform in volume and beta.
-  An extensive remainder cannot control log Z(2n)-2 log Z(n). Deriving a convergent,
-  numerically useful remainder near D=3 is not assumed. Cost after such a derivation
-  could be independent of n up to exponentially small winding polymers.
-* **Transfer moments (chosen beyond-ED route):** for even n, the normalized X_beta^n is
-  positive. Squaring improves its purity defect s to at most
-  f(s)=s^2/[2(1-s)^2]. Bound spatial purities at n=12,24,... from n=6 without constructing
-  those rings. At each step use the exact identity
-  P_tau(2n,b)=P_s(n,2b) P_tau(n,b)^2/P_s(n,b)^2 and P_s<=1 to bound the thermal input.
-  Maintain spatial defects at both b and 2b. This costs O(log(n/6)) scalar interval
-  operations after evaluating the stored L=6,12 partition functions. If the thermal
-  loss prevents admissibility, record that loss explicitly, rather than calling ED
-  alone the new result. A Birkhoff contraction estimate is less direct because no
-  strictly positive finite kernel with controlled Trotter error is supplied here.
-* **Perturbation (second chosen route):** V=sum (Sz)^2 has 0<=V<=L. Centering at L/2
-  gives norm(V-L/2)<=L/2. Weyl therefore transfers each verified finite-ring spectrum
-  to nearby D, with radius enlarged by L*abs(delta D)/2 and a cancelling energy shift.
-  This can certify parameter intervals and a refined grid point without another ED
-  run. Its defect loss is O(n beta abs(delta D)), so it will not be presented as a
-  uniform-volume perturbation theorem. The subsequent bootstrap is uniform in L.
-* **Smaller seeds:** the coupling identity above supplies the missing thermal purity
-  on the doubled ring from smaller rings; use exact identities and track all errors.
-  It may permit seed n0>6 even though ED stops at L=12.
-* **Symmetry/counting:** retain Sz, translation, spin flip and paired momenta. Dense
-  L=12 is a verified baseline; L=14 dimensions will be checked before any allocation.
-  Because n0 must be even, L=14 alone cannot certify n0=7. Sparse numerical L=14
-  diagnostics are useful only if they affect a decision. Full spectra scale
-  exponentially, and unverified Krylov tails cannot certify a seed.
-* **Variational sandwiches:** a trial MPS gives an upper E0(2n), but the existing
-  finite spectra do not give a matching lower E0(n) with exponentially small surface
-  error. A norm/Anderson bound with O(1) error will not resolve the spatial defect
-  near threshold. Developing an independently verified MPS/cluster sandwich is left
-  as a separate route, not silently approximated by ED extrapolation.
+* **Closed forms.** The exchange terms commute neither with the single-ion term nor with
+  adjacent bonds. No free-particle or frustration-free partition function is known for this
+  D range, and the D = ∞ product limit alone does not give finite-D seeds.
+* **Cluster / low-temperature expansion.** The product vacuum is a natural reference, but pair
+  creation by exchange needs a polymer estimate uniform in volume and β. An extensive
+  remainder cannot control log Z₂ₙ − 2 log Zₙ, and a convergent, numerically useful remainder
+  near D ≈ 3 would be substantial new analysis. Not pursued; cost after such a derivation could
+  be independent of n up to exponentially small winding polymers.
+* **Symmetry-resolved dense ED (baseline).** Sᶻ and translation reduce the largest L = 12 block
+  from 73789 to about 6000; spin inversion pairs ±Sᶻ and conjugation pairs ±k. Cost is cubic
+  in block dimension and exponential in L; L = 14 blocks (~42000) are infeasible densely on this
+  host, and n₀ = 7 would be odd anyway. Certification needs every level of every block, with
+  verified residual/orthogonality bounds and a polar/Weyl enclosure; Krylov low spectra are
+  only for screening.
+* **Transfer moments (chosen beyond-ED route).** For even n, X_βⁿ/Zₙ is a positive density, and
+  squaring improves its purity defect s to at most s²/[2(1 − s)²]. This bounds Pₛ at
+  n = 12, 24, … from L = 6, 12 alone. The thermal input follows from the exact identity
+  P_τ(2n, b) = Pₛ(n, 2b) P_τ(n, b)² / Pₛ(n, b)² and Pₛ ≤ 1, tracking spatial defects at both b
+  and 2b. Cost: O(log(n/6)) interval operations after four stored log Z enclosures. Risk: the
+  thermal defect grows with every lift. A Birkhoff contraction estimate is less direct because
+  no strictly positive finite kernel with controlled Trotter error is available.
+* **Perturbation in D (second chosen route).** V = Σ(Sᶻ)² satisfies 0 ≤ V ≤ L, so
+  ‖V − L/2‖ ≤ L/2 and Weyl moves each verified finite spectrum to nearby D with radius
+  L|δD|/2 and a cancelling energy shift. Its defect loss is O(nβ|δD|): good for certifying
+  parameter intervals without another ED run, not a uniform-volume perturbation theorem.
+* **Smaller seeds (survey Thm 2.24(v)).** Replace P_τ(2n₀) by P_τ(n₀) and Pₛ(n₀, 2β₀); the
+  coupling identity above is the same mechanism, used inside the transfer route.
+* **Variational sandwiches.** A trial MPS bounds E₀(2n) from above, but no matching lower bound
+  on E₀(n) with exponentially small surface error is available; an Anderson-type bound with
+  O(1) error cannot resolve δₙ near threshold. Left as a separate route.
 
-First replay the existing checker in this directory's own Julia project. Then test
-the transfer-moment lift and centered Weyl transport, preserve exact strings in new
-certificates, record source hashes and runtime/package metadata, and add focused tests.
-Retain the quarter-step numerical scan as explicitly floating-point evidence; refine
-the certified threshold without claiming a global minimum over D or all seed sizes.
-All individual runs have a 2700-second timeout. No shared-core edits are planned.
+## Choice
 
-## Original ED baseline plan
+ED baseline: exact RP, a floating-point screen over D, β and n₀ ≤ 6, then complete verified
+dense spectra at L = 6, 12 for the best reachable seeds. Follow-up: transfer squaring and
+centred Weyl transport on those stored spectra, a verified small-ring bridge, and a refined
+certified D interval, with every failure recorded rather than hidden.
 
-### Follow-up outcome
+## Outcome
 
-Transfer squaring succeeds at D=4: n0=12, beta=29/10, bound >0.899143399, using
-only L=6,12 spectral inputs. Fresh verified L=8,10 gaps bridge the result to every
-even L>=6. L=14 block counting confirms that one matrix alone exceeds host memory.
-At D=3.206, spatial lifts through n0=192 fail on beta=1.5:0.025:6 (plus 381/125):
-thermal-purity loss prevents closure. This negative is limited to these estimates.
-Centered Weyl transport still certifies [3.2059998,3.206], with n0=6 and beta=381/125.
-Thus the chosen beyond-ED route produces a stronger certificate, while its limitation
-near the threshold is retained explicitly. See TRANSFER.md for the inequalities.
-
-The model is the spin-1 antiferromagnet plus D(Sz)^2, with a one-site cell.
-All new work stays here; the shared core is read only.
-
-1. **Exact local RP algebra.** Integer Cartesian generators give the bond identity
-   immediately. Verify the spin commutators, Casimir, onsite term and a local basis
-   change, rather than assuming that the supplied generators describe the model.
-2. **Symmetry-resolved dense ED.** Sz and translation reduce the largest L=12 block
-   from 73789 to about 6200. Spin inversion pairs opposite Sz sectors; complex
-   conjugation pairs momenta. Cost is cubic in block dimension, exponential in L;
-   L=14 has blocks near 44000 and is unlikely to be feasible densely on this host.
-   A floating-point scan may use low eigenvalues, but certification must use all
-   levels of every block with an asserted total dimension 3^L.
-3. **Verified eigensystems.** Enclose block construction, residuals and Q*Q-I.
-   Bound distance to the unitary polar factor and use Weyl to enclose each sorted
-   eigenvalue. Directed interval elementary functions propagate the partition sums
-   and yield exact rational defect upper bounds for the core recurrence.
-4. **Large-D perturbation / cluster expansion.** The product vacuum is a useful
-   reference, but elementary norm perturbation is extensive and cannot certify the
-   required finite-size free-energy cancellation. A convergent polymer remainder
-   would need substantial new analysis, so it is not the primary route here.
-5. **Smaller-seed coupling identity.** Potentially halves the largest ring but
-   requires another spatial seed at 2 beta. Keep as an alternative if dense ED is
-   prohibitive; do not silently substitute it for the requested thermal seed.
-
-Chosen route: exact RP, numerical parameter screening, then complete dense spectra
-and verified residual bounds for the best reachable seeds. Only even n0 can invoke
-this repository's stated theorem. Numerical references and extrapolations remain
-explicitly separate from certificates. A smallest successful scanned D is not a
-proof that all smaller real D fail, nor a phase transition.
+* ED seeds n₀ = 6 certify D = 4 (0.694694192) and D = 3.206 (0.002213456); the screen finds
+  no even seed with n₀ ≤ 6 at D ≤ 3.205.
+* Transfer squaring succeeds at D = 4: n₀ = 12, β = 29/10, bound 0.899143399, from L ≤ 12 only;
+  verified L = 8, 10 gaps extend it to every even L ≥ 6. Further lifts (n₀ = 24, 48, 96) still
+  close but with smaller bounds, because thermal purity is lost at each step.
+* At D = 3.206 no lift through n₀ = 192 closes on β = 1.5:0.025:6 (plus 381/125): thermal-purity
+  loss prevents it. This negative applies to these estimates only.
+* Centred Weyl transport certifies D ∈ [3.2059998, 3.206] with n₀ = 6, β = 381/125.
+* Pushing below D ≈ 3.2 needs seeds of roughly n₀ ≈ 10–26 at β ≈ 4–30 (a crude extrapolation
+  of δ(n) from n = 4, 6), i.e. a route that bounds spatial purity at large n without losing
+  thermal purity, such as a polymer expansion or a verified MPS/cluster sandwich.

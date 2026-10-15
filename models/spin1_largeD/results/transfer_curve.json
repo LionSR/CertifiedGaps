@@ -1,11 +1,5 @@
 {
-    "source_hashes": {
-        "model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472",
-        "report_transfer.jl": "b6c99d79ba688530a09cc8231c06b4377426a938172ec6daadfc0f9e897718e4",
-        "scan.jl": "6498f6374d59577f1ec28da8b746b4d3fbc5f80b298f73ab59f7a2e90abdf3e4",
-        "refine_beta.jl": "11ed3cd44a6e196253e4b3e4d6156a1c7d1b897cb3629bfebfd5e347d7a8c8dc"
-    },
-    "rows": [
+    "numerical": [
         {
             "status": "numerical screening, n0<=6; missing means no tested seed",
             "ratio": null,
@@ -125,7 +119,16 @@
             "gap_L12": 2.2694589440617685,
             "D": 4,
             "bound": 0.6947548159052186
-        },
+        }
+    ],
+    "source_hashes": {
+        "scripts/refine_beta.jl": "d44bb18134d0702a89e2a460a2b9e24c18d23b326e6251375814f1b3fd5d2f3e",
+        "scripts/report.jl": "f22ef5b0a89a3812ae276f8ef4255407df8e66b123a506b3a0259fcbb2d77bf7",
+        "model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472",
+        "scripts/scan.jl": "9c8f048975c47ce3682cb1a0f9bda384e46c8f3b4896487a7bde495274b1659c"
+    },
+    "certificate_sha256": "e430e284e0b27566f28c28de4753e453f026e890df922adf30199e212fb36eb0",
+    "certified": [
         {
             "gap_L12_interval": [
                 "6959497159391323//4503599627370496",
@@ -136,9 +139,13 @@
                 "5978294846705997//9223372036854775808"
             ],
             "status": "certified numerator and finite L=12 denominator interval",
-            "D_exact": "16029999//5000000",
+            "id": "transport-threshold-D1603//500",
             "D": 3.2059998,
-            "bound": 0.001001626234429964
+            "bound": "2309592850505369//2305843009213693952",
+            "D_interval": [
+                "16029999//5000000",
+                "1603//500"
+            ]
         },
         {
             "gap_L12_interval": [
@@ -150,11 +157,14 @@
                 "892150175086991//2251799813685248"
             ],
             "status": "certified numerator and finite L=12 denominator interval",
-            "D_exact": "4//1",
+            "id": "space-lift-1-D4//1",
             "D": 4,
-            "bound": 0.899143399258073
+            "bound": "8098763755702597//9007199254740992",
+            "D_interval": [
+                "4//1",
+                "4//1"
+            ]
         }
     ],
-    "certificate_sha256": "906ff46a43a7ae663ee104761904df003846577390fab0a95d9f735773226cb9",
     "denominator": "finite-ring Delta_12; no thermodynamic gap asserted"
 }

@@ -1,8 +1,17 @@
+# Stage 2: write certificate.json and results/finite_bridge.json (under a minute).
+#
+#   OPENBLAS_NUM_THREADS=1 julia --project=models/spin1_largeD \
+#       models/spin1_largeD/transfer_certify.jl
+#
+# Reads only the stored, hash-checked L = 6, 12 spectral enclosures and recomputes the small
+# L = 8, 10 bridge spectra. No floating-point shortcut decides acceptance: every candidate is
+# evaluated with interval log Z and exact rational defects, and a seed is kept only if
+# `certified_gap_bound` accepts it.
 include("src/TransferCertificate.jl")
 using .TransferCertificate, CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic
 const TC = TransferCertificate
 
-"Search cached, verified moments; failed scalar bounds are not physical gap exclusions."
+"Best successful row over cached log Z enclosures for the interval [lo, hi], or `nothing`."
 function best_transported(cache, Dref, lo, hi; max_lifts = 5)
     best = nothing
     for (beta, base) in cache
@@ -16,16 +25,22 @@ function best_transported(cache, Dref, lo, hi; max_lifts = 5)
     return best
 end
 
-"Re-certify the survey seed and search spatial lifts and nearby exact D intervals."
+"""
+    certify_transfer()
+
+Re-certify the ED seeds, search spatial lifts at each reference D, and bisect for the widest
+transported D interval below each reference D; write `certificate.json`.
+"""
 function certify_transfer()
     started = time()
     records, diagnostics = Any[], Any[]
     for D in (4//1, 1603//500)
         a, b = TC.reference_spectrum(D, 6), TC.reference_spectrum(D, 12)
-        beta0 = D == 4 ? 9//4 : 381//125
+        beta0 = D == 4 ? 9//4 : 381//125      # the stage-1 seeds in results/certificate_D*
         direct = only(TC.evaluate(a, b, beta0; max_lifts = 0))
         push!(records, TC.record(direct, b, "reference-D$D"))
         if D == 4
+            # The survey's quoted seed (n0, beta0) = (6, 3), now with an interval bound.
             survey = only(TC.evaluate(a, b, 3//1; max_lifts = 0))
             push!(records, TC.record(survey, b, "survey-D4-beta3"))
         end
@@ -47,7 +62,8 @@ function certify_transfer()
             best === nothing || lifts == 0 || push!(records,
                 TC.record(best, b, "space-lift-$lifts-D$D"))
         end
-        # Monotone loss in the symmetric Weyl radius permits integer bisection of this grid.
+        # The Weyl radius grows monotonically with |D - Dref|, so integer bisection on a
+        # 1e-7 grid finds the last grid point at which some cached seed still succeeds.
         grid = 10^7
         success, failure = 0, grid ÷ 10
         best_transported(cache, D, D-failure//grid, D) === nothing ||
@@ -71,10 +87,10 @@ function certify_transfer()
         flush(stdout)
     end
     hashes = TC.proof_hashes()
-    data = Dict("format" => "spin1_largeD transfer and Weyl certificate v1",
+    data = Dict("format" => TC.FORMAT,
         "cases" => records, "search_diagnostics" => diagnostics,
         "source_hashes" => hashes, "input_hashes" => TC.input_hashes(),
-        "partition_keep" => "8192", "wall_seconds" => time()-started,
+        "partition_keep" => string(TC.KEEP), "wall_seconds" => time()-started,
         "run_metadata" => run_metadata(Dict("largest_ED_ring" => "12");
             source_sha256 = hashes, packages = (CertifiedGaps, IntervalArithmetic),
             status = "verified moments, transfer squaring and centered Weyl transport",
@@ -85,4 +101,7 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     certify_transfer()
+    bridge = TC.bridge_certificate()
+    write_result(joinpath(@__DIR__, "results", "finite_bridge.json"), bridge)
+    println("finite bridge: ", [(r["L"], r["gap_interval"]) for r in bridge["rings"]])
 end
