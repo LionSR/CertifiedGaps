@@ -353,7 +353,7 @@ recheck does not close any of those obligations. The nmax=8 and no-C nmax=10 fai
 negative results for the tested family, not universal lower bounds.
 
 The upstream paper was read at commit `adc7f1241b42e322a6451854ab7e4b4c146bf78a`
-(`scripts/seed_design/fetch_paper.jl`); downloads stay in the ignored `upstream/` directory.
+(`scripts/fetch_paper.jl`); downloads stay in the ignored `upstream/` directory.
 
 ## 2. spectrum: spin-1 seed spectra, filtering precision and kernel costs
 
@@ -1119,7 +1119,7 @@ lengths**, and the π twist about z.
 Paths below are relative to `Mathlib/` in the Mathlib checkout pinned by the repository's
 `lean/` project (commit `c55e6e78`, the same pin this prototype was written against).
 Declaration names are fully qualified. `results/spin1_kernel/mathlib-audit.txt` records matching source
-lines; `scripts/spin1_kernel/audit_mathlib.sh` reproduces the search (re-run in the cleanup with identical
+lines; `scripts/audit_mathlib.jl` (formerly `scripts/spin1_kernel/audit_mathlib.sh`) reproduces the search (re-run in the cleanup with identical
 output; the negative search, `results/spin1_kernel/mathlib-negative-search.txt`, has zero hits). A wider
 manual search for interlacing, minimax and eigenvalue monotonicity also found nothing; the
 only related extras are `Matrix.eigenvalue_mem_ball` (Gershgorin, `LinearAlgebra/Matrix/
