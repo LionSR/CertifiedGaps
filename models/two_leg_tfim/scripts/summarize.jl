@@ -1,4 +1,4 @@
-# Regenerates the "## Results" section of REPORT.md from the scan, spectra (scripts/scan.jl),
+# Regenerates the "## Results" section of METHOD.md from the scan, spectra (scripts/scan.jl),
 # extrapolation and certificate files in results/.
 using CertifiedGaps.Results, Printf
 include(joinpath(dirname(@__DIR__), "src", "Provenance.jl"))
@@ -53,5 +53,5 @@ for tag in fields
         "uncompressed bytes `aba98d98…a74928`).")
 end
 println(io,"\nCertified: the exact RP identity, whole-spectrum eigenvalue enclosures for the selected parameter/seed, outward log-partition and rational defect bounds, and the resulting uniform gap under the repository's two-purity theorem. Numerical: seed optimization, all nonverified scan spectra and finite-size gaps, the literature critical point, and comparisons to finite-ring reference gaps. The ED reference gap is not claimed to be an infinite-volume limit.\n")
-p=joinpath(root,"REPORT.md"); old=read(p,String)
+p=joinpath(root,"METHOD.md"); old=read(p,String)
 write(p,first(split(old,"## Results"))*"## Results\n\n"*String(take!(io)))

@@ -59,7 +59,7 @@ end
 end
 
 @testset "Certificate replay rejects a truncated case list" begin
-    data = TC.parse_exact_json(read(joinpath(TC.ROOT, "certificate.json"), String))
+    data = TC.parse_exact_json(read(joinpath(TC.ROOT, "results", "certificate.json"), String))
     filter!(case -> case["id"] != "transport-threshold-D1603//500", data["cases"])
     path = tempname() * ".json"
     TC.write_result(path, data)
@@ -68,5 +68,6 @@ end
 
 @testset "Curve data comes from the committed certificate" begin
     curve = TC.parse_exact_json(read(joinpath(TC.ROOT, "results", "transfer_curve.json"), String))
-    @test curve["certificate_sha256"] == TC.sha256_file(joinpath(TC.ROOT, "certificate.json"))
+    @test curve["certificate_sha256"] ==
+        TC.sha256_file(joinpath(TC.ROOT, "results", "certificate.json"))
 end

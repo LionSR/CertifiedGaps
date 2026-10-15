@@ -95,7 +95,7 @@ function certify_verified(delta::Rational{BigInt}, beta::Rational{BigInt})
     sources = source_hashes(repository_root(); dirs=("julia/src",), files=(
         "$MODEL/src/rp.jl", "$MODEL/src/sectors.jl", "$MODEL/src/verified_spectra.jl",
         "$MODEL/certify.jl", "$MODEL/check.jl", "$MODEL/test/verified_independent.jl",
-        "$MODEL/ENCLOSURE_PROOF.md", "julia/Project.toml", "julia/Manifest.toml",
+        "$MODEL/METHOD.md", "julia/Project.toml", "julia/Manifest.toml",
         "outputs/thermal-mpo-gap-note.tex", "outputs/thermal-mpo-gap-scope.tex"))
     record = Dict("metadata" => run_metadata(Dict("delta" => string(delta),
                 "beta0" => string(beta), "n0_cells" => 4);

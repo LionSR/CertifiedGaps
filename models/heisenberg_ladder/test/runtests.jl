@@ -57,7 +57,7 @@ end
     @test HL.rejection(big(0) // 1, big(1) // 2) !== nothing
     @test HL.rejection(big(1) // 100, big(1) // 100) === nothing
     @test_throws ErrorException HL.rejection(big(-1) // 100, big(1) // 100)
-    # Exact rational inequalities used in the arbitrary-size argument of PERTURBATION.md.
+    # Exact rational inequalities used in the arbitrary-size argument of METHOD.md.
     @test 1 + 1 + 1 // 2 > 2
     @test 4 / (1 + 9 // 4)^2 == 64 // 169 < 1 // 2
 end

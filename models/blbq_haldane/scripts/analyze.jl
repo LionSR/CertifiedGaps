@@ -1,6 +1,7 @@
 # Rebuilds results/scaling.json (grid maxima, best even seeds, energy scaling, extrapolations)
 # from the complete spectra results/spectrum_L*.json[.gz] and the references. The spectra are
-# not committed; regenerate them with scan.jl and the SU(2) pipeline first. Numerical only.
+# not committed; regenerate them with scripts/scan.jl and the SU(2) pipeline first.
+# Numerical only.
 using CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds
 using CertifiedGaps.ExactDiagonalization: PartialSpectrum
 using JSON3, LinearAlgebra, Printf
@@ -98,7 +99,7 @@ function analyze()
         push!(extrapolations,(;theta,estimates))
     end
     sources=source_hashes(ROOT;dirs=("src","test"),
-        files=("scripts/analyze.jl","scan.jl","scripts/reference.jl"))
+        files=("scripts/analyze.jl","scripts/scan.jl","scripts/reference.jl"))
     inputs_used=filter(f->startswith(f,"spectrum_L")||startswith(f,"reference_L"),
         readdir(joinpath(ROOT,"results")))
     data=(;metadata=run_metadata((;thetas=THETAS,beta_grid="1//8:1//8:64//1",n_grid=ns);

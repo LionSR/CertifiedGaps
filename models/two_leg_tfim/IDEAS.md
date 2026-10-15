@@ -10,5 +10,5 @@ A ten-rung ring has 1,048,576 states; full dense diagonalization may exceed the 
 
 The dense route certified g = 3 at (n0, β0) = (4, 3/2) from rings of 4 and 8 rungs; the
 ten-rung ring was not needed. g = 2 and 5/2 have no seed with n0 ≤ 4; the extrapolation in
-REPORT.md puts their first seeds at about 10 and 6 rungs, beyond dense ED of the doubled ring.
+METHOD.md puts their first seeds at about 10 and 6 rungs, beyond dense ED of the doubled ring.
 Reaching them needs one of the expansion or transfer-operator routes above.

@@ -302,6 +302,31 @@ function produce(path = CERTIFICATE)
     return cert
 end
 
+"""
+    check_decision(row, beta)
+
+Re-derive one grid row's decision from its stored rational defects alone: a certified row must
+close the core recurrence with its upper defects and its stored gap, a rejected row must carry
+the exact `rejection` witness of its lower defects. Needs no spectrum.
+"""
+function check_decision(row, beta)
+    sl, tl = q(row["eps_s_lower"]), q(row["eps_t_lower"])
+    su, tu = q(row["eps_s_upper"]), q(row["eps_t_upper"])
+    0 <= sl <= su && 0 <= tl <= tu || error("defect bounds out of order")
+    if row["status"] == "certified"
+        b = certified_gap_bound(su, tu, beta).bound
+        b !== nothing && 0 < q(row["gap_lower_bound"]) <= Q(b) || error("gap bound fails")
+        q(row["interval_bound_exact"]) <= Q(b) || error("interval bound mismatch")
+    elseif row["status"] == "rejected_by_recurrence"
+        witness = rejection(sl, tl)
+        witness !== nothing || error("rejection not proved")
+        witness == row["rejection"] || error("rejection witness mismatch")
+    else
+        row["status"] == "unresolved" || error("unknown status")
+    end
+    return true
+end
+
 "Verify one stored grid row against fresh defect enclosures."
 function check_row(row, specs, n, beta)
     (Int(q(row["n0"])), q(row["beta0"])) == (n, beta) || error("grid mismatch")
@@ -310,21 +335,13 @@ function check_row(row, specs, n, beta)
     su, tu = q(row["eps_s_upper"]), q(row["eps_t_upper"])
     sl <= max(0, Q(inf(s))) && tl <= max(0, Q(inf(t))) || error("lower defects fail")
     Q(sup(s)) <= su && Q(sup(t)) <= tu || error("upper defects fail")
+    check_decision(row, beta)
     if row["status"] == "certified"
-        b = certified_gap_bound(su, tu, beta).bound
-        b !== nothing && 0 < q(row["gap_lower_bound"]) <= Q(b) || error("gap bound fails")
-        q(row["interval_bound_exact"]) <= Q(b) || error("interval bound mismatch")
         for (saved, fresh) in zip(row["logZ"], logs)
             # Independent eigensolves need only overlap; the seeds are checked above.
             q(saved[1]) <= Q(sup(fresh)) && Q(inf(fresh)) <= q(saved[2]) ||
                 error("log Z enclosure mismatch")
         end
-    elseif row["status"] == "rejected_by_recurrence"
-        witness = rejection(sl, tl)
-        witness !== nothing || error("rejection not proved")
-        witness == row["rejection"] || error("rejection witness mismatch")
-    else
-        row["status"] == "unresolved" || error("unknown status")
     end
 end
 
@@ -341,16 +358,8 @@ function check_claim(J, result)
     return true
 end
 
-"""
-    check(path = CERTIFICATE) -> true
-
-Verify the certificate from scratch: source hashes, exact RP, fresh complete spectra, every
-seed inequality and grid decision, the core recurrence, all-β exclusions, coupling
-continuation and the README claims. Throws on any mismatch.
-"""
-function check(path = CERTIFICATE)
-    start = time()
-    cert = parse_exact_json(read(path, String))
+"Format, validity claim, source hashes and coupling list of a parsed certificate."
+function check_header(cert)
     cert["format"] == FORMAT || error("unknown certificate format")
     cert["validity"] == VALIDITY || error("incorrect validity claim")
     for (file, hash) in cert["metadata"]["source_sha256"]
@@ -359,14 +368,76 @@ function check(path = CERTIFICATE)
         sha256_file(full) == hash || error("source mismatch: $file")
     end
     q.(getindex.(cert["parameters"], "J")) == Q.(COUPLINGS) || error("couplings mismatch")
+    return true
+end
+
+"Exact RP of coupling `J` and agreement of the stored model and RP factors with it."
+function check_model(J, result)
+    @assert exact_rp(J)
+    model, rp = rp_model(J)
+    stored = decode_model(result["model"])
+    stored.d == model.d && stored.bond == model.bond && stored.onsite == model.onsite ||
+        error("model mismatch")
+    verify_rp(stored, decode_rp(result["rp"])) || error("RP identity fails")
+    return true
+end
+
+"""
+    check_stored(path = CERTIFICATE) -> true
+
+Fast check (`check.jl`, seconds): everything `check` verifies that needs no spectrum. It
+re-derives the source hashes, the exact RP identities and stored model, every grid decision
+from its stored rational defects, the best seed, the coupling continuation and the README
+claims. The defect enclosures themselves, the log Z intervals and the all-β exclusions are
+re-established only by `check` (`check.jl --full`). Throws on any mismatch.
+"""
+function check_stored(path = CERTIFICATE)
+    start = time()
+    cert = parse_exact_json(read(path, String))
+    check_header(cert)
     for result in cert["parameters"]
         J = Rational{Int}(q(result["J"]))
-        @assert exact_rp(J)
-        model, rp = rp_model(J)
-        stored = decode_model(result["model"])
-        stored.d == model.d && stored.bond == model.bond && stored.onsite == model.onsite ||
-            error("model mismatch")
-        verify_rp(stored, decode_rp(result["rp"])) || error("RP identity fails")
+        check_model(J, result)
+        expected = [(n, beta) for n in SEED_LENGTHS for beta in BETAS]
+        length(result["grid"]) == length(expected) || error("incomplete grid")
+        for (row, (n, beta)) in zip(result["grid"], expected)
+            (Int(q(row["n0"])), q(row["beta0"])) == (n, beta) || error("grid mismatch")
+            check_decision(row, beta)
+        end
+        best = best_row(result["grid"])
+        best == result["best"] || error("best seed mismatch")
+        if result["continuation"] !== nothing
+            fresh = continuation(best, q(result["continuation"]["delta"]))
+            fresh == result["continuation"] || error("continuation mismatch")
+        end
+        exclusions = result["all_beta_exclusions"]
+        if J in ALL_BETA_EXCLUDED
+            q.(getindex.(exclusions, "n0")) == collect(SEED_LENGTHS) ||
+                error("exclusion lengths mismatch")
+        else
+            exclusions === nothing || error("unexpected exclusion")
+        end
+        check_claim(J, result)
+    end
+    println("PASS (fast, no spectra): hashes, RP, grid decisions, best seeds, continuation ",
+        "and README claims; ", round(time() - start; digits = 2), " seconds")
+    return true
+end
+
+"""
+    check(path = CERTIFICATE) -> true
+
+Verify the certificate from scratch (`check.jl --full`): source hashes, exact RP, fresh
+complete spectra, every seed inequality and grid decision, the core recurrence, all-β
+exclusions, coupling continuation and the README claims. Throws on any mismatch.
+"""
+function check(path = CERTIFICATE)
+    start = time()
+    cert = parse_exact_json(read(path, String))
+    check_header(cert)
+    for result in cert["parameters"]
+        J = Rational{Int}(q(result["J"]))
+        check_model(J, result)
         specs = verified_spectra(J)
         expected = [(n, beta) for n in SEED_LENGTHS for beta in BETAS]
         length(result["grid"]) == length(expected) || error("incomplete grid")

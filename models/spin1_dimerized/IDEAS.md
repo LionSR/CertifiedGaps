@@ -40,6 +40,6 @@ both irrational symbolic eigenvectors and an unmanageable 73789-square Sz block.
 ## Outcome
 
 The dense route with exact projectors certified δ = 9/10 at (2, 7/2) and δ = 7/10 at the odd
-seed (3, 17/4), using the positive cell transfer above (proof in REPORT.md). δ = 3/5 and 1/2
-have no seed within the six-cell cap; the extrapolation in REPORT.md puts their first seeds
+seed (3, 17/4), using the positive cell transfer above (proof in METHOD.md). δ = 3/5 and 1/2
+have no seed within the six-cell cap; the extrapolation in METHOD.md puts their first seeds
 at about 5 and 7 cells, which needs rings of 20–28 spins.

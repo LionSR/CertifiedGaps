@@ -43,7 +43,7 @@ function independent_logz(blocks,beta)
 end
 
 started=time(); rows=Any[]; pairs=Set{Tuple{Rational{BigInt},Rational{BigInt}}}()
-paths=sort(filter(p->startswith(basename(p),"g") && endswith(p,".json.gz"),
+paths=sort(filter(p->startswith(basename(p),"certificate_g") && endswith(p,".json.gz"),
     readdir(joinpath(AUDIT_ROOT,"results");join=true)))
 @testset "Independent final artifact audit" begin
     @test length(paths)==30

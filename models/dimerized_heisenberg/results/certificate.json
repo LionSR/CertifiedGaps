@@ -89,11 +89,11 @@
             "model": "dimerized_heisenberg",
             "sites_per_cell": 2
         },
-        "created_utc": "2026-10-15T03:46:58.077",
+        "created_utc": "2026-10-15T04:40:57.569",
         "certified": true,
         "source_sha256": {
             "models/dimerized_heisenberg/src/provenance.jl": "aa26604a9005b81653f50f130b27b5dedb4e831b65ddb771f7a5d135c44a8f96",
-            "models/dimerized_heisenberg/certify.jl": "1c2d7f1165ffefb14f54ecd7d081054a5b4f899c04deb686f1c07f6a57f6bb48"
+            "models/dimerized_heisenberg/certify.jl": "568f871c7e985ad3864fd9caad1c653f3617e8ac259d7b1718b7ee5c2a7d1bf5"
         },
         "CertifiedGaps": "0.2.0",
         "blas_threads": 1

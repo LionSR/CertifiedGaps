@@ -7,6 +7,13 @@ for this bond and is not claimed. No admissible seed exists for δ ≤ 1/5 at th
 (numerical scan). The Lean statements in `lean/CertifiedGaps/Models/DimerizedHeisenberg*.lean`
 take these seeds as hypotheses.
 
+| δ | seed (n₀, β₀) | certified gap ≥ | lengths covered |
+|---|---|---:|---|
+| 1/2 | (4, 6) cells | 0.5326577398571627 | every even L ≥ 4 cells |
+| 3/10 | (4, 13/2) cells | 0.17291646480187198 | every even L ≥ 4 cells |
+| 1/4 | (4, 29/4) cells | 0.057966591686137485 | every even L ≥ 4 cells |
+| ≤ 1/5 | none at n₀ ≤ 4 | — | no certificate (numerical scan) |
+
 ## Model
 
 A ring of 2n spin-1/2, `H = Σ (1+δ) S·S` on the bond inside each two-spin cell
@@ -50,7 +57,7 @@ operators. So the literal identical-factor form fails in every common cell basis
 (`src/reflection_conventions.jl` checks the two- and four-spin blocks exactly). The criterion
 does not need it.
 
-## Seed and certified bound
+## Seeds and certified bounds
 
 Seed n₀ = 4 cells at every δ: the rings of 8 and 16 spins. Exact rational upper bounds
 `εₛ ≥ 1 − Pₛ(4, β₀)`, `εₜ ≥ 1 − P_τ(8, β₀)`, and `CertifiedGaps.certified_gap_bound(εₛ, εₜ, β₀)`:
@@ -66,7 +73,7 @@ log-partition enclosures are in `results/certificate.json` (plain) and in the fu
 certificates `results/verified_delta_*.json.gz` (with every enclosed eigenvalue). The ED gaps are
 numerical, for comparison only.
 
-**How the seeds are enclosed** (proof in [ENCLOSURE_PROOF.md](ENCLOSURE_PROOF.md)). Each ring
+**How the seeds are enclosed** (proof in [METHOD.md](METHOD.md)). Each ring
 is split into Sz, cell-momentum and (at Sz = 0) spin-flip sectors: 21 blocks (largest 14) at 8
 spins and 73 blocks (largest 1430) at 16 spins, with weighted dimensions checked to sum to 2^L.
 Block matrices are built in interval arithmetic (roots of unity and orbit-size square roots
@@ -102,12 +109,16 @@ From the repository root, with `OPENBLAS_NUM_THREADS=1` (times on an Apple M-ser
 ```sh
 julia --project=models/dimerized_heisenberg -e 'using Pkg; Pkg.instantiate()'
 julia --project=models/dimerized_heisenberg models/dimerized_heisenberg/check.jl         # ~10 s
+julia --project=models/dimerized_heisenberg models/dimerized_heisenberg/check.jl --full  # ~4 min
 julia --project=models/dimerized_heisenberg models/dimerized_heisenberg/test/runtests.jl # ~20 s
 ```
 
 `check.jl` re-derives the exact RP audit and, from the stored spectra, every block's residual,
 orthogonality and radius witness, the three log-partition intervals, the rational seeds and the
-bound, and requires exact equality; it also checks the source hashes. The tests add
+bound, and requires exact equality; it also checks the source hashes. `check.jl --full` also
+re-solves every block of the six rings from the model, encloses the fresh eigenvalues with the
+refined witness of `scripts/independent_review.jl`, and requires the fresh rational seeds to be
+at most the stored ones (so the fresh data prove the stored bounds again). The tests add
 independent checks: the sector solver against the core dense ED (4–10 spins), exact rational
 residuals and the analytic four-spin spectrum against the enclosures, and the reflection
 conventions. Regeneration (not needed for checking):
@@ -155,7 +166,7 @@ verified-file checks.
 | path | role |
 |---|---|
 | `certify.jl` | writes `results/rp_audit.json`, `verified_delta_*.json.gz`, `certificate.json` |
-| `check.jl` | checker for all stored results (also loaded by the tests) |
+| `check.jl` | checker for all stored results (also loaded by the tests); `--full` re-solves |
 | `src/rp.jl` | exact audit of the reflected, conjugate and identical-factor forms |
 | `src/reflection_conventions.jl` | exact audit of other cell orientations and 4-spin blocks |
 | `src/sectors.jl` | symmetry orbits; Float64 sector solver for the numerical scan |
@@ -163,12 +174,16 @@ verified-file checks.
 | `src/provenance.jl` | gzip reader and source-hash checks (current and historical) |
 | `scripts/` | independent review, numerical scan and its heuristic summary |
 | `test/runtests.jl` | fast tests |
-| `ENCLOSURE_PROOF.md` | the enclosure theorem and the asymmetric recurrence |
+| `METHOD.md` | the enclosure theorem and the asymmetric recurrence |
 | `IDEAS.md` | route choice |
 | `results/certificate.json` | the three seeds and bounds as exact rationals (plain JSON) |
 | `results/verified_delta_*.json.gz` | full certificates (every block, witness, eigenvalue) |
 | `results/rp_audit.json` | exact RP audit at six deltas (no seeds) |
 | `results/numerical_summary.json` | Float64 scan summary and heuristic extrapolation |
+
+Hash pinning: `results/certificate.json` records the SHA-256 of `certify.jl` and
+`src/provenance.jl` by path and is regenerated in seconds by `certify.jl summary`; the other
+results pin historical paths only (History). There are no layout exceptions.
 
 ## History
 
@@ -176,7 +191,9 @@ The verified certificates and `rp_audit.json` were produced under the core's for
 `ThermalMPOGap` (core commit `ef0a3e6`) from sources under `certificates/dimerized_heisenberg/`
 (commit `fd3c3d5`). Their `source_sha256` records are left untouched; `src/provenance.jl`
 compares them with the git objects of those commits (and skips with a warning if the commits
-are absent from the clone). `results/certificate.json` hashes the current `certify.jl`.
+are absent from the clone). `results/certificate.json` hashes the current `certify.jl`; it was
+regenerated (`certify.jl summary`, identical seeds and bounds) when the directory-format tidy
+renamed `ENCLOSURE_PROOF.md` to `METHOD.md` and added `check.jl --full`.
 Removed over time (all in the git history): the 10 MB review output, uncompressed certificates,
 run logs, bitwise-reproduction probes, migration helpers, `PR_BODY.md`, `REPORT.md` and
 `review/independent_review.md` (folded into this README), and the per-δ Float64 scans

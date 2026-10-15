@@ -6,8 +6,8 @@
 # results/audit.json.
 #
 #     OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder \
-#         models/heisenberg_ladder/audit.jl
-include(joinpath(@__DIR__, "src", "HeisenbergLadder.jl"))
+#         models/heisenberg_ladder/scripts/audit.jl
+include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
 using .HeisenbergLadder: Q, q, CERTIFICATE, exact_rp, provenance, verified_spectra
 using CertifiedGaps: certified_gap_bound
 using CertifiedGaps.Results: write_result, parse_exact_json
@@ -70,7 +70,7 @@ function audit()
     @test Q(et) <= eps_t
     @test q(seed["gap_lower_bound"]) <= certified_gap_bound(eps_s, eps_t, beta).bound
     enc(x) = Dict("lo" => string(Q(x[1])), "hi" => string(Q(x[2])))
-    write_result(joinpath(@__DIR__, "results", "audit.json"), Dict(
+    write_result(joinpath(@__DIR__, "..", "results", "audit.json"), Dict(
         "metadata" => provenance(Dict("arithmetic" =>
             "256-bit directed MPFR and exact rational trace moments"); certified = true),
         "seed" => Dict("J" => "4//1", "n0" => n, "beta0" => string(beta),

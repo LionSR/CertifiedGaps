@@ -1,9 +1,19 @@
-# Spin-1 bilinear–biquadratic chain: finite-size survey (no certificate)
+# Spin-1 bilinear–biquadratic chain
 
 **No uniform-gap certificate.** This directory is a negative finite-size survey. It proves the
 local reflection-positivity identity exactly, then scans the two seed purities on complete
 numerical spectra up to 14 sites. No even seed reachable at these sizes is admissible. All
 purities, defects and gaps below are floating point; none is an eigenvalue enclosure.
+Admissibility needs both purities above about 0.873.
+
+| θ | best even seed (n₀, β₀) | max min(Pₛ, P_τ) | certified gap ≥ | lengths covered |
+|---:|---|---:|---|---|
+| 0 | (6, 3.25) | 0.329 | no certificate | — |
+| −0.1 | (6, 2.875) | 0.292 | no certificate | — |
+| −0.3 | (6, 2.375) | 0.264 | no certificate | — |
+| −0.5 | (6, 2.125) | 0.249 | no certificate | — |
+| −0.6 | (6, 2) | 0.256 | no certificate | — |
+| −0.7 | (6, 1.875) | 0.242 | no certificate | — |
 
 ## Model
 
@@ -29,7 +39,7 @@ skew-symmetric and six Q's the symmetric operators (exact 9×9 determinant ≠ 0
 so the bond is RP **iff** both weights are nonnegative, that is for −π/4 < θ ≤ 0. The matrices
 are stored as exact rationals in `results/rp.json`.
 
-## Result: no certificate
+## Result
 
 **Computed (floating point, dense LAPACK solves with exact integer multiplicities).**
 
@@ -91,8 +101,10 @@ scale: the route to a certificate here is a non-ED method (see `IDEAS.md` and `A
 From the repository root, Julia 1.12, `OPENBLAS_NUM_THREADS=1`:
 
 ```sh
-# Fast check (about 70 s, 357 assertions). check.jl runs the same test suite.
+# Fast check (about 20 s, 387 assertions): check.jl runs the test suite.
 julia --project=models/blbq_haldane models/blbq_haldane/check.jl
+# Adds the n₀ = 4 rows from complete 4- and 8-site spectra (about 2 s more).
+julia --project=models/blbq_haldane models/blbq_haldane/check.jl --full
 julia --project=julia models/blbq_haldane/test/runtests.jl
 ```
 
@@ -100,16 +112,20 @@ The tests prove the RP identities and small Casimir-projector identities exactly
 reduced and SU(2) spectra with unreduced ED through L = 7; confirm that the stored rational seed
 inputs are rejected by `certified_gap_bound`; check the SHA-256 of the stored references
 recorded in `scaling.json`; compare the L = 14 rows with the independent L = 14 reference; and
-recompute the n₀ = 2, 3 rows of `grid_maxima` and `energy_scaling` from scratch.
+recompute the n₀ = 2, 3 rows of `grid_maxima` and `energy_scaling` from scratch (`--full`: also
+n₀ = 4). There is no certificate, so there is no `certify.jl`; the regeneration drivers below
+are in `scripts/`. Times measured on an Apple M-series laptop (2026-10-14): `check.jl` 19 s,
+`check.jl --full` 21 s.
 
-Regenerating the spectra (not needed for checking; `run.sh` wraps `julia --project=julia` with one
-BLAS thread; times from the original 4-CPU run):
+Regenerating the spectra (not needed for checking; `scripts/run.sh` wraps `julia --project=julia`
+with one BLAS thread; times from the original 4-CPU run):
 
 ```sh
-models/blbq_haldane/run.sh -t 4 models/blbq_haldane/scan.jl 2 3 4 5 6 7 8 10 12  # ~20 min
-models/blbq_haldane/run.sh models/blbq_haldane/scripts/reference.jl 14           # ~2 min
-models/blbq_haldane/run.sh models/blbq_haldane/scripts/reference.jl 16           # ~20 min
-models/blbq_haldane/run.sh models/blbq_haldane/scripts/preflight.jl              # seconds
+models/blbq_haldane/scripts/run.sh -t 4 \
+    models/blbq_haldane/scripts/scan.jl 2 3 4 5 6 7 8 10 12      # ~20 min
+models/blbq_haldane/scripts/run.sh models/blbq_haldane/scripts/reference.jl 14  # ~2 min
+models/blbq_haldane/scripts/run.sh models/blbq_haldane/scripts/reference.jl 16  # ~20 min
+models/blbq_haldane/scripts/run.sh models/blbq_haldane/scripts/preflight.jl     # seconds
 models/blbq_haldane/scripts/run_su2_grid.sh   # 120 L14 sectors: ~4 h, peak ~15 GiB RAM
 models/blbq_haldane/scripts/finalize_su2.sh   # collect, gzip, analyze, audit, test
 ```
@@ -128,9 +144,9 @@ models/blbq_haldane/scripts/finalize_su2.sh   # collect, gzip, analyze, audit, t
 
 | path | role |
 |---|---|
-| `scan.jl` | complete dense spectra through L = 12 (writes `results/spectrum_L*.json`) |
-| `check.jl` | runs the test suite (there is no certificate to check) |
-| `run.sh` | wrapper: `julia --project=julia`, one BLAS thread |
+| `check.jl` | runs the test suite (no certificate to check); `--full` adds the n₀ = 4 rows |
+| `scripts/scan.jl` | complete dense spectra through L = 12 (writes `results/spectrum_L*.json`) |
+| `scripts/run.sh` | wrapper: `julia --project=julia`, one BLAS thread |
 | `src/model.jl` | exact RP identities (`exact_rp`), integer S·S bond |
 | `src/sectors.jl` | translation orbits, momentum/flip/reflection blocks |
 | `src/su2.jl` | numerical SU(2) highest-weight blocks (Casimir projector, CholeskyQR2) |
@@ -150,6 +166,9 @@ models/blbq_haldane/scripts/finalize_su2.sh   # collect, gzip, analyze, audit, t
 | `results/preflight.json`, `su2_benchmark_*.json` | dimension counts, resources, benchmarks |
 | `results/archive.json`, `environment.json` | gzip hashes of the spectra; run environment |
 
+Hash pinning: no checker compares a source hash by path (the tests verify only the input hashes
+of the stored references in `scaling.json`), so there are no layout exceptions.
+
 ## History
 
 Developed as `certificates/blbq_haldane/` against the core's former name `ThermalMPOGap`
@@ -167,3 +186,9 @@ source, `su2_householder.jl`, whose hash the L = 14 benchmark records). Sources 
 `src/` and `scripts/`; the `source_sha256` records already in `results/` name the old flat paths
 and are kept unchanged (no checker verifies them; the test suite verifies only the input hashes
 of the stored references). The project now has its own `Manifest.toml`.
+
+The directory-format tidy moved `scan.jl` and `run.sh` from the top level into `scripts/` (paths
+inside them adjusted) and added `check.jl --full`. The `"scan.jl"` and `"run.sh"` entries in
+`results/scaling.json` and `results/environment.json` record earlier versions of those files at
+their former top-level paths (see the git history); later regenerations hash them under
+`scripts/`.

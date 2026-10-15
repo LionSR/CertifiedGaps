@@ -1,6 +1,6 @@
 # Low-energy M = 0 reference levels at L = 14, 16 (KrylovKit, six levels per symmetry block).
 # Numerical reference only: these incomplete spectra are NEVER used in partition functions.
-# Usage: models/blbq_haldane/run.sh models/blbq_haldane/scripts/reference.jl 14
+# Usage: models/blbq_haldane/scripts/run.sh models/blbq_haldane/scripts/reference.jl 14
 using CertifiedGaps, CertifiedGaps.Results, KrylovKit, LinearAlgebra, Random
 const ROOT = normpath(joinpath(@__DIR__, ".."))
 include(joinpath(ROOT, "src", "sectors.jl"))

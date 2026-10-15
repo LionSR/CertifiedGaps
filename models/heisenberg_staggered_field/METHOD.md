@@ -1,4 +1,4 @@
-# Uniform gap certificates: Heisenberg chain in a staggered field
+# Method: uniform gap certificates for the Heisenberg chain in a staggered field
 
 The numerical tables were generated (by a since-removed `report.jl`) from the spectra and scan
 caches of `scripts/scan.jl`, which are not stored; they are kept as a record.
@@ -319,7 +319,7 @@ and 1/4, computed from complete 8- and 16-site spectra.** Their uniform gap boun
 to every even L >= 8 one-spin cells/sites. This acceptance does not extend to
 the numerical twenty-site search candidates.
 
-The separate reviewer inspected AGENTS.md, REPORT.md, common.jl, certify.jl,
+The separate reviewer inspected AGENTS.md, REPORT.md (now METHOD.md), common.jl, certify.jl,
 test/runtests.jl, the core certified recurrence, and the scope note's transfer
 operator and two-purity criterion. No defect requiring a mathematical source
 or certificate-data change was found.

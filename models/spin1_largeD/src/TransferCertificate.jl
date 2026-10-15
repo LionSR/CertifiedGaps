@@ -21,7 +21,7 @@ const box = CertifiedGaps.to_interval
 const FORMAT = "spin1_largeD transfer and Weyl certificate v1"
 const VALIDITY = "unique ground state and gap >= bound for every even L >= n0 sites"
 const KEEP = 8192
-"The case ids `transfer_certify.jl` writes; `check_certificate` requires exactly these."
+"The case ids `scripts/transfer_certify.jl` writes; `check_certificate` requires exactly these."
 const EXPECTED_CASES = ["reference-D4//1", "survey-D4-beta3",
     ["space-lift-$k-D4//1" for k in 1:4]..., "transport-threshold-D4//1",
     "reference-D1603//500", "transport-threshold-D1603//500"]
@@ -169,7 +169,7 @@ end
 "SHA-256 of the files that define the stage-2 proof and its environment, including the core."
 function proof_hashes()
     hashes = source_hashes(ROOT; dirs = ("src",),
-        files = ("model.jl", "transfer_certify.jl", "check.jl", "Project.toml",
+        files = ("model.jl", "scripts/transfer_certify.jl", "check.jl", "Project.toml",
             "Manifest.toml"))
     core = source_hashes(joinpath(ROOT, "../../julia"); dirs = ("src",),
         files = ("Project.toml",))
@@ -302,11 +302,11 @@ function check_bridge(data, threshold)
 end
 
 """
-    check_certificate(path = joinpath(ROOT, "certificate.json"))
+    check_certificate(path = joinpath(ROOT, "results", "certificate.json"))
 
 Replay every case of the stage-2 certificate and the finite bridge; error on any mismatch.
 """
-function check_certificate(path = joinpath(ROOT, "certificate.json"))
+function check_certificate(path = joinpath(ROOT, "results", "certificate.json"))
     data = parse_exact_json(read(path, String))
     data["format"] == FORMAT || error("format")
     Dict(data["source_hashes"]) == proof_hashes() || error("proof source hash mismatch")
