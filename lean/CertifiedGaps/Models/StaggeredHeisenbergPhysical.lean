@@ -5,7 +5,7 @@ Authors: thermal-mpo-gap contributors
 -/
 import CertifiedGaps.Models.StaggeredHeisenberg
 import CertifiedGaps.Ring.Conjugation
-import CertifiedGaps.Models.SpinHalfRotation
+import CertifiedGaps.Local.SpinHalfRotation
 
 /-!
 # The staggered-field chain in the physical frame
@@ -13,7 +13,7 @@ import CertifiedGaps.Models.SpinHalfRotation
 `physicalHamiltonian h L = ∑ⱼ Sⱼ · Sⱼ₊₁ - h ∑ⱼ (-1)ʲ Sᶻⱼ` with the complex spin one-half matrices.
 On an even ring it is the rotated chain `model h` conjugated by `e^{iπSʸ}` on the odd sites
 (`physicalHamiltonian_eq`), so the two have the same spectrum (`physicalSpectrum_eq`) and the gap
-theorems of `StaggeredHeisenberg` hold for the physical chain (`physical_gap_h1`, …).
+theorem of `StaggeredHeisenberg` holds for the physical chain (`physical_gap`).
 -/
 
 open Matrix Real
@@ -99,30 +99,11 @@ theorem physicalSpectrum_eq (h : ℝ) {L : ℕ} (hL : Even L) :
     physicalSpectrum h L = (model h).spectrum L :=
   (model h).eigenvalues_eq_spectrum _ (rotation_mul_conjTranspose L) _ (physicalHamiltonian_eq h hL)
 
-/-- **The physical staggered-field chain at `h = 1`.** Every even ring of `L ≥ 8` sites has a
-unique ground state and gap `Δ_L > log 413.4 / (21/4) ≈ 1.1475`. -/
-theorem physical_gap_h1 {L : ℕ} (hL : 8 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum 1 L) (log 413.4 / (21 / 4)) := by
-  rw [physicalSpectrum_eq 1 hLe]; exact gap_h1 hL hLe
-
-/-- The physical staggered-field chain at `h = 3/4`: `Δ_L > log 106.9 / (21/4) ≈ 0.8899`. -/
-theorem physical_gap_h34 {L : ℕ} (hL : 8 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum (3 / 4) L) (log 106.9 / (21 / 4)) := by
-  rw [physicalSpectrum_eq _ hLe]; exact gap_h34 hL hLe
-
-/-- The physical staggered-field chain at `h = 1/2`: `Δ_L > log 26.23 / (11/2) ≈ 0.5940`. -/
-theorem physical_gap_h12 {L : ℕ} (hL : 8 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum (1 / 2) L) (log 26.23 / (11 / 2)) := by
-  rw [physicalSpectrum_eq _ hLe]; exact gap_h12 hL hLe
-
-/-- The physical staggered-field chain at `h = 7/20`: `Δ_L > log 9.035 / (23/4) ≈ 0.3828`. -/
-theorem physical_gap_h720 {L : ℕ} (hL : 8 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum (7 / 20) L) (log 9.035 / (23 / 4)) := by
-  rw [physicalSpectrum_eq _ hLe]; exact gap_h720 hL hLe
-
-/-- The physical staggered-field chain at `h = 1/4`: `Δ_L > log 3.806 / (25/4) ≈ 0.2139`. -/
-theorem physical_gap_h14 {L : ℕ} (hL : 8 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum (1 / 4) L) (log 3.806 / (25 / 4)) := by
-  rw [physicalSpectrum_eq _ hLe]; exact gap_h14 hL hLe
+/-- **The physical staggered-field chain.** At every point `p ∈ points`, every even ring of
+`L ≥ 8` sites has a unique ground state and gap `Δ_L > log r / β₀` (`≈ 1.1475, 0.8899, 0.5940,
+0.3828, 0.2139` at `h = 1, 3/4, 1/2, 7/20, 1/4`). -/
+theorem physical_gap {p : Point} (hp : p ∈ points) {L : ℕ} (hL : 8 ≤ L) (hLe : Even L) :
+    GapGT (physicalSpectrum p.h L) (log (p.cert.r : ℝ) / p.β₀) := by
+  rw [physicalSpectrum_eq _ hLe]; exact gap hp hL hLe
 
 end CertifiedGaps.StaggeredHeisenberg

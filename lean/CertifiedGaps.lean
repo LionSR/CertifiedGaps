@@ -16,18 +16,19 @@ import CertifiedGaps.Heisenberg.Hamiltonian
 import CertifiedGaps.Heisenberg.Gap
 import CertifiedGaps.Heisenberg.Main
 -- Local building blocks of the models
-import CertifiedGaps.Models.Pauli
-import CertifiedGaps.Models.SpinHalf
-import CertifiedGaps.Models.SpinHalfRotation
-import CertifiedGaps.Models.CellSwap
--- Models
+import CertifiedGaps.Local.Pauli
+import CertifiedGaps.Local.SpinHalf
+import CertifiedGaps.Local.SpinHalfRotation
+import CertifiedGaps.Local.SpinOne
+import CertifiedGaps.Local.CellSwap
+-- Models (one file per directory `models/<slug>`; `*Physical` for rotated frames)
 import CertifiedGaps.Models.SpinOneLargeD
 import CertifiedGaps.Models.SpinOneDimerized
-import CertifiedGaps.Models.IsingLadder
-import CertifiedGaps.Models.IsingLongitudinal
+import CertifiedGaps.Models.HeisenbergLadder
+import CertifiedGaps.Models.HeisenbergLadderPhysical
 import CertifiedGaps.Models.StaggeredHeisenberg
 import CertifiedGaps.Models.StaggeredHeisenbergPhysical
 import CertifiedGaps.Models.DimerizedHeisenberg
 import CertifiedGaps.Models.DimerizedHeisenbergPhysical
-import CertifiedGaps.Models.TwoLegLadder
-import CertifiedGaps.Models.TwoLegLadderPhysical
+import CertifiedGaps.Models.TwoLegIsing
+import CertifiedGaps.Models.IsingLongitudinal

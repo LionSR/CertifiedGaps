@@ -50,7 +50,7 @@ Read the files in this order. Each step uses only the ones before it.
 4. **Models** (`Heisenberg/*`, `Models/*`). Each model is written as an `RPRing` in a real
    basis, plus its two seeds and a chain certificate, which together give its gap theorem.
    Some models are reflection positive only after a sublattice rotation. For those,
-   `Ring/Conjugation` transfers the gap to the physical Hamiltonian (`physical_gap_*`).
+   `Ring/Conjugation` transfers the gap to the physical Hamiltonian (`physical_gap`).
 5. **Seeds** (still `sorry`). These carry the physics, and the bootstrap cannot produce them.
    The opt-in library `SeedKernel` works toward proving them in the kernel. Julia generates
    witnesses, `decide +kernel` checks them, and no `native_decide` is used.
@@ -73,7 +73,7 @@ lake build SeedKernel       # opt-in: kernel-checked seed arithmetic, about 80 s
 lake build SeedKernelBench  # opt-in: kernel benchmarks, about 2 min, up to 4 GB per file
 ```
 
-Lean and Mathlib are pinned at `v4.35.0-rc3`. `CertifiedGaps` has about 4400 lines, `SeedKernel`
+Lean and Mathlib are pinned at `v4.35.0-rc3`. `CertifiedGaps` has about 4300 lines, `SeedKernel`
 about 1200 (plus generated witness files). All declarations live in the namespace
 `CertifiedGaps`; names below are relative to it.
 
@@ -97,18 +97,20 @@ lies more than `c` above it. Every gap theorem below holds for every even ring l
 | Theorem | Model | Bound | Open seeds (the only `sorry`s) |
 |---|---|---|---|
 | `SpinOneHeisenberg.spin_one_heisenberg_gap` | spin-1 Heisenberg ring | `Δ_L > log 20 / 784` for `L ≥ 2304` | `seed_spatial`: `P_s(2304, 784) ≥ 0.99`; `seed_thermal`: `P_τ(4608, 784) ≥ 0.99` |
-| `SpinOneLargeD.gap_D4` | spin-1, `+ 4 ∑ (Sᶻ)²` | `log 4.755 / (9/4) ≈ 0.693`, `L ≥ 6` | `seed_spatial_D4`, `seed_thermal_D4`: `P_s(6, 9/4) ≥ 1 − 0.06411`, `P_τ(12, 9/4) ≥ 1 − 0.04053` |
-| `SpinOneLargeD.gap_D3206` | spin-1, `+ (1603/500) ∑ (Sᶻ)²` | `log 1.0065429 / (381/125) ≈ 0.00214`, `L ≥ 6` | `seed_spatial_D3206`, `seed_thermal_D3206` at `(6, 381/125)` |
-| `SpinOneDimerized.gap_d910` | spin-1 dimerized chain, `δ = 9/10` (cells = weak pairs) | `log 6.339 / (7/2) ≈ 0.528`, `L ≥ 2` | `seed_spatial_d910`, `seed_thermal_d910`: `P_s(2, 7/2) ≥ 1 − 0.04972`, `P_τ(4, 7/2) ≥ 1 − 0.03206` |
-| `TwoLegLadder.physical_gap_J4` (rotated: `gap_J4`) | spin-½ ladder `∑_{legs} S·S + 4 ∑_{rungs} S·S` | `log 9.033 / 2 ≈ 1.100`, `L ≥ 4` rungs | `seed_spatial_J4`, `seed_thermal_J4`: `P_s(4, 2) ≥ 1 − 0.03509`, `P_τ(8, 2) ≥ 1 − 0.02463` |
-| `StaggeredHeisenberg.physical_gap_h1`, `_h34`, `_h12`, `_h720`, `_h14` (rotated: `gap_h*`) | `∑ S·S − h ∑ (−1)ʲ Sᶻⱼ`, `h = 1, 3/4, 1/2, 7/20, 1/4` | `1.147, 0.890, 0.594, 0.383, 0.214`, `L ≥ 8` | `seed_spatial_h*`, `seed_thermal_h*` at `(8, β₀)` |
-| `DimerizedHeisenberg.physical_gap_d12`, `_d310`, `_d14` (rotated: `gap_d*`) | spin-½ dimerized chain, `δ = 1/2, 3/10, 1/4` (cells = strong pairs) | `0.532, 0.172, 0.057`, `L ≥ 4` | `seed_spatial_d*`, `seed_thermal_d*` at `(4, β₀)` |
-| `IsingLadder.gap_G3` | two-leg TFIM, `g = 3` | `log 2.585 / (3/2) ≈ 0.633`, `L ≥ 4` rungs | `seed_spatial_G3`, `seed_thermal_G3`: `P_s(4, 3/2) ≥ 1 − 0.1125`, `P_τ(8, 3/2) ≥ 1 − 0.05162` |
+| `SpinOneLargeD.gap` | spin-1, `+ D ∑ (Sᶻ)²`, `D = 4, 1603/500` | `log 4.755 / (9/4) ≈ 0.693`, `log 1.0065429 / (381/125) ≈ 0.00214`; `L ≥ 6` | `seeds` at `(6, β₀)`: `P_s ≥ 1 − 0.06411`, `P_τ ≥ 1 − 0.04053` at `D = 4` |
+| `SpinOneDimerized.gap` | spin-1 dimerized chain, `δ = 9/10` (cells = weak pairs) | `log 6.339 / (7/2) ≈ 0.528`, `L ≥ 2` | `seeds`: `P_s(2, 7/2) ≥ 1 − 0.04972`, `P_τ(4, 7/2) ≥ 1 − 0.03206` |
+| `HeisenbergLadder.physical_gap` (rotated: `gap`) | spin-½ ladder `∑_{legs} S·S + 4 ∑_{rungs} S·S` | `log 9.033 / 2 ≈ 1.100`, `L ≥ 4` rungs | `seeds`: `P_s(4, 2) ≥ 1 − 0.03509`, `P_τ(8, 2) ≥ 1 − 0.02463` |
+| `StaggeredHeisenberg.physical_gap` (rotated: `gap`) | `∑ S·S − h ∑ (−1)ʲ Sᶻⱼ`, `h = 1, 3/4, 1/2, 7/20, 1/4` | `1.147, 0.890, 0.594, 0.383, 0.214`, `L ≥ 8` | `seeds` at `(8, β₀)` |
+| `DimerizedHeisenberg.physical_gap` (rotated: `gap`) | spin-½ dimerized chain, `δ = 1/2, 3/10, 1/4` (cells = strong pairs) | `0.532, 0.172, 0.057`, `L ≥ 4` | `seeds` at `(4, β₀)` |
+| `TwoLegIsing.gap` | two-leg TFIM, `g = 3` | `log 2.585 / (3/2) ≈ 0.633`, `L ≥ 4` rungs | `seeds`: `P_s(4, 3/2) ≥ 1 − 0.1125`, `P_τ(8, 3/2) ≥ 1 − 0.05162` |
 | `IsingLongitudinal.gap` | Ising chain `−ZZ − gX − hZ`, 30 points `g ∈ {1/4, …, 2}`, `h ∈ {1/20, …, 1}` | `log r / β₀` per point (`0.075` at `g = 1, h = 1/20` to `3.70`), `L ≥ 6` | `seeds` (one lemma for all 30 points) |
 
-`#print axioms` on each of these lists `propext`, `Classical.choice`, `Quot.sound` and `sorryAx`
-(from its seeds). The `physical_*` theorems are about the physical Hamiltonian; the rotated
-`gap_*` theorems about the reflection-positive frame, which has the same spectrum.
+Every model except the spin-1 Heisenberg ring lists its parameter points in `points`; `gap hp`
+(for `hp : p ∈ points`) gives `Δ_L > log r / β₀` with `r = p.cert.r`, and the one `sorry` of
+the model, `seeds`, states both seed inequalities at every point. `#print axioms` on each of
+these lists `propext`, `Classical.choice`, `Quot.sound` and `sorryAx` (from its seeds). The
+`physical_gap` theorems are about the physical Hamiltonian; the rotated `gap` theorems about the
+reflection-positive frame, which has the same spectrum.
 
 The Lean theorems use the seeds that were current when they were written. Some model
 certificates have since improved (for example `models/spin1_largeD` now certifies 0.899 at
@@ -131,7 +133,7 @@ These use only `propext`, `Classical.choice` and `Quot.sound`.
 | `RPRing.eigenvalues_eq_spectrum` | a Hamiltonian conjugate to the ring by one-site unitaries has the ring's spectrum |
 | `SpinOneHeisenberg.gapGT_log_twenty` | Theorem 1 of the note from its inputs (`ThermalMPOInputs`): `Δ_L > log 20 / 784` |
 | `*.physicalSpectrum_eq` | each physical Hamiltonian has the spectrum of its rotated reflection-positive ring |
-| `*_valid`, `IsingLongitudinal.points_valid` | every chain certificate, by `decide +kernel` |
+| `*.points_valid` | every chain certificate, by `decide +kernel` |
 
 The seeds of the models come from the certificates in `../models/` (complete spectra of the seed
 rings with rigorous eigenvalue enclosures; each model file names its directory). The spin-1
@@ -195,20 +197,54 @@ A gap certificate enters Lean in exactly this form:
    symmetry conditions are finite matrix computations; `transpose_kronecker_eq_or`,
    `transpose_sum_kronecker_self` and `cellSwap_conj_smul_sum_kronecker_self` cover the usual
    cases.
-2. **The seeds**: `1 − εₛ ≤ R.spatialPurity n₀ β₀` and `1 − εₜ ≤ R.thermalPurity (2 n₀) β₀` with
-   decimal `εₛ, εₜ`, `n₀ ≥ 2` even. These are the only statements left to numerics.
-3. **A `ChainCertificate`**: generate it with
-   `julia lean/scripts/chain_certificate.jl εₛ εₜ β₀ [J] [digits]` and paste it in. Lean checks it
-   with `decide +kernel`. The resulting bound is `log r / β₀`.
-4. **The gap**: `R.gapGT_of_chainCertificate (by norm_num) (by decide) (by norm_num) cert_valid
-   (by norm_num [cert, ChainCertificate.sAt, ChainCertificate.tAt]) seed_spatial seed_thermal hL hLe`.
-   See `Models/TwoLegLadder.lean` for a complete example (about 80 lines).
+2. **The points**: a `structure Point` with the model parameters (as `ℚ`), the seed inverse
+   temperature `β₀ : ℚ` and a `cert : ChainCertificate`, and `def points : List Point`. Generate
+   each certificate with `julia lean/scripts/chain_certificate.jl εₛ εₜ β₀ [J] [digits]` (the
+   arguments are exact literals such as `a//b` or `0.064`; nothing is evaluated) and paste it in.
+   Its first entries `s[0], t[0]` are the seed defects. `points_valid` and `points_β₀_pos` are
+   checked by `decide +kernel`; the bound is `log r / β₀`.
+3. **The seeds**: one `sorry` lemma `seeds : ∀ p ∈ points, 1 − s[0] ≤ (model p.x).spatialPurity n₀
+   p.β₀ ∧ 1 − t[0] ≤ (model p.x).thermalPurity (2 n₀) p.β₀`, `n₀ ≥ 2` even and written as a
+   literal. These are the only statements left to numerics.
+4. **The gap**: `gap hp hL hLe` is `(model p.x).gapGT_of_chainCertificate (n₀ := n₀) (by norm_num)
+   (by decide) (by exact_mod_cast points_β₀_pos p hp) (points_valid p hp) ⟨rfl, rfl, rfl⟩
+   (seeds p hp).1 (seeds p hp).2 hL hLe`. See `Models/TwoLegIsing.lean` for a complete example
+   (about 80 lines).
 5. **A rotated frame** (if the model is reflection positive only after one-site unitaries `a`):
-   define the physical Hamiltonian, prove it is `piTensor a * R.hamiltonian L * piTensor aᴴ` with
-   `RPRing.conj_hamiltonian`, and transfer the gap with `RPRing.eigenvalues_eq_spectrum`.
+   in `Models/<Name>Physical.lean`, define the physical Hamiltonian, prove it is
+   `piTensor a * R.hamiltonian L * piTensor aᴴ` with `RPRing.conj_hamiltonian`, and transfer the
+   gap with `RPRing.eigenvalues_eq_spectrum`.
+6. **Check the seeds against the certificate**: add the model to `lean/scripts/check_seeds.jl`
+   and run `julia --project=julia lean/scripts/check_seeds.jl` from the repository root. It
+   checks that every Lean `s[0], t[0]` is at least the certified defect at the same `(n₀, β₀)`.
 
 The seeds of a certificate should therefore be reported as exact rationals together with
-`(n₀, β₀)` and the exact `C_α, o`.
+`(n₀, β₀)` and the exact `C_α, o`. Building blocks shared by several models (one-site matrices,
+the cell swap) go in `Local/`, not in `Models/`.
+
+**Naming scheme.** Every model uses the same names, so that a model is read the same way in
+every file:
+
+| Name | Meaning |
+|---|---|
+| `Models/<Name>.lean`, namespace `CertifiedGaps.<Name>` | `<Name>` is the Julia directory `models/<slug>` in UpperCamelCase (table below) |
+| `model` | the model as an `RPRing`, a function of its real parameters |
+| `Point`, `points` | the certified parameter points with `β₀` and `cert` |
+| `points_valid`, `points_β₀_pos`, `points_<field>_…` | decidable facts about all points (`decide +kernel`) |
+| `seeds` | the seed inequalities at every point: the one `sorry` of the model |
+| `gap` | the gap at every point, in the frame of `model` |
+| `physicalHamiltonian`, `physicalSpectrum`, `physicalHamiltonian_eq`, `physicalSpectrum_eq`, `physical_gap` | `Models/<Name>Physical.lean`: the physical frame, when `model` is rotated |
+
+| Lean namespace | Julia directory |
+|---|---|
+| `SpinOneHeisenberg` (`Heisenberg/`) | `models/spin1` (the headline theorem keeps its own names: `seed_spatial`, `seed_thermal`, `spin_one_heisenberg_gap`) |
+| `SpinOneLargeD` | `models/spin1_largeD` |
+| `SpinOneDimerized` | `models/spin1_dimerized` |
+| `HeisenbergLadder` | `models/heisenberg_ladder` |
+| `StaggeredHeisenberg` | `models/heisenberg_staggered_field` |
+| `DimerizedHeisenberg` | `models/dimerized_heisenberg` |
+| `TwoLegIsing` | `models/two_leg_tfim` |
+| `IsingLongitudinal` | `models/tfim_longitudinal` |
 
 ## Files
 
@@ -226,16 +262,18 @@ The seeds of a certificate should therefore be reported as exact rationals toget
 | `Ring/Conjugation.lean` | Sitewise unitary conjugation of the ring Hamiltonian; conjugate Hamiltonians have the same spectrum |
 | `Heisenberg/Hamiltonian.lean` | The spin-1 ring `H_L = ∑ⱼ Sⱼ·Sⱼ₊₁` in the Cartesian basis |
 | `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Theorem 1 of the note, with the two seed `sorry`s |
-| `Models/Pauli.lean`, `Models/SpinHalf.lean` | The real factors `X, Z` and `Sˣ, iSʸ, Sᶻ` |
-| `Models/SpinHalfRotation.lean` | The rotation `e^{iπSʸ}` and the complex spin-½ matrices |
-| `Models/CellSwap.lean` | The swap `F` of a two-site cell, `F (A ⊗ B) F = B ⊗ A` |
+| `Local/Pauli.lean`, `Local/SpinHalf.lean` | The real factors `X, Z` and `Sˣ, iSʸ, Sᶻ` (`SpinHalf.P`) |
+| `Local/SpinHalfRotation.lean` | The rotation `e^{iπSʸ}` and the complex spin-½ matrices |
+| `Local/SpinOne.lean` | The real antisymmetric spin-1 factors `SpinOne.G α = i S^α` |
+| `Local/CellSwap.lean` | The swap `F` of a two-site cell, `F (A ⊗ B) F = B ⊗ A` |
 | `Models/SpinOneLargeD.lean` | `∑ Sⱼ·Sⱼ₊₁ + D ∑ (Sᶻⱼ)²` as an `RPRing` (`D = 0` is the Heisenberg ring); `D = 4`, `D = 1603/500` |
 | `Models/SpinOneDimerized.lean` | The dimerized spin-1 chain, internal reflection `F`; `δ = 9/10` |
-| `Models/IsingLadder.lean` | The two-leg transverse-field Ising ladder; `g = 3` |
+| `Models/TwoLegIsing.lean` | The two-leg transverse-field Ising ladder; `g = 3` |
 | `Models/IsingLongitudinal.lean` | The Ising chain in transverse and longitudinal fields; 30 grid points |
-| `Models/TwoLegLadder.lean`, `Models/StaggeredHeisenberg.lean`, `Models/DimerizedHeisenberg.lean` | The three rotated spin-½ models; seeds and gaps |
+| `Models/HeisenbergLadder.lean`, `Models/StaggeredHeisenberg.lean`, `Models/DimerizedHeisenberg.lean` | The three rotated spin-½ models; seeds and gaps |
 | `Models/*Physical.lean` | Their physical Hamiltonians, the rotations, and the physical gap theorems |
-| `scripts/chain_certificate.jl` | Searches a `ChainCertificate` from the seeds (exact rationals; Lean re-checks) |
+| `scripts/chain_certificate.jl` | Searches a `ChainCertificate` from the seeds (exact rationals, literal parser; Lean re-checks) |
+| `scripts/check_seeds.jl` | Checks every Lean seed defect against the certificate JSON in `../models/*/results` |
 
 ## Why each piece is needed in Lean
 

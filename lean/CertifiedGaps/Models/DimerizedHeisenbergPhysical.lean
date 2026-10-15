@@ -5,7 +5,7 @@ Authors: thermal-mpo-gap contributors
 -/
 import CertifiedGaps.Models.DimerizedHeisenberg
 import CertifiedGaps.Ring.Conjugation
-import CertifiedGaps.Models.SpinHalfRotation
+import CertifiedGaps.Local.SpinHalfRotation
 
 /-!
 # The dimerized spin-one-half chain in the physical frame
@@ -15,7 +15,7 @@ import CertifiedGaps.Models.SpinHalfRotation
 pairs: the on-site term is `(1 + δ) S · S` within a pair and the bond is
 `(1 - δ) ∑_α (1 ⊗ S_α) ⊗ (S_α ⊗ 1)` from the second spin of a pair to the first spin of the next.
 For `δ ≤ 1` it is the rotated chain `model δ` conjugated by `e^{iπSʸ}` on the second spin of every
-pair (`physicalHamiltonian_eq`), so the gap theorems hold for the physical chain.
+pair (`physicalHamiltonian_eq`), so the gap theorem holds for the physical chain (`physical_gap`).
 -/
 
 open Matrix Real
@@ -124,20 +124,12 @@ theorem physicalSpectrum_eq {δ : ℝ} (hδ : δ ≤ 1) {L : ℕ} (hL : 2 ≤ L)
   (model δ).eigenvalues_eq_spectrum _ (fun _ ↦ cellRot_mul_conjTranspose) _
     (physicalHamiltonian_eq hδ hL)
 
-/-- **The physical dimerized chain at `δ = 1/2`.** Every even ring of `L ≥ 4` pairs has a unique
-ground state and gap `Δ_L > log 24.33 / 6 ≈ 0.5320`. -/
-theorem physical_gap_d12 {L : ℕ} (hL : 4 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum (1 / 2) L) (log 24.33 / 6) := by
-  rw [physicalSpectrum_eq (by norm_num) (by omega)]; exact gap_d12 hL hLe
-
-/-- The physical dimerized chain at `δ = 3/10`: `Δ_L > log 3.065 / (13/2) ≈ 0.1723`. -/
-theorem physical_gap_d310 {L : ℕ} (hL : 4 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum (3 / 10) L) (log 3.065 / (13 / 2)) := by
-  rw [physicalSpectrum_eq (by norm_num) (by omega)]; exact gap_d310 hL hLe
-
-/-- The physical dimerized chain at `δ = 1/4`: `Δ_L > log 1.514 / (29/4) ≈ 0.0572`. -/
-theorem physical_gap_d14 {L : ℕ} (hL : 4 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum (1 / 4) L) (log 1.514 / (29 / 4)) := by
-  rw [physicalSpectrum_eq (by norm_num) (by omega)]; exact gap_d14 hL hLe
+/-- **The physical dimerized chain.** At every point `p ∈ points`, every even ring of `L ≥ 4`
+pairs has a unique ground state and gap `Δ_L > log r / β₀` (`≈ 0.5320, 0.1723, 0.0572` at
+`δ = 1/2, 3/10, 1/4`). -/
+theorem physical_gap {p : Point} (hp : p ∈ points) {L : ℕ} (hL : 4 ≤ L) (hLe : Even L) :
+    GapGT (physicalSpectrum p.δ L) (log (p.cert.r : ℝ) / p.β₀) := by
+  rw [physicalSpectrum_eq (by exact_mod_cast points_δ_le_one p hp) (by omega)]
+  exact gap hp hL hLe
 
 end CertifiedGaps.DimerizedHeisenberg
