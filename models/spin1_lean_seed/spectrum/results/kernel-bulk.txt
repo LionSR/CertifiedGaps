@@ -1,0 +1,18 @@
+baseline bits=4000000 count=0 seconds=1.2723560333251953 'bench' depends on axioms: [propext]
+baseline bits=4000000 count=0 seconds=0.6798970699310303 'bench' depends on axioms: [propext]
+multiply_bulk bits=4000000 count=100 seconds=2.255530834197998 'bench' does not depend on any axioms
+multiply_bulk bits=4000000 count=100 seconds=3.078780174255371 'bench' does not depend on any axioms
+mask_bulk bits=4000000 count=200 seconds=1.0392889976501465 'bench' depends on axioms: [propext]
+mask_bulk bits=4000000 count=200 seconds=1.0540401935577393 'bench' depends on axioms: [propext]
+baseline bits=20000000 count=0 seconds=0.7450480461120605 'bench' depends on axioms: [propext]
+baseline bits=20000000 count=0 seconds=0.8063499927520752 'bench' depends on axioms: [propext]
+multiply_bulk bits=20000000 count=30 seconds=4.143424987792969 'bench' does not depend on any axioms
+multiply_bulk bits=20000000 count=30 seconds=6.379785060882568 'bench' does not depend on any axioms
+mask_bulk bits=20000000 count=200 seconds=2.3002569675445557 'bench' depends on axioms: [propext]
+mask_bulk bits=20000000 count=200 seconds=1.8670170307159424 'bench' depends on axioms: [propext]
+baseline bits=68000000 count=0 seconds=0.6515240669250488 'bench' depends on axioms: [propext]
+baseline bits=68000000 count=0 seconds=0.7003641128540039 'bench' depends on axioms: [propext]
+multiply_bulk bits=68000000 count=10 seconds=5.171353101730347 'bench' does not depend on any axioms
+multiply_bulk bits=68000000 count=10 seconds=4.984571933746338 'bench' does not depend on any axioms
+mask_bulk bits=68000000 count=200 seconds=5.588212013244629 'bench' depends on axioms: [propext]
+mask_bulk bits=68000000 count=200 seconds=6.300411939620972 'bench' depends on axioms: [propext]

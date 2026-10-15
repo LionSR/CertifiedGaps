@@ -1,0 +1,2 @@
+'packedA' does not depend on any axioms
+wall_seconds 0.910 user_seconds 0.556 system_seconds 0.361
