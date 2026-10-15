@@ -95,6 +95,8 @@ because ...") is a result.
   `README.md` has the status table of all models; update its row when you add or change one.
 - `lean/`: Lean 4 formalisation of the criterion and of each certified model's gap theorem
   (seeds are hypotheses).
+- `models/spin1_lean_seed/`, `models/lean_seed_small/`: studies toward seeds checked in the
+  Lean kernel (`decide +kernel` only; Julia generates, Lean checks).
 
 ## Directory format
 
