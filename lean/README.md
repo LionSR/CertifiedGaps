@@ -1,13 +1,69 @@
-# Lean checks of two-purity gap certificates
+# CertifiedGaps: Lean proofs of spectral gaps by the spacetime bootstrap
 
-A Lean 4 project, with Mathlib as its only dependency, that proves uniform spectral gaps of
-quantum spin rings with the two-purity doubling argument of the thermal-MPO note
-(`../notes/thermal-mpo-gap-note.tex`). Everything is proved except the seed inequalities: two
-numbers per model, stated as named `sorry` lemmas. The library `CertifiedGaps` (the default
-target) holds the criterion and the models; all its declarations live in the namespace
-`CertifiedGaps`, and the names below are relative to it. A second, opt-in library
-`SeedKernel` kernel-checks seed arithmetic toward closing those `sorry`s
-([below](#seedkernel-kernel-checked-seed-arithmetic)).
+This Lean 4 + Mathlib package proves that quantum spin rings have a spectral gap that stays
+open as the ring grows. It follows the spacetime-bootstrap argument of the main note
+(`../notes/thermal-mpo-gap-note.tex`). **Everything is proved except the finite numerical
+inputs** (two "seed" inequalities per model). They are named `sorry` lemmas, and their values
+come from the certified computations in `../models/`.
+
+## The rundown
+
+### The headline theorem
+
+```lean
+-- CertifiedGaps/Heisenberg/Main.lean
+theorem SpinOneHeisenberg.spin_one_heisenberg_gap {L : ℕ} (hL : 2304 ≤ L) (hLe : Even L) :
+    GapGT (spectrum L) (log 20 / 784)
+```
+
+For every even `L ≥ 2304`, the periodic spin-1 Heisenberg ring `H_L = ∑ⱼ Sⱼ·Sⱼ₊₁` has a unique
+ground state. Every other level lies more than `log 20 / 784 ≈ 0.0038` above it. The statement
+uses the actual Hamiltonian matrix on `(Fin L → Fin 3)`. `GapGT e c` means: some level `m₀` has
+every other level more than `c` above it. The proof is complete except for two `sorry`s,
+`seed_spatial : P_s(2304, 784) ≥ 0.99` and `seed_thermal : P_τ(4608, 784) ≥ 0.99`. These are
+OpenAI's Proposition 5.5, reproduced in exact arithmetic in `../models/spin1/`.
+
+### How the proof is put together
+
+Read the files in this order. Each step uses only the ones before it.
+
+1. **From purities to a gap** (`PurityCriterion.lean`). Write the partition function as
+   `Z_L(β) = Re Tr e^{-βH_L}` and define two purities, `P_s(n,β) = Z_{2n}/Z_n²` and
+   `P_τ(n,β) = Z_n(2β)/Z_n²`. Assume the *spatial moment inequalities*: traces behave like
+   moments `∑ᵢ λᵢⁿ` of a positive transfer operator. Then both purities improve quadratically
+   when length and inverse temperature double. Two purity bounds at one scale therefore give a
+   gap for every larger even ring: `gapGT_of_purities` (seeds ≥ 0.99) and `gapGT_of_seeds`.
+2. **Realistic seeds** (`Chain.lean`, `ChainCheck.lean`). Certified seeds are usually worse
+   than 0.99. `gapGT_of_chain` follows the exact doubling recurrence for unequal defects. A
+   `ChainCertificate` turns the whole chain into rational inequalities, which `decide` checks.
+   The bound comes out as `log r / β₀`.
+3. **The moment inequalities are true** (`Transfer/*`, `Ring/*`). This is the core of the
+   formalisation and contains no numerics. It covers every reflection-positive ring
+   (`RPRing`): bond `−h = ∑_α C_α ⊗ C_α` with real `C_α`, plus a real on-site term.
+   * Trotterise `e^{-βH}`; each Trotter trace equals `Tr (FᵀF)^{L/2}` with real `F`
+     (`Ring/Transfer`, `Transfer/PiTensor`).
+   * A PSD matrix has the moment form (`Transfer/MomentForm`).
+   * The Trotter traces converge to `Z_L(β)` by a product formula proved here
+     (`Transfer/ProductLimit`).
+   * The inequalities are closed, so they pass to the limit. The result is
+     `RPRing.spatialMomentBounds`, and with step 2, `RPRing.gapGT_of_chainCertificate`.
+4. **Models** (`Heisenberg/*`, `Models/*`). Each model is written as an `RPRing` in a real
+   basis, plus its two seeds and a chain certificate, which together give its gap theorem.
+   Some models are reflection positive only after a sublattice rotation. For those,
+   `Ring/Conjugation` transfers the gap to the physical Hamiltonian (`physical_gap_*`).
+5. **Seeds** (still `sorry`). These carry the physics, and the bootstrap cannot produce them.
+   The opt-in library `SeedKernel` works toward proving them in the kernel. Julia generates
+   witnesses, `decide +kernel` checks them, and no `native_decide` is used.
+
+### What is proved, and what is open
+
+| | status |
+|---|---|
+| the criterion (steps 1–2), the moment inequalities for every `RPRing` (step 3), the frame changes | proved; axioms `propext`, `Classical.choice`, `Quot.sound` only |
+| gap theorems for the spin-1 Heisenberg ring and 8 other model families (table below) | proved **given their seeds** (`sorryAx` appears only through the seed lemmas) |
+| the seeds | open. `SeedKernel` checks seed arithmetic in the kernel. Its furthest result is one longitudinal-Ising point, proved from four explicit `log Z` enclosure hypotheses. See `../models/lean_seeds/` for the plan and the open obligations |
+
+### Build
 
 ```sh
 cd lean
@@ -18,7 +74,17 @@ lake build SeedKernelBench  # opt-in: kernel benchmarks, about 2 min, up to 4 GB
 ```
 
 Lean and Mathlib are pinned at `v4.35.0-rc3`. `CertifiedGaps` has about 4400 lines, `SeedKernel`
-about 1200 (plus generated witness files).
+about 1200 (plus generated witness files). All declarations live in the namespace
+`CertifiedGaps`; names below are relative to it.
+
+### Where to read further
+
+* [Status](#status): every model theorem with its bound and its open seeds; the sorry-free theorems.
+* [SeedKernel](#seedkernel-kernel-checked-seed-arithmetic): what the kernel-checked seed work proves.
+* [Adding a model](#adding-a-model): the five-step recipe.
+* [Files](#files): one line per file.
+* [Why each piece is needed in Lean](#why-each-piece-is-needed-in-lean): where the formal
+  proof differs from the note, and why.
 
 ## Status
 
