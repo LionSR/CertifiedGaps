@@ -3,7 +3,7 @@
 #   julia --project=models/spin1_largeD models/spin1_largeD/scripts/report.jl
 #
 # Inputs: the gitignored results/summary_D*.json and results/beta_refinement_D*.json from
-# scripts/scan.jl and scripts/refine_beta.jl, and certificate.json. Outputs:
+# scripts/scan.jl and scripts/refine_beta.jl, and results/certificate.json. Outputs:
 #   results/scan_summary.json  per-D sizes, purity diagnostics and best seeds (no raw rows);
 #   results/transfer_curve.json  numerical ratios and certified exact ratio intervals;
 #   results/transfer_curve.pdf  rendered with pdflatex/PGFPlots in a temporary directory.
@@ -88,7 +88,7 @@ function report()
             "ratio" => best === nothing ? nothing : best["bound"] / gap,
             "status" => "numerical screening, n0<=6; missing means no tested seed"))
     end
-    cases = parse_exact_json(read(joinpath(ROOT, "certificate.json"), String))["cases"]
+    cases = parse_exact_json(read(joinpath(RESULTS, "certificate.json"), String))["cases"]
     certified = Any[]
     for id in CERTIFIED_IDS
         c = only(filter(c -> c["id"] == id, cases))
@@ -102,7 +102,7 @@ function report()
         "numerical" => numerical, "certified" => certified,
         "denominator" => "finite-ring Delta_12; no thermodynamic gap asserted",
         "source_hashes" => hashes,
-        "certificate_sha256" => sha256_file(joinpath(ROOT, "certificate.json"))))
+        "certificate_sha256" => sha256_file(joinpath(RESULTS, "certificate.json"))))
     shown = filter(r -> r["ratio"] !== nothing, numerical)
     mktempdir() do dir
         tex = joinpath(dir, "transfer_curve.tex")

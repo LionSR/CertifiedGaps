@@ -2,7 +2,7 @@
 
 Everything below is conditional on the repository's two-purity (spacetime bootstrap) theorem.
 Stage 1 (`certify.jl`, `seed.jl`) produces complete verified spectra at L = 6, 12 and the ED
-seed n₀ = 6. Stage 2 (`src/TransferCertificate.jl`, `transfer_certify.jl`) reuses those
+seed n₀ = 6. Stage 2 (`src/TransferCertificate.jl`, `scripts/transfer_certify.jl`) reuses those
 spectra to certify n₀ = 12, …, 96 and nearby D intervals without building a larger ring.
 
 ## 1. Exact model and reflection positivity
