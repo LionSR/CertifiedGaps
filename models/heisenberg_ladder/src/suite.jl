@@ -48,7 +48,7 @@ function provenance(config; certified = false)
     model = "models/heisenberg_ladder"
     hashes = source_hashes(ROOT; dirs = ("julia/src", "$model/src"),
         files = ("julia/Project.toml", "$model/Project.toml", "$model/Manifest.toml",
-            "$model/certify.jl", "$model/check.jl", "outputs/thermal-mpo-gap-scope.tex"))
+            "$model/certify.jl", "$model/check.jl", "notes/thermal-mpo-gap-scope.tex"))
     return run_metadata(config; source_sha256 = hashes,
         packages = (CertifiedGaps, IntervalArithmetic, JSON3),
         status = certified ? "certified" : "numerical, not certified", certified)

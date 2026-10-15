@@ -1,7 +1,7 @@
 # Hexagonal AKLT: thermal-recursion pilot (no certificate)
 
 `AKLTPilot` tests the 2+1-dimensional thermal recursion of
-[the 2+1D note](../../outputs/thermal-mpo-gap-2plus1d.tex) on the periodic spin-3/2 AKLT model
+[the 2+1D note](../../notes/thermal-mpo-gap-2plus1d.tex) on the periodic spin-3/2 AKLT model
 of the honeycomb lattice, \(H=\sum_{\text{bonds}}P_{ij}(\text{total spin}=3)\), with this
 projector normalisation throughout.
 

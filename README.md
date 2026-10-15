@@ -22,13 +22,13 @@ The method, the **spacetime bootstrap**, has two halves:
 
 | statement | status | where |
 |---|---|---|
-| Δ_L > (log 20)/784 ≈ 0.00382 for every even L ≥ 2304 | proof in the main note, given the purity bounds at (2304, 784) | [`outputs/thermal-mpo-gap-note.pdf`](outputs/thermal-mpo-gap-note.pdf) |
+| Δ_L > (log 20)/784 ≈ 0.00382 for every even L ≥ 2304 | proof in the main note, given the purity bounds at (2304, 784) | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
 | the purity bounds Pₛ(2304, 784), P_τ(4608, 784) ≥ 0.99 | reproduced in exact arithmetic (status `passed`) | [`models/spin1/`](models/spin1/) |
 | the criterion, and the theorem above given the two purity bounds | formalised in Lean 4 | [`lean/`](lean/) |
 | Δ_L > 0.0729 for every even L ≥ 36 | exact-arithmetic computation with a temperature-lifting argument; not yet independently reviewed | [`models/spin1/`](models/spin1/) (`experiments/`) |
 | open chains with endpoint fields h = 3/5: Δ_n > (log 10)/392 for odd n ≥ 1921 | proof in appendices A–C, given four finite estimates of the boundary-field paper | main note |
-| which Hamiltonians the method covers | appendices D–H | [`outputs/thermal-mpo-gap-scope.pdf`](outputs/thermal-mpo-gap-scope.pdf) |
-| how the starting estimate is certified, in diagrams | appendices I–M | [`outputs/thermal-mpo-gap-certificate.pdf`](outputs/thermal-mpo-gap-certificate.pdf) |
+| which Hamiltonians the method covers | appendices D–H | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf) |
+| how the starting estimate is certified, in diagrams | appendices I–M | [`notes/thermal-mpo-gap-certificate.pdf`](notes/thermal-mpo-gap-certificate.pdf) |
 
 ## Other models
 
@@ -59,7 +59,7 @@ model, including the BLAS products; that arithmetic model is the trusted base.
 
 | directory | content |
 |---|---|
-| [`outputs/`](outputs/) | the LaTeX notes and their PDFs, the shared diagram package `tnnotes.sty`, notation and diagram conventions |
+| [`notes/`](notes/) | the LaTeX notes and their PDFs, the shared diagram package `tnnotes.sty`, notation and diagram conventions |
 | [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalisation, verified ring spectra, certified MPO arithmetic (Nemo/Arb), thermal purification (ITensors) |
 | [`models/`](models/) | one directory per model: certificate, checker, tests and README; `spin1/` is the exact-arithmetic reproduction of the spin-1 certificate |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalisation of the criterion and of each certified model's gap theorem, with the seeds as hypotheses |
@@ -88,7 +88,7 @@ OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenber
 cd lean && lake exe cache get && lake build
 
 # notes
-latexmk -pdf -outdir=work/latex-build outputs/thermal-mpo-gap-note.tex
+latexmk -pdf -outdir=work/latex-build notes/thermal-mpo-gap-note.tex
 ```
 
 Each directory's README gives its own commands, run times, and what is and is not rigorous.
