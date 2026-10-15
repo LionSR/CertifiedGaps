@@ -29,6 +29,8 @@ The method, the **spacetime bootstrap**, has two halves:
 | open chains with endpoint fields h = 3/5: Δ_n > (log 10)/392 for odd n ≥ 1921 | proof in appendices A–C, given four finite estimates of the boundary-field paper | main note |
 | which Hamiltonians the method covers | appendices D–H | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf) |
 | how the starting estimate is certified, in diagrams | appendices I–M | [`notes/thermal-mpo-gap-certificate.pdf`](notes/thermal-mpo-gap-certificate.pdf) |
+| smaller seed inputs for a Lean-checked seed: gap > 0.039 for every even L ≥ 60 from traces at even n ≤ 12 with real twists only | exact rational chain, conditional on the finite trace tables and the analytic seed lemmas | [`models/spin1_lean_seed/`](models/spin1_lean_seed/) (`seed_design/`) |
+| proving the seed inside the Lean kernel (packed-integer arithmetic, counting anchors) | feasibility studies; no seed proved yet | [`models/spin1_lean_seed/`](models/spin1_lean_seed/), [`models/lean_seed_small/`](models/lean_seed_small/) |
 
 ## Other models
 
@@ -41,7 +43,7 @@ the only open hypotheses.
 | model | seed (n₀, β₀) | certified uniform gap bound | directory |
 |---|---|---|---|
 | spin-½ Heisenberg + staggered field, h = 1, 3/4, 1/2, 7/20, 1/4 | (8, 21/4 … 25/4) | 1.148, 0.890, 0.594, 0.383, 0.214 | [`heisenberg_staggered_field`](models/heisenberg_staggered_field/) |
-| spin-½ dimerized Heisenberg, δ = 1/2, 3/10, 1/4 (2-site cells) | (4, 6 … 29/4) | 0.532, 0.172, 0.057 | [`dimerized_heisenberg`](models/dimerized_heisenberg/) |
+| spin-½ dimerized Heisenberg, δ = 1/2, 3/10, 1/4 (2-site cells; δ = 1/4 is the smallest certifiable grid point with rings ≤ 16 spins) | (4, 6 … 29/4) | 0.534, 0.173, 0.058 | [`dimerized_heisenberg`](models/dimerized_heisenberg/) |
 | spin-1 dimerized Heisenberg, δ = 9/10, 7/10 (2-site cells) | (2, 7/2), (3, 17/4) | 0.528, 0.218 | [`spin1_dimerized`](models/spin1_dimerized/) |
 | spin-1 Heisenberg + D Σ(Sᶻ)², D = 4 and D ∈ [3.2059998, 3.206] | (12, 29/10), (6, 381/125) | 0.899, 0.0010 (every even L ≥ 6) | [`spin1_largeD`](models/spin1_largeD/) |
 | two-leg Heisenberg ladder, J⊥ = 4, 7/2, 3, 5/2 (rung cells) | (4, 2 … 3) | 1.102, 0.778, 0.454, 0.042 | [`heisenberg_ladder`](models/heisenberg_ladder/) |
@@ -61,7 +63,7 @@ model, including the BLAS products; that arithmetic model is the trusted base.
 |---|---|
 | [`notes/`](notes/) | the LaTeX notes and their PDFs, the shared diagram package `tnnotes.sty`, notation and diagram conventions |
 | [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalisation, verified ring spectra, certified MPO arithmetic (Nemo/Arb), thermal purification (ITensors) |
-| [`models/`](models/) | one directory per model: certificate, checker, tests and README; `spin1/` is the exact-arithmetic reproduction of the spin-1 certificate |
+| [`models/`](models/) | one directory per model in a common format (AGENTS.md, "Directory format"): certificate, `certify.jl`, `check.jl`, tests and README; `spin1/` is the exact-arithmetic reproduction of the spin-1 certificate; `spin1_lean_seed/` and `lean_seed_small/` study kernel-checked seeds |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalisation of the criterion and of each certified model's gap theorem, with the seeds as hypotheses |
 | [`tools/`](tools/) | `fetch_upstream.jl`: downloads the preprint's evidence files at a pinned commit and checks their hashes |
 
@@ -81,7 +83,8 @@ julia --project=models/spin1 -e 'using Pkg; Pkg.instantiate()'
 julia --project=models/spin1 models/spin1/test/runtests.jl
 julia --project=models/spin1 --threads=4 models/spin1/scripts/reproduce.jl all /tmp/spin1-fresh   # ≈20–45 min
 
-# any other model's fast checker, e.g.
+# any other model: fast checker (add --full for the slow replay), and its tests
+OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenberg_ladder/check.jl
 OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenberg_ladder/test/runtests.jl
 
 # Lean
@@ -98,9 +101,11 @@ Each directory's README gives its own commands, run times, and what is and is no
 * The proof of the spin-1 theorem is complete on paper given the purity bounds at
   (2304, 784); those bounds are reproduced here in exact finite arithmetic, and the criterion
   with its application to the spin-1 ring is checked in Lean. The finite computations are not
-  formalised: in Lean each model's two seeds are named `sorry` lemmas.
+  formalised: in Lean each model's two seeds are named `sorry` lemmas. Kernel-checked seed
+  arithmetic exists so far only as a study (`models/lean_seed_small/`, one Ising point,
+  conditional on four log Z enclosures).
 * The other models' seeds rest on verified eigenvalue enclosures whose rounding analysis
   assumes IEEE binary64 arithmetic and conventional BLAS; each was independently replayed or
-  reviewed (see the model's README and audit notes).
+  reviewed (see the model's README and `METHOD.md`).
 * Numbers labelled numerical (DMRG, Lanczos, floating-point exact diagonalisation, thermal
   purification, extrapolations) are diagnostics, never certificates.

@@ -38,6 +38,13 @@ lies more than `c` above it. Every gap theorem below holds for every even ring l
 (from its seeds). The `physical_*` theorems are about the physical Hamiltonian; the rotated
 `gap_*` theorems about the reflection-positive frame, which has the same spectrum.
 
+The Lean theorems use the seeds that were current when they were written. Some model
+certificates have since improved (for example `models/spin1_largeD` now certifies 0.899 at
+`D = 4` from an `n₀ = 12` seed, and `models/dimerized_heisenberg` has slightly stronger seeds
+than the ones used here, which therefore remain valid); the model READMEs and the root README give the current bounds.
+Kernel-checked seed arithmetic is studied outside this package, in `models/lean_seed_small/`
+and `models/spin1_lean_seed/`.
+
 ### Proved theorems (no `sorry`)
 
 These use only `propext`, `Classical.choice` and `Quot.sound`.
