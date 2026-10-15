@@ -1,5 +1,16 @@
 # Spin-2: reassessing the thermal starting point
 
+## Reproducible audit for review, 2026-10-14
+
+The implementation and October 11 strategy memos are already on `main`. The remaining
+reviewable contribution is a standalone Julia replay of the two numerical tables below.
+Reusing the existing scalar screen is cheapest, but it writes only the polynomial table;
+replaying the full MPO trajectory would test a different claim at much higher cost.
+Choose a bounded audit of the scalar majorant and the four-site Gibbs/Trotter comparison.
+The polynomial scan is scalar in n and beta, with cost controlled by degree, precision,
+and the scanned powers. The four-site reference enumerates fixed magnetization blocks;
+it is deliberately not a method for large rings. No new MPO construction is claimed.
+
 ## Big-picture decision, 2026-10-11
 
 The objective is one admissible, independently checked finite seed for the uniform-gap
@@ -161,6 +172,22 @@ established for this Hamiltonian.
 
 ## Reproduction and sources
 
+Replay both tables and check all acceptance inequalities from the repository root:
+
+```sh
+OPENBLAS_NUM_THREADS=1 julia --startup-file=no --project=models/spin2 \
+  models/spin2/scripts/audit_thermal_start.jl /tmp/spin2-thermal-start-audit.json
+```
+
+Omit the output argument to print the audit without writing a file. The optional JSON records
+strict rational enclosures, source and environment hashes, package versions, and explicit
+false flags for compressed-MPO, large-ring thermal-seed, and uniform-gap certification.
+The audit checks the ten reported squaring counts, independent 384-bit Arb remainder and
+inflation inequalities, the full 625-state four-site multiplicity count, and decreasing
+Trotter/Gibbs ratios above one for 64, 128, and 256 product steps. It uses exact integers and
+rationals plus Nemo/Arb enclosures; no floating-point estimate accepts an inequality.
+The run does not replay the historical compressed-MPO witnesses or modify `results/`.
+
 Run with one BLAS thread and `--project=models/spin2`. The scalar diagnostic is reproducible
 by evaluating `CertifiedGaps.CertifiedMPO.PolynomialBounds.taylor_seed(256, 64, p, d)` for
 `p=0:32` and the table's degrees, checking its rational `log_inflation_upper` against
@@ -179,3 +206,18 @@ spectral sum above, both in Arb arithmetic. The code inspected was at commit
   nonnormal matrices is not a direct solution here: for Hermitian K in the physical metric,
   `||K^p||^(1/p) = ||K||`. The applicable lesson is to choose approximation order and scaling
   jointly, while retaining an independent certificate for every approximation.
+
+## Outcome
+
+The October 14 replay passed on Julia 1.12.4 with Nemo 0.57.0 and one BLAS thread.
+The audit body took 0.43 seconds, excluding Julia startup, package precompilation, and
+compilation before entering the function. Exact JSON parsing and all 42 recorded source
+and environment hashes were checked separately. The new driver was formatted with
+JuliaFormatter; `git diff --check` passed.
+
+The audit identifies two distinct limitations: increasing polynomial degree reduces the
+number of squarings without establishing affordable MPO construction, and the small
+compression overhead at four sites excludes a larger Trotter overestimate. The selected
+next research route remains local gates with final-trace certification and measured scaling.
+The PR packages a reproducible diagnostic; a large-ring thermal seed and the uniform spin-2
+gap certificate remain missing.
