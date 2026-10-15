@@ -1,1 +1,1 @@
-include("test/runtests.jl")
+include("check_suite.jl")

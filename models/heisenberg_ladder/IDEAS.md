@@ -67,3 +67,26 @@ finite-size certificate method, not the physical gap-closing coupling. Report
 an achieved coupling and a bracket/search resolution only to the extent the
 calculation supports them. A failed finite scan cannot establish the physical
 threshold. All implementation and outputs stay in this model directory.
+
+## Checkout discovery and route update (before fresh computation)
+
+The checkout already includes a complete earlier ED implementation, stored
+sector-resolved scans through ten rungs, and a J=4 certificate. The prior memo
+is preserved as `IDEAS.previous.md`, including its memory observations. Reuse
+that evidence explicitly as historical floating-point data; do not repeat six
+long dense scans merely to overwrite equivalent data. Rebuild symmetry counts
+and replay every stored scan, while freshly enclosing all spectra used by new
+certificates. Strengthen the result with certified lower-coupling seeds, a
+rigorous finite-beta-grid failure test, and local coupling continuation.
+
+The centered independent-rung sandwich is stronger than the uncentered memo
+estimate but still fails for every n,beta when 0<J<=4; `PERTURBATION.md` gives
+a proof without numerical input. This settles the selected arbitrary-length
+route negatively rather than leaving it as an untested suggestion.
+
+Before running the new suite, add a continuous-temperature negative test for
+J=2 and J=3/2: shift every verified spectrum below its ground energy, use
+monotonicity of the shifted partition sums and thermal purity to bound defects
+on beta intervals, and split intervals until a lower-defect recurrence proves
+rejection. A positive enclosed ground-energy mismatch supplies the beta-to-
+infinity tail. This makes no assumption that spatial purity is monotone.
