@@ -1,9 +1,9 @@
-include("common.jl")
-include("exact.jl")
+include("../src/common.jl")
+include("../src/exact.jl")
 using .AnchorStudy, Printf
 using CertifiedGaps.Results
 const A=AnchorStudy
-const R=joinpath(@__DIR__,"results")
+const R=A.RESULTS
 fmt(x,d=6)=@sprintf("%.*f",d,A.num(x))
 function table(io,heads,rows)
     println(io,"| ",join(heads," | ")," |")
@@ -16,7 +16,7 @@ end
 
 function generate()
     data=read_exact_json(joinpath(R,"analysis.json"))
-    cert=read_exact_json(joinpath(@__DIR__,"certificate.json"))
+    cert=read_exact_json(joinpath(R,"certificate.json"))
     hom=Any[]
     for f in sort(readdir(R))
         startswith(f,"homotopy_n") && endswith(f,"_binned.json") || continue
@@ -25,7 +25,7 @@ function generate()
     sort!(hom;by=x->(A.ival(x["n"]),x["twist"],A.ival(x["Sz"])))
     @assert length(hom)==26 "expected all nonzero-count sectors"
     @assert all(x["complete"] for x in hom) "continuation incomplete"
-    path=joinpath(@__DIR__,"REPORT.md")
+    path=joinpath(A.ROOT,"METHOD.md")
     prefix=first(split(read(path,String),"<!-- GENERATED TABLES -->"))
     open(path,"w") do io
         print(io,prefix);println(io,"<!-- GENERATED TABLES -->\n")
@@ -90,10 +90,12 @@ function generate()
             "(**NON-CERTIFYING**). Final K is the retained count, which may exceed the "*
             "actual number below the target. Timings include numerical eigensolves, "*
             "compilation, and contention; they are not Lean timings. Negative Sz shares "*
-            "the same spectrum. Each linked file lists k and rho at every stage.\n")
+            "the same spectrum. Per-stage k and rho are written to the regenerable (gitignored) "*
+            "results/homotopy_n*_binned.json.\n")
         rows=Any[]
         csv=open(joinpath(R,"homotopy_summary.csv"),"w")
-        println(csv,"n,twist,Sz,stages,attempts,initial_k,final_k,physical_k_binned,seconds,min_margin,sum_K,sum_K2,pair_products")
+        println(csv,"n,twist,Sz,stages,attempts,initial_k,final_k,physical_k_binned,"*
+            "seconds,min_margin,sum_K,sum_K2,pair_products")
         for x in hom
             ss=x["stages"];ks=[A.ival(s["k_in"]) for s in ss]
             margin=minimum(A.num(s["margin"]) for s in ss)
@@ -103,7 +105,7 @@ function generate()
             @assert A.ival(x["final_k"])>=phys
             push!(rows,[x["n"],x["twist"],x["Sz"],length(ss),
                 "$(x["initial_k"]) → $(x["final_k"])",phys,fmt(x["seconds"],1),
-                @sprintf("%.2g",margin),"[stages](results/$(x["file"]))"])
+                @sprintf("%.2g",margin)])
             vals=[x["n"],x["twist"],x["Sz"],length(ss),x["attempts"],
                 x["initial_k"],x["final_k"],phys,x["seconds"],margin,sum(ks),
                 sum(abs2,ks),sum(3*k*(k+1)÷2 for k in ks)]
@@ -111,7 +113,7 @@ function generate()
         end
         close(csv)
         table(io,["n","g","Sz","stages","initial → final K","physical k",
-            "Julia seconds","min margin","data"],rows)
+            "Julia seconds","min margin"],rows)
 
         println(io,"Naive three-Gram packed-dot work for completed binned runs. "*
             "Only nonnegative Sz is computed; negative Sz is reused. The final column "*
@@ -126,6 +128,6 @@ function generate()
         table(io,["n","g","sector-stages","sum K","pair products","budget hours"],rows)
     end
     write(path,rstrip(read(path,String))*"\n")
-    println("Wrote REPORT.md and results/homotopy_summary.csv from 26 completed runs.")
+    println("Wrote METHOD.md and results/homotopy_summary.csv from 26 completed runs.")
 end
 generate()

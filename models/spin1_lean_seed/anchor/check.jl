@@ -2,7 +2,8 @@
 # is recomputed with Rational{BigInt}, or bounded Int128 arithmetic. Not a Lean checker.
 include("certify.jl")
 
-function check(path=joinpath(@__DIR__,"certificate.json"))
+"Recompute every certificate record exactly (stored enclosures must contain fresh ones)."
+function check(path=joinpath(A.RESULTS,"certificate.json"))
     data=read_exact_json(path)
     for p in data["parameters"]
         n=parse(Int,p["n"]);u=rat(p["u"]);v=rat(p["v"]);c=rat(p["c"])

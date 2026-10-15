@@ -1,11 +1,11 @@
-include("common.jl")
+include("../src/common.jl")
 using .AnchorStudy, LinearAlgebra, Printf
 using CertifiedGaps.Results
 const A=AnchorStudy
 
 function run_analysis()
-    ground=read_exact_json(joinpath(@__DIR__,"results","optimized.json"))["rows"]
-    countopt=read_exact_json(joinpath(@__DIR__,"results","count_optimized.json"))["rows"]
+    ground=read_exact_json(joinpath(A.RESULTS,"optimized.json"))["rows"]
+    countopt=read_exact_json(joinpath(A.RESULTS,"count_optimized.json"))["rows"]
     rows=Any[]; summary=Any[]; alternatives=Any[]
     for n in (8,10,12)
         p=only(filter(x->A.ival(x["n"])==n,countopt))
@@ -26,7 +26,7 @@ function run_analysis()
                 "k0"=>ks[1],"ktotal"=>ks[1]+2sum(ks[2:end]),"ground"=>sp[0][1]))
         end
         for g in ("I","P")
-            r=read_exact_json(joinpath(@__DIR__,"results","n$(n)_g$g.json"))
+            r=read_exact_json(joinpath(A.RESULTS,"n$(n)_g$g.json"))
             e0=A.num(r["E0"])
             totals=Dict("tail"=>0,"two"=>0,"bare"=>0,"ground"=>0,"count"=>0)
             z=0.
@@ -58,11 +58,12 @@ function run_analysis()
                 "count_ground_loss"=>e0-specs["count"][0][1]))
         end
     end
-    write_result(joinpath(@__DIR__,"results","analysis.json"),Dict(
+    write_result(joinpath(A.RESULTS,"analysis.json"),Dict(
         "metadata"=>A.metadata(Dict("meaning"=>"all floating spectra non-certifying")),
         "summary"=>summary,"sectors"=>rows,"alternative_partitions"=>alternatives))
-    open(joinpath(@__DIR__,"results","sectors.csv"),"w") do io
-        println(io,"n,twist,Sz,dimension,k_H_tail,k_H_E0plus2,k_bare,k_ground,k_count,rho_small,rho_count,H_count_below_rho,loss1,loss2,loss3,loss4,loss5")
+    open(joinpath(A.RESULTS,"sectors.csv"),"w") do io
+        println(io,"n,twist,Sz,dimension,k_H_tail,k_H_E0plus2,k_bare,k_ground,k_count,"*
+            "rho_small,rho_count,H_count_below_rho,loss1,loss2,loss3,loss4,loss5")
         for r in rows
             vals=Any[r[k] for k in ("n","twist","Sz","dimension","k_H_tail","k_H_E0plus2")]
             append!(vals,[r["k_H0"][k] for k in ("bare","ground","count")])

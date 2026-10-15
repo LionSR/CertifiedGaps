@@ -1,5 +1,5 @@
 # NON-CERTIFYING search for a cheaper tail bound using the comparison density of states.
-include("common.jl")
+include("../src/common.jl")
 using .AnchorStudy
 using CertifiedGaps.Results
 const A=AnchorStudy
@@ -20,7 +20,7 @@ function binned_tail(spec,n,rho;step=1/8,bins=32)
 end
 
 function run_bins()
-    ps=read_exact_json(joinpath(@__DIR__,"results","count_optimized.json"))["rows"]
+    ps=read_exact_json(joinpath(A.RESULTS,"count_optimized.json"))["rows"]
     rows=Any[]
     for p in ps
         n=A.ival(p["n"]);u,v,c=A.num.((p["u"],p["v"],p["c"]))
@@ -40,7 +40,7 @@ function run_bins()
             "tail_upper_float"=>binned_tail(spec,n,rho),"k_total"=>ks[1]+2sum(ks[2:end])))
         println("BINNED n=$n rho=$rho counts=$ks tail=$(binned_tail(spec,n,rho))")
     end
-    write_result(joinpath(@__DIR__,"results","binned_tails.json"),Dict(
+    write_result(joinpath(A.RESULTS,"binned_tails.json"),Dict(
         "metadata"=>A.metadata(Dict("tail_budget"=>A.TOLERANCE/2)),"rows"=>rows))
 end
 run_bins()

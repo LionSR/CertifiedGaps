@@ -1,8 +1,8 @@
-include("common.jl")
+include("../src/common.jl")
 using .AnchorStudy, Printf
 using CertifiedGaps.Results
 const A=AnchorStudy
-const R=joinpath(@__DIR__,"results")
+const R=A.RESULTS
 
 data=read_exact_json(joinpath(R,"analysis.json"))
 println("SUMMARY")
@@ -11,7 +11,7 @@ for x in data["summary"]
         "$(x["ground_loss"]),$(x["count_ground_loss"]) counts=$(x["totals"])")
 end
 println("EXACT ANCHORS")
-cert=read_exact_json(joinpath(@__DIR__,"certificate.json"))
+cert=read_exact_json(joinpath(R,"certificate.json"))
 for p in cert["parameters"]
     p["kind"]=="count_optimized" || continue
     println("n=$(p["n"]) u=$(p["u"]) v=$(p["v"]) c=$(p["c"])")

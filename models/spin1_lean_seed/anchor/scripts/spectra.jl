@@ -1,4 +1,4 @@
-include("common.jl")
+include("../src/common.jl")
 using .AnchorStudy, LinearAlgebra, Serialization
 using CertifiedGaps.Results
 const A = AnchorStudy
@@ -6,7 +6,7 @@ const A = AnchorStudy
 function run_spectra(ns)
     for n in ns, twist in (1,-1)
         name="n$(n)_g$(twist==1 ? "I" : "P")"
-        path=joinpath(@__DIR__,"results",name*".json")
+        path=joinpath(A.RESULTS,name*".json")
         rows=Any[]
         e0=Inf
         for m in 0:n

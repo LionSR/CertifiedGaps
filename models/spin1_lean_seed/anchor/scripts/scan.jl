@@ -1,4 +1,4 @@
-include("common.jl")
+include("../src/common.jl")
 using .AnchorStudy, LinearAlgebra, Optim
 using CertifiedGaps.Results
 const A = AnchorStudy
@@ -25,7 +25,7 @@ function run_scan()
         push!(rows,Dict("n"=>2l,"u"=>u,"v"=>v,"c"=>c,"ground"=>E,
             "bare_ground"=>-objective([0.,0.])))
     end
-    write_result(joinpath(@__DIR__,"results","optimized.json"),Dict(
+    write_result(joinpath(A.RESULTS,"optimized.json"),Dict(
         "metadata"=>A.metadata(Dict("optimization"=>"four-start Nelder Mead ground energy")),
         "rows"=>rows))
 end

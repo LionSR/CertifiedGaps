@@ -5,7 +5,9 @@ using CertifiedGaps.Results
 import Arpack, Optim
 
 BLAS.set_num_threads(1)
-const ROOT = @__DIR__
+# Model directory (this file lives in src/); results and hashed sources are relative to it.
+const ROOT = dirname(@__DIR__)
+const RESULTS = joinpath(ROOT, "results")
 const BETA = 49 / 4
 const SHIFT = 700741 / 500000
 const TOLERANCE = 3e-5
@@ -139,8 +141,7 @@ function low_spectrum(H, cutoff; minimum_count=12, vectors=false)
 end
 
 function metadata(config; status="NON-CERTIFYING Float64 experiment")
-    hashes=source_hashes(ROOT;dirs=("test",),
-        files=filter(f->endswith(f,".jl"),readdir(ROOT)))
+    hashes=source_hashes(ROOT;dirs=("src","scripts","test"),files=["certify.jl","check.jl"])
     return run_metadata(config;source_sha256=hashes,packages=(Arpack,Optim),
         status,certified=false)
 end

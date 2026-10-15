@@ -1,4 +1,4 @@
-include("common.jl")
+include("../src/common.jl")
 using .AnchorStudy, LinearAlgebra
 using CertifiedGaps.Results
 const A=AnchorStudy
@@ -50,11 +50,11 @@ function run_counts()
         push!(rows,Dict("n"=>2l,"u"=>u,"v"=>v,"c"=>c,
             "kind"=>"count_optimized","counts"=>r.ks,"k0"=>r.k0,
             "ktotal"=>r.ktotal,"cutoff"=>cut,"samples"=>length(allrows)))
-        write_result(joinpath(@__DIR__,"results","scan_n$(2l).json"),allrows)
+        write_result(joinpath(A.RESULTS,"scan_n$(2l).json"),allrows)
         println("COUNT n=$(2l) u=$u v=$v c=$c k0=$(r.k0) total=$(r.ktotal)")
         flush(stdout)
     end
-    write_result(joinpath(@__DIR__,"results","count_optimized.json"),Dict(
+    write_result(joinpath(A.RESULTS,"count_optimized.json"),Dict(
         "metadata"=>A.metadata(Dict("objective"=>"lexicographic (Sz=0 count, total count)",
             "global_optimality"=>false)),"rows"=>rows))
 end

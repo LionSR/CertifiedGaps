@@ -1,11 +1,18 @@
-include("common.jl")
-include("exact.jl")
+include("src/common.jl")
+include("src/exact.jl")
 using .AnchorStudy, LinearAlgebra
 using CertifiedGaps.Results
 const A=AnchorStudy
 const TARGETS=Dict(8=>-9644246//big(10)^6,10=>-12267845//big(10)^6,
     12=>-14891444//big(10)^6)
 
+"""
+    exact_counts(blocks, n, c; rho)
+
+Exact per-Sz count of two-half comparison levels below `rho`, from the stored half-chain
+enclosures on a 1e-7 integer grid. Asserts that lower and upper endpoints give the same count,
+and records the next comparison level as the counting anchor.
+"""
 function exact_counts(blocks,n,c;rho=TARGETS[n])
     scale=big(10)^7
     lower=Dict(parse(Int,x["Sz"])=>BigInt.(rat.(x["lower"]).*scale) for x in blocks)
@@ -31,6 +38,13 @@ function exact_counts(blocks,n,c;rho=TARGETS[n])
     return records
 end
 
+"""
+    exact_binned_tail(blocks, n, c)
+
+Exact binned upper bound on the comparison-spectrum thermal tail above the target `rho`
+(32 bins of width 1/8 plus an overflow bin, rational `exp(-x)` upper bounds). Asserts the
+total is below the 1.5e-5 budget.
+"""
 function exact_binned_tail(blocks,n,c)
     targets=Dict(8=>-9925//big(1000),10=>-12687//big(1000),12=>-15453//big(1000))
     rho=targets[n];scale=big(10)^7;l=n÷2
@@ -59,6 +73,12 @@ function exact_binned_tail(blocks,n,c)
         "sector_anchors"=>exact_counts(blocks,n,c;rho))
 end
 
+"""
+    check_local(u, v, c)
+
+Exact LDL pivots proving the four-site remainder `h23 - B12 - B34 - c` is PSD in every Sz
+sector, plus the pi-twist and spin-flip conjugation identities.
+"""
 function check_local(u,v,c)
     records=Any[]
     for m in 0:4
@@ -81,11 +101,12 @@ function check_local(u,v,c)
     return records
 end
 
+"Recompute every exact record and write `results/certificate.json`."
 function run_certify()
-    opt=read_exact_json(joinpath(@__DIR__,"results","optimized.json"))["rows"]
+    opt=read_exact_json(joinpath(A.RESULTS,"optimized.json"))["rows"]
     params=[Dict("n"=>r["n"],"u"=>r["u"],"v"=>r["v"],"c"=>r["c"],
         "kind"=>"ground_optimized") for r in opt]
-    countpath=joinpath(@__DIR__,"results","count_optimized.json")
+    countpath=joinpath(A.RESULTS,"count_optimized.json")
     if isfile(countpath)
         append!(params,read_exact_json(countpath)["rows"])
     end
@@ -118,7 +139,7 @@ function run_certify()
         p["kind"]=="count_optimized" && (result["binned_tail"]=exact_binned_tail(blocks,n,c))
         push!(records,result)
     end
-    write_result(joinpath(@__DIR__,"certificate.json"),Dict(
+    write_result(joinpath(A.RESULTS,"certificate.json"),Dict(
         "metadata"=>A.metadata(Dict("scope"=>"local PSD and half-chain enclosures");
             status="EXACT Julia checks; not a Lean certificate or gap proof"),
         "parameters"=>records))

@@ -28,3 +28,16 @@ checks establish finite identities only; they are not Lean kernel certificates.
 Chosen first: routes 1 and 2, with complete block spectra and ring low spectra in Sz
 sectors, then quantitative comparison against routes 3 and 6. New files stay in this
 folder. No changes to lean/ or models/spin1/results.
+
+## Outcome
+
+- Route 2 works locally: the four-site remainder is exactly PSD for the selected boundary
+  parameters, and the half-chain spectra (Sz blocks ≤ 141) are cheap to enclose exactly.
+  Optimising the comparison for the ground energy is the wrong objective; optimising the
+  count at the tail cutoff cuts the Sz=0 count at n=12 from 191 (bare) / 212 (ground-opt) to 121.
+- A binned tail using the comparison density of states lowers that to 49 (n=12, Sz=0).
+- A one-shot count does not by itself give ordered lower bounds (missing-level obstruction);
+  route 6 (continuation) is required. Its Float64 version completed in all 26 nonzero
+  sectors for n=8,10,12 (2–73 stages per sector), as a design test only.
+- Routes 3 (more blocks: larger counts), 4 (overlapping Anderson clusters: scalar only) and
+  5 (edge spin-1/2: no lower comparison) were rejected in their cheap forms.

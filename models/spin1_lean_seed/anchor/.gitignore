@@ -1,2 +1,7 @@
-.runtime/
-results/*.bin
+# Regenerable NON-CERTIFYING Float64 data (see README "Reproduce").
+results/scan_n*.json
+results/n*_g[IP].json
+results/analysis.json
+results/metrics.txt
+results/homotopy_n*.json
+results/*.tmp

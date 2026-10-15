@@ -1,5 +1,5 @@
 # NON-CERTIFYING Goerisch/Lehmann continuation experiment.
-include("common.jl")
+include("../src/common.jl")
 using .AnchorStudy, LinearAlgebra, SparseArrays, Arpack, Random
 using CertifiedGaps.Results
 const A=AnchorStudy
@@ -22,12 +22,12 @@ function lowest_fixed(H,k)
 end
 
 function continuation(n,g; sector=0,mode="uniform")
-    allp=read_exact_json(joinpath(@__DIR__,"results","count_optimized.json"))["rows"]
+    allp=read_exact_json(joinpath(A.RESULTS,"count_optimized.json"))["rows"]
     p=only(filter(x->A.ival(x["n"])==n,allp))
     u,v,c=A.num.((p["u"],p["v"],p["c"]))
     cut=A.tail_cutoff(n)
     if mode=="binned"
-        bs=read_exact_json(joinpath(@__DIR__,"results","binned_tails.json"))["rows"]
+        bs=read_exact_json(joinpath(A.RESULTS,"binned_tails.json"))["rows"]
         cut=A.num(only(filter(x->A.ival(x["n"])==n,bs))["rho"])
     end
     sp=A.comparison_spectra([n÷2,n÷2],u,v;c)[sector]
@@ -42,7 +42,7 @@ function continuation(n,g; sector=0,mode="uniform")
     t=0.; dt=min(0.1,0.8*(rho-sp[K])/dnorm)
     records=Any[]; attempts=0; started=time()
     suffix=mode=="uniform" ? "" : "_binned"
-    path=joinpath(@__DIR__,"results","homotopy_n$(n)_g$(g)_m$(sector)$suffix.json")
+    path=joinpath(A.RESULTS,"homotopy_n$(n)_g$(g)_m$(sector)$suffix.json")
     if isfile(path) && get(ENV,"ANCHOR_FRESH","0")!="1"
         old=read_exact_json(path)
         if old["complete"]

@@ -1,6 +1,6 @@
 using Test, LinearAlgebra, SparseArrays
-include("../common.jl")
-include("../exact.jl")
+include("../src/common.jl")
+include("../src/exact.jl")
 using .AnchorStudy
 const A=AnchorStudy
 
