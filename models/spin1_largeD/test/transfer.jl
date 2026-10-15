@@ -65,3 +65,8 @@ end
     TC.write_result(path, data)
     @test_throws ErrorException TC.check_certificate(path)
 end
+
+@testset "Curve data comes from the committed certificate" begin
+    curve = TC.parse_exact_json(read(joinpath(TC.ROOT, "results", "transfer_curve.json"), String))
+    @test curve["certificate_sha256"] == TC.sha256_file(joinpath(TC.ROOT, "certificate.json"))
+end
