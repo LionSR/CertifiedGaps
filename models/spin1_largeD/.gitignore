@@ -1,0 +1,5 @@
+# Reproducible numerical caches; fresh_scan.json retains every tested seed row.
+results/scan_*.json
+results/summary_*.json
+results/beta_refinement_*.json
+results/transfer_curve.png

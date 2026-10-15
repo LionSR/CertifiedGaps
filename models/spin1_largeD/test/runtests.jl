@@ -92,3 +92,8 @@ end
 
 include("small.jl")
 include("symmetry.jl")
+include("transfer.jl")
+include("../transfer_check.jl")
+@testset "Transfer certificate and finite bridge" begin
+    @test check_transfer() !== nothing
+end

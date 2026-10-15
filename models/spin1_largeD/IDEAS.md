@@ -53,6 +53,17 @@ All individual runs have a 2700-second timeout. No shared-core edits are planned
 
 ## Original ED baseline plan
 
+### Follow-up outcome
+
+Transfer squaring succeeds at D=4: n0=12, beta=29/10, bound >0.899143399, using
+only L=6,12 spectral inputs. Fresh verified L=8,10 gaps bridge the result to every
+even L>=6. L=14 block counting confirms that one matrix alone exceeds host memory.
+At D=3.206, spatial lifts through n0=192 fail on beta=1.5:0.025:6 (plus 381/125):
+thermal-purity loss prevents closure. This negative is limited to these estimates.
+Centered Weyl transport still certifies [3.2059998,3.206], with n0=6 and beta=381/125.
+Thus the chosen beyond-ED route produces a stronger certificate, while its limitation
+near the threshold is retained explicitly. See TRANSFER.md for the inequalities.
+
 The model is the spin-1 antiferromagnet plus D(Sz)^2, with a one-site cell.
 All new work stays here; the shared core is read only.
 

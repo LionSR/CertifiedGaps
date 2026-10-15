@@ -1,5 +1,10 @@
 # Spin-one large-D spectral-gap certificate
 
+> Historical ED baseline. The current result, transfer-moment extension, fresh scan and
+> refined certified interval are in [README.md](README.md) and [TRANSFER.md](TRANSFER.md).
+> In particular, the current D = 4 bound is 0.899143399 for every even L ≥ 6, and the
+> smallest certified search value is D = 3.2059998. The tables below preserve the earlier run.
+
 Model: H = Σ Sⱼ·Sⱼ₊₁ + D Σ (Sᶻⱼ)² on periodic rings, with one site per cell.
 
 **Smallest certified sampled D: 1603//500 = 3.206.** This is a finite-size, finite-grid search threshold, not a proven minimum over all real D or a phase boundary. At that D the uniform bound is **0.002213456**, for **every even L ≥ 6 cells = sites**.
