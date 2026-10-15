@@ -5,7 +5,9 @@
 #      enclosures, the exact rational seeds and `certified_gap_bound`, and compares them exactly;
 #   3. confirms that results/certificate.json copies those seeds exactly;
 #   4. checks the recorded source hashes (src/provenance.jl).
-# It does not redo the eigenvector solves; scripts/independent_review.jl does.
+# The fast check does not redo the eigenvector solves. `check.jl --full` (about 2.5 min) also
+# re-solves every block and proves the stored seeds again (check_fresh_replay);
+# scripts/independent_review.jl adds the stricter interval-containment test.
 using CertifiedGaps, CertifiedGaps.Results, JSON3, Test, IntervalArithmetic, LinearAlgebra
 isdefined(@__MODULE__, :check_historical_hashes) ||
     include(joinpath(@__DIR__, "src", "provenance.jl"))
@@ -135,6 +137,80 @@ function check_certificate_summary(paths)
     end
 end
 
+"""
+    refined_witness(rec, L)
+
+Rigorous residual, orthogonality and eigenvalue-radius bounds for one freshly solved block
+record `rec` of an `L`-spin ring, sharper than `VerifiedSpectra.scalar_witness` (Cauchy on the
+concatenated real dot products). Used by `check_fresh_replay` and scripts/independent_review.jl.
+"""
+function refined_witness(rec, L)
+    d = Int(rec["dimension"])
+    h = parseq(rec["matrix_error_upper"])
+    q = parseq(rec["q_component_max"])
+    lam = parseq(rec["lambda_max_abs"])
+    rawr = parseq(rec["raw_residual_component_max"])
+    rawe = parseq(rec["raw_orthogonality_component_max"])
+    coarse = VerifiedSpectra.scalar_witness(d, L, parseq(rec["h_component_max"]),
+        q, lam, rawr, rawe, h)
+    @assert coarse.ebound < 1 # Thus ||Q|| < 2, independently of the refinement.
+    a = big(3) * L // 4
+    # Cauchy on two concatenated real dot-product vectors gives these sums.
+    rerr = min(coarse.rerr, coarse.gamma * (2 * (a + h) + q * lam) + coarse.underflow)
+    eerr = min(coarse.eerr, coarse.gamma * 5 + coarse.underflow)
+    # ||complex dxd matrix||F <= sqrt(2)*d*componentmax < (3/2)*d*componentmax.
+    # This also strictly improves the coarse radius of scalar/small blocks.
+    factor = big(3) * d // 2
+    r = factor * (rawr + rerr); e = factor * (rawe + eerr)
+    @assert e < 1
+    return (; r, e, radius = r + 2 * h + (a + lam) * e)
+end
+
+"""
+    check_fresh_replay()
+
+Slow replay (`check.jl --full`, about 2.5 min): re-solve both rings of every certified delta
+from the model, enclose every eigenvalue with `refined_witness`, and require the fresh rational
+seeds to be at most the stored ones, so the fresh data prove the stored bound again. Unlike
+scripts/independent_review.jl it does not require each fresh interval to lie inside the stored
+one; that stricter test can fail on another BLAS without affecting validity (README).
+"""
+function check_fresh_replay()
+    for path in verified_paths()
+        data = JSON3.read(read_json_text(path))
+        delta = parseq(data.delta); beta = parseq(data.beta0)
+        fresh = Dict{Int,Tuple{Vector{Float64},Vector{Rational{BigInt}}}}()
+        for stored in data.rings
+            L = Int(stored.spins)
+            ring, _, _ = verified_ring(delta, L)
+            @test ring["dimension"] == stored.dimension
+            @test length(ring["blocks"]) == length(stored.blocks)
+            centers = Float64[]; radii = Rational{BigInt}[]
+            for (a, b) in zip(ring["blocks"], stored.blocks)
+                for key in ("dimension", "down_spins", "cell_momentum", "spin_flip_parity",
+                        "multiplicity")
+                    @test a[key] == b[Symbol(key)]
+                end
+                w = refined_witness(a, L)
+                vals = Float64.(parseq.(a["eigenvalues"]))
+                for _ in 1:Int(a["multiplicity"])
+                    append!(centers, vals); append!(radii, fill(w.radius, length(vals)))
+                end
+            end
+            @test length(centers) == 2^L
+            fresh[L] = (centers, radii)
+        end
+        small = enclosed_logZ(fresh[8]..., beta); large = enclosed_logZ(fresh[16]..., beta)
+        double = enclosed_logZ(fresh[16]..., 2beta)
+        es = rational_upper(1 - exp(large - 2small)); et = rational_upper(1 - exp(double - 2large))
+        @test es <= parseq(data.epsilon_s_upper)
+        @test et <= parseq(data.epsilon_t_upper)
+        bound = certified_gap_bound(es, et, beta).bound
+        @test bound !== nothing && bound >= data.recurrence_bound
+        println("fresh replay delta=$(data.delta) stored=$(data.recurrence_bound) fresh=$bound")
+    end
+end
+
 if abspath(PROGRAM_FILE) == @__FILE__
     @testset "Dimerised Heisenberg certificate" begin
         @testset "Exact RP audit" begin
@@ -142,6 +218,11 @@ if abspath(PROGRAM_FILE) == @__FILE__
         end
         @testset "Verified spectra, partition sums, seeds and bounds" begin
             check_verified_results()
+        end
+        if "--full" in ARGS
+            @testset "Fresh spectral replay of all three seeds" begin
+                check_fresh_replay()
+            end
         end
     end
 end

@@ -32,7 +32,9 @@ checks. Scanned n0=2,3,4 and beta=0.25:0.25:32; odd n0 remains diagnostic only.
 This supplies useful non-certified data despite the original specification
 mismatch. Residual enclosures and rational purity certification remain undone.
 
-## Verified enclosure route completed
+## Outcome
+
+Verified enclosure route completed.
 
 Following explicit authorization to continue under an audited applicable
 repository theorem, implement interval algebraic block construction and dense

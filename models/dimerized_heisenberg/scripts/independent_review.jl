@@ -4,27 +4,7 @@
 include(joinpath(@__DIR__, "..", "check.jl"))
 const QQReview=Rational{BigInt}
 const CQReview=Complex{QQReview}
-function refined_witness(rec,L)
-    d=Int(rec["dimension"])
-    h=parseq(rec["matrix_error_upper"])
-    q=parseq(rec["q_component_max"])
-    lam=parseq(rec["lambda_max_abs"])
-    rawr=parseq(rec["raw_residual_component_max"])
-    rawe=parseq(rec["raw_orthogonality_component_max"])
-    coarse=VerifiedSpectra.scalar_witness(d,L,parseq(rec["h_component_max"]),
-        q,lam,rawr,rawe,h)
-    @assert coarse.ebound<1 # Thus ||Q||<2, independently of the refinement.
-    a=big(3)*L//4
-    # Cauchy on two concatenated real dot-product vectors gives these sums.
-    rerr=min(coarse.rerr,coarse.gamma*(2*(a+h)+q*lam)+coarse.underflow)
-    eerr=min(coarse.eerr,coarse.gamma*5+coarse.underflow)
-    # ||complex dxd matrix||F <= sqrt(2)*d*componentmax < (3/2)*d*componentmax.
-    # This also strictly improves the coarse radius of scalar/small blocks.
-    factor=big(3)*d//2
-    r=factor*(rawr+rerr); e=factor*(rawe+eerr)
-    @assert e<1
-    return (;r,e,radius=r+2*h+(a+lam)*e)
-end
+# refined_witness is defined in check.jl (shared with `check.jl --full`).
 reviewrecords=Any[]
 elapsed=@elapsed @testset "Independent acceptance: containment from fresh full spectra" begin
     check_verified_results()
@@ -117,7 +97,7 @@ end
 root=normpath(joinpath(@__DIR__,"../../.."))
 files=vcat(["models/dimerized_heisenberg/scripts/independent_review.jl",
     "models/dimerized_heisenberg/src/verified_spectra.jl",
-    "models/dimerized_heisenberg/ENCLOSURE_PROOF.md"],
+    "models/dimerized_heisenberg/METHOD.md"],
     ["models/dimerized_heisenberg/results/"*r["production_certificate"] for r in reviewrecords])
 write_result(joinpath(@__DIR__,"..","results","acceptance.json"),Dict(
     "metadata"=>run_metadata(Dict("scope"=>"independent_general_reflected_RP_acceptance");

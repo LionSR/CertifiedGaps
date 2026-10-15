@@ -1,4 +1,4 @@
-# Verified spectral and recurrence argument
+# Method: verified spectral and recurrence argument
 
 This proof applies to the **general internally reflected RP formulation** of
 README.md. It does not assert the impossible stronger uniform real
