@@ -1,6 +1,7 @@
 # Independent acceptance: fresh solves, rigorous refined radii, stored-interval containment.
 # This does not require bitwise-identical eigenvectors and never overwrites production data.
-include("../check_verified.jl")
+# About 2.5 minutes; writes the 10 MB results/acceptance.json (gitignored).
+include(joinpath(@__DIR__, "..", "check.jl"))
 const QQReview=Rational{BigInt}
 const CQReview=Complex{QQReview}
 function refined_witness(rec,L)
@@ -40,7 +41,8 @@ elapsed=@elapsed @testset "Independent acceptance: containment from fresh full s
             @test length(ring["blocks"])==length(stored.blocks)
             centerlist=Float64[]; refinedlist=QQReview[]; blocks=Any[]
             for (a,b) in zip(ring["blocks"],stored.blocks)
-                for key in ("dimension","down_spins","cell_momentum","spin_flip_parity","multiplicity")
+                for key in ("dimension","down_spins","cell_momentum","spin_flip_parity",
+                        "multiplicity")
                     @test a[key]==b[Symbol(key)]
                 end
                 for key in ("h_component_max","q_component_max","lambda_max_abs",
@@ -99,11 +101,13 @@ elapsed=@elapsed @testset "Independent acceptance: containment from fresh full s
         end
         push!(reviewrecords,Dict("delta"=>string(delta),"production_certificate"=>basename(path),
             "production_sha256"=>sha256_file(path),"beta"=>string(beta),
-            "stored_epsilon_s"=>String(data.epsilon_s_upper),"stored_epsilon_t"=>String(data.epsilon_t_upper),
+            "stored_epsilon_s"=>String(data.epsilon_s_upper),
+            "stored_epsilon_t"=>String(data.epsilon_t_upper),
             "fresh_refined_epsilon_s"=>string(es),"fresh_refined_epsilon_t"=>string(et),
             "accepted_stored_bound"=>String(data.recurrence_bound_exact_binary),
             "fresh_refined_bound"=>string(QQReview(freshbound)),
-            "non_bitwise_equal_block_counts"=>mismatches,"exact_rational_eight_spin_blocks"=>exactblocks,
+            "non_bitwise_equal_block_counts"=>mismatches,
+            "exact_rational_eight_spin_blocks"=>exactblocks,
             "all_stored_eigenvalue_intervals_independently_contained"=>true,"rings"=>rings))
         println("ACCEPTED delta=",delta," stored_bound=",data.recurrence_bound,
             " fresh_refined_bound=",freshbound," exact-eight-spin-blocks=",exactblocks,
@@ -111,11 +115,11 @@ elapsed=@elapsed @testset "Independent acceptance: containment from fresh full s
     end
 end
 root=normpath(joinpath(@__DIR__,"../../.."))
-files=vcat(["models/dimerized_heisenberg/review/independent_review.jl",
-    "models/dimerized_heisenberg/verified_spectra.jl",
+files=vcat(["models/dimerized_heisenberg/scripts/independent_review.jl",
+    "models/dimerized_heisenberg/src/verified_spectra.jl",
     "models/dimerized_heisenberg/ENCLOSURE_PROOF.md"],
     ["models/dimerized_heisenberg/results/"*r["production_certificate"] for r in reviewrecords])
-write_result(joinpath(@__DIR__,"acceptance.json"),Dict(
+write_result(joinpath(@__DIR__,"..","results","acceptance.json"),Dict(
     "metadata"=>run_metadata(Dict("scope"=>"independent_general_reflected_RP_acceptance");
         source_sha256=source_hashes(root;dirs=(),files=Tuple(files)),
         packages=(CertifiedGaps,IntervalArithmetic),status="pass",certified=true),

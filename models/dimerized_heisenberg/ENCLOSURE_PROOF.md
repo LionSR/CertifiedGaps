@@ -1,7 +1,7 @@
 # Verified spectral and recurrence argument
 
-This proof applies to the **general internally reflected RP formulation** in
-REPORT.md. It does not assert the impossible stronger uniform real
+This proof applies to the **general internally reflected RP formulation** of
+README.md. It does not assert the impossible stronger uniform real
 identical-factor identity from the original task. An independent subagent
 reviewed the reflection, asymmetric recurrence, interval block construction,
 and residual/polar/Weyl argument.
@@ -158,17 +158,17 @@ saved as a rational string and passed with exact beta to
 `certified_gap_bound`. The checker reconstructs all log-partition intervals
 from stored spectral centers/radii and recomputes the seeds and bound.
 It does not rerun the expensive eigenvector solves; reproducing those is the
-purpose of `run_verified.jl`.
+purpose of `certify.jl verified` and `scripts/independent_review.jl`.
 
 ## General reflected RP and the asymmetric recurrence
 
-The cell reflection proof in REPORT.md establishes a real symmetric bounded
+The cell reflection proof in README.md establishes a real symmetric bounded
 Hilbert--Schmidt spatial kernel, hence the even moment representation
 `Z_n(beta)=sum |lambda_i(beta)|^n`. Internal reflection is an algebra
 automorphism on operators, so it preserves chronological product order; no
 unproved time-order reversal or fermion sign is involved.
 
-The survey theorem numbers mentioned in `certified.jl` are not separately
+The survey theorem numbers mentioned in the core `certified_gap_bound` are not separately
 available as named proofs in this checkout. The following derivation instead
 uses explicit proved identities of `outputs/thermal-mpo-gap-note.tex`, extended
 to this moment form by Appendix E of the scope note.

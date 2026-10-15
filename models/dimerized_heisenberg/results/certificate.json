@@ -89,14 +89,14 @@
             "model": "dimerized_heisenberg",
             "sites_per_cell": 2
         },
-        "created_utc": "2026-10-12T07:08:19.193",
+        "created_utc": "2026-10-15T03:46:58.077",
         "certified": true,
         "source_sha256": {
-            "models/dimerized_heisenberg/provenance.jl": "75167f1c20e4211b42ee4b0ef9cb064c46654ab00c3eb0f400833b4b87c7191a",
-            "models/dimerized_heisenberg/summarize_certificates.jl": "4eebac030c526887366c7951d618f5484878d288055f76e7461df0761f7279db"
+            "models/dimerized_heisenberg/src/provenance.jl": "aa26604a9005b81653f50f130b27b5dedb4e831b65ddb771f7a5d135c44a8f96",
+            "models/dimerized_heisenberg/certify.jl": "1c2d7f1165ffefb14f54ecd7d081054a5b4f899c04deb686f1c07f6a57f6bb48"
         },
         "CertifiedGaps": "0.2.0",
         "blas_threads": 1
     },
-    "rp_form": "Scope-note bond form with an internal reflection: rotate the second spin of every cell by J = [0 1; -1 0]; then -h = (1-delta) sum_{C in (Sx, iSy, Sz) on the second spin of the left cell} C (x) Theta(C), Theta(X) = F conj(X) F with F the swap of the two spins of a cell, and o = (1+delta) J-rotated S1.S2 is real with Theta(o) = o. In the cell basis M/sqrt(2) (F = M M^T/2, columns |00>+|11>, |00>-|11>, |01>+|10>, i(|01>-|10>)) this is -h = sum C' (x) conj(C') with complex C' and real diagonal o. No common cell basis gives a swap-symmetric sum C (x) C. Exact checks: rp.jl."
+    "rp_form": "Scope-note bond form with an internal reflection: rotate the second spin of every cell by J = [0 1; -1 0]; then -h = (1-delta) sum_{C in (Sx, iSy, Sz) on the second spin of the left cell} C (x) Theta(C), Theta(X) = F conj(X) F with F the swap of the two spins of a cell, and o = (1+delta) J-rotated S1.S2 is real with Theta(o) = o. In the cell basis M/sqrt(2) (F = M M^T/2, columns |00>+|11>, |00>-|11>, |01>+|10>, i(|01>-|10>)) this is -h = sum C' (x) conj(C') with complex C' and real diagonal o. No common cell basis gives a swap-symmetric sum C (x) C. Exact checks: src/rp.jl."
 }

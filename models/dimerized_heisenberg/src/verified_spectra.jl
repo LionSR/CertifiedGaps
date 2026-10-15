@@ -3,7 +3,7 @@ module VerifiedSpectra
 using LinearAlgebra, IntervalArithmetic
 using CertifiedGaps.Recurrence: to_interval
 using CertifiedGaps.Results
-include("numerical_ed.jl") # Exact orbit/stabilizer enumeration; no run on include.
+include("sectors.jl") # Exact orbit/stabilizer enumeration.
 export verified_ring, scalar_witness, enclosed_logZ, rational_upper, rational_lower
 const QQ=Rational{BigInt}
 const CI=Complex{Interval{Float64}}
@@ -133,12 +133,14 @@ function verified_ring(delta::QQ,L)
             H,herror=built; dim=size(H,1); qdim+=dim
             runtime=@elapsed block,vals,radius=enclose_block(H,herror,L)
             merge!(block,Dict("down_spins"=>q,"cell_momentum"=>k,
-                "spin_flip_parity"=>(useflip ? parity : nothing),"multiplicity"=>mult,"seconds"=>runtime))
+                "spin_flip_parity"=>(useflip ? parity : nothing),"multiplicity"=>mult,
+                "seconds"=>runtime))
             push!(blocks,block); dimension+=mult*dim
             for _ in 1:mult
                 append!(centers,vals); append!(radii,fill(radius,dim))
             end
-            println("verified delta=$delta L=$L q=$q k=$k parity=$parity dim=$dim radius=$(Float64(radius)) sec=$runtime");flush(stdout)
+            println("verified delta=$delta L=$L q=$q k=$k parity=$parity dim=$dim ",
+                "radius=$(Float64(radius)) sec=$runtime"); flush(stdout)
         end
         @assert qdim==binomial(L,q)
     end

@@ -1,4 +1,5 @@
-include("../numerical_ed.jl")
+# The Float64 sector solver (scripts/numerical_scan.jl) against the core dense ED.
+include(joinpath(@__DIR__, "..", "src", "sectors.jl"))
 using CertifiedGaps.Models
 @testset "Numerical sector implementation vs core dense ED" begin
     for L in (4,6,8,10)

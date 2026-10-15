@@ -15,8 +15,8 @@ const PRODUCER_CERTIFICATE_COMMIT = "fd3c3d5592a91c0d37f9f4dfb85048ca5d9cfba2"
 read_json_text(path) = endswith(path, ".gz") ? read(pipeline(`gzip -dc $path`), String) :
     read(path, String)
 
-"Repository root (two levels above this directory)."
-repository_root() = normpath(joinpath(@__DIR__, "..", ".."))
+"Repository root (three levels above this src/ directory)."
+repository_root() = normpath(joinpath(@__DIR__, "..", "..", ".."))
 
 function _git_object_available(root, rev)
     return success(pipeline(`git -C $root cat-file -e $(rev * "^{commit}")`;

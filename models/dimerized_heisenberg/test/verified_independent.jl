@@ -1,4 +1,5 @@
-include("../check_verified.jl")
+# Exact rational residuals and the analytic four-spin spectrum versus the block enclosures.
+isdefined(@__MODULE__, :check_verified_results) || include(joinpath(@__DIR__, "..", "check.jl"))
 @testset "Independent exact residual and analytic four-spin validation" begin
     QQ=Rational{BigInt}; CQ=Complex{QQ}
     for delta in (big(1)//2,big(3)//10,big(1)//4)
@@ -43,7 +44,4 @@ include("../check_verified.jl")
             @test BigFloat(inf(computed))<=inf(direct)<=sup(direct)<=BigFloat(sup(computed))
         end
     end
-end
-@testset "Verified saved spectral and purity certificates" begin
-    check_verified_results()
 end
