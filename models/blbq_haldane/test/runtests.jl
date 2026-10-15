@@ -1,7 +1,7 @@
 using Test, LinearAlgebra, CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds, JSON3
 using CertifiedGaps.ExactDiagonalization
-include("../sectors.jl")
-include("../result_io.jl")
+include("../src/sectors.jl")
+include("../src/result_io.jl")
 BLAS.set_num_threads(1)
 @testset "RP coefficient identities, exact rational arithmetic" begin
     r=exact_rp()
