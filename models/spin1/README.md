@@ -60,7 +60,7 @@ largest-first queue, with 32 integer columns per batch.
 The exact trials establish \(\langle H_{72}\rangle/72<-1.401482\) and
 \(\langle H_{120}\rangle/120<-1.401482\). The default trial verifier works in exact SU(2)
 multiplicity blocks of sizes 26, 56, 48, 24, 7 and 1 instead of the eleven charge blocks (largest
-162); [`OPTIMIZATION.md`](OPTIMIZATION.md) derives that reduction, describes the thermal kernel
+162); [`METHOD.md`](METHOD.md) derives that reduction, describes the thermal kernel
 changes, and records the benchmarks.
 
 ### Stronger bounds from the same finite inputs (`experiments/`)
@@ -111,10 +111,18 @@ repository; fetch it first (it lands in the gitignored `references/` directory):
 julia tools/fetch_upstream.jl
 julia --project=models/spin1 -e 'using Pkg; Pkg.instantiate()'
 julia --startup-file=no --project=models/spin1 models/spin1/test/runtests.jl   # 43 tests, ~1.5 min
+julia --startup-file=no --project=models/spin1 models/spin1/check.jl            # stored-output audit
+julia --startup-file=no --threads=4 --project=models/spin1 models/spin1/check.jl --full  # ~45 min
 ```
 
-To check the stored outputs without repeating the expensive contractions, audit a **copy** of
-`results/`. The audit rewrites `verification.json` in the directory it checks, and the
+`check.jl` (fast) audits a temporary copy of `results/`, requires the component hashes and
+the implementation fingerprint to equal those in the committed `verification.json`, runs the
+corrupted-artifact tests on the copy and the two `experiments/` test files (16 checks; about
+13 min on a heavily loaded machine, a few minutes otherwise). `check.jl --full` runs the
+complete fresh reproduction below into a temporary directory and requires every certified
+integer, interval and scalar record to equal the committed one. Both write nothing into the
+repository. The same steps by hand: to check the stored outputs without repeating the expensive
+contractions, audit a **copy** of `results/`. The audit rewrites `verification.json` in the directory it checks, and the
 experiments pin the SHA-256 of the committed `results/verification.json`, so an in-place audit
 of `results/` would break their tests.
 
@@ -177,6 +185,22 @@ before running. These are modified Julia implementations, not upstream code; see
   the fingerprint, any edit to those files makes the experiments' generators refuse to run until
   the full reproduction is redone.
 - `experiments/`: the stronger bounds above, their records, tests and derivation.
+- `check.jl`: the checker (fast stored-output audit, `--full` fresh reproduction); outside the
+  fingerprint, so editing it does not invalidate `verification.json`.
+- `IDEAS.md` (route memo, reconstructed) and `METHOD.md` (the SU(2) reduction, thermal kernel
+  changes and benchmarks; formerly `OPTIMIZATION.md`).
+
+Layout exceptions (top-level entries beyond the standard format), each kept on purpose:
+
+- `.JuliaFormatter.toml`: hash-pinned. It is one of the three environment files in the
+  implementation fingerprint recorded in `results/verification.json`; moving or editing it
+  would invalidate the stored audit and the experiments' generators.
+- `experiments/`: the stronger bounds, with records that pin the SHA-256 of their own scripts
+  and of `results/verification.json` (`experiments/test_*.jl` check them); moving them under
+  `scripts/` would put them inside the fingerprint.
+- `NOTICE` and `LICENSE.upstream`: attribution and the Apache-2.0 licence of the upstream
+  code these Julia files are adapted from, which the licence requires to accompany the
+  modified files.
 
 Rationals are stored as `numerator//denominator` strings. The manifest pins ITensors 0.9.32,
 ITensorMPS 0.4.2, JSON3 1.14.3 and Nemo 0.57.0.
@@ -184,6 +208,10 @@ ITensorMPS 0.4.2, JSON3 1.14.3 and Nemo 0.57.0.
 ## History
 
 The first, unoptimised Julia run is kept in `results/reference/`;
-[`OPTIMIZATION.md`](OPTIMIZATION.md) records the later kernel and SU(2) optimisations and their
+[`METHOD.md`](METHOD.md) records the later kernel and SU(2) optimisations and their
 benchmarks. The stronger bounds in `experiments/` were derived afterwards from the frozen
 finite inputs.
+
+The format tidy renamed `OPTIMIZATION.md` to `METHOD.md` (no fingerprinted file reads it),
+added `IDEAS.md` and the top-level `check.jl`, and documented the layout exceptions; no
+fingerprinted file, result or experiment record changed.
