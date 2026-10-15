@@ -52,6 +52,7 @@ function ITensors.space(::SiteType"AKLT3/2"; conserve_qns = false)
 end
 ITensors.op(::OpName"Id", ::SiteType"AKLT3/2") = Matrix{Float64}(I, 4, 4)
 
+"Imaginary-time gate `exp(-tau P)` on sites `a`, `b`, using the exact projector identity."
 function bond_gate(sites, a, b, tau)
     matrix = Matrix{Float64}(I, 16, 16) + expm1(-tau)*bond_projector()
     return ITensor(

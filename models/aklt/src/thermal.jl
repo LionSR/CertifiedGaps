@@ -33,6 +33,7 @@ function thermal_curve(
     )
 end
 
+"`log(Z-1)` from `log Z`, stable for both small and large `Z-1`; `nothing` unless `Z>1`."
 function log_excess(logz)
     logz>0 || return nothing
     return logz>log(2) ? logz+log1p(-exp(-logz)) : log(expm1(logz))

@@ -2,7 +2,7 @@
 
 julia_version = "1.12.4"
 manifest_format = "2.0"
-project_hash = "672e0e2a8fead7bc06d91bf23bd8586491583fb3"
+project_hash = "04d5c6893d9f40a7d5ae0fe468306441369545c0"
 
 [[deps.AKLTPilot]]
 deps = ["CertifiedGaps", "ITensorMPS", "ITensors", "JSON3", "LinearAlgebra", "TOML", "Test"]

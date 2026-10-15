@@ -1,8 +1,15 @@
 using TOML, LinearAlgebra
 using AKLTPilot
 
+"""
+    main(args)
+
+Run the exact or thermal configuration in the TOML file `args[1]` and write the result to
+`args[2]`, rewriting it after every finished sector or temperature so partial runs survive.
+"""
 function main(args)
-    length(args)==2 || error("usage: julia --project=models/aklt models/aklt/scripts/run.jl CONFIG OUTPUT")
+    length(args)==2 ||
+        error("usage: julia --project=models/aklt models/aklt/scripts/run.jl CONFIG OUTPUT")
     config = TOML.parsefile(args[1])
     BLAS.set_num_threads(get(config, "blas_threads", 1))
     result = Dict{String,Any}("provenance"=>provenance(config), "runs"=>Any[], "complete"=>false)
