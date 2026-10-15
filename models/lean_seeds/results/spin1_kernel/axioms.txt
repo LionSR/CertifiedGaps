@@ -7,17 +7,25 @@
 'SeedKernel.fast_reverse_case' depends on axioms: [propext]
 'SeedKernel.gram_prepared_case' depends on axioms: [propext]
 'SeedKernel.Spin1.weyl_counting_one' depends on axioms: [propext, Quot.sound]
+'SeedKernel.Spin1.residual_anchor_not_enough' does not depend on any axioms
+'SeedKernel.Spin1.h6_naive_anchor_separation_fails' does not depend on any axioms
 'SeedKernel.Spin1.signed_h_cases' depends on axioms: [propext, Classical.choice, Quot.sound]
 'SeedKernel.Spin1.filter_cases' depends on axioms: [propext, Classical.choice, Quot.sound]
 'SeedKernel.Spin1.h6_ritz_witness' depends on axioms: [propext]
+'SeedKernel.Spin1.h6_lane_bound' does not depend on any axioms
 'SeedKernel.Spin1.h8_ritz_witness' depends on axioms: [propext]
+'SeedKernel.Spin1.h8_lane_bound' does not depend on any axioms
 'SeedKernel.Spin1.h10_ritz_witness' depends on axioms: [propext]
+'SeedKernel.Spin1.h10_lane_bound' does not depend on any axioms
 'SeedKernel.Ising.check6' depends on axioms: [propext]
 'SeedKernel.Ising.check12' depends on axioms: [propext]
 'SeedKernel.Ising.direct6' depends on axioms: [propext]
 'SeedKernel.Ising.direct12_chunked' depends on axioms: [propext]
 'SeedKernel.Ising.allChunks12_eq_range' depends on axioms: [propext]
 'SeedKernel.Ising.direct12_canonical' depends on axioms: [propext]
+'SeedKernel.Ising.coverage12' does not depend on any axioms
+'SeedKernel.Ising.anchor6' does not depend on any axioms
+'SeedKernel.Ising.anchor12' does not depend on any axioms
 'SeedKernel.Ising.exists_eigenvalue_near' depends on axioms: [propext, Classical.choice, Quot.sound]
 'SeedKernel.Ising.card_eigenvalues_lt_le' depends on axioms: [propext, Classical.choice, Quot.sound]
 'SeedKernel.Ising.hamiltonian_mulVec_apply' depends on axioms: [propext, Classical.choice, Quot.sound]
