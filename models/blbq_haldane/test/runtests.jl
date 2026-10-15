@@ -74,14 +74,23 @@ const THETAS=[0.0,-0.1,-0.3,-0.5,-0.6,-0.7]
     end
 end
 
-@testset "Small-ring rows of the summary tables reproduced from scratch" begin
+"""
+    check_small_rows(ns, lengths)
+
+Recompute from scratch, with complete dense core ED spectra of the rings in `lengths`, the
+`grid_maxima` and `energy_scaling` rows of results/scaling.json for the seed lengths `ns`
+(`lengths` must contain every n and 2n). Every spectrum is also checked against the analytic
+infinite-temperature moments. Numerical consistency only, no enclosure claim.
+"""
+function check_small_rows(ns, lengths)
     data=JSON3.read(read(joinpath(RESULTS,"scaling.json"),String))
     X=sz_bond()
     for (t,theta) in enumerate(THETAS)
         h=cos(theta)*X+sin(theta)*X^2
-        specs=Dict(L=>spectrum(Chain(3,ring_bonds(h);charge=[-1,0,1]),L;dense_max=1000)
-            for L in 2:6)
+        specs=Dict(L=>spectrum(Chain(3,ring_bonds(h);charge=[-1,0,1]),L;dense_max=3^L)
+            for L in lengths)
         for (L,s) in specs
+            @test s.exact && length(s.E)==s.N==3^L
             # Analytic infinite-temperature moments of the complete spectrum.
             c,si=cos(theta),sin(theta)
             mean=L*4si/3
@@ -90,8 +99,8 @@ end
             @test sum(s.E)/3^L ≈ mean atol=1e-10
             @test sum(abs2,s.E)/3^L ≈ variance+mean^2 rtol=1e-10
         end
-        results=scan_seeds(spectral_defects(specs),2:3,0.125:0.125:64.0)
-        for n in 2:3
+        results=scan_seeds(spectral_defects(specs),ns,0.125:0.125:64.0)
+        for n in ns
             best=argmax(r->min(1-r.εₛ,1-r.εₜ),filter(r->r.n₀==n,results))
             row=only(filter(r->r.theta==theta && r.n==n,data.grid_maxima))
             @test best.β₀==row.beta
@@ -102,6 +111,10 @@ end
             @test specs[2n].E[1]-2specs[n].E[1] ≈ srow.delta atol=1e-9
         end
     end
+end
+
+@testset "Small-ring rows of the summary tables reproduced from scratch" begin
+    check_small_rows(2:3,2:6)
 end
 
 @testset "Complete weighted-spectrum partition function" begin

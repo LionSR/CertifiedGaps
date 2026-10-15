@@ -1,17 +1,18 @@
 # Complete dense spectra of the BLBQ ring through L = 12, by magnetization, momentum, spin flip
 # and reflection sectors. Numerical only: dense LAPACK solves, no eigenvalue enclosures.
 # Usage (from the repository root):
-#     models/blbq_haldane/run.sh -t 4 models/blbq_haldane/scan.jl 2 3 4 5 6 7 8 10 12
+#     models/blbq_haldane/scripts/run.sh -t 4 \
+#         models/blbq_haldane/scripts/scan.jl 2 3 4 5 6 7 8 10 12
 using CertifiedGaps, CertifiedGaps.Results
 using LinearAlgebra, Printf
-include(joinpath(@__DIR__, "src", "sectors.jl"))
+include(joinpath(@__DIR__, "..", "src", "sectors.jl"))
 BLAS.set_num_threads(1)
-const ROOT = @__DIR__
+const ROOT = normpath(joinpath(@__DIR__, ".."))
 const THETAS = [0.0, -0.1, -0.3, -0.5, -0.6, -0.7]
 
 "Run metadata with the hashes of this directory's sources and of the shared core."
 function provenance(config)
-    hashes = source_hashes(ROOT; dirs=("src", "test"), files=("scan.jl",))
+    hashes = source_hashes(ROOT; dirs=("src", "test"), files=("scripts/scan.jl",))
     core = joinpath(ROOT, "../../julia")
     merge!(hashes, Dict("../../julia/" * k => v for (k, v) in
         source_hashes(core; dirs=("src",), files=("Project.toml", "Manifest.toml"))))

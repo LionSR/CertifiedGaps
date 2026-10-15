@@ -40,3 +40,11 @@ The implementation orders polynomial roots to limit intermediate amplification, 
 raising residuals and orthogonality, and first compares complete weighted spectra with
 unreduced small rings. Benchmarks determine whether projected bases and dense eigensolves
 fit the 16 GiB memory and 45-minute per-run budgets before attempting L=14.
+
+## Outcome
+
+No certificate. The exact RP identity holds for −π/4 < θ ≤ 0, but on complete spectra through
+L = 14 no even seed n₀ ≤ 6 comes near the admissible region at any of the six angles (best
+min(Pₛ, P_τ) = 0.329 at θ = 0, n₀ = 6, against about 0.873 needed). The SU(2) route above made
+L = 14 complete; L = 16 (n₀ = 8) exceeds the 16 GiB machine. Conditional extrapolations put the
+first admissible seed at n₀ ≈ 20–48, so a certificate needs a non-ED route (README, "Result").

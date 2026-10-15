@@ -1,5 +1,6 @@
 # One complete (S, k) highest-weight sector of the L-site ring, dense solves at all angles.
-# Usage: run.sh -t 4 scripts/su2_sector.jl L S k; driven by run_su2_grid.sh. Numerical only.
+# Usage: models/blbq_haldane/scripts/run.sh -t 4 models/blbq_haldane/scripts/su2_sector.jl L S k
+# (driven by run_su2_grid.sh). Numerical only.
 using CertifiedGaps, CertifiedGaps.Results, LinearAlgebra, Serialization
 const ROOT=normpath(joinpath(@__DIR__,".."))
 include(joinpath(ROOT,"src","su2.jl"))

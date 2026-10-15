@@ -3,7 +3,7 @@
 # RP/environment records, then run the tests.
 set -euo pipefail
 cd "$(dirname "$0")/../../.."
-runner=models/blbq_haldane/run.sh
+runner=models/blbq_haldane/scripts/run.sh
 $runner models/blbq_haldane/scripts/collect_su2.jl 14
 $runner models/blbq_haldane/scripts/archive_spectra.jl
 $runner models/blbq_haldane/scripts/analyze.jl
