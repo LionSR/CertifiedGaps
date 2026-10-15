@@ -4,7 +4,8 @@ This Lean 4 + Mathlib package proves that quantum spin rings have a spectral gap
 open as the ring grows. It follows the spacetime-bootstrap argument of the main note
 (`../notes/thermal-mpo-gap-note.tex`). **Everything is proved except the finite numerical
 inputs** (two "seed" inequalities per model). They are named `sorry` lemmas, and their values
-come from the certified computations in `../models/`.
+come from the certified computations in `../models/`. One seed is now proved outright in the
+kernel: `SeedKernel.Ising.ising_gap` is an unconditional gap theorem (below).
 
 ## The rundown
 
@@ -22,6 +23,19 @@ uses the actual Hamiltonian matrix on `(Fin L → Fin 3)`. `GapGT e c` means: so
 every other level more than `c` above it. The proof is complete except for two `sorry`s,
 `seed_spatial : P_s(2304, 784) ≥ 0.99` and `seed_thermal : P_τ(4608, 784) ≥ 0.99`. These are
 OpenAI's Proposition 5.5, reproduced in exact arithmetic in `../models/spin1/`.
+
+### The first unconditional gap
+
+```lean
+-- SeedKernel/Ising/Seed.lean (lake build SeedKernel)
+theorem SeedKernel.Ising.ising_gap {L : ℕ} (hL : 6 ≤ L) (hLe : Even L) :
+    GapGT ((IsingLongitudinal.model (1 / 4) (1 / 20)).spectrum L) (log 13480 / (97 / 4))
+```
+
+For every even `L ≥ 6`, the Ising ring `−∑ ZⱼZⱼ₊₁ − ¼ ∑ Xⱼ − (1/20) ∑ Zⱼ` has a unique ground
+state and gap `> 0.392`. No `sorry`, no hypothesis, no `native_decide`; axioms `propext`,
+`Classical.choice`, `Quot.sound` only. Its seed is proved from kernel-checked integer residual
+and counting checks on the 6- and 12-site rings (see SeedKernel below).
 
 ### How the proof is put together
 
@@ -61,7 +75,7 @@ Read the files in this order. Each step uses only the ones before it.
 |---|---|
 | the criterion (steps 1–2), the moment inequalities for every `RPRing` (step 3), the frame changes | proved; axioms `propext`, `Classical.choice`, `Quot.sound` only |
 | gap theorems for the spin-1 Heisenberg ring and 8 other model families (table below) | proved **given their seeds** (`sorryAx` appears only through the seed lemmas) |
-| the seeds | open. `SeedKernel` checks seed arithmetic in the kernel. Its furthest result is one longitudinal-Ising point, proved from four explicit `log Z` enclosure hypotheses. See `../models/lean_seeds/` for the plan and the open obligations |
+| the seeds | one proved: the longitudinal Ising chain at `g = 1/4`, `h = 1/20` (`SeedKernel.Ising.first_point_seed`, giving the unconditional `ising_gap`). All others open; `../models/lean_seeds/` has the plan and the obligations of the spin-1 seed |
 
 ### Build
 
@@ -144,12 +158,12 @@ Heisenberg seeds are OpenAI's Proposition 5.5, reproduced in `../models/spin1/`.
 An opt-in library (`lake build SeedKernel`; not built by `lake build`) toward proving seeds in
 the kernel. Every computational statement is checked by `decide +kernel` on `Nat`/`Int`, which
 the kernel evaluates with GMP; there is no `native_decide`, no `sorry` and no new axiom.
-`SeedKernel/Audit.lean` (a root of the library) prints the axioms of 36 main declarations: all
+`SeedKernel/Audit.lean` (a root of the library) prints the axioms of 40 main declarations: all
 use at most `propext`, `Classical.choice`, `Quot.sound`. The Julia generators, the witness
 inventory and the checker (`check.jl`: Julia replay, `lake build SeedKernel`, audit) are in
 `models/lean_seeds/`, whose README states the results and the open obligations.
 
-**What it proves.** No seed is closed.
+**What it proves.** One seed is closed (Ising); the spin-1 work is arithmetic only.
 
 * *Shared packed lanes.* A vector of `d` naturals packed into one `Nat` in radix `2^w`, with
   lane extraction, shifts, butterfly reversal and a one-multiplication dot product; the radix
@@ -163,10 +177,17 @@ inventory and the checker (`check.jl`: Julia replay, `lake build SeedKernel`, au
   counting step.
 * *Longitudinal Ising, g = 1/4, h = 1/20.* Exact integer Gram/residual/anchor inequalities for
   two generated vectors on the 6- and 12-site rings (packed and direct, the 12-site direct check
-  in 64 blocks with a coverage proof; rejection of corrupted proposals), and
-  `first_point_seed_instance`: the first of the thirty seed conjunctions of
-  `IsingLongitudinal.seeds`, proved from four explicit log Z enclosures (`LogEnclosures`), which
-  remain hypotheses.
+  in 64 blocks with a coverage proof; rejection of corrupted proposals), turned into a proof of
+  the seed:
+  - `Spectral`: for a Hermitian matrix, a residual bound `∃ i, (λᵢ − θ)² ‖x‖² ≤ ‖Ax − θx‖²`
+    and counting by comparison (`Re ⟪x, Ax⟫ ≥ ρ ‖x‖²` off a set `B` ⇒ at most `|B|`
+    eigenvalues below `ρ`), from the unitary diagonalisation;
+  - `Hamiltonian`: `IsingLongitudinal.model g h` acts as `E(σ) x(σ) − g ∑ⱼ x(flipⱼ σ)`, and
+    `Re ⟪x, Hx⟫ ≥ ∑ (E(σ) − gL) |x(σ)|²`;
+  - `Bridge`: the checker's bit-indexed sums are these quadratic forms (`xor 2ʲ` is a spin flip);
+  - `Seed`: one eigenvalue within `10⁻¹⁰` of each candidate, at most two below the anchor, hence
+    two-sided bounds on `Z₆(β)`, `Z₁₂(β)`, `Z₁₂(2β)` and `seed_spatial`, `seed_thermal`,
+    `first_point_seed`, `ising_gap`.
 
 | File | Role |
 |---|---|
@@ -181,8 +202,9 @@ inventory and the checker (`check.jl`: Julia replay, `lake build SeedKernel`, au
 | `SeedKernel/Ising/Checker.lean`, `Ising/Packed.lean`, `Ising/Chunked.lean` | Integer `20H`, direct, packed (on the shared lanes) and blockwise checkers |
 | `SeedKernel/Ising/Generated.lean`, `Ising/GeneratedChunks.lean` | Generated proposals and their checks (`models/lean_seeds/certify.jl ising`) |
 | `SeedKernel/Ising/ChunkCoverage.lean`, `Ising/NegativeChecks.lean` | Coverage of the 64 blocks; rejection of wrong proposals |
-| `SeedKernel/Ising/Arithmetic.lean`, `Ising/ResidualLemma.lean` | Endpoint arithmetic of the log enclosures; the scalar weighted-residual lemma |
-| `SeedKernel/Ising/SeedBridge.lean` | `LogEnclosures` and the conditional seed of `IsingLongitudinal` at its first point |
+| `SeedKernel/Ising/Spectral.lean` | Residual bound and counting by comparison for Hermitian matrices |
+| `SeedKernel/Ising/Hamiltonian.lean`, `Ising/Bridge.lean` | The Ising Hamiltonian on vectors; identification with the integer checker |
+| `SeedKernel/Ising/Seed.lean` | The unconditional seed and `ising_gap` |
 | `SeedKernel/Audit.lean` | `#print axioms` for every main declaration |
 | `SeedKernel/Bench/*.lean` | Kernel benchmarks up to n = 12 (library `SeedKernelBench`) |
 

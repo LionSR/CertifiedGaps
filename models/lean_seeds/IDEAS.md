@@ -205,9 +205,9 @@ long review and the implementation budget (8.5–15k Lean lines) are in METHOD.m
 Route 2 (low-energy Ritz plus a classical anchor) at the longitudinal Ising point
 `g = 1/4, h = 1/20, (n₀, β₀) = (6, 97/4)`, with only two levels per ring, plus route 5 (the
 partition-enclosure interface). The integer Gram/residual/anchor arithmetic is kernel-checked
-at 6 and 12 sites, and the exact seed conclusions for the first grid point are proved
-conditional on four `LogEnclosures` hypotheses. No seed is unconditional: the matrix
-identification, min–max counting and scalar `exp` enclosures remain (METHOD.md). The
+at 6 and 12 sites. Later the seed was closed without new witnesses: the matrix
+identification, counting by comparison (instead of min–max) and elementary `exp` bounds give
+the unconditional `ising_gap` (README, "ising"; `lean/SeedKernel/Ising/Seed.lean`). The
 43-point inventory shows that full k×k Gram checks reach hours to ~1,000 hours for the
 65,536- and 531,441-dimensional seeds, so routes 1–2 do not scale there without clustering or
 symmetry reductions.

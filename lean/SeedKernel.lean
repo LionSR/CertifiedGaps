@@ -2,9 +2,10 @@
 SeedKernel: kernel-checked seed arithmetic (an opt-in library: `lake build SeedKernel`).
 
 Every computational statement is checked by `decide +kernel` (no `native_decide`, no `sorry`);
-see `SeedKernel/Audit.lean`. No statement here is an unconditional seed or gap theorem: the
-spin-1 witnesses are arithmetic facts about packed integer vectors, and the Ising seed bridge
-is conditional on explicit log-partition enclosures. lean/README.md has the file map.
+see `SeedKernel/Audit.lean`. The spin-1 witnesses are arithmetic facts about packed integer
+vectors. The Ising files prove one seed outright: `SeedKernel.Ising.ising_gap` is an
+unconditional gap theorem for `IsingLongitudinal.model (1/4) (1/20)` (no `sorry`, standard
+axioms only). lean/README.md has the file map.
 -/
 import SeedKernel.Packed
 import SeedKernel.PackingProofs
@@ -18,10 +19,11 @@ import SeedKernel.Spin1.Tests
 import SeedKernel.Spin1.H6
 import SeedKernel.Spin1.H8
 import SeedKernel.Spin1.H10
-import SeedKernel.Ising.Arithmetic
 import SeedKernel.Ising.Generated
 import SeedKernel.Ising.GeneratedChunks
 import SeedKernel.Ising.ChunkCoverage
 import SeedKernel.Ising.NegativeChecks
-import SeedKernel.Ising.ResidualLemma
-import SeedKernel.Ising.SeedBridge
+import SeedKernel.Ising.Spectral
+import SeedKernel.Ising.Hamiltonian
+import SeedKernel.Ising.Bridge
+import SeedKernel.Ising.Seed
