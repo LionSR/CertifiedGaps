@@ -10,7 +10,7 @@ No seed theorem from the imported model is used. Axiom output alone does NOT mak
 unconditional: the enclosure hypotheses below are the remaining mathematical obligations.
 -/
 namespace LeanSeedSmall
-open Real CertifiedGaps ThermalPurityGap
+open Real CertifiedGaps
 
 theorem ratio_of_log_bounds {x y eps : ℝ} (hx : 0 < x) (hy : 0 < y)
     (h : -eps ≤ Real.log y - 2 * Real.log x) : 1 - eps ≤ y / x^2 := by

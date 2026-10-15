@@ -1,7 +1,7 @@
 # NON-CERTIFYING inventory of existing spectral data and the exact Lean seed targets.
 using JSON, SHA, Printf
-const ROOT = @__DIR__
-const REPO = normpath(joinpath(ROOT, "../.."))
+const ROOT = joinpath(@__DIR__, "..", "results")
+const REPO = normpath(joinpath(@__DIR__, "..", "..", ".."))
 rat(s::AbstractString) = occursin("//", s) ?
     (a = split(s, "//"); parse(BigInt, a[1]) // parse(BigInt, a[2])) :
     rationalize(BigInt, parse(BigFloat, s); tol=0)
@@ -99,7 +99,7 @@ for (m, s) in zip(ms,seeds)
         s["epsilon_s"],s["epsilon_t"],levels(c["large"];key="values"),p)
 end
 open(joinpath(ROOT,"inventory.json"),"w") do io
-    JSON.print(io,Dict("status"=>"NON-CERTIFYING", "rows"=>rows),2)
+    JSON.print(io,Dict("status"=>"NON-CERTIFYING", "rows"=>rows))
 end
 open(joinpath(ROOT,"inventory.tsv"),"w") do io
     println(io,"model\tdimension\tbeta\teps_s\teps_t\tslack\ttail_budget\teigen_radius\tcutoff\tk")

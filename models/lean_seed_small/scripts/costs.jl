@@ -1,11 +1,14 @@
 # NON-CERTIFYING runtime model. The benchmark propositions themselves are kernel checked.
+# Benchmark sources and logs go to the ignored scratch directory `.cache/`; `--reuse` skips the
+# benchmarks and reuses the timings stored in results/costs.json.
 using JSON, Printf
-const HERE=@__DIR__
-lean=get(ENV,"LEAN_EXE",joinpath(HERE,".tools/lean-4.35.0-rc3-linux/bin/lean"))
-mkpath(joinpath(HERE,"benchmarks"))
+const HERE=joinpath(@__DIR__, "..", "results")
+const SCRATCH=joinpath(@__DIR__, "..", ".cache")
+lean=get(ENV,"LEAN_EXE","lean")
+mkpath(SCRATCH)
 timings="--reuse" in ARGS ? JSON.parsefile(joinpath(HERE,"costs.json"))["benchmarks"] : []
 for bits in ("--reuse" in ARGS ? Int[] : [262144,1179648,3706560,21251232])
-    f=joinpath(HERE,"benchmarks","Mul$bits.lean")
+    f=joinpath(SCRATCH,"Mul$bits.lean")
     write(f,"""
     import Lean
     set_option maxHeartbeats 0
@@ -16,7 +19,7 @@ for bits in ("--reuse" in ARGS ? Int[] : [262144,1179648,3706560,21251232])
       (1 <<< $(2bits))-(1 <<< $(bits+2))+3 := by decide +kernel
     #print axioms product
     """)
-    log=joinpath(HERE,"logs","mul$bits.log")
+    log=joinpath(SCRATCH,"mul$bits.log")
     t=@elapsed open(log,"w") do io; run(pipeline(`$lean $f`,stdout=io,stderr=io)); end
     text=read(log,String)
     matches=collect(eachmatch(r"(?m)^type checking took ([\d.]+)(ms|s)",text))
@@ -51,6 +54,6 @@ for r in inv
 end
 open(joinpath(HERE,"costs.json"),"w") do io
     JSON.print(io,Dict("status"=>"NON-CERTIFYING, optimistic arithmetic-only model",
-        "benchmarks"=>timings,"rows"=>inv),2)
+        "benchmarks"=>timings,"rows"=>inv))
 end
 println(JSON.json(timings))

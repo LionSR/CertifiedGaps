@@ -1,7 +1,7 @@
 # NON-CERTIFYING: test the proposed two-eigenvalue plus classical-anchor sandwich.
 # The exact integer residuals are real evidence, but the eigenvalue theorem is not in Lean yet.
 using JSON, Printf
-const HERE=@__DIR__
+const HERE=joinpath(@__DIR__, "..", "results")
 c=JSON.parsefile(joinpath(HERE,"certificate.json"))
 beta=97/4
 eta=1e-10 # deliberately generous compared with exact normalized residuals
@@ -27,5 +27,5 @@ out=Dict("status"=>"NON-CERTIFYING Float64 feasibility; assumes eigenvalue enclo
     "eps_s_sandwich"=>es,"eps_t_sandwich"=>et,
     "eps_s_target"=>9064e-9,"eps_t_target"=>3141e-8,
     "fits_log_enclosures"=>fits,"passes"=>es<9064e-9 && et<3141e-8)
-open(joinpath(HERE,"feasibility.json"),"w") do io; JSON.print(io,out,2); end
+open(joinpath(HERE,"feasibility.json"),"w") do io; JSON.print(io,out); end
 println(JSON.json(out))

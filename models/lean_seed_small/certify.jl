@@ -1,11 +1,14 @@
 # UNTRUSTED generator. Floating-point eigensolves only propose vectors. Every integer
-# Gram/residual claim is independently re-evaluated by Lean's kernel in Generated.lean.
+# Gram/residual claim is independently re-evaluated by Lean's kernel in
+# lean/LeanSeedSmall/Generated.lean. Writes results/certificate.json and that Lean file.
 using LinearAlgebra, SparseArrays, JSON, SHA
 BLAS.set_num_threads(1)
 const SCALE = big(2)^52
 const WIDTH = 56
 const BIAS = big(2)^54
-const OUT = @__DIR__
+const HERE = @__DIR__
+const OUT = joinpath(HERE, "results")
+const LEANDIR = joinpath(HERE, "lean", "LeanSeedSmall")
 exactstr(x::Integer)=string(x,"//1")
 function exactint(s::AbstractString)
     a=split(s,"//"); @assert length(a)==2 && a[2]=="1"
@@ -61,8 +64,8 @@ function main()
             "JSON"=>string(Base.pkgversion(JSON)), "blas"=>string(BLAS.get_config()),
             "generator"=>"untrusted Float64 LAPACK plus exact BigInt arithmetic",
             "status"=>"partial: not a seed proof"))
-    open(joinpath(OUT,"certificate.json"),"w") do io; JSON.print(io,cert,2); end
-    open(joinpath(OUT,"LeanSeedSmall","Generated.lean"),"w") do io
+    open(joinpath(OUT,"certificate.json"),"w") do io; JSON.print(io,cert); end
+    open(joinpath(LEANDIR,"Generated.lean"),"w") do io
         println(io,"import LeanSeedSmall.Packed\n\nnamespace LeanSeedSmall\n")
         println(io,"set_option maxRecDepth 1000000\nset_option maxHeartbeats 0\n")
         for p in cert["points"]

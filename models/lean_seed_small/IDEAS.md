@@ -1,4 +1,4 @@
-# Candidate routes (Task 5)
+# Candidate routes: small seeds in Lean
 
 All numerical searches are untrusted and non-certifying. The deliverable must separate
 checked integer/rational facts from the analytic bridge to the original `RPRing`.
@@ -27,3 +27,15 @@ Initial choice: inventory exact seed targets and low-energy counts, then use the
 small-ring model for an exact certificate component and the original-RPRing interface.
 Prefer a concrete counterexample to a proposed shortcut over an optimistic runtime estimate.
 Keep all source, downloads, caches, and build outputs inside this directory; never edit `lean/`.
+
+## Outcome
+
+Route 2 (low-energy Ritz plus a classical anchor) at the longitudinal Ising point
+`g = 1/4, h = 1/20, (n₀, β₀) = (6, 97/4)`, with only two levels per ring, plus route 5 (the
+partition-enclosure interface). The integer Gram/residual/anchor arithmetic is kernel-checked
+at 6 and 12 sites, and the exact seed conclusions for the first grid point are proved
+conditional on four `LogEnclosures` hypotheses. No seed is unconditional: the matrix
+identification, min–max counting and scalar `exp` enclosures remain (METHOD.md). The
+43-point inventory shows that full k×k Gram checks reach hours to ~1,000 hours for the
+65,536- and 531,441-dimensional seeds, so routes 1–2 do not scale there without clustering or
+symmetry reductions.

@@ -1,5 +1,5 @@
 # Generate separately checked direct scalar blocks to bound kernel memory.
-include("check.jl")
+include(joinpath(@__DIR__, "..", "check.jl"))
 c=JSON.parsefile(joinpath(OUT,"certificate.json")); @assert verify_certificate(c)
 p=c["points"][2]; n=p["n"]; @assert n==12
 V=map(p["packed"]) do x
@@ -7,7 +7,7 @@ V=map(p["packed"]) do x
 end
 lam=exactint.(p["lambda"])
 R=[SCALE.*apply_h(n,V[i]).-lam[i].*V[i] for i in 1:2]
-open(joinpath(OUT,"LeanSeedSmall/GeneratedChunks.lean"),"w") do io
+open(joinpath(LEANDIR,"GeneratedChunks.lean"),"w") do io
     println(io,"import LeanSeedSmall.Generated\nimport LeanSeedSmall.Chunked\n")
     println(io,"namespace LeanSeedSmall\nset_option maxHeartbeats 0\nset_option maxRecDepth 1000000")
     for j in 0:63
