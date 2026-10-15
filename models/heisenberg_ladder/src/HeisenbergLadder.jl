@@ -8,7 +8,7 @@ coupling `J`, one rung per cell). Three layers:
 - `spectra.jl`: symmetry-resolved complete spectra, either verified (interval matrix, Weyl
   residual enclosure) or numerical (for the floating-point scans only).
 - `suite.jl`: the certificate: grid classification, rejection witnesses, all-beta seed
-  exclusions, coupling continuation, `produce` and `check`.
+  exclusions, coupling continuation, `produce`, `check_stored` (fast) and `check` (full).
 """
 module HeisenbergLadder
 

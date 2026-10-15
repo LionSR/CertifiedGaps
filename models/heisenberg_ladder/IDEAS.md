@@ -20,7 +20,7 @@ finite-size certificate method, not the physical gap-closing coupling.
 4. **Perturbation from independent rungs.** Weyl sandwiches log Zₙ around the rung product
    with an error extensive in n. Cost O(1), any n, but the bulk cancellation between the
    purities is lost. Tested analytically: **fails for every n and β when 0 < J⊥ ≤ 4**, even
-   with the centred bond (PERTURBATION.md). The same norm bound is useful *locally in J⊥*: it
+   with the centred bond (METHOD.md). The same norm bound is useful *locally in J⊥*: it
    continues a certified seed over |J⊥ − J*| ≤ δ.
 5. **Smaller seeds.** P_τ(2n, β) = Pₛ(n, 2β) P_τ(n, β)² / Pₛ(n, β)² is exact, but bounding
    P_τ(2n) this way still needs Pₛ(n, 2β), i.e. Z₂ₙ(2β); no ring is saved without extra
@@ -35,6 +35,15 @@ finite-size certificate method, not the physical gap-closing coupling.
    control E₀ but not the thermal tail, and a small energy-density error grows extensively
    in the purity ratio. Not attempted.
 
+## Practical notes
+
+- Running the six ten-rung scans concurrently with dense complex intermediates exceeded a
+  17 GiB memory limit (one process OOM-killed). The numerical path therefore builds blocks
+  sparsely and makes complex momentum blocks real with a sparse antiunitary change of basis.
+  Run scans one or two at a time.
+- The ten-rung spectra are stored compacted (sector table, log Z grid, lowest 32 levels);
+  full level lists are regenerable with `scripts/scan.jl` and are not needed by any check.
+
 ## Outcome
 
 - Certified seeds at n₀ = 4 for J⊥ = 4, 7/2, 3, 5/2 and at the upper threshold endpoint, with
@@ -45,12 +54,3 @@ finite-size certificate method, not the physical gap-closing coupling.
 - The floating-point scans through ten rungs find no even seed at J⊥ ≤ 2. A two-point fit of
   the spatial mismatch suggests n₀ ≈ 6 (J⊥ = 2) and 8 (J⊥ = 3/2), i.e. complete traces of
   24 and 32 spins, beyond dense ED. Reaching them needs route 2 or 3, not larger ED.
-
-## Practical notes
-
-- Running the six ten-rung scans concurrently with dense complex intermediates exceeded a
-  17 GiB memory limit (one process OOM-killed). The numerical path therefore builds blocks
-  sparsely and makes complex momentum blocks real with a sparse antiunitary change of basis.
-  Run scans one or two at a time.
-- The ten-rung spectra are stored compacted (sector table, log Z grid, lowest 32 levels);
-  full level lists are regenerable with `scripts/scan.jl` and are not needed by any check.
