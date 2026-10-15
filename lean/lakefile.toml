@@ -14,3 +14,14 @@ rev = "v4.35.0-rc3"
 
 [[lean_lib]]
 name = "CertifiedGaps"
+
+# Kernel-checked seed arithmetic (spin-1 and Ising), opt-in: `lake build SeedKernel`.
+# The root `SeedKernel.Audit` prints the axioms of every main declaration.
+[[lean_lib]]
+name = "SeedKernel"
+roots = ["SeedKernel", "SeedKernel.Audit"]
+
+# Kernel benchmarks (several minutes, up to ~4 GB per file), opt-in: `lake build SeedKernelBench`.
+[[lean_lib]]
+name = "SeedKernelBench"
+globs = ["SeedKernel.Bench.+"]

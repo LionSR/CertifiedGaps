@@ -1,8 +1,0 @@
-# Std-only on purpose: nothing here imports Mathlib, so `lake build` needs no Mathlib cache.
-# The Mathlib API audit (scripts/audit_mathlib.sh) reads the source pinned by the repository's
-# lean/ project instead.
-name = "SeedPrototype"
-defaultTargets = ["SeedPrototype"]
-
-[[lean_lib]]
-name = "SeedPrototype"

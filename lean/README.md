@@ -3,16 +3,22 @@
 A Lean 4 project, with Mathlib as its only dependency, that proves uniform spectral gaps of
 quantum spin rings with the two-purity doubling argument of the thermal-MPO note
 (`../notes/thermal-mpo-gap-note.tex`). Everything is proved except the seed inequalities: two
-numbers per model, stated as named `sorry` lemmas. All declarations live in the namespace
-`CertifiedGaps`; the names below are relative to it.
+numbers per model, stated as named `sorry` lemmas. The library `CertifiedGaps` (the default
+target) holds the criterion and the models; all its declarations live in the namespace
+`CertifiedGaps`, and the names below are relative to it. A second, opt-in library
+`SeedKernel` kernel-checks seed arithmetic toward closing those `sorry`s
+([below](#seedkernel-kernel-checked-seed-arithmetic)).
 
 ```sh
 cd lean
-lake exe cache get   # prebuilt Mathlib; never build Mathlib from source
-lake build           # about 4 minutes from scratch, warning-free except the seed `sorry`s
+lake exe cache get          # prebuilt Mathlib; never build Mathlib from source
+lake build                  # CertifiedGaps: about 4 min from scratch, warning-free but the seeds
+lake build SeedKernel       # opt-in: kernel-checked seed arithmetic, about 80 s more
+lake build SeedKernelBench  # opt-in: kernel benchmarks, about 2 min, up to 4 GB per file
 ```
 
-Lean and Mathlib are pinned at `v4.35.0-rc3`. The package has about 4400 lines.
+Lean and Mathlib are pinned at `v4.35.0-rc3`. `CertifiedGaps` has about 4400 lines, `SeedKernel`
+about 1200 (plus generated witness files).
 
 ## Status
 
@@ -42,8 +48,8 @@ The Lean theorems use the seeds that were current when they were written. Some m
 certificates have since improved (for example `models/spin1_largeD` now certifies 0.899 at
 `D = 4` from an `n₀ = 12` seed, and `models/dimerized_heisenberg` has slightly stronger seeds
 than the ones used here, which therefore remain valid); the model READMEs and the root README give the current bounds.
-Kernel-checked seed arithmetic is studied outside this package, in `models/lean_seed_small/`
-and `models/spin1_lean_seed/`.
+Kernel-checked seed arithmetic is in the opt-in library `SeedKernel` (below), whose generators
+and checker are in `models/lean_seeds/`.
 
 ### Proved theorems (no `sorry`)
 
@@ -64,6 +70,53 @@ These use only `propext`, `Classical.choice` and `Quot.sound`.
 The seeds of the models come from the certificates in `../models/` (complete spectra of the seed
 rings with rigorous eigenvalue enclosures; each model file names its directory). The spin-1
 Heisenberg seeds are OpenAI's Proposition 5.5, reproduced in `../models/spin1/`.
+
+## SeedKernel: kernel-checked seed arithmetic
+
+An opt-in library (`lake build SeedKernel`; not built by `lake build`) toward proving seeds in
+the kernel. Every computational statement is checked by `decide +kernel` on `Nat`/`Int`, which
+the kernel evaluates with GMP; there is no `native_decide`, no `sorry` and no new axiom.
+`SeedKernel/Audit.lean` (a root of the library) prints the axioms of 36 main declarations: all
+use at most `propext`, `Classical.choice`, `Quot.sound`. The Julia generators, the witness
+inventory and the checker (`check.jl`: Julia replay, `lake build SeedKernel`, audit) are in
+`models/lean_seeds/`, whose README states the results and the open obligations.
+
+**What it proves.** No seed is closed.
+
+* *Shared packed lanes.* A vector of `d` naturals packed into one `Nat` in radix `2^w`, with
+  lane extraction, shifts, butterfly reversal and a one-multiplication dot product; the radix
+  encoding lemmas (`radixPack_extract`, `pack_eq_radixPack`) and kernel-checked examples. The
+  general correctness of the packed operations is stated as `Prop`s (`DotCorrect`, ...) that
+  nothing assumes.
+* *Spin-1 Heisenberg (Std only).* Packed `H` and power filter `nI − H_M` on full `3ⁿ`-lane
+  vectors; comparison with an independent row specification on small rings; arithmetic
+  Ritz/residual witnesses `h6_ritz_witness`, `h8_ritz_witness`, `h10_ritz_witness` (integer
+  facts about the filtered Néel trial, not eigenvalue theorems); a conditional one-Ritz-value
+  counting step.
+* *Longitudinal Ising, g = 1/4, h = 1/20.* Exact integer Gram/residual/anchor inequalities for
+  two generated vectors on the 6- and 12-site rings (packed and direct, the 12-site direct check
+  in 64 blocks with a coverage proof; rejection of corrupted proposals), and
+  `first_point_seed_instance`: the first of the thirty seed conjunctions of
+  `IsingLongitudinal.seeds`, proved from four explicit log Z enclosures (`LogEnclosures`), which
+  remain hypotheses.
+
+| File | Role |
+|---|---|
+| `SeedKernel.lean` | Root: imports the library |
+| `SeedKernel/Packed.lean` | Shared packed-`Nat` lanes: `lane`, `repunit`, `pack`, `move`, `Signed`, floors, `reverseLanes`, `dot`, `gram`, fast variants |
+| `SeedKernel/PackingProofs.lean` | Radix encoding: extraction and `pack = radixPack` |
+| `SeedKernel/Obligations.lean`, `SeedKernel/PackedTests.lean` | Open correctness `Prop`s of the lanes; kernel-checked examples |
+| `SeedKernel/Spin1/Packed.lean`, `Spin1/Optimized.lean` | Packed spin-1 `hApply`, `filterApply`, trial moments, `ritzCheck`; prepared-mask variants |
+| `SeedKernel/Spin1/Obligations.lean`, `Spin1/Tests.lean` | Row specification and open `Prop`s (`HApplyCorrect`, `FilterCorrect`, ...); small-ring comparisons |
+| `SeedKernel/Spin1/Counting.lean` | Conditional one-Ritz-value counting step and two obstructions |
+| `SeedKernel/Spin1/H6.lean`, `H8.lean`, `H10.lean` | Generated Ritz/residual witnesses (`models/lean_seeds/certify.jl spin1_kernel`) |
+| `SeedKernel/Ising/Checker.lean`, `Ising/Packed.lean`, `Ising/Chunked.lean` | Integer `20H`, direct, packed (on the shared lanes) and blockwise checkers |
+| `SeedKernel/Ising/Generated.lean`, `Ising/GeneratedChunks.lean` | Generated proposals and their checks (`models/lean_seeds/certify.jl ising`) |
+| `SeedKernel/Ising/ChunkCoverage.lean`, `Ising/NegativeChecks.lean` | Coverage of the 64 blocks; rejection of wrong proposals |
+| `SeedKernel/Ising/Arithmetic.lean`, `Ising/ResidualLemma.lean` | Endpoint arithmetic of the log enclosures; the scalar weighted-residual lemma |
+| `SeedKernel/Ising/SeedBridge.lean` | `LogEnclosures` and the conditional seed of `IsingLongitudinal` at its first point |
+| `SeedKernel/Audit.lean` | `#print axioms` for every main declaration |
+| `SeedKernel/Bench/*.lean` | Kernel benchmarks up to n = 12 (library `SeedKernelBench`) |
 
 ## Adding a model
 
