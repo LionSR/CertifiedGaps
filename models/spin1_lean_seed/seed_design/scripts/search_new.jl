@@ -1,7 +1,7 @@
-include("common.jl")
+include(joinpath(@__DIR__, "..", "src", "common.jl"))
 
 function load_spectra(nmax)
-    Dict((n,g)=>JSON3.read(read(joinpath(@__DIR__,"cache","spectrum-$n-$g.json"),String),
+    Dict((n,g)=>JSON3.read(read(joinpath(CACHE,"spectrum-$n-$g.json"),String),
         Dict{String,Any})
         for n in 4:nmax for g in 0:2)
 end
@@ -57,7 +57,7 @@ function main()
             flush(stdout)
         end
     end
-    write_result(joinpath(@__DIR__,"new_search_$nmax.json"),Dict(
+    write_compact(joinpath(RAW,"new_search_$nmax.json"),Dict(
         "metadata"=>metadata("new spectra; all non-certifying"),
         "checks_against_stored_centers"=>checks,"records"=>records))
 end

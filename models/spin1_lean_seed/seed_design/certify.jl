@@ -1,18 +1,18 @@
-include("exact.jl")
+include(joinpath(@__DIR__, "src", "exact.jl"))
 
 function audit_stored(source,eps)
     @assert eps >= (source==1 ? frac(3,100000) : frac(1,100000))
-    verification=read_exact_json(joinpath(RESULTS,"verification.json"))
+    verification=read_exact_json(joinpath(SPIN1_RESULTS,"verification.json"))
     @assert verification["status"]=="passed"
     paths=["source$source","trials"]
     hashes=Dict{String,String}()
     for name in paths
-        path=joinpath(RESULTS,"$name.json")
+        path=joinpath(SPIN1_RESULTS,"$name.json")
         h=sha256_file(path)
         @assert verification["components"][name]["sha256"]==h
         hashes[name]=h
     end
-    raw=read_exact_json(joinpath(RESULTS,"source$source.json"))
+    raw=read_exact_json(joinpath(SPIN1_RESULTS,"source$source.json"))
     for row in raw["certificates"]
         c=parse_rational(row["center"])
         lo=parse_rational(row[source==1 ? "lower" : "true_trace_lower"])
@@ -54,7 +54,7 @@ function main_certify()
             " gap > ",chain["gap_display"]," every even L >= ",trial÷2," seconds=",time()-started)
         flush(stdout)
     end
-    write_result(joinpath(@__DIR__,"certificate.json"),Dict(
+    write_result(joinpath(OUT,"certificate.json"),Dict(
         "metadata"=>metadata("three exact scalar designs";
         status="exact rational scalar checks passed; " *
             "physical premises and analytic lemmas not Lean-checked"),
@@ -67,7 +67,7 @@ function main_certify()
             [r["new"] for r in row["seed"]["refinements"]]),
         "chain_rate"=>row["chain"]["r"],"chain_steps"=>length(row["chain"]["s"])-1,
         "chain_grid"=>"10^512") for row in rows]
-    write_result(joinpath(@__DIR__,"compact_witnesses.json"),Dict(
+    write_result(joinpath(OUT,"compact_witnesses.json"),Dict(
         "scope"=>"compact replay recipes; not standalone physical or Lean certificates",
         "designs"=>compact))
 end

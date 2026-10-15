@@ -1,7 +1,7 @@
-include("common.jl")
+include(joinpath(@__DIR__, "..", "src", "common.jl"))
 using Downloads
 using Nemo
-const SOURCE=joinpath(@__DIR__,"upstream","verification/computations")
+const SOURCE=joinpath(UPSTREAM,"verification/computations")
 integer(x::AbstractString)=parse(BigInt,x)
 integer(x::Integer)=BigInt(x)
 include(joinpath(ROOT,"models/spin1/src/trials.jl"))
@@ -51,7 +51,7 @@ function trial_main()
         flush(stdout)
     end
     @assert v>0 && -700741v-500000u>0
-    write_result(joinpath(@__DIR__,"trial_scan.json"),Dict(
+    write_compact(joinpath(OUT,"trial_scan.json"),Dict(
         "metadata"=>metadata("other trial lengths"),
         "floating"=>floating,"exact"=>Dict("length"=>n,"U"=>string(u),"V"=>string(v),
         "positive_margin"=>string(-700741v-500000u),"seconds"=>time()-started,

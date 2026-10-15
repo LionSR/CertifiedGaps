@@ -1,6 +1,6 @@
-include("certify.jl")
+include(joinpath(@__DIR__, "certify.jl"))
 
-function check_certificate(path=joinpath(@__DIR__,"certificate.json"))
+function check_certificate(path=joinpath(OUT,"certificate.json"))
     c=JSON3.read(read(path,String),Dict{String,Any})
     for row in c["designs"]
         inp=row["input"];seed=row["seed"];chain=row["chain"]
@@ -30,5 +30,5 @@ function check_certificate(path=joinpath(@__DIR__,"certificate.json"))
     true
 end
 if abspath(PROGRAM_FILE) == @__FILE__
-    check_certificate(isempty(ARGS) ? joinpath(@__DIR__,"certificate.json") : only(ARGS))
+    check_certificate(isempty(ARGS) ? joinpath(OUT,"certificate.json") : only(ARGS))
 end

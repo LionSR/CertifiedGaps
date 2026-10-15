@@ -1,4 +1,4 @@
-include("search_new.jl")
+include(joinpath(@__DIR__, "search_new.jl"))
 function main_refine()
     rows=Any[]
     for eps in (1e-5,3e-5,1e-4,2e-4,3e-4,4e-4,5e-4,7.5e-4,1e-3),
@@ -26,7 +26,7 @@ function main_refine()
             (first(existing).gap,first(existing).p,first(existing).q,
                 first(existing).k,first(existing).r))
     end
-    write_result(joinpath(@__DIR__,"refinement.json"),Dict(
+    write_compact(joinpath(RAW,"refinement.json"),Dict(
         "metadata"=>metadata("source 2 error/mass ablation"),"records"=>rows))
 end
 main_refine()

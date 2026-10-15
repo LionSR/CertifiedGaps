@@ -2,7 +2,7 @@ using Test
 include(joinpath(@__DIR__,"../check.jl"))
 @testset "exact scalar replay and forged witnesses" begin
     @test check_certificate()
-    cert=JSON3.read(read(joinpath(@__DIR__,"../certificate.json"),String),Dict{String,Any})
+    cert=JSON3.read(read(joinpath(OUT,"certificate.json"),String),Dict{String,Any})
     for row in cert["designs"]
         input=row["input"];c=row["chain"]
         @test chain_valid(c)
@@ -33,7 +33,7 @@ include(joinpath(@__DIR__,"../check.jl"))
 end
 @testset "Float64 controls remain explicitly non-certifying" begin
     for n in 4:10,g in 0:2
-        path=joinpath(@__DIR__,"../cache","spectrum-$n-$g.json")
+        path=joinpath(CACHE,"spectrum-$n-$g.json")
         isfile(path) || continue
         s=JSON3.read(read(path,String),Dict{String,Any})
         @test s["certified"]===false

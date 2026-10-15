@@ -1,6 +1,6 @@
 # Exact scalar verifier. The finite physical inputs and analytic lemmas remain hypotheses
 # until separately proved in Lean; no floating-point comparison accepts an inequality here.
-include("common.jl")
+include(joinpath(@__DIR__, "common.jl"))
 
 function exact_sector_data(source,mode,eps)
     table=stored_table(source)
@@ -162,18 +162,19 @@ function exact_input(source,mode,nmax,eps,proposals;uncappedO=false)
         "base_beta"=>source==1 ? "49//4" : "21//2")
 end
 
+"Check the stored exact MPS trial energy beats the shift: 500000 U + 700741 V < 0."
 function verify_trial(trial)
     if trial in (72,120)
-        path=joinpath(RESULTS,"trials.json")
+        path=joinpath(SPIN1_RESULTS,"trials.json")
         row=only(x for x in read_exact_json(path)["certificates"] if parse(Int,x["length"])==trial)
     else
-        path=joinpath(@__DIR__,"trial_scan.json")
+        path=joinpath(OUT,"trial_scan.json")
         row=read_exact_json(path)["exact"]
         @assert parse(Int,row["length"])==trial
     end
     u,v=parse(BigInt,row["U"]),parse(BigInt,row["V"])
     @assert v>0 && 500000u+700741v<0
-    Dict("path"=>relpath(path,@__DIR__),"sha256"=>sha256_file(path),"length"=>trial,
+    Dict("path"=>relpath(path,PROJECT),"sha256"=>sha256_file(path),"length"=>trial,
         "energy_per_bond"=>string(u//v),"positive_margin"=>string(-500000u-700741v),
         "scope"=>trial in (72,120) ? "stored exact trial output; no fresh contraction" :
             "fresh Julia integer contraction")

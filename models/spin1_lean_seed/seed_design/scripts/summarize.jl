@@ -1,6 +1,6 @@
-include("common.jl")
+include(joinpath(@__DIR__, "..", "src", "common.jl"))
 
-loadjson(name)=JSON3.read(read(joinpath(@__DIR__,name),String),Dict{String,Any})
+loadjson(path)=JSON3.read(read(path,String),Dict{String,Any})
 
 function used_pairs(filters,mode,nmax;exact=false)
     supports=[Set([nmax]) for _ in filters]
@@ -24,9 +24,9 @@ function work(pairs,beta,eps;a=SHIFT)
     rows=Any[]
     dimension_sum=proxy=matvec=gram=complex_proxy=0.0
     for (n,g) in pairs
-        path=joinpath(@__DIR__,"cache","spectrum-$n-$g.json")
+        path=joinpath(CACHE,"spectrum-$n-$g.json")
         isfile(path) || error("missing spectra for work proxy: $path")
-        spec=loadjson(joinpath("cache","spectrum-$n-$g.json"))
+        spec=loadjson(path)
         cutoff=log(2*3.0^n/eps)/beta-n*a
         K=0;mv=0;gr=0;censored=false;persector=Any[]
         for s in spec["sectors"]
@@ -48,7 +48,7 @@ function work(pairs,beta,eps;a=SHIFT)
 end
 
 function main_summary()
-    certificate=loadjson("certificate.json")
+    certificate=loadjson(joinpath(OUT,"certificate.json"))
     design_rows=Any[]
     for d in certificate["designs"]
         input=d["input"];seed=d["seed"];chain=d["chain"]
@@ -68,7 +68,7 @@ function main_summary()
     for (filename,sourcekind) in (("existing_search.json","stored tables"),
         ("new_search_8.json","Float64 spectra"),("new_search_10.json","Float64 spectra"),
         ("refinement.json","stored tables"))
-        for row in loadjson(filename)["records"]
+        for row in loadjson(joinpath(RAW,filename))["records"]
             reps=get(row,"best_per_trial",Any[])
             isempty(reps) && continue
             source=get(row,"source",2)
@@ -94,7 +94,7 @@ function main_summary()
     sort!(front;by=r->(r["state_proxy"],r["eps"],-r["gap"]))
     cols=["nmax","mode","eps","base_beta","beta","n0","trial","gap","p","q","k","r",
         "trace_count","dimension_sum","state_proxy","complex_state_proxy","input_kind","certified"]
-    open(joinpath(@__DIR__,"pareto.csv"),"w") do io
+    open(joinpath(OUT,"pareto.csv"),"w") do io
         println(io,join(cols,","))
         for r in front
             println(io,join((r[c] for c in cols),","))
@@ -102,18 +102,18 @@ function main_summary()
     end
     control=Any[]
     for n in 4:12,g in 0:(n==12 ? 1 : 2)
-        path=joinpath(@__DIR__,"cache","spectrum-$n-$g.json")
+        path=joinpath(CACHE,"spectrum-$n-$g.json")
         isfile(path) || continue
-        spec=loadjson(joinpath("cache","spectrum-$n-$g.json"))
+        spec=loadjson(path)
         push!(control,Dict("n"=>n,"g"=>g,"seconds"=>sum(s["seconds"] for s in spec["sectors"]),
             "largest_residual"=>maximum(s["maximum_ritz_residual"] for s in spec["sectors"]),
             "spectrum_sha256"=>sha256_file(path),"certified"=>false))
     end
-    write_result(joinpath(@__DIR__,"summary.json"),Dict(
+    write_compact(joinpath(OUT,"summary.json"),Dict(
         "metadata"=>metadata("work and Pareto summary; estimates non-certifying"),
         "designs"=>design_rows,"original_work"=>baseline,"pareto"=>front,
         "candidate_count"=>length(candidates),"spectrum_controls"=>control,
-        "upstream_sha256"=>Dict(n=>sha256_file(joinpath(@__DIR__,"upstream",n))
+        "upstream_sha256"=>Dict(n=>sha256_file(joinpath(UPSTREAM,n))
             for n in ("initialization.tex","transfer.tex","thermal72.tex",
                 "trials.tex","bootstrap.tex"))))
     for r in design_rows

@@ -1,4 +1,4 @@
-include("search_new.jl")
+include(joinpath(@__DIR__, "search_new.jl"))
 
 function direct_seed(input,N)
     pwr=N/input.nmax
@@ -59,7 +59,7 @@ function main_diagnostics()
             "best_max_defect"=>minimax,"direct"=>direct)
         push!(summaries,rec);println(rec);flush(stdout)
     end
-    write_result(joinpath(@__DIR__,"diagnostics.json"),Dict(
+    write_compact(joinpath(OUT,"diagnostics.json"),Dict(
         "metadata"=>metadata("adversarial negative-case scan"),"records"=>summaries))
 end
 main_diagnostics()

@@ -1,5 +1,5 @@
 # All spectra and derived thermal values are NON-CERTIFYING Float64 calculations.
-include("common.jl")
+include(joinpath(@__DIR__, "..", "src", "common.jl"))
 using SparseArrays, KrylovKit, Random, Serialization
 BLAS.set_num_threads(1)
 
@@ -62,15 +62,15 @@ function spectrum(n,twist; nev=96)
 end
 
 function main()
-    mkpath(joinpath(@__DIR__,"cache"))
+    mkpath(CACHE)
     lengths=isempty(ARGS) ? (4:10) : parse.(Int,ARGS)
     for n in lengths, g in 0:2
         n == 12 && g == 2 && continue  # Baseline workload needs only the two real twists.
-        path=joinpath(@__DIR__,"cache","spectrum-$n-$g.json")
+        path=joinpath(CACHE,"spectrum-$n-$g.json")
         isfile(path) && continue
         result=spectrum(n,g;nev=n==12 ? 48 : 96)
         result["metadata"]=metadata("Float64 spectra; n=$n g=$g")
-        write_result(path,result)
+        write_compact(path,result)
     end
 end
 if abspath(PROGRAM_FILE) == @__FILE__

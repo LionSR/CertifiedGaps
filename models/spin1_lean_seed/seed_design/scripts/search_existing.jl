@@ -1,4 +1,4 @@
-include("common.jl")
+include(joinpath(@__DIR__, "..", "src", "common.jl"))
 function main()
     records=Any[]
     for source in (1,2), nmax in (8,10,12), mode in ("Z","JN","ION"),
@@ -24,7 +24,7 @@ function main()
             flush(stdout)
         end
     end
-    write_result(joinpath(@__DIR__,"existing_search.json"),Dict(
+    write_compact(joinpath(RAW,"existing_search.json"),Dict(
         "metadata"=>metadata("existing inputs"),"records"=>records))
 end
 main()

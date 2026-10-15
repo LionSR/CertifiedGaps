@@ -29,3 +29,12 @@ search scalar bounds, then replay 2–3 useful designs with exact rationals.
 Report failures and conditional assumptions explicitly, along with work proxies
 and the analytic lemmas each winning design needs. Do not infer a runtime for
 an unimplemented Lean spectral checker from Julia timings.
+
+## Outcome
+
+Route 2 (I/O/N split with the C twist) won; route 1 (real twists only) works only with the
+length-12 tables. Three designs replay exactly (README); the recommended one uses nine traces
+at n = 6, 8, 10 with absolute error 3/10000 and gives a conditional gap > 0.005966152 for every
+even L ≥ 60. Length 8 fails in the tested family even at zero error (best maximum defect about
+0.529), and length 10 without the C twist fails as well (about 0.296). Route 4 (moving the
+shift) only relabels the error budget. Details and the Pareto front are in METHOD.md.

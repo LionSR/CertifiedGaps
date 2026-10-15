@@ -1,16 +1,23 @@
 # Search utilities. Float64 functions in this file are NON-CERTIFYING.
 using LinearAlgebra, JSON3, SHA, Dates, TOML
-const ROOT = normpath(joinpath(@__DIR__, "../../.."))
+# Paths: ROOT is the repository, PROJECT this directory. Generated data live under results/
+# (raw search rows in results/raw/, gitignored); spectra and downloads in cache/ and upstream/.
+const PROJECT = normpath(joinpath(@__DIR__, ".."))
+const ROOT = normpath(joinpath(PROJECT, "../../.."))
+const OUT = joinpath(PROJECT, "results")
+const RAW = joinpath(OUT, "raw")
+const CACHE = joinpath(PROJECT, "cache")
+const UPSTREAM = joinpath(PROJECT, "upstream")
 include(joinpath(ROOT, "julia/src/ExactArithmetic.jl"))
 include(joinpath(ROOT, "julia/src/Results.jl"))
 using .ExactArithmetic, .Results
 const SHIFT = 700741 / 500000
 const RATSHIFT = frac(700741, 500000)
-const RESULTS = joinpath(ROOT, "models/spin1/results")
+const SPIN1_RESULTS = joinpath(ROOT, "models/spin1/results")
 const sqdef(x) = x * (2 + x) / (1 + x)^2
 
 function stored_table(source)
-    raw = read_exact_json(joinpath(RESULTS, "source$source.json"))
+    raw = read_exact_json(joinpath(SPIN1_RESULTS, "source$source.json"))
     Dict((parse(Int, row["n"]), parse(Int, row["twist"])) =>
         parse_rational(row["center"]) for row in raw["certificates"])
 end
@@ -176,18 +183,30 @@ function scan_seeds(input; trials=(72,120), multipliers=1.0:0.125:5.0)
     sort!(rows;by=x->-x.gap)
 end
 
+"Provenance record: source and environment hashes plus package versions."
 function metadata(config; status="non-certifying Float64 discovery")
-    hashes=source_hashes(@__DIR__;dirs=("test",),
-        files=filter(f->endswith(f,".jl"),readdir(@__DIR__)))
-    hashes["../../../julia/src/ExactArithmetic.jl"]=
-        sha256_file(joinpath(ROOT,"julia/src/ExactArithmetic.jl"))
-    hashes["../../../julia/src/Results.jl"]=sha256_file(joinpath(ROOT,"julia/src/Results.jl"))
-    for name in ("Project.toml","Manifest.toml")
-        hashes[name]=sha256_file(joinpath(@__DIR__,name))
+    hashes=source_hashes(PROJECT;files=("certify.jl","check.jl"))
+    for name in ("julia/src/ExactArithmetic.jl","julia/src/Results.jl")
+        hashes["../../../$name"]=sha256_file(joinpath(ROOT,name))
     end
-    manifest=TOML.parsefile(joinpath(@__DIR__,"Manifest.toml"))
+    for name in ("Project.toml","Manifest.toml")
+        hashes[name]=sha256_file(joinpath(PROJECT,name))
+    end
+    manifest=TOML.parsefile(joinpath(PROJECT,"Manifest.toml"))
     result=run_metadata(config;source_sha256=hashes,packages=(JSON3,),status,certified=false)
     result["package_versions"]=Dict(name=>only(manifest["deps"][name])["version"]
         for name in ("JSON3","KrylovKit","Nemo","FLINT_jll"))
     result
+end
+
+"""
+    write_compact(path, data)
+
+Write a search or summary record as single-line JSON (via `JSON3.write`); these files are
+regenerable floating-point outputs, so they are stored without pretty-printing.
+"""
+function write_compact(path, data)
+    mkpath(dirname(abspath(path)))
+    open(io -> (JSON3.write(io, data); println(io)), path, "w")
+    path
 end

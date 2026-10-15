@@ -1,4 +1,4 @@
-# Finite seed redesign for the Lean spin-1 gap proof
+# Finite seed redesign for the Lean spin-1 gap proof: method and findings
 
 ## Recommendation and trust boundary
 
@@ -32,7 +32,7 @@ seed lemmas. The required spatial moment inequalities already exist in
 
 All three use the original shift `a = 700741/500000`. `b` is the temperature of the finite
 thermal tables; `beta = r b` is the temperature of the resulting seed. Bounds below come from
-`certificate.json`, with upward/downward rational rounding throughout.
+`results/certificate.json`, with upward/downward rational rounding throughout.
 
 | Design | Thermal lengths; twists | eps per trace | b | r; beta | Trial; n0 | p upper, displayed | q upper, displayed | Exact gap lower bound |
 |---|---|---:|---:|---|---|---:|---:|---:|
@@ -136,10 +136,10 @@ for arbitrary filters, moment inequalities, or trial tensors.
   the rescaled physical and spatial trial lower bounds. The MPS energy was screened at
   every multiple of four from 24 through 192; only length 144 was freshly contracted exactly.
 
-`pareto.csv` contains **39 nondominated rows from 94 successful grid representatives**, using
-four objectives: minimize `sum 3^n K`, maximize eps, maximize the reported numerical gap,
-and minimize the covered-length threshold. Representatives retain the best gap at each tested
-trial length, rather than silently dropping shorter-length coverage. This is a Pareto front
+`results/pareto.csv` contains **39 nondominated rows from 94 successful grid
+representatives**, using four objectives: minimize `sum 3^n K`, maximize eps, maximize the
+reported numerical gap, and minimize the covered-length threshold. Representatives retain the best gap at each tested trial length,
+rather than silently dropping shorter-length coverage. This is a Pareto front
 of the recorded grid, at the canonical shift, not of all possible proofs. Every CSV row is
 non-certifying, including rows built from the stored exact tables: their search arithmetic
 and low-state cost estimates are floating point.
@@ -251,7 +251,7 @@ rho = log(2 * 3^n / eps)/b - n*a.
 
 If a certified counting anchor later establishes this cutoff, the omitted-state tail is at
 most eps/2, leaving half the error budget for retained-state enclosures. Here K is estimated
-from **non-certifying** ED/Lanczos, not proved by the residuals. `summarize.jl` rejects a
+from **non-certifying** ED/Lanczos, not proved by the residuals. `scripts/summarize.jl` rejects a
 truncated Ritz list that does not extend beyond rho. The estimates include physical
 multiplicities and all Sz sectors; they do not assume SU(2) counting.
 
@@ -291,8 +291,9 @@ without SU(2) reduction. FLINT integer powers took about **5 seconds** (about 6 
 result assembly); the exact energy per bond is approximately `-1.4014821051729465`.
 The output contains the full U, V and positive integer margin `-500000 U - 700741 V`.
 The three scalar replays take roughly 5–7 seconds including compilation; the two subsequent
-warm replays take about 0.05 seconds each. Final tests passed **110 checks**, including rejection
-of forged rates, invalid chain steps, inflated tails, and invalid filter caps.
+warm replays take about 0.05 seconds each. Final tests passed **110 checks** (46 exact, plus
+64 Float64 spectrum controls that run only when `cache/` holds the n = 4–10 spectra),
+including rejection of forged rates, invalid chain steps, inflated tails, and invalid filter caps.
 
 ### Lean effort and kernel time
 
@@ -329,27 +330,14 @@ the anchor succeeds and the finite transfer extension is straightforward. Neithe
 was established by this task. The priority gate remains a sound, inexpensive low-spectrum
 counting anchor at n=10; seed arithmetic is no longer the critical numerical obstacle.
 
-## Deliverables, verification, and remaining risks
+## Remaining risks
 
-- `certificate.json`: three expanded rational scalar witnesses and chain certificates.
-- `compact_witnesses.json`: 9.1 KiB of replay recipes for all three designs.
-- `check.jl`, `test/runtests.jl`, `test_results.txt`: scalar replay and adversarial checks.
-- `trial_scan.json`: fresh length-144 exact contraction plus explicitly non-certifying scans
-  of other trial lengths. The exact source matrix recipe is checked against the pinned
-  upstream manifest before contracting.
-- `pareto.csv`, `summary.json`: the numerical grid frontier and workload estimates.
-- `existing_search.json`, `new_search_8.json`, `new_search_10.json`, `refinement.json`,
-  `diagnostics.json`, `shift_search.json`: successful and failed searches, with Julia scripts.
-- `README.md`: reproducible commands. `Manifest.toml` pins package versions. Source and input
-  hashes are recorded in outputs. The upstream paper was read at commit
-  `adc7f1241b42e322a6451854ab7e4b4c146bf78a`, with downloaded files confined to this directory.
-
-Remaining risks are concrete: the spectral counting anchor is unproved; a complex C trace
+The open obligations are concrete: the spectral counting anchor is unproved; a complex C trace
 needs kernel-checked arithmetic; the finite twisted transfer/sector extension is missing;
 Peierls/Ritz and MPS formulas must be tied to the Lean Hamiltonian and its normalization;
 and the packed kernel's speed has not been measured on these witnesses. An exact scalar
 recheck does not close any of those obligations. The nmax=8 and no-C nmax=10 failures are
 negative results for the tested family, not universal lower bounds.
 
-All authored and generated files are confined to `models/spin1_lean_seed/seed_design/`.
-Neither `lean/` nor `models/spin1/results/` was modified.
+The upstream paper was read at commit `adc7f1241b42e322a6451854ab7e4b4c146bf78a`
+(`scripts/fetch_paper.jl`); downloads stay in the ignored `upstream/` directory.
