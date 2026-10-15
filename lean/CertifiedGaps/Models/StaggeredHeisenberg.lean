@@ -19,7 +19,7 @@ The seeds are certified in `models/heisenberg_staggered_field` (complete spectra
 `8` and `16` sites with rigorous eigenvalue enclosures); they are the only `sorry`s.
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 
 namespace CertifiedGaps.StaggeredHeisenberg
 

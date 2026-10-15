@@ -57,7 +57,7 @@ implied by the note's eq. (5).
 
 open Filter Finset Real
 
-namespace ThermalPurityGap
+namespace CertifiedGaps
 
 /-! ### Lemma 1: squaring -/
 
@@ -658,4 +658,4 @@ theorem gapGT_of_purities (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀ :
   norm_num at h
   exact h
 
-end ThermalPurityGap
+end CertifiedGaps

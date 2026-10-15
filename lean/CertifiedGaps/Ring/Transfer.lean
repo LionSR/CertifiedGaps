@@ -42,7 +42,7 @@ variable {d : Type} [Fintype d] [DecidableEq d]
 /-! ### Ring geometry -/
 
 /-- The cyclic successor in coordinates: `finRotate L j = j + 1`, wrapping `L - 1` to `0`. -/
-theorem val_finRotate' {L : ℕ} (j : Fin L) :
+theorem val_finRotate {L : ℕ} (j : Fin L) :
     (finRotate L j : ℕ) = if (j : ℕ) + 1 = L then 0 else (j : ℕ) + 1 := by
   cases L with
   | zero => exact j.elim0
@@ -51,17 +51,17 @@ theorem val_finRotate' {L : ℕ} (j : Fin L) :
     split_ifs with h₁ h₂ h₂ <;> simp_all [Fin.ext_iff]
 
 /-- On a ring of at least two sites, the two ends of a bond are distinct. -/
-theorem ne_finRotate' {L : ℕ} (hL : 2 ≤ L) (j : Fin L) : j ≠ finRotate L j := by
+theorem ne_finRotate {L : ℕ} (hL : 2 ≤ L) (j : Fin L) : j ≠ finRotate L j := by
   intro h
   have h' := congrArg Fin.val h
-  rw [val_finRotate'] at h'
+  rw [val_finRotate] at h'
   split_ifs at h' <;> omega
 
 /-- The even site `2 k` of a ring of `2 N` sites. -/
-def evenSite' (N : ℕ) (k : Fin N) : Fin (2 * N) := ⟨2 * k, by omega⟩
+def evenSite (N : ℕ) (k : Fin N) : Fin (2 * N) := ⟨2 * k, by omega⟩
 
 /-- The odd site `2 k + 1` of a ring of `2 N` sites. -/
-def oddSite' (N : ℕ) (k : Fin N) : Fin (2 * N) := ⟨2 * k + 1, by omega⟩
+def oddSite (N : ℕ) (k : Fin N) : Fin (2 * N) := ⟨2 * k + 1, by omega⟩
 
 /-- The even bonds of a ring, in increasing order. -/
 def evenBonds (L : ℕ) : List (Fin L) := (List.finRange L).filter fun j ↦ decide (Even j.val)
@@ -69,86 +69,41 @@ def evenBonds (L : ℕ) : List (Fin L) := (List.finRange L).filter fun j ↦ dec
 /-- The odd bonds of a ring, in increasing order. -/
 def oddBonds (L : ℕ) : List (Fin L) := (List.finRange L).filter fun j ↦ !decide (Even j.val)
 
-theorem evenBonds_two_mul (N : ℕ) : evenBonds (2 * N) = List.ofFn (evenSite' N) := by
+theorem evenBonds_two_mul (N : ℕ) : evenBonds (2 * N) = List.ofFn (evenSite N) := by
   refine List.SortedLT.eq_of_mem_iff ?_ ?_ fun j ↦ ?_
   · exact ((List.sortedLT_finRange _).pairwise.filter _).sortedLT
   · exact List.sortedLT_ofFn_iff.2 fun a b h ↦ by
-      simp only [evenSite', Fin.lt_def] at h ⊢; omega
+      simp only [evenSite, Fin.lt_def] at h ⊢; omega
   · simp only [evenBonds, List.mem_filter, List.mem_finRange, true_and, decide_eq_true_eq,
       List.mem_ofFn]
     constructor
     · rintro ⟨r, hr⟩
-      exact ⟨⟨r, by omega⟩, Fin.ext (by simp [evenSite']; omega)⟩
+      exact ⟨⟨r, by omega⟩, Fin.ext (by simp [evenSite]; omega)⟩
     · rintro ⟨k, rfl⟩
-      exact ⟨k, by simp [evenSite']; omega⟩
+      exact ⟨k, by simp [evenSite]; omega⟩
 
-theorem oddBonds_two_mul (N : ℕ) : oddBonds (2 * N) = List.ofFn (oddSite' N) := by
+theorem oddBonds_two_mul (N : ℕ) : oddBonds (2 * N) = List.ofFn (oddSite N) := by
   refine List.SortedLT.eq_of_mem_iff ?_ ?_ fun j ↦ ?_
   · exact ((List.sortedLT_finRange _).pairwise.filter _).sortedLT
   · exact List.sortedLT_ofFn_iff.2 fun a b h ↦ by
-      simp only [oddSite', Fin.lt_def] at h ⊢; omega
+      simp only [oddSite, Fin.lt_def] at h ⊢; omega
   · simp only [oddBonds, List.mem_filter, List.mem_finRange, true_and, Bool.not_eq_eq_eq_not,
       Bool.not_true, decide_eq_false_iff_not, Nat.not_even_iff_odd, List.mem_ofFn]
     constructor
     · rintro ⟨r, hr⟩
-      exact ⟨⟨r, by omega⟩, Fin.ext (by simp [oddSite']; omega)⟩
+      exact ⟨⟨r, by omega⟩, Fin.ext (by simp [oddSite]; omega)⟩
     · rintro ⟨k, rfl⟩
-      exact ⟨k, by simp [oddSite']⟩
-
-/-- The even site `2 m` lies on the even bond `2 k` exactly when `k = m`. -/
-theorem evenSite_mem_evenBond_iff' {N : ℕ} (m k : Fin N) :
-    evenSite' N m = evenSite' N k ∨ evenSite' N m = finRotate (2 * N) (evenSite' N k) ↔
-      k = m := by
-  simp only [Fin.ext_iff, evenSite', val_finRotate']
-  have := m.isLt
-  have := k.isLt
-  split_ifs <;> omega
-
-/-- The odd site `2 m + 1` lies on the even bond `2 k` exactly when `k = m`. -/
-theorem oddSite_mem_evenBond_iff' {N : ℕ} (m k : Fin N) :
-    oddSite' N m = evenSite' N k ∨ oddSite' N m = finRotate (2 * N) (evenSite' N k) ↔
-      k = m := by
-  simp only [Fin.ext_iff, evenSite', oddSite', val_finRotate']
-  have := m.isLt
-  have := k.isLt
-  split_ifs <;> omega
-
-/-- The even site `2 m` lies on the odd bond `2 k + 1` exactly when `k = m - 1` cyclically. -/
-theorem evenSite_mem_oddBond_iff' {N : ℕ} (m k : Fin N) :
-    evenSite' N m = oddSite' N k ∨ evenSite' N m = finRotate (2 * N) (oddSite' N k) ↔
-      k = (finRotate N).symm m := by
-  rw [Equiv.eq_symm_apply]
-  simp only [Fin.ext_iff, evenSite', oddSite', val_finRotate']
-  have := m.isLt
-  have := k.isLt
-  split_ifs <;> omega
-
-/-- The odd site `2 m + 1` lies on the odd bond `2 k + 1` exactly when `k = m`. -/
-theorem oddSite_mem_oddBond_iff' {N : ℕ} (m k : Fin N) :
-    oddSite' N m = oddSite' N k ∨ oddSite' N m = finRotate (2 * N) (oddSite' N k) ↔ k = m := by
-  simp only [Fin.ext_iff, oddSite', val_finRotate']
-  have := m.isLt
-  have := k.isLt
-  split <;> omega
+      exact ⟨k, by simp [oddSite]⟩
 
 /-- A product over the `2 N` sites of the ring, grouped into the pairs `(2 m, 2 m + 1)`. -/
-theorem prod_fin_two_mul' {R : Type*} [CommMonoid R] (N : ℕ) (f : Fin (2 * N) → R) :
-    ∏ i, f i = ∏ m, f (evenSite' N m) * f (oddSite' N m) := by
+theorem prod_fin_two_mul {R : Type*} [CommMonoid R] (N : ℕ) (f : Fin (2 * N) → R) :
+    ∏ i, f i = ∏ m, f (evenSite N m) * f (oddSite N m) := by
   rw [← (finProdFinEquiv.trans (finCongr (Nat.mul_comm N 2))).prod_comp, Fintype.prod_prod_type]
   refine Finset.prod_congr rfl fun m _ ↦ ?_
   rw [Fin.prod_univ_two]
-  congr 2 <;> ext <;> simp [evenSite', oddSite']; ring
+  congr 2 <;> ext <;> simp [evenSite, oddSite]; ring
 
 /-! ### Local factors -/
-
-omit [Fintype d] in
-/-- A two-site product `A ⊗ A` on distinct sites as a tensor product. -/
-theorem bondOp_kronecker_self' {L : ℕ} {j k : Fin L} (hjk : j ≠ k) (A : Matrix d d ℂ) :
-    bondOp j k (A ⊗ₖ A) = piTensor fun i ↦ if i = j ∨ i = k then A else 1 := by
-  rw [bondOp_kronecker hjk]
-  congr 1
-  ext1 i
-  by_cases h₁ : i = j <;> by_cases h₂ : i = k <;> simp [h₁, h₂]
 
 omit [Fintype d] in
 /-- `1 - c A` at one site, as a tensor product. -/
@@ -172,40 +127,40 @@ theorem one_sub_smul_siteOp {L : ℕ} (j : Fin L) (A : Matrix d d ℂ) (c : ℂ)
 
 /-! ### Which end of which bond a site is -/
 
-theorem evenSite_eq_evenSite_iff {N : ℕ} (m k : Fin N) : evenSite' N m = evenSite' N k ↔ k = m := by
-  simp only [Fin.ext_iff, evenSite']; omega
+theorem evenSite_eq_evenSite_iff {N : ℕ} (m k : Fin N) : evenSite N m = evenSite N k ↔ k = m := by
+  simp only [Fin.ext_iff, evenSite]; omega
 
 theorem evenSite_ne_rot_evenSite {N : ℕ} (m k : Fin N) :
-    evenSite' N m ≠ finRotate (2 * N) (evenSite' N k) := by
-  simp only [ne_eq, Fin.ext_iff, evenSite', val_finRotate']
+    evenSite N m ≠ finRotate (2 * N) (evenSite N k) := by
+  simp only [ne_eq, Fin.ext_iff, evenSite, val_finRotate]
   have := m.isLt; have := k.isLt
   split_ifs <;> omega
 
-theorem evenSite_ne_oddSite {N : ℕ} (m k : Fin N) : evenSite' N m ≠ oddSite' N k := by
-  simp only [ne_eq, Fin.ext_iff, evenSite', oddSite']; omega
+theorem evenSite_ne_oddSite {N : ℕ} (m k : Fin N) : evenSite N m ≠ oddSite N k := by
+  simp only [ne_eq, Fin.ext_iff, evenSite, oddSite]; omega
 
 theorem evenSite_eq_rot_oddSite_iff {N : ℕ} (m k : Fin N) :
-    evenSite' N m = finRotate (2 * N) (oddSite' N k) ↔ k = (finRotate N).symm m := by
+    evenSite N m = finRotate (2 * N) (oddSite N k) ↔ k = (finRotate N).symm m := by
   rw [Equiv.eq_symm_apply]
-  simp only [Fin.ext_iff, evenSite', oddSite', val_finRotate']
+  simp only [Fin.ext_iff, evenSite, oddSite, val_finRotate]
   have := m.isLt; have := k.isLt
   split_ifs <;> omega
 
-theorem oddSite_ne_evenSite {N : ℕ} (m k : Fin N) : oddSite' N m ≠ evenSite' N k := by
-  simp only [ne_eq, Fin.ext_iff, evenSite', oddSite']; omega
+theorem oddSite_ne_evenSite {N : ℕ} (m k : Fin N) : oddSite N m ≠ evenSite N k := by
+  simp only [ne_eq, Fin.ext_iff, evenSite, oddSite]; omega
 
 theorem oddSite_eq_rot_evenSite_iff {N : ℕ} (m k : Fin N) :
-    oddSite' N m = finRotate (2 * N) (evenSite' N k) ↔ k = m := by
-  simp only [Fin.ext_iff, evenSite', oddSite', val_finRotate']
+    oddSite N m = finRotate (2 * N) (evenSite N k) ↔ k = m := by
+  simp only [Fin.ext_iff, evenSite, oddSite, val_finRotate]
   have := m.isLt; have := k.isLt
   split_ifs <;> omega
 
-theorem oddSite_eq_oddSite_iff {N : ℕ} (m k : Fin N) : oddSite' N m = oddSite' N k ↔ k = m := by
-  simp only [Fin.ext_iff, oddSite']; omega
+theorem oddSite_eq_oddSite_iff {N : ℕ} (m k : Fin N) : oddSite N m = oddSite N k ↔ k = m := by
+  simp only [Fin.ext_iff, oddSite]; omega
 
 theorem oddSite_ne_rot_oddSite {N : ℕ} (m k : Fin N) :
-    oddSite' N m ≠ finRotate (2 * N) (oddSite' N k) := by
-  simp only [ne_eq, Fin.ext_iff, oddSite', val_finRotate']
+    oddSite N m ≠ finRotate (2 * N) (oddSite N k) := by
+  simp only [ne_eq, Fin.ext_iff, oddSite, val_finRotate]
   have := m.isLt; have := k.isLt
   split_ifs <;> first | exact not_false | omega
 
@@ -285,7 +240,7 @@ noncomputable def bondSite (L : ℕ) (τ : ℝ) (j : Fin L) (γ : Option ι) :
 /-- A first-order bond factor as a sum over the bond label: `1 - τ h = ∑_γ C_γ ⊗ D_γ`. -/
 theorem one_sub_smul_bond {L : ℕ} (hL : 2 ≤ L) {τ : ℝ} (hτ : 0 ≤ τ) (j : Fin L) :
     1 - (τ : ℂ) • R.bond L j = ∑ γ, piTensor (R.bondSite L τ j γ) := by
-  have hjk := ne_finRotate' hL j
+  have hjk := ne_finRotate hL j
   have h1 : R.bondSite L τ j none = fun _ ↦ 1 := funext fun i ↦ by
     unfold bondSite; rw [siteFactor_none, rightFactor_none, ite_self, ite_self]
   rw [Fintype.sum_option, h1, piTensor_one]
@@ -317,8 +272,8 @@ noncomputable def trotterTrace (M : ℕ) (β : ℝ) (L : ℕ) : ℝ :=
 `bc.2`. -/
 noncomputable def sliceSite (N : ℕ) (τ : ℝ) (bc : (Fin N → Option ι) × (Fin N → Option ι))
     (i : Fin (2 * N)) : Matrix d d ℂ :=
-  (List.ofFn fun k ↦ R.bondSite (2 * N) τ (evenSite' N k) (bc.1 k) i).prod * R.onsite τ *
-    (List.ofFn fun k ↦ R.bondSite (2 * N) τ (oddSite' N k) (bc.2 k) i).prod
+  (List.ofFn fun k ↦ R.bondSite (2 * N) τ (evenSite N k) (bc.1 k) i).prod * R.onsite τ *
+    (List.ofFn fun k ↦ R.bondSite (2 * N) τ (oddSite N k) (bc.2 k) i).prod
 
 /-- One Trotter slice on a ring of `2 N` cells is a sum of tensor products. -/
 theorem trotterSlice_eq_sum {N : ℕ} (hN : 1 ≤ N) {τ : ℝ} (hτ : 0 ≤ τ) :
@@ -341,7 +296,7 @@ theorem trotterSlice_eq_sum {N : ℕ} (hN : 1 ≤ N) {τ : ℝ} (hτ : 0 ≤ τ)
 factor, the right factor of its odd bond. -/
 theorem sliceSite_evenSite (N : ℕ) (τ : ℝ) (bc : (Fin N → Option ι) × (Fin N → Option ι))
     (m : Fin N) :
-    R.sliceSite N τ bc (evenSite' N m) =
+    R.sliceSite N τ bc (evenSite N m) =
       R.siteFactor τ (bc.1 m) * R.onsite τ * R.rightFactor τ (bc.2 ((finRotate N).symm m)) := by
   simp only [sliceSite, bondSite, evenSite_ne_rot_evenSite, evenSite_ne_oddSite, ite_false]
   rw [list_prod_ofFn_ite _ _ m (evenSite_eq_evenSite_iff m),
@@ -351,7 +306,7 @@ theorem sliceSite_evenSite (N : ℕ) (τ : ℝ) (bc : (Fin N → Option ι) × (
 factor, the left factor of its odd bond. -/
 theorem sliceSite_oddSite (N : ℕ) (τ : ℝ) (bc : (Fin N → Option ι) × (Fin N → Option ι))
     (m : Fin N) :
-    R.sliceSite N τ bc (oddSite' N m) =
+    R.sliceSite N τ bc (oddSite N m) =
       R.rightFactor τ (bc.1 m) * R.onsite τ * R.siteFactor τ (bc.2 m) := by
   simp only [sliceSite, bondSite, oddSite_ne_evenSite, oddSite_ne_rot_oddSite, ite_false]
   rw [list_prod_ofFn_ite _ _ m (oddSite_eq_rot_evenSite_iff m),
@@ -406,7 +361,7 @@ theorem trace_trotterSlice_pow_eq_sum {N : ℕ} (hN : 1 ≤ N) {τ : ℝ} (hτ :
   rw [← List.prod_replicate, ← List.ofFn_const, R.trotterSlice_eq_sum hN hτ, list_prod_ofFn_sum,
     trace_sum]
   refine Finset.sum_congr rfl fun a _ ↦ ?_
-  rw [list_prod_ofFn_piTensor, trace_piTensor, prod_fin_two_mul']
+  rw [list_prod_ofFn_piTensor, trace_piTensor, prod_fin_two_mul]
   refine Finset.prod_congr rfl fun m _ ↦ ?_
   simp only [sliceSite_evenSite, sliceSite_oddSite]
   rw [R.trace_oddWord]

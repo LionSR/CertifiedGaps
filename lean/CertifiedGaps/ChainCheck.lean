@@ -20,7 +20,7 @@ only searches, and Lean re-checks every inequality.
 
 open Real
 
-namespace ThermalPurityGap
+namespace CertifiedGaps
 
 /-- The rational data of a chain certificate: upper bounds `s j, t j` on the defects at scales
 `j = 0, …, J` (with `J + 1` the length of `s`), the hand-over defect `ε` and the rate `r`. -/
@@ -101,4 +101,4 @@ theorem gapGT_of_chainCertificate (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} 
     simp only [cast_zQ]
     exact_mod_cast h5
 
-end ThermalPurityGap
+end CertifiedGaps

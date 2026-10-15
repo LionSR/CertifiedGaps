@@ -15,7 +15,7 @@ sublattice (leg `b` of the even rungs and leg `a` of the odd rungs; `physicalHam
 so the gap theorem holds for the physical ladder (`physical_gap_J4`).
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.TwoLegLadder
@@ -130,7 +130,7 @@ theorem physicalHamiltonian_eq (Jperp : ℝ) {L : ℕ} (hL : Even L) :
       Finset.mul_sum, Finset.sum_mul, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun α _ ↦ ?_
     rw [(model Jperp).Dc_eq_of_refl rfl, conj_bondOp_kronecker _ (rungRot_mul_conjTranspose L)
-      (ne_finRotate' hL2 j), ← bondOp_neg, Cc_eq, conj_legS, conj_legS]
+      (ne_finRotate hL2 j), ← bondOp_neg, Cc_eq, conj_legS, conj_legS]
     congr 1
     rw [smul_kronecker, kronecker_smul, smul_smul, ← neg_smul]
     have h1 : -(sign L j α * c α.2 * (sign L (finRotate L j) α * c α.2)) = 1 := by

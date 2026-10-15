@@ -28,7 +28,7 @@ are certified numerically in `models/spin1_largeD` (complete spectra of the ring
 chain certificates are checked by `decide`.
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.SpinOneLargeD

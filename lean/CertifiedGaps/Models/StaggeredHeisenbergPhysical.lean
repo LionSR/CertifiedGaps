@@ -16,7 +16,7 @@ On an even ring it is the rotated chain `model h` conjugated by `e^{iπSʸ}` on 
 theorems of `StaggeredHeisenberg` hold for the physical chain (`physical_gap_h1`, …).
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.StaggeredHeisenberg
@@ -59,7 +59,7 @@ theorem conjTranspose_rotation_mul (L : ℕ) (i : Fin L) : (rotation L i)ᴴ * r
 /-- On an even ring the two ends of a bond have opposite parity. -/
 theorem odd_finRotate_iff {L : ℕ} (hL : Even L) (j : Fin L) :
     Odd (finRotate L j : ℕ) ↔ ¬ Odd (j : ℕ) := by
-  rw [val_finRotate']
+  rw [val_finRotate]
   obtain ⟨k, hk⟩ := hL
   have := j.isLt
   split_ifs with h <;> simp only [Nat.odd_iff] <;> omega
@@ -102,7 +102,7 @@ theorem physicalHamiltonian_eq (h : ℝ) {L : ℕ} (hL : Even L) :
       Finset.mul_sum, Finset.sum_mul, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun α _ ↦ ?_
     rw [(model h).Dc_eq_of_refl rfl, conj_bondOp_kronecker _ (rotation_mul_conjTranspose L)
-      (ne_finRotate' hL2 j), ← bondOp_neg, rotated_bond]
+      (ne_finRotate hL2 j), ← bondOp_neg, rotated_bond]
     unfold rotation
     have := odd_finRotate_iff hL j
     by_cases hj : Odd (j : ℕ)

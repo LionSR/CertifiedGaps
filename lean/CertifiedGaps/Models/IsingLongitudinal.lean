@@ -21,7 +21,7 @@ The seeds are certified in `models/tfim_longitudinal` (complete spectra of the r
 and `12` sites with rigorous eigenvalue enclosures); `seeds` is the only `sorry`.
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 
 namespace CertifiedGaps.IsingLongitudinal
 

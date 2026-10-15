@@ -17,7 +17,7 @@ The seeds are certified in `models/two_leg_tfim` (complete spectra of the rings 
 rungs with rigorous eigenvalue enclosures); they are the only `sorry`s.
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.IsingLadder

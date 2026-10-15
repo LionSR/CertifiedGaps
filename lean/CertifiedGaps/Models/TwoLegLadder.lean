@@ -29,7 +29,7 @@ It depends on two seed inequalities (`sorry`), certified numerically in
 `models/heisenberg_ladder` (complete spectra of the rings of `4` and `8` rungs).
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.TwoLegLadder

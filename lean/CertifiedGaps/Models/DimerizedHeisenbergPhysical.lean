@@ -18,7 +18,7 @@ For `δ ≤ 1` it is the rotated chain `model δ` conjugated by `e^{iπSʸ}` on 
 pair (`physicalHamiltonian_eq`), so the gap theorems hold for the physical chain.
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.DimerizedHeisenberg
@@ -101,7 +101,7 @@ theorem physicalHamiltonian_eq {δ : ℝ} (hδ : δ ≤ 1) {L : ℕ} (hL : 2 ≤
     rw [RPRing.bond, RPRing.bondMatrix, bondOp_neg, bondOp_sum, Matrix.mul_neg, Matrix.neg_mul,
       Finset.mul_sum, Finset.sum_mul, ← Finset.sum_neg_distrib]
     refine Finset.sum_congr rfl fun α _ ↦ ?_
-    rw [conj_bondOp_kronecker _ hu (ne_finRotate' hL j), ← bondOp_neg, Cc_eq, Dc_eq]
+    rw [conj_bondOp_kronecker _ hu (ne_finRotate hL j), ← bondOp_neg, Cc_eq, Dc_eq]
     congr 1
     rw [Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, cellRot_conj,
       cellRot_conj, rot_conj_Pc, Matrix.mul_one, rot_mul_conjTranspose, Pc_eq]

@@ -23,7 +23,7 @@ spins); it is the only `sorry`. The `δ = 7/10` certificate of that directory us
 (`n₀ = 3` cells) and is not covered here.
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.SpinOneDimerized

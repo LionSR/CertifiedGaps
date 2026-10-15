@@ -25,7 +25,7 @@ So it is a reflection-positive ring with internal reflection `F`. The seeds are 
 only `sorry`s.
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.DimerizedHeisenberg

@@ -24,9 +24,9 @@ The two seeds are Proposition 5.5 of OpenAI's *The periodic spin-one Haldane gap
 `#print axioms spin_one_heisenberg_gap` lists `sorryAx` until both seeds are proved.
 -/
 
-open Real ThermalPurityGap
+open Real
 
-namespace SpinOneHeisenberg
+namespace CertifiedGaps.SpinOneHeisenberg
 
 /-- **Input 1 (proved).** The spatial moment inequalities for the Heisenberg traces at every
 `β > 0`, from Trotterized finite transfer matrices and the product formula
@@ -34,8 +34,8 @@ namespace SpinOneHeisenberg
 ring `SpinOneLargeD.model 0`). -/
 theorem spatialMomentBounds (β : ℝ) (hβ : 0 < β) :
     SpatialMomentBounds (fun L ↦ partitionFunction L β) 2 := by
-  have h := (CertifiedGaps.SpinOneLargeD.model 0).spatialMomentBounds β hβ
-  simpa only [CertifiedGaps.SpinOneLargeD.partitionFunction_zero] using h
+  have h := (SpinOneLargeD.model 0).spatialMomentBounds β hβ
+  simpa only [SpinOneLargeD.partitionFunction_zero] using h
 
 /-- **Open input 2.** The spatial seed `P_s(2304, 784) ≥ 0.99`. -/
 theorem seed_spatial : 99 / 100 ≤ spatialPurity 2304 784 := by
@@ -58,4 +58,4 @@ theorem spin_one_heisenberg_gap {L : ℕ} (hL : 2304 ≤ L) (hLe : Even L) :
     GapGT (spectrum L) (log 20 / 784) :=
   gapGT_log_twenty thermalMPOInputs hL hLe
 
-end SpinOneHeisenberg
+end CertifiedGaps.SpinOneHeisenberg

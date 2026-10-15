@@ -27,7 +27,7 @@ gap bound `log r / β₀` on every even ring `L ≥ n₀` from the two seed ineq
 * `RPRing.gapGT_of_chainCertificate`: the uniform gap from seeds and a valid certificate.
 -/
 
-open Filter Matrix ThermalPurityGap
+open Filter Matrix
 open scoped ComplexOrder
 
 namespace CertifiedGaps
@@ -107,11 +107,11 @@ theorem gapGT_of_chainCertificate [Nonempty d] {n₀ : ℕ} (hn₀ : 2 ≤ n₀)
     (hs : 1 - (c.sAt 0 : ℝ) ≤ R.spatialPurity n₀ β₀)
     (ht : 1 - (c.tAt 0 : ℝ) ≤ R.thermalPurity (2 * n₀) β₀) {L : ℕ} (hL : n₀ ≤ L)
     (hLe : Even L) : GapGT (R.spectrum L) (Real.log (c.r : ℝ) / β₀) := by
-  refine ThermalPurityGap.gapGT_of_chainCertificate (ι := fun L ↦ Fin L → d) R.spectrum
+  refine CertifiedGaps.gapGT_of_chainCertificate (ι := fun L ↦ Fin L → d) R.spectrum
     (by omega) hn₀e hβ₀ (fun β hβ ↦ (R.hasSpatialMomentBounds β hβ).mono hn₀) c hc ?_ ?_ hL hLe
-  · simpa only [ThermalPurityGap.spatialPurity, ThermalPurityGap.partitionFunction,
+  · simpa only [CertifiedGaps.spatialPurity, CertifiedGaps.partitionFunction,
       spatialPurity, partitionFunction_eq_sum] using hs
-  · simpa only [ThermalPurityGap.thermalPurity, ThermalPurityGap.partitionFunction,
+  · simpa only [CertifiedGaps.thermalPurity, CertifiedGaps.partitionFunction,
       thermalPurity, partitionFunction_eq_sum] using ht
 
 end RPRing
