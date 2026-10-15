@@ -29,8 +29,8 @@ The method, the **spacetime bootstrap**, has two halves:
 | open chains with endpoint fields h = 3/5: Δ_n > (log 10)/392 for odd n ≥ 1921 | proof in appendices A–C, given four finite estimates of the boundary-field paper | main note |
 | which Hamiltonians the method covers | appendices D–H | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf) |
 | how the starting estimate is certified, in diagrams | appendices I–M | [`notes/thermal-mpo-gap-certificate.pdf`](notes/thermal-mpo-gap-certificate.pdf) |
-| smaller seed inputs for a Lean-checked seed: gap > 0.039 for every even L ≥ 60 from traces at even n ≤ 12 with real twists only | exact rational chain, conditional on the finite trace tables and the analytic seed lemmas | [`models/spin1_lean_seed/`](models/spin1_lean_seed/) (`seed_design/`) |
-| proving the seed inside the Lean kernel (packed-integer arithmetic, counting anchors) | feasibility studies; no seed proved yet | [`models/spin1_lean_seed/`](models/spin1_lean_seed/), [`models/lean_seed_small/`](models/lean_seed_small/) |
+| smaller seed inputs for a Lean-checked seed: gap > 0.039 for every even L ≥ 60 from traces at even n ≤ 12 with real twists only | exact rational chain, conditional on the finite trace tables and the analytic seed lemmas | [`models/lean_seeds/`](models/lean_seeds/) (`seed_design`) |
+| proving the seed inside the Lean kernel (packed-integer arithmetic, counting anchors) | feasibility studies; no seed proved yet | [`models/lean_seeds/`](models/lean_seeds/), [`lean/`](lean/) (`SeedKernel`) |
 
 ## Other models
 
@@ -63,8 +63,8 @@ model, including the BLAS products; that arithmetic model is the trusted base.
 |---|---|
 | [`notes/`](notes/) | the LaTeX notes and their PDFs, the shared diagram package `tnnotes.sty`, notation and diagram conventions |
 | [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalisation, verified ring spectra, certified MPO arithmetic (Nemo/Arb), thermal purification (ITensors) |
-| [`models/`](models/) | one directory per model in a common format (AGENTS.md, "Directory format"): certificate, `certify.jl`, `check.jl`, tests and README; `spin1/` is the exact-arithmetic reproduction of the spin-1 certificate; `spin1_lean_seed/` and `lean_seed_small/` study kernel-checked seeds |
-| [`lean/`](lean/) | Lean 4 + Mathlib formalisation of the criterion and of each certified model's gap theorem, with the seeds as hypotheses |
+| [`models/`](models/) | one directory per model in a common format (AGENTS.md, "Directory format"): certificate, `certify.jl`, `check.jl`, tests and README; `spin1/` is the exact-arithmetic reproduction of the spin-1 certificate; `lean_seeds/` studies kernel-checked seeds |
+| [`lean/`](lean/) | Lean 4 + Mathlib formalisation of the criterion and of each certified model's gap theorem, with the seeds as hypotheses; the opt-in library `SeedKernel` kernel-checks seed arithmetic |
 | [`tools/`](tools/) | `fetch_upstream.jl`: downloads the preprint's evidence files at a pinned commit and checks their hashes |
 
 [`AGENTS.md`](AGENTS.md) states what counts as a gap certificate here and how new ones are added.
@@ -102,8 +102,8 @@ Each directory's README gives its own commands, run times, and what is and is no
   (2304, 784); those bounds are reproduced here in exact finite arithmetic, and the criterion
   with its application to the spin-1 ring is checked in Lean. The finite computations are not
   formalised: in Lean each model's two seeds are named `sorry` lemmas. Kernel-checked seed
-  arithmetic exists so far only as a study (`models/lean_seed_small/`, one Ising point,
-  conditional on four log Z enclosures).
+  arithmetic exists so far only as a study (`models/lean_seeds/` with the Lean library
+  `SeedKernel`: one Ising point, conditional on four log Z enclosures).
 * The other models' seeds rest on verified eigenvalue enclosures whose rounding analysis
   assumes IEEE binary64 arithmetic and conventional BLAS; each was independently replayed or
   reviewed (see the model's README and `METHOD.md`).
