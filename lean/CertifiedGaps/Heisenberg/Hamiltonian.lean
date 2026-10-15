@@ -3,11 +3,6 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import Mathlib.Analysis.Matrix.Spectrum
-import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.Analysis.SpecialFunctions.Exponential
-import Mathlib.LinearAlgebra.Matrix.Kronecker
-import Mathlib.Logic.Equiv.Fin.Rotate
 import CertifiedGaps.Ring.Model
 
 /-!
@@ -27,26 +22,24 @@ exactly such an eigenvalue sum.
 * `exchange`: the two-site exchange `S · S = ∑_α S^α ⊗ S^α`.
 * `hamiltonian L`: the periodic chain `∑ⱼ bondOp j (j + 1) exchange`, where the cyclic successor
   is `finRotate L`. For `L = 2` both bonds join sites `0` and `1`, so the Hamiltonian is the
-  double-bond ring `2 S₁ · S₂`; for `L = 1` it is the single self-bond `S₀ · S₀ = 2`.
+  double-bond ring `2 S₀ · S₁`.
 * `spectrum L`: the eigenvalues of `hamiltonian L` with multiplicity, indexed by
   `Fin L → Fin 3`.
 * `partitionFunction L β`: the real part of `Tr exp (-β H_L)`.
 
 ## Main results
 
-* `spinOne_isHermitian`, `sum_spinOne_mul_self`: the spin matrices are Hermitian and
-  `∑_α (S^α)² = 2`, the Casimir value `s (s + 1)` for `s = 1`.
+* `spinOne_isHermitian`: the spin matrices are Hermitian.
 * `exchange_isHermitian`, `hamiltonian_isHermitian`.
 * `trace_exp_hamiltonian`: `Tr exp (-β H_L) = ∑ₘ exp (-(β Eₘ(L)))` as complex numbers.
 * `partitionFunction_eq_sum`: `partitionFunction L β = ∑ₘ exp (-(β Eₘ(L)))`, the form of
-  `ThermalPurityGap.partitionFunction spectrum L β`.
+  `CertifiedGaps.partitionFunction spectrum L β`.
 -/
 
 open Matrix NormedSpace
-open CertifiedGaps (bondOp bondOp_isHermitian trace_exp_smul_eq_sum_of_isHermitian)
 open scoped Kronecker
 
-namespace SpinOneHeisenberg
+namespace CertifiedGaps.SpinOneHeisenberg
 
 /-! ### Spin-one matrices -/
 
@@ -72,13 +65,6 @@ theorem spinOne_isHermitian (α : Fin 3) : (spinOne α).IsHermitian := by
     Complex.conj_ofReal]
   push_cast
   ring
-
-/-- The spin-one Casimir: `∑_α (S^α)² = s (s + 1) = 2`. -/
-theorem sum_spinOne_mul_self :
-    ∑ α, spinOne α * spinOne α = (2 : ℕ) • (1 : Matrix (Fin 3) (Fin 3) ℂ) := by
-  ext i j
-  fin_cases i <;> fin_cases j <;>
-    simp [Fin.sum_univ_three, mul_apply, spinOne, leviCivita, one_apply] <;> norm_num
 
 /-- The two-site exchange interaction `S · S = ∑_α S^α ⊗ S^α`. -/
 def exchange : Matrix (Fin 3 × Fin 3) (Fin 3 × Fin 3) ℂ :=
@@ -125,9 +111,9 @@ theorem trace_exp_hamiltonian (L : ℕ) (β : ℝ) :
   simp [spectrum, neg_mul]
 
 /-- The partition function of the Heisenberg chain is the eigenvalue sum
-`∑ₘ exp (-(β Eₘ(L)))`, i.e. `ThermalPurityGap.partitionFunction spectrum L β`. -/
+`∑ₘ exp (-(β Eₘ(L)))`, i.e. `CertifiedGaps.partitionFunction spectrum L β`. -/
 theorem partitionFunction_eq_sum (L : ℕ) (β : ℝ) :
     partitionFunction L β = ∑ m, Real.exp (-(β * spectrum L m)) := by
   rw [partitionFunction, trace_exp_hamiltonian, Complex.ofReal_re]
 
-end SpinOneHeisenberg
+end CertifiedGaps.SpinOneHeisenberg

@@ -10,8 +10,8 @@ import CertifiedGaps.Heisenberg.Hamiltonian
 # A uniform gap for the periodic spin-one Heisenberg ring from thermal-MPO inputs
 
 This file states Theorem 1 of the thermal-MPO note for the Lean Hamiltonian
-`SpinOneHeisenberg.hamiltonian L = ∑ⱼ Sⱼ · Sⱼ₊₁` on `(ℂ³)^{⊗L}`. It proves the theorem from
-explicit inputs, so that each input can be discharged separately later.
+`SpinOneHeisenberg.hamiltonian L = ∑ⱼ Sⱼ · Sⱼ₊₁` on `(ℂ³)^{⊗L}` and proves it from explicit
+inputs, without `sorry`.
 
 ## The inputs
 
@@ -22,19 +22,10 @@ exponential that Lean defines:
   closed inequalities between traces at different lengths.
 * `seed_spatial`, `seed_thermal`: the two seed purities `P_s(n₀, β₀), P_τ(2n₀, β₀) ≥ 1 - ε₀`.
 
-## Discharging the inputs
-
-* `moments` follows from the moment form `Z_L(β) = ∑ᵢ μᵢ^L`
-  (`ThermalMPOInputs.of_hasMomentForm`). The continuous-time thermal MPO of the note gives that
-  form with `μᵢ = |λᵢ(β)|`, where the `λᵢ(β)` are the eigenvalues of the self-adjoint
-  Hilbert–Schmidt transfer operator `X_β`.
-* Infinite-dimensional operators can also be avoided: `moments` follows from finite approximants
-  with the moment form that converge at each even length
-  (`ThermalMPOInputs.of_tendsto_hasMomentForm`). With the even/odd Trotter splitting into
-  `M` slices, `Tr (K_in K_out)^M = Tr (T_o T_e)^{L/2}` with `T_o T_e = T_e^† T_e ⪰ 0`. This gives
-  the moment form for each `M`, and the Lie–Trotter formula gives convergence as `M → ∞`.
-* The seeds are finite numerical statements about two rings of 2304 and 4608 sites, taken
-  from Proposition 5.5 of OpenAI's *The periodic spin-one Haldane gap* (2026).
+`Heisenberg.Main` proves `moments` (the Heisenberg ring is the reflection-positive ring
+`SpinOneLargeD.model 0`) and states the two seeds, which are finite numerical statements about
+rings of 2304 and 4608 sites (Proposition 5.5 of OpenAI's *The periodic spin-one Haldane gap*,
+2026).
 
 ## Main results
 
@@ -43,9 +34,9 @@ exponential that Lean defines:
 * `gapGT_log_twenty`: Theorem 1 of the note, `Δ_L > (log 20)/784` for every even `L ≥ 2304`.
 -/
 
-open Filter Real ThermalPurityGap
+open Real
 
-namespace SpinOneHeisenberg
+namespace CertifiedGaps.SpinOneHeisenberg
 
 /-- The spatial purity `P_s(n, β) = Z_{2n}(β) / Z_n(β)²` of the Heisenberg ring. -/
 noncomputable def spatialPurity (n : ℕ) (β : ℝ) : ℝ :=
@@ -66,30 +57,11 @@ structure ThermalMPOInputs (n₀ : ℕ) (β₀ ε₀ : ℝ) : Prop where
   /-- The thermal seed `P_τ(2n₀, β₀) ≥ 1 - ε₀`. -/
   seed_thermal : 1 - ε₀ ≤ thermalPurity (2 * n₀) β₀
 
-/-- The trace partition function is the spectral one of `ThermalPurityGap`. -/
-theorem thermalPurityGap_partitionFunction :
-    ThermalPurityGap.partitionFunction spectrum = partitionFunction := by
+/-- The trace partition function is the spectral one of the abstract criterion. -/
+theorem partitionFunction_spectrum :
+    CertifiedGaps.partitionFunction spectrum = partitionFunction := by
   funext L β
   exact (partitionFunction_eq_sum L β).symm
-
-/-- The moment form at every `β > 0` gives the `moments` input. -/
-theorem ThermalMPOInputs.of_hasMomentForm {n₀ : ℕ} (hn₀ : 0 < n₀) {β₀ ε₀ : ℝ}
-    (hM : ∀ β : ℝ, 0 < β → HasMomentForm (fun L ↦ partitionFunction L β) n₀)
-    (hs : 1 - ε₀ ≤ spatialPurity n₀ β₀) (ht : 1 - ε₀ ≤ thermalPurity (2 * n₀) β₀) :
-    ThermalMPOInputs n₀ β₀ ε₀ :=
-  ⟨fun β hβ ↦ (hM β hβ).spatialMomentBounds hn₀, hs, ht⟩
-
-/-- Finite approximants: if for each `β > 0` there are functions `Zs M` with the moment form
-for large `M`, converging to the traces at every even length `L ≥ n₀`, then the `moments` input
-holds. This is the interface for Trotterized transfer matrices. -/
-theorem ThermalMPOInputs.of_tendsto_hasMomentForm {n₀ : ℕ} (hn₀ : 0 < n₀) {β₀ ε₀ : ℝ}
-    (Zs : ℝ → ℕ → ℕ → ℝ)
-    (hM : ∀ β : ℝ, 0 < β → ∀ᶠ M in atTop, HasMomentForm (Zs β M) n₀)
-    (hlim : ∀ β : ℝ, 0 < β → ∀ L, n₀ ≤ L → Even L →
-      Tendsto (fun M ↦ Zs β M L) atTop (nhds (partitionFunction L β)))
-    (hs : 1 - ε₀ ≤ spatialPurity n₀ β₀) (ht : 1 - ε₀ ≤ thermalPurity (2 * n₀) β₀) :
-    ThermalMPOInputs n₀ β₀ ε₀ :=
-  ⟨fun β hβ ↦ SpatialMomentBounds.of_tendsto_hasMomentForm hn₀ (hM β hβ) (hlim β hβ), hs, ht⟩
 
 /-- **Uniform gap from thermal-MPO inputs.** Let `n₀ > 0` be even, `β₀ > 0`,
 `0 < ε₀ ≤ 1/100`. Under `ThermalMPOInputs n₀ β₀ ε₀`, for every even `L ≥ n₀` the Heisenberg ring
@@ -100,12 +72,12 @@ theorem gapGT_of_inputs {n₀ : ℕ} (hn₀ : 0 < n₀) (hn₀e : Even n₀) {β
     (hLe : Even L) : GapGT (spectrum L) (log (1 / (5 * ε₀)) / β₀) := by
   have hZ : HasSpatialMomentBounds spectrum n₀ := by
     intro β hβ
-    rw [thermalPurityGap_partitionFunction]
+    rw [partitionFunction_spectrum]
     exact h.moments β hβ
   refine gapGT_of_seeds spectrum hn₀ hn₀e hβ₀ hZ hε₀ hε₁ ?_ ?_ hL hLe
-  · simpa [ThermalPurityGap.spatialPurity, spatialPurity, thermalPurityGap_partitionFunction]
+  · simpa [CertifiedGaps.spatialPurity, spatialPurity, partitionFunction_spectrum]
       using h.seed_spatial
-  · simpa [ThermalPurityGap.thermalPurity, thermalPurity, thermalPurityGap_partitionFunction]
+  · simpa [CertifiedGaps.thermalPurity, thermalPurity, partitionFunction_spectrum]
       using h.seed_thermal
 
 /-- **Theorem 1** of the thermal-MPO note, from its inputs: if the spatial moment inequalities
@@ -117,4 +89,4 @@ theorem gapGT_log_twenty (h : ThermalMPOInputs 2304 784 (1 / 100)) {L : ℕ} (hL
   norm_num at this
   exact this
 
-end SpinOneHeisenberg
+end CertifiedGaps.SpinOneHeisenberg

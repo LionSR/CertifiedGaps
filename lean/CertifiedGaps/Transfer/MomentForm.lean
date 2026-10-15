@@ -11,7 +11,7 @@ import Mathlib.Analysis.Matrix.PosDef
 
 If the even partition functions are traces of powers of a positive semidefinite transfer matrix,
 `Z (2 * N) = Re tr (T ^ N)` for `N ≥ 1`, then `Z` has the moment form of
-`ThermalPurityGap.HasMomentForm` from `L = 2` on, with weights `μ i = √(λ i)` the square
+`CertifiedGaps.HasMomentForm` from `L = 2` on, with weights `μ i = √(λ i)` the square
 roots of the eigenvalues of `T` (indexed through `Fintype.equivFin` and padded with zeros).
 
 ## Main results
@@ -39,7 +39,7 @@ the moment form from `L = 2` on, with weights the square roots of the eigenvalue
 theorem hasMomentForm_of_trace_pow {D : Type*} [Fintype D] [DecidableEq D]
     {T : Matrix D D ℂ} (hT : T.PosSemidef) {Z : ℕ → ℝ}
     (hZ : ∀ N : ℕ, 1 ≤ N → Z (2 * N) = (Matrix.trace (T ^ N)).re) :
-    ThermalPurityGap.HasMomentForm Z 2 := by
+    CertifiedGaps.HasMomentForm Z 2 := by
   set e := Fintype.equivFin D
   let μ : ℕ → ℝ := fun i ↦
     if h : i < Fintype.card D then √(hT.1.eigenvalues (e.symm ⟨i, h⟩)) else 0

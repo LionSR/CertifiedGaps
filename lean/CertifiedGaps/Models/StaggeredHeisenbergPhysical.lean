@@ -16,7 +16,7 @@ On an even ring it is the rotated chain `model h` conjugated by `e^{iπSʸ}` on 
 theorems of `StaggeredHeisenberg` hold for the physical chain (`physical_gap_h1`, …).
 -/
 
-open Matrix Real ThermalPurityGap
+open Matrix Real
 open scoped Kronecker
 
 namespace CertifiedGaps.StaggeredHeisenberg
@@ -29,6 +29,7 @@ noncomputable def physicalHamiltonian (h : ℝ) (L : ℕ) :
   ∑ j : Fin L, ∑ α, bondOp j (finRotate L j) (spinHalf α ⊗ₖ spinHalf α) +
     ∑ j : Fin L, siteOp j (((-h * (-1) ^ (j : ℕ) : ℝ) : ℂ) • spinHalf 2)
 
+/-- The physical chain is Hermitian. -/
 theorem physicalHamiltonian_isHermitian (h : ℝ) (L : ℕ) :
     (physicalHamiltonian h L).IsHermitian := by
   refine (isSelfAdjoint_sum _ fun j _ ↦ isSelfAdjoint_sum _ fun α _ ↦
@@ -46,23 +47,11 @@ noncomputable def physicalSpectrum (h : ℝ) (L : ℕ) : (Fin L → Fin 2) → �
 noncomputable def rotation (L : ℕ) (i : Fin L) : Matrix (Fin 2) (Fin 2) ℂ :=
   if Odd (i : ℕ) then rot else 1
 
+/-- The rotation is unitary. -/
 theorem rotation_mul_conjTranspose (L : ℕ) (i : Fin L) : rotation L i * (rotation L i)ᴴ = 1 := by
   unfold rotation; split_ifs
-  · ext a b; fin_cases a <;> fin_cases b <;> simp [rot, mul_apply, conjTranspose_apply]
+  · exact rot_mul_conjTranspose
   · simp
-
-theorem conjTranspose_rotation_mul (L : ℕ) (i : Fin L) : (rotation L i)ᴴ * rotation L i = 1 := by
-  unfold rotation; split_ifs
-  · ext a b; fin_cases a <;> fin_cases b <;> simp [rot, mul_apply, conjTranspose_apply]
-  · simp
-
-/-- On an even ring the two ends of a bond have opposite parity. -/
-theorem odd_finRotate_iff {L : ℕ} (hL : Even L) (j : Fin L) :
-    Odd (finRotate L j : ℕ) ↔ ¬ Odd (j : ℕ) := by
-  rw [val_finRotate']
-  obtain ⟨k, hk⟩ := hL
-  have := j.isLt
-  split_ifs with h <;> simp only [Nat.odd_iff] <;> omega
 
 /-- The rotated bond in either orientation is the exchange `S_α ⊗ S_α`. -/
 theorem rotated_bond (h : ℝ) (α : Fin 3) {x y : Matrix (Fin 2) (Fin 2) ℂ}
@@ -93,31 +82,22 @@ theorem rotated_site (h : ℝ) (L : ℕ) (j : Fin L) :
 theorem physicalHamiltonian_eq (h : ℝ) {L : ℕ} (hL : Even L) :
     physicalHamiltonian h L = piTensor (rotation L) * (model h).hamiltonian L *
       piTensor (fun i ↦ (rotation L i)ᴴ) := by
-  rw [RPRing.hamiltonian, Matrix.mul_add, Matrix.add_mul, Finset.mul_sum, Finset.sum_mul,
-    Finset.mul_sum, Finset.sum_mul, physicalHamiltonian]
+  rw [(model h).conj_hamiltonian _ (rotation_mul_conjTranspose L)
+    (by rintro rfl; exact Nat.not_even_one hL), physicalHamiltonian]
   congr 1
-  · refine Finset.sum_congr rfl fun j _ ↦ ?_
-    have hL2 : 2 ≤ L := by obtain ⟨k, hk⟩ := hL; have := j.isLt; omega
-    rw [RPRing.bond, RPRing.bondMatrix, bondOp_neg, bondOp_sum, Matrix.mul_neg, Matrix.neg_mul,
-      Finset.mul_sum, Finset.sum_mul, ← Finset.sum_neg_distrib]
-    refine Finset.sum_congr rfl fun α _ ↦ ?_
-    rw [(model h).Dc_eq_of_refl rfl, conj_bondOp_kronecker _ (rotation_mul_conjTranspose L)
-      (ne_finRotate' hL2 j), ← bondOp_neg, rotated_bond]
+  · refine Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun α _ ↦ ?_
+    rw [(model h).Dc_eq_of_refl rfl, rotated_bond]
     unfold rotation
     have := odd_finRotate_iff hL j
     by_cases hj : Odd (j : ℕ)
     · right; exact ⟨ite_eq_left hj, ite_eq_right (by rw [this]; exact not_not.mpr hj)⟩
     · left; exact ⟨ite_eq_right hj, ite_eq_left (this.mpr hj)⟩
-  · refine Finset.sum_congr rfl fun j _ ↦ ?_
-    rw [RPRing.site, conj_siteOp _ (rotation_mul_conjTranspose L), rotated_site]
+  · exact Finset.sum_congr rfl fun j _ ↦ by rw [rotated_site]
 
 /-- On an even ring the physical and the rotated chain have the same spectrum. -/
 theorem physicalSpectrum_eq (h : ℝ) {L : ℕ} (hL : Even L) :
-    physicalSpectrum h L = (model h).spectrum L := by
-  refine eigenvalues_eq_of_conj _ _ (U := piTensor (rotation L)) ?_ ?_
-  · rw [conjTranspose_piTensor]
-    exact piTensor_conjTranspose_mul_self _ (conjTranspose_rotation_mul L)
-  · rw [conjTranspose_piTensor]; exact physicalHamiltonian_eq h hL
+    physicalSpectrum h L = (model h).spectrum L :=
+  (model h).eigenvalues_eq_spectrum _ (rotation_mul_conjTranspose L) _ (physicalHamiltonian_eq h hL)
 
 /-- **The physical staggered-field chain at `h = 1`.** Every even ring of `L ≥ 8` sites has a
 unique ground state and gap `Δ_L > log 413.4 / (21/4) ≈ 1.1475`. -/

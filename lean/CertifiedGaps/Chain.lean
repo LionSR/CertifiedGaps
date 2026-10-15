@@ -33,7 +33,7 @@ scale `J` where `gapGT_of_seeds` takes over.
 
 open Filter Finset Real
 
-namespace ThermalPurityGap
+namespace CertifiedGaps
 
 /-- The coupling defect `z(a, b) = 1 - (1 - b)(1 - a)²`: if `P_s ≥ 1 - a` and `P_τ ≥ 1 - b` then
 the coupled purity is at least `1 - z(a, b)`. -/
@@ -283,4 +283,4 @@ theorem gapGT_of_chain (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀ : 0 
     push_cast at hlog
     nlinarith
 
-end ThermalPurityGap
+end CertifiedGaps

@@ -44,11 +44,10 @@ For each length `L`, the Hamiltonian is represented by its spectrum with multipl
 
 ## Scope
 
-Theorem 1 of the note (the spin-one Heisenberg chain) is stated for the Lean Hamiltonian in
-`CertifiedGaps.Heisenberg.Gap`, with two inputs as hypotheses: the moment inequalities,
-which the continuous-time thermal MPO gives through the moment form (5) (Proposition 3.1 of the
-note's Ref. [1]), and the numerical estimates `P_s(2304, 784), P_τ(4608, 784) ≥ 0.99`
-(Proposition 5.5 of Ref. [1]). The staged plan is `lean/README.md`.
+The criterion is abstract: it needs only the spectra `E L` and the moment inequalities. They are
+proved for every reflection-positive ring in `CertifiedGaps.Ring.Gap`, and Theorem 1 of the note
+(the spin-one Heisenberg chain) is stated for the Lean Hamiltonian in `CertifiedGaps.Heisenberg`.
+The numerical seeds `P_s(n₀, β₀)`, `P_τ(2n₀, β₀)` are the only inputs left as hypotheses.
 
 The moment form is stated with the eigenvalue moduli `|λᵢ(β)|` indexed by `ℕ` (a finite spectrum
 is padded by zeros) and only for even lengths `L ≥ n₀`, which is all that the proofs use; this is
@@ -57,7 +56,7 @@ implied by the note's eq. (5).
 
 open Filter Finset Real
 
-namespace ThermalPurityGap
+namespace CertifiedGaps
 
 /-! ### Lemma 1: squaring -/
 
@@ -342,25 +341,31 @@ section Basic
 
 variable (E : (L : ℕ) → ι L → ℝ)
 
+/-- `Z_L(β) > 0`. -/
 theorem partitionFunction_pos (L : ℕ) (β : ℝ) : 0 < partitionFunction E L β :=
   Finset.sum_pos (fun _ _ ↦ exp_pos _) univ_nonempty
 
+/-- `e^{-2βe} = (e^{-βe})²`. -/
 theorem exp_neg_mul_two_mul (β e : ℝ) : exp (-(2 * β * e)) = exp (-(β * e)) ^ 2 := by
   rw [← exp_nat_mul]; ring_nf
 
 omit [∀ L, Nonempty (ι L)] in
+/-- `Z_L(2β) = ∑ₘ (e^{-βEₘ})²`. -/
 theorem partitionFunction_two_mul (L : ℕ) (β : ℝ) :
     partitionFunction E L (2 * β) = ∑ m, exp (-(β * E L m)) ^ 2 := by
   simp only [partitionFunction, exp_neg_mul_two_mul]
 
 omit [∀ L, Nonempty (ι L)] in
+/-- `Z_L(4β) = ∑ₘ (e^{-βEₘ})⁴`. -/
 theorem partitionFunction_four_mul (L : ℕ) (β : ℝ) :
     partitionFunction E L (2 * (2 * β)) = ∑ m, exp (-(β * E L m)) ^ 4 := by
   simp only [partitionFunction, exp_neg_mul_two_mul, ← pow_mul]
 
+/-- `P_τ(L, β) > 0`. -/
 theorem thermalPurity_pos (L : ℕ) (β : ℝ) : 0 < thermalPurity E L β :=
   div_pos (partitionFunction_pos E _ _) (pow_pos (partitionFunction_pos E _ _) 2)
 
+/-- `P_s(n, β) > 0`. -/
 theorem spatialPurity_pos (n : ℕ) (β : ℝ) : 0 < spatialPurity E n β :=
   div_pos (partitionFunction_pos E _ _) (pow_pos (partitionFunction_pos E _ _) 2)
 
@@ -491,11 +496,14 @@ theorem doubling (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hZ : HasSpatialM
 it is `ε_j = 20^{-2^j} / 5`, eq. (13) of the thermal-MPO note. -/
 noncomputable def defect (ε₀ : ℝ) (j : ℕ) : ℝ := (1 / 5) * (5 * ε₀) ^ 2 ^ j
 
+/-- `ε_0 = ε₀`. -/
 @[simp] theorem defect_zero (ε₀ : ℝ) : defect ε₀ 0 = ε₀ := by simp [defect]
 
+/-- `ε_{j+1} = 5 ε_j²`. -/
 theorem defect_succ (ε₀ : ℝ) (j : ℕ) : defect ε₀ (j + 1) = 5 * defect ε₀ j ^ 2 := by
   simp only [defect, pow_succ 2 j, pow_mul]; ring
 
+/-- `ε_j > 0` for `ε₀ > 0`. -/
 theorem defect_pos {ε₀ : ℝ} (hε₀ : 0 < ε₀) (j : ℕ) : 0 < defect ε₀ j := by
   unfold defect; positivity
 
@@ -504,6 +512,7 @@ theorem five_mul_pow_le {ε₀ : ℝ} (hε₀ : 0 ≤ ε₀) (hε₁ : ε₀ ≤
     (5 * ε₀) ^ 2 ^ j ≤ 5 * ε₀ :=
   pow_le_of_le_one (by positivity) (by linarith) (pow_pos two_pos j).ne'
 
+/-- `ε_j ≤ 1/100` for `0 ≤ ε₀ ≤ 1/100`. -/
 theorem defect_le {ε₀ : ℝ} (hε₀ : 0 ≤ ε₀) (hε₁ : ε₀ ≤ 1 / 100) (j : ℕ) :
     defect ε₀ j ≤ 1 / 100 := by
   have := five_mul_pow_le hε₀ (by linarith) j
@@ -658,4 +667,4 @@ theorem gapGT_of_purities (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀ :
   norm_num at h
   exact h
 
-end ThermalPurityGap
+end CertifiedGaps

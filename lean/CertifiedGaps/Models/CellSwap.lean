@@ -37,6 +37,13 @@ theorem cellSwap_mul_cellSwap : (cellSwap : Matrix (n × n) (n × n) ℝ) * cell
   have h := cellSwap_mul_kronecker_mul_cellSwap (n := n) 1 1
   rwa [one_kronecker_one, Matrix.mul_one] at h
 
+/-- The swap commutes with an exchange `c ∑ₖ Aₖ ⊗ Aₖ` within the cell. -/
+theorem cellSwap_conj_smul_sum_kronecker_self {κ : Type*} [Fintype κ] (c : ℝ)
+    (A : κ → Matrix n n ℝ) :
+    cellSwap * (c • ∑ k, A k ⊗ₖ A k) * cellSwap = c • ∑ k, A k ⊗ₖ A k := by
+  rw [Matrix.mul_smul, Matrix.smul_mul, Finset.mul_sum, Finset.sum_mul]
+  simp_rw [cellSwap_mul_kronecker_mul_cellSwap]
+
 omit [Fintype n] in
 /-- The swap is symmetric. -/
 theorem cellSwap_transpose : (cellSwap : Matrix (n × n) (n × n) ℝ)ᵀ = cellSwap := by

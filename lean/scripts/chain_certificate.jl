@@ -1,4 +1,4 @@
-# Rational chain data for `ThermalPurityGap.ChainCertificate` (lean/CertifiedGaps/ChainCheck.lean).
+# Rational chain data for `CertifiedGaps.ChainCertificate` (lean/CertifiedGaps/ChainCheck.lean).
 #
 # Given seed defect bounds εₛ, εₜ and the seed inverse temperature β₀ (exact rationals), this
 # computes a chain s_j, t_j of short decimal upper bounds for the exact doubling recurrence
@@ -73,6 +73,23 @@ function lean(q::Rational)
     return k == 0 ? string(m) : string(m, "e-", k)
 end
 
+"`  name := [a, b, …]`, wrapped at 100 columns with a 6-space continuation indent."
+function lean_list(name, xs)
+    lines, cur = String[], "  $name := ["
+    for (i, x) in enumerate(xs)
+        tok = lean(x) * (i < length(xs) ? "," : "]")
+        cand = endswith(cur, "[") ? cur * tok : cur * " " * tok
+        if length(cand) <= 100
+            cur = cand
+        else
+            push!(lines, cur)
+            cur = "      " * tok
+        end
+    end
+    push!(lines, cur)
+    return join(lines, "\n")
+end
+
 function main(args)
     εs, εt, β₀ = parse_rational.(args[1:3])
     J = length(args) ≥ 4 ? parse(Int, args[4]) : 6
@@ -85,8 +102,8 @@ function main(args)
     r = best_r(s, t, ε, digits)
     r === nothing && error("no r ≥ 1 satisfies the rate conditions")
     println("-- gap bound log r / β₀ = ", Float64(log(BigFloat(r)) / BigFloat(β₀)))
-    println("  s := [\n    ", join(lean.(s), ",\n    "), "]")
-    println("  t := [\n    ", join(lean.(t), ",\n    "), "]")
+    println(lean_list("s", s))
+    println(lean_list("t", t))
     println("  r := ", lean(r))
     println("  ε := ", lean(ε))
 end
