@@ -63,9 +63,9 @@ model, including the BLAS products; that arithmetic model is the trusted base.
 |---|---|
 | [`notes/`](notes/) | the LaTeX notes and their PDFs, the shared diagram package `tnnotes.sty`, notation and diagram conventions |
 | [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalisation, verified ring spectra, certified MPO arithmetic (Nemo/Arb), thermal purification (ITensors) |
-| [`models/`](models/) | one directory per model in a common format (AGENTS.md, "Directory format"): certificate, `certify.jl`, `check.jl`, tests and README; `spin1/` is the exact-arithmetic reproduction of the spin-1 certificate; `lean_seeds/` studies kernel-checked seeds |
+| [`models/`](models/) | one directory per model in a common format (AGENTS.md, "Directory format"): README, `IDEAS.md`, certificate, `certify.jl`, `check.jl`, tests; documented layout exceptions are listed in each README's "Layout". `spin1/` is the exact-arithmetic reproduction of the spin-1 certificate; `lean_seeds/` studies kernel-checked seeds |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalisation of the criterion and of each certified model's gap theorem, with the seeds as hypotheses; the opt-in library `SeedKernel` kernel-checks seed arithmetic |
-| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the preprint's evidence files at a pinned commit and checks their hashes |
+| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and checks their hashes |
 
 [`AGENTS.md`](AGENTS.md) states what counts as a gap certificate here and how new ones are added.
 
@@ -81,7 +81,8 @@ julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 julia tools/fetch_upstream.jl
 julia --project=models/spin1 -e 'using Pkg; Pkg.instantiate()'
 julia --project=models/spin1 models/spin1/test/runtests.jl
-julia --project=models/spin1 --threads=4 models/spin1/scripts/reproduce.jl all /tmp/spin1-fresh   # ≈20–45 min
+julia --project=models/spin1 models/spin1/check.jl                      # stored-output audit
+julia --project=models/spin1 --threads=4 models/spin1/check.jl --full   # fresh run, ≈20–45 min
 
 # any other model: fast checker (add --full for the slow replay), and its tests
 OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenberg_ladder/check.jl
