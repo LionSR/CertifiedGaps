@@ -1,4 +1,4 @@
-# Rebuilds results/summary.json and the "## Results from completed runs" section of REPORT.md
+# Rebuilds results/summary.json and the "## Results from completed runs" section of METHOD.md
 # from the scans, the certificates and the regenerated spectra (scripts/scan.jl, all c6 files).
 include(joinpath(dirname(@__DIR__), "src", "common.jl"))
 using Printf
@@ -35,7 +35,7 @@ for delta in DELTAS
 end
 metadata=provenance(Dict("purpose"=>"parameter comparison and numerical extrapolation"))
 write_result(joinpath(ROOT,"results","summary.json"),Dict("metadata"=>metadata,"parameters"=>rows))
-reportpath=joinpath(ROOT,"REPORT.md")
+reportpath=joinpath(ROOT,"METHOD.md")
 base=first(split(read(reportpath,String),"\n## Results from completed runs"))
 open(reportpath,"w") do io
     write(io,base)
