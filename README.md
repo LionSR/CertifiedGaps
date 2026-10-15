@@ -30,7 +30,7 @@ The method, the **spacetime bootstrap**, has two halves:
 | which Hamiltonians the method covers | appendices D–H | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf) |
 | how the starting estimate is certified, in diagrams | appendices I–M | [`notes/thermal-mpo-gap-certificate.pdf`](notes/thermal-mpo-gap-certificate.pdf) |
 | smaller seed inputs for a Lean-checked seed: gap > 0.039 for every even L ≥ 60 from traces at even n ≤ 12 with real twists only | exact rational chain, conditional on the finite trace tables and the analytic seed lemmas | [`models/lean_seeds/`](models/lean_seeds/) (`seed_design`) |
-| proving the seed inside the Lean kernel (packed-integer arithmetic, counting anchors) | feasibility studies; no seed proved yet | [`models/lean_seeds/`](models/lean_seeds/), [`lean/`](lean/) (`SeedKernel`) |
+| proving the seed inside the Lean kernel (packed-integer arithmetic, counting anchors) | **one unconditional Lean gap**: the Ising chain at g = 1/4, h = 1/20, gap > 0.392 for every even L ≥ 6 (`SeedKernel.Ising.ising_gap`, no `sorry`); spin-1 seed: feasibility studies | [`models/lean_seeds/`](models/lean_seeds/), [`lean/`](lean/) (`SeedKernel`) |
 
 ## Other models
 
@@ -103,8 +103,8 @@ Each directory's README gives its own commands, run times, and what is and is no
   (2304, 784); those bounds are reproduced here in exact finite arithmetic, and the criterion
   with its application to the spin-1 ring is checked in Lean. The finite computations are not
   formalised: in Lean each model's two seeds are named `sorry` lemmas. Kernel-checked seed
-  arithmetic exists so far only as a study (`models/lean_seeds/` with the Lean library
-  `SeedKernel`: one Ising point, conditional on four log Z enclosures).
+  arithmetic proves one seed outright: `SeedKernel.Ising.ising_gap` (`models/lean_seeds/`) is an
+  unconditional, fully kernel-checked gap theorem for the Ising chain at g = 1/4, h = 1/20.
 * The other models' seeds rest on verified eigenvalue enclosures whose rounding analysis
   assumes IEEE binary64 arithmetic and conventional BLAS; each was independently replayed or
   reviewed (see the model's README and `METHOD.md`).

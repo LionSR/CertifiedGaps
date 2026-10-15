@@ -7,8 +7,9 @@ Heisenberg seed and one carrying the pipeline furthest on the cheapest model, th
 Ising chain. Julia is an untrusted generator; the Lean side is the opt-in library
 `SeedKernel` of the repository's Lake package (`lake build SeedKernel`).
 
-**No certificate.** No seed and no gap is certified here. The strongest results are exact but
-conditional:
+**One unconditional gap.** The Ising study closes: `SeedKernel.Ising.ising_gap` proves, with no
+hypothesis and no `sorry`, that the Ising ring at g = 1/4, h = 1/20 has gap > log(13480)/(97/4)
+≈ 0.3921 for every even L ≥ 6. The spin-1 studies remain exact but conditional:
 
 | study | question | best result (status) |
 |---|---|---|
@@ -16,7 +17,7 @@ conditional:
 | `spectrum` | how many low states, how precise, how expensive? | 26 (I) / 34 (P) states below the tail cutoff at n = 12, β = 49/4; Q48 filtering meets every residual target (Float64, non-certifying) |
 | `anchor` | can a cheap comparison anchor the eigenvalue count? | exact local PSD comparison; 121 → 49 comparison levels at n = 12, Sᶻ = 0 against 8 physical (exact counts; anchor does not close) |
 | `spin1_kernel` | does packed arithmetic fit the kernel? | yes: n = 12 matvec + dot in 20–26 s; Ritz witnesses for H₆, H₈, H₁₀ kernel-checked (arithmetic only) |
-| `ising` | the whole pipeline on the cheapest model | seed of `IsingLongitudinal` at g = 1/4, h = 1/20, (n₀, β₀) = (6, 97/4) proved in Lean from four `LogEnclosures` hypotheses; would give gap > log(13480)/(97/4) ≈ 0.3921 |
+| `ising` | the whole pipeline on the cheapest model | **proved**: seed of `IsingLongitudinal` at g = 1/4, h = 1/20, (n₀, β₀) = (6, 97/4), and the gap > log(13480)/(97/4) ≈ 0.3921 for every even L ≥ 6 (`ising_gap`; standard axioms only) |
 
 ## Model
 
@@ -122,11 +123,16 @@ configurations below the anchor, and rejection of corrupted proposals.
 | 6 sites | 64 | −6.391774806847206 | −5.796599647006008 | −3.7 | 5.97×10⁻¹⁵ |
 | 12 sites | 4096 | −12.78354960854822 | −11.59319932209873 | −11.5 | 1.49×10⁻¹³ |
 
-`SeedBridge.lean` proves `first_point_seed_instance (h : LogEnclosures)`: exactly the first
-of the thirty conjunctions of `IsingLongitudinal.seeds` (`1 − 9064·10⁻⁹ ≤ spatialPurity 6
-(97/4)`, `1 − 3141·10⁻⁸ ≤ thermalPurity 12 (97/4)`), from four rational log Z endpoints
-taken verbatim from `models/tfim_longitudinal` (interval arithmetic outside Lean). It does not
-use `seeds`. A 43-target inventory (`results/ising/costs.json`, Float64) shows the full k×k
+`Ising/Seed.lean` turns these checks into `first_point_seed`: exactly the first of the thirty
+conjunctions of `IsingLongitudinal.seeds` (`1 − 9064·10⁻⁹ ≤ spatialPurity 6 (97/4)`,
+`1 − 3141·10⁻⁸ ≤ thermalPurity 12 (97/4)`), with no hypothesis, and then `ising_gap`. The
+steps: a residual bound gives an eigenvalue within 10⁻¹⁰ of each candidate (`Ising/Spectral`);
+`Re ⟪x, Hx⟫ ≥ ∑ (E(σ) − L/4) |x(σ)|²` and the classical count give at most two eigenvalues below
+the anchor (counting by comparison); the checker's integer sums are identified with the matrix
+`IsingLongitudinal.model (1/4) (1/20)` (`Ising/Hamiltonian`, `Ising/Bridge`); then
+`e^{-β(θ₀+r)} ≤ Z ≤ e^{-β(θ₀−r)}(1 + e^{-β(θ₁−θ₀)} + 2^L e^{-β(ρ−θ₀+r)})` with `e > 2.7182818283`
+bounds both purities. It does not use `seeds`; the earlier conditional bridge (`LogEnclosures`) is
+retired. A 43-target inventory (`results/ising/costs.json`, Float64) shows the full k×k
 Gram route reaching hours to ~1,000 hours for the 65,536- and 531,441-dimensional seeds.
 
 ### Open obligations
@@ -134,16 +140,16 @@ Gram route reaching hours to ~1,000 hours for the 65,536- and 531,441-dimensiona
 1. **Anchor.** A kernel-checkable counting anchor ρ ≤ λ_{k+1} for the spin-1 rings (better
    comparisons, fewer continuation stages, Lehmann–Goerisch with a priori bounds); the
    bottleneck of the whole route.
-2. **Spectral linear algebra in Lean.** Min–max, Weyl and Lehmann bounds for ordered
-   eigenvalues (absent from Mathlib), and the residual-to-eigenvalue step beyond the scalar
-   `exists_near_of_weighted_residual`.
+2. **Spectral linear algebra in Lean.** Lehmann bounds and ordered-eigenvalue statements
+   (absent from Mathlib). The residual bound and counting by comparison are now proved
+   (`Ising/Spectral.lean`) and apply to any Hermitian matrix.
 3. **Packing correctness.** The `Prop`s in `lean/SeedKernel/Obligations.lean` and
    `Spin1/Obligations.lean` (`DotCorrect`, `HApplyCorrect`, `FilterCorrect`, ...) and the lane
    decoding of `Ising/Packed.lean`; nothing assumes them.
 4. **Hamiltonian bridges.** Identify the checked integer matrices with the Lean Hamiltonians
-   (Cartesian ↔ Sᶻ for spin 1, including twisted rings; `20·RPRing.hamiltonian` for Ising).
-5. **Scalar enclosures.** Rational `exp`/trace bounds turning eigenvalue enclosures into the
-   `LogEnclosures` (Ising) and the trace tables with their sector/filter lemmas (spin 1).
+   (Cartesian ↔ Sᶻ for spin 1, including twisted rings); done for Ising (`Ising/Bridge.lean`).
+5. **Scalar enclosures.** The trace tables with their sector/filter lemmas (spin 1); the Ising
+   case is done in `Ising/Seed.lean`.
 
 Estimates: 900–1,950 Lean lines for the Ising point, 8–15k for the spin-1 route (METHOD.md).
 Target design C first (real arithmetic only, largest ring 12).
@@ -215,13 +221,13 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for it
 ## What is rigorous
 
 - **Lean kernel, standard axioms only.** Every declaration in `lean/SeedKernel/Audit.lean`
-  (36, checked by `check.jl`) depends on at most `propext`, `Classical.choice`, `Quot.sound`;
+  (40, checked by `check.jl`) depends on at most `propext`, `Classical.choice`, `Quot.sound`;
   none uses `sorryAx` or `Lean.ofReduceBool`. The computational checks (spin-1 witnesses and
-  tests, Ising Gram/residual/anchor checks) use only `propext` or nothing. `SeedBridge` imports
+  tests, Ising Gram/residual/anchor checks) use only `propext` or nothing. `Ising/Seed` imports
   `IsingLongitudinal`, whose `seeds` is a `sorry`, but no audited declaration depends on it.
-- **Conditional.** The Ising seed theorems assume `LogEnclosures`; an axiom audit does not
-  discharge a hypothesis. The spin-1 witnesses are arithmetic facts about packed integers until
-  the obligations above are proved.
+- **Unconditional (Ising).** `seed_spatial`, `seed_thermal`, `first_point_seed` and `ising_gap`
+  have no hypotheses. **Conditional (spin 1).** The spin-1 witnesses are arithmetic facts about
+  packed integers until the obligations above are proved.
 - **Exact in Julia (not Lean).** `seed_design` (BigInt rationals, integer-root and series
   enclosures; a line-by-line transcription of `ChainCertificate.Valid`) and `anchor` (rational
   LDL, half-chain enclosures from Float64 eigenvector proposals by bounded Int128 polar
@@ -295,3 +301,6 @@ as of commit `463c4a5`; two of them are now gitignored regenerable data
   `scripts/spectrum/KernelBench.lean` stays where it is: `scripts/spectrum/provenance.jl` hashes
   it into `results/spectrum/provenance.json`, and the Lean benchmarks under `lean/` are not
   edited from model directories.
+- The Ising seed closed: `Ising/Spectral`, `Ising/Hamiltonian`, `Ising/Bridge` and `Ising/Seed`
+  prove `first_point_seed` and the unconditional `ising_gap` from the existing kernel checks
+  (no new witnesses); `SeedBridge`, `Arithmetic` and `ResidualLemma` were retired.
