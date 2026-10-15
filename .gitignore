@@ -22,7 +22,7 @@
 /references/
 /working/
 
-# No Python in this repository (aklt's local analysis helpers stay local)
+# No Python in this repository (local analysis helpers stay local)
 *.py
 
 # Editor and build caches
@@ -31,9 +31,4 @@ lean/.lake
 *.tmp
 *.jls
 
-# Large or regenerable result data; small certificates read by tests are tracked
-/models/aklt/results/
-/models/spin2/results/*
-!/models/spin2/results/trial-certificate.json
-!/models/spin2/results/trial-137-certificate.json
-!/models/spin2/results/trial-295-symmetric-certificate.json
+# Model-specific ignores (regenerable results) live in models/<slug>/.gitignore.
