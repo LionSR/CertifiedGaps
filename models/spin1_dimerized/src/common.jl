@@ -1,14 +1,18 @@
+# Model, exact integer Hamiltonian and symmetry bases for the dimerized spin-1 ring.
 using CertifiedGaps, LinearAlgebra, SparseArrays, JSON3
 using CertifiedGaps.Results, CertifiedGaps.ExactDiagonalization, CertifiedGaps.Seeds
 using IntervalArithmetic
 BLAS.set_num_threads(1)
-const ROOT = @__DIR__
+# The model directory (this file is in src/); results/ and hashed paths are relative to it.
+const ROOT = dirname(@__DIR__)
 const REPO = normpath(joinpath(ROOT,"../.."))
 const DELTAS = [9//10, 4//5, 7//10, 3//5, 1//2]
 ratstr(x::Rational) = string(numerator(x),"//",denominator(x))
 parserat(s) = (a=split(s,"//");parse(BigInt,a[1])//parse(BigInt,a[2]))
+"Run metadata with SHA-256 of this model's sources, the core sources and its manifest."
 function provenance(config; certified=false)
-    hashes = source_hashes(ROOT; dirs=("test",), files=("common.jl","scan.jl","certify.jl","rp.jl","verified_blocks.jl","check.jl","Project.toml"))
+    hashes = source_hashes(ROOT; dirs=("src","scripts","test"),
+        files=("certify.jl","check.jl","Project.toml"))
     merge!(hashes, Dict("../../"*k=>v for (k,v) in source_hashes(REPO;dirs=("julia/src",),files=("julia/Project.toml","julia/Manifest.toml"))))
     run_metadata(config;source_sha256=hashes,packages=(CertifiedGaps,IntervalArithmetic,JSON3),status=certified ? "certified" : "numerical",certified)
 end
@@ -36,6 +40,7 @@ function integer_hamiltonian(cells, delta, states)
     @assert A==transpose(A)
     return A,den
 end
+"Product states of the ring of `cells` cells grouped by total S^z = M ≥ 0 (M < 0 by spin flip)."
 function charge_groups(cells)
     L=2cells; groups=[Int[] for _ in 0:L]
     for s in 0:3^L-1
@@ -46,6 +51,7 @@ function charge_groups(cells)
     @assert length(groups[1])+2sum(length,groups[2:end])==9^cells
     groups
 end
+"Translation by one cell (two sites) of a base-3 product state."
 translate(s,L) = (s÷9)+(s%9)*3^(L-2)
 "Build normalized character projections of cell translation and (at M=0) spin flip."
 function orbit_basis(states,cells,k,parity)

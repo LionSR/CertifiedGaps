@@ -1,5 +1,9 @@
-include("common.jl")
-include("rp.jl")
+# Numerical seed scan (not certified) at delta = d/10: dense symmetry-block spectra of rings of
+# 2, 3, 4, 6 cells, cached in results/spectrum_d<d>_c<cells>.json (gitignored; six cells take
+# about 9 min), and the β grid in results/scan_d<d>.json.
+#     julia --project=models/spin1_dimerized models/spin1_dimerized/scripts/scan.jl 7 2,3,4,6
+include(joinpath(dirname(@__DIR__), "src", "common.jl"))
+include(joinpath(dirname(@__DIR__), "src", "rp.jl"))
 # Separate invocations per parameter keep the runtime independently bounded.
 delta=length(ARGS)>0 ? parse(Int,ARGS[1])//10 : 9//10
 sizes=length(ARGS)>1 ? parse.(Int,split(ARGS[2],",")) : [2,3,4,6]

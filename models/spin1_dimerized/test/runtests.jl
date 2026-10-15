@@ -1,7 +1,12 @@
+# Fast checker: exact RP and cell reflection, the symmetry decomposition against direct ED,
+# exact larger-period projectors and the verified block path on a small ring, the stored seeds
+# and bounds with their log-partition enclosures and provenance, and a fresh recertification
+# of the delta = 9/10 seed (rings of 4 and 8 spins) checked against the stored enclosures.
 using Test
 using SHA
-include("../common.jl")
-include("../rp.jl")
+include(joinpath(@__DIR__, "..", "src", "common.jl"))
+include(joinpath(@__DIR__, "..", "src", "rp.jl"))
+include(joinpath(@__DIR__, "..", "src", "enclosure.jl"))
 @testset "Exact RP and cell reflection" begin
     for delta in DELTAS;@test check_rp(delta);end
 end
@@ -66,7 +71,6 @@ end
     end
 end
 @testset "Exact larger-period projectors" begin
-    include("../verified_blocks.jl")
     for cells in (3,4,6)
         states=charge_groups(cells)[end-2]
         for k in 0:fld(cells,2),reflection in (k==0 || 2k==cells ? (-1,1) : (1,))
@@ -74,4 +78,34 @@ end
             @test distance<1e-8
         end
     end
+end
+@testset "Verified block basis and Hamiltonian" begin
+    delta=4//5;cells=2
+    vals,radii,records,_=verified_block_spectrum(cells,delta)
+    reference,_,_=dense_spectrum(cells,delta)
+    perm=sortperm(vals)
+    @test all(abs(vals[perm[i]]-reference.E[i])<Float64(radii[perm[i]]) for i in eachindex(vals))
+    @test sum(r["dimension"]*r["multiplicity"] for r in records)==9^cells
+end
+@testset "Fresh recertification of delta = 9/10" begin
+    # Rebuilds every block, eigensystem and radius of the stored delta = 9/10 certificate from
+    # the model. LAPACK output differs slightly across machines, so the fresh seeds need not be
+    # bit-identical; the fresh certificate must be valid on its own, and its log Z enclosures
+    # must overlap the stored ones because both enclose the same exact numbers.
+    stored=read_exact_json(joinpath(ROOT,"results","certificate_d9.json"))
+    path=tempname()*".json"
+    fresh=redirect_stdout(devnull) do
+        certify_selected(9//10; n0=2, beta0=7//2, output_path=path)
+    end
+    rm(path; force=true)
+    @test fresh["bound"]>0
+    @test certified_gap_bound(parserat(fresh["epsilon_s"]),parserat(fresh["epsilon_t"]),
+        7//2).bound==fresh["bound"]
+    for key in ("logZ_n_beta","logZ_2n_beta","logZ_2n_2beta")
+        a=parserat.((stored[key]["lower"],stored[key]["upper"]))
+        b=parserat.((fresh[key]["lower"],fresh[key]["upper"]))
+        @test max(a[1],b[1])<=min(a[2],b[2])
+    end
+    # Machine-level differences move the bound in the ninth decimal, not more.
+    @test abs(fresh["bound"]-stored["bound"])<1e-8
 end
