@@ -24,10 +24,10 @@ the paper's evidence files, and then see whether the same inputs support stronge
   33 s. An exact SU(2) multiplicity reduction (largest block 56) brings this to 0.09 s and is
   verified by exact tensor relations (see `METHOD.md`). Chosen.
 * **Floating-point controls.** ITensors physical MPOs, the integer trial imported as an MPS, QN
-  DMRG and a thermal MPO. These are kept as labelled numerical cross-checks, never as certificate
+  DMRG and a thermal MPO. These are kept as labeled numerical cross-checks, never as certificate
   inputs.
 * **Stronger bounds from the same inputs (`experiments/`).** These reuse the frozen finite
-  inputs with no new contraction. One route optimises the scalar polynomial cutoffs and keeps
+  inputs with no new contraction. One route optimizes the scalar polynomial cutoffs and keeps
   unequal defects through the coupled updates. The other lifts the temperature before extracting
   purity bounds, using the length-120 trial and the threefold sector multiplicity. All
   inequalities are decided by rational logarithm and power enclosures.

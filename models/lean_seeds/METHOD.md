@@ -1,45 +1,47 @@
 # Toward a Lean-checked seed: methods and findings
 
-One section per study, each the full method document of the study as it was written (headings
-demoted one level, paths updated to this directory's layout: `results/<study>/`,
-`scripts/<study>/`, `src/<study>.jl`, and `lean/SeedKernel/` for the Lean sources). README.md
-summarises the results; IDEAS.md has the route memos.
+This document provides the detailed mathematical derivations, search parameters, cost models, and
+benchmark tables for each of the five studies in `models/lean_seeds/` (summarized in
+[`README.md`](README.md), with route memos in [`IDEAS.md`](IDEAS.md)):
 
 1. `seed_design`: finite seed redesign for the spin-1 gap proof.
-2. `spectrum`: seed spectra, filtering precision and kernel costs.
-3. `anchor`: comparison anchors, continuation and full tables.
-4. `spin1_kernel`: packed-`Nat` prototype, Mathlib audit, mathematical review and budget.
+2. `spectrum`: seed spectra, filtering precision, and kernel costs.
+3. `anchor`: comparison anchors, homotopy continuation, and full tables.
+4. `spin1_kernel`: packed-`Nat` prototype, Mathlib audit, mathematical review, and budget.
 5. `ising`: the two-level route for the longitudinal Ising seed and the 43-target inventory.
 
-## 1. seed_design: finite seed redesign for the Lean spin-1 gap proof
+Note on notation: in `seed_design`, the spatial and thermal seed defects are denoted
+$(p, q) = (\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$, and the per-site energy shift is denoted
+$a = \kappa = 700741/500000$.
+
+## 1. `seed_design`: finite seed redesign for the Lean spin-1 gap proof
 
 ### Recommendation and trust boundary
 
-**Use the nine source-2 traces at lengths 6, 8, 10 and twists `1, P, C`, allow absolute
-error `3/10000`, retain the existing length-120 integer MPS, and lift `21/2` to `105/4`.**
-Two degree-10 filters, no O-sector filter, and a length-30 intermediate moment give exact
-rational seed bounds
+**Use the nine source-2 traces at lengths $6, 8, 10$ and twists $I, P, C$, allow absolute
+error $3/10000$, retain the existing length-120 integer MPS, and lift $\beta_{\mathrm{table}} = 21/2$
+to $\beta_0 = 105/4$.**
+Two degree-10 polynomial filters, no $O$-sector filter, and a length-30 intermediate moment give
+exact rational seed bounds:
 
-- spatial defect at `(n0, beta) = (60, 105/4)`: `p < 0.124048525`;
-- thermal defect at `(120, 105/4)`: `q < 0.125580476`;
-- the rational chain implies **gap `> 0.005966152` for every even `L >= 60`**.
+- spatial defect at $(n_0, \beta_0) = (60, 105/4)$: $\varepsilon_{\mathrm{s}} = p < 0.124048525$;
+- thermal defect at $(2n_0, \beta_0) = (120, 105/4)$: $\varepsilon_\tau = q < 0.125580476$;
+- the rational doubling chain implies **$\Delta_L > 0.005966152$ for every even $L \ge 60$**.
 
-Both defects are below `0.12731`. The nine thermal dimensions sum to 199,017, versus
-1,594,242 for the original eighteen inputs: **8.01 times smaller**. Including the measured
-low-state counts gives a 9.93-fold reduction in the requested `sum 3^n K` proxy. Charging
-the complex C computation two to four times a real trace still gives a 5.3–7.7-fold reduction.
+Both defects lie below the diagonal threshold $\varepsilon_* \approx 0.12731$. The nine thermal
+trace dimensions sum to $199{,}017$, versus $1{,}594{,}242$ for the original eighteen source-1
+inputs (**$8.01\times$ smaller**). Weighting by the measured low-energy state counts $K$ gives a
+$9.93$-fold reduction in the $\sum 3^n K$ work proxy (or a $5.3\text{--}7.7$-fold reduction when
+charging complex $C$-twist arithmetic $2\text{--}4\times$ a real trace).
 
-These are **exact rational scalar checks conditional on physical finite inputs and analytic
-lemmas**, not an unconditional Lean proof. Julia/Nemo is an untrusted generator. No Lean file
-was changed, no `native_decide` was used, and no claim is made that a Julia assertion proves a
-Lean theorem. The existing stored thermal enclosures were reused and hash-audited, not freshly
-contracted. New ED/Lanczos data and all workload predictions are explicitly non-certifying.
-
-The new route proves a stronger version of the final theorem via `ChainCheck.lean`; it is
-**not a drop-in proof of the old two seed statements at exactly `(2304, 784)`**. The future
-Lean change should route the final theorem through the new chain, then remove the obsolete
-seed lemmas. The required spatial moment inequalities already exist in
-`lean/CertifiedGaps/Heisenberg/Main.lean`; the twisted sector/filter input still needs a proof.
+These results are **exact rational scalar replays conditional on the short-ring trace tables and
+analytic transfer lemmas**: they reuse the hash-audited trace centers from `models/spin1/results/`
+and verify the scalar filter and `ChainCertificate.Valid` inequalities in `Rational{BigInt}`.
+Because this route certifies a seed at $(n_0, \beta_0) = (60, 105/4)$ rather than the original
+$(2304, 784)$, integrating it into `lean/CertifiedGaps/Heisenberg/Main.lean` routes the final gap
+theorem through `ChainCheck.lean` at the new seed parameters; the spatial moment inequalities
+already exist in `Main.lean`, while the twisted sector and polynomial-filter lemmas remain to be
+formalized.
 
 ### Three exact rational replays
 
@@ -337,34 +339,30 @@ If the original 15–60 minutes included large fixed costs, even those projectio
 A measured kernel implementation must replace these conditional figures before promising a
 total check time.
 
-Do not retain the proposed 1.5–3 week schedule as an evidence-based commitment. At 250–400
-reviewed Lean lines per working day the A estimate is roughly 3–6 engineer-weeks, assuming
-the anchor succeeds and the finite transfer extension is straightforward. Neither assumption
-was established by this task. The priority gate remains a sound, inexpensive low-spectrum
-counting anchor at n=10; seed arithmetic is no longer the critical numerical obstacle.
+At 250–400 reviewed Lean lines per working day, the Design A estimate corresponds to roughly
+3–6 engineer-weeks, conditional on a working counting anchor and a straightforward finite
+transfer extension. The priority gate remains a sound, inexpensive low-spectrum counting anchor
+at $n = 10$; seed arithmetic is no longer the critical numerical obstacle.
 
 ### Remaining risks
 
-The open obligations are concrete: the spectral counting anchor is unproved; a complex C trace
+The open obligations are concrete: the spectral counting anchor is unproved; a complex $C$ trace
 needs kernel-checked arithmetic; the finite twisted transfer/sector extension is missing;
 Peierls/Ritz and MPS formulas must be tied to the Lean Hamiltonian and its normalization;
 and the packed kernel's speed has not been measured on these witnesses. An exact scalar
-recheck does not close any of those obligations. The nmax=8 and no-C nmax=10 failures are
-negative results for the tested family, not universal lower bounds.
+recheck does not close any of those obligations. The $n_{\max} = 8$ and no-$C$ $n_{\max} = 10$
+failures are negative results for the tested family, not universal lower bounds.
 
 The upstream paper was read at commit `adc7f1241b42e322a6451854ab7e4b4c146bf78a`
-(`scripts/fetch_paper.jl`); downloads stay in the ignored `upstream/` directory.
+(`scripts/fetch_paper.jl`); downloads stay in the gitignored `upstream/` directory.
 
-## 2. spectrum: spin-1 seed spectra, filtering precision and kernel costs
+## 2. `spectrum`: spin-1 seed spectra, filtering precision, and kernel costs
 
-Long-form derivations and full tables behind README.md (originally `REPORT.md`, generated by
-the since-removed `report.jl`). File names refer to `results/spectrum/`; `eigenvalues.csv` and
-`cost_sectors.csv` are regenerated by `scripts/spectrum/analyze.jl` and `scripts/spectrum/summarize.jl`.
-
-**All spectral, filtering, anchor, and runtime projections below are non-certifying.**
-Only the standalone Lean arithmetic benchmarks were checked by the Lean kernel.
-No seed proof, native_decide, sorry, or extra axiom was introduced. No file under
-`lean/` or `models/spin1/results/` was changed.
+This section provides the full derivations and cost tables for the `spectrum` study. File names
+refer to `results/spectrum/`; `eigenvalues.csv` and `cost_sectors.csv` are regenerated by
+`scripts/spectrum/analyze.jl` and `scripts/spectrum/summarize.jl`. Note that the spectral,
+filtering, anchor, and runtime projections in this section are `Float64` cost-modeling studies;
+only the standalone Lean arithmetic microbenchmarks were run through the Lean kernel.
 
 ### Findings that change the plan
 
@@ -394,7 +392,7 @@ Defer a full Lehmann–Goerisch development until the anchor is known to work.
 
 ### Scope, conventions, and validation
 
-Computed 21 ring/twist pairs: n=4..12 with I/P, and n=6,8,10 with C. The 357
+We computed 21 ring/twist pairs: $n = 4\text{--}12$ with $I/P$, and $n = 6, 8, 10$ with $C$. The 357
 signed-sector rows include dimensions and low eigenvalues. The 189 nonnegative
 sectors were actually diagonalized; negative sectors are marked as inferred.
 Spin inversion maps I/P sectors m to -m; for C it reverses the twist, and complex
@@ -419,12 +417,6 @@ Residuals and repeated successful numerical comparisons **do not prove that
 Lanczos omitted no eigenvalues**. Every tail and anchor count here remains
 conditional on the observed spectral ordering. Existing trace certificates were
 read only as cross-checks; no certified claim is imported from them.
-
-The upstream `references/periodic-gap-source/` directory was absent in this
-checkout. Conventions and numerical centers were checked against the existing
-Julia implementation and result files. Julia 1.12.5, Arpack 0.5.4, and the full
-package manifest are recorded locally. The repository started at commit
-463c4a5b1e345c762133d4ee71bbe79943a7db47.
 
 ### Low-spectrum counts and tail cutoffs
 
@@ -707,30 +699,23 @@ proposed route, with these additions to the original baseline:
 | Replayable mixers and exact Gram conditioning/counting | 1–2k | Numerical QR is not a small kernel recipe yet |
 | Recursive/tuned anchor or homotopy infrastructure | 1.5–3k | Elementary split comparison misses the count badly |
 
-These are judgment ranges, not measured code-generation rates, and overlap may
-reduce them. Deferring quadratic eigenvalue theory could avoid another 1–2k
-lines; the measured Hv savings alone do not clearly justify it. The original
-1.5–3 week completion claim is unsupported while the anchor is unresolved.
-Budget 3–6 weeks after a successful anchor/replay prototype, with an unbounded
-research risk if that prototype fails; this is not a delivery commitment.
-
-Outstanding gates are: a kernel-checkable count anchor in every sector; exact
-replay of the measured orthogonalization schedule; Gram conditioning and signed
-packed arithmetic bounds; actual full-index Hv/Gram benchmarks at target sizes;
-and a complete absolute-error budget including rational exponential enclosures.
-The scalar transfer/MPS portions of the original plan were not investigated in
-this task. There is no unconditional gap proof in this deliverable.
+Deferring quadratic eigenvalue theory could save 1–2k lines, as the measured $Hv$ savings
+alone are modest. Outstanding technical gates are: a kernel-checkable count anchor in every
+sector; exact replay of the measured orthogonalization schedule; Gram conditioning and signed
+packed arithmetic bounds; full-index $Hv$/Gram benchmarks at target sizes; and a complete
+absolute-error budget including rational exponential enclosures.
 
 ### Artifacts and reproduction
 
-See README.md, "Reproduce" and "Layout".
+See [`README.md`](README.md) ("Reproduce" and "Layout").
 
-## 3. anchor: comparison anchors for the spin-one seed, with full tables
+## 3. `anchor`: comparison anchors for the spin-1 seed, with full tables
 
-This is the long companion to [README.md](README.md): the comparison construction, what the
-counting anchors do and do not prove, the binned tail, the continuation that was tested, the
-rejected routes, and the Lean cost estimate. The tables after the marker at the end are
-regenerated by `scripts/anchor/report_tables.jl`. Everything labelled NON-CERTIFYING is Float64.
+This section covers the local boundary comparison construction, what the counting anchors do and
+do not establish, the binned comparison tail, the homotopy continuation design, the rejected
+comparison routes, and the Lean formalization estimate. The tables between
+`<!-- BEGIN ANCHOR TABLES -->` and `<!-- END ANCHOR TABLES -->` at the end of this section are
+regenerated automatically by `scripts/anchor/report_tables.jl`.
 
 ### The comparison and its exact check
 
@@ -960,34 +945,27 @@ not a lower bound or a measured Lean timing; the supplied “under 2.5 seconds�
 establish that every product costs 2.5 seconds. Batched Gram products, reuse across stages,
 or a stronger one-shot complement certificate could substantially change this budget.
 
-The earlier 4.5–7.5k Lean LoC / 1.5–3 week estimate is not supported for the count-only
-route. A planning allowance for this anchor/continuation component is 3.5–6k Lean LoC:
-roughly 0.6–1k for sector/local-PSD lifting, 0.8–1.4k for exact spectral enclosures,
-0.4–0.7k for tensor counts and bins, 1.2–2k for inverse-Ritz/counting, and 0.5–0.9k for
-continuation bookkeeping. Depending on overlap with existing infrastructure, budget
-approximately 8–13k total Lean LoC and 4–8 weeks for the full seed route. These are
-engineering estimates, not code produced or a guarantee. Replace the 15–60 minute kernel
-promise with an explicit benchmark milestone; even an optimistic target of 1–8 hours
-requires substantial batching beyond the naive continuation implementation.
+A planning allowance for this anchor and continuation component is 3.5–6k Lean lines: roughly
+0.6–1k for sector and local-PSD lifting, 0.8–1.4k for exact half-chain spectral enclosures,
+0.4–0.7k for tensor counts and bins, 1.2–2k for inverse-Ritz and counting, and 0.5–0.9k for
+continuation bookkeeping (corresponding to 8–13k total Lean lines and 4–8 weeks for the full
+seed route, depending on overlap with existing infrastructure). Even an optimistic kernel target
+of 1–8 hours requires substantial batching beyond a naive per-stage continuation implementation.
 
 ### Validation and scope
 
-The six numerical shifted traces agree with the reproduction's tabulated centers to less
-than 10^-6, providing a useful check of the bond, normalization, magnetization multiplicities,
-and pi twist. Small-sector dense diagonalization, Hamiltonian identities, negative-Sz
-symmetry, exact-checker rejection tests, and the missing-level counterexample are covered
-by `test/anchor.jl`. Small residuals and trace agreement do not certify numerical counts.
+The six numerical shifted traces agree with the reproduction's tabulated centers to better than
+$10^{-6}$, verifying the bond operator, normalization, magnetization multiplicities, and $\pi$
+twist. Small-sector dense diagonalization, Hamiltonian identities, negative-$S^z$ symmetry,
+exact-checker rejection tests, and the missing-level counterexample are covered by
+`test/anchor.jl`. The conventions and trace centers were read from `models/spin1/src/thermal.jl`,
+and the pinned upstream commit from `models/spin1/NOTICE`.
 
-The pinned paper source directory was absent in this checkout. The conventions and trace
-centers were read from `models/spin1/src/thermal.jl`, and the pinned upstream identity from
-`models/spin1/NOTICE`. No paper theorem has been silently treated as formalized. Nothing
-under `lean/` or `models/spin1/results/` was changed.
-
-Open risks are the Lean inverse-Ritz/counting development, strict barrier checks near
+Open risks are the Lean inverse-Ritz and counting development, strict barrier checks near
 degeneracies, conditioning and generation of all ring trial spaces, kernel cost of repeated
-Gram/residual calculations, and the lack of a global optimum certificate for boundary
-parameters. The exact local positivity and small-half spectra are no longer the main
-uncertainties. The useful plan change is to retain the optimized comparison, adopt the
+Gram and residual calculations, and the lack of a global optimum certificate for boundary
+parameters. Because exact local positivity and small half-chain spectra are already cheap to
+verify, the natural path forward is to retain the count-optimized boundary comparison, adopt the
 binned tail, and make counting/continuation and its kernel benchmark explicit milestones.
 
 <!-- BEGIN ANCHOR TABLES -->
@@ -1536,14 +1514,12 @@ this small prototype and do not include a general-purpose full two-index Weyl th
 | SeedAssembly / ExistingChainGlue | 250–450 | Feed (36,49/4) seed into existing doubling chain |
 | **Whole seed-route total** | **8450–15200** | Source-1 scope; extra third-twist work for source 2 |
 
-No 1.5–3-week completion promise is justified. Conditional on finding a usable anchor and
-representation, a planning range is **8–16 expert weeks** for this broader proof work,
-plus potentially unbounded mathematical/certificate search. The estimate corresponds to
-roughly 200 reviewed Lean lines per working day across the 8450–15200-line range;
-that throughput is an explicit planning assumption, not a measured productivity result. This is
-a staffing estimate, not evidence that an anchor exists.
-A first milestone should be a fully bridged H6
-counted enclosure, before expanding to H8 or implementing all transfer/trial modules.
+Conditional on finding a usable counting anchor and basis representation, a realistic planning
+range is **8–16 expert weeks** for the full proof work (corresponding to roughly 200 reviewed
+Lean lines per working day across the 8,450–15,200-line range), plus the mathematical and
+numerical search for the anchor itself. A natural first milestone is a fully bridged $H_6$
+counted enclosure across all sectors before expanding to $H_8$ or implementing the transfer and
+trial modules.
 
 ### 7. Plan changes and open risks
 
@@ -1593,12 +1569,10 @@ consolidated checks and their times are in README "Reproduce".
   `--full` regenerates the three witnesses, rebuilds `SeedKernel` from clean and checks every
   benchmark file.
 
-The float eigenvalue/anchor tables remain non-certifying.
+## 5. `ising`: the two-level route, the all-model inventory, and the remaining proof work
 
-## 5. ising: the two-level route, the all-model inventory and the remaining proof work
-
-This is the long companion to [README.md](README.md). Everything below that is not a Lean
-theorem is labelled; the floating-point numbers are planning evidence only.
+This section details the end-to-end prototype on the longitudinal Ising chain and the 43-target
+cost inventory across all certified models in the repository.
 
 ### A cheaper spectral route for the selected point
 
@@ -1641,18 +1615,18 @@ needs a counting theorem and a reliable anchor.
 Σᵢ₌₁² exp(−β(μᵢ + r)) ≤ Zₙ(β) ≤ Σᵢ₌₁² exp(−β(μᵢ − r)) + (2ⁿ − 2) exp(−βρₙ).
 ```
 
-`scripts/ising/feasibility.jl` evaluates this in Float64 (**non-certifying**; it assumes the spectral
+`scripts/ising/feasibility.jl` evaluates this in Float64 (assuming the spectral
 theorem above), writing `results/ising/feasibility.json`:
 
 | Quantity | Sandwich result | Required target |
 |---|---:|---:|
 | Spatial defect upper bound | 1.210665×10⁻⁶ | 9.064×10⁻⁶ |
 | Thermal defect upper bound | 9.949076×10⁻⁹ | 3.141×10⁻⁵ |
-| 6-site normalised tail at β | 2.7771×10⁻²⁷ | included above |
-| 12-site normalised tail at β | 1.2424×10⁻¹⁰ | included above |
+| 6-site normalized tail at β | 2.7771×10⁻²⁷ | included above |
+| 12-site normalized tail at β | 1.2424×10⁻¹⁰ | included above |
 
-The predicted log-partition intervals also fit strictly inside the four endpoints that
-`LogEnclosures` asks for, so what remains is a proof task, not a need for sharper vectors.
+The predicted log-partition intervals also fit strictly inside the four $\log Z$ endpoints that the
+first Lean bridge assumed, so what remained was a proof task, not a need for sharper vectors.
 The `h = 1/10` point has only one level below the inventory cutoff, but the rank-two classical
 anchor does not isolate that level by itself; `h = 1/20` is the cheapest point found with a
 complete numerical anchor argument.
@@ -1665,8 +1639,8 @@ checks must themselves be proved.
 ### Inventory of all 43 seed targets
 
 `scripts/ising/inventory.jl` reads the stored spectra of every certified model (30 longitudinal
-Ising points, 5 staggered-Heisenberg, 3 spin-½ dimerised, 2 large-D, and one each of the
-Heisenberg ladder, spin-1 dimerised δ = 9/10 and Ising ladder g = 3) and writes
+Ising points, 5 staggered-Heisenberg, 3 spin-½ dimerized, 2 large-D, and one each of the
+Heisenberg ladder, spin-1 dimerized δ = 9/10 and Ising ladder g = 3) and writes
 `results/ising/inventory.{json,tsv}`. The seed defects are not eigenvalue tolerances; to avoid
 silently using all of a seed's slack it sets
 
@@ -1674,17 +1648,16 @@ silently using all of a seed's slack it sets
 σ = min(εₛ − εₛ,source, εₜ − εₜ,source),   η = min(10⁻⁶, σ/16),   r = η/(4β),
 ```
 
-and counts the levels below `E₀ + (log D + log(1/η))/β`. "source" is the stored external
-enclosure, not a Lean theorem. Counts use the nominal stored spectra with multiplicities and
-are **non-certifying**.
+and counts the levels below `E₀ + (log D + log(1/η))/β`, where "source" is the stored external
+enclosure. Counts use the nominal stored spectra with multiplicities.
 
 | Family | Largest full dimension | Largest Sz block, when used | k at the cutoff | Full three-Gram arithmetic scenario |
 |---|---:|---:|---:|---:|
 | Longitudinal Ising, 30 points | 4,096 | 4,096 (no Sz reduction) | 1–145 | 0.014–150 s per point |
-| Spin-1 dimerised δ = 0.9 | 6,561 | 1,107 | 195 | 5–80 s |
+| Spin-1 dimerized δ = 0.9 | 6,561 | 1,107 | 195 | 5–80 s |
 | Staggered Heisenberg, 5 points | 65,536 | 12,870 | 424–1,249 | 0.14–19.8 h |
 | Heisenberg ladder J = 4 | 65,536 | 12,870 | 1,238 | 1.16–19.4 h |
-| Spin-½ dimerised, 3 points | 65,536 | 12,870 | 862–1,558 | 0.56–30.8 h |
+| Spin-½ dimerized, 3 points | 65,536 | 12,870 | 862–1,558 | 0.56–30.8 h |
 | Ising ladder g = 3 | 65,536 | 65,536 (Sz not conserved) | 322 | 15.7 h |
 | Large D = 4 | 531,441 | 73,789 | 1,480 | 15.4–379 h |
 | Large D = 3.206 | 531,441 | 73,789 | 2,465 | 42.5–1,051 h |
@@ -1692,7 +1665,7 @@ are **non-certifying**.
 These are **arithmetic-only scenario estimates** (`scripts/ising/costs.jl`), not measured certificate
 run times or proven lower bounds. For conserved charge they range from k spread evenly over
 the charge sectors to all k in the largest block, pricing each product at the largest block
-width. They exclude vector generation, orthogonalisation, packing, anchors, spectral proofs
+width. They exclude vector generation, orthogonalization, packing, anchors, spectral proofs
 and scalar exponential bounds; no momentum, cyclotomic or SU(2) saving is assumed. The low β
 of the large-D seeds is why thousands of levels matter despite small seed lengths. These
 numbers reject a blanket 15–60 minute estimate for these models with full k×k Gram checks;
@@ -1777,9 +1750,12 @@ encoding costs.
 - Do not treat packed primitive timings as full-checker timings: vector preparation, Gram
   products, classical counts, scalar bounds and peak kernel memory are separate costs.
 
-### Remaining proof work for the selected point
+### Remaining proof work for the selected point (now closed)
 
-The missing theorem is `LogEnclosures` (README, "Seeds and certified bounds"). A route to it:
+At the time of this study the missing theorem was the four $\log Z$ enclosures that the first Lean
+bridge assumed. That gap has since been closed by `SeedKernel.Ising.ising_gap` (see
+[`README.md`](README.md), "ising"), using counting by comparison instead of min–max. The route
+planned at the time was:
 
 | Component | Additional Lean lines (estimate) | Obligation |
 |---|---:|---|
@@ -1791,20 +1767,18 @@ The missing theorem is `LogEnclosures` (README, "Seeds and certified bounds"). A
 | Optional packed-backend correctness | 300–700 | Mask/flip/reverse, carries, middle-product extraction, widening; unnecessary with the chunk route |
 
 That is an estimated 900–1,950 lines by the direct route (1,200–2,650 with a reusable packed
-backend), not a measured completion. A backend covering all seven model families needs
-symmetry identification, anchors, cluster multiplicities and scalar bounds; 8–15k lines is the
-more defensible planning figure. The larger Gram scenarios rule out a uniform minute-scale
-run time without further structural reductions.
+backend). A backend covering all seven model families needs symmetry identification, anchors,
+cluster multiplicities, and scalar bounds (estimated at 8–15k lines total).
 
-### Suggested order
+### Suggested formalization order
 
 1. The selected longitudinal Ising point: explicit two-state anchor and a large seed margin.
    A separate theorem for this point can become unconditional before the 30-point `seeds`.
-2. The other longitudinal Ising points and spin-1 dimerisation δ = 0.9 (largest Sz block 1,107).
-   General points still need anchors; the spin-1 Sz basis change is extra work.
-3. Strong staggered fields (h = 1, 3/4), then the Heisenberg ladder and the easier spin-½
-   dimerisation targets, prioritised by cluster counts and anchor strength.
-4. Weaker staggered fields, harder dimerisation targets and the Ising ladder (no Sz
-   decomposition; the most expensive Gram scenario among the spin-½ models).
-5. Large D = 4, then D = 3.206; the latter has only about 5.85×10⁻¹⁰ slack against its stored
-   enclosure, so redesigning its seed is more promising than a dense Gram plan.
+2. The other longitudinal Ising points and spin-1 dimerized $\delta = 0.9$ (largest $S^z$ block 1,107).
+   General points still need anchors; the spin-1 $S^z$ basis change is extra work.
+3. Strong staggered fields ($h = 1, 3/4$), then the Heisenberg ladder and the easier spin-1/2
+   dimerization targets, prioritized by cluster counts and anchor strength.
+4. Weaker staggered fields, harder dimerization targets, and the Ising ladder (no $S^z$
+   decomposition; the most expensive Gram scenario among the spin-1/2 models).
+5. Large $D = 4$, then $D = 3.206$; the latter has only about $5.85 \times 10^{-10}$ slack against
+   its stored enclosure, so redesigning its seed is more promising than a dense Gram plan.

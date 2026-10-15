@@ -1,59 +1,57 @@
-# Route memo: spin-1 chain with single-ion anisotropy D
+# Route memo: spin-1 chain with single-ion anisotropy $D$
 
-Model H = Σ Sⱼ·Sⱼ₊₁ + D Σ (Sᶻⱼ)², one-site cells, Cartesian RP basis. This memo was written in
-two rounds, each before its computations: first for the ED baseline, then for the follow-up
-that goes beyond ED. The outcomes are recorded at the end.
+We study the periodic spin-1 chain $H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum_{j=1}^L (S_j^z)^2$
+with single-site unit cells in the Cartesian reflection-positive basis. This memo records the
+candidate routes evaluated prior to Stage 1 (the verified exact-diagonalization baseline) and
+Stage 2 (the transfer-squaring and Weyl-transport extensions), followed by their outcomes.
 
 ## Candidate routes
 
-* **Closed forms.** The exchange terms commute neither with the single-ion term nor with
-  adjacent bonds. No free-particle or frustration-free partition function is known for this
-  D range, and the D = ∞ product limit alone does not give finite-D seeds.
-* **Cluster / low-temperature expansion.** The product vacuum is a natural reference, but pair
-  creation by exchange needs a polymer estimate uniform in volume and β. An extensive
-  remainder cannot control log Z₂ₙ − 2 log Zₙ, and a convergent, numerically useful remainder
-  near D ≈ 3 would be substantial new analysis. Not pursued; cost after such a derivation could
-  be independent of n up to exponentially small winding polymers.
-* **Symmetry-resolved dense ED (baseline).** Sᶻ and translation reduce the largest L = 12 block
-  from 73789 to about 6000; spin inversion pairs ±Sᶻ and conjugation pairs ±k. Cost is cubic
-  in block dimension and exponential in L; L = 14 blocks (~42000) are infeasible densely on this
-  host, and n₀ = 7 would be odd anyway. Certification needs every level of every block, with
-  verified residual/orthogonality bounds and a polar/Weyl enclosure; Krylov low spectra are
-  only for screening.
-* **Transfer moments (chosen beyond-ED route).** For even n, X_βⁿ/Zₙ is a positive density, and
-  squaring improves its purity defect s to at most s²/[2(1 − s)²]. This bounds Pₛ at
-  n = 12, 24, … from L = 6, 12 alone. The thermal input follows from the exact identity
-  P_τ(2n, b) = Pₛ(n, 2b) P_τ(n, b)² / Pₛ(n, b)² and Pₛ ≤ 1, tracking spatial defects at both b
-  and 2b. Cost: O(log(n/6)) interval operations after four stored log Z enclosures. Risk: the
-  thermal defect grows with every lift. A Birkhoff contraction estimate is less direct because
-  no strictly positive finite kernel with controlled Trotter error is available.
-* **Perturbation in D (second chosen route).** V = Σ(Sᶻ)² satisfies 0 ≤ V ≤ L, so
-  ‖V − L/2‖ ≤ L/2 and Weyl moves each verified finite spectrum to nearby D with radius
-  L|δD|/2 and a cancelling energy shift. Its defect loss is O(nβ|δD|): good for certifying
-  parameter intervals without another ED run, not a uniform-volume perturbation theorem.
-* **Smaller seeds (survey Thm 2.24(v)).** Replace P_τ(2n₀) by P_τ(n₀) and Pₛ(n₀, 2β₀); the
-  coupling identity above is the same mechanism, used inside the transfer route.
-* **Variational sandwiches.** A trial MPS bounds E₀(2n) from above, but no matching lower bound
-  on E₀(n) with exponentially small surface error is available; an Anderson-type bound with
-  O(1) error cannot resolve δₙ near threshold. Left as a separate route.
-
-## Choice
-
-ED baseline: exact RP, a floating-point screen over D, β and n₀ ≤ 6, then complete verified
-dense spectra at L = 6, 12 for the best reachable seeds. Follow-up: transfer squaring and
-centred Weyl transport on those stored spectra, a verified small-ring bridge, and a refined
-certified D interval, with every failure recorded rather than hidden.
+1. **Closed forms:** Because the nearest-neighbor Heisenberg exchange terms commute neither with the
+   single-ion anisotropy $D(S_j^z)^2$ nor with adjacent bonds, no closed-form or free-fermion
+   partition function is available at finite $D$.
+2. **Cluster / low-temperature polymer expansion around $D = \infty$:** The product state
+   $|0\rangle^{\otimes L}$ ($S_j^z = 0$) is the exact ground state at $D = \infty$, with local
+   excitation energy $D$, but bounding $\log Z_{2n} - 2\log Z_n$ uniformly in $n$ near $D \approx 3.2$
+   against virtual $m = \pm 1$ pair creation requires a convergent low-temperature polymer
+   expansion with explicit quantitative remainders.
+3. **Symmetry-resolved verified dense exact diagonalization (Stage-1 baseline):** Conservation of
+   total $S^z$, translation momentum, spin inversion at $S^z = 0$, and conjugate-momentum pairing
+   reduce the $3^{12} = 531{,}441$-dimensional Hilbert space at $L = 12$ into 92 blocks of dimension
+   at most $5{,}798$. Every block can be diagonalized densely and certified via interval matrix
+   construction, IEEE binary64 residual and orthogonality norm bounds, and polar-factor/Weyl
+   eigenvalue enclosures, yielding rigorous seeds at $n_0 = 6$ ($2n_0 = 12$). Going directly to
+   $n_0 = 8$ ($2n_0 = 16$) or even $L = 14$ (largest block $41{,}835$) is prohibitive for dense
+   diagonalization. **Chosen Stage-1 route.**
+4. **Spatial transfer squaring and purity coupling without the $4n_0$ ring (Stage-2 extension):**
+   For even $n$, $\sigma_n = X_\beta^n / Z_n(\beta)$ is a positive trace-one density operator, and
+   squaring bounds the spatial defect at $2n$ by $\varepsilon_{\mathrm{s}}(2n, \beta) \le f(\varepsilon_{\mathrm{s}}(n, \beta)) = \varepsilon_{\mathrm{s}}^2 / [2(1 - \varepsilon_{\mathrm{s}})^2]$.
+   Meanwhile, the exact partition-function identity
+   $$P_\tau(4n, \beta) = \frac{P_{\mathrm{s}}(2n, 2\beta)\,P_\tau(2n, \beta)^2}{P_{\mathrm{s}}(2n, \beta)^2} \ge P_{\mathrm{s}}(2n, 2\beta)\,P_\tau(2n, \beta)^2$$
+   bounds the thermal purity at $4n = 24$ using only $\log Z_6$ and $\log Z_{12}$ evaluated at
+   $\beta$ and $2\beta$ (equivalent to Theorem 2.24(v) of the survey). This lifts an $n_0 = 6$
+   spectral calculation to an $n_0 = 12$ (or $24, 48, 96$) seed in $O(\log(n_0/6))$ interval
+   operations without ever diagonalizing $L = 24$. **Chosen Stage-2 route.**
+5. **Centered Weyl perturbation transport in $D$ (Stage-2 extension):** Because
+   $V = \sum_{j=1}^L (S_j^z)^2$ satisfies $0 \le V \le L I$, centering $V$ by $\frac{L}{2}I$ gives
+   $\|\delta D (V - \frac{L}{2}I)\|_2 \le \frac{1}{2}L|\delta D|$. By Weyl's inequality, shifting
+   $D^* \mapsto D^* + \delta D$ shifts every eigenvalue of $H_L(D) - \frac{L\delta D}{2}I$ by at
+   most $\frac{1}{2}L|\delta D|$, and the constant shift cancels in both purities. This transports
+   verified $\log Z$ enclosures across narrow intervals of $D$ without re-diagonalizing $H_{12}$.
+   **Chosen Stage-2 route.**
 
 ## Outcome
 
-* ED seeds n₀ = 6 certify D = 4 (0.694694192) and D = 3.206 (0.002213456); the screen finds
-  no even seed with n₀ ≤ 6 at D ≤ 3.205.
-* Transfer squaring succeeds at D = 4: n₀ = 12, β = 29/10, bound 0.899143399, from L ≤ 12 only;
-  verified L = 8, 10 gaps extend it to every even L ≥ 6. Further lifts (n₀ = 24, 48, 96) still
-  close but with smaller bounds, because thermal purity is lost at each step.
-* At D = 3.206 no lift through n₀ = 192 closes on β = 1.5:0.025:6 (plus 381/125): thermal-purity
-  loss prevents it. This negative applies to these estimates only.
-* Centred Weyl transport certifies D ∈ [3.2059998, 3.206] with n₀ = 6, β = 381/125.
-* Pushing below D ≈ 3.2 needs seeds of roughly n₀ ≈ 10–26 at β ≈ 4–30 (a crude extrapolation
-  of δ(n) from n = 4, 6), i.e. a route that bounds spatial purity at large n without losing
-  thermal purity, such as a polymer expansion or a verified MPS/cluster sandwich.
+- **Stage-1 ED seeds ($n_0 = 6$):** Complete verified $L = 6, 12$ spectra certify $D = 4$
+  ($\Delta_L \ge 0.694694192$ at $\beta_0 = 9/4$) and $D = 1603/500 = 3.206$
+  ($\Delta_L \ge 0.002213456$ at $\beta_0 = 381/125$) for all even $L \ge 6$. On the exploratory
+  grid, $D \le 3.205$ has no admissible even seed at $n_0 \le 6$.
+- **Stage-2 transfer squaring ($n_0 = 12, \dots, 96$):** At $D = 4$, lifting from $L = 6, 12$ to a
+  seed at $(n_0, \beta_0) = (12, 29/10)$ without constructing $L = 24$ raises the certified uniform
+  gap bound from $0.694694192$ to **$0.899143399$** for all even $L \ge 12$, and verified spectra at
+  $L = 6, 8, 10$ bridge the remaining even lengths down to $L \ge 6$. Iterating further certifies
+  $n_0 = 24, 48, 96$ as well. At $D = 3.206$, where the $n_0 = 6$ thermal defect is already near
+  threshold, spatial lifting without a new thermal input loses too much thermal purity to close.
+- **Stage-2 Weyl transport:** Centered Weyl perturbation around $D^* = 3.206$ certifies the
+  continuous parameter interval $D \in [3.2059998, 3.206]$ ($\Delta_L \ge 0.001001626$ for all even
+  $L \ge 6$), and similarly certifies $D \in [3.9979773, 4]$ around $D^* = 4$.

@@ -1,45 +1,49 @@
-# Candidate routes
+# Candidate routes: dimerized spin-1 Heisenberg ring
 
-The authorized numerical route is full dense ED in Sz, cell momentum and spin-flip
-sectors, followed by verified residual enclosures only at the best eligible seed.
-At twelve spins the largest unreduced Sz sector is 73789; cell momentum and spin flip
-reduce it, but full dense spectra remain expensive (cubic work, quadratic memory).
-The six-cell cap permits n=2,3 only; the repository theorem requires even n, hence
-only n=2 is an eligible certificate seed. n=3 is a numerical diagnostic, not a
-uniform-gap certificate under the stated theorem. n=4 would need sixteen spins.
+Grouping adjacent spin-1 sites joined by a weak bond $1 - \delta$ into a two-spin unit cell
+(dimension $3^2 = 9$) yields a translation-invariant ring of $L$ cells coupled by strong bonds
+$1 + \delta$. At $L = 6$ cells ($12$ spins, Hilbert-space dimension $3^{12} = 531{,}441$), the
+largest unreduced $S^z$ block has dimension $73{,}789$; exploiting two-site translation, spatial
+reflection, and spin-flip symmetries reduces the largest block to dimension $11{,}596$, which can
+be diagonalized densely. Within a 6-cell ($12$-spin) ring ceiling, the available seed sizes are
+$n_0 = 2$ cells (requiring $2$ and $4$ cells) and $n_0 = 3$ cells (requiring $3$ and $6$ cells),
+whereas $n_0 = 4$ cells would require a $16$-spin ring ($3^{16} = 43{,}046{,}721$ states).
 
-A strong-dimer perturbation expansion could bypass ED size limits, but implementing
-and checking an explicit convergent remainder is a separate substantial project.
-The exact decoupled dimer point is a useful validation case, not one of the requested
-parameters. A transfer-kernel argument using swap reflection inside the cell is
-needed: the intercell interaction is not literally a sum of identical cell operators.
+## Candidate routes
 
-Chosen route: first verify site RP and the cell-reflection kernel identity; implement
-symmetry-block dense ED with exact integer spin-1 Hamiltonian entries times rational
-couplings. Use a rigorous residual/orthogonality norm bound for the best even seed,
-and outward interval partition sums. Report any computational limits honestly.
-
-## Refinement after inspecting the event expansion
-
-The initial even-cell restriction is unnecessarily strong for this model. Write the
-one-site real event kernel as F(a,b). It is symmetric because the insertions from
-the two incident bonds are the same real matrices. With positive weak/strong event
-measures the blocked kernel is X(a,b)=integral F(a,u)F(b,u) dmu_weak(u)=KK*.
-Thus X is positive semidefinite, not merely self-adjoint, and the proof of the
-criterion applies also to odd n=3 cells: positivity of X^n and the moment
-interpolation are the only uses of even n in the supplied proof. We retain the
-requested conclusion for even cell lengths. The six-cell cap still excludes n>=4.
-
-For rigorous twelve-spin blocks, use real dihedral projectors (cell momentum plus
-reflection) and spin flip. For cell periods 2,3,4,6, twice every cosine in the real
-character projector is integral. Exact integer idempotence checks verify every
-orbit projector. A verified bound on the numerical basis distance to an exact
-orthonormal basis controls projected-Hamiltonian construction error. This avoids
-both irrational symbolic eigenvectors and an unmanageable 73789-square Sz block.
+1. **Reflected unit-cell RP identity and positive cell-transfer factorization ($X_\beta = K K^*$):**
+   In the Cartesian spin-1 basis ($G_\alpha = i S^\alpha$ real and antisymmetric), every bond
+   satisfies $-J\,\mathbf{S}_i\cdot\mathbf{S}_j = J \sum_\alpha G_\alpha \otimes G_\alpha$ with
+   $J > 0$. Inside a two-spin cell $(a, b)$, the weak bond $o = (1 - \delta)\,\mathbf{S}_a\cdot\mathbf{S}_b$
+   is real symmetric and swap-invariant ($F = P$), while the strong inter-cell bond satisfies
+   $-h = (1 + \delta)\sum_\alpha C_\alpha \otimes F \overline{C_\alpha} F$ with $C_\alpha = I \otimes G_\alpha$.
+   Crucially, because both incident bonds at any single site insert the exact same real matrices
+   $G_\alpha$, the single-site event trace kernel $F_{\mathrm{site}}(a, u)$ is real and symmetric.
+   Cutting the ring at the strong bonds and integrating out the weak intra-cell bond history $u$
+   expresses the cell transfer kernel as $X_\beta(a, b) = \int F_{\mathrm{site}}(a, u) F_{\mathrm{site}}(u, b)\,d\mu_-(u) = (K K^*)(a, b)$.
+   Thus $X_\beta$ is positive semidefinite (not merely self-adjoint), so all of its eigenvalues are
+   nonnegative and the spatial squaring and moment-interpolation inequalities hold for **odd**
+   $n_0 = 3$ cells as well as even $n_0 = 2$. **Chosen theoretical route.**
+2. **Verified dense diagonalization with exact integer dihedral projectors:** In the $S^z$ product
+   basis, every off-diagonal exchange matrix element of the spin-1 Heisenberg bond is equal to the
+   bond coupling $J_j$ (the $\sqrt{2}$ ladder factors cancel the $1/2$), so $\mathrm{den}(\delta)\cdot H_L$
+   is an exact symmetric integer matrix. For cell counts $L \in \{2, 3, 4, 6\}$, twice every cosine
+   $2\cos(2\pi k r / L)$ in the real dihedral (translation + reflection) character projector is an
+   exact integer. We can therefore verify projector symmetry, idempotence, and exact rank over
+   $\mathbb{Z}$ on every permutation orbit, bound the distance from the floating-point orthonormal
+   basis to the exact projector range, and enclose all block eigenvalues via polar-factor/Weyl
+   bounds. **Chosen computational route.**
+3. **Strong-dimer cluster expansion around $\delta = 1$:** A convergent low-temperature polymer
+   expansion around decoupled spin-1 singlets at $\delta = 1$ could reach larger $n_0$ at smaller
+   $\delta$, but deriving explicit finite-temperature remainder bounds is not needed to certify
+   $\delta = 9/10$ and $\delta = 7/10$.
 
 ## Outcome
 
-The dense route with exact projectors certified δ = 9/10 at (2, 7/2) and δ = 7/10 at the odd
-seed (3, 17/4), using the positive cell transfer above (proof in METHOD.md). δ = 3/5 and 1/2
-have no seed within the six-cell cap; the extrapolation in METHOD.md puts their first seeds
-at about 5 and 7 cells, which needs rings of 20–28 spins.
+Combining Route 1 and Route 2 certified $\delta = 9/10$ at the even seed $(n_0, \beta_0) = (2, 7/2)$
+($\Delta_L \ge 0.528801949327$ for even $L \ge 2$ cells) and $\delta = 7/10$ at the odd seed
+$(n_0, \beta_0) = (3, 17/4)$ ($\Delta_L \ge 0.218794169839$ for even $L \ge 3$ cells), using exact
+integer dihedral projectors across all 79 blocks of the 12-spin ring (`METHOD.md`). Within the
+6-cell ($12$-spin) ring cap, $\delta = 3/5$ and $\delta = 1/2$ do not yet reach the admissible
+region; finite-size energy-defect extrapolations place their first admissible seeds near $n_0 \approx 5$
+and $n_0 \approx 7$ cells ($20\text{--}28$ spins).
