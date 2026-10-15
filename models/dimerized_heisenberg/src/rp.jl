@@ -59,6 +59,7 @@ function audit_rp(delta::Q)
     return (; delta, weak, strong, defect_norm2, transformed_onsite, channels,
         conjugate_identity=true, reflected_real_identity=true,
         theta_invariant_onsite=true, real_identical_identity=false,
-        real_rhs_error_norm2=sum(abs2,-transformed_bond-real_rhs))
+        real_rhs_error_norm2=sum(abs2,-transformed_bond-real_rhs),
+        transformed_bond, basis_numerator=V, mirror_basis_numerator=M)
 end
 end

@@ -1,35 +1,38 @@
-# Checker for the dimerised Heisenberg certificates (about 10 s). From the stored files it
+# Checker for the dimerised Heisenberg certificates.
+#
+# Fast (about 1 min): from the stored files it
 #   1. re-derives every exact RP identity of results/rp_audit.json at all six deltas;
-#   2. for each results/verified_delta_*.json.gz, recomputes every block's scalar spectral
-#      witness (residual, orthogonality, eigenvalue radius), the three outward log-partition
-#      enclosures, the exact rational seeds and `certified_gap_bound`, and compares them exactly;
-#   3. confirms that results/certificate.json copies those seeds exactly;
-#   4. checks the recorded source hashes (src/provenance.jl).
-# The fast check does not redo the eigenvector solves. `check.jl --full` (about 2.5 min) also
-# re-solves every block and proves the stored seeds again (check_fresh_replay);
-# scripts/independent_review.jl adds the stricter interval-containment test.
-using CertifiedGaps, CertifiedGaps.Results, JSON3, Test, IntervalArithmetic, LinearAlgebra
-isdefined(@__MODULE__, :check_historical_hashes) ||
-    include(joinpath(@__DIR__, "src", "provenance.jl"))
-isdefined(@__MODULE__, :VerifiedSpectra) ||
-    include(joinpath(@__DIR__, "src", "verified_spectra.jl"))
-isdefined(@__MODULE__, :DimerizedRP) || include(joinpath(@__DIR__, "src", "rp.jl"))
-using .VerifiedSpectra, .DimerizedRP
+#   2. for each results/seed_delta_*.json.gz: checks the source hashes, rebuilds the model and
+#      verifies the stored RP factors exactly, re-derives every block's residual, orthogonality
+#      and radius witness from its stored component maxima, checks sector completeness and the
+#      momentum-conjugate blocks, recomputes every seed's three log-partition enclosures, defects
+#      and `certified_gap_bound`, the 16-spin gap interval, the dimer perturbation bound, and
+#      every all-beta exclusion (both analytic tails and each interval box of the cover);
+#   3. checks that results/certificate.json indexes those certificates exactly.
+# `check.jl --full` (about 4 min) then re-solves every block of every ring from the model,
+# rebuilds the eigenvectors, residuals and Gram defects, and repeats all of step 2 with the
+# fresh spectra only: the stored eigenvalues and residual maxima are not trusted.
+using CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic, LinearAlgebra, Test
+isdefined(@__MODULE__, :read_json_text) || include(joinpath(@__DIR__, "src", "provenance.jl"))
+isdefined(@__MODULE__, :Certification) ||
+    include(joinpath(@__DIR__, "src", "Certification.jl"))
+using .Certification, .Certification.VerifiedSpectra, .Certification.DimerizedRP
+using .Certification: exact # IntervalArithmetic also exports `exact`.
 BLAS.set_num_threads(1)
 
 const RESULTS_DIR = joinpath(@__DIR__, "results")
 
 "Parse an exact `\"num//den\"` string."
-parseq(s) = (p = split(String(s), "//"); parse(BigInt, p[1]) // parse(BigInt, p[2]))
+parseq(s) = exact(String(s))
 
 "Re-derive the exact RP audit (reflected form holds, identical-factor form fails)."
 function check_audit()
     data = read_exact_json(joinpath(RESULTS_DIR, "rp_audit.json"))
     @test data["exact_algebraic_audit"] === true
-    # The audit is about the RP hypothesis only; the seeds live in the verified certificates.
+    # The audit is about the RP hypothesis only; the seeds live in the seed certificates.
     @test data["gap_certificate"] === false
     @test data["metadata"]["certified"] === false
-    @test length(data["parameters"]) == 6
+    @test [parseq(row["delta"]) for row in data["parameters"]] == DELTAS
     for row in data["parameters"]
         a = audit_rp(parseq(row["delta"]))
         @test a.defect_norm2 == parseq(row["swap_defect_frobenius_squared"])
@@ -47,102 +50,64 @@ function check_audit()
     check_source_hashes(data["metadata"])
 end
 
-"Recompute every witness, partition enclosure, seed and the bound of one verified certificate."
-function check_verified_file(path)
-    data = JSON3.read(read_json_text(path))
-    @test data.original_stronger_RP_condition_satisfied === false
-    @test data.general_reflected_RP_exact === true
-    @test 0 <= parseq(data.delta) < 1
-    @test audit_rp(parseq(data.delta)).reflected_real_identity
-    check_source_hashes(data.metadata)
-    spectra = Dict{Int,Tuple{Vector{Float64},Vector{Rational{BigInt}}}}()
-    for ring in data.rings
-        E = Float64[]; radii = Rational{BigInt}[]; totaldim = 0
-        for block in ring.blocks
-            d = Int(block.dimension)
-            w = VerifiedSpectra.scalar_witness(d, Int(ring.spins), parseq(block.h_component_max),
-                parseq(block.q_component_max), parseq(block.lambda_max_abs),
-                parseq(block.raw_residual_component_max),
-                parseq(block.raw_orthogonality_component_max), parseq(block.matrix_error_upper))
-            @test w.steps * VerifiedSpectra.UNIT < 1
-            @test w.ebound == parseq(block.orthogonality_norm_upper) < 1
-            @test w.rbound == parseq(block.residual_norm_upper)
-            @test w.radius == parseq(block.eigenvalue_radius) > 0
-            vals = parseq.(block.eigenvalues)
-            @test length(vals) == d
-            @test all(x -> Rational{BigInt}(Float64(x)) == x, vals)
-            @test issorted(vals)
-            for _ in 1:Int(block.multiplicity)
-                append!(E, Float64.(vals)); append!(radii, fill(w.radius, d))
-            end
-            totaldim += d * Int(block.multiplicity)
-        end
-        # Completeness: every state of the ring is counted once, sector by sector.
-        @test totaldim == 2^Int(ring.spins) == Int(ring.dimension) == length(E)
-        for q in 0:Int(ring.spins)÷2
-            @test sum(Int(b.dimension) for b in ring.blocks if Int(b.down_spins) == q) ==
-                binomial(Int(ring.spins), q)
-        end
-        spectra[Int(ring.spins)] = (E, radii)
+"""
+    check_seed_certificates(; fresh=false)
+
+Check every seed certificate with `Certification.check_record`: from the stored spectra after
+re-deriving each block witness (`fresh=false`), or from spectra re-solved from the model
+(`fresh=true`, check.jl --full).
+"""
+function check_seed_certificates(; fresh=false)
+    for delta in DELTAS
+        record = load_record(seed_path(delta))
+        @test record["delta"] == string(delta)
+        spectra = fresh ? nothing : stored_spectra(record)
+        seconds = @elapsed @test check_record(record; spectra) isa Dict
+        bounds = [Float64(exact(s["gap_lower"])) for s in record["seeds"]]
+        println("checked delta=$delta fresh=$fresh bounds=$bounds ",
+            "exclusions=$(length(record["negative_results"])) seconds=$(round(seconds; digits=1))")
     end
-    beta = parseq(data.beta0)
-    small = enclosed_logZ(spectra[8]..., beta)
-    large = enclosed_logZ(spectra[16]..., beta)
-    double = enclosed_logZ(spectra[16]..., 2beta)
-    for (key, value) in ((:n_beta, small), (:var"2n_beta", large), (:var"2n_2beta", double))
-        stored = parseq.(data.log_partition_enclosures[key])
-        @test stored == [rational_lower(value), rational_upper(value)]
-    end
-    es = rational_upper(1 - exp(large - 2small)); et = rational_upper(1 - exp(double - 2large))
-    @test es == parseq(data.epsilon_s_upper)
-    @test et == parseq(data.epsilon_t_upper)
-    result = certified_gap_bound(es, et, beta)
-    @test result.bound !== nothing
-    @test Rational{BigInt}(result.bound) == parseq(data.recurrence_bound_exact_binary)
-    @test result.bound == data.recurrence_bound
-    println("verified stored delta=$(data.delta) bound=$(result.bound)")
 end
 
-"The compressed verified certificates, sorted by file name."
-verified_paths() = sort(filter(p -> startswith(basename(p), "verified_delta_") &&
-    endswith(p, ".json.gz"), readdir(RESULTS_DIR; join=true)))
-
-"Check all three verified certificates and the plain summary."
-function check_verified_results()
-    paths = verified_paths()
-    @test length(paths) == 3
-    for path in paths
-        check_verified_file(path)
-    end
-    check_certificate_summary(paths)
-end
-
-"The plain results/certificate.json must copy the seeds of the compressed certificates exactly."
-function check_certificate_summary(paths)
-    summary = JSON3.read(read(joinpath(RESULTS_DIR, "certificate.json"), String))
-    check_source_hashes(summary.metadata)
-    rows = Dict(String(r.source_file) => r for r in summary.certificates)
-    @test length(rows) == length(paths)
-    for path in paths
-        r = rows["results/" * basename(path)]; data = JSON3.read(read_json_text(path))
-        @test String(r.source_file_sha256) == sha256_file(path)
-        @test Int(r.n0_cells) == Int(data.n0_cells) == 4 && iseven(Int(r.n0_cells))
-        for key in (:delta, :beta0, :epsilon_s_upper, :epsilon_t_upper,
-                :recurrence_bound_exact_binary)
-            @test String(r[key]) == String(data[key])
+"results/certificate.json must index the six seed certificates exactly."
+function check_certificate_summary()
+    summary = load_record(joinpath(RESULTS_DIR, "certificate.json"))
+    check_source_hashes(summary["metadata"])
+    @test summary["format"] == "dimerized-heisenberg-summary-v2"
+    @test [parseq(r["delta"]) for r in summary["parameters"]] == DELTAS
+    positive = Rational{BigInt}[]
+    for row in summary["parameters"]
+        path = seed_path(parseq(row["delta"]))
+        @test row["source_file"] == "results/" * basename(path)
+        @test sha256_file(path) == row["sha256"]
+        record = load_record(path)
+        for key in ("delta", "seeds", "survey_seed", "reference_gap_16_interval")
+            @test record[key] == row[key]
         end
-        for (k, v) in pairs(data.log_partition_enclosures)
-            @test String.(r.log_partition_enclosures[k]) == String.(v)
+        @test [(r["n0_cells"], r["status"], string(length(r["cover"])))
+            for r in record["negative_results"]] ==
+            [(r["n0_cells"], r["status"], r["beta_boxes"]) for r in row["negative_results"]]
+        if isempty(record["seeds"])
+            @test row["bound_to_gap16_interval"] === nothing
+        else
+            push!(positive, parseq(row["delta"]))
+            bound = maximum(parseq(s["gap_lower"]) for s in record["seeds"])
+            gl, gh = parseq.(record["reference_gap_16_interval"])
+            rl, rh = parseq.(row["bound_to_gap16_interval"])
+            @test rl <= bound / gh <= bound / gl <= rh
         end
     end
+    # Every smaller grid delta has no seed; check_record proved its n0 = 2, 4 exclusions.
+    @test minimum(positive) == parseq(summary["smallest_certified_grid_delta"])
+    @test all(d -> d in positive, filter(>=(minimum(positive)), DELTAS))
 end
 
 """
     refined_witness(rec, L)
 
 Rigorous residual, orthogonality and eigenvalue-radius bounds for one freshly solved block
-record `rec` of an `L`-spin ring, sharper than `VerifiedSpectra.scalar_witness` (Cauchy on the
-concatenated real dot products). Used by `check_fresh_replay` and scripts/independent_review.jl.
+record `rec` of an `L`-spin ring, sharper than `VerifiedSpectra.scalar_witness` (Frobenius
+factor 3d/2 instead of 2d). Used by scripts/independent_review.jl.
 """
 function refined_witness(rec, L)
     d = Int(rec["dimension"])
@@ -159,56 +124,10 @@ function refined_witness(rec, L)
     rerr = min(coarse.rerr, coarse.gamma * (2 * (a + h) + q * lam) + coarse.underflow)
     eerr = min(coarse.eerr, coarse.gamma * 5 + coarse.underflow)
     # ||complex dxd matrix||F <= sqrt(2)*d*componentmax < (3/2)*d*componentmax.
-    # This also strictly improves the coarse radius of scalar/small blocks.
     factor = big(3) * d // 2
     r = factor * (rawr + rerr); e = factor * (rawe + eerr)
     @assert e < 1
     return (; r, e, radius = r + 2 * h + (a + lam) * e)
-end
-
-"""
-    check_fresh_replay()
-
-Slow replay (`check.jl --full`, about 2.5 min): re-solve both rings of every certified delta
-from the model, enclose every eigenvalue with `refined_witness`, and require the fresh rational
-seeds to be at most the stored ones, so the fresh data prove the stored bound again. Unlike
-scripts/independent_review.jl it does not require each fresh interval to lie inside the stored
-one; that stricter test can fail on another BLAS without affecting validity (README).
-"""
-function check_fresh_replay()
-    for path in verified_paths()
-        data = JSON3.read(read_json_text(path))
-        delta = parseq(data.delta); beta = parseq(data.beta0)
-        fresh = Dict{Int,Tuple{Vector{Float64},Vector{Rational{BigInt}}}}()
-        for stored in data.rings
-            L = Int(stored.spins)
-            ring, _, _ = verified_ring(delta, L)
-            @test ring["dimension"] == stored.dimension
-            @test length(ring["blocks"]) == length(stored.blocks)
-            centers = Float64[]; radii = Rational{BigInt}[]
-            for (a, b) in zip(ring["blocks"], stored.blocks)
-                for key in ("dimension", "down_spins", "cell_momentum", "spin_flip_parity",
-                        "multiplicity")
-                    @test a[key] == b[Symbol(key)]
-                end
-                w = refined_witness(a, L)
-                vals = Float64.(parseq.(a["eigenvalues"]))
-                for _ in 1:Int(a["multiplicity"])
-                    append!(centers, vals); append!(radii, fill(w.radius, length(vals)))
-                end
-            end
-            @test length(centers) == 2^L
-            fresh[L] = (centers, radii)
-        end
-        small = enclosed_logZ(fresh[8]..., beta); large = enclosed_logZ(fresh[16]..., beta)
-        double = enclosed_logZ(fresh[16]..., 2beta)
-        es = rational_upper(1 - exp(large - 2small)); et = rational_upper(1 - exp(double - 2large))
-        @test es <= parseq(data.epsilon_s_upper)
-        @test et <= parseq(data.epsilon_t_upper)
-        bound = certified_gap_bound(es, et, beta).bound
-        @test bound !== nothing && bound >= data.recurrence_bound
-        println("fresh replay delta=$(data.delta) stored=$(data.recurrence_bound) fresh=$bound")
-    end
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
@@ -216,12 +135,15 @@ if abspath(PROGRAM_FILE) == @__FILE__
         @testset "Exact RP audit" begin
             check_audit()
         end
-        @testset "Verified spectra, partition sums, seeds and bounds" begin
-            check_verified_results()
+        @testset "Seed certificates and exclusions (stored spectra)" begin
+            check_seed_certificates()
+        end
+        @testset "Summary index" begin
+            check_certificate_summary()
         end
         if "--full" in ARGS
-            @testset "Fresh spectral replay of all three seeds" begin
-                check_fresh_replay()
+            @testset "Fresh spectral replay of every certificate" begin
+                check_seed_certificates(; fresh=true)
             end
         end
     end

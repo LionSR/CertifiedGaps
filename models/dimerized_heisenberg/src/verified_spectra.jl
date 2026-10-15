@@ -22,8 +22,16 @@ function scalar_witness(dim,L,hmax,qmax,lmax,rmax,emax,herror)
     @assert steps*UNIT<1
     gamma=(steps*UNIT)/(1-steps*UNIT)
     underflow=(steps*TINY)/(1-steps*UNIT)
-    rerr=gamma*(2*dim*hmax*qmax+qmax*lmax)+underflow
-    eerr=gamma*(2*dim*qmax^2+1)+underflow
+    # First certify ||Q'Q-I||<1 using only component maxima. This implies every
+    # column has Euclidean norm <sqrt(2). Cauchy-Schwarz then bounds each absolute
+    # Gram dot sum by 2, and each residual dot sum by 2||H0||. This second pass
+    # removes the artificial dimension factor in the dot-product absolute sums.
+    coarse_eerr=gamma*(2*dim*qmax^2+1)+underflow
+    coarse_ebound=2*dim*(emax+coarse_eerr)
+    @assert coarse_ebound<1
+    hnorm=big(3)*L//4+herror
+    rerr=gamma*(2*hnorm+qmax*lmax)+underflow
+    eerr=3gamma+underflow
     # ||A||_2 <= ||A||_F <= 2*dim*max(|Re Aij|,|Im Aij|).
     rbound=2*dim*(rmax+rerr)
     ebound=2*dim*(emax+eerr)
@@ -31,7 +39,7 @@ function scalar_witness(dim,L,hmax,qmax,lmax,rmax,emax,herror)
     # Polar factor U: ||Q-U|| <= ||Q*Q-I||, ||Q||<2.
     # ||Htrue|| <= 3L/4 because all AF weights are positive and sum to L.
     radius=rbound+2*herror+(big(3)*L//4+lmax)*ebound
-    return (;steps,gamma,underflow,rerr,eerr,rbound,ebound,radius)
+    return (;steps,gamma,underflow,rerr,eerr,rbound,ebound,radius,coarse_ebound)
 end
 
 function phases8()
@@ -111,6 +119,7 @@ function enclose_block(H,herror,L)
         "q_component_max"=>string(qmax),"lambda_max_abs"=>string(lmax),
         "raw_residual_component_max"=>string(rmax),"raw_orthogonality_component_max"=>string(emax),
         "matrix_error_upper"=>string(herror),"residual_norm_upper"=>string(w.rbound),
+        "coarse_orthogonality_norm_upper"=>string(w.coarse_ebound),
         "orthogonality_norm_upper"=>string(w.ebound),"eigenvalue_radius"=>string(w.radius),
         "eigenvalues"=>string.(QQ.(vals))),vals,w.radius
 end
@@ -127,11 +136,24 @@ function verified_ring(delta::QQ,L)
     blocks=Any[]; centers=Float64[]; radii=QQ[]; n=L÷2; dimension=0
     seconds=@elapsed for q in 0:L÷2
         orbits,useflip=group_orbits(L,q); mult=useflip ? 1 : 2; qdim=0
+        conjugates=Dict{Tuple{Int,Int},Tuple{Any,Any,Any}}()
         for k in 0:n-1, parity in (useflip ? (1,-1) : (1,))
-            built=verified_block(delta,L,q,k,parity,orbits)
-            built===nothing && continue
-            H,herror=built; dim=size(H,1); qdim+=dim
-            runtime=@elapsed block,vals,radius=enclose_block(H,herror,L)
+            # Exact character conjugation: real H implies H_(n-k,p)=conj(H_(k,p)).
+            # Compatible stabilizers and orbit ordering agree, so the entire spectrum
+            # and its verified radius can be reused, including all multiplicities.
+            if k>n÷2
+                haskey(conjugates,(n-k,parity)) || continue
+                prior,vals,radius=conjugates[(n-k,parity)]
+                block=copy(prior); dim=block["dimension"]; runtime=0.0
+                block["conjugate_momentum"]=n-k
+            else
+                built=verified_block(delta,L,q,k,parity,orbits)
+                built===nothing && continue
+                H,herror=built; dim=size(H,1)
+                runtime=@elapsed block,vals,radius=enclose_block(H,herror,L)
+                conjugates[(k,parity)]=(block,vals,radius)
+            end
+            qdim+=dim
             merge!(block,Dict("down_spins"=>q,"cell_momentum"=>k,
                 "spin_flip_parity"=>(useflip ? parity : nothing),"multiplicity"=>mult,
                 "seconds"=>runtime))
@@ -156,8 +178,10 @@ function enclosed_logZ(centers,radii,beta::QQ)
     b=to_interval(beta)
     shift=minimum(centers) # Arbitrary exact binary64 energy shift, no claimed E0.
     total=interval(0.0)
+    radius_cache=Dict(r=>sup(to_interval(r)) for r in unique(radii))
     for (center,radius) in zip(centers,radii)
-        enclosure=interval(center)+interval(-sup(to_interval(radius)),sup(to_interval(radius)))
+        rr=radius_cache[radius]
+        enclosure=interval(center)+interval(-rr,rr)
         total+=exp(-b*(enclosure-interval(shift)))
     end
     return -b*interval(shift)+log(total)

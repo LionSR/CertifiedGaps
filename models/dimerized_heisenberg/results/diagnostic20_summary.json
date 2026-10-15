@@ -1,0 +1,302 @@
+{
+    "scope": "Numerical only: partial Float64 Ritz spectra of the 20-spin ring, an odd n0 = 5 seed outside the even-seed theorem, energy-defect decay fits",
+    "diagnostics": [
+        {
+            "theorem_eligible": false,
+            "retained_levels": "1406",
+            "decay_length_cells_3_4_float": 0.5493097815120518,
+            "gap_20_float": 1.188631092655534,
+            "n0_cells": "5",
+            "delta": "1//2",
+            "decay_times_delta_two_thirds_float": 0.35428051378114483,
+            "spins": "20",
+            "certified": false,
+            "reason": "Odd seed; partial Float64 Ritz spectra can miss levels or multiplicities",
+            "decay_length_cells_4_5_float": 0.5623852602680235,
+            "max_ritz_residual_float": 9.012842916631206e-12,
+            "scaling_estimate_n0_float": 2.5198420997897464,
+            "verified_spectrum_input_sha256": "4686cd436b712fe1d4ed73bf9e9616e3d6d8a6edab31ba8a13c320870ee90f77",
+            "ground_energy_defects_float": [
+                0.011523788633878596,
+                0.0018662798725337382,
+                0.0003153117618275303
+            ],
+            "scaling_caveat": "Energy-defect decay fit, not a certified correlation length or seed",
+            "best_odd_seed_float": {
+                "s_float": 0.0023087480478413136,
+                "beta_float": 7.25,
+                "t_float": 0.0030243044300771738,
+                "logZ_tail_width_float": 2.5355177513119997e-8,
+                "bound_float": 0.6485119104814927
+            },
+            "sectors": 111,
+            "complete_sectors": 41,
+            "run_metadata": {
+                "julia_threads": "1",
+                "julia": "1.12.4",
+                "status": "20_spin_diagnostic_only",
+                "config": {
+                    "delta": "1//2"
+                },
+                "created_utc": "2026-10-15T06:02:26.571",
+                "certified": false,
+                "source_sha256": {
+                    "models/dimerized_heisenberg/src/sectors.jl": "fd26b6f99a12563ed541a827d33b56219f1a081c68e5cb3ba1cf9f2d8a4eb879",
+                    "models/dimerized_heisenberg/src/Diagnostics.jl": "7bcbd41b66a2183cbca6d6e9968259ee68636597dad7f628706b54a9cf00c0da"
+                },
+                "CertifiedGaps": "0.2.0",
+                "blas_threads": "1",
+                "KrylovKit": "0.10.4"
+            },
+            "seconds_total": 103.16527700424194
+        },
+        {
+            "theorem_eligible": false,
+            "retained_levels": "1427",
+            "decay_length_cells_3_4_float": 0.8273289726588307,
+            "gap_20_float": 0.8102139797062424,
+            "n0_cells": "5",
+            "delta": "3//10",
+            "decay_times_delta_two_thirds_float": 0.3785781109005458,
+            "spins": "20",
+            "certified": false,
+            "reason": "Odd seed; partial Float64 Ritz spectra can miss levels or multiplicities",
+            "decay_length_cells_4_5_float": 0.8447755387222903,
+            "max_ritz_residual_float": 8.573857367309688e-12,
+            "scaling_estimate_n0_float": 3.5421952306087037,
+            "verified_spectrum_input_sha256": "a7d03d099fbfff6132360df93e34d06aed0825551d07e596986befaa3682c09f",
+            "ground_energy_defects_float": [
+                0.051972698546719265,
+                0.015518137836560086,
+                0.004750562946506776
+            ],
+            "scaling_caveat": "Energy-defect decay fit, not a certified correlation length or seed",
+            "best_odd_seed_float": {
+                "s_float": 0.03527928250466161,
+                "beta_float": 7.5,
+                "t_float": 0.02669227201631097,
+                "logZ_tail_width_float": 1.130545712157982e-6,
+                "bound_float": 0.2890219670793436
+            },
+            "sectors": 111,
+            "complete_sectors": 41,
+            "run_metadata": {
+                "julia_threads": "1",
+                "julia": "1.12.4",
+                "status": "20_spin_diagnostic_only",
+                "config": {
+                    "delta": "3//10"
+                },
+                "created_utc": "2026-10-15T06:02:27.681",
+                "certified": false,
+                "source_sha256": {
+                    "models/dimerized_heisenberg/src/sectors.jl": "fd26b6f99a12563ed541a827d33b56219f1a081c68e5cb3ba1cf9f2d8a4eb879",
+                    "models/dimerized_heisenberg/src/Diagnostics.jl": "7bcbd41b66a2183cbca6d6e9968259ee68636597dad7f628706b54a9cf00c0da"
+                },
+                "CertifiedGaps": "0.2.0",
+                "blas_threads": "1",
+                "KrylovKit": "0.10.4"
+            },
+            "seconds_total": 104.37497997283936
+        },
+        {
+            "theorem_eligible": false,
+            "retained_levels": "1458",
+            "decay_length_cells_3_4_float": 0.9511355071272933,
+            "gap_20_float": 0.7071926794936783,
+            "n0_cells": "5",
+            "delta": "1//4",
+            "decay_times_delta_two_thirds_float": 0.38421748584094145,
+            "spins": "20",
+            "certified": false,
+            "reason": "Odd seed; partial Float64 Ritz spectra can miss levels or multiplicities",
+            "decay_length_cells_4_5_float": 0.968167396297375,
+            "max_ritz_residual_float": 9.195542223754236e-12,
+            "scaling_estimate_n0_float": "4",
+            "verified_spectrum_input_sha256": "a225225d95508ede7f65314792fa41c79c8985fc99df69fef2a4706669750666",
+            "ground_energy_defects_float": [
+                0.0726371365341425,
+                0.025383552176906576,
+                0.00903605040478972
+            ],
+            "scaling_caveat": "Energy-defect decay fit, not a certified correlation length or seed",
+            "best_odd_seed_float": {
+                "s_float": 0.06743606212027842,
+                "beta_float": 7.75,
+                "t_float": 0.04323117087347783,
+                "logZ_tail_width_float": 1.4699442516530326e-6,
+                "bound_float": 0.19311094197006967
+            },
+            "sectors": 111,
+            "complete_sectors": 41,
+            "run_metadata": {
+                "julia_threads": "1",
+                "julia": "1.12.4",
+                "status": "20_spin_diagnostic_only",
+                "config": {
+                    "delta": "1//4"
+                },
+                "created_utc": "2026-10-15T06:02:29.538",
+                "certified": false,
+                "source_sha256": {
+                    "models/dimerized_heisenberg/src/sectors.jl": "fd26b6f99a12563ed541a827d33b56219f1a081c68e5cb3ba1cf9f2d8a4eb879",
+                    "models/dimerized_heisenberg/src/Diagnostics.jl": "7bcbd41b66a2183cbca6d6e9968259ee68636597dad7f628706b54a9cf00c0da"
+                },
+                "CertifiedGaps": "0.2.0",
+                "blas_threads": "1",
+                "KrylovKit": "0.10.4"
+            },
+            "seconds_total": 106.11975598335266
+        },
+        {
+            "theorem_eligible": false,
+            "retained_levels": "1517",
+            "decay_length_cells_3_4_float": 1.126589586137019,
+            "gap_20_float": 0.59981850205115,
+            "n0_cells": "5",
+            "delta": "1//5",
+            "decay_times_delta_two_thirds_float": 0.3909107663234071,
+            "spins": "20",
+            "certified": false,
+            "reason": "Odd seed; partial Float64 Ritz spectra can miss levels or multiplicities",
+            "decay_length_cells_4_5_float": 1.1430300147880268,
+            "max_ritz_residual_float": 4.589024094815937e-12,
+            "scaling_estimate_n0_float": 4.641588833612779,
+            "verified_spectrum_input_sha256": "66e1dd2ec89ae1b2ae1541fd78f5c16389a0cc7903f8ee9da271e402cd6e28e1",
+            "ground_energy_defects_float": [
+                0.09961711689436381,
+                0.041005217489988866,
+                0.017095780001525895
+            ],
+            "scaling_caveat": "Energy-defect decay fit, not a certified correlation length or seed",
+            "best_odd_seed_float": {
+                "s_float": 0.13318090421800455,
+                "beta_float": 8.5,
+                "t_float": 0.054714208916733176,
+                "logZ_tail_width_float": 3.8412295566558896e-7,
+                "bound_float": 0.08621137763522183
+            },
+            "sectors": 111,
+            "complete_sectors": 41,
+            "run_metadata": {
+                "julia_threads": "1",
+                "julia": "1.12.4",
+                "status": "20_spin_diagnostic_only",
+                "config": {
+                    "delta": "1//5"
+                },
+                "created_utc": "2026-10-15T06:02:30.474",
+                "certified": false,
+                "source_sha256": {
+                    "models/dimerized_heisenberg/src/sectors.jl": "fd26b6f99a12563ed541a827d33b56219f1a081c68e5cb3ba1cf9f2d8a4eb879",
+                    "models/dimerized_heisenberg/src/Diagnostics.jl": "7bcbd41b66a2183cbca6d6e9968259ee68636597dad7f628706b54a9cf00c0da"
+                },
+                "CertifiedGaps": "0.2.0",
+                "blas_threads": "1",
+                "KrylovKit": "0.10.4"
+            },
+            "seconds_total": 107.14838218688965
+        },
+        {
+            "theorem_eligible": false,
+            "retained_levels": "1533",
+            "decay_length_cells_3_4_float": 1.3956068664322376,
+            "gap_20_float": 0.488095560347265,
+            "n0_cells": "5",
+            "delta": "3//20",
+            "decay_times_delta_two_thirds_float": 0.4000696474931414,
+            "spins": "20",
+            "certified": false,
+            "reason": "Odd seed; partial Float64 Ritz spectra can miss levels or multiplicities",
+            "decay_length_cells_4_5_float": 1.4171247972615106,
+            "max_ritz_residual_float": 8.933190291278025e-12,
+            "scaling_estimate_n0_float": 5.622884435344995,
+            "verified_spectrum_input_sha256": "55e3ec09e67a89d7036603d24f8a15f18987acebc4c50322e478488618ff3490",
+            "ground_energy_defects_float": [
+                0.13308624818421677,
+                0.06500493799361529,
+                0.032098493003068995
+            ],
+            "scaling_caveat": "Energy-defect decay fit, not a certified correlation length or seed",
+            "best_odd_seed_float": null,
+            "sectors": 111,
+            "complete_sectors": 41,
+            "run_metadata": {
+                "julia_threads": "1",
+                "julia": "1.12.4",
+                "status": "20_spin_diagnostic_only",
+                "config": {
+                    "delta": "3//20"
+                },
+                "created_utc": "2026-10-15T06:02:31.243",
+                "certified": false,
+                "source_sha256": {
+                    "models/dimerized_heisenberg/src/sectors.jl": "fd26b6f99a12563ed541a827d33b56219f1a081c68e5cb3ba1cf9f2d8a4eb879",
+                    "models/dimerized_heisenberg/src/Diagnostics.jl": "7bcbd41b66a2183cbca6d6e9968259ee68636597dad7f628706b54a9cf00c0da"
+                },
+                "CertifiedGaps": "0.2.0",
+                "blas_threads": "1",
+                "KrylovKit": "0.10.4"
+            },
+            "seconds_total": 107.90188789367676
+        },
+        {
+            "theorem_eligible": false,
+            "retained_levels": "1463",
+            "decay_length_cells_3_4_float": 1.845646356649045,
+            "gap_20_float": 0.3742808710592822,
+            "n0_cells": "5",
+            "delta": "1//10",
+            "decay_times_delta_two_thirds_float": 0.41215070564484535,
+            "spins": "20",
+            "certified": false,
+            "reason": "Odd seed; partial Float64 Ritz spectra can miss levels or multiplicities",
+            "decay_length_cells_4_5_float": 1.9130341130867412,
+            "max_ritz_residual_float": 9.404476083779983e-12,
+            "scaling_estimate_n0_float": 7.368062997280773,
+            "verified_spectrum_input_sha256": "9ea1e0073da7bb501b287b270a6a8dd2170b4ccae2483b5e15eb67eed69b6f18",
+            "ground_energy_defects_float": [
+                0.17059894477683546,
+                0.09923589992567816,
+                0.05883694721205046
+            ],
+            "scaling_caveat": "Energy-defect decay fit, not a certified correlation length or seed",
+            "best_odd_seed_float": null,
+            "sectors": 111,
+            "complete_sectors": 41,
+            "run_metadata": {
+                "julia_threads": "1",
+                "julia": "1.12.4",
+                "status": "20_spin_diagnostic_only",
+                "config": {
+                    "delta": "1//10"
+                },
+                "created_utc": "2026-10-15T06:02:30.781",
+                "certified": false,
+                "source_sha256": {
+                    "models/dimerized_heisenberg/src/sectors.jl": "fd26b6f99a12563ed541a827d33b56219f1a081c68e5cb3ba1cf9f2d8a4eb879",
+                    "models/dimerized_heisenberg/src/Diagnostics.jl": "7bcbd41b66a2183cbca6d6e9968259ee68636597dad7f628706b54a9cf00c0da"
+                },
+                "CertifiedGaps": "0.2.0",
+                "blas_threads": "1",
+                "KrylovKit": "0.10.4"
+            },
+            "seconds_total": 107.39589285850525
+        }
+    ],
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "20_spin_diagnostic_summary",
+        "config": {
+            "model": "dimerized_heisenberg"
+        },
+        "created_utc": "2026-10-15T06:02:54.098",
+        "certified": false,
+        "source_sha256": {
+            "models/dimerized_heisenberg/src/Diagnostics.jl": "d75421e8323db3ca41f10c9dc464d422c1da932ea9ac101de494697d073b9769"
+        },
+        "CertifiedGaps": "0.2.0",
+        "blas_threads": 1
+    }
+}

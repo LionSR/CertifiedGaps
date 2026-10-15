@@ -1,8 +1,8 @@
 # Exact rational residuals and the analytic four-spin spectrum versus the block enclosures.
-isdefined(@__MODULE__, :check_verified_results) || include(joinpath(@__DIR__, "..", "check.jl"))
+isdefined(@__MODULE__, :check_seed_certificates) || include(joinpath(@__DIR__, "..", "check.jl"))
 @testset "Independent exact residual and analytic four-spin validation" begin
     QQ=Rational{BigInt}; CQ=Complex{QQ}
-    for delta in (big(1)//2,big(3)//10,big(1)//4)
+    for delta in DELTAS
         allvals=Float64[]; allr=QQ[]
         for q in 0:2
             orbits,flip=VerifiedSpectra.group_orbits(4,q)
