@@ -120,8 +120,8 @@ julia --project=models/dimerized_heisenberg models/dimerized_heisenberg/test/run
 `check.jl` re-derives the exact RP audit and, per δ, the stored RP factors, every block's
 residual/orthogonality/radius witness from its stored maxima, sector completeness and the
 reused conjugate blocks, all seeds, log-partition enclosures and recurrence values, the 16-spin
-gap interval, the dimer bound and every exclusion box and tail; it checks the source hashes and
-that `results/certificate.json` indexes the certificates. `--full` re-solves every block from the
+gap interval, the dimer bound and every exclusion box and tail; it checks the model-local source
+hashes and that `results/certificate.json` indexes the certificates. `--full` re-solves every block from the
 model and repeats all of this from the fresh spectra alone, so no stored eigenvalue or residual
 maximum is trusted. The tests add exact rational residuals (all 4-spin blocks at six δ, all
 8-spin blocks at three δ), the analytic four-spin spectrum, conjugate-block equality, the sector
@@ -182,8 +182,12 @@ different BLAS; it writes the gitignored `results/acceptance.json`.
 | `results/rp_audit.json` | exact RP audit at six deltas (no seeds) |
 | `results/numerical_summary.json`, `results/diagnostic20_summary.json` | Float64 summaries |
 
-Every result records the SHA-256 of its sources by path and is regenerated in minutes; there
-are no layout exceptions.
+Every result records, by repository path, the SHA-256 of its model-local sources
+(`metadata.source_sha256`: the producing `src/` files, `certify.jl`, `check.jl`, `Project.toml`,
+`Manifest.toml`), which `check.jl` enforces, and of the shared core (`metadata.core_sha256`:
+`julia/src`, `julia/Project.toml`, `julia/Manifest.toml`), which is provenance only and not
+compared with the checkout; `notes/` and `METHOD.md` are not hashed. Results are regenerated in
+minutes; there are no layout exceptions.
 
 ## History
 
@@ -198,3 +202,10 @@ review output, uncompressed certificates, run logs, `PR_BODY.md`, `REPORT.md`,
 `validate.jl`/`validation.json` (timings now in this README), `review/independent_review.md`,
 and the per-δ Float64 scans `results/numerical_delta_*.json` and 20-spin runs
 `results/diagnostic20_*.json` (regenerate with the scripts above).
+
+The source-hash policy change (the checker enforces only model-local sources; core hashes are
+provenance, notes and `METHOD.md` are no longer hashed) regenerated `rp_audit.json`, all six
+`seed_delta_*.json.gz` and `certificate.json` with `certify.jl`. A deep comparison of old and new
+JSON found every eigenvalue, radius, witness, seed, log Z enclosure, exclusion box and bound
+identical; only hashes, timestamps and timings changed. The seed hashes recorded in
+`diagnostic20_summary.json` were updated by hand to the regenerated, content-identical seeds.

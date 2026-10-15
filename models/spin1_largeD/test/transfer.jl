@@ -68,6 +68,17 @@ end
 
 @testset "Curve data comes from the committed certificate" begin
     curve = TC.parse_exact_json(read(joinpath(TC.ROOT, "results", "transfer_curve.json"), String))
-    @test curve["certificate_sha256"] ==
-        TC.sha256_file(joinpath(TC.ROOT, "results", "certificate.json"))
+    # Compare the certified numbers, not the file bytes: regenerating the certificate with new
+    # provenance metadata leaves every case identical but changes its SHA-256, which the curve
+    # records for provenance only.
+    cases = TC.parse_exact_json(read(joinpath(TC.ROOT, "results", "certificate.json"),
+        String))["cases"]
+    @test length(curve["certified"]) == 2
+    for point in curve["certified"]
+        case = only(filter(c -> c["id"] == point["id"], cases))
+        @test point["D_interval"] == case["D_interval"]
+        @test point["bound"] == case["bound"]
+        @test point["gap_L12_interval"] == case["finite_gap_L12"]
+        @test point["ratio_interval"] == case["ratio_to_gap_L12"]
+    end
 end

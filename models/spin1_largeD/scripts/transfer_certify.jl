@@ -91,10 +91,10 @@ function certify_transfer()
         "cases" => records, "search_diagnostics" => diagnostics,
         "source_hashes" => hashes, "input_hashes" => TC.input_hashes(),
         "partition_keep" => string(TC.KEEP), "wall_seconds" => time()-started,
-        "run_metadata" => run_metadata(Dict("largest_ED_ring" => "12");
+        "run_metadata" => merge(run_metadata(Dict("largest_ED_ring" => "12");
             source_sha256 = hashes, packages = (CertifiedGaps, IntervalArithmetic),
             status = "verified moments, transfer squaring and centered Weyl transport",
-            certified = true))
+            certified = true), Dict("core_sha256" => TC.core_hashes())))
     write_result(joinpath(TC.ROOT, "results", "certificate.json"), data)
     return data
 end

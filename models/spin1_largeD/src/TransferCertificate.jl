@@ -166,15 +166,29 @@ function finite_gap(spec, lo, hi)
     return box(spec.E[2]) - box(spec.E[1]) + interval(-sup(r), sup(r))
 end
 
-"SHA-256 of the files that define the stage-2 proof and its environment, including the core."
+"""
+    proof_hashes()
+
+SHA-256 of the model-local files that define the stage-2 proof and its environment (keyed
+relative to this model directory). The checker requires exactly these keys and digests.
+"""
 function proof_hashes()
-    hashes = source_hashes(ROOT; dirs = ("src",),
+    return source_hashes(ROOT; dirs = ("src",),
         files = ("model.jl", "scripts/transfer_certify.jl", "check.jl", "Project.toml",
             "Manifest.toml"))
-    core = source_hashes(joinpath(ROOT, "../../julia"); dirs = ("src",),
-        files = ("Project.toml",))
-    merge!(hashes, Dict("../../julia/$f" => h for (f, h) in core))
-    return hashes
+end
+
+"""
+    core_hashes()
+
+SHA-256 of the shared core (`julia/src`, `julia/Project.toml`, `julia/Manifest.toml`, keyed by
+repository path), stored as `run_metadata["core_sha256"]`. Provenance only: the checker does
+not compare it with the checkout, since it reruns the core arithmetic itself.
+"""
+function core_hashes()
+    repo = normpath(joinpath(ROOT, "..", ".."))
+    return source_hashes(repo; dirs = ("julia/src",),
+        files = ("julia/Project.toml", "julia/Manifest.toml"))
 end
 
 "Byte hashes of the stage-1 spectral evidence and the certificates that anchor it."
@@ -270,10 +284,10 @@ function bridge_certificate()
     hashes = proof_hashes()
     return Dict("rings" => rows, "wall_seconds" => time()-started,
         "source_hashes" => hashes,
-        "run_metadata" => run_metadata(Dict("D" => "4//1");
+        "run_metadata" => merge(run_metadata(Dict("D" => "4//1");
             source_sha256 = hashes, packages = (CertifiedGaps, IntervalArithmetic),
             status = "fresh complete spectra; checker repeats these small eigensolves",
-            certified = true))
+            certified = true), Dict("core_sha256" => core_hashes())))
 end
 
 """

@@ -108,8 +108,9 @@ julia --project=models/spin1_largeD models/spin1_largeD/scripts/transfer_certify
 ```
 
 `scripts/transfer_certify.jl` (stage 2) rewrites `results/certificate.json` and
-`results/finite_bridge.json`; afterwards rerun `scripts/report.jl` (below), because
-`results/transfer_curve.json` records the certificate's SHA-256 and a test enforces it.
+`results/finite_bridge.json`. `results/transfer_curve.json` (from `scripts/report.jl`, below)
+records the certificate's SHA-256 as provenance; a test requires its certified points to equal
+the certificate's cases, so rerun `scripts/report.jl` only if a certified number changes.
 `check.jl --full` adds a fresh dense replay of the two L = 12 spectra (about 35 min each with
 one BLAS thread); the fast check already replays the two L = 6 ones.
 
@@ -183,6 +184,15 @@ per D. For that reason a few of their lines exceed 100 columns, and the stage-2 
 as `*.skeleton.json` plus run-length-encoded `*.levels.bin`; `src/spectra.jl` rebuilds the
 original JSON bytes and the checker compares their hash with the certificate.
 
+Source hashes of stage 2: `results/certificate.json` and `results/finite_bridge.json` record
+the SHA-256 of the model-local proof sources (`src/`, `model.jl`, `scripts/transfer_certify.jl`,
+`check.jl`, `Project.toml`, `Manifest.toml`; keyed relative to this directory) under
+`source_hashes`, and the checker requires exactly these keys and digests. The shared core
+(`julia/src`, `julia/Project.toml`, `julia/Manifest.toml`) is recorded under
+`run_metadata.core_sha256`, keyed by repository path, as provenance only: the checker reruns
+the core arithmetic and does not compare those hashes with the checkout. Notes and `METHOD.md`
+are not hashed. (The stage-1 files keep their own pinned hashes, listed above.)
+
 ## History
 
 `results/feasibility.json` was produced on the original Linux host by the script now at
@@ -196,3 +206,10 @@ entries were identical, but on an Apple M5 the floating-point scan reproduced th
 screening numbers only to the last bits (LAPACK), so `results/scan_summary.json`,
 `results/transfer_curve.pdf` and the numbers in `results/transfer_curve.json` were kept and
 only the latter's `certificate_sha256` was updated to the regenerated certificate.
+
+The source-hash policy change (core hashes become provenance, the checker enforces only
+model-local sources) regenerated both stage-2 files with `scripts/transfer_certify.jl`; a
+deep comparison of old and new JSON found every case, log Z enclosure, defect, bound, interval
+and bridge gap identical, with only hashes, timestamps and timings changed. The curve test now
+compares the certified numbers instead of the certificate's bytes, and
+`results/transfer_curve.json`'s `certificate_sha256` was again updated by hand.
