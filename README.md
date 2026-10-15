@@ -43,8 +43,8 @@ the only open hypotheses.
 | spin-½ Heisenberg + staggered field, h = 1, 3/4, 1/2, 7/20, 1/4 | (8, 21/4 … 25/4) | 1.148, 0.890, 0.594, 0.383, 0.214 | [`heisenberg_staggered_field`](models/heisenberg_staggered_field/) |
 | spin-½ dimerized Heisenberg, δ = 1/2, 3/10, 1/4 (2-site cells) | (4, 6 … 29/4) | 0.532, 0.172, 0.057 | [`dimerized_heisenberg`](models/dimerized_heisenberg/) |
 | spin-1 dimerized Heisenberg, δ = 9/10, 7/10 (2-site cells) | (2, 7/2), (3, 17/4) | 0.528, 0.218 | [`spin1_dimerized`](models/spin1_dimerized/) |
-| spin-1 Heisenberg + D Σ(Sᶻ)², D = 4, 1603/500 | (6, 9/4), (6, 381/125) | 0.694, 0.0022 | [`spin1_largeD`](models/spin1_largeD/) |
-| two-leg Heisenberg ladder, J⊥ = 4 (rung cells) | (4, 2) | 1.102 | [`heisenberg_ladder`](models/heisenberg_ladder/) |
+| spin-1 Heisenberg + D Σ(Sᶻ)², D = 4 and D ∈ [3.2059998, 3.206] | (12, 29/10), (6, 381/125) | 0.899, 0.0010 (every even L ≥ 6) | [`spin1_largeD`](models/spin1_largeD/) |
+| two-leg Heisenberg ladder, J⊥ = 4, 7/2, 3, 5/2 (rung cells) | (4, 2 … 3) | 1.102, 0.778, 0.454, 0.042 | [`heisenberg_ladder`](models/heisenberg_ladder/) |
 | two-leg transverse-field Ising ladder, g = 3 (rung cells) | (4, 3/2) | 0.636 | [`two_leg_tfim`](models/two_leg_tfim/) |
 | Ising chain −ZZ − gX − hZ, 30 points g ∈ [1/4, 2], h ∈ [1/20, 1] | (6, per point) | ≥ 0.0763 at every point (smallest at g = 1, h = 1/20) | [`tfim_longitudinal`](models/tfim_longitudinal/) |
 | spin-1 bilinear–biquadratic, θ ∈ [−7/10, 0] | no admissible even seed with n₀ ≤ 6 | negative result; seed scale estimated | [`blbq_haldane`](models/blbq_haldane/) |
@@ -82,7 +82,7 @@ julia --project=models/spin1 models/spin1/test/runtests.jl
 julia --project=models/spin1 --threads=4 models/spin1/scripts/reproduce.jl all /tmp/spin1-fresh   # ≈20–45 min
 
 # any other model's fast checker, e.g.
-OPENBLAS_NUM_THREADS=1 julia --project=julia models/heisenberg_ladder/test/runtests.jl
+OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenberg_ladder/test/runtests.jl
 
 # Lean
 cd lean && lake exe cache get && lake build
