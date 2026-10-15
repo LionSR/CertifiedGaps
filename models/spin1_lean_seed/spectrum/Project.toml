@@ -1,8 +1,0 @@
-[deps]
-Arpack = "7d9fca2a-8960-54d3-9f78-7d1dccf2cb97"
-JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
-
-[compat]
-Arpack = "0.5"
-JSON3 = "1"
-julia = "1.12"
