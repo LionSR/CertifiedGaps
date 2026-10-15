@@ -1,0 +1,4 @@
+# Lake build tree and Mathlib checkout (several GB); `lake exe cache get` restores Mathlib.
+/lean/.lake/
+# Benchmark sources and logs from scripts/costs.jl and scripts/validate.jl.
+/.cache/
