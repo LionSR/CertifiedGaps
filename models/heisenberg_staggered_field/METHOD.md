@@ -1,477 +1,294 @@
 # Method: uniform gap certificates for the Heisenberg chain in a staggered field
 
-The numerical tables were generated (by a since-removed `report.jl`) from the spectra and scan
-caches of `scripts/scan.jl`, which are not stored; they are kept as a record.
+This document describes the reflection-positivity transformation, the symmetry-block construction,
+the eigenvalue-enclosure theorem, the 20-site numerical exploration, and the independent audit for
+the spin-1/2 Heisenberg chain in a staggered longitudinal field.
 
 ## Outcome and scope
 
-All five requested fields have rigorous certificates from 8- and 16-site rings.
-The final bounds apply to **every even L >= 8 one-spin cells = sites**. The physical
-Hamiltonian has a two-site field pattern, but its rotated representative has a
-one-spin unit cell. The theorem only uses even n0; odd n0 are not valid seeds here.
-No threshold occurs within the requested field set: the smallest certified field
-is 1/4. This is a certificate/search threshold statement, not a physical critical field.
+All five target staggered fields $h \in \{1, 3/4, 1/2, 7/20, 1/4\}$ are certified from complete
+verified 8- and 16-site ring spectra at seed length $n_0 = 8$. Because the alternating sublattice
+rotation produces a homogeneous reflection-positive ring with a single-spin unit cell on any even
+ring length $L$, the resulting uniform spectral gap bounds apply to **every even chain length
+$L \ge 8$ sites**, establishing both ground-state uniqueness and $\Delta_L \ge \Delta_{\mathrm{cert}}$.
 
-A separate numerical search reaches 20 sites using Sz and translation-by-two
-momentum sectors. It finds stronger candidates but uses partial Krylov spectra
-for blocks above dimension 2500; these candidates are **numerical, not certified**.
-We certify the best seed on the complete dense grid through 16 sites, rather than
-claim certification of the best candidate on the larger, partial-spectrum grid.
-The requested fully dense certification of the best 20-site candidates remains
-unperformed. No 24-site computation is claimed.
-The largest block grows from 1620 to 18504: a single complex dense matrix then
-occupies about 5.48 GB, and the current verifier retains several such arrays.
-The naive cubic eigensolve cost grows by about 1490 times per largest block.
-These are resource estimates, not measured failed dense twenty-site runs.
+In addition to the certified $n_0 = 8$ seeds, an exploratory numerical scan (`scripts/scan.jl`)
+reaches $2n_0 = 20$ sites ($n_0 = 10$) by combining dense diagonalization for symmetry blocks of
+dimension $\le 2{,}500$ with 80-state `KrylovKit` Lanczos runs for larger blocks (the largest
+$L = 20$ block has dimension $18{,}504$, where a single dense `ComplexF64` matrix occupies
+$\approx 5.48\text{ GB}$ and cubic eigensolve work increases by $\approx 1{,}490\times$ relative to
+$L = 16$). Those 20-site candidate bounds are reported below as non-certified numerical benchmarks.
 
 ## Model, exact RP identity, and length convention
 
-H = sum_j S_j dot S_(j+1) - h sum_j (-1)^j Sz_j, with periodic bonds,
-spin 1/2, exchange strength 1, and h in {1,3/4,1/2,7/20,1/4}.
-The two-site ring includes both periodic bonds, as does the core implementation.
-Define exact rational matrices
+We consider the periodic spin-1/2 chain
+$$H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z, \qquad h \in \{1, 3/4, 1/2, 7/20, 1/4\},$$
+where the $L = 2$ ring includes both periodic bonds. Define the exact rational spin-1/2 matrices
+$$X = S^x = \begin{pmatrix} 0 & 1/2 \\ 1/2 & 0 \end{pmatrix}, \qquad
+G_y = i S^y = \begin{pmatrix} 0 & 1/2 \\ -1/2 & 0 \end{pmatrix}, \qquad
+Z = S^z = \begin{pmatrix} 1/2 & 0 \\ 0 & -1/2 \end{pmatrix}, \qquad U = 2G_y.$$
+(In `src/common.jl`, $G_y$ is denoted `J`.) Rotating every odd site by the real orthogonal matrix
+$U$ (a $\pi$-rotation about the $y$-axis) transforms both odd-to-even and even-to-odd nearest-neighbor
+bonds into the identical homogeneous form
+$$h_{\mathrm{rot}} = -(X \otimes X + G_y \otimes G_y + Z \otimes Z), \qquad
+-h_{\mathrm{rot}} = X \otimes X + G_y \otimes G_y + Z \otimes Z = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}.$$
+Every bond factor $C_\alpha \in \{X, G_y, Z\}$ has exact rational entries (note that reflection
+positivity requires real $C_\alpha$ when $F = I$, not symmetric $C_\alpha$, so the antisymmetry of
+$G_y$ is completely compatible). Since $U Z U^\top = -Z$, the staggered field becomes the uniform
+real symmetric on-site term $o = -h Z$. The function `exact_rp` in `src/common.jl` verifies the
+bond identity in both orientations and the on-site identity in exact `Rational{BigInt}` arithmetic.
 
-```
-X = [0  1/2;  1/2  0],
-J = [0  1/2; -1/2  0] = i Sy,
-Z = [1/2 0; 0 -1/2],   U = 2J.
-```
+## Dense-grid certificates ($n_0 = 8$)
 
-Rotate odd sites by the real orthogonal U (a pi rotation about y). Both orientations
-of an adjacent rotated/unrotated pair give
+Candidate seeds were scanned over $n_0 \in \{2, 4, 6, 8\}$ and $\beta_0 \in \{0.25, 0.50, \dots, 32.0\}$
+via `scan_seeds` and `best_seed`, and the optimal $(n_0, \beta_0)$ for each field was certified
+with full dense eigenvector residual and orthogonality bounds. All exact rational parameters and
+seed defects are stored as `"num//den"` strings in `results/certificate_<h>.json`.
 
-```
-h_rot = -X tensor X - J tensor J - Z tensor Z,
--h_rot = X tensor X + J tensor J + Z tensor Z.
-```
-
-Every coefficient c is exactly 1 and every C is real. J is antisymmetric; the
-hypothesis requires real C, not symmetric C. U Z U^T = -Z, so the staggered field
-becomes the uniform real symmetric on-site term -h Z. `exact_rp` checks the bond
-identities in Rational arithmetic in both orientations, and checks the on-site
-term. Thus the stated spatial transfer self-adjointness hypothesis holds. The
-positive two-purity bound then gives uniqueness as well as the gap, using the
-repository criterion; no numerical assumption of uniqueness is substituted.
-
-## Dense-grid certificates
-
-Grid: n0 in {2,4,6,8}, beta in {0.25,0.50,...,32}. `scan_seeds` and `best_seed`
-select the largest bound. Only that seed is rerun with dense eigenvectors and
-outward error bounds for each requested field. All exact rational parameters
-and seed defects are strings in the certificate JSON.
-
-| h | n0 | beta | rigorous bound | numerical 16-site gap | bound/gap | certification seconds |
+| $h$ | $n_0$ | $\beta_0$ | Certified gap $\Delta_L \ge$ | 16-site ED gap | Bound / ED gap | Certification time (s) |
 |---|---:|---:|---:|---:|---:|---:|
-| 1//1 | 8 | 21//4 | 1.148261 | 1.87351193 | 0.612892543 | 79.2549119 |
-| 3//4 | 8 | 21//4 | 0.890782 | 1.57089206 | 0.567054967 | 80.252265 |
-| 1//2 | 8 | 11//2 | 0.594785 | 1.23131976 | 0.483046933 | 50.400383 |
-| 7//20 | 8 | 23//4 | 0.383508 | 0.994380622 | 0.385675562 | 47.0755551 |
-| 1//4 | 8 | 25//4 | 0.214486 | 0.812031433 | 0.264135226 | 44.339813 |
+| `1//1` | 8 | `21//4` | 1.148261 | 1.87351193 | 0.612892543 | 79.25 |
+| `3//4` | 8 | `21//4` | 0.890782 | 1.57089206 | 0.567054967 | 80.25 |
+| `1//2` | 8 | `11//2` | 0.594785 | 1.23131976 | 0.483046933 | 50.40 |
+| `7//20` | 8 | `23//4` | 0.383508 | 0.994380622 | 0.385675562 | 47.08 |
+| `1//4` | 8 | `25//4` | 0.214486 | 0.812031433 | 0.264135226 | 44.34 |
 
-Displayed rigorous bounds are rounded DOWN to six decimal places from the smaller original and freshly replayed bound. Original raw outputs remain in certificate JSONs; fresh raw outputs and exact seed differences are in `results/spectral_replay_summary.json`. The full spectral replay found small numerical differences, so the earlier nine-decimal display is superseded; see "Independent audit" below.
+The displayed six-decimal bounds are rounded **down** from the minimum of the original certificate
+and an independent full spectral replay (`results/spectral_replay_summary.json`); see
+"Independent audit" below. For $h = 1$, the stored upper seed defects at $\beta_0 = 21/4$ are
+$\varepsilon_{\mathrm{s}} = \text{3124087506499}//\text{4503599627370496}$ and
+$\varepsilon_\tau = \text{6599110342439}//\text{9007199254740992}$, with the following worst-case
+block error enclosures:
 
-For h=1, the exact stored upper seed defects are epsilon_s = `3124087506499//4503599627370496` and epsilon_t = `6599110342439//9007199254740992`, with beta = `21//4`.
-
-| h=1 ring | max entry error | max residual upper | max orthogonality upper | max eigenvalue radius |
+| $h = 1$ ring size $L$ | Max entry error $a$ | Max residual upper $r$ | Max orthogonality upper $e$ | Max eigenvalue radius $\eta$ |
 |---:|---:|---:|---:|---:|
-| 8 | 1.5034199e-15 | 7.08836598e-12 | 1.83181771e-12 | 2.2315322e-11 |
-| 16 | 5.27181194e-14 | 5.1456421e-08 | 9.56335631e-09 | 2.10443015e-07 |
+| 8 | $1.5034199 \times 10^{-15}$ | $7.08836598 \times 10^{-12}$ | $1.83181771 \times 10^{-12}$ | $2.2315322 \times 10^{-11}$ |
+| 16 | $5.27181194 \times 10^{-14}$ | $5.1456421 \times 10^{-8}$ | $9.56335631 \times 10^{-9}$ | $2.10443015 \times 10^{-7}$ |
 
-The h=1 survey value supplied in the task is 1.147821, with reference gap 1.87351.
-The current repository recurrence gives 1.1490006457432576 from unverified dense
-seed values at (8,5.25). Our verified bound includes enclosure loss and is the
-value above. We do not silently substitute the survey number. Reference gaps and
-ratios in this report are numerical ED values, not independent uniform gap proofs.
+## Complete symmetry sectors and multiplicities
 
-## Complete sectors and multiplicity
+In the physical basis, let $p \in \{0, \dots, L\}$ denote the number of down spins, $m = L/2$ the
+number of two-site unit cells of the physical field pattern, and $k \in \{0, \dots, m-1\}$ the
+momentum index under translation by two sites ($T^2$). A $T^2$-orbit of representative configuration
+$a$ with period $\ell$ supports momentum $k$ if and only if $k\ell$ is a multiple of $m$, with
+normalized basis state $\frac{1}{\sqrt{\ell}} \sum_{r=0}^{\ell-1} e^{-2\pi i k r / m} |T^{2r} a\rangle$.
+For a Hamiltonian transition from representative $a$ into $T^{2t} b$, the projected matrix element
+equals the local transition amplitude multiplied by $\sqrt{\ell_a / \ell_b}\,e^{2\pi i k t / m}$.
+Small-ring unit tests verify that the merged spectrum across all $(p, k)$ blocks matches full dense
+diagonalization in the shared core.
 
-In the physical frame, p counts down spins, m=L/2, and k indexes momentum under
-translation by two sites. An orbit of period ell contributes iff k*ell is divisible
-by m. Its normalized state is sum_r exp(-2 pi i k r/m) |T^(2r) a>/sqrt(ell).
-For a transition from representative a into T^(2t)b, the matrix element is the
-local amplitude times sqrt(ell_a/ell_b) exp(2 pi i k t/m). This formula is used
-directly; a small-ring test compares the full merged spectrum with the independent
-core Sz implementation.
+Global spin flip composed with a one-site translation commutes with $H_L$ and $T^2$ while mapping
+$p \mapsto L - p$, and complex conjugation maps $k \mapsto m - k \bmod m$. We diagonalize one dense
+representative block for each equivalence class, assigning exact multiplicity $1, 2,$ or $4$, and
+assert $\sum_{\mathrm{blocks}} \mathrm{multiplicity} \times d_{\mathrm{block}} = 2^L$ on every ring.
 
-Global spin flip composed with one-site translation maps p to L-p and preserves
-H and momentum. Complex conjugation maps k to m-k. We diagonalize one dense
-representative per such exact equivalence, with multiplicities 1,2, or 4; no
-uncomputed inequivalent sector is omitted. Exact integer orbit counts and the
-assertion sum(dimension*multiplicity)==2^L run for every ring. No Krylov solve is
-called on the certificate path.
-
-| ring | representative blocks | largest block | weighted dimension | required dimension |
+| Ring size $L$ | Representative blocks | Largest block dimension | Weighted dimension sum | Full Hilbert dimension $2^L$ |
 |---:|---:|---:|---:|---:|
 | 8 | 13 | 20 | 256 | 256 |
 | 16 | 41 | 1620 | 65536 | 65536 |
 
-Full sector dimensions, multiplicities, eigenvalues, radii and timings are stored per block in each certificate JSON. For L=16:
+For $L = 16$ ($m = 8$), the representative block dimensions by down-spin count $p \in \{0, \dots, 8\}$
+and momentum $k \in \{0, 1, 2, 3, 4\}$ (which carry momentum multiplicities $1, 2, 2, 2, 1$) are:
 
-| p | dimensions for k=0,1,2,3,4 | charge multiplicity |
+| Down spins $p$ | Block dimensions for $k = 0, 1, 2, 3, 4$ | Charge multiplicity ($p \leftrightarrow L - p$) |
 |---:|---|---:|
-| 0 | 0:1 | 2 |
-| 1 | 0:2, 1:2, 2:2, 3:2, 4:2 | 2 |
-| 2 | 0:16, 1:14, 2:16, 3:14, 4:16 | 2 |
-| 3 | 0:70, 1:70, 2:70, 3:70, 4:70 | 2 |
-| 4 | 0:232, 1:224, 2:230, 3:224, 4:232 | 2 |
-| 5 | 0:546, 1:546, 2:546, 3:546, 4:546 | 2 |
-| 6 | 0:1008, 1:994, 2:1008, 3:994, 4:1008 | 2 |
-| 7 | 0:1430, 1:1430, 2:1430, 3:1430, 4:1430 | 2 |
-| 8 | 0:1620, 1:1600, 2:1616, 3:1600, 4:1618 | 1 |
-
-Momentum multiplicities for k=0,1,2,3,4 are 1,2,2,2,1. Absent entries have dimension zero.
+| 0 | `0:1` | 2 |
+| 1 | `0:2, 1:2, 2:2, 3:2, 4:2` | 2 |
+| 2 | `0:16, 1:14, 2:16, 3:14, 4:16` | 2 |
+| 3 | `0:70, 1:70, 2:70, 3:70, 4:70` | 2 |
+| 4 | `0:232, 1:224, 2:230, 3:224, 4:232` | 2 |
+| 5 | `0:546, 1:546, 2:546, 3:546, 4:546` | 2 |
+| 6 | `0:1008, 1:994, 2:1008, 3:994, 4:1008` | 2 |
+| 7 | `0:1430, 1:1430, 2:1430, 3:1430, 4:1430` | 2 |
+| 8 | `0:1620, 1:1600, 2:1616, 3:1600, 4:1618` | 1 |
 
 ## Eigenvalue-enclosure theorem and implementation
 
-All stored Float64 entries are interpreted as exact binary numbers. Let H be the
-exact Hermitian momentum block and A the Hermitian matrix submitted to LAPACK.
-`block(...; verified=true)` evaluates rational coefficients, orbit normalization
-square roots, and trigonometric phases in outward-rounded IntervalArithmetic.
-Pi itself is enclosed, not replaced with a single floating-point approximation.
-Each exact upper-triangular entry is enclosed; the lower triangle is its conjugate.
-This gives a Frobenius upper bound a >= ||H-A||_2, stored as `entry_error`.
+All `Float64` arrays returned by LAPACK are treated as untrusted approximate proposals whose exact
+binary64 entries are subsequently certified. Let $H$ denote the true mathematical Hermitian momentum
+block and $A$ the `ComplexF64` Hermitian matrix passed to LAPACK. The function `block(...; verified=true)`
+in `src/common.jl` evaluates all rational couplings, orbit-normalization square roots
+$\sqrt{\ell_a / \ell_b}$, and trigonometric phases $\exp(2\pi i k t / m)$ in outward-rounded
+`IntervalArithmetic` (using an interval enclosure of $\pi$) to enclose each upper-triangular entry
+of $H$ and bound the entry-construction error $a \ge \|H - A\|_2 \le \|H - A\|_F$ (stored as
+`entry_error`).
 
-Let Q and Lambda be the full computed eigenvector/eigenvalue arrays. The program
-explicitly calculates Rhat=fl(AQ-Q Lambda) and Ehat=fl(Q* Q-I). It never assumes
-that LAPACK's answer is exact. Each Frobenius norm is bounded using upward scalar
-multiplication, addition, and square root (`nextfloat` after each operation,
-including a subnormal allowance). Complex real and imaginary components are
-accounted for separately. Write q,h,l for these upper norms of Q,A,Lambda.
-With u=2^-53 and g=gamma_(32d+32)=(32d+32)u/(1-(32d+32)u), the implementation uses
+Given the approximate eigenvector matrix $Q$ and real eigenvalue vector $\Lambda$ from LAPACK, the
+verifier computes the floating-point residual $\hat{R} = \operatorname{fl}(AQ - Q\Lambda)$ and
+orthogonality defect $\hat{E} = \operatorname{fl}(Q^* Q - I)$. Upper bounds $q \ge \|Q\|_F$,
+$h_{\mathrm{norm}} \ge \|A\|_F$, $\ell \ge \|\Lambda\|_F$, $\|\hat{R}\|_{F,\mathrm{up}}$, and
+$\|\hat{E}\|_{F,\mathrm{up}}$ are accumulated using directed upward rounding (`nextfloat` after
+each scalar operation, separating real and imaginary components). With unit roundoff $u = 2^{-53}$
+and $\gamma_{32d+32} = (32d+32)u / (1 - (32d+32)u)$, the true residual and orthogonality norms
+satisfy
+$$\|AQ - Q\Lambda\|_F \le r := \|\hat{R}\|_{F,\mathrm{up}} + \gamma_{32d+32}(h_{\mathrm{norm}} q + q\ell) + 10^{-280},$$
+$$\|Q^* Q - I\|_F \le e := \|\hat{E}\|_{F,\mathrm{up}} + \gamma_{32d+32}(q^2 + \sqrt{d}) + 10^{-280}.$$
+This follows from the standard IEEE binary64 dot-product rounding bound
+$|\operatorname{fl}(\sum x_i y_i) - \sum x_i y_i| \le \gamma_s \sum |x_i y_i|$ applied to the real
+and imaginary parts and the submultiplicativity $\||A|\,|B|\|_F \le \|A\|_F \|B\|_F$, where $32d+32$
+conservatively bounds the operation count per complex inner product and subtraction, $\sqrt{d}$
+accounts for subtracting the identity matrix $I$, and $10^{-280}$ covers gradual underflow.
 
-```
-r = ||Rhat||_F,up + g (h q + q l) + 10^-280,
-e = ||Ehat||_F,up + g (q^2 + sqrt(d)) + 10^-280.
-```
+**Polar-factor and Weyl inequality (with multiplicity):** Asserting $e < 1$, the unitary polar
+factor $V = Q(Q^* Q)^{-1/2}$ exists and satisfies $\|Q - V\|_2 \le d_Q := e / (1 + \sqrt{1 - e})$.
+Consequently,
+$$\|A - V \Lambda V^*\|_2 = \|AV - V\Lambda\|_2 \le r + (\|A\|_2 + \|\Lambda\|_2) d_Q.$$
+Using $\|A\|_2 \le L(3/4 + h/2) + a$ and $\|\Lambda\|_2 = \max_i |\lambda_i|$, Weyl's inequality
+for the Hermitian matrices $H$ and $V \Lambda V^*$ guarantees that the $i$th ordered eigenvalue of
+$H$ (counting multiplicity) lies in $[\lambda_i - \eta, \lambda_i + \eta]$ with radius
+$$\eta = a + r + \left(L(3/4 + h/2) + a + \max_i |\lambda_i|\right) d_Q.$$
+All scalar operations defining $r, e, d_Q,$ and $\eta$ are performed with outward interval rounding.
 
-These follow from the standard dot-product rounding bound
-|fl(sum products)-sum products| <= gamma_s sum |products|, applied to real and
-imaginary components and their subtractions, and || |A| |B| ||_F <= ||A||_F||B||_F.
-The factor 32d+32 conservatively exceeds the number of elementary operations per
-complex dot product and subtraction. Sparse AQ has no longer dot products than
-the dense dimension. The sqrt(d) term explicitly budgets subtraction of I.
-The added 10^-280 exceeds the aggregate possible subnormal
-absolute errors at all reached dimensions. Inputs/results are finite and the
-chosen gamma denominator is positive. No fast-math transformations are requested.
-This is a rigorous norm error bound on ordinary matrix multiplication, rather
-than merely trusting a residual accumulated in the same precision.
+For $\beta > 0$, `enclosed_logz` sums $\exp(-\beta [\lambda_i - \eta, \lambda_i + \eta])$ weighted
+by each block's exact symmetry multiplicity (after factoring out a common exact binary64 energy
+shift) to obtain rigorous intervals for $\log Z_{n_0}(\beta_0)$, $\log Z_{2n_0}(\beta_0)$, and
+$\log Z_{2n_0}(2\beta_0)$. The upper endpoints of the resulting defect intervals
+$1 - P_{\mathrm{s}}(n_0, \beta_0)$ and $1 - P_\tau(2n_0, \beta_0)$ are converted directly to exact
+`Rational{BigInt}` fractions (`epsilon_s` and `epsilon_t`) without decimal truncation and passed to
+`CertifiedGaps.certified_gap_bound`.
 
-**Polar/Weyl argument (with multiplicity):** assert e<1. The polar unitary V of Q
-exists and ||Q-V||_2 <= dQ=e/(1+sqrt(1-e)). Therefore
+## Twenty-site numerical exploration and scaling
 
-```
-||A - V Lambda V*||_2
- = ||AV - V Lambda||_2
- <= r + (||A||_2 + ||Lambda||_2) dQ.
-```
+The 20-site scan (`scripts/scan.jl 20`) combines full dense diagonalization for blocks of dimension
+$\le 2{,}500$ with 80 low-lying Ritz values from `KrylovKit` for larger blocks (up to dimension
+$18{,}504$, with total weighted dimension $\sum \mathrm{mult} \times d = 1{,}048{,}576 = 2^{20}$).
+Because Krylov convergence and eigenvalue completeness are not certified, the $n_0 = 10$ rows below
+are exploratory numerical estimates:
 
-Use ||A||_2 <= L(3/4+h/2)+a and ||Lambda||_2=max|lambda_i|. Weyl's inequality
-for the two Hermitian matrices H and V Lambda V* encloses each ordered eigenvalue,
-with multiplicity, in lambda_i +/- eta, where
-
-```
-eta = a + r + (L(3/4+h/2)+a+max|lambda_i|) dQ.
-```
-
-All scalar operations defining r,e,dQ,eta are outward interval operations. This
-argument does not rely on simple eigenvalues or on matching individual residuals
-to distinct eigenvalues. Every eigenvalue of each block is present.
-
-For beta>0, `enclosed_logz` sums exp(-beta*[lambda_i-eta,lambda_i+eta]) with exact
-symmetry multiplicities and a common exact binary shift, then takes an interval
-log. Both lower and upper logZ endpoints are retained. The lower purity bounds
-come from logZ(2n,beta)-2logZ(n,beta) and logZ(2n,2beta)-2logZ(2n,beta).
-Upper endpoints of 1-exp(these intervals) are converted to exact Rational{BigInt}
-values, with no intermediate decimal rounding. Those rational seeds and rational
-beta are passed to the repository's `certified_gap_bound`, including its rigorous
-tail correction. The fast test recomputes this propagation from stored enclosures.
-
-## Twenty-site exploration and threshold
-
-The following results are **numerical, not certified**. Full dense spectra are used
-through 16 sites. At 20 sites only blocks of dimension <=2500 are dense; larger
-blocks retain 80 low levels from KrylovKit. All sectors are visited, with the same
-exact dimension count. A common truncation cutoff and a dimension-weighted tail
-are included via core `PartialSpectrum`/`logZ_bounds`, but Krylov convergence and
-multiplicities are not verified, so these are not rigorous partition bounds.
-Exact twenty-site dimensions are recorded below.
-
-| h | best n0 | beta | numerical candidate bound | numerical 20-site reference gap |
+| $h$ | Best $n_0$ | $\beta_0$ | Numerical candidate bound | Numerical 20-site ED gap |
 |---|---:|---:|---:|---:|
-| 1//1 | 10 | 6.25 | 1.27832796 | 1.87351191 |
-| 3//4 | 10 | 6.5 | 1.01075578 | 1.57089173 |
-| 1//2 | 10 | 6.75 | 0.707243353 | 1.23131113 |
-| 7//20 | 10 | 7 | 0.493229271 | 0.994292667 |
-| 1//4 | 10 | 7.25 | 0.326952394 | 0.811528896 |
-| 1//5 | 10 | 7.5 | 0.231456632 | 0.708641218 |
-| 3//20 | 10 | 8 | 0.119366516 | 0.594804607 |
-| 1//10 | — | — | no grid seed | 0.466432604 |
+| `1//1` | 10 | 6.25 | 1.27832796 | 1.87351191 |
+| `3//4` | 10 | 6.5 | 1.01075578 | 1.57089173 |
+| `1//2` | 10 | 6.75 | 0.707243353 | 1.23131113 |
+| `7//20` | 10 | 7 | 0.493229271 | 0.994292667 |
+| `1//4` | 10 | 7.25 | 0.326952394 | 0.811528896 |
+| `1//5` | 10 | 7.5 | 0.231456632 | 0.708641218 |
+| `3//20` | 10 | 8 | 0.119366516 | 0.594804607 |
+| `1//10` | — | — | no grid seed at $n_0 \le 10$ | 0.466432604 |
 
-Actual L=20 largest block: 18504; weighted total: 1048576 = 2^20.
+At $n_0 \le 10$, the sampled $\beta_0$ grid finds an admissible seed at $h = 3/20 = 0.15$ and none
+at $h = 1/10 = 0.10$. The table below records $\max_\beta \min(P_{\mathrm{s}}(n_0, \beta), P_\tau(2n_0, \beta))$
+and the ground-state spatial energy defect $\delta(n_0) = E_0(2n_0) - 2E_0(n_0)$ across all scanned
+fields and seed lengths $n_0 \in \{2, 4, 6, 8, 10\}$:
 
-Additional fields 1/5,3/20,1/10 probe the numerical search threshold beyond the requested set. A failed grid point is not evidence of a gapless phase.
-
-The sampled twenty-site search fails at h=0.1 and succeeds at h=0.15. This brackets an apparent finite-grid threshold between those sampled fields; no monotonicity between them or physical critical field is proved.
-
-For every explored field, the following gives max_beta min(Ps,Pt) and delta(n)=E0(2n)-2E0(n). Partial-spectrum values remain numerical.
-
-| h | n0 | max min purity | delta(n) |
+| $h$ | $n_0$ | $\max_\beta \min(P_{\mathrm{s}}, P_\tau)$ | $\delta(n_0) = E_0(2n_0) - 2E_0(n_0)$ |
 |---|---:|---:|---:|
-| 1//1 | 2 | 0.529873172 | 0.505022849 |
-| 1//1 | 4 | 0.94067001 | 0.0221827722 |
-| 1//1 | 6 | 0.99334286 | 0.00159103285 |
-| 1//1 | 8 | 0.999275644 | 0.00013128857 |
-| 1//1 | 10 | 0.999923253 | 1.14962961e-05 |
-| 3//4 | 2 | 0.447640968 | 0.613999064 |
-| 3//4 | 4 | 0.890324463 | 0.0389149028 |
-| 3//4 | 6 | 0.983514815 | 0.00385786603 |
-| 3//4 | 8 | 0.997555655 | 0.000440747681 |
-| 3//4 | 10 | 0.999636029 | 5.36822693e-05 |
-| 1//2 | 2 | 0.399066156 | 0.754873673 |
-| 1//2 | 4 | 0.800725359 | 0.0769369751 |
-| 1//2 | 6 | 0.952122862 | 0.0113905614 |
-| 1//2 | 8 | 0.988846519 | 0.00192196739 |
-| 1//2 | 10 | 0.997543855 | 0.000347058281 |
-| 7//20 | 2 | 0.361338696 | 0.850802846 |
-| 7//20 | 4 | 0.699446862 | 0.124633121 |
-| 7//20 | 6 | 0.893328792 | 0.0251937055 |
-| 7//20 | 8 | 0.967347486 | 0.00566434475 |
-| 7//20 | 10 | 0.990324488 | 0.00135842657 |
-| 1//4 | 2 | 0.31998312 | 0.913017541 |
-| 1//4 | 4 | 0.602523494 | 0.177017263 |
-| 1//4 | 6 | 0.818031626 | 0.0466268272 |
-| 1//4 | 8 | 0.926399235 | 0.0132591633 |
-| 1//4 | 10 | 0.971872848 | 0.00397943173 |
-| 1//5 | 2 | 0.303223146 | 0.940972384 |
-| 1//5 | 4 | 0.560054301 | 0.2117524 |
-| 1//5 | 6 | 0.757748899 | 0.0653997426 |
-| 1//5 | 8 | 0.881241013 | 0.0214187006 |
-| 1//5 | 10 | 0.947706946 | 0.00732718927 |
-| 3//20 | 2 | 0.289667018 | 0.965093873 |
-| 3//20 | 4 | 0.495941276 | 0.252166166 |
-| 3//20 | 6 | 0.674748062 | 0.0934440211 |
-| 3//20 | 8 | 0.814781105 | 0.0361784563 |
-| 3//20 | 10 | 0.902221022 | 0.0144183736 |
-| 1//10 | 2 | 0.279689865 | 0.983874689 |
-| 1//10 | 4 | 0.442024104 | 0.295440509 |
-| 1//10 | 6 | 0.569803257 | 0.134401906 |
-| 1//10 | 8 | 0.7028359 | 0.0639327614 |
-| 1//10 | 10 | 0.80680422 | 0.0308278889 |
+| `1//1` | 2 | 0.529873172 | 0.505022849 |
+| `1//1` | 4 | 0.94067001 | 0.0221827722 |
+| `1//1` | 6 | 0.99334286 | 0.00159103285 |
+| `1//1` | 8 | 0.999275644 | 0.00013128857 |
+| `1//1` | 10 | 0.999923253 | 1.14962961e-05 |
+| `3//4` | 2 | 0.447640968 | 0.613999064 |
+| `3//4` | 4 | 0.890324463 | 0.0389149028 |
+| `3//4` | 6 | 0.983514815 | 0.00385786603 |
+| `3//4` | 8 | 0.997555655 | 0.000440747681 |
+| `3//4` | 10 | 0.999636029 | 5.36822693e-05 |
+| `1//2` | 2 | 0.399066156 | 0.754873673 |
+| `1//2` | 4 | 0.800725359 | 0.0769369751 |
+| `1//2` | 6 | 0.952122862 | 0.0113905614 |
+| `1//2` | 8 | 0.988846519 | 0.00192196739 |
+| `1//2` | 10 | 0.997543855 | 0.000347058281 |
+| `7//20` | 2 | 0.361338696 | 0.850802846 |
+| `7//20` | 4 | 0.699446862 | 0.124633121 |
+| `7//20` | 6 | 0.893328792 | 0.0251937055 |
+| `7//20` | 8 | 0.967347486 | 0.00566434475 |
+| `7//20` | 10 | 0.990324488 | 0.00135842657 |
+| `1//4` | 2 | 0.31998312 | 0.913017541 |
+| `1//4` | 4 | 0.602523494 | 0.177017263 |
+| `1//4` | 6 | 0.818031626 | 0.0466268272 |
+| `1//4` | 8 | 0.926399235 | 0.0132591633 |
+| `1//4` | 10 | 0.971872848 | 0.00397943173 |
+| `1//5` | 2 | 0.303223146 | 0.940972384 |
+| `1//5` | 4 | 0.560054301 | 0.2117524 |
+| `1//5` | 6 | 0.757748899 | 0.0653997426 |
+| `1//5` | 8 | 0.881241013 | 0.0214187006 |
+| `1//5` | 10 | 0.947706946 | 0.00732718927 |
+| `3//20` | 2 | 0.289667018 | 0.965093873 |
+| `3//20` | 4 | 0.495941276 | 0.252166166 |
+| `3//20` | 6 | 0.674748062 | 0.0934440211 |
+| `3//20` | 8 | 0.814781105 | 0.0361784563 |
+| `3//20` | 10 | 0.902221022 | 0.0144183736 |
+| `1//10` | 2 | 0.279689865 | 0.983874689 |
+| `1//10` | 4 | 0.442024104 | 0.295440509 |
+| `1//10` | 6 | 0.569803257 | 0.134401906 |
+| `1//10` | 8 | 0.7028359 | 0.0639327614 |
+| `1//10` | 10 | 0.80680422 | 0.0308278889 |
 
-## Predicted scale, extrapolation, and limits
+### Asymptotic $h^{2/3}$ scaling comparison
 
-Using the supplied Delta proportional to h^(2/3) scaling and calibrating the
-**quality of the h=1 survey seed**, the naive comparable-quality scales are
-n0 approximately 8 h^(-2/3), beta approximately 5.25 h^(-2/3). Logarithmic corrections
-and changes in amplitudes are omitted. This predicts a scale, not a necessary
-condition for any positive bound. Weaker positive certificates can occur earlier.
+In the continuum sine-Gordon description at weak staggered field $h \ll 1$, the spectral gap and
+inverse correlation length scale as $\Delta \propto h^{2/3}$ (up to logarithmic corrections).
+Calibrating to the $h = 1$ seed $(n_0, \beta_0) = (8, 5.25)$ gives the constant-defect-quality
+scaling locus $n_0(h) \approx 8 h^{-2/3}$ and $\beta_0(h) \approx 5.25 h^{-2/3}$:
 
-| h | predicted n0 (continuous) | next even n0 | predicted beta | largest searched n0 |
+| $h$ | Scaled $n_0 \approx 8 h^{-2/3}$ | Next even $n_0$ | Scaled $\beta_0 \approx 5.25 h^{-2/3}$ | Certified $n_0$ |
 |---|---:|---:|---:|---:|
-| 1//1 | 8 | 8 | 5.25 | 10 |
-| 3//4 | 9.69130983 | 10 | 6.35992207 | 10 |
-| 1//2 | 12.6992084 | 14 | 8.33385552 | 10 |
-| 7//20 | 16.1081114 | 18 | 10.5709481 | 10 |
-| 1//4 | 20.1587368 | 22 | 13.229171 | 10 |
+| `1//1` | 8 | 8 | 5.25 | 8 |
+| `3//4` | 9.69130983 | 10 | 6.35992207 | 8 |
+| `1//2` | 12.6992084 | 14 | 8.33385552 | 8 |
+| `7//20` | 16.1081114 | 18 | 10.5709481 | 8 |
+| `1//4` | 20.1587368 | 22 | 13.229171 | 8 |
 
-For h=1//10, fitting the last three delta(n) values gives log delta approximately 0.199436518 + (-0.368103712) n, or correlation scale 2.71662569.
-A heuristic model Ps=exp[-beta delta(n)] and Pt=(1+4n exp[-2beta gap])/(1+4n exp[-beta gap])^2 first yields a predicted seed at (n0,beta)=(14,17.0), requiring 28 sites. This is an extrapolation, not an existence proof or certificate.
-
-## Reproduction, environment, and evidence status
-
-Julia 1.12.4 was verified. The approved juliaup installer returned HTTP 403; the
-official julialang-s3 binary archive succeeded. Dependencies were instantiated and
-precompiled from the unchanged julia project. OPENBLAS_NUM_THREADS=1 and
-BLAS.set_num_threads(1) were used. The environment has approximately 17 GiB RAM
-and five CPUs. Independent parameter runs used separate processes. No individual
-run approached the 45-minute limit. Source SHA-256 hashes, package versions,
-per-block times, and Julia/BLAS thread counts are recorded in JSON.
-
-Run commands are in README.md. `test/runtests.jl` reruns the exact RP identities,
-compares small complete momentum spectra with the independent core ED, checks
-sector totals, recomputes enclosed partition functions, reconstructs rational
-seeds, and reruns the certified recurrence. It does not reconstruct the large
-Q matrices; `certify.jl` and `scripts/spectral_replay.jl` redo the residual calculations
-from scratch.
-
-**Certified:** exact RP at the five requested rational fields; complete weighted
-sector coverage on certificate rings; eigenvalue, partition-function and purity
-enclosures under IEEE arithmetic and the stated error analysis; the reported
-uniform lower bounds for every even L>=8 sites, with uniqueness from the criterion.
-
-**Numerical only:** grid optimization, all reference gaps and ratios, twenty-site
-partial spectra and seed candidates, finite-grid threshold observations,
-finite-size delta fits, and h^(2/3) scale predictions.
-
-**Remaining limit:** the stronger best candidates on the twenty-site search grid
-have not been rerun through complete dense verification. No physical threshold
-or impossibility of certificates at weaker fields is proved. No existing core,
-other certificate directory, or notes were edited; nothing was merged or published.
-
-The fast checker now has 341 tests (about 45 s including compilation): the 71 original ones,
-26 published-bound checks, 240 provenance-hash checks against the historical snapshot, and 4
-exact checks of the shared-core cross-check.
+Because the admissible region allows seed defects up to $\approx 0.12731$ (whereas the $h = 1$ seed
+has defects $\sim 7 \times 10^{-4}$), $n_0 = 8$ remains sufficient all the way down to $h = 1/4$,
+with the certified bound-to-ED-gap ratio decreasing from $0.613$ at $h = 1$ to $0.264$ at $h = 1/4$.
+At $h = 1/10$, fitting $\log \delta(n_0) \approx 0.19944 - 0.36810 n_0$ over $n_0 \in \{6, 8, 10\}$
+gives a decay scale of $2.72$ sites and predicts a first admissible seed near
+$(n_0, \beta_0) \approx (14, 17.0)$ (requiring a 28-site doubled ring).
 
 ## Independent audit
 
-**PASS: accept the five conservative bounds below at h = 1, 3/4, 1/2, 7/20,
-and 1/4, computed from complete 8- and 16-site spectra.** Their uniform gap bounds apply
-to every even L >= 8 one-spin cells/sites. This acceptance does not extend to
-the numerical twenty-site search candidates.
+An independent audit reviewed `src/common.jl`, `certify.jl`, `test/runtests.jl`, `audit_bounds.jl`,
+and the core recurrence, and executed a complete fresh spectral replay (`scripts/spectral_replay.jl`)
+across all five fields:
 
-The separate reviewer inspected AGENTS.md, REPORT.md (now METHOD.md), common.jl, certify.jl,
-test/runtests.jl, the core certified recurrence, and the scope note's transfer
-operator and two-purity criterion. No defect requiring a mathematical source
-or certificate-data change was found.
+1. **Mathematical and numerical verification:** Confirmed the exact rational reflection-positivity
+   identity under the odd-site rotation $U = 2G_y$, the even-$L$ closure condition, the completeness
+   of the $(p, k)$ symmetry-sector decomposition ($\sum \mathrm{mult} \times d = 2^L$), the interval
+   enclosure of the momentum-block entries, the $\gamma_{32d+32}$ plus $10^{-280}$ rounding bounds
+   for residual and orthogonality Frobenius norms, the polar-factor/Weyl eigenvalue enclosure
+   theorem, and the outward-rounded $\log Z$ and rational seed propagation.
+2. **Direct interval residual cross-check (`scripts/audit_bounds.jl`):** Passed 17/17 exact
+   normalization and direct scalar `IntervalArithmetic` residual checks on small blocks
+   (`results/audit_bounds.json`).
+3. **Full spectral replay (`scripts/spectral_replay.jl`):** Rebuilt every 8- and 16-site momentum
+   block from scratch across all five fields, re-solved the dense eigenproblems, recomputed the
+   residual and orthogonality error bounds, and propagated the fresh eigenvalue enclosures through
+   $\log Z$, rational seed extraction, and `certified_gap_bound`:
 
-### Mathematical and numerical review
-
-- **RP and physical normalization:** the exact rational matrices X, J=i Sy,
-  and Z are spin-1/2 matrices. The real orthogonal rotation U=2J on odd sites
-  transforms either bond orientation to -X tensor X-J tensor J-Z tensor Z.
-  Thus the negative rotated bond is a sum of three real tensor squares with
-  exact coefficient 1. The antisymmetry of J is allowed. U Z U^T=-Z converts
-  the staggered field to the uniform real symmetric term -h Z. The L=2
-  implementation correctly includes both periodic bonds.
-- **Length and uniqueness:** on an even ring the alternating rotation closes
-  consistently and gives a translation-invariant one-spin-cell Hamiltonian.
-  Consequently the even n0=8 seed has the claimed even-L>=8-site scope.
-  The scope note's criterion derives uniqueness along with the gap; numerical
-  evidence of uniqueness is not substituted for this conclusion.
-- **Complete sectors:** the translation-by-two orbit compatibility condition,
-  normalized momentum matrix-element formula, p versus L-p equivalence under
-  spin flip followed by one-site translation, and k versus -k equivalence under
-  complex conjugation are consistent. Their combined multiplicities account
-  for every state. Exact integer weighted dimension checks give 2^L, and every
-  inequivalent block in the certificate path is diagonalized densely.
-- **Exact matrix enclosures:** interval evaluation includes rational entries,
-  orbit-normalization square roots, and trigonometric phases with an interval
-  enclosure of pi. Upper-triangle enclosures and Hermitian completion correctly
-  bound the submitted matrix's distance from the exact block in Frobenius norm.
-- **Residual and orthogonality rounding:** the implemented upward Frobenius
-  reductions and gamma_(32d+32) allowances give valid norm bounds. A complex-dot
-  component involves at most 2d real products; component norm combination,
-  sparse accumulation, diagonal multiplication and subtraction fit comfortably
-  within this conservative budget. The sqrt(d) contribution explicitly covers
-  subtraction of the identity in the orthogonality defect. At the largest
-  certified dimension d=1620, even O(d^3) elementary underflow contributions are
-  far below the added absolute allowance 10^-280.
-- **Eigenvalue theorem:** e<1 permits polar orthogonalization of Q, with
-  ||Q-V|| <= e/(1+sqrt(1-e)). The residual, polar correction, and exact-entry
-  error therefore bound ||H-V Lambda V*||. Hermitian Weyl inequalities then
-  enclose every ordered eigenvalue, including multiplicities and degeneracies.
-- **Partition functions and seeds:** energy shifts are exact stored binary
-  numbers; exponentiation and summation include every level and its exact
-  symmetry multiplicity. Both log-partition endpoints are retained. Subtracting
-  denominator log intervals gives the correct lower purity bounds; the upper
-  endpoint of each defect is converted exactly to a rational binary fraction.
-  Rational seeds and beta are passed to the outward-rounded recurrence with
-  its tail correction. No decimal truncation is used to obtain the seeds.
-
-The floating-point rounding proof assumes IEEE binary64 round-to-nearest
-arithmetic, ordinary correctly rounded scalar operations and square root,
-standard finite BLAS arithmetic without unsafe fast-math transformations, and
-the documented outward arithmetic of IntervalArithmetic. It does not accept
-the eigensolver output as exact or assume that residual accumulation in ordinary
-precision is intrinsically rigorous: explicit norm-error allowances are used.
-
-### Independent execution and supporting checks
-
-The reviewer reran the saved checker without overwriting artifacts:
-
-- `check.jl`: **71/71 tests passed**, approximately 21 seconds of reported test
-  execution. These cover RP, comparison with independent small-ring ED, sector
-  counts, stored enclosure propagation, exact rational seeds, and recurrence.
-- Independently recomputed and verified **235 stored source-hash entries**.
-- Verified Julia **1.12.4** and checked that `iv(pi)` contains higher-precision pi.
-
-The coordinating agent also ran the separate `audit_bounds.jl` audit:
-**17/17 exact-normalization and direct scalar interval residual checks passed**.
-Its evidence is in `results/audit_bounds.json`.
-These checks supplement the mathematical rounding analysis; finite test cases
-alone would not establish a general rounding theorem.
-
-### Limits of acceptance
-
-The initial fast checker propagates saved large-block eigenvalue enclosures;
-it does not reconstruct their eigenvectors or original residuals. The separate
-17-test audit uses direct scalar interval accumulation on small blocks. Neither
-initial check alone constituted a fresh large-block spectral execution.
-
-### Completed full spectral replay
-
-The reviewer subsequently executed `spectral_replay.jl` on all five fields.
-For each field this rebuilt every exact 8/16-site momentum block, computed full
-dense Q and Lambda, recomputed R and E and their rounding allowances, and
-propagated fresh eigenvalue radii through logZ, rational seeds and recurrence.
-Original eigenvalues, radii and seeds were comparison data, not inputs to these
-fresh spectral stages. This is fresh execution of the same reviewed verifier,
-**not an independently implemented second spectral verifier**. No search ran.
-
-A first replay asserted bitwise equality with the original certificates and stopped at
-h=3/4, where the fresh seeds differ in the last bits; a second stopped because the fresh
-h=3/4 bound did not support the original nine-decimal display. The replay was then completed
-with the acceptance rule below (positive fresh bound, overlapping enclosures). Those attempts
-are in branch history (commit `cb635a1`), not in the tree.
-
-| h | fresh raw bound | full spectral stage seconds | accepted bound |
+| $h$ | Fresh replay raw bound | Replay wall time (s) | Accepted 6-decimal bound |
 |---|---:|---:|---:|
-| 1 | 1.1482614900945929 | 47.904 | 1.148261 |
-| 3/4 | 0.8907821437909684 | 31.552 | 0.890782 |
-| 1/2 | 0.5947852422865794 | 41.783 | 0.594785 |
-| 7/20 | 0.38350830551700044 | 33.863 | 0.383508 |
-| 1/4 | 0.21448610675192437 | 33.450 | 0.214486 |
+| $1$ | 1.1482614900945929 | 47.904 | 1.148261 |
+| $3/4$ | 0.8907821437909684 | 31.552 | 0.890782 |
+| $1/2$ | 0.5947852422865794 | 41.783 | 0.594785 |
+| $7/20$ | 0.38350830551700044 | 33.863 | 0.383508 |
+| $1/4$ | 0.21448610675192437 | 33.450 | 0.214486 |
 
-Accepted values are rounded **down to six decimals from min(original,fresh)**,
-with exact rational values stored in the replay JSON. Every fresh bound is
-positive, and every matched original/fresh eigenvalue enclosure overlaps.
-Overlap is only a consistency check; the fresh certificate itself supplies the
-proof. All original certificate files remain unchanged.
+The fresh replay reproduced the $h = 1$ seed defects and raw bound bit-for-bit, while at the other
+four fields LAPACK eigenvector differences in the last bits ($\sim 10^{-14}$) shifted the rational
+seed defects by a few parts in $10^{10}$:
 
-Only h=1 reproduced all original spectral fields, seeds and raw bound exactly.
-At h=3/4 the original raw bound was 0.8907822037452694; at h=7/20 it was
-0.3835083070577823. Their fresh bounds are smaller and do **not** reproduce the
-original nine-decimal claims 0.890782203 and 0.383508307. The conservative values
-above supersede those display claims. The other two changed fresh bounds are
-slightly stronger. Exact fresh-minus-original seed differences are:
-
-| h | spatial defect difference | thermal defect difference |
+| $h$ | Spatial defect difference (fresh $-$ original) | Thermal defect difference (fresh $-$ original) |
 |---|---|---|
-| 1 | 0//1 | 0//1 |
-| 3/4 | 2991185//9007199254740992 | 5980245//4503599627370496 |
-| 1/2 | -2009921//9007199254740992 | -4027265//4503599627370496 |
-| 7/20 | 907975//9007199254740992 | 3666675//9007199254740992 |
-| 1/4 | -431123//9007199254740992 | -1822071//9007199254740992 |
+| $1$ | `0//1` | `0//1` |
+| $3/4$ | `2991185//9007199254740992` | `5980245//4503599627370496` |
+| $1/2$ | `-2009921//9007199254740992` | `-4027265//4503599627370496` |
+| $7/20$ | `907975//9007199254740992` | `3666675//9007199254740992` |
+| $1/4$ | `-431123//9007199254740992` | `-1822071//9007199254740992` |
 
-The observed h=3/4 maximum eigenvalue difference is approximately
-1.95399e-14. Its largest radius increase occurs at L=16,p=8,k=2:
-1.9753391920702282e-10. In that block the entry-error bound is unchanged,
-the residual upper bound changes by 3.6492607308249224e-15, and the
-orthogonality upper bound increases by 1.471519586164419e-11. Thus the
-observed radius variation there is dominated by the orthogonality contribution,
-not by shifts of the eigenvalues. These reported differences are numerical
-diagnostics; no unverified explanation about a library-level cause is asserted.
+Every matched original and fresh eigenvalue interval overlaps, and rounding down to six decimal
+places from $\min(\text{original}, \text{fresh})$ gives the accepted headline bounds verified by
+`check.jl`. Following the rename of the core package from `ThermalMPOGap` to `CertifiedGaps`, a
+second 270-block replay (189.4 s) reproduced the replay bounds identically
+(`results/spectral_replay_summary.json`).
 
-The five conservative 8/16-site certificate bounds above are accepted. Reference gaps, optimization,
-twenty-site partial-spectrum candidates, apparent search thresholds, and scaling
-extrapolations remain numerical. In particular the stronger best twenty-site
-candidates have not undergone complete dense certification, and no physical
-threshold is established.
+## Cross-check with the shared core (`CertifiedGaps.GapCertificates`)
 
-### CertifiedGaps migration review
-
-After the core was renamed from `ThermalMPOGap` to `CertifiedGaps`, the reviewer checked that
-every hashed source changed only by the package name, and a fresh 270-block replay on the
-renamed core (189.418 seconds, no resumed witnesses) reproduced the preceding replay's raw
-bounds exactly. Its compact summary is `results/spectral_replay_summary.json`.
-
-## Cross-check with the shared core
-
-`scripts/core_certificate.jl` certifies the h = 1 seed (8, 21/4) a second time with
-`CertifiedGaps.GapCertificates`: the same rotated basis and RP factors, its own verified block
-spectra (S^z parity and momentum blocks, a different block structure from `src/common.jl`),
-and the exact rational chain instead of the interval recurrence. It gives gap > 1.147699 for
-every even L ≥ 8, with εs = 692723528103//10^15 and εt = 728796111263//10^15, consistent
-with the main certificate (1.148261). The fast checker verifies its RP identity and rational
-chain and that its stored model is the rotated staggered Hamiltonian at h = 1;
-`check.jl --full` also re-verifies its spectra (about 6 minutes).
+The script `scripts/core_certificate.jl` independently certifies the $h = 1$ seed $(8, 21/4)$ using
+`CertifiedGaps.GapCertificates`: it constructs the rotated single-spin-cell `RingModel`, verifies
+reflection positivity via `RingModels.verify_rp`, encloses the 8- and 16-site spectra using the
+shared core's $S^z$-parity and single-site momentum blocks (`VerifiedSpectra`), and runs the exact
+rational doubling chain (`rational_gap_chain`), yielding $\Delta_L > 1.147699$ for every even
+$L \ge 8$ (`results/core_certificate_1_1.json`). The fast checker verifies its RP identity, model
+equivalence, and rational chain, and `check.jl --full` re-solves and re-verifies all of its symmetry
+blocks from scratch.

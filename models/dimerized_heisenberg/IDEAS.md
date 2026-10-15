@@ -1,129 +1,69 @@
-# Candidate routes and first prerequisite
+# Candidate routes: dimerized spin-1/2 Heisenberg chain
 
-1. Dense ED in Sz, cell momentum, and spin-flip blocks, then rigorous residual and
-   orthogonality enclosures: exponential in the largest ring (4 n0 spins for a
-   seed at n0 two-spin cells). The requested 20-spin ceiling allows n0 <= 5,
-   not n0 <= 10. Known n0=4 seeds require 16 spins.
-2. Expansion around disconnected dimers: potentially scalable in n0, but a
-   rigorous finite-temperature remainder is needed away from delta=1.
-3. Generalized cell reflection, using swap composed with time reversal: may
-   support a broader transfer theorem, but is not automatically the real-C
-   identical-factor decomposition required in the task.
+Grouping each strong bond $(1 + \delta)\,\mathbf{S}_{2j-1}\cdot\mathbf{S}_{2j}$ into a two-spin
+unit cell produces a translation-invariant ring of $L$ cells connected by weak bonds
+$(1 - \delta)\,\mathbf{S}_{2j}\cdot\mathbf{S}_{2j+1}$. Because a seed at $n_0$ two-spin cells
+requires evaluating the thermal purity $P_\tau(2n_0, \beta_0)$ on a doubled ring of $2n_0$ cells
+($4n_0$ spins), a 16-spin exact diagonalization ceiling permits even seed lengths $n_0 \in \{2, 4\}$
+cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
 
-Chosen first step: verify the exact local RP assumption before ED. A bond of
-form sum c C tensor C must commute with cell exchange. The physical oriented
-inter-cell Heisenberg bond does not. Common cell basis changes preserve this
-obstruction. A sublattice rotation is a common cell unitary and cannot fix it.
-If confirmed, stop certification at hypothesis (a); numerical seeds cannot
-repair an algebraically impossible identity. Do not label this as a failure to
-find an admissible numerical seed or as evidence against a physical gap.
+## Candidate routes
 
-## Follow-up scope correction and numerical route
-
-Independent review confirms the general repository criterion IS available:
-Theta is internal cell reflection composed with conjugation. The outer-cell
-swap obstruction excludes only the stronger literal identical-factor demand.
-Larger even blocks preserve this reflected form; alternating orientations give
-two different identical-factor bond operators, not one homogeneous operator.
-
-Implemented full dense Sz/momentum/spin-flip ED through 16 spins for all six
-parameters, with complete dimension accounting and independent small-ring
-checks. Scanned n0=2,3,4 and beta=0.25:0.25:32; odd n0 remains diagnostic only.
-This supplies useful non-certified data despite the original specification
-mismatch. Residual enclosures and rational purity certification remain undone.
-
-## Earlier verified enclosure round
-
-Following explicit authorization to continue under an audited applicable
-repository theorem, implement interval algebraic block construction and dense
-LAPACK eigenvectors. Compute residual and orthogonality centers using four
-real GEMMs; bound every rounding/underflow contribution by exact rational
-gamma bounds. A polar-factor/Weyl theorem then bounds every true eigenvalue
-with multiplicity. Outward full-spectrum log partition sums give exact
-rational purity seeds and positive general-reflected-RP bounds for delta
-0.5, 0.3, 0.25. The literal original real identical-factor requirement remains
-false and explicitly excluded from the claim. Independent review validated
-the asymmetric recurrence/tail directly from the repository note identities.
-
-## Re-certification: route assessment before computation (2026-10-14)
-
-The earlier results above are historical evidence, not trusted inputs for this task.
-Re-derive the conjugated-factor RP identity, rerun verified spectra, and make the main checker
-recompute spectral enclosures rather than trust saved residual maxima. The required form is
-`-h = sum C tensor conj(C)`: complex channels are allowed. The old stronger real-channel
-obstruction is irrelevant to the current task and must not be presented as a failed hypothesis.
-
-The computation ceiling is **10 cells = 20 spins in the largest ring**, not a seed of 10
-cells requiring 40 spins. Direct seeds have even n0, hence n0=2 or 4. An n0=5 diagnostic can
-use 10 cells but cannot establish the stated even-seed theorem. All runs get a 44-minute
-external timeout. No existing floating-point survey value will be used as a proof input.
-
-Candidate routes, including ones that can exceed the ED ceiling:
-
-1. **Closed forms.** At delta=1, independent strong dimers give
-   `Z_n=(exp(3 beta/2)+3 exp(-beta/2))^n` at all sizes in O(1) operations. At the requested
-   deltas the alternating isotropic Heisenberg chain is neither commuting nor free fermionic;
-   Jordan-Wigner retains the density interaction. No closed form is assumed.
-2. **Rigorous expansions.** A linked polymer expansion around dimers would bound the
-   finite-ring remainder uniformly in n. Its expansion parameter involves the weak/strong
-   ratio `(1-delta)/(1+delta)` (1/3 at delta=1/2, 7/13 at delta=3/10, and larger below),
-   imaginary-time integrals and connectivity. High-temperature convergence conflicts with
-   the low temperature needed for thermal purity. Deriving a valid low-temperature cluster
-   remainder is substantial work; merely truncating a series is not certification.
-3. **Transfer operator.** A rigorous subleading/leading eigenvalue ratio would make the
-   spatial defect exponentially small at arbitrary n, with cost controlled by the transfer
-   approximation and beta rather than Hilbert dimension. RP supplies self-adjointness but
-   no contraction constant. A Trotter/MPO estimate needs both discretization and truncation
-   bounds; a positive-kernel/Birkhoff estimate is not supplied by the spin interaction alone.
-4. **Perturbation from dimers.** The exact inequality `|log Z-log Z_dimer| <= beta ||V||`
-   with `||V|| <= 3 n (1-delta)/4` scales as beta*n*(1-delta). Combining independent ring
-   errors loses cancellation of the bulk free energy, so increasing n makes this elementary
-   bound worse. Record its certified failure at requested seeds; it still gives a scalable
-   sufficient condition close to delta=1. A linked remainder could fix the volume loss.
-5. **Smaller-seed identities.** Evaluate the precise hypotheses before using the note's
-   thermal replacement. Bounds on `P_tau(n,beta)` and `P_s(n,2beta)` still involve a doubled
-   ring unless the latter is independently bounded by a transfer/expansion argument. They
-   cannot silently license an odd seed or a 10-cell seed within a 20-spin ED ceiling.
-6. **Symmetry/counting.** Use Sz, translation by one cell and spin-flip orbits exactly.
-   Their dimensions and multiplicities must exhaust `2^(2n)`. Complete dense spectra cost
-   roughly the sum of block-dimension cubes, with memory quadratic in the largest block.
-   SU(2) character inversion or exact trace recursions could go further, but require a
-   remainder bound for uncomputed energies/traces. Partial Lanczos alone cannot bound Z.
-7. **Variational sandwiches.** Trial states upper-bound E0(2n); cluster/Anderson bounds
-   lower-bound E0(n). For spatial purity a useful estimate must also control excited-state
-   partition tails; independent extensive energy errors again lose the cancellation needed
-   at beta of order 1/gap. No numerical MPS energy is accepted as a lower bound.
-
-Chosen route: first repair the proof/checker boundary and regenerate complete verified
-8/16-spin spectra (ED is the baseline); accompany it with an exact, scalable dimer-limit
-perturbation bound and documented assessment of why it does not reach the requested deltas.
-Then scan all specified deltas with complete symmetry counting and extend diagnostics toward
-20 spins within each time cap. Negative findings must distinguish a tested beta grid, an
-all-beta exclusion if one is proved, and resource-limited cases. Ratios to a finite-ring gap
-must be labeled accordingly; no finite-size value is an exact thermodynamic Delta. Compare
-seed sizes to delta^(-2/3) only as a scaling diagnostic, not a rigorous extrapolation.
+1. **Reflected unit-cell RP identity (`-h = Σ C_α ⊗ conj(C_α)` in a complex singlet/triplet basis):**
+   An unreflected bond decomposition $\sum_\alpha C_\alpha \otimes C_\alpha$ ($F = I$) must commute
+   with swapping two entire unit cells ($F_{\mathrm{outer}}$), which fails for the oriented
+   inter-cell bond $\mathbf{S}_{2j}\cdot\mathbf{S}_{2j+1}$. However, combining the internal
+   two-spin swap $F$ inside each cell with single-site rotation $J = 2iS^y$ on the second spin and
+   transforming to the complex singlet/triplet basis $M/\sqrt{2}$ diagonalizes $F$, turning the
+   antiunitary reflection $F\overline{(\cdot)}F$ into standard entrywise complex conjugation
+   $-h = \sum_\alpha C_\alpha \otimes \overline{C_\alpha}$ with real diagonal on-site term $o$.
+   **Chosen RP formulation.**
+2. **Verified dense diagonalization in $(S^z, k, p)$ symmetry blocks:** Total magnetization $S^z$,
+   one-cell translation momentum $k$, and global spin flip $p$ commute with $H_L$, decomposing the
+   $2^{2n}$-dimensional Hilbert space into orthogonal symmetry blocks whose dimensions and
+   multiplicities sum to $2^{2n}$. Enclosing block entries in `IntervalArithmetic` and bounding
+   dense `Float64` eigenvector residuals and orthogonality defects via a two-pass Cauchy–Schwarz
+   $\gamma_{4d+16}$ rounding analysis certifies complete spectra at $n_0 = 2$ and $n_0 = 4$ cells
+   ($8$ and $16$ spins) in a few minutes. **Chosen route for $\delta \in \{1/2, 3/10, 1/4\}$.**
+3. **Continuous-$\beta$ interval exclusion covers:** When a grid scan finds no admissible seed at
+   $n_0 \in \{2, 4\}$ for weaker dimerizations ($\delta \in \{1/5, 3/20, 1/10\}$), we can upgrade
+   that numerical observation to a rigorous all-$\beta$ exclusion theorem by combining thermal
+   purity monotonicity on $(0, 1]$, a ground-state energy defect bound on $[B, \infty)$, and a
+   finite cover of $[1, B]$ by interval boxes propagating lower defect bounds through the monotone
+   doubling map until $z \ge 1/2$. **Chosen route for certifying the $n_0 \le 4$ grid boundary.**
+4. **Operator-norm perturbation around decoupled dimers ($\delta = 1$):** At $\delta = 1$ ($w = 0$),
+   the partition function factors exactly into independent dimers,
+   $Z_n^{\mathrm{dimer}}(\beta) = (e^{3\beta s/4} + 3e^{-\beta s/4})^n$. Writing $H_n = H_n^{\mathrm{dimer}} + V_n$
+   with $\|V_n\| \le \frac{3}{4} n (1 - \delta)$ and applying Weyl's inequality bounds
+   $|\log Z_n - \log Z_n^{\mathrm{dimer}}| \le \frac{3}{4}\beta n (1 - \delta)$ at arbitrary $n$ in
+   $O(\log n)$ operations. However, because unlinked norm bounds lose the extensive bulk free-energy
+   cancellation between $\log Z_{2n}$ and $2\log Z_n$, the resulting error grows with $n$ and only
+   closes seeds very close to $\delta = 1$. **Implemented as a scalable baseline and tested at 512
+   spins ($\delta = 0.999999$).**
+5. **Convergent linked cluster / polymer expansion around $\delta = 1$:** A Kotecký–Preiss polymer
+   expansion in the weak-to-strong ratio $(1 - \delta)/(1 + \delta)$ ($1/3$ at $\delta = 1/2$,
+   $7/13$ at $\delta = 3/10$) cancels the bulk free energy and bounds $\log Z_{2n} - 2\log Z_n = O(e^{-n/\xi})$
+   uniformly in $n$, but requires deriving explicit low-temperature imaginary-time polymer weights
+   and convergence radii.
+6. **20-spin sparse Krylov diagnostics:** Using `KrylovKit` to extract the 40 lowest eigenvalues in
+   large 20-spin symmetry blocks ($n_0 = 5$ cells) provides numerical insight into how the seed
+   defects and energy-defect decay length $\xi_{\mathrm{eff}}$ scale with $\delta$, without
+   entering the certified proof path.
 
 ## Outcome
 
-- Exact conjugated-factor RP holds in precisely the requested basis, with complex channels
-  and a real diagonal onsite term. No core change or alternate theorem is needed.
-- Complete verified spectra plus a two-pass Cauchy-Schwarz rounding estimate certify
-  delta=1/2,3/10,1/4 with n0=4 and bounds 0.534756,0.173197,0.058225, respectively
-  (0.173194 at 3/10 in the first, Linux run; eigensolves differ in the last bits).
-  The survey beta values are independently covered by positive certificates.
-- A continuous-beta interval cover, including analytic tails, excludes n0=2 at all six
-  parameters and n0=4 at 1/5,3/20,1/10. This establishes the grid minimum for the stated
-  recurrence and the largest-ring ceiling, without confusing it with gaplessness.
-- Twenty-spin Sz/momentum/spin-flip Ritz diagnostics find an odd n0=5 candidate at delta=1/5.
-  It is not theorem eligible. The next even seed would require 24 spins. The diagnostics
-  also give finite-size energy-defect decay lengths roughly compatible with delta^(-2/3),
-  with nonconstant prefactors and no rigorous asymptotic claim.
-- The implemented arbitrary-size dimer norm sandwich closes a 512-spin seed near delta=1
-  in the fast tests. Its extensive error prevents certification at the requested seeds.
-  This quantifies the chosen beyond-ED route's limitation. Linked-cluster cancellation or
-  a verified transfer gap remains the useful direction beyond this ceiling.
-- `check.jl --full` rebuilds spectra and residuals instead of trusting saved maxima; the
-  fast check re-derives every witness from the stored maxima. Both verify all temperature
-  covers and require a positive or negative classification for each eligible seed. Neither
-  uses numerical 20-spin results as proof inputs.
-
+- **Exact RP:** Verified in `Complex{Rational{BigInt}}` across all six $\delta$ values in the
+  reflected singlet/triplet cell basis (`src/rp.jl`, `RingModels.verify_rp`).
+- **Certified positive bounds ($n_0 = 4$ cells):** Complete verified 8- and 16-spin spectra
+  combined with the two-pass Cauchy–Schwarz rounding bound certify $\Delta_L \ge 0.534756$
+  ($\delta = 1/2, \beta_0 = 6$), $\Delta_L \ge 0.173197$ ($\delta = 3/10, \beta_0 = 13/2$), and
+  $\Delta_L \ge 0.058225$ ($\delta = 1/4, \beta_0 = 29/4$) for all even $L \ge 4$ cells.
+- **Rigorous all-$\beta$ exclusions ($n_0 = 2, 4$ cells):** Continuous-$\beta$ interval covers
+  prove that no $\beta_0 > 0$ yields an admissible seed for this recurrence at $n_0 = 2$ (for any of
+  the six $\delta$ values) or at $n_0 = 4$ for $\delta \in \{1/5, 3/20, 1/10\}$, establishing
+  $\delta = 1/4$ as the exact certifiability threshold on rings of at most 16 spins.
+- **Beyond-ED and 20-spin diagnostics:** The arbitrary-$n$ dimer perturbation bound certifies a
+  512-spin seed at $\delta = 0.999999$ in the unit tests while quantifying why unlinked norm bounds
+  fail at $\delta \le 1/2$. The 20-spin Krylov diagnostics identify a numerical odd-seed candidate
+  at $(\delta, n_0, \beta_0) = (1/5, 5, 8.5)$ and confirm that the next even seeds for
+  $\delta \in \{1/5, 3/20, 1/10\}$ require $n_0 \ge 6\text{--}8$ cells ($24\text{--}32$ spins).

@@ -1,45 +1,53 @@
 # CertifiedGaps.jl
 
-The shared Julia core of this repository. Every project under `models/` depends on it as a
-path dependency (or runs with `--project=julia`); anything two projects need lives here once.
+`CertifiedGaps` is the shared Julia core package of this repository. Every model directory under
+`models/` depends on it as a local path dependency (or runs directly with `--project=julia`), so
+functionality shared across models lives here once.
 
-It holds the numerics of the spacetime bootstrap, the two-purity doubling criterion. A ring with spatial and thermal
-purities Pₛ(n, β) = Z₂ₙ(β)/Zₙ(β)² and P_τ(n, β) = Zₙ(2β)/Zₙ(β)² has a uniform gap for every even
-L ≥ n₀ when its transfer operator is self-adjoint and the seed defects at (n₀, β₀) are admissible.
+The package implements the numerical and algebraic machinery of the **spacetime bootstrap** (the
+two-purity doubling criterion): a periodic ring with spatial purity
+$P_{\mathrm{s}}(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2$ and thermal purity
+$P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$ has a unique ground state and a certified uniform lower
+bound on its spectral gap $\Delta_L$ for every even ring length $L \ge n_0$ whenever its bond transfer
+operator is self-adjoint (reflection positive) and the seed purity defects
+$\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$ and
+$\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$ lie in the admissible basin of the doubling recurrence.
 
 ## Layout
 
-Each submodule is used on its own, so generic names never collide with a project's:
-`using CertifiedGaps.ExactDiagonalization`. The top level re-exports `Recurrence` only.
+Each submodule is imported explicitly (for example, `using CertifiedGaps.ExactDiagonalization`) so that
+identifiers do not collide with model-specific code. The top-level module `CertifiedGaps` re-exports
+`Recurrence` only.
 
 | submodule | file | content |
 |---|---|---|
-| `Recurrence` | `src/Recurrence.jl`, `src/recurrence/` | the exact doubling map in any number type (`map.jl`), the outward-rounded uniform bound (`certified.jl`), the exact-rational chain with the bootstrap tail used by the spin-1 certificates (`rational.jl`) |
-| `ExactArithmetic` | `src/ExactArithmetic.jl` | rational helpers with outward rounding: `log_enclosure`, `power_interval`, `integer_root`, `first_true`, `round_up`/`round_down`, exact fraction tokens |
-| `Results` | `src/Results.jl` | `write_result` (atomic JSON), `source_hashes`/`file_hashes`, `run_metadata`, `parse_exact_json` (big integers never pass through `Float64`) |
-| `Spins` | `src/Spins.jl` | `spin_matrices(s)`, `integer_ladders(j)` and `binomial_weights(j)`, `cartesian_generators(s)` |
-| `ReflectionPositivity` | `src/ReflectionPositivity.jl` | `realign`, `rp_test`, `rp_decomposition` |
-| `ExactDiagonalization` | `src/ExactDiagonalization.jl` | `Chain` on any bond list (`ring_bonds`, `open_bonds`, `graph_bonds`), charge sectors, `spectrum` (dense or Lanczos, optional spin-flip doubling), `PartialSpectrum`, `logZ_bounds`, `log_partition` |
-| `RingModels` | `src/RingModels.jl` | `RingModel(d, bond, onsite; charge, modulus)` with exact entries, the exact RP certificate `rp_certificate` / `verify_rp` (−h = Σ w C ⊗ C̄, by given factors or exact LDL†), exact JSON encoding |
-| `VerifiedSpectra` | `src/VerifiedSpectra.jl` | `verified_ring_spectrum`: complete spectrum of a ring by charge and momentum blocks with rigorous eigenvalue radii (residual, Weyl and Ostrowski bounds with a priori rounding errors), `log_partition_enclosure` |
-| `GapCertificates` | `src/GapCertificates.jl` | `certify_gap(model; n0, β0, rp)` and `check_certificate`: RP identity, seed defects from verified spectra, exact `rational_gap_chain` |
-| `Models` | `src/Models.jl` | `tfim` (with exact `tfim_logZ`), `heisenberg(s)`, `staggered_heisenberg` |
-| `Seeds` | `src/Seeds.jl` | `seed_defects` from spectra, `scan_seeds`, `best_seed` |
-| `Purification` | `src/Purification.jl`, `ext/CertifiedGapsITensorsExt.jl` | `purified_log_partition`: thermal purification with ITensors; enabled by `using ITensors, ITensorMPS` |
-| `CertifiedMPO` | `src/CertifiedMPO/` | certified MPO arithmetic with Nemo/Arb (norms, squaring, products, operator errors, gauges), moved from spin2 |
+| `Recurrence` | `src/Recurrence.jl`, `src/recurrence/` | the exact doubling recurrence in any number type (`map.jl`), outward-rounded interval gap bounds (`certified.jl`), and the exact-rational doubling chain with the analytic tail bound used by the certificates (`rational.jl`) |
+| `ExactArithmetic` | `src/ExactArithmetic.jl` | rational enclosure helpers with outward rounding: `log_enclosure`, `power_interval`, `integer_root`, `first_true`, `round_up`/`round_down`, and exact fraction parsers |
+| `Results` | `src/Results.jl` | `write_result` (atomic JSON output), `source_hashes`/`file_hashes`, `run_metadata`, and `parse_exact_json` (which parses arbitrary-precision integers and rationals directly without passing through `Float64`) |
+| `Spins` | `src/Spins.jl` | `spin_matrices(s)`, `integer_ladders(j)`, `binomial_weights(j)`, and `cartesian_generators(s)` |
+| `ReflectionPositivity` | `src/ReflectionPositivity.jl` | floating-point screening utilities: `realign`, `rp_test`, and `rp_decomposition` |
+| `ExactDiagonalization` | `src/ExactDiagonalization.jl` | `Chain` on arbitrary bond graphs (`ring_bonds`, `open_bonds`, `graph_bonds`), abelian charge sectors, `spectrum` (dense or Lanczos, with optional spin-flip doubling), `PartialSpectrum`, `logZ_bounds`, and `log_partition` |
+| `RingModels` | `src/RingModels.jl` | `RingModel(d, bond, onsite; charge, modulus)` with exact rational entries, exact reflection-positivity certificates `rp_certificate` and `verify_rp` ($-h = \sum_\alpha w_\alpha C_\alpha \otimes \overline{C_\alpha}$ via explicit factors or exact rational $LDL^\dagger$), and exact JSON serialization |
+| `VerifiedSpectra` | `src/VerifiedSpectra.jl` | `verified_ring_spectrum`: complete block-diagonal spectrum of a ring across charge and translation-momentum sectors with rigorous eigenvalue error radii (residual, Weyl, and Ostrowski bounds with a priori IEEE binary64 rounding bounds), plus `log_partition_enclosure` |
+| `GapCertificates` | `src/GapCertificates.jl` | end-to-end certification pipeline `certify_gap(model; n0, β0, rp)` and fast/full verifier `check_certificate`: verifies the exact RP identity, encloses the seed defects from verified ring spectra, and checks the exact `rational_gap_chain` |
+| `Models` | `src/Models.jl` | standard constructors for screening and testing: `tfim` (including closed-form `tfim_logZ`), `heisenberg(s)`, and `staggered_heisenberg` |
+| `Seeds` | `src/Seeds.jl` | floating-point seed screening helpers: `seed_defects`, `scan_seeds`, and `best_seed` |
+| `Purification` | `src/Purification.jl`, `ext/CertifiedGapsITensorsExt.jl` | `purified_log_partition`: thermal MPO purification via ITensors (activated when `using ITensors, ITensorMPS` is loaded) |
+| `CertifiedMPO` | `src/CertifiedMPO/` | certified MPO arithmetic over Nemo/Arb ball matrices (norms, squaring, products, operator truncation bounds, and gauge transforms) |
 
-Besides `src/`: `ext/` (the ITensors extension), `test/` (run by `Pkg.test()`) and `examples/`
-(two survey screens using the API, not loaded by the package; see "Use").
+Besides `src/`, the package contains `ext/` (the ITensors extension), `test/` (run by `Pkg.test()`),
+and `examples/` (two survey screening drivers that use the API but are not loaded by the package;
+see "Usage").
 
 ## Conventions
 
-* `spin_matrices(s)`: basis m = s, …, −s; `sz`, `sp`, `sm`, `sx` real, `sy` complex.
-* `integer_ladders(j)`: basis m = −j, …, j in the binomial gauge, integer entries.
-* `ExactDiagonalization`: site 1 is the most significant base-d digit; a two-site term acts on
-  `kron(site i, site j)`. Spectra do not depend on this; code that stores basis indices keeps its
-  own encoding.
+* `spin_matrices(s)`: ordered basis $m = s, s-1, \dots, -s$; `sz`, `sp`, `sm`, and `sx` are real, while `sy` is purely imaginary.
+* `integer_ladders(j)`: ordered basis $m = -j, \dots, j$ in the binomial gauge, where the ladder matrices have exact integer entries.
+* `ExactDiagonalization`: site $1$ is the most significant base-$d$ digit, and a two-site operator on $(i, j)$ acts as `kron(site i, site j)`. Eigenvalues and partition functions are basis-independent; code that stores explicit basis indices preserves its own digit ordering.
 
-## Use
+## Usage
+
+From the repository root:
 
 ```sh
 julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
@@ -47,32 +55,35 @@ julia --project=julia julia/examples/tfim.jl        # free-fermion TFIM seeds (B
 julia --project=julia julia/examples/ed_seeds.jl    # float ED seed scans (≈15 min)
 ```
 
-The two examples in `examples/` reproduce numbers of the local survey (its section numbers
-appear in their comments) with the core API; neither is a certificate. `ed_seeds.jl` is
-floating-point screening for the staggered-field and spin-1 Heisenberg rings (certified in
-`models/heisenberg_staggered_field` and reproduced in `models/spin1`), and `tfim.jl` pads
-BigFloat defects heuristically for the TFIM open targets of `AGENTS.md`. The recurrence
-constants that `scripts/constants.jl` used to print (threshold ε⋆, the note's seeds, odd
-lengths, the Theorem 2.22 closed forms) are now asserted in `test/runtests.jl`.
+The two examples in `julia/examples/` reproduce reference numbers from the local survey notes (its
+section numbers appear in their comments) using the core API; neither produces a rigorous
+certificate. `ed_seeds.jl` performs floating-point screening for the staggered-field spin-½ and
+spin-1 Heisenberg chains (certified in `models/heisenberg_staggered_field` and reproduced in
+`models/spin1`), and `tfim.jl` evaluates free-fermion partition functions in `BigFloat` with
+heuristic safety padding for the TFIM open targets of `AGENTS.md`. The recurrence constants that the
+former `scripts/constants.jl` printed (the diagonal threshold ε⋆, the note's seeds, odd lengths, and
+the Theorem 2.22 closed forms) are now asserted in `test/runtests.jl`.
 
-From a project under `models/`: `Pkg.develop(path = "../../julia")`, then e.g.
+To use `CertifiedGaps` from a model project under `models/`, link it with
+`Pkg.develop(path = "../../julia")`:
 
 ```julia
-using CertifiedGaps                                  # doubling map and bounds
+using CertifiedGaps                                  # doubling recurrence and gap bounds
 using CertifiedGaps.ExactDiagonalization, CertifiedGaps.Models
 spec = spectrum(heisenberg(1).chain, 8; spin_flip = true)
 certified_gap_bound(1 // 100, 1 // 100, 784)         # (bound = 0.0042911…, …)
 ```
 
-## Certify a new model
+## Certifying a new model
 
-Any translation-invariant ring whose seed rings n₀ and 2n₀ fit in dense exact diagonalisation
-(up to about 2¹⁶ states per ring) is certified end to end:
+Any translation-invariant ring whose seed rings of lengths $n_0$ and $2n_0$ fit within dense exact
+diagonalization (up to roughly $2^{16}$ states per ring, reduced by charge and translation symmetry) can
+be certified end to end with `GapCertificates`:
 
 ```julia
 using CertifiedGaps.RingModels, CertifiedGaps.GapCertificates, CertifiedGaps.Results
 S = (x = [0 1//2; 1//2 0], iy = [0 1//2; -1//2 0], z = [1//2 0; 0 -1//2])
-bond = -kron(S.x, S.x) - kron(S.iy, S.iy) - kron(S.z, S.z)     # exact entries only
+bond = -kron(S.x, S.x) - kron(S.iy, S.iy) - kron(S.z, S.z)     # exact rational entries
 model = RingModel(2, bond, -S.z; charge = [0, 1], modulus = 2)
 rp = rp_certificate(model; factors = [S.x, S.iy, S.z])          # or rp_certificate(model)
 cert = certify_gap(model; n0 = 8, β0 = 21 // 4, rp)
@@ -80,20 +91,29 @@ write_result("certificate.json", cert)
 check_certificate(read_exact_json("certificate.json"))
 ```
 
-The certificate stores the model, the RP factors, the seed (n₀, β₀, εₛ, εₜ) as exact strings,
-the log Z enclosures and the rational chain; these are the hypotheses of the Lean ring theorem.
-A unit cell of c sites is one site of dimension dᶜ with the intra-cell terms in `onsite`.
-Larger seeds need structure (closed forms, expansions, symmetry counting; see `AGENTS.md`).
+The resulting certificate stores the exact model matrices, the reflection-positivity factors, the seed
+parameters $(n_0, \beta_0, \varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ as exact rational strings, the interval
+enclosures of $\log Z$, and the exact rational doubling chain (`rational_gap_chain`). These quantities
+provide the exact inputs required by the Lean ring theorems in `lean/`. A multi-site unit cell of $c$
+spins is represented as a single effective site of local dimension $d^c$ with all intra-cell bonds
+collected in `onsite`. Models requiring larger seed lengths $n_0$ need additional analytic or algebraic
+structure (such as symmetry-sector trace recursion, polymer expansions, or variational bounds; see
+[`../AGENTS.md`](../AGENTS.md)).
 
 ## What is rigorous
 
-`certified_gap_bound` and `rational_gap_chain` are outward rounded: their output is a lower
-bound for the stated seed defects. `ExactArithmetic` returns exact rational enclosures.
-`GapCertificates` is rigorous end to end: the RP identity is exact, every eigenvalue comes
-with a proven radius, and log Z is enclosed in interval arithmetic. The radii assume only
-IEEE binary64 arithmetic with round-to-nearest in BLAS (the classical a priori error bound for
-dot products, valid for any summation order and with FMA). Seed defects from `spectrum`
-are floating point (screening only), and when a sector falls back to Lanczos they can miss
-degenerate partners. `purified_log_partition` is a numerical control.
+- **Recurrence and rational arithmetic:** `certified_gap_bound` (interval arithmetic) and
+  `rational_gap_chain` (exact rational arithmetic) round outward at every step, guaranteeing that the
+  returned gap bound is a strict lower bound for the given seed defects $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$.
+  `ExactArithmetic` produces verified rational enclosures of logarithms and fractional powers.
+- **Verified ring spectra (`VerifiedSpectra` and `GapCertificates`):** The reflection-positivity
+  decomposition is verified in exact rational arithmetic. In each charge and momentum block, candidate
+  eigenvectors are computed in `Float64`, and the residual and orthogonality defects are enclosed using
+  explicit a priori IEEE binary64 rounding bounds (assuming round-to-nearest and the standard $\gamma_n$
+  BLAS dot-product bound, valid for any summation order and fused multiply-add). Weyl and Ostrowski
+  perturbation theorems then enclose every eigenvalue, and $\log Z$ is summed in interval arithmetic.
+- **Screening tools (non-rigorous):** Eigenvalues from `ExactDiagonalization.spectrum` are unverified
+  floating-point approximations (and when a sector uses Lanczos, degenerate eigenvalues can be missed).
+  Similarly, `Purification.purified_log_partition` is an uncertified tensor-network diagnostic.
 
-Run Julia with one BLAS thread (`OPENBLAS_NUM_THREADS=1`) when several jobs share the machine.
+When running multiple Julia processes concurrently on a shared machine, set `OPENBLAS_NUM_THREADS=1`.
