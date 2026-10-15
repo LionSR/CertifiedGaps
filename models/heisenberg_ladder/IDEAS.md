@@ -1,92 +1,56 @@
-# Heisenberg ladder: pre-computation route memo
+# Heisenberg ladder: route memo
 
-Written before any model computation. Lengths below count rungs (two spin-1/2 sites).
-The supplied survey values are hypotheses to reproduce, never certified inputs.
+Lengths count rungs (two spin-1/2 sites, d = 4 per cell). Survey values are hypotheses to
+reproduce, never certified inputs. "Threshold" means the threshold reached by this
+finite-size certificate method, not the physical gap-closing coupling.
 
-## Candidate routes and their costs
+## Candidate routes
 
-1. **Closed forms / independent rungs.** At zero leg coupling the rung singlet and
-   three triplets give Z_n = (exp(3 beta J/4) + 3 exp(-beta J/4))^n.
-   The interacting isotropic ladder is neither commuting nor free fermionic;
-   Jordan-Wigner introduces interactions. The independent-rung formula is an
-   exact arbitrary-length reference, but cannot replace the interacting trace.
-2. **Rigorous expansions.** A strong-rung linked-cluster / polymer expansion could
-   isolate wrapping clusters and bound log Z_2n - 2 log Z_n exponentially in n.
-   Its cost would depend on expansion order and beta, not exponentially on n.
-   At the requested moderate J a convergence majorant and wrapping remainder
-   must first be proved; none of the quoted survey numbers provides one. A
-   high-temperature expansion is poorly matched to the low-temperature seed.
-   Do not claim an unproved convergence radius.
-3. **Transfer operator.** In the checkerboard-rotated basis all cross-cell
-   coefficients have exact real RP factors. A positive Trotter transfer kernel
-   has dimension growing exponentially with imaginary-time slices. Certified
-   contraction plus a Trotter remainder could reach arbitrary n, but the
-   low-temperature contraction estimate may deteriorate with slice count.
-   RP alone gives self-adjointness, not a quantitative contraction coefficient.
-4. **Perturbation from independent rungs (selected analytical test).** Each of
-   the 2n leg bonds has norm 3/4, so ||V_n|| <= 3n/2. Weyl gives the exact
-   sandwich |log Z_n - log Z_n^(0)| <= 3 beta n/2. Apply this bound to both
-   purities, retaining the extensive errors, and determine analytically whether
-   it can close a seed for any n and beta. Cost O(1), arbitrary n. This route
-   may fail because it discards the cancellation between bulk free energies.
-   Record that failure explicitly; do not quietly treat an ED baseline as an
-   arbitrary-size seed method. A second use of perturbation is to continue a
-   verified finite seed over a coupling interval with a proven norm remainder.
-5. **Smaller seeds.** Check the precise thermal/spatial inequality in the notes
-   before using survey Theorem 2.24(v). Replacing one purity is useful only if
-   every remaining trace and omitted sector is bounded. No odd n0 is allowed
-   by the stated certificate standard; ten-rung rings are scan data, not an
-   automatic five-rung seed.
-6. **Symmetry and exact counting (selected finite baseline).** Work spectrally
-   in the unrotated SU(2)-invariant basis with total Sz and rung momentum, and
-   prove its unitary equivalence to the exact rotated RP model. Spin inversion
-   and conjugate momenta provide exact multiplicities. Full verified spectra
-   for four/eight rungs use the core residual/Weyl enclosure, not raw LAPACK.
-   For ten rungs use sparse sector-resolved low-energy calculations with
-   explicit missing-state counts; label unverified results floating point.
-   Full dense cost is sum O(block_dimension^3), memory O(max block_dimension^2).
-   Translation reduces the largest block by approximately n, but remains ED.
-7. **Variational sandwiches.** Rung-singlet products give a rigorous trial
-   energy; finite-cluster lower bounds can improve the ground-energy sandwich.
-   MPS and Lanczos alone do not control the thermal tail or prove the spatial
-   defect. Their cost can be polynomial in n at fixed bond dimension, but a
-   small bulk energy-density error still grows extensively in the purity ratio.
+1. **Closed forms.** At zero leg coupling Zₙ = (e^{3βJ/4} + 3e^{−βJ/4})ⁿ exactly. The
+   interacting isotropic ladder is neither commuting nor free-fermionic (Jordan–Wigner leaves
+   interactions), so this is only a reference point.
+2. **Convergent expansions.** A strong-rung linked-cluster/polymer expansion could bound
+   log Z₂ₙ − 2 log Zₙ exponentially in n at a cost set by the expansion order, not by n. At the
+   couplings of interest a convergence majorant and a wrapping remainder would first have to
+   be proved; none is available. High-temperature expansions do not reach the low-temperature
+   seed. Not attempted.
+3. **Transfer operator.** After the checkerboard rotation all cross-cell factors are real, so
+   a Trotterised transfer kernel is positive, but its dimension grows exponentially with the
+   number of slices and RP gives self-adjointness, not a contraction rate. Not attempted.
+4. **Perturbation from independent rungs.** Weyl sandwiches log Zₙ around the rung product
+   with an error extensive in n. Cost O(1), any n, but the bulk cancellation between the
+   purities is lost. Tested analytically: **fails for every n and β when 0 < J⊥ ≤ 4**, even
+   with the centred bond (PERTURBATION.md). The same norm bound is useful *locally in J⊥*: it
+   continues a certified seed over |J⊥ − J*| ≤ δ.
+5. **Smaller seeds.** P_τ(2n, β) = Pₛ(n, 2β) P_τ(n, β)² / Pₛ(n, β)² is exact, but bounding
+   P_τ(2n) this way still needs Pₛ(n, 2β), i.e. Z₂ₙ(2β); no ring is saved without extra
+   structure. Odd n₀ are not admissible, so ten-rung traces do not give an n₀ = 5 seed.
+6. **Symmetry-resolved complete spectra (chosen).** Work in the unrotated SU(2) basis
+   (unitarily equivalent to the RP model) with magnetisation, rung momentum, leg exchange and
+   spin inversion; exact multiplicities from spin flip and complex conjugation. Dense cost is
+   Σ O(block³), memory O(max block²). Verified enclosures (interval matrix, residual and
+   orthogonality bounds, Weyl) for 2, 4, 8 rungs; floating-point scans through 10 rungs
+   (largest block 8398) for orientation only.
+7. **Variational sandwiches.** Rung-singlet or MPS trial energies and cluster lower bounds
+   control E₀ but not the thermal tail, and a small energy-density error grows extensively
+   in the purity ratio. Not attempted.
 
-## Chosen work and stopping rules
+## Outcome
 
-First document the arbitrary-size perturbation test. Then reproduce J=4 with
-exact RP factors, complete sector multiplicities, rigorously enclosed log Z,
-and the core exact rational recurrence. Scan J in {7/2,3,5/2,2,3/2} on even rings
-through ten rungs. Store reproducible evidence, distinguish complete spectra
-from partial low-energy data, and certify every claimed seed independently.
-Use a timeout of at most 2700 seconds for each run. No floating-point scan is a
-proof of nonexistence of a seed or of a gapless model.
+- Certified seeds at n₀ = 4 for J⊥ = 4, 7/2, 3, 5/2 and at the upper threshold endpoint, with
+  coupling continuation (δ = 10⁻⁴) around 4, 7/2, 3.
+- Every one of the 128 grid seeds n₀ ∈ {2, 4}, β₀ = k/4 is rigorously rejected (lower
+  defects plus an exact recurrence witness) at J⊥ = 326133/131072; at J⊥ = 2 and 3/2 the
+  rejection is extended to every β > 0 by monotone window bounds and a ground-energy tail.
+- The floating-point scans through ten rungs find no even seed at J⊥ ≤ 2. A two-point fit of
+  the spatial mismatch suggests n₀ ≈ 6 (J⊥ = 2) and 8 (J⊥ = 3/2), i.e. complete traces of
+  24 and 32 spins, beyond dense ED. Reaching them needs route 2 or 3, not larger ED.
 
-Unless clarified otherwise, “threshold” means the threshold reached by this
-finite-size certificate method, not the physical gap-closing coupling. Report
-an achieved coupling and a bracket/search resolution only to the extent the
-calculation supports them. A failed finite scan cannot establish the physical
-threshold. All implementation and outputs stay in this model directory.
+## Practical notes
 
-## Checkout discovery and route update (before fresh computation)
-
-The checkout already includes a complete earlier ED implementation, stored
-sector-resolved scans through ten rungs, and a J=4 certificate. The prior memo
-is preserved as `IDEAS.previous.md`, including its memory observations. Reuse
-that evidence explicitly as historical floating-point data; do not repeat six
-long dense scans merely to overwrite equivalent data. Rebuild symmetry counts
-and replay every stored scan, while freshly enclosing all spectra used by new
-certificates. Strengthen the result with certified lower-coupling seeds, a
-rigorous finite-beta-grid failure test, and local coupling continuation.
-
-The centered independent-rung sandwich is stronger than the uncentered memo
-estimate but still fails for every n,beta when 0<J<=4; `PERTURBATION.md` gives
-a proof without numerical input. This settles the selected arbitrary-length
-route negatively rather than leaving it as an untested suggestion.
-
-Before running the new suite, add a continuous-temperature negative test for
-J=2 and J=3/2: shift every verified spectrum below its ground energy, use
-monotonicity of the shifted partition sums and thermal purity to bound defects
-on beta intervals, and split intervals until a lower-defect recurrence proves
-rejection. A positive enclosed ground-energy mismatch supplies the beta-to-
-infinity tail. This makes no assumption that spatial purity is monotone.
+- Running the six ten-rung scans concurrently with dense complex intermediates exceeded a
+  17 GiB memory limit (one process OOM-killed). The numerical path therefore builds blocks
+  sparsely and makes complex momentum blocks real with a sparse antiunitary change of basis.
+  Run scans one or two at a time.
+- The ten-rung spectra are stored compacted (sector table, log Z grid, lowest 32 levels);
+  full level lists are regenerable with `scripts/scan.jl` and are not needed by any check.

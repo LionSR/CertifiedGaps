@@ -47,7 +47,7 @@ Thus from a seed (s,t) at n,beta, valid enlarged upper defects are
 
 Evaluating these expressions outward and closing the recurrence certifies an
 entire coupling interval, without assuming monotonicity of the ladder gap or
-its seed defects. The fresh certificate suite checks this continuation too.
+its seed defects. `check.jl` recomputes this continuation for δ = 1/10000.
 
 ## Smaller-seed identity checked
 
