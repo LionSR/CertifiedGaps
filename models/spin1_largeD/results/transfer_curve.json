@@ -1,0 +1,170 @@
+{
+    "numerical": [
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "1//1",
+            "gap_L12": 0.25542284508575364,
+            "D": 1,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "5//4",
+            "gap_L12": 0.2803740965317534,
+            "D": 1.25,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "3//2",
+            "gap_L12": 0.3418441778972703,
+            "D": 1.5,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "7//4",
+            "gap_L12": 0.4438385693665827,
+            "D": 1.75,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "2//1",
+            "gap_L12": 0.5839663400002681,
+            "D": 2,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "9//4",
+            "gap_L12": 0.7541297776088669,
+            "D": 2.25,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "5//2",
+            "gap_L12": 0.9451819917593625,
+            "D": 2.5,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "11//4",
+            "gap_L12": 1.1500372796056744,
+            "D": 2.75,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "3//1",
+            "gap_L12": 1.3640829075706766,
+            "D": 3,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": null,
+            "D_exact": "641//200",
+            "gap_L12": 1.544439731154231,
+            "D": 3.205,
+            "bound": null
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": 0.0018287170358027532,
+            "D_exact": "1603//500",
+            "gap_L12": 1.5453282014390979,
+            "D": 3.206,
+            "bound": 0.002825968007878107
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": 0.058782595333276684,
+            "D_exact": "13//4",
+            "gap_L12": 1.5844960750611392,
+            "D": 3.25,
+            "bound": 0.09314079158748415
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": 0.17863631130628266,
+            "D_exact": "7//2",
+            "gap_L12": 1.809542089565065,
+            "D": 3.5,
+            "bound": 0.32324992403336616
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": 0.251250726042464,
+            "D_exact": "15//4",
+            "gap_L12": 2.0381120711029608,
+            "D": 3.75,
+            "bound": 0.512077137620529
+        },
+        {
+            "status": "numerical screening, n0<=6; missing means no tested seed",
+            "ratio": 0.30613235710789277,
+            "D_exact": "4//1",
+            "gap_L12": 2.2694589440617685,
+            "D": 4,
+            "bound": 0.6947548159052186
+        }
+    ],
+    "source_hashes": {
+        "scripts/refine_beta.jl": "d44bb18134d0702a89e2a460a2b9e24c18d23b326e6251375814f1b3fd5d2f3e",
+        "scripts/report.jl": "f22ef5b0a89a3812ae276f8ef4255407df8e66b123a506b3a0259fcbb2d77bf7",
+        "model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472",
+        "scripts/scan.jl": "9c8f048975c47ce3682cb1a0f9bda384e46c8f3b4896487a7bde495274b1659c"
+    },
+    "certificate_sha256": "e26e72fa94aa17d6468928137d4a6dfdb14944da73a37dd00b1a8cc203ddee93",
+    "certified": [
+        {
+            "gap_L12_interval": [
+                "6959497159391323//4503599627370496",
+                "6959581864941733//4503599627370496"
+            ],
+            "ratio_interval": [
+                "2989111042233749//4611686018427387904",
+                "5978294846705997//9223372036854775808"
+            ],
+            "status": "certified numerator and finite L=12 denominator interval",
+            "id": "transport-threshold-D1603//500",
+            "D": 3.2059998,
+            "bound": "2309592850505369//2305843009213693952",
+            "D_interval": [
+                "16029999//5000000",
+                "1603//500"
+            ]
+        },
+        {
+            "gap_L12_interval": [
+                "5110348914742333//2251799813685248",
+                "5110385540067043//2251799813685248"
+            ],
+            "ratio_interval": [
+                "892143781187823//2251799813685248",
+                "892150175086991//2251799813685248"
+            ],
+            "status": "certified numerator and finite L=12 denominator interval",
+            "id": "space-lift-1-D4//1",
+            "D": 4,
+            "bound": "8098763755702597//9007199254740992",
+            "D_interval": [
+                "4//1",
+                "4//1"
+            ]
+        }
+    ],
+    "denominator": "finite-ring Delta_12; no thermodynamic gap asserted"
+}

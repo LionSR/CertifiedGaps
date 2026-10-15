@@ -1,120 +1,166 @@
-# Spin-1 large-D gap certificate
+# Spin-1 large-D chain: uniform-gap certificates
 
-Model: H = Σⱼ Sⱼ·Sⱼ₊₁ + D Σⱼ (Sᶻⱼ)² on periodic rings, one site per cell.
+H = Σⱼ Sⱼ·Sⱼ₊₁ + D Σⱼ (Sᶻⱼ)² on periodic rings of spin-1 sites, one site per cell, so all
+lengths below count sites. Every conclusion is "unique ground state and Δ_L ≥ bound for every
+even L ≥ n₀", under the repository's two-purity theorem. Bounds are rounded **down**; the exact
+rationals are in the JSON files.
 
 ## Results
 
-| D (exact) | Seed (n₀, β₀) | ε_s ≥ 1−Pₛ(n₀,β₀) | ε_t ≥ 1−P_τ(2n₀,β₀) | Uniform gap bound | ED gap, L=12 |
-|---|---|---|---|---:|---:|
-| 4 | (6, 9/4) | 577405872923865/2⁵³ ≈ 0.0641 | 45632040552745/2⁵⁰ ≈ 0.0405 | 0.694694192 | 2.2695 |
-| 1603/500 = 3.206 | (6, 381/125) | 863088513139635/2⁵² ≈ 0.1916 | 418496566764289/2⁵³ ≈ 0.0465 | 0.002213456 | 1.5453 |
+| D | Certified gap bound | Valid for | Seed (n₀, β₀) | Certificate |
+|---|---:|---|---|---|
+| 4 | **0.899143399** | every even L ≥ 6 | (12, 29/10) + finite bridge L = 6, 8, 10 | `certificate.json` |
+| [3.2059998, 3.206] | **0.001001626** | every even L ≥ 6 | (6, 381/125), Weyl-transported | `certificate.json` |
+| 4 | 0.694694192 | every even L ≥ 6 | (6, 9/4), ED seed | `results/certificate_D4_1.json` |
+| 1603/500 = 3.206 | 0.002213456 | every even L ≥ 6 | (6, 381/125), ED seed | `results/certificate_D1603_500.json` |
 
-Both bounds hold for **every even L ≥ 6** (sites = cells), with a unique ground state,
-under the repository's two-purity theorem. Bounds are rounded down; the exact binary values
-and rational seeds are in `results/certificate_D*.json`. D = 3.206 is the smallest sampled D
-with an admissible seed at n₀ ≤ 6; the neighbouring sample D = 3.205 has none on the refined
-β grid. That is a search threshold, not a proven minimum over real D or a phase boundary.
-At D = 3.206 the initial spatial defect exceeds 0.12731; the core's asymmetric recurrence
-still enters the admissible square (first admissible iteration j = 7).
+Exact seed defects (εₛ ≥ 1 − Pₛ(n₀, β₀), εₜ ≥ 1 − P_τ(2n₀, β₀)):
 
-[REPORT.md](REPORT.md) has the scan, ED reference gaps, negative-grid diagnostics and
-extrapolations (all numerical). [METHOD.md](METHOD.md) gives the RP identity, symmetry
-accounting and the eigenvalue-enclosure proof. [audit/](audit/README.md) records an
-independent review and a fresh dense replay that reproduced both certificates bit for bit.
+| Seed | εₛ | εₜ |
+|---|---|---|
+| D = 4, n₀ = 12, β₀ = 29/10 | 8376656523711495 / 2^61 | 283096258190373 / 2^53 |
+| D ∈ [3.2059998, 3.206], n₀ = 6, β₀ = 381/125 | 863115144109137 / 2^52 | 418622220052377 / 2^53 |
+| D = 4, n₀ = 6, β₀ = 9/4 (stage 1) | 577405872923865 / 2^53 | 45632040552745 / 2^50 |
+| D = 3.206, n₀ = 6, β₀ = 381/125 (stage 1) | 863088513139635 / 2^52 | 418496566764289 / 2^53 |
+
+`certificate.json` also certifies, at D = 4, the larger seeds n₀ = 24, 48, 96 (bounds 0.660233530,
+0.402885117, 0.063967113), the survey seed (6, 3) with bound **0.543812926** (the survey's
+floating-point 0.543842 is neither used nor reproduced), and D ∈ [3.9979773, 4] with bound
+0.001442884. For comparison, the finite-ring gaps are Δ₁₂ ≈ 2.26946 at D = 4 (Δ₈ ≈ 2.27392,
+Δ₁₀ ≈ 2.27024) and Δ₁₂ ≈ 1.54533 at D = 3.206; the D = 4 bound is 0.396 Δ₁₂.
 
 ## Reflection positivity
 
-Cartesian basis (x, y, z), real antisymmetric integer matrices
+Cartesian basis (x, y, z), Sₐ = −iGₐ with the real integer matrices
 
-    Gx = [0 0 0; 0 0 1; 0 -1 0],  Gy = [0 0 -1; 0 0 0; 1 0 0],  Gz = [0 1 0; -1 0 0; 0 0 0],
+```
+Gx = [0 0 0; 0 0 1; 0 -1 0]    Gy = [0 0 -1; 0 0 0; 1 0 0]    Gz = [0 1 0; -1 0 0; 0 0 0]
+```
 
-with Sₐ = −i Gₐ. The checker verifies exactly that −h = Σₐ Gₐ ⊗ Gₐ (so C_α = G_α and
-conj(C_α) = C_α), h = P − |Ω⟩⟨Ω| with Ω = Σₐ|aa⟩, and that the on-site term
-o = D·diag(1,1,0) = D(Sᶻ)² is real symmetric.
+The checker verifies −h = Σₐ Gₐ ⊗ Gₐ (= Σₐ Gₐ ⊗ conj Gₐ) exactly in integer arithmetic, together
+with the spin algebra and h = P − |Ω⟩⟨Ω|; the on-site term D(Sᶻ)² = D·diag(1, 1, 0) is real.
 
-## What is rigorous
+## How it works
 
-- **Certified:** exact RP; complete spectra of every symmetry block at L = 6 and L = 12
-  (multiplicities summing to 3^L); interval block construction plus floating-point residual
-  and orthogonality norm bounds with explicit rounding-error terms, fed to a polar/Weyl
-  eigenvalue enclosure; outward-rounded log Z intervals; exact rational defect upper bounds;
-  `CertifiedGaps.certified_gap_bound`.
-- **Trusted base:** Julia, IntervalArithmetic outward rounding, the standard IEEE binary64
-  dot-product error model for the BLAS products that form the residual and Q*Q−I (bounded a
-  priori by γ = (8m+32)u/(1−(8m+32)u), not by interval matrix products), and the repository
-  theorem.
-- **Numerical only:** the parameter scan, unsuccessful grid points, ED reference gaps,
-  bound/gap ratios, the plotted curve and size extrapolations.
+**Stage 1 (exact diagonalisation, `certify.jl`, `seed.jl`).** Sᶻ, translation, spin inversion
+at Sᶻ = 0 and conjugate-momentum pairing split 3¹² = 531441 states into 92 blocks (largest
+5798). Every block is diagonalised densely, and each eigenvalue is enclosed by interval block
+construction, rigorous residual and orthogonality norms, and a polar/Weyl bound. Interval log Z
+at L = 6, 12 gives the exact rational ED seed n₀ = 6.
 
-## Checking
+**Stage 2 (beyond ED, `transfer_certify.jl`).** From the same L = 6, 12 spectra:
+transfer-operator squaring bounds Pₛ(12, β), and the exact coupling identity
+P_τ(4n, β) = Pₛ(2n, 2β) P_τ(2n, β)² / Pₛ(2n, β)² bounds P_τ(24, β), **without building L = 24**.
+This raises the D = 4 bound from 0.694694192 to 0.899143399 for even L ≥ 12; fresh verified
+spectra at L = 8, 10 (and the stored L = 6 one) extend it to every even L ≥ 6. A centred Weyl
+bound (0 ≤ Σ(Sᶻ)² ≤ L) transports a seed to an exact D interval. [METHOD.md](METHOD.md) proves
+every inequality; [IDEAS.md](IDEAS.md) is the route memo.
 
-From the repository root (Julia 1.12, instantiated `julia/`):
+## What is and is not rigorous
+
+Rigorous (relative to the trusted base): the RP identity; sector completeness; every
+eigenvalue enclosure at L = 6, 8, 10, 12; all log Z intervals; the defect bounds εₛ, εₜ (exact
+rationals); transfer squaring, coupling and Weyl transport; and the recurrence bound from the
+unmodified `CertifiedGaps.certified_gap_bound`. The trusted base is the repository's
+two-purity theorem, Julia, IntervalArithmetic's outward rounding, and the standard IEEE
+binary64 / BLAS dot-product error model used for the residual bounds (one BLAS thread).
+
+Not rigorous, and never used as a premise: the floating-point scan below, the Δ₁₂ values used
+as plot denominators (the certified markers do enclose the finite Δ₁₂, but it is not the
+thermodynamic gap), every failure statement, and size extrapolations. D = 3.2059998 is the
+smallest D certified by this search, not a threshold: the transport search fails at the next
+10⁻⁷ grid point, and spatial lifts at D = 3.206 fail on β = 1.5:0.025:6 because thermal purity
+is lost. These are failures of these estimates, not evidence of a vanishing gap.
+
+The fast checker recomputes everything from the stored, hash-verified L = 6, 12 enclosures but
+does **not** repeat their dense L = 12 eigensolves (35 min each); it does repeat the L = 8, 10
+bridge eigensolves. A separate fresh dense replay of all L = 6, 12 blocks at both D reproduced
+every eigenvalue centre and radius bit for bit, and an independent review of the stage-1
+pipeline found no defect. The review is at
+`git show 593299f:models/spin1_largeD/audit/INDEPENDENT_REVIEW.md`; the replay evidence was
+removed before merging and its commit (`cf7bdd7`) is not on `main`. Re-running `certify.jl`
+and comparing SHA-256 with `enclosure_hashes` is an equivalent replay.
+
+## Numerical scan (floating point, not certified)
+
+D = 1:0.25:4 and 3.205, 3.206; n₀ = 2…6 (odd n₀ only as diagnostics); β = 0.125:0.125:20,
+refined to β = 2.75:0.002:3.75 at D = 3.205, 3.206. Summary in
+[results/scan_summary.json](results/scan_summary.json); curve in
+[results/transfer_curve.pdf](results/transfer_curve.pdf) (data with exact certified ratio
+intervals in `results/transfer_curve.json`).
+
+| D | best even seed (n₀, β₀) | numerical bound | Δ₁₂ | max_β min(Pₛ, P_τ), n = 6 | δ(6) = E₀(12) − 2E₀(6) |
+|---:|---|---:|---:|---:|---:|
+| 1 | none | — | 0.2554 | 0.335 | 0.3528 |
+| 1.5 | none | — | 0.3418 | 0.375 | 0.3229 |
+| 2 | none | — | 0.5840 | 0.494 | 0.2422 |
+| 2.5 | none | — | 0.9452 | 0.655 | 0.1505 |
+| 3 | none | — | 1.3641 | 0.799 | 0.0857 |
+| 3.205 | none | — | 1.5444 | 0.839 | 0.0677 |
+| 3.206 | (6, 3.048) | 0.00283 | 1.5453 | 0.839 | 0.0676 |
+| 3.25 | (6, 3) | 0.0931 | 1.5845 | 0.847 | 0.0642 |
+| 3.5 | (6, 2.625) | 0.3232 | 1.8095 | 0.888 | 0.0483 |
+| 3.75 | (6, 2.375) | 0.5121 | 2.0381 | 0.916 | 0.0365 |
+| 4 | (6, 2.25) | 0.6948 | 2.2695 | 0.938 | 0.0278 |
+
+Missing seeds mean the tested grid failed, not that the gap closes. Dense L = 14 is out of
+reach here: one Sᶻ = 1 momentum block has 41835 states, i.e. 28.0 GB for a single complex
+matrix against a 16 GiB host ([results/feasibility.json](results/feasibility.json)); n₀ = 7 is
+also odd and ineligible.
+
+## Layout
+
+| Path | Role |
+|---|---|
+| `model.jl` | model, RP identity, symmetry blocks, verified dense enclosures |
+| `certify.jl`, `certify_parallel.jl` | stage 1: complete enclosed spectra (L = 12: ~35 min) |
+| `seed.jl` | stage 1: ED seed certificates `results/certificate_D*.json` |
+| `transfer_certify.jl` | stage 2: `certificate.json` and `results/finite_bridge.json` |
+| `check.jl` | checker for both stages |
+| `src/TransferCertificate.jl` | stage-2 proof arithmetic, bridge and checker |
+| `src/spectra.jl` | byte-exact compact storage of the L = 12 spectra |
+| `scripts/` | floating-point scan, β refinement, L = 14 feasibility, report/plot |
+| `test/` | unit tests; `ed_seeds.jl` is the stage-1 replay used by `check.jl` |
+| `results/` | spectra, certificates, bridge, scan summary, curve |
+
+`model.jl`, `seed.jl`, `certify.jl` and `certify_parallel.jl` must stay byte-identical at the
+top level: the stage-1 certificates and spectra record their SHA-256 under these paths (with
+the core's former name `ThermalMPOGap`), and the checker verifies them. For that reason a few of
+their lines exceed 100 columns. The L = 12 spectra are stored as `*.skeleton.json` plus
+run-length-encoded `*.levels.bin`; `src/spectra.jl` rebuilds the original JSON bytes and the
+checker compares their hash with the certificate.
+
+## Reproduce
+
+Julia 1.12.4; this directory is its own project depending on `../../julia`. From the
+repository root:
 
 ```sh
 export OPENBLAS_NUM_THREADS=1
-julia --project=julia models/spin1_largeD/test/runtests.jl     # = check.jl, about 1 min
-julia --project=julia models/spin1_largeD/audit/reviewer_checks.jl
+julia --project=models/spin1_largeD -e 'using Pkg; Pkg.instantiate()'
+julia --project=models/spin1_largeD models/spin1_largeD/check.jl            # ~20 s
+julia --project=models/spin1_largeD models/spin1_largeD/test/runtests.jl    # ~25 s
+julia --project=models/spin1_largeD models/spin1_largeD/transfer_certify.jl # ~15 s
 ```
 
-`test/runtests.jl` (3353 checks) verifies the exact RP identity; that the producing scripts
-match the source hashes recorded in the certificates (up to the literal core rename
-`ThermalMPOGap` → `CertifiedGaps`); that the stored spectra are byte-identical to the dense
-runs' output (SHA-256 against `enclosure_hashes`); full multiplicity accounting; the log Z
-intervals, both defect inequalities and the recurrence bound. It then runs `test/small.jl`
-(full dense comparison through L = 6, enclosures through L = 4) and `test/symmetry.jl`
-(exact symmetry covariance and orbit counts through L = 12). It does not redo the L = 12
-dense eigensolves.
-
-## Storage of the L = 12 spectra
-
-`certify.jl` writes `results/enclosed_D*_L12.json` (about 30 MB each). Their sorted level
-lists repeat every block eigenvalue by its symmetry multiplicity, so `spectra.jl` stores them
-as `*.skeleton.json` (the JSON text with the two large arrays replaced by markers) plus
-`*.levels.bin` (run-length encoded energies and radius indices, little-endian). The loader
-rebuilds the original bytes exactly; the checker compares their SHA-256 with the certificate.
-If a full `.json` is present it is used instead. To compact a regenerated file:
+Floating-point scan and plot (gitignored caches in `results/`; plotting needs `pdflatex`):
 
 ```sh
-julia --project=julia -e 'include("models/spin1_largeD/spectra.jl");
-    compact_enclosure("models/spin1_largeD/results", "enclosed_D4_1_L12")'
+julia --project=models/spin1_largeD models/spin1_largeD/scripts/scan.jl              # ~4 min
+julia --project=models/spin1_largeD models/spin1_largeD/scripts/scan.jl 1603//500 641//200
+julia --project=models/spin1_largeD models/spin1_largeD/scripts/refine_beta.jl 1603//500 641//200
+julia --project=models/spin1_largeD models/spin1_largeD/scripts/report.jl
 ```
 
-## Regenerating
+Stage 1 is optional (the stored spectra are verified by hash). Each L = 12 run took
+2117–2164 s with one BLAS thread; L = 6 takes under a second:
 
 ```sh
-export OPENBLAS_NUM_THREADS=1
 cd models/spin1_largeD
-julia --project=../../julia certify.jl 4 6
-julia --project=../../julia certify.jl 4 12                   # 36 min
-julia --project=../../julia seed.jl 4 6 9//4                  # needs the full L=12 .json
-julia --project=../../julia certify.jl 1603//500 6
-julia --threads=2 --project=../../julia certify_parallel.jl 1603//500 12   # 35 min
-julia --project=../../julia seed.jl 1603//500 6 381//125
-julia --project=../../julia scan.jl                           # numerical scan, D=4:-1/4:1
-julia --project=../../julia scan.jl 25//8 1603//500           # extra D samples
-julia --project=../../julia refine_beta.jl 1603//500          # fine beta grid at n0=6
-julia --project=../../julia report.jl                         # REPORT.md, curve.{csv,json}
+julia --project=. certify.jl 4 12                             # writes results/enclosed_*_L12.json
+julia -t 4 --project=. certify_parallel.jl 1603//500 12
+julia --project=. seed.jl 4 6 9//4                            # needs the full L = 6, 12 JSON
 ```
 
-The dense runs used Julia 1.12.4, IntervalArithmetic 1.0.12, one BLAS thread, and the core
-at `ef0a3e6` (then named `ThermalMPOGap`); the only later change to the producing scripts is
-the package rename. `report.jl` needs the scan outputs (`scan_*`, `summary_*`,
-`beta_refinement_*`), which are not stored; the sampled D values are listed in REPORT.md.
-L = 14 dense ED was infeasible on the 16 GiB host (one charge-1 momentum block needs 28 GB
-as a complex matrix).
-
-## Removed from the original PR
-
-To keep the directory small (87 MB → 3.9 MB) the following were deleted. All remain in the
-branch history at commit `cf7bdd7` and can be regenerated with the commands above:
-
-- the full `enclosed_D{4_1,1603_500}_L12.json` (replaced by the byte-exact compact form),
-  and the unused `enclosed_D13_4_L4.json`, `enclosed_D3207_1000_L6.json`;
-- numerical scan caches `scan_D*_L*.json`, `summary_D*.json`, `beta_refinement_D*.json`
-  (regenerate with `scan.jl`, `refine_beta.jl`);
-- plotting artefacts `curve.png`, `curve.vega.json` (`report.jl` rewrites the Vega spec);
-- package-rename provenance: `provenance/legacy/`, `migrate_package.jl`, `check_pinned.jl`,
-  `audit_current.jl`, `results/package-migration.json`, `results/validation-current.json`;
-- the per-block fresh-replay evidence `audit/results/`, its driver, assembler and checker
-  (`audit/replay_worker.jl`, `assemble_replay.jl`, `check.jl`), and all logs;
-- `PROMPT.txt` and `PR_BODY.md`.
+`results/feasibility.json` was produced on the original Linux host by the script now at
+`scripts/feasibility.jl`; its recorded script hashes refer to the earlier path and content.

@@ -1,3 +1,2 @@
 results/*.json linguist-generated=true
-results/*.svg linguist-generated=true
 results/*.bin binary

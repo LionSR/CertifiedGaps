@@ -1,4 +1,6 @@
-# Independent finite checks supplementing (not replacing) the full spectral replay.
+# Independent checks from the stage-1 review (supplementing, not replacing, the enclosures):
+# an exact Cartesian-to-normalised-Sz basis bridge for the bond, and 256-bit diagnostics of
+# the residual and orthogonality bounds. The BigFloat comparisons are not new enclosures.
 using Test
 include("../model.jl")
 
@@ -66,4 +68,3 @@ end
         end
     end
 end
-println("Independent reviewer checks passed. BigFloat comparisons are diagnostics, not new enclosures.")

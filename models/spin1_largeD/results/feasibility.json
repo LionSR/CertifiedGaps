@@ -1,0 +1,23 @@
+{
+    "source_hashes": {
+        "model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472",
+        "feasibility.jl": "ee01564a689a70297e1ab772aa16a322a84964932127e730d0b0e1103a74206d"
+    },
+    "note": "Dense L=14 is infeasible here; n0=7 is also odd and ineligible.",
+    "single_matrix_fits": false,
+    "one_complex_dense_matrix_bytes": "28002675600",
+    "charge": "1",
+    "L": "14",
+    "momentum_dimensions": [
+        "41835",
+        "41835",
+        "41835",
+        "41835",
+        "41835",
+        "41835",
+        "41835",
+        "41835"
+    ],
+    "host_memory_limit_bytes": "17179869184",
+    "wall_seconds": 0.5988419055938721
+}
