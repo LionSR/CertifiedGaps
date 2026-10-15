@@ -39,23 +39,7 @@ namespace CertifiedGaps
 
 variable {d : Type} [Fintype d] [DecidableEq d]
 
-/-! ### Ring geometry -/
-
-/-- The cyclic successor in coordinates: `finRotate L j = j + 1`, wrapping `L - 1` to `0`. -/
-theorem val_finRotate {L : ℕ} (j : Fin L) :
-    (finRotate L j : ℕ) = if (j : ℕ) + 1 = L then 0 else (j : ℕ) + 1 := by
-  cases L with
-  | zero => exact j.elim0
-  | succ n =>
-    rw [coe_finRotate]
-    split_ifs with h₁ h₂ h₂ <;> simp_all [Fin.ext_iff]
-
-/-- On a ring of at least two sites, the two ends of a bond are distinct. -/
-theorem ne_finRotate {L : ℕ} (hL : 2 ≤ L) (j : Fin L) : j ≠ finRotate L j := by
-  intro h
-  have h' := congrArg Fin.val h
-  rw [val_finRotate] at h'
-  split_ifs at h' <;> omega
+/-! ### Even and odd sites and bonds -/
 
 /-- The even site `2 k` of a ring of `2 N` sites. -/
 def evenSite (N : ℕ) (k : Fin N) : Fin (2 * N) := ⟨2 * k, by omega⟩
@@ -69,6 +53,7 @@ def evenBonds (L : ℕ) : List (Fin L) := (List.finRange L).filter fun j ↦ dec
 /-- The odd bonds of a ring, in increasing order. -/
 def oddBonds (L : ℕ) : List (Fin L) := (List.finRange L).filter fun j ↦ !decide (Even j.val)
 
+/-- On a ring of `2 N` sites the even bonds start at the even sites `2 k`. -/
 theorem evenBonds_two_mul (N : ℕ) : evenBonds (2 * N) = List.ofFn (evenSite N) := by
   refine List.SortedLT.eq_of_mem_iff ?_ ?_ fun j ↦ ?_
   · exact ((List.sortedLT_finRange _).pairwise.filter _).sortedLT
@@ -82,6 +67,7 @@ theorem evenBonds_two_mul (N : ℕ) : evenBonds (2 * N) = List.ofFn (evenSite N)
     · rintro ⟨k, rfl⟩
       exact ⟨k, by simp [evenSite]; omega⟩
 
+/-- On a ring of `2 N` sites the odd bonds start at the odd sites `2 k + 1`. -/
 theorem oddBonds_two_mul (N : ℕ) : oddBonds (2 * N) = List.ofFn (oddSite N) := by
   refine List.SortedLT.eq_of_mem_iff ?_ ?_ fun j ↦ ?_
   · exact ((List.sortedLT_finRange _).pairwise.filter _).sortedLT
@@ -127,18 +113,23 @@ theorem one_sub_smul_siteOp {L : ℕ} (j : Fin L) (A : Matrix d d ℂ) (c : ℂ)
 
 /-! ### Which end of which bond a site is -/
 
+/-- The even site `2 m` is the left end of the even bond `2 k` iff `k = m`. -/
 theorem evenSite_eq_evenSite_iff {N : ℕ} (m k : Fin N) : evenSite N m = evenSite N k ↔ k = m := by
   simp only [Fin.ext_iff, evenSite]; omega
 
+/-- An even site is never the right end of an even bond. -/
 theorem evenSite_ne_rot_evenSite {N : ℕ} (m k : Fin N) :
     evenSite N m ≠ finRotate (2 * N) (evenSite N k) := by
   simp only [ne_eq, Fin.ext_iff, evenSite, val_finRotate]
   have := m.isLt; have := k.isLt
   split_ifs <;> omega
 
+/-- An even site is never the left end of an odd bond. -/
 theorem evenSite_ne_oddSite {N : ℕ} (m k : Fin N) : evenSite N m ≠ oddSite N k := by
   simp only [ne_eq, Fin.ext_iff, evenSite, oddSite]; omega
 
+/-- The even site `2 m` is the right end of the odd bond `2 k + 1` iff `k = m - 1`
+cyclically. -/
 theorem evenSite_eq_rot_oddSite_iff {N : ℕ} (m k : Fin N) :
     evenSite N m = finRotate (2 * N) (oddSite N k) ↔ k = (finRotate N).symm m := by
   rw [Equiv.eq_symm_apply]
@@ -146,18 +137,22 @@ theorem evenSite_eq_rot_oddSite_iff {N : ℕ} (m k : Fin N) :
   have := m.isLt; have := k.isLt
   split_ifs <;> omega
 
+/-- An odd site is never the left end of an even bond. -/
 theorem oddSite_ne_evenSite {N : ℕ} (m k : Fin N) : oddSite N m ≠ evenSite N k := by
   simp only [ne_eq, Fin.ext_iff, evenSite, oddSite]; omega
 
+/-- The odd site `2 m + 1` is the right end of the even bond `2 k` iff `k = m`. -/
 theorem oddSite_eq_rot_evenSite_iff {N : ℕ} (m k : Fin N) :
     oddSite N m = finRotate (2 * N) (evenSite N k) ↔ k = m := by
   simp only [Fin.ext_iff, evenSite, oddSite, val_finRotate]
   have := m.isLt; have := k.isLt
   split_ifs <;> omega
 
+/-- The odd site `2 m + 1` is the left end of the odd bond `2 k + 1` iff `k = m`. -/
 theorem oddSite_eq_oddSite_iff {N : ℕ} (m k : Fin N) : oddSite N m = oddSite N k ↔ k = m := by
   simp only [Fin.ext_iff, oddSite]; omega
 
+/-- An odd site is never the right end of an odd bond. -/
 theorem oddSite_ne_rot_oddSite {N : ℕ} (m k : Fin N) :
     oddSite N m ≠ finRotate (2 * N) (oddSite N k) := by
   simp only [ne_eq, Fin.ext_iff, oddSite, val_finRotate]
@@ -201,23 +196,28 @@ def realOnsite (τ : ℝ) : Matrix d d ℝ := 1 - τ • R.o
 /-- The on-site factor `O = 1 - τ o`, as a complex matrix with real entries. -/
 def onsite (τ : ℝ) : Matrix d d ℂ := (R.realOnsite τ).map (↑)
 
+/-- `O = 1 - τ o` as complex matrices. -/
 theorem onsite_eq (τ : ℝ) : R.onsite τ = 1 - (τ : ℂ) • R.oc := by
   ext a b
   simp [onsite, realOnsite, oc, one_apply, apply_ite]
 
+/-- The complex reflection is an involution. -/
 theorem Rc_mul_Rc : R.Rc * R.Rc = 1 := by
   change Complex.ofRealHom.mapMatrix R.refl * Complex.ofRealHom.mapMatrix R.refl = 1
   rw [← map_mul, R.refl_sq, map_one]
 
+/-- The right factors are the reflected left factors. -/
 theorem rightFactor_eq (τ : ℝ) (γ : Option ι) :
     R.rightFactor τ γ = R.Rc * R.siteFactor τ γ * R.Rc := by
   change Complex.ofRealHom.mapMatrix (R.refl * R.realSiteFactor τ γ * R.refl) = _
   rw [map_mul, map_mul]
   rfl
 
+/-- The label `none` carries the identity. -/
 @[simp] theorem siteFactor_none (τ : ℝ) : R.siteFactor τ none = 1 := by
   simp [siteFactor, realSiteFactor]
 
+/-- The label `none` carries the identity at the right end too. -/
 @[simp] theorem rightFactor_none (τ : ℝ) : R.rightFactor τ none = 1 := by
   rw [rightFactor_eq, siteFactor_none, mul_one, Rc_mul_Rc]
 
@@ -366,6 +366,7 @@ theorem trace_trotterSlice_pow_eq_sum {N : ℕ} (hN : 1 ≤ N) {τ : ℝ} (hτ :
   simp only [sliceSite_evenSite, sliceSite_oddSite]
   rw [R.trace_oddWord]
   rfl
+
 /-- **Transfer factorization.** `Tr (slice)^M = Tr (Fᵀ F)^N` on a ring of `2 N` cells. -/
 theorem trace_trotterSlice_pow_eq_trace_transfer [DecidableEq ι] {N : ℕ} (hN : 1 ≤ N) {τ : ℝ}
     (hτ : 0 ≤ τ) (M : ℕ) :

@@ -62,11 +62,14 @@ def Valid : Prop :=
       zQ (c.tAt j) (c.sAt (j + 1)) < 1 ∧ fQ (zQ (c.tAt j) (c.sAt (j + 1))) ≤ c.tAt (j + 1) ∧
       c.r ^ 2 ^ j * zQ (c.sAt j) (c.tAt j) < 1 - zQ (c.sAt j) (c.tAt j))
 
+/-- The conditions are decidable, so `decide` checks a concrete certificate. -/
 instance : Decidable c.Valid := by unfold Valid; infer_instance
 
+/-- `zQ` computes the coupling defect. -/
 theorem cast_zQ (a b : ℚ) : couplingDefect a b = (zQ a b : ℝ) := by
   simp [couplingDefect, zQ]
 
+/-- `fQ` computes the squaring bound. -/
 theorem cast_fQ (z : ℚ) : squaringDefect z = (fQ z : ℝ) := by
   simp [squaringDefect, fQ]
 

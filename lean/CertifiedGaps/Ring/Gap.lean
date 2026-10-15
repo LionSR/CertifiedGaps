@@ -99,14 +99,16 @@ noncomputable def thermalPurity (L : ℕ) (β : ℝ) : ℝ :=
   R.partitionFunction L (2 * β) / R.partitionFunction L β ^ 2
 
 /-- **The two-purity criterion for a reflection-positive ring.** Let `n₀ ≥ 2` be even, `β₀ > 0`,
-and `c` a valid rational chain certificate. If `P_s(n₀, β₀) ≥ 1 - s₀` and
-`P_τ(2n₀, β₀) ≥ 1 - t₀` for its seed defects `s₀ = c.sAt 0`, `t₀ = c.tAt 0`, then every even ring
-of `L ≥ n₀` cells has a nondegenerate ground state and gap `Δ_L > log r / β₀`. -/
+and `c` a valid rational chain certificate with seed defects `s = c.sAt 0`, `t = c.tAt 0` and
+rate `r = c.r`. If `P_s(n₀, β₀) ≥ 1 - s` and `P_τ(2n₀, β₀) ≥ 1 - t`, then every even ring of
+`L ≥ n₀` cells has a nondegenerate ground state and gap `Δ_L > log r / β₀`. The defects and the
+rate are passed as real numbers, so that the seeds can be stated with decimal literals. -/
 theorem gapGT_of_chainCertificate [Nonempty d] {n₀ : ℕ} (hn₀ : 2 ≤ n₀) (hn₀e : Even n₀) {β₀ : ℝ}
-    (hβ₀ : 0 < β₀) (c : ChainCertificate) (hc : c.Valid)
-    (hs : 1 - (c.sAt 0 : ℝ) ≤ R.spatialPurity n₀ β₀)
-    (ht : 1 - (c.tAt 0 : ℝ) ≤ R.thermalPurity (2 * n₀) β₀) {L : ℕ} (hL : n₀ ≤ L)
-    (hLe : Even L) : GapGT (R.spectrum L) (Real.log (c.r : ℝ) / β₀) := by
+    (hβ₀ : 0 < β₀) {c : ChainCertificate} (hc : c.Valid) {s t r : ℝ}
+    (hcert : (c.sAt 0 : ℝ) = s ∧ (c.tAt 0 : ℝ) = t ∧ (c.r : ℝ) = r)
+    (hs : 1 - s ≤ R.spatialPurity n₀ β₀) (ht : 1 - t ≤ R.thermalPurity (2 * n₀) β₀) {L : ℕ}
+    (hL : n₀ ≤ L) (hLe : Even L) : GapGT (R.spectrum L) (Real.log r / β₀) := by
+  obtain ⟨rfl, rfl, rfl⟩ := hcert
   refine CertifiedGaps.gapGT_of_chainCertificate (ι := fun L ↦ Fin L → d) R.spectrum
     (by omega) hn₀e hβ₀ (fun β hβ ↦ (R.hasSpatialMomentBounds β hβ).mono hn₀) c hc ?_ ?_ hL hLe
   · simpa only [CertifiedGaps.spatialPurity, CertifiedGaps.partitionFunction,

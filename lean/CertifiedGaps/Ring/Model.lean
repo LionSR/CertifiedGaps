@@ -45,6 +45,62 @@ namespace CertifiedGaps
 
 variable {d : Type} [Fintype d] [DecidableEq d]
 
+/-! ### Ring geometry -/
+
+/-- The cyclic successor in coordinates: `finRotate L j = j + 1`, wrapping `L - 1` to `0`. -/
+theorem val_finRotate {L : ℕ} (j : Fin L) :
+    (finRotate L j : ℕ) = if (j : ℕ) + 1 = L then 0 else (j : ℕ) + 1 := by
+  cases L with
+  | zero => exact j.elim0
+  | succ n =>
+    rw [coe_finRotate]
+    split_ifs with h₁ h₂ h₂ <;> simp_all [Fin.ext_iff]
+
+/-- On a ring of at least two sites, the two ends of a bond are distinct. -/
+theorem ne_finRotate {L : ℕ} (hL : 2 ≤ L) (j : Fin L) : j ≠ finRotate L j := by
+  intro h
+  have h' := congrArg Fin.val h
+  rw [val_finRotate] at h'
+  split_ifs at h' <;> omega
+
+/-- On an even ring the two ends of a bond have opposite parity. -/
+theorem odd_finRotate_iff {L : ℕ} (hL : Even L) (j : Fin L) :
+    Odd (finRotate L j : ℕ) ↔ ¬ Odd (j : ℕ) := by
+  rw [val_finRotate]
+  obtain ⟨k, hk⟩ := hL
+  have := j.isLt
+  split_ifs with h <;> simp only [Nat.odd_iff] <;> omega
+
+/-! ### Symmetric and antisymmetric real factors -/
+
+/-- A Kronecker product of symmetric or antisymmetric matrices is symmetric or antisymmetric. -/
+theorem transpose_kronecker_eq_or {m n : Type*} {A : Matrix m m ℝ} {B : Matrix n n ℝ}
+    (hA : Aᵀ = A ∨ Aᵀ = -A) (hB : Bᵀ = B ∨ Bᵀ = -B) :
+    (A ⊗ₖ B)ᵀ = A ⊗ₖ B ∨ (A ⊗ₖ B)ᵀ = -(A ⊗ₖ B) := by
+  rw [← kroneckerMap_transpose]
+  rcases hA with hA | hA <;> rcases hB with hB | hB <;> rw [hA, hB]
+  · exact .inl rfl
+  · exact .inr (by ext; simp [kroneckerMap_apply])
+  · exact .inr (by ext; simp [kroneckerMap_apply])
+  · exact .inl (by ext; simp [kroneckerMap_apply])
+
+/-- A real multiple of a symmetric or antisymmetric matrix is symmetric or antisymmetric. -/
+theorem transpose_smul_eq_or {m : Type*} (c : ℝ) {A : Matrix m m ℝ} (hA : Aᵀ = A ∨ Aᵀ = -A) :
+    (c • A)ᵀ = c • A ∨ (c • A)ᵀ = -(c • A) := by
+  rw [transpose_smul]
+  rcases hA with hA | hA <;> rw [hA]
+  · exact .inl rfl
+  · exact .inr (smul_neg c A)
+
+/-- An exchange `∑ₖ Aₖ ⊗ Aₖ` of symmetric or antisymmetric matrices is symmetric. -/
+theorem transpose_sum_kronecker_self {m κ : Type*} [Fintype κ] (A : κ → Matrix m m ℝ)
+    (hA : ∀ k, (A k)ᵀ = A k ∨ (A k)ᵀ = -A k) : (∑ k, A k ⊗ₖ A k)ᵀ = ∑ k, A k ⊗ₖ A k := by
+  rw [transpose_sum]
+  refine Finset.sum_congr rfl fun k _ ↦ ?_
+  rw [← kroneckerMap_transpose]
+  rcases hA k with h | h <;> rw [h]
+  ext; simp [kroneckerMap_apply]
+
 /-! ### Operators on the ring -/
 
 /-- The operator `B` on two sites `j, k` of a ring of `L` sites, acting as the identity on all
@@ -209,6 +265,7 @@ def site (L : ℕ) (j : Fin L) : Matrix (Fin L → d) (Fin L → d) ℂ :=
 def hamiltonian (L : ℕ) : Matrix (Fin L → d) (Fin L → d) ℂ :=
   ∑ j, R.bond L j + ∑ j, R.site L j
 
+/-- The complex bond factors are Hermitian or anti-Hermitian. -/
 theorem conjTranspose_Cc (α : ι) : (R.Cc α)ᴴ = R.Cc α ∨ (R.Cc α)ᴴ = -R.Cc α := by
   have h : (R.Cc α)ᴴ = ((R.C α)ᵀ).map (↑) := by
     ext a b; simp [Cc, conjTranspose_apply]
@@ -216,11 +273,13 @@ theorem conjTranspose_Cc (α : ι) : (R.Cc α)ᴴ = R.Cc α ∨ (R.Cc α)ᴴ = -
   · exact Or.inl (by rw [h, hC]; rfl)
   · exact Or.inr (by rw [h, hC]; ext; simp [Cc])
 
+/-- The complex reflection is Hermitian. -/
 theorem conjTranspose_Rc : R.Rcᴴ = R.Rc := by
   ext a b
   simp only [conjTranspose_apply, Rc, map_apply, Complex.star_def, Complex.conj_ofReal]
   rw [← transpose_apply R.refl, R.refl_symm]
 
+/-- The bond is Hermitian. -/
 theorem bondMatrix_isHermitian : R.bondMatrix.IsHermitian := by
   refine IsHermitian.neg (isSelfAdjoint_sum _ fun α _ ↦ ?_)
   change (R.Cc α ⊗ₖ R.Dc α)ᴴ = R.Cc α ⊗ₖ R.Dc α
@@ -230,6 +289,7 @@ theorem bondMatrix_isHermitian : R.bondMatrix.IsHermitian := by
   ext ⟨a, b⟩ ⟨c, e⟩
   simp [kroneckerMap_apply]
 
+/-- The complex on-site term is Hermitian. -/
 theorem oc_isHermitian : R.oc.IsHermitian := by
   ext a b
   simp only [conjTranspose_apply, oc, map_apply, Complex.star_def, Complex.conj_ofReal]

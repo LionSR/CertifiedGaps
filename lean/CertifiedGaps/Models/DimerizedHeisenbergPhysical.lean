@@ -32,6 +32,7 @@ noncomputable def physicalHamiltonian (δ : ℝ) (L : ℕ) :
       (((1 - δ : ℝ) : ℂ) • ((1 ⊗ₖ spinHalf α) ⊗ₖ (spinHalf α ⊗ₖ 1))) +
     ∑ j : Fin L, siteOp j (((1 + δ : ℝ) : ℂ) • ∑ α, spinHalf α ⊗ₖ spinHalf α)
 
+/-- The physical dimerized chain is Hermitian. -/
 theorem physicalHamiltonian_isHermitian (δ : ℝ) (L : ℕ) :
     (physicalHamiltonian δ L).IsHermitian := by
   have hS := spinHalf_isHermitian
@@ -52,24 +53,23 @@ noncomputable def physicalSpectrum (δ : ℝ) (L : ℕ) : (Fin L → Fin 2 × Fi
 /-- `e^{iπSʸ}` on the second spin of a pair. -/
 def cellRot : Matrix (Fin 2 × Fin 2) (Fin 2 × Fin 2) ℂ := 1 ⊗ₖ rot
 
+/-- The rotation of a pair is unitary. -/
 theorem cellRot_mul_conjTranspose : cellRot * cellRotᴴ = 1 := by
   rw [cellRot, conjTranspose_kronecker, ← mul_kronecker_mul, conjTranspose_one, Matrix.mul_one,
     rot_mul_conjTranspose, one_kronecker_one]
 
-theorem conjTranspose_cellRot_mul : cellRotᴴ * cellRot = 1 := by
-  rw [cellRot, conjTranspose_kronecker, ← mul_kronecker_mul, conjTranspose_one, Matrix.mul_one,
-    conjTranspose_rot_mul, one_kronecker_one]
-
+/-- The rotation of a pair acts on its second spin. -/
 theorem cellRot_conj (A B : Matrix (Fin 2) (Fin 2) ℂ) :
     cellRot * (A ⊗ₖ B) * cellRotᴴ = A ⊗ₖ (rot * B * rotᴴ) := by
-  rw [cellRot, conjTranspose_kronecker, ← mul_kronecker_mul, ← mul_kronecker_mul,
-    conjTranspose_one, Matrix.one_mul, Matrix.mul_one]
+  rw [cellRot, kronecker_conj, Matrix.one_mul, conjTranspose_one, Matrix.mul_one]
 
+/-- The bond factors of the rotated chain as complex matrices. -/
 theorem Cc_eq (δ : ℝ) (α : Fin 3) :
     (model δ).Cc α = ((Real.sqrt (1 - δ) : ℝ) : ℂ) • (1 ⊗ₖ Pc α) := by
   ext ⟨a, b⟩ ⟨c', e⟩
   by_cases h : a = c' <;> simp [RPRing.Cc, model, Pc, kroneckerMap_apply, one_apply, h]
 
+/-- The reflected bond factors of the rotated chain as complex matrices. -/
 theorem Dc_eq (δ : ℝ) (α : Fin 3) :
     (model δ).Dc α = ((Real.sqrt (1 - δ) : ℝ) : ℂ) • (Pc α ⊗ₖ 1) := by
   have h : (model δ).Dc α =
@@ -81,6 +81,7 @@ theorem Dc_eq (δ : ℝ) (α : Fin 3) :
   ext ⟨a, b⟩ ⟨c', e⟩
   by_cases h : b = e <;> simp [Pc, kroneckerMap_apply, one_apply, h]
 
+/-- The on-site term of the rotated chain as a complex matrix. -/
 theorem oc_eq (δ : ℝ) :
     (model δ).oc = ((-(1 + δ) : ℝ) : ℂ) • ∑ α, Pc α ⊗ₖ Pc α := by
   ext ⟨a, b⟩ ⟨c', e⟩
@@ -91,17 +92,13 @@ by `e^{iπSʸ}` on the second spin of every pair. -/
 theorem physicalHamiltonian_eq {δ : ℝ} (hδ : δ ≤ 1) {L : ℕ} (hL : 2 ≤ L) :
     physicalHamiltonian δ L = piTensor (fun _ : Fin L ↦ cellRot) * (model δ).hamiltonian L *
       piTensor (fun _ ↦ cellRotᴴ) := by
-  have hu : ∀ _ : Fin L, cellRot * cellRotᴴ = 1 := fun _ ↦ cellRot_mul_conjTranspose
   have ha : ((Real.sqrt (1 - δ) : ℝ) : ℂ) * ((Real.sqrt (1 - δ) : ℝ) : ℂ) = ((1 - δ : ℝ) : ℂ) := by
     rw [← Complex.ofReal_mul, Real.mul_self_sqrt (by linarith)]
-  rw [RPRing.hamiltonian, Matrix.mul_add, Matrix.add_mul, Finset.mul_sum, Finset.sum_mul,
-    Finset.mul_sum, Finset.sum_mul, physicalHamiltonian]
+  rw [(model δ).conj_hamiltonian _ (fun _ ↦ cellRot_mul_conjTranspose) (by omega),
+    physicalHamiltonian]
   congr 1
-  · refine Finset.sum_congr rfl fun j _ ↦ ?_
-    rw [RPRing.bond, RPRing.bondMatrix, bondOp_neg, bondOp_sum, Matrix.mul_neg, Matrix.neg_mul,
-      Finset.mul_sum, Finset.sum_mul, ← Finset.sum_neg_distrib]
-    refine Finset.sum_congr rfl fun α _ ↦ ?_
-    rw [conj_bondOp_kronecker _ hu (ne_finRotate hL j), ← bondOp_neg, Cc_eq, Dc_eq]
+  · refine Finset.sum_congr rfl fun j _ ↦ Finset.sum_congr rfl fun α _ ↦ ?_
+    rw [Cc_eq, Dc_eq]
     congr 1
     rw [Matrix.mul_smul, Matrix.smul_mul, Matrix.mul_smul, Matrix.smul_mul, cellRot_conj,
       cellRot_conj, rot_conj_Pc, Matrix.mul_one, rot_mul_conjTranspose, Pc_eq]
@@ -110,7 +107,7 @@ theorem physicalHamiltonian_eq {δ : ℝ} (hδ : δ ≤ 1) {L : ℕ} (hL : 2 ≤
     linear_combination
       -(((Real.sqrt (1 - δ) : ℝ) : ℂ) * ((Real.sqrt (1 - δ) : ℝ) : ℂ)) * neg_s_mul_c_sq α - ha
   · refine Finset.sum_congr rfl fun j _ ↦ ?_
-    rw [RPRing.site, conj_siteOp _ hu, oc_eq]
+    rw [oc_eq]
     congr 1
     rw [Matrix.mul_smul, Matrix.smul_mul, Finset.mul_sum, Finset.sum_mul, Finset.smul_sum,
       Finset.smul_sum]
@@ -123,11 +120,9 @@ theorem physicalHamiltonian_eq {δ : ℝ} (hδ : δ ≤ 1) {L : ℕ} (hL : 2 ≤
 
 /-- For `δ ≤ 1` the physical and the rotated chain have the same spectrum. -/
 theorem physicalSpectrum_eq {δ : ℝ} (hδ : δ ≤ 1) {L : ℕ} (hL : 2 ≤ L) :
-    physicalSpectrum δ L = (model δ).spectrum L := by
-  refine eigenvalues_eq_of_conj _ _ (U := piTensor (fun _ : Fin L ↦ cellRot)) ?_ ?_
-  · rw [conjTranspose_piTensor]
-    exact piTensor_conjTranspose_mul_self _ fun _ ↦ conjTranspose_cellRot_mul
-  · rw [conjTranspose_piTensor]; exact physicalHamiltonian_eq hδ hL
+    physicalSpectrum δ L = (model δ).spectrum L :=
+  (model δ).eigenvalues_eq_spectrum _ (fun _ ↦ cellRot_mul_conjTranspose) _
+    (physicalHamiltonian_eq hδ hL)
 
 /-- **The physical dimerized chain at `δ = 1/2`.** Every even ring of `L ≥ 4` pairs has a unique
 ground state and gap `Δ_L > log 24.33 / 6 ≈ 0.5320`. -/

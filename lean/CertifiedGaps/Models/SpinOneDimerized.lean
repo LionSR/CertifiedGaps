@@ -30,55 +30,26 @@ namespace CertifiedGaps.SpinOneDimerized
 
 open SpinOneLargeD
 
-theorem G_transpose (α : Fin 3) : (G α)ᵀ = -G α := by
-  ext s s'; simp [G, SpinOneHeisenberg.leviCivita_swap α s s']
-
 /-- The dimerized spin-one chain as a reflection-positive ring of weak pairs. -/
 noncomputable def model (δ : ℝ) : RPRing (Fin 3 × Fin 3) (Fin 3) where
   C α := Real.sqrt (1 + δ) • (1 ⊗ₖ G α)
   o := -(1 - δ) • ∑ α, G α ⊗ₖ G α
-  C_symm α := by
-    right
-    rw [transpose_smul, ← kroneckerMap_transpose, transpose_one, G_transpose]
-    ext; simp [kroneckerMap_apply]
-  o_symm := by
-    rw [transpose_smul, transpose_sum]
-    congr 1
-    refine Finset.sum_congr rfl fun k _ ↦ ?_
-    rw [← kroneckerMap_transpose, G_transpose]
-    ext; simp [kroneckerMap_apply]
+  C_symm α := transpose_smul_eq_or _ (transpose_kronecker_eq_or (.inl transpose_one)
+    (.inr (G_transpose α)))
+  o_symm := by rw [transpose_smul, transpose_sum_kronecker_self G fun α ↦ .inr (G_transpose α)]
   refl := cellSwap
   refl_symm := cellSwap_transpose
   refl_sq := cellSwap_mul_cellSwap
-  refl_o := by
-    rw [Matrix.mul_smul, Matrix.smul_mul, Finset.mul_sum, Finset.sum_mul]
-    simp_rw [cellSwap_mul_kronecker_mul_cellSwap]
+  refl_o := cellSwap_conj_smul_sum_kronecker_self _ _
 
 /-- The rational chain certificate for `δ = 9/10`, seed `(n₀, β₀) = (2, 7/2)`. -/
 def cert_d910 : ChainCertificate where
-  s := [
-    4972e-5,
-    1038e-5,
-    294e-6,
-    1857e-10,
-    6931e-17,
-    9608e-30,
-    1847e-55,
-    6823e-107,
-    9311e-210]
-  t := [
-    3206e-5,
-    3084e-6,
-    2108e-8,
-    8967e-13,
-    1609e-21,
-    5178e-39,
-    5363e-74,
-    5753e-144,
-    662e-283]
+  s := [4972e-5, 1038e-5, 294e-6, 1857e-10, 6931e-17, 9608e-30, 1847e-55, 6823e-107, 9311e-210]
+  t := [3206e-5, 3084e-6, 2108e-8, 8967e-13, 1609e-21, 5178e-39, 5363e-74, 5753e-144, 662e-283]
   r := 6339e-3
   ε := 9311e-210
 
+/-- The certificate is valid, checked by the kernel. -/
 theorem cert_d910_valid : cert_d910.Valid := by decide +kernel
 
 /-- Seed: `P_s(2, 7/2) ≥ 1 - 0.04972`. Certified in `models/spin1_dimerized`. -/
@@ -92,12 +63,9 @@ theorem seed_thermal_d910 : 1 - (3206e-5 : ℝ) ≤ (model (9 / 10)).thermalPuri
 /-- **The dimerized spin-one chain at `δ = 9/10`.** Every even ring of `L ≥ 2` cells has a unique
 ground state and gap `Δ_L > log 6.339 / (7/2) ≈ 0.5276`. -/
 theorem gap_d910 {L : ℕ} (hL : 2 ≤ L) (hLe : Even L) :
-    GapGT ((model (9 / 10)).spectrum L) (log 6.339 / (7 / 2)) := by
-  have h := (model (9 / 10)).gapGT_of_chainCertificate (n₀ := 2) (β₀ := 7 / 2) le_rfl
-    (by decide) (by norm_num) cert_d910 cert_d910_valid
-    (by simpa [cert_d910, ChainCertificate.sAt] using seed_spatial_d910)
-    (by simpa [cert_d910, ChainCertificate.tAt] using seed_thermal_d910) hL hLe
-  convert h using 3
-  simp [cert_d910]
+    GapGT ((model (9 / 10)).spectrum L) (log 6.339 / (7 / 2)) :=
+  (model (9 / 10)).gapGT_of_chainCertificate le_rfl (by decide) (by norm_num)
+    cert_d910_valid (by norm_num [cert_d910, ChainCertificate.sAt, ChainCertificate.tAt])
+    seed_spatial_d910 seed_thermal_d910 hL hLe
 
 end CertifiedGaps.SpinOneDimerized
