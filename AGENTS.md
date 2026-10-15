@@ -96,6 +96,48 @@ because ...") is a result.
 - `lean/`: Lean 4 formalisation of the criterion and of each certified model's gap theorem
   (seeds are hypotheses).
 
+## Directory format
+
+Every `models/<slug>/` has exactly these top-level entries (examples:
+`models/heisenberg_staggered_field` for a certificate, `models/blbq_haldane` for a negative
+result):
+
+| entry | content |
+|---|---|
+| `README.md` | required; sections below |
+| `IDEAS.md` | required: the route memo written before computing; ends with `## Outcome` |
+| `METHOD.md` | optional: the one long method/proof/audit document (no `REPORT.md` etc.) |
+| `Project.toml`, `Manifest.toml` | the environment |
+| `.gitignore` | local ignores for regenerable data (when there is any) |
+| `certify.jl` | produces the certificate(s); omitted for a negative result |
+| `check.jl` | verifies them: fast by default, `--full` for the slow replay |
+| `src/` | library code (a module where natural) |
+| `scripts/` | one-off, exploratory, scan, report and audit drivers |
+| `test/runtests.jl` | fast tests (may include other files in `test/`) |
+| `results/` | certificate data (`results/certificate*.json[.gz]`) and small summaries |
+
+No other top-level files. The one exception is a file whose SHA-256 a certificate records by
+path when that certificate cannot be regenerated in under 10 minutes: it stays where it is and
+README "Layout" lists it with the reason. Never rename, move or edit a hashed file unless you
+regenerate the certificate and every certified number is identical.
+
+`README.md` uses these headings, in this order and with this wording:
+
+1. `# <Model name in words>`: a 2–4 sentence summary, then a headline table
+   (parameter | seed (n₀, β₀) | certified gap ≥ | lengths covered), or "No certificate" with
+   the best numerical evidence.
+2. `## Model`: Hamiltonian, conventions, cell structure, whether lengths count cells or sites.
+3. `## Reflection positivity`: RP basis or frame, the exact identity and where it is checked.
+4. `## Seeds and certified bounds`: exact (n₀, β₀, εₛ, εₜ) and the bound per parameter
+   (`## Result` instead for a negative result).
+5. `## Reproduce`: the certify, check, `check --full` and test commands with measured run times.
+6. `## What is rigorous`: the trusted base (exact, interval, IEEE binary64 + BLAS rounding
+   model), what is floating point only, platform caveats (e.g. LAPACK bit-identity).
+7. `## Layout`: file map, including hash-pinned exceptions.
+8. `## History` (optional): PRs, audits, superseded results.
+
+Keep the README concise; long derivations go to `METHOD.md`.
+
 ## Environment
 
 Julia 1.12. From the repository root:
@@ -121,10 +163,8 @@ relative path to `../../julia` inside the project), or runs with `--project=juli
 - Certificate JSON stores every exact number as a string (`"num//den"`); use
   `CertifiedGaps.Results.write_result` and `parse_exact_json`. Record the code's SHA-256
   (`source_hashes`) and the Julia/package versions (`run_metadata`).
-- Each certificate directory has: `Project.toml`, `src/` or a single `certify.jl` that produces
-  the certificate, `check.jl` that verifies it, `test/runtests.jl` (fast), and a `README.md`
-  stating the model, the RP basis, the seed (n₀, β₀), the certified bound, run time, and what
-  is and is not rigorous (including the arithmetic model trusted).
+- Every model directory follows "Directory format" above (files, `check.jl` modes, README
+  headings).
 - Report negative results too: if no admissible seed exists at accessible sizes, commit the
   scan with its (floating-point, clearly labelled) evidence and the estimated seed scale.
 - Code style: 100 columns, docstrings on public functions, comments that say why.
