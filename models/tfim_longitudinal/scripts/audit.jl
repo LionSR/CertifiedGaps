@@ -1,4 +1,7 @@
-include("certify.jl")
+# Numerical cross-checks (computational-basis ED, free fermions at h = 0, exact g = 0
+# spectra inside the enclosures) and exact momentum-block resource counts; writes
+# results/audit.json.
+include(joinpath(@__DIR__, "..", "src", "LongitudinalCertificate.jl"))
 using .LongitudinalCertificate, LinearAlgebra, CertifiedGaps, CertifiedGaps.Results
 using CertifiedGaps.Models, CertifiedGaps.ExactDiagonalization, Test
 const C=LongitudinalCertificate

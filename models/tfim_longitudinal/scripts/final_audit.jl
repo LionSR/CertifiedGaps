@@ -1,8 +1,9 @@
 # Independent checks of stored artifacts: no calls to seed_enclosure or orbits.
+# Usage: julia --project=julia models/tfim_longitudinal/scripts/final_audit.jl (~30 s).
 using LinearAlgebra, IntervalArithmetic, CertifiedGaps, CertifiedGaps.Results, JSON3
 using Test
 BLAS.set_num_threads(1)
-const AUDIT_ROOT = @__DIR__
+const AUDIT_ROOT = normpath(joinpath(@__DIR__, ".."))
 parseq(s) = let a=split(s,"//"); parse(BigInt,a[1])//parse(BigInt,a[2]) end
 qstr(q) = string(numerator(q),"//",denominator(q))
 biginterval(q::Rational) = interval(BigFloat,numerator(q))/interval(BigFloat,denominator(q))
@@ -22,7 +23,7 @@ ramanujan(q,k) = sum(d*mobius(q÷d) for d in 1:gcd(q,k) if gcd(q,k)%d==0)
 function character_dimensions(L)
     [begin
         numerator=sum(big(2)^(L÷q)*ramanujan(q,k) for q in 1:L if L%q==0)
-        @assert numerator%L==0
+        numerator%L==0 || error("character sum not divisible by L=$L")
         Int(numerator÷L)
     end for k in 0:L-1]
 end
@@ -106,7 +107,8 @@ end
 worst=argmin(r->parseq(r["stored_bound_exact"]),rows)
 write_result(joinpath(AUDIT_ROOT,"results","final_audit.json"),Dict(
     "status"=>"passed","parameters"=>rows,"worst"=>worst,"seconds"=>time()-started,
-    "method"=>"Independent character dimensions, Pauli trace moments, 256-bit interval partition sums",
-    "source_hashes"=>source_hashes(AUDIT_ROOT;dirs=("test",),
+    "method"=>"Independent character dimensions, Pauli trace moments, " *
+        "256-bit interval partition sums",
+    "source_hashes"=>source_hashes(AUDIT_ROOT;dirs=("src","scripts","test"),
         files=Tuple(filter(p->endswith(p,".jl"),readdir(AUDIT_ROOT)))),
     "julia"=>string(VERSION),"bigfloat_precision"=>precision(BigFloat)))

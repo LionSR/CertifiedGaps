@@ -1,81 +1,127 @@
-# Longitudinal-field TFIM certificates
+# Longitudinal-field TFIM
 
-Model: H_L = −Σ Z_j Z_{j+1} − g Σ X_j − h Σ Z_j (Pauli matrices, periodic ring, one site per
-cell), on the grid g ∈ {1/4, 1/2, 3/4, 1, 3/2, 2} × h ∈ {1/20, 1/10, 1/4, 1/2, 1}.
+**Certified at all 30 grid points.** For every even L ≥ 6 the ring has a unique ground state
+and gap at least the stored bound. The smallest bound is 2749898627347949/36028797018963968
+≈ 0.0763, at g = 1, h = 1/20 (n₀ = 6, β₀ = 13/2). Nothing is claimed between grid points, for
+odd L, or as h → 0.
 
-**All 30 points are certified**: for every even L ≥ 6 the ground state is unique and the gap
-is at least the stored bound. The smallest bound is 2749898627347949/36028797018963968
-≈ 0.0763 (g = 1, h = 1/20). See [REPORT.md](REPORT.md) for the table and region map,
-[METHOD.md](METHOD.md) for the enclosure theorem, [IDEAS.md](IDEAS.md) for the route
-choice and [INDEPENDENT_REVIEW.md](INDEPENDENT_REVIEW.md) for the independent review.
+## Model
 
-- **RP basis**: σᶻ basis, −h_bond = Z ⊗ Z (one term, C = Z, real), on-site
-  o = −gX − hZ real symmetric. `rp_check` verifies this in `Rational{BigInt}`.
-- **Seed**: n₀ = 6 at every point, β₀ ∈ (1/4)ℤ chosen per point by a numerical scan
-  (n₀ ∈ {2, 4, 6}, β₀ ∈ {1/4, …, 64}). Rings of 6 and 12 sites are diagonalised densely in
-  every momentum sector (no spin-flip or reflection-parity reduction); a polar-factor/Weyl
-  argument with explicit rounding allowances encloses every eigenvalue with multiplicity;
-  interval partition sums give exact rational εₛ ≥ 1 − Pₛ(6, β₀), εₜ ≥ 1 − P_τ(12, β₀).
-- **Bound**: `CertifiedGaps.certified_gap_bound(εₛ, εₜ, β₀)`; exact binary value stored.
+H_L = −Σ Z_j Z_{j+1} − g Σ X_j − h Σ Z_j on a periodic ring of L spin-1/2 sites (Pauli
+matrices, one site per cell), on the grid g ∈ {1/4, 1/2, 3/4, 1, 3/2, 2} ×
+h ∈ {1/20, 1/10, 1/4, 1/2, 1}. For h > 0 the model is not integrable and spin-flip symmetry is
+broken. At every finite L the ground state is unique by Perron–Frobenius (g > 0 connects the
+spin-flip hypercube), but that alone gives no uniform gap.
 
-Rigorous: RP identity, sector dimensions, eigenvalue enclosures (under the IEEE binary64 /
-MPFR / IntervalArithmetic model with gradual underflow and single-threaded BLAS, see
-METHOD.md), partition-function and seed enclosures, the resulting uniform gap on the
-discrete grid. Numerical only: seed ranking, 12-site ED reference gaps, bound/ED ratios,
-finite-size diagnostics. Nothing is claimed between grid points, for odd L, or as h → 0.
+## Reflection positivity
 
-## Files
+σᶻ basis: −h_bond = Z ⊗ Z (one term, C = Z, real, coefficient 1), on-site o = −gX − hZ real
+symmetric. `rp_check` verifies these identities in `Rational{BigInt}` at every grid point.
 
-| file | role |
-|---|---|
-| `certify.jl` | module: momentum blocks, rigorous enclosures, seed enclosure, I/O |
-| `scan.jl` | numerical seed scan + rigorous best seed; writes `results/g*_h*.json.gz` |
-| `check.jl` | checker; `DEEP_CHECK=1` also regenerates and contains all enclosures |
-| `test/runtests.jl` | fast tests (RP, sector counts, partition intervals, recurrence, seed table) |
-| `seeds.jl` | writes `results/seeds.json`, the exact seed table of all 30 points |
-| `audit.jl`, `final_audit.jl`, `independent_residual_audit.jl` | independent cross-checks |
-| `report.jl` | regenerates the body of `REPORT.md` |
-| `results/g<g>_h<h>.json.gz` | per-point certificate: exact seeds, bound, full enclosed spectra |
-| `results/seeds.json` | g, h, n₀, β₀, εₛ, εₜ, bound for every point (exact rationals) |
-| `results/*audit*.json` | outputs of the audit scripts |
+## Seed and certified bound
 
-The per-point certificates are gzip-compressed JSON (each ~260 kB uncompressed, almost all
-of it the 4096 + 64 stored eigenvalue midpoints and radii, which the checker needs to
-recompute the partition intervals). `C.read_point` decompresses with the system `gzip`;
-`gzip -dc results/g1_1_h1_20.json.gz` shows one. Exact numbers are `"num//den"` strings.
+n₀ = 6 at every point; β₀ ∈ (1/4)ℤ was chosen by a numerical scan over n₀ ∈ {2, 4, 6},
+β₀ ∈ {1/4, …, 64}. The rings of 6 and 12 sites are diagonalised densely in every momentum
+sector (no spin-flip or reflection reduction); a polar-factor/Weyl argument with explicit
+rounding allowances ([METHOD.md](METHOD.md)) encloses every eigenvalue with multiplicity;
+interval partition sums give exact rational εₛ ≥ 1 − Pₛ(6, β₀) and εₜ ≥ 1 − P_τ(12, β₀);
+`CertifiedGaps.certified_gap_bound(εₛ, εₜ, β₀)` gives the bound, stored as an exact binary
+rational. All exact values are in [`results/seeds.json`](results/seeds.json) (the Lean file
+`lean/CertifiedGaps/Models/IsingLongitudinal.lean` quotes them).
 
-## Commands
+Certified bound ≈ (β₀), row g, column h:
 
-From the repository root (Julia 1.12):
+| g \ h | 1/20 | 1/10 | 1/4 | 1/2 | 1 |
+|---:|---:|---:|---:|---:|---:|
+| 1/4 | 0.3923 (97/4) | 0.7332 (55/4) | 1.6606 (13/2) | 1.9757 (11/2) | 2.0336 (21/4) |
+| 1/2 | 0.4564 (13) | 0.9592 (8) | 2.3616 (9/2) | 2.7754 (4) | 2.7276 (4) |
+| 3/4 | 0.3170 (8) | 0.7712 (21/4) | 2.1018 (7/2) | 3.0117 (7/2) | 3.1374 (7/2) |
+| 1 | 0.0763 (13/2) | 0.5043 (17/4) | 1.6092 (3) | 2.7523 (3) | 3.6403 (3) |
+| 3/2 | 0.1692 (7/2) | 0.3601 (13/4) | 1.0556 (11/4) | 2.1293 (5/2) | 3.7050 (5/2) |
+| 2 | 0.9121 (9/4) | 0.9643 (9/4) | 1.2728 (9/4) | 2.0005 (9/4) | 3.4912 (2) |
+
+The bounds are 9–74% of the 12-site ED gap (numerical; stored as `spectra` in each
+certificate). The equal-defect threshold 0.12731 is sufficient, not necessary: at g = 1,
+h = 1/20 the seed has εₛ ≈ 0.184 and the asymmetric recurrence still succeeds.
+
+Dense ED stops well short of L = 20: one generic momentum block at L = 20 has 52,377 states
+(≈ 41 GiB as a complex dense matrix; exact counts in `results/audit.json`). Smaller seeds
+sufficed at every grid point.
+
+## Reproduce
+
+From the repository root, Julia 1.12, `export OPENBLAS_NUM_THREADS=1`; `--project=julia` and
+`--project=models/tfim_longitudinal` both work. Times measured on an Apple M-series laptop.
 
 ```sh
-export OPENBLAS_NUM_THREADS=1
-julia --project=julia -e 'using Pkg; Pkg.instantiate()'
-julia --project=julia models/tfim_longitudinal/test/runtests.jl          # ~20 s
-DEEP_CHECK=1 julia --project=julia models/tfim_longitudinal/check.jl     # ~6 min CPU, full replay
-julia --project=julia models/tfim_longitudinal/final_audit.jl            # ~30 s
-julia --project=julia models/tfim_longitudinal/independent_residual_audit.jl
-julia --project=julia models/tfim_longitudinal/audit.jl
-julia --project=julia models/tfim_longitudinal/scan.jl                   # ~5 min, rewrites results
-julia --project=julia models/tfim_longitudinal/seeds.jl
+julia --project=julia models/tfim_longitudinal/test/runtests.jl     # fast tests, ~15 s
+julia --project=julia models/tfim_longitudinal/check.jl             # fast checker, ~15 s
+DEEP_CHECK=1 julia --project=julia models/tfim_longitudinal/check.jl # full replay, ~6 min
+julia --project=julia models/tfim_longitudinal/scripts/final_audit.jl                # ~30 s
+julia --project=julia models/tfim_longitudinal/scripts/independent_residual_audit.jl # ~10 s
+julia --project=julia models/tfim_longitudinal/scripts/audit.jl                      # ~20 s
+julia --project=julia models/tfim_longitudinal/certify.jl  # regenerate all results, ~5 min
 ```
 
-The directory's own `Project.toml` points at `../../julia`. Measured on the current core:
-fast tests 74/74 in about 20 s, deep replay 30/30 (330 s CPU), final artifact audit 1592/1592
-in about 30 s.
+`certify.jl` takes optional point indices 1–30 (g-major) and `NMAX` (default 6); after a full
+run it rewrites `results/seeds.json`. The audit scripts rewrite their `results/*audit*.json`.
 
-`scan.jl` takes `NMAX` (default 6) and optional parameter indices 1–30 (g-major). Larger rings
-are expensive: a single generic momentum block at L = 20 is 52,377-dimensional (~41 GiB as a
-complex dense matrix), so the dense route stops well short of L = 20.
+## What is rigorous
 
-## Removed when moving to `models/`
+- **Rigorous**: the RP identity (exact rationals); sector dimensions; eigenvalue enclosures for
+  every eigenvalue with multiplicity; partition-function and seed enclosures; the uniform gap
+  for every even L ≥ 6 at each grid point. The fast checker recomputes the partition intervals,
+  rational seeds and bounds from the stored eigenvalue intervals; `DEEP_CHECK=1` rebuilds every
+  block, re-proves its enclosure and checks (in exact rationals) that the fresh interval of
+  radius η lies inside the stored one of radius 2η. Accept regenerated certificates only after
+  the deep replay.
+- **Trusted assumptions**: the IEEE binary64 / MPFR / IntervalArithmetic model with gradual
+  underflow (checked at load time) and single-threaded OpenBLAS without fast-math; the
+  rounding allowances of [METHOD.md](METHOD.md) bound its dot-product errors but BLAS itself is
+  not formally verified.
+- **Numerical only**: seed ranking, 12-site ED reference gaps and bound/ED ratios, the
+  finite-size diagnostics stored in each certificate, and the free-fermion cross-check.
 
-The draft PR lived in `certificates/tfim_longitudinal/` and carried migration and provenance
-records that are no longer needed: uncompressed per-point JSONs (now gzipped, content
-unchanged), `results/original_generation_sources.json` and `archive_generation.jl` (archive of
-the pre-rename `ThermalMPOGap` sources), `results/namespace_migration.json`,
-`results/validation.json` and `results/validation_original.json` with `verify_all.jl`
-(replaced by `DEEP_CHECK=1 check.jl`), `results/audit_manifest.json` with `seal.jl`, and run
-logs. All remain in the git history of this branch. The per-point `metadata.source_sha256`
-values are historical (they fingerprint the generating sources at run time); rerun `scan.jl`
-to obtain fingerprints of the current sources.
+Independent checks: an independent review (2026-10-11) accepted the enclosure theorem and its
+implementation (all momentum sectors kept, no spin-flip reduction, correct Fourier
+coefficients −g√(p_b/p_a) e^{2πikt/L}, rounding allowances valid). `scripts/final_audit.jl`
+re-derives, without the production code, the sector dimensions (Ramanujan sums), Pauli trace
+moments tr H and tr H², 256-bit interval partition ratios, the seeds and bounds of all 30
+points (1592 checks). `scripts/independent_residual_audit.jl` checks the residual and
+orthogonality allowances on all 180 L = 6 blocks in exact rational arithmetic (360
+inequalities; largest exact/allowed ratios 0.005 and 0.017). `scripts/audit.jl` compares with
+computational-basis ED and the h = 0 free-fermion log Z (max error 7e−13).
+
+## Layout
+
+| path | role |
+|---|---|
+| `certify.jl` | numerical seed scan, rigorous enclosure of the best seed, writes results |
+| `check.jl` | checker (`DEEP_CHECK=1` for the full enclosure replay) |
+| `src/LongitudinalCertificate.jl` | momentum blocks, enclosures, seed enclosure, I/O |
+| `scripts/final_audit.jl` | independent stored-artifact audit → `results/final_audit.json` |
+| `scripts/independent_residual_audit.jl` | exact L = 6 residual audit → `results/independent_residual_audit.json` |
+| `scripts/audit.jl` | numerical cross-checks, resource counts → `results/audit.json` |
+| `test/runtests.jl` | fast tests (RP, sector counts, all 30 certificates, seed table) |
+| `METHOD.md` | the enclosure theorem and the rounding allowances |
+| `IDEAS.md` | candidate routes and the choice |
+| `results/g<g>_h<h>.json.gz` | per-point certificate: exact seeds, bound, all enclosed eigenvalues |
+| `results/seeds.json` | g, h, n₀, β₀, εₛ, εₜ, bound for all 30 points (exact) |
+
+The per-point certificates are gzip-compressed JSON (≈ 260 kB each uncompressed, mostly the
+4096 + 64 eigenvalue midpoints that the checker needs); `gzip -dc results/g1_1_h1_20.json.gz`
+shows one. Exact numbers are `"num//den"` strings.
+
+## History
+
+Moved from `certificates/tfim_longitudinal/`. The per-point `metadata.source_sha256` values
+are historical: they fingerprint the generating sources (under the former core name
+`ThermalMPOGap` and the former file layout) and are not checked; the deep replay re-derives
+every enclosure with the current code instead. In the tidy-up the module `certify.jl` became
+`src/LongitudinalCertificate.jl`, `scan.jl` became `certify.jl`, the audits moved to
+`scripts/`, `seeds.jl` was folded into the module, and `REPORT.md`, `INDEPENDENT_REVIEW.md`
+and the report generator `report.jl` were folded into this README. Earlier removals
+(uncompressed JSONs, migration and validation records, run logs) and the removed files remain
+in the git history. The three `results/*audit*.json` files are kept as produced before the
+tidy-up (their source hashes name the old layout); all three audits were rerun afterwards and
+passed with the same counts.
