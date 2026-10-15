@@ -58,7 +58,7 @@ oldes=parse(Rational{BigInt},old["epsilon_s"]); oldet=parse(Rational{BigInt},old
 hashes=merge(source_hashes(root;files=["certify.jl"]),
     Dict("../../julia/"*k=>v for (k,v) in source_hashes(joinpath(root,"../../julia"))),
     file_hashes(root,["../../julia/Project.toml","../../julia/Manifest.toml",
-        "../../outputs/thermal-mpo-gap-scope.tex"]))
+        "../../notes/thermal-mpo-gap-scope.tex"]))
 # Historical provenance hashes need the pinned commit in the local Git object store.
 if snapshot_available(root)
     @assert all(source_sha256(root,p;snapshot=HISTORICAL_SNAPSHOT)==h

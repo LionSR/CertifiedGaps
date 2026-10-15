@@ -170,7 +170,7 @@ unproved time-order reversal or fermion sign is involved.
 
 The survey theorem numbers mentioned in the core `certified_gap_bound` are not separately
 available as named proofs in this checkout. The following derivation instead
-uses explicit proved identities of `outputs/thermal-mpo-gap-note.tex`, extended
+uses explicit proved identities of `notes/thermal-mpo-gap-note.tex`, extended
 to this moment form by Appendix E of the scope note.
 
 Let `s,t` upper-bound the two defects and put

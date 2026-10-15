@@ -17,16 +17,16 @@ From the repository root:
 ```sh
 mkdir -p work/latex-build
 latexmk -pdf -interaction=nonstopmode -halt-on-error -file-line-error \
-  -outdir=work/latex-build outputs/thermal-mpo-gap-note.tex
-cp work/latex-build/thermal-mpo-gap-note.pdf outputs/thermal-mpo-gap-note.pdf
+  -outdir=work/latex-build notes/thermal-mpo-gap-note.tex
+cp work/latex-build/thermal-mpo-gap-note.pdf notes/thermal-mpo-gap-note.pdf
 ```
 
-The root `.latexmkrc` adds `outputs/` to `TEXINPUTS`, so the build finds `tnnotes.sty`.
+The root `.latexmkrc` adds `notes/` to `TEXINPUTS`, so the build finds `tnnotes.sty`.
 `work/` is not version controlled.
 
 ## Shared notation
 
-The note loads `outputs/tnnotes.sty`, which holds the shared notation macros,
+The note loads `notes/tnnotes.sty`, which holds the shared notation macros,
 colours and TikZ styles, and four general building blocks; diagrams are written
 inline with them rather than as one-off macros:
 

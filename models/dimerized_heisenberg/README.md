@@ -37,7 +37,7 @@ real channels `(C_x, C_y, C_z) = (B_x, i B_y, B_z)`:
 Θ² = 1,   Θ(D) = D,   Θ(C_x, C_y, C_z) = (A_x, i A_y, A_z),   −h = w Σ_a C_a ⊗ Θ(C_a).
 ```
 
-This is the antiunitary bond form of Appendix E of `outputs/thermal-mpo-gap-scope.tex`
+This is the antiunitary bond form of Appendix E of `notes/thermal-mpo-gap-scope.tex`
 (`Θ = V K`, `Θ² = ±1`, `−h = Σ c C ⊗ Θ(C)`, `Θ(D) = D`), and here the transfer kernel is even
 real symmetric. Equivalently, in the cell basis `W = M/√2`,
 

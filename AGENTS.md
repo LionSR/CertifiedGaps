@@ -83,7 +83,7 @@ because ...") is a result.
 
 ## Repository layout
 
-- `outputs/`: LaTeX notes (main proof, scope, certificate method). Do not edit unless asked.
+- `notes/`: LaTeX notes (main proof, scope, certificate method). Do not edit unless asked.
 - `julia/`: shared core package `CertifiedGaps` (recurrence and certified bounds, exact
   arithmetic, results I/O, spin operators, RP tests and exact RP certificates, exact
   diagonalisation, verified ring spectra and `certify_gap`, Nemo/Arb certified MPO toolkit,

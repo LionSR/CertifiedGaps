@@ -2,7 +2,7 @@
 
 A Lean 4 project, with Mathlib as its only dependency, that proves uniform spectral gaps of
 quantum spin rings with the two-purity doubling argument of the thermal-MPO note
-(`../outputs/thermal-mpo-gap-note.tex`). Everything is proved except the seed inequalities: two
+(`../notes/thermal-mpo-gap-note.tex`). Everything is proved except the seed inequalities: two
 numbers per model, stated as named `sorry` lemmas. All declarations live in the namespace
 `CertifiedGaps`; the names below are relative to it.
 
