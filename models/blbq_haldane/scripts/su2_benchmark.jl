@@ -1,5 +1,5 @@
 # Time one SU(2) highest-weight block construction and one eigensolve (theta = -0.3).
-# Usage: models/blbq_haldane/scripts/run.sh models/blbq_haldane/scripts/su2_benchmark.jl L S k
+# Usage: julia models/blbq_haldane/scripts/run.jl models/blbq_haldane/scripts/su2_benchmark.jl L S k
 # Writes results/su2_benchmark_L*_S*_k*.json.
 using CertifiedGaps.Results, LinearAlgebra
 const ROOT=normpath(joinpath(@__DIR__,".."))

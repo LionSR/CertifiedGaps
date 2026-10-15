@@ -46,14 +46,8 @@ checks=@testset "Fresh spectral replay artifact" begin
     @test c["recurrence"]==old["recurrence"]
 
     beta=parse(Rational{BigInt},c["beta"])
-    specs=[(;sectors=[(;eigenvalues=Float64.(sec["eigenvalues"]),
-        verification=(;radius=sec["verification"]["radius"])) for sec in sp["sectors"]])
-        for sp in c["spectra"]]
-    ln=logz_interval(specs[1],beta); l2=logz_interval(specs[2],beta)
-    l22=logz_interval(specs[2],2beta)
-    ls=Ladder.down(()->l2[1]-2ln[2]); lt=Ladder.down(()->l22[1]-2l2[2])
-    es=Rational{BigInt}(-Ladder.down(()->expm1(ls)))
-    et=Rational{BigInt}(-Ladder.down(()->expm1(lt)))
+    specs=stored_spectra(c)
+    (;es,et)=seed_defects(specs[1],specs[2],beta)
     @test es==parse(Rational{BigInt},c["epsilon_s"])
     @test et==parse(Rational{BigInt},c["epsilon_t"])
     @test certified_gap_bound(es,et,beta).bound==c["bound"]

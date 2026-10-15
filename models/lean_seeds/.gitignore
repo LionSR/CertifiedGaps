@@ -1,6 +1,6 @@
 # Regenerable or downloaded data; see README "Reproduce". Committed results are listed there.
 
-# Shared: paper sources (scripts/fetch_paper.jl), scratch caches, logs, temporaries
+# Shared: paper sources (tools/fetch_upstream.jl --paper), scratch caches, logs, temporaries
 /upstream/
 /cache/
 /.cache/

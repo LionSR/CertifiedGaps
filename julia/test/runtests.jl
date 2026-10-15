@@ -17,6 +17,21 @@ using ITensors, ITensorMPS, CertifiedGaps.Purification
             majorant_loss(interval(BigFloat, 3) / 97, interval(BigFloat, 1) / 3; J = 40)
         end
         @test ok && 0.129021 < sup(Λ) < 0.129022
+        # The other reference values formerly printed by julia/scripts/constants.jl.
+        B(x) = interval(BigFloat, x)
+        setprecision(BigFloat, 256) do
+            # Theorem 2.22 (i) at ε₀ = 1/100: β₀Δ_L ≥ log(0.97/(3ε₀)) − Λ₄₀ ≈ 3.3471.
+            @test 3.34707 < inf(log(B(97) / 3) - Λ) < 3.34708
+            # Theorem 2.22 (ii), r₀ ≤ 0.03 and a₀ ≤ 1/100.
+            for (R₀, low, high) in ((B(3) / 100, 0.833876, 0.833877),
+                                    (B(1) / 99, 0.787726, 0.787727))
+                Λii, okii = majorant_loss(R₀, B(1); J = 40)
+                @test okii && low < sup(Λii) < high
+            end
+        end
+        # Odd lengths (Proposition 2.13): β₀Δ_L ≥ log((1 − 2u₀)/(2u₀)), u₀ = 1 − 0.99³.
+        u₀ = 1 - (B(99) / 100)^3
+        @test 2.762187 < inf(log((1 - 2u₀) / (2u₀))) < 2.762188
     end
 
     @testset "certified bound" begin

@@ -173,7 +173,7 @@ Non-certifying drivers, by study (outputs under `results/<study>/`; caches and r
 the gitignored `cache/`, `upstream/`, `.cache/`, `runtime/` and the paths in `.gitignore`):
 
 ```sh
-julia --project=. scripts/fetch_paper.jl                   # paper sources -> upstream/ (network)
+julia scripts/fetch_paper.jl         # paper sources -> upstream/ (network; tools/fetch_upstream.jl)
 # seed_design: spectra (70 s for n <= 10), searches, diagnostics, trial contraction, summary
 julia --project=. scripts/seed_design/spectra.jl 4 5 6 7 8 9 10
 julia --project=. scripts/seed_design/search_existing.jl   # results/seed_design/raw/
@@ -204,7 +204,7 @@ julia --project=. scripts/anchor/report_tables.jl         # METHOD.md §3 tables
 # spin1_kernel: Float64 structure/anchor tables (5 s), kernel benchmarks, Mathlib audit
 julia --project=. scripts/spin1_kernel/experiments.jl
 julia --startup-file=no scripts/spin1_kernel/benchmark.jl 300   # ~2.5 min
-scripts/spin1_kernel/audit_mathlib.sh                      # reads lean/.lake/packages/mathlib
+julia scripts/audit_mathlib.jl       # Mathlib audit; reads lean/.lake/packages/mathlib, needs rg
 # ising: two-level feasibility, cost model, 43-row table, inventory
 julia --project=. scripts/ising/feasibility.jl
 julia --project=. scripts/ising/costs.jl --reuse           # without --reuse: re-run benchmarks
@@ -249,7 +249,9 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for it
 | `src/anchor.jl` | `AnchorStudy`: integer bonds, comparison matrices, exact LDL and enclosures, certify and check |
 | `src/spin1_kernel.jl` | `Spin1Kernel`: witness generator, Lean text, witness inventory and check |
 | `src/ising.jl` | `IsingSeed`: proposal generator, `Generated*.lean` text, exact replay and check |
-| `scripts/<study>/` | the drivers under "Reproduce"; `scripts/fetch_paper.jl` is shared |
+| `scripts/<study>/` | the drivers under "Reproduce" |
+| `scripts/fetch_paper.jl` | shared: runs `tools/fetch_upstream.jl --paper` (paper sources into `upstream/`) |
+| `scripts/audit_mathlib.jl` | spin1_kernel Mathlib audit; kept outside `scripts/spin1_kernel/`, whose `.jl` files are hash-pinned by `results/spin1_kernel/witnesses.json` |
 | `test/runtests.jl` | runs `test/<study>.jl` (one module each) |
 | `results/seed_design/` | `certificate.json`, `compact_witnesses.json` (exact); `trial_scan.json`, `pareto.csv`, `summary.json`, `diagnostics.json`, `shift_search.json` (search records) |
 | `results/spectrum/` | `spectrum_<n>_<twist>.json`, `analysis.json`, `summary.json`, CSV tables, kernel logs, `provenance.json` |
@@ -285,3 +287,11 @@ as of commit `463c4a5`; two of them are now gitignored regenerable data
   directly. All exact records were regenerated: every exact number is identical (only
   provenance hashes, timings and the seed_design trial-file paths changed), and the Lean
   witness files are byte-identical apart from module names.
+- Layout tidy: `scripts/fetch_paper.jl` now forwards to the shared
+  `tools/fetch_upstream.jl --paper` (one place for the pinned commit; it also skips files that
+  are already present with the pinned hash), and `scripts/spin1_kernel/audit_mathlib.sh` was
+  ported to `scripts/audit_mathlib.jl` (byte-identical output). The port sits outside
+  `scripts/spin1_kernel/` so that the spin1_kernel source-hash set is unchanged.
+  `scripts/spectrum/KernelBench.lean` stays where it is: `scripts/spectrum/provenance.jl` hashes
+  it into `results/spectrum/provenance.json`, and the Lean benchmarks under `lean/` are not
+  edited from model directories.

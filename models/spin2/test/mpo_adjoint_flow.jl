@@ -1,4 +1,4 @@
-include(joinpath(@__DIR__, "../scripts/mpo_adjoint_flow.jl"))
+include(joinpath(@__DIR__, "../scripts/adjoint/mpo_adjoint_flow.jl"))
 using LinearAlgebra, Random, Test
 
 function expand_adjoint_test(cores)

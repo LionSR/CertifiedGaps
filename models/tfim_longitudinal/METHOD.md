@@ -94,5 +94,5 @@ Both lower and upper partition endpoints are required. Finally its `.bound` is r
 also as an exact binary rational, so the displayed decimal is only a readable rendering.
 
 The fast checker repeats RP, dimension counts, interval partition sums and the recurrence.
-`DEEP_CHECK=1` additionally regenerates the dense eigenvalue enclosures, verifying containment in the
+`check.jl --full` additionally regenerates the dense eigenvalue enclosures, verifying containment in the
 stored spectral inputs; no eigenvectors are trusted from a JSON file.

@@ -1,4 +1,4 @@
-include(joinpath(@__DIR__, "../scripts/repeated_l2_probe.jl"))
+include(joinpath(@__DIR__, "../scripts/compression/repeated_l2_probe.jl"))
 using Test, Random
 
 @testset "Weighted Hilbert--Schmidt and operator-norm witnesses" begin

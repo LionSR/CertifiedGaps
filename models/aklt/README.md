@@ -3,7 +3,13 @@
 `AKLTPilot` tests the 2+1-dimensional thermal recursion of
 [the 2+1D note](../../notes/thermal-mpo-gap-2plus1d.tex) on the periodic spin-3/2 AKLT model
 of the honeycomb lattice, \(H=\sum_{\text{bonds}}P_{ij}(\text{total spin}=3)\), with this
-projector normalisation throughout.
+projector normalisation throughout. It is a floating-point implementation check: the thermal-MPO
+purification does not reproduce the smallest exact reference, so no seed or gluing diagnostic is
+resolved.
+
+| parameter | seed (n₀, β₀) | certified gap ≥ | lengths covered |
+|---|---|---|---|
+| honeycomb AKLT | none (8-spin candidate R(64) ≈ 0.0083, floating point) | no certificate | — |
 
 ## Model
 
@@ -31,6 +37,15 @@ For base geometry \((n,m)\) and inverse temperature \(\beta\) the diagnostics ar
 \(C=[Z(2n,2m,2\beta)-1]/R^2\), the gluing defect \(G=\log Z(2n,2m,2\beta)-4\log Z(n,m,2\beta)\)
 split as \(G=2G_x+G_y\), and \(\max(G,0)/R^2\). The relevant condition is \(CR<1\) with a uniform
 bound on later scales; a small \(C\) is useless when \(R\) is large.
+
+## Reflection positivity
+
+Not available. The 2+1D note proves that the standard time-reversal construction fails for one
+AKLT bond: with \(\theta(A)=U\bar AU^\dagger\), \(U=e^{-i\pi S^y}\), and the quadrupole
+\(Q=(S^z)^2-\tfrac54\), \(\operatorname{Tr}[e^{-tP^{(3)}}(Q\otimes\theta Q)]=\tfrac75(e^{-t}-1)<0\)
+for every \(t>0\). `test/runtests.jl` checks the ingredients in floating point
+(\(\operatorname{Tr}[P^{(3)}(Q\otimes Q)]=7/5\) and the projector polynomial). This excludes only
+that local construction; the scalar gluing inequalities the 2+1D recursion needs remain open.
 
 ## Result
 
@@ -73,26 +88,50 @@ pinned to the same versions as `models/spin2`. From the repository root:
 julia --startup-file=no --project=models/aklt -e 'using Pkg; Pkg.instantiate()'
 julia --startup-file=no --project=models/aklt models/aklt/test/runtests.jl   # 38 tests, ~3.5 min
 julia --startup-file=no --project=models/aklt models/aklt/scripts/run.jl \
-  models/aklt/configs/exact-small.toml models/aklt/results/exact-small.json
+  models/aklt/scripts/configs/exact-small.toml models/aklt/results/exact-small.json
 ```
 
-The other configurations are `thermal-pilot.toml` (2×2 base, \(\chi\in\{16,32\}\),
-\(\delta\beta\in\{1/8,1/16\}\)), `thermal-reference-refinement.toml` (eight spins only,
-\(\chi\in\{64,128\}\)) and `thermal-swap-refinement.toml` (the same without moving sites back).
-Each output records source and environment hashes, parameters, versions, thread counts,
-geometry, a `complete` flag and `certified=false`, and is rewritten after every finished sector
-or temperature, so an interrupted run is visible; use a fresh filename to keep an earlier run.
+There is no `certify.jl` (nothing is certified) and no `check.jl` (no tracked results to
+check); the test suite is the verification. The other configurations in `scripts/configs/` are
+`thermal-pilot.toml` (2×2 base, \(\chi\in\{16,32\}\), \(\delta\beta\in\{1/8,1/16\}\)),
+`thermal-reference-refinement.toml` (eight spins only, \(\chi\in\{64,128\}\)) and
+`thermal-swap-refinement.toml` (the same without moving sites back). Each output records source
+and environment hashes, parameters, versions, thread counts, geometry, a `complete` flag and
+`certified=false`, and is rewritten after every finished sector or temperature, so an
+interrupted run is visible; use a fresh filename to keep an earlier run.
+
+## What is rigorous
+
+Nothing is certified. The exact identities checked by the tests (projector polynomial,
+\(\operatorname{Tr}[P^{(3)}(Q\otimes Q)]=7/5\), the single-bond partition function) hold in exact
+arithmetic, but the tests evaluate them in `Float64`. The reference spectra are unverified dense
+`Float64` eigensolves, and the thermal-MPO values carry uncontrolled Trotter and truncation
+errors.
 
 ## Layout
 
 - `src/AKLTPilot.jl` (module), `src/model.jl` (periodic honeycomb quotient geometry),
   `src/thermal.jl` (thermal MPO purification), `src/exact.jl` (polynomial projector and
   reference diagonalisation).
-- `scripts/run.jl`: runs one configuration from `configs/*.toml` and writes its JSON output.
+- `scripts/run.jl`: runs one configuration from `scripts/configs/*.toml` and writes its JSON
+  output.
+- `scripts/configs/`: the four run configurations listed under Reproduce.
 - `test/runtests.jl`: the tests.
+- `.JuliaFormatter.toml`: formatter settings for this directory (editor tooling, not data).
+- `.gitignore`: keeps `results/` local.
 
 `results/` is gitignored and kept locally. The stored files were produced before the move to
 `models/`, with the `spin2` environment, so their `environment/` hashes refer to
 `spin2/Project.toml` and `spin2/Manifest.toml`; `pilot-summary.json` and the two projection
 files there came from the local Python helpers mentioned above. Rerun the configurations to
 regenerate the Julia outputs.
+
+## History
+
+- Added with the notes and the Julia core; moved under `models/` when the core was renamed
+  `CertifiedGaps`.
+- #15: README rewritten to state that nothing is certified and to record the negative results;
+  an unused dependency removed.
+- #19: aligned with the common directory format.
+- Run configurations moved from `configs/` to `scripts/configs/`, and `IDEAS.md` reconstructed,
+  to match the directory format.

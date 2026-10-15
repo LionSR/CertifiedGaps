@@ -1,0 +1,2 @@
+# Pilot outputs are regenerable from scripts/configs/*.toml and kept local only; see README.md.
+/results/

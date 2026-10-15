@@ -1,5 +1,6 @@
 # Independent checks of stored artifacts: no calls to seed_enclosure or orbits.
-# Usage: julia --project=julia models/tfim_longitudinal/scripts/final_audit.jl (~30 s).
+# Usage (~30 s):
+#     julia --project=models/tfim_longitudinal models/tfim_longitudinal/scripts/final_audit.jl
 using LinearAlgebra, IntervalArithmetic, CertifiedGaps, CertifiedGaps.Results, JSON3
 using Test
 BLAS.set_num_threads(1)

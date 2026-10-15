@@ -250,4 +250,5 @@ function write_seed_table()
         "epsilon_t"=>"upper bound on 1 - Z_{2n0}(2 beta0)/Z_{2n0}(beta0)^2",
         "validity"=>"every even L >= n0 sites","points"=>seed_rows()))
 end
+include("checks.jl")
 end

@@ -117,17 +117,20 @@ n₀ = 4). There is no certificate, so there is no `certify.jl`; the regeneratio
 are in `scripts/`. Times measured on an Apple M-series laptop (2026-10-14): `check.jl` 19 s,
 `check.jl --full` 21 s.
 
-Regenerating the spectra (not needed for checking; `scripts/run.sh` wraps `julia --project=julia`
-with one BLAS thread; times from the original 4-CPU run):
+Regenerating the spectra (not needed for checking; `scripts/run.jl` runs `julia --project=julia`
+from the repository root with one BLAS thread; times from the original 4-CPU run):
 
 ```sh
-models/blbq_haldane/scripts/run.sh -t 4 \
+julia models/blbq_haldane/scripts/run.jl -t 4 \
     models/blbq_haldane/scripts/scan.jl 2 3 4 5 6 7 8 10 12      # ~20 min
-models/blbq_haldane/scripts/run.sh models/blbq_haldane/scripts/reference.jl 14  # ~2 min
-models/blbq_haldane/scripts/run.sh models/blbq_haldane/scripts/reference.jl 16  # ~20 min
-models/blbq_haldane/scripts/run.sh models/blbq_haldane/scripts/preflight.jl     # seconds
-models/blbq_haldane/scripts/run_su2_grid.sh   # 120 L14 sectors: ~4 h, peak ~15 GiB RAM
-models/blbq_haldane/scripts/finalize_su2.sh   # collect, gzip, analyze, audit, test
+julia models/blbq_haldane/scripts/run.jl \
+    models/blbq_haldane/scripts/reference.jl 14                    # ~2 min
+julia models/blbq_haldane/scripts/run.jl \
+    models/blbq_haldane/scripts/reference.jl 16                    # ~20 min
+julia models/blbq_haldane/scripts/run.jl \
+    models/blbq_haldane/scripts/preflight.jl                       # seconds
+julia models/blbq_haldane/scripts/run_su2_grid.jl  # 120 L14 sectors: ~4 h, peak ~15 GiB RAM
+julia models/blbq_haldane/scripts/finalize_su2.jl  # collect, gzip, analyze, audit, test
 ```
 
 ## What is rigorous
@@ -146,19 +149,19 @@ models/blbq_haldane/scripts/finalize_su2.sh   # collect, gzip, analyze, audit, t
 |---|---|
 | `check.jl` | runs the test suite (no certificate to check); `--full` adds the n₀ = 4 rows |
 | `scripts/scan.jl` | complete dense spectra through L = 12 (writes `results/spectrum_L*.json`) |
-| `scripts/run.sh` | wrapper: `julia --project=julia`, one BLAS thread |
+| `scripts/run.jl` | launcher: `julia --project=julia` from the root, one BLAS thread |
 | `src/model.jl` | exact RP identities (`exact_rp`), integer S·S bond |
 | `src/sectors.jl` | translation orbits, momentum/flip/reflection blocks |
 | `src/su2.jl` | numerical SU(2) highest-weight blocks (Casimir projector, CholeskyQR2) |
 | `src/dimensions.jl` | exact character dimensions of magnetization/momentum sectors |
 | `src/result_io.jl` | reading (gzipped) spectra, weighted spectra, moments |
 | `scripts/reference.jl` | L = 14, 16 low-energy M = 0 references |
-| `scripts/su2_sector.jl`, `run_su2_grid.sh` | one / all L = 14 SU(2) sectors |
+| `scripts/su2_sector.jl`, `run_su2_grid.jl` | one / all L = 14 SU(2) sectors |
 | `scripts/collect_su2.jl`, `archive_spectra.jl` | assemble and gzip the L = 14 spectrum |
 | `scripts/analyze.jl` | rebuild `results/scaling.json` from the spectra |
 | `scripts/preflight.jl`, `su2_benchmark.jl` | exact dimension counts, block timing |
 | `scripts/audit.jl` | writes `results/rp.json`, `results/environment.json` |
-| `scripts/finalize_su2.sh` | post-sweep pipeline |
+| `scripts/finalize_su2.jl` | post-sweep pipeline |
 | `test/runtests.jl`, `test/su2_small.jl` | fast tests |
 | `results/scaling.json` | grid maxima, best even seeds, δ(n), gaps, forecasts, input hashes |
 | `results/reference_L14.json`, `reference_L16.json` | low-energy references (hashed in scaling) |
@@ -191,4 +194,6 @@ The directory-format tidy moved `scan.jl` and `run.sh` from the top level into `
 inside them adjusted) and added `check.jl --full`. The `"scan.jl"` and `"run.sh"` entries in
 `results/scaling.json` and `results/environment.json` record earlier versions of those files at
 their former top-level paths (see the git history); later regenerations hash them under
-`scripts/`.
+`scripts/`. The shell drivers `run.sh`, `run_su2_grid.sh` and `finalize_su2.sh` were later
+ported to the Julia scripts `run.jl`, `run_su2_grid.jl` and `finalize_su2.jl` (same steps,
+same timeout); the `run.sh` hash in `results/environment.json` names the old wrapper.

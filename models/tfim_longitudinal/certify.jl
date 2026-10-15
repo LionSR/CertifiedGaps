@@ -3,7 +3,8 @@
 # For each grid point: diagonalise every ring of n and 2n sites (n ∈ 2:2:NMAX) densely in
 # floating point, rank the seeds (n₀, β₀) numerically, then redo the best one with rigorous
 # eigenvalue enclosures and interval partition sums and apply `certified_gap_bound`.
-# Usage: julia --project=julia models/tfim_longitudinal/certify.jl [point indices 1-30]
+# Usage: julia --project=models/tfim_longitudinal models/tfim_longitudinal/certify.jl \
+#     [point indices 1-30]
 # (g-major order; NMAX defaults to 6). Takes about five minutes for all 30 points.
 include(joinpath(@__DIR__, "src", "LongitudinalCertificate.jl"))
 using .LongitudinalCertificate, CertifiedGaps, CertifiedGaps.Seeds, CertifiedGaps.Results

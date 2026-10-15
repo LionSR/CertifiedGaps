@@ -1,7 +1,8 @@
 module Ladder
 using LinearAlgebra, SparseArrays, CertifiedGaps
 using CertifiedGaps.Results
-export rp_identity, blocks, block_matrix, full_spectrum, verify_eigen, logz_interval
+export rp_identity, blocks, block_matrix, full_spectrum, verify_eigen, logz_interval,
+    seed_defects, stored_spectra
 BLAS.set_num_threads(1)
 
 "Exact rational check of −h_bond = Σ C⊗C (C = Z⊗I, I⊗Z) and of a real symmetric on-site term."
@@ -165,4 +166,27 @@ function logz_interval(spec,beta)
     hi=up(()->log(sum(e->exp(-beta*e),lows)))
     (lo,hi)
 end
+
+"""
+    seed_defects(small, large, beta) -> (; es, et, logZ)
+
+Rational upper bounds `es ≥ 1 − Z_{2n}(β)/Z_n(β)²` and `et ≥ 1 − Z_{2n}(2β)/Z_{2n}(β)²` from the
+enclosed spectra of the rings of n and 2n rungs, with the three directed log Z intervals
+`logZ = (log Z_n(β), log Z_{2n}(β), log Z_{2n}(2β))`. The single implementation of the seed
+step, used by certify.jl, the tests and the replay scripts; it rounds in the ambient BigFloat
+precision (256 bits by default).
+"""
+function seed_defects(small,large,beta)
+    ln=logz_interval(small,beta); l2=logz_interval(large,beta)
+    l22=logz_interval(large,2beta)
+    ls=down(()->l2[1]-2ln[2]); lt=down(()->l22[1]-2l2[2])
+    es=Rational{BigInt}(-down(()->expm1(ls)))
+    et=Rational{BigInt}(-down(()->expm1(lt)))
+    (;es,et,logZ=(ln,l2,l22))
+end
+
+"The `spectra` of a stored certificate or replay, in the form `logz_interval` reads."
+stored_spectra(c)=[(;sectors=[(;eigenvalues=Float64.(sec["eigenvalues"]),
+    verification=(;radius=sec["verification"]["radius"])) for sec in sp["sectors"]])
+    for sp in c["spectra"]]
 end

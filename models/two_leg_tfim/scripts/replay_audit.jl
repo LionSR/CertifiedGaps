@@ -24,11 +24,7 @@ started=string(now(UTC)); t=time()
 g=3//1; n=4; beta=BigInt(3)//BigInt(2)
 @assert rp_identity(g) && iseven(n) && g>0
 fresh=[full_spectrum(L,g;verified=true) for L in (n,2n)]
-ln=logz_interval(fresh[1],beta); l2=logz_interval(fresh[2],beta)
-l22=logz_interval(fresh[2],2beta)
-ls=Ladder.down(()->l2[1]-2ln[2]); lt=Ladder.down(()->l22[1]-2l2[2])
-es=Rational{BigInt}(-Ladder.down(()->expm1(ls)))
-et=Rational{BigInt}(-Ladder.down(()->expm1(lt)))
+(;es,et,logZ)=seed_defects(fresh[1],fresh[2],beta)
 @assert 0<=es<1 && 0<=et<1
 result=certified_gap_bound(es,et,beta)
 @assert result.bound !== nothing
@@ -89,7 +85,7 @@ payload=(;status="fresh spectral verification complete",started_utc=started,fini
     original_artifact_preserved=true,historical_source_snapshot=HISTORICAL_SNAPSHOT,source_hashes=hashes,
     g=string(g),n0=n,beta=string(beta),epsilon_s=string(es),epsilon_t=string(et),
     bound=result.bound,bound_exact_binary=string(Rational{BigInt}(result.bound)),recurrence=result,
-    logZ=[map(x->string(Rational{BigInt}(x)),v) for v in (ln,l2,l22)],
+    logZ=[map(x->string(Rational{BigInt}(x)),v) for v in logZ],
     agreement,sector_comparisons=comparisons,spectra=fresh,theorem_assumptions=assumptions,
     metadata=run_metadata((;mode="fixed-seed replay; no search",bigfloat_precision=precision(BigFloat),
         blas=string(BLAS.get_config()),rounding="nearest",gradual_underflow=true);

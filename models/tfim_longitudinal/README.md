@@ -56,17 +56,19 @@ sufficed at every grid point.
 
 ## Reproduce
 
-From the repository root, Julia 1.12, `export OPENBLAS_NUM_THREADS=1`; `--project=julia` and
-`--project=models/tfim_longitudinal` both work. Times measured on an Apple M-series laptop.
+From this directory (`models/tfim_longitudinal`), Julia 1.12, `export OPENBLAS_NUM_THREADS=1`;
+from the repository root use `--project=models/tfim_longitudinal` and prefix the paths. Times
+measured on an Apple M-series laptop.
 
 ```sh
-julia --project=julia models/tfim_longitudinal/test/runtests.jl     # fast tests, ~15 s
-julia --project=julia models/tfim_longitudinal/check.jl             # fast checker, ~15 s
-julia --project=julia models/tfim_longitudinal/check.jl --full      # full replay, ~6 min
-julia --project=julia models/tfim_longitudinal/scripts/final_audit.jl                # ~30 s
-julia --project=julia models/tfim_longitudinal/scripts/independent_residual_audit.jl # ~10 s
-julia --project=julia models/tfim_longitudinal/scripts/audit.jl                      # ~20 s
-julia --project=julia models/tfim_longitudinal/certify.jl  # regenerate all results, ~5 min
+julia --project=. -e 'using Pkg; Pkg.instantiate()'
+julia --project=. test/runtests.jl                       # fast tests, ~15 s
+julia --project=. check.jl                               # fast checker, ~15 s
+julia --project=. check.jl --full                        # full replay, ~6 min
+julia --project=. scripts/final_audit.jl                 # ~30 s
+julia --project=. scripts/independent_residual_audit.jl  # ~10 s
+julia --project=. scripts/audit.jl                       # ~20 s
+julia --project=. certify.jl                             # regenerate all results, ~5 min
 ```
 
 `certify.jl` takes optional point indices 1–30 (g-major) and `NMAX` (default 6); after a full
@@ -103,12 +105,13 @@ computational-basis ED and the h = 0 free-fermion log Z (max error 7e−13).
 | path | role |
 |---|---|
 | `certify.jl` | numerical seed scan, rigorous enclosure of the best seed, writes results |
-| `check.jl` | checker (`--full`, or `DEEP_CHECK=1`, for the full enclosure replay) |
+| `check.jl` | checker entry point (`--full` for the full enclosure replay) |
 | `src/LongitudinalCertificate.jl` | momentum blocks, enclosures, seed enclosure, I/O |
+| `src/checks.jl` | `check_result`, `check_grid`: the checks behind `check.jl` and the tests |
 | `scripts/final_audit.jl` | independent stored-artifact audit → `results/final_audit.json` |
 | `scripts/independent_residual_audit.jl` | exact L = 6 residual audit → `results/independent_residual_audit.json` |
 | `scripts/audit.jl` | numerical cross-checks, resource counts → `results/audit.json` |
-| `test/runtests.jl` | fast tests (RP, sector counts, all 30 certificates, seed table) |
+| `test/runtests.jl` | fast tests (RP, sector counts, all 30 certificates via `src/checks.jl`, seed table) |
 | `METHOD.md` | the enclosure theorem and the rounding allowances |
 | `IDEAS.md` | candidate routes and the choice |
 | `results/certificate_g<g>_h<h>.json.gz` | per-point certificate: exact seeds, bound, all enclosed eigenvalues |
@@ -135,3 +138,6 @@ passed with the same counts. In the format tidy-up the per-point files were rena
 `results/g<g>_h<h>.json.gz` to `results/certificate_g<g>_h<h>.json.gz` (contents unchanged, so
 the `certificate_sha256` values in `results/final_audit.json` still apply; the `file` fields of
 `results/seeds.json` were updated), and `check.jl` gained `--full` as the name of the deep replay.
+Later the checks moved from `check.jl` into `src/checks.jl`, so that `check.jl` is the entry
+point and `test/runtests.jl` no longer includes it; the `DEEP_CHECK=1` alias of `--full` was
+dropped. Behaviour and checks are unchanged.
