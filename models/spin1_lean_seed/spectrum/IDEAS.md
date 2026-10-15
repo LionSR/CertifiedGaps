@@ -23,3 +23,13 @@
 Chosen route: dense/sparse numerical spectra, followed by measured Chebyshev
 filtering and exact integer recurrence probes. This is an experiment and cost
 audit, not a certificate. All new files remain in this task directory.
+
+## Outcome
+
+No certificate (none was attempted). The low-state counts are small (n = 12, β = 12.25 keeps 26
+states for I and 34 for P; source 2 at n = 10 keeps 22/30/26 for I/P/C), and Q48 integer
+recurrences with degree-16 cycles meet the numerical residual targets in every active sector.
+Two premises of the proposed Lean seed route fail: direct compressed-Sz masked shifts need
+thousands of displacement masks (3,816 at n = 12, Sz = 0; 13,620 at Sz = 2) instead of about 50,
+and the elementary two-half-chain anchor leaves 242 Sz = 0 levels below the n = 12/I anchor
+where the ring has 10. A kernel-checkable spectral anchor is the open problem (README, "Result").
