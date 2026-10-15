@@ -1,0 +1,16 @@
+{
+  "axiom_audit": "only the standard three; conditional hypotheses remain open",
+  "axioms": {
+    "passed": true,
+    "seconds": 2.666961563
+  },
+  "build": {
+    "passed": true,
+    "seconds": 5.563942967
+  },
+  "julia_tests": {
+    "passed": true,
+    "seconds": 5.443459041
+  },
+  "protected_sources": "unchanged against recorded SHA256 snapshot"
+}

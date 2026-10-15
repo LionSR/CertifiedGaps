@@ -1,0 +1,17 @@
+'LeanSeedSmall.check6' depends on axioms: [propext]
+'LeanSeedSmall.check12' depends on axioms: [propext]
+'LeanSeedSmall.direct6' depends on axioms: [propext]
+'LeanSeedSmall.direct12_chunked' depends on axioms: [propext]
+'LeanSeedSmall.allChunks12_eq_range' depends on axioms: [propext]
+'LeanSeedSmall.direct12_canonical' depends on axioms: [propext]
+'LeanSeedSmall.coverage12' does not depend on any axioms
+'LeanSeedSmall.anchor6' does not depend on any axioms
+'LeanSeedSmall.anchor12' does not depend on any axioms
+'LeanSeedSmall.spatial_arithmetic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LeanSeedSmall.thermal_arithmetic' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LeanSeedSmall.exists_near_of_weighted_residual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LeanSeedSmall.seed_spatial_from_enclosures' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LeanSeedSmall.seed_thermal_from_enclosures' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LeanSeedSmall.first_point_seed_instance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'LeanSeedSmall.wrong_eigenvalue_rejected' depends on axioms: [propext]
+'LeanSeedSmall.wrong_vector_rejected' depends on axioms: [propext]

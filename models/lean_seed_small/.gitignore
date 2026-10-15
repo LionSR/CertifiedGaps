@@ -1,0 +1,7 @@
+.lake/
+.tools/
+.julia/
+vendor/
+logs/
+*.olean
+*.ilean

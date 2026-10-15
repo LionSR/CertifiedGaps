@@ -1,0 +1,28 @@
+{
+  "double_beta": {
+    "lo": 620.0021560097376,
+    "hi": 620.0021560194376,
+    "tail": 3.770335477181426e-24,
+    "cutoff": 1.2835496085481992
+  },
+  "energy_radius": 1.0e-10,
+  "eps_s_sandwich": 1.2106652381740608e-6,
+  "eps_s_target": 9.064e-6,
+  "eps_t_sandwich": 9.949076180039725e-9,
+  "eps_t_target": 3.141e-5,
+  "fits_log_enclosures": true,
+  "large": {
+    "lo": 310.0010780048691,
+    "hi": 310.00107800984335,
+    "tail": 1.2424070767498373e-10,
+    "cutoff": 1.2835496085481992
+  },
+  "passes": true,
+  "small": {
+    "lo": 155.00053960291754,
+    "hi": 155.00053960776754,
+    "tail": 2.7770600435961243e-27,
+    "cutoff": 2.6917748068472047
+  },
+  "status": "NON-CERTIFYING Float64 feasibility; assumes eigenvalue enclosure theorem"
+}
