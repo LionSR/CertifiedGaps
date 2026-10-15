@@ -10,6 +10,8 @@ The source verifier contracts its 676-dimensional double layer in eleven charge-
 
 ## What the upstream implementation already does
 
+The upstream files linked here live in the gitignored `references/` directory; `julia tools/fetch_upstream.jl` fetches them.
+
 The pinned [upstream trial code](../../references/periodic-gap-source/verification/computations/trials/original_trial.py) builds the integer matrices, separates charge differences, and evaluates powers by repeated squaring. Its block sizes are
 
 ```
@@ -58,33 +60,21 @@ Tests compare every output coordinate with the reference kernels, including sign
 
 The task queue now follows the upstream largest-first approach across all lengths, twists and magnetization sectors, with Julia's greedy scheduling. This corrects the unbalanced scheduling of the first port. Sector completion is reported during long runs.
 
-## Measurements and reproducibility
+## Measurements
 
-`results/reference/` preserves the completed first Julia reproduction. `results/` holds the optimized run. All performance claims should be read with their scopes:
+`results/reference/` preserves the completed first Julia reproduction and `results/` the optimized run. Every measurement below is local and scoped as stated; none is a comparison with the upstream authors' hardware.
 
-- `kernel-benchmark.json` compares warmed reference and optimized sector contractions in one process. The measured gains were about 2.18x for source 1 at length 11, twist pi, magnetization 1, and 2.58x for source 2 at length 10, complex twist, magnetization 1. The complete integers agree.
-- `trial-benchmark.json`, produced by `scripts/benchmark_trials.jl`, compares warmed contraction costs for Julia `BigInt` charge blocks, FLINT charge blocks, and FLINT SU(2) blocks at both lengths. Geometry construction and compilation are excluded equally.
-- `batch-benchmark.json` tests the same 64 columns of the largest real-twist sector at batch sizes 4, 8, 16 and 32. All integers agree. The smaller batches were slower in this experiment, so the default stays at 32. This is a partial-column experiment, not a full thermal certificate.
-- The component `wall_seconds` values include their recorded calculation scope; cold compilation and competing work can affect them. They are local measurements, not comparisons with the upstream authors' hardware.
+- **Trials** (`results/trial-benchmark.json`, `scripts/benchmark_trials.jl`). Both N=72 and N=120 were contracted by all three methods in one process, after warming each; geometry construction was excluded equally, and the complete U/V integers and every charge-block contribution agreed.
 
-To rerun the benchmarks:
+  | Exact contraction method | Time for both lengths |
+  | --- | ---: |
+  | Original Julia `BigInt` charge blocks | 33.181536 s |
+  | FLINT with the same charge blocks | 1.553376 s |
+  | FLINT with SU(2) multiplicity blocks | 0.092126 s |
 
-```sh
-julia --startup-file=no --project=models/spin1 models/spin1/scripts/benchmark_kernels.jl
-julia --startup-file=no --project=models/spin1 models/spin1/scripts/benchmark_trials.jl
-julia --startup-file=no --project=models/spin1 models/spin1/scripts/benchmark_batches.jl
-```
+  The warmed contraction speedup over the first Julia implementation is 360.2x, of which the SU(2) reduction contributes 16.9x beyond the change of arithmetic backend.
+- **Thermal kernels** (`results/kernel-benchmark.json`, `scripts/benchmark_kernels.jl`). Warmed reference and optimized sector contractions in one process gained about 2.18x for source 1 (length 11, twist pi, magnetization 1) and 2.58x for source 2 (length 10, complex twist, magnetization 1). The complete integers agree.
+- **Batch width** (`results/batch-benchmark.json`, `scripts/benchmark_batches.jl`). The same 64 columns of the largest real-twist sector at batch sizes 4, 8, 16 and 32 give identical integers; smaller batches were slower, so the default stays at 32. This is a partial-column experiment, not a full thermal certificate.
+- **Full components.** The `wall_seconds` recorded in the component outputs include cold compilation and any competing work; see the README for the stored run.
 
-To rerun all optimized certificates, use the complete reproduction command in `README.md`. The physical trial remains bond dimension 26; reducing that dimension would require a new variational search and a new check of the very tight energy threshold. The existing trial can already be certified using much smaller symmetry blocks. The same representation-theoretic approach is a useful starting point for an SU(2)-structured spin-2 trial, with its own tensor relations and finite checks.
-
-## Final same-process trial benchmark
-
-Both N=72 and N=120 were contracted by all three methods, after warming each method. Geometry construction was excluded equally; complete U/V integers and every charge-block contribution were equal.
-
-| Exact contraction method | Time for both lengths |
-| --- | ---: |
-| Original Julia BigInt charge blocks | 33.181536 s |
-| FLINT with the same charge blocks | 1.553376 s |
-| FLINT with SU(2) multiplicity blocks | 0.092126 s |
-
-The warmed contraction speedup over the first Julia implementation is 360.2x. The SU(2) reduction contributes an additional 16.9x beyond changing the arithmetic backend. The complete optimized trial run, including matrix construction, the independent four-site check, all rational intertwiners, and certificate comparisons, took 6.40 seconds. The full optimized thermal tables took 859.50 and 25.59 seconds; all 27 certificates passed. All 51 tests passed, including corrupted-artifact rejection.
+The physical trial remains bond dimension 26; reducing it would need a new variational search and a new check of the very tight energy threshold. The same representation-theoretic reduction is a natural starting point for an SU(2)-structured spin-2 trial, with its own tensor relations and finite checks.

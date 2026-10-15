@@ -358,16 +358,16 @@ selected parameter choices are replayed through the rational verifier.
 \section{Reproduction and the arithmetic trust boundary}
 Run from the repository root:
 \begin{verbatim}
-julia --startup-file=no --project=spin1 \
-  spin1/experiments/optimize_bounds.jl
-julia --startup-file=no --project=spin1 \
-  spin1/experiments/test_bounds.jl
-julia --startup-file=no --project=spin1 \
-  spin1/experiments/temperature_lift.jl
-julia --startup-file=no --project=spin1 \
-  spin1/experiments/test_temperature_lift.jl
+julia --startup-file=no --project=models/spin1 \
+  models/spin1/experiments/optimize_bounds.jl
+julia --startup-file=no --project=models/spin1 \
+  models/spin1/experiments/test_bounds.jl
+julia --startup-file=no --project=models/spin1 \
+  models/spin1/experiments/temperature_lift.jl
+julia --startup-file=no --project=models/spin1 \
+  models/spin1/experiments/test_temperature_lift.jl
 \end{verbatim}
-The output \texttt{spin1/experiments/bounds.json} contains the complete
+The output \texttt{models/spin1/experiments/bounds.json} contains the complete
 initialization parameters, every rational defect pair, interval coverage,
 the tail-theorem parameters, logarithm enclosures, and source hashes.
 All accepting comparisons use integers or rationals. Displayed floating-point

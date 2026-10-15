@@ -13,6 +13,12 @@ include("thermal.jl")
 export honeycomb, bond_projector, full_spectrum
 export thermal_curve, log_partition, diagnostics, write_result, provenance
 
+"""
+    provenance(config)
+
+Run metadata for an output: `config`, package versions, and the SHA-256 of this package's
+sources and of the active environment (which need not be `models/aklt`), with `certified=false`.
+"""
 function provenance(config)
     root = dirname(@__DIR__)
     environment = dirname(Base.active_project())
