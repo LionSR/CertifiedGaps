@@ -210,7 +210,8 @@ end
 """
     check_record(data, a, b; keep = $KEEP)
 
-Replay one stored case from its spectral inputs; error on any changed seed, scope or bound.
+Replay one stored case from its spectral inputs. Every stored value must equal the recomputed
+one exactly, so any stale or altered field fails, not only an overstated one.
 """
 function check_record(data, a, b; keep = KEEP)
     data["validity"] == VALIDITY || error("unsupported validity claim")
@@ -227,20 +228,20 @@ function check_record(data, a, b; keep = KEEP)
     for (z, stored) in zip(row.logZ, data["logZ"])
         length(stored) == 2 || error("wrong partition interval length")
         zl, zh = parse.(Q, stored)
-        zl <= Q(inf(z)) <= Q(sup(z)) <= zh || error("log Z enclosure mismatch")
+        (zl, zh) == (Q(inf(z)), Q(sup(z))) || error("log Z enclosure mismatch")
     end
     es, et = parse(Q, data["eps_s"]), parse(Q, data["eps_t"])
-    row.eps_s <= es < 1 && row.eps_t <= et < 1 || error("invalid seed upper bounds")
+    (es, et) == (row.eps_s, row.eps_t) || error("seed defect mismatch")
     result = certified_gap_bound(es, et, beta)
     result.bound !== nothing || error("seed not admissible")
     bound = parse(Q, data["bound"])
-    0 < bound <= Q(result.bound) || error("overstated uniform gap")
+    bound == Q(result.bound) > 0 || error("uniform gap mismatch")
     gap = finite_gap(b, lo, hi)
     gl, gh = parse.(Q, data["finite_gap_L12"])
-    0 < gl <= Q(inf(gap)) <= Q(sup(gap)) <= gh || error("finite gap mismatch")
+    (gl, gh) == (Q(inf(gap)), Q(sup(gap))) && gl > 0 || error("finite gap mismatch")
     rl, rh = parse.(Q, data["ratio_to_gap_L12"])
     ratio = box(bound) / gap
-    rl <= Q(inf(ratio)) <= Q(sup(ratio)) <= rh || error("gap ratio mismatch")
+    (rl, rh) == (Q(inf(ratio)), Q(sup(ratio))) || error("gap ratio mismatch")
     return row
 end
 

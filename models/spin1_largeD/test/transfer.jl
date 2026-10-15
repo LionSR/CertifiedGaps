@@ -48,7 +48,9 @@ end
     @test row.n0 == 12 && row.result.bound > 8//10
     data = TC.record(row, b, "mutation-test")
     @test TC.check_record(data, a, b).result.bound == row.result.bound
-    for (key, value) in (("n0", "7"), ("bound", "2//1"), ("eps_s", "0//1"),
+    # Weakened values ("1//10", "99//100") must fail too: the replay requires equality.
+    for (key, value) in (("n0", "7"), ("bound", "2//1"), ("bound", "1//10"), ("eps_s", "0//1"),
+        ("eps_t", "99//100"),
         ("reference_D", "3//1"), ("D_interval", ["4//1", "3//1"]), ("logZ", Any[]))
         changed = deepcopy(data)
         changed[key] = value

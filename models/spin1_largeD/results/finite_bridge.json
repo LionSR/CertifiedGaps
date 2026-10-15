@@ -12,7 +12,7 @@
         "../../julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
         "../../julia/src/ExactDiagonalization.jl": "3589e3461ea172adb4234fe52a8aa2ec8f36c939984e28e98559a1e9ec72c1d1",
         "../../julia/src/CertifiedGaps.jl": "958e839cff840169bfaeb0463a9f06f2a5276453b1472e478111ca36f48ba75b",
-        "src/TransferCertificate.jl": "3b9da220167c11f86df1ac962b9b542840eda90e1196fa237598d6f756a9c455",
+        "src/TransferCertificate.jl": "cafda235e38fe8d84e9ec3b972fbd0fadcf718d66cc2a3af9e92be9611086796",
         "check.jl": "4e441959f44bb87120dcd4f4c5ac94ab9637263ee302f2faa834ad06f4d74d56",
         "../../julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
         "Project.toml": "89cda383e17e9cdc166800d29d78817d486665bc598d1de80eb0fb67e4c1e0dd",
@@ -47,7 +47,7 @@
             "dimension": "6561",
             "D": "4//1",
             "L": "8",
-            "seconds": 0.155656099319458
+            "seconds": 0.09682798385620117
         },
         {
             "gap_interval": [
@@ -58,7 +58,7 @@
             "dimension": "59049",
             "D": "4//1",
             "L": "10",
-            "seconds": 8.712717056274414
+            "seconds": 7.423518180847168
         }
     ],
     "run_metadata": {
@@ -69,7 +69,7 @@
         "config": {
             "D": "4//1"
         },
-        "created_utc": "2026-10-15T03:35:08.945",
+        "created_utc": "2026-10-15T03:39:15.814",
         "certified": true,
         "source_sha256": {
             "../../julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8",
@@ -84,7 +84,7 @@
             "../../julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
             "../../julia/src/ExactDiagonalization.jl": "3589e3461ea172adb4234fe52a8aa2ec8f36c939984e28e98559a1e9ec72c1d1",
             "../../julia/src/CertifiedGaps.jl": "958e839cff840169bfaeb0463a9f06f2a5276453b1472e478111ca36f48ba75b",
-            "src/TransferCertificate.jl": "3b9da220167c11f86df1ac962b9b542840eda90e1196fa237598d6f756a9c455",
+            "src/TransferCertificate.jl": "cafda235e38fe8d84e9ec3b972fbd0fadcf718d66cc2a3af9e92be9611086796",
             "check.jl": "4e441959f44bb87120dcd4f4c5ac94ab9637263ee302f2faa834ad06f4d74d56",
             "../../julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
             "Project.toml": "89cda383e17e9cdc166800d29d78817d486665bc598d1de80eb0fb67e4c1e0dd",
@@ -112,5 +112,5 @@
         "CertifiedGaps": "0.2.0",
         "blas_threads": 1
     },
-    "wall_seconds": 9.002581119537354
+    "wall_seconds": 7.643905878067017
 }
