@@ -8,4 +8,4 @@ excited_sz0 = true
 penalty_weight = 10.0
 outputlevel = 1
 blas_threads = 1
-checkpoint_dir = "../../../work/spin2/checkpoints"
+checkpoint_dir = "../../../../work/spin2/checkpoints"

@@ -38,7 +38,7 @@ function dense_operator(cores)
 end
 
 function main(
-    output = joinpath(@__DIR__, "../results/mpo-norm-probe.json");
+    output = joinpath(@__DIR__, "../../results/mpo-norm-probe.json");
     conserve_qns = true,
     lengths = (4, 8),
     target_steps = (1, 8),
@@ -54,7 +54,7 @@ function main(
         "runs"=>Any[],
         "runner_sha256"=>bytes2hex(sha256(read(@__FILE__))),
         "norm_module_sha256"=>bytes2hex(
-            sha256(read(joinpath(@__DIR__, "../../../julia/src/CertifiedMPO/Norms.jl"))),
+            sha256(read(joinpath(@__DIR__, "../../../../julia/src/CertifiedMPO/Norms.jl"))),
         ),
         "ITensors"=>string(pkgversion(ITensors)),
         "ITensorMPS"=>string(pkgversion(ITensorMPS)),
@@ -108,5 +108,5 @@ function main(
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    main(isempty(ARGS) ? joinpath(@__DIR__, "../results/mpo-norm-probe.json") : only(ARGS))
+    main(isempty(ARGS) ? joinpath(@__DIR__, "../../results/mpo-norm-probe.json") : only(ARGS))
 end

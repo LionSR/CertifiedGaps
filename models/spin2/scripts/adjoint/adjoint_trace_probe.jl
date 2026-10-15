@@ -1,5 +1,5 @@
 # Dense four-site reference for the full multi-step adjoint correction.
-include(joinpath(@__DIR__, "repeated_l2_probe.jl"))
+include(joinpath(@__DIR__, "../compression/repeated_l2_probe.jl"))
 import CertifiedGaps
 using CertifiedGaps.Results: write_result
 const AT = CertifiedGaps.CertifiedMPO.AdjointTrace

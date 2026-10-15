@@ -40,7 +40,7 @@ function candidate_mpo(cores; maxdim = 16, bits = 48)
 end
 
 function seed_probe(
-    output = joinpath(@__DIR__, "../results/polynomial-seed-probe.json");
+    output = joinpath(@__DIR__, "../../results/polynomial-seed-probe.json");
     lengths = (4, 16),
     maxdim = 16,
     power = 28,
@@ -103,6 +103,6 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     seed_probe(
-        isempty(ARGS) ? joinpath(@__DIR__, "../results/polynomial-seed-probe.json") : only(ARGS),
+        isempty(ARGS) ? joinpath(@__DIR__, "../../results/polynomial-seed-probe.json") : only(ARGS),
     )
 end

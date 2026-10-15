@@ -96,7 +96,7 @@ function audit_thermal_start()
         flush(stdout)
     end
 
-    root = normpath(joinpath(@__DIR__, "../../.."))
+    root = normpath(joinpath(@__DIR__, "../../../.."))
     hashes = source_hashes(
         root;
         dirs = ("julia/src", "models/spin2/src"),

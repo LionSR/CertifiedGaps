@@ -176,7 +176,7 @@ Replay both tables and check all acceptance inequalities from the repository roo
 
 ```sh
 OPENBLAS_NUM_THREADS=1 julia --startup-file=no --project=models/spin2 \
-  models/spin2/scripts/audit_thermal_start.jl /tmp/spin2-thermal-start-audit.json
+  models/spin2/scripts/polynomial/audit_thermal_start.jl /tmp/spin2-thermal-start-audit.json
 ```
 
 Omit the output argument to print the audit without writing a file. The optional JSON records

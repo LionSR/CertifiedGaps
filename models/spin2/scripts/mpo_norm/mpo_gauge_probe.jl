@@ -5,7 +5,7 @@ import CertifiedGaps
 using CertifiedGaps.Results: write_result
 using CertifiedGaps.CertifiedMPO.GaugeSearch
 
-function gauge_main(output = joinpath(@__DIR__, "../results/mpo-gauge-probe.json"))
+function gauge_main(output = joinpath(@__DIR__, "../../results/mpo-gauge-probe.json"))
     result = Dict{String,Any}(
         "status"=>"numerical-MPO-gauge-search",
         "certified"=>false,
@@ -50,5 +50,5 @@ function gauge_main(output = joinpath(@__DIR__, "../results/mpo-gauge-probe.json
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    gauge_main(isempty(ARGS) ? joinpath(@__DIR__, "../results/mpo-gauge-probe.json") : only(ARGS))
+    gauge_main(isempty(ARGS) ? joinpath(@__DIR__, "../../results/mpo-gauge-probe.json") : only(ARGS))
 end

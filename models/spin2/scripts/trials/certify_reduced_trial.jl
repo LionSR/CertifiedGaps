@@ -55,12 +55,12 @@ function main(
         "source_sha256"=>bytes2hex(sha256(read(source))),
         "input_kind"=>replay ? "integer-witness-replay" : "quantized-numerical-candidate",
         "implementation_sha256"=>Dict(
-            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../src", name)))) for
+            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../../src", name)))) for
             name in ("Certificate.jl", "Trials.jl", "trial_certificate.jl")
         ),
         "runner_sha256"=>bytes2hex(sha256(read(@__FILE__))),
         "environment_sha256"=>Dict(
-            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "..", name)))) for
+            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../..", name)))) for
             name in ("Project.toml", "Manifest.toml")
         ),
         "julia"=>string(VERSION),
@@ -124,8 +124,8 @@ end
 if abspath(PROGRAM_FILE) == @__FILE__
     if isempty(ARGS)
         main(
-            joinpath(@__DIR__, "../results/trial-reduced-certificate.json"),
-            joinpath(@__DIR__, "../results/trial-analytic.json"),
+            joinpath(@__DIR__, "../../results/trial-reduced-certificate.json"),
+            joinpath(@__DIR__, "../../results/trial-analytic.json"),
         )
     else
         length(ARGS) in (3, 4) ||

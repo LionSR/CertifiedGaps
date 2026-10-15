@@ -2,8 +2,8 @@ using Spin2Gap, LinearAlgebra, JSON3, SHA, Dates
 const SV = Spin2Gap.Variational
 BLAS.set_num_threads(1)
 
-function main(output = joinpath(@__DIR__, "../results/trial-analytic.json"))
-    source = joinpath(@__DIR__, "../results/trial-polished.json")
+function main(output = joinpath(@__DIR__, "../../results/trial-analytic.json"))
+    source = joinpath(@__DIR__, "../../results/trial-polished.json")
     old = JSON3.read(read(source, String), Dict{String,Any})["runs"][2]
     previous_t = SV.ST.templates(Int.(old["virtual_spins"]))
     previous_x = Float64.(old["x"])
@@ -66,7 +66,7 @@ function main(output = joinpath(@__DIR__, "../results/trial-analytic.json"))
                 "runs"=>runs,
                 "source_input_sha256"=>bytes2hex(sha256(read(source))),
                 "module_sha256"=>bytes2hex(
-                    sha256(read(joinpath(@__DIR__, "../src/Variational.jl"))),
+                    sha256(read(joinpath(@__DIR__, "../../src/Variational.jl"))),
                 ),
                 "completed_utc"=>string(now(UTC)),
                 "wall_seconds"=>time()-started,
@@ -76,5 +76,5 @@ function main(output = joinpath(@__DIR__, "../results/trial-analytic.json"))
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    main(isempty(ARGS) ? joinpath(@__DIR__, "../results/trial-analytic.json") : only(ARGS))
+    main(isempty(ARGS) ? joinpath(@__DIR__, "../../results/trial-analytic.json") : only(ARGS))
 end

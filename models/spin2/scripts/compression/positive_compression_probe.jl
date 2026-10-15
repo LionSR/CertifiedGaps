@@ -54,7 +54,7 @@ function local_metric(code)
 end
 
 function main(
-    output = joinpath(@__DIR__, "../results/positive-compression-probe.json");
+    output = joinpath(@__DIR__, "../../results/positive-compression-probe.json");
     rankcaps = (4, 8, 16),
     iterations = 1500,
     underweight = 256.0,
@@ -73,7 +73,7 @@ function main(
         "correction_rank"=>correction_rank,
         "runs"=>Any[],
         "source_sha256"=>Dict(
-            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../src", name)))) for
+            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../../src", name)))) for
             name in ("../../../julia/src/CertifiedMPO/PositiveBounds.jl", "ThermalBounds.jl")
         ),
     )
@@ -135,7 +135,7 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     main(
-        isempty(ARGS) ? joinpath(@__DIR__, "../results/positive-compression-probe.json") :
+        isempty(ARGS) ? joinpath(@__DIR__, "../../results/positive-compression-probe.json") :
         only(ARGS),
     )
 end

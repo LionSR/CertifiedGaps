@@ -78,6 +78,6 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     run_loewner(
-        isempty(ARGS) ? joinpath(@__DIR__, "../results/loewner-compression.json") : only(ARGS),
+        isempty(ARGS) ? joinpath(@__DIR__, "../../results/loewner-compression.json") : only(ARGS),
     )
 end

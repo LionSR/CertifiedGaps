@@ -176,7 +176,7 @@ function run_l2(output; rankcaps = (16, 32, 64), beta_target = 4, doublings = 5)
             sha256(read(joinpath(@__DIR__, "positive_compression_probe.jl"))),
         ),
         "source_sha256"=>Dict(
-            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../src", name)))) for
+            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../../src", name)))) for
             name in ("ThermalBounds.jl", "../../../julia/src/CertifiedMPO/PositiveBounds.jl")
         ),
     )
@@ -235,6 +235,6 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     run_l2(
-        isempty(ARGS) ? joinpath(@__DIR__, "../results/repeated-l2-compression.json") : only(ARGS),
+        isempty(ARGS) ? joinpath(@__DIR__, "../../results/repeated-l2-compression.json") : only(ARGS),
     )
 end

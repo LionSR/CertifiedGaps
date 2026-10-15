@@ -3,7 +3,7 @@ include(joinpath(@__DIR__, "mpo_gauge_probe.jl"))
 using CertifiedGaps.Results: write_result
 
 function certify_main(
-    output = joinpath(@__DIR__, "../results/mpo-local-norm-certificate.json");
+    output = joinpath(@__DIR__, "../../results/mpo-local-norm-certificate.json");
     lengths = (4, 8),
     target_steps = (1, 8),
     iterations = 200,
@@ -18,7 +18,7 @@ function certify_main(
         "runs"=>Any[],
         "runner_sha256"=>bytes2hex(sha256(read(@__FILE__))),
         "norm_module_sha256"=>bytes2hex(
-            sha256(read(joinpath(@__DIR__, "../../../julia/src/CertifiedMPO/Norms.jl"))),
+            sha256(read(joinpath(@__DIR__, "../../../../julia/src/CertifiedMPO/Norms.jl"))),
         ),
     )
     for n in lengths
@@ -84,7 +84,7 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     certify_main(
-        isempty(ARGS) ? joinpath(@__DIR__, "../results/mpo-local-norm-certificate.json") :
+        isempty(ARGS) ? joinpath(@__DIR__, "../../results/mpo-local-norm-certificate.json") :
         only(ARGS),
     )
 end

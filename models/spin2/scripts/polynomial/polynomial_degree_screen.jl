@@ -61,7 +61,7 @@ function degree_screen(
         "verification_precision_bits"=>384,
         "source_sha256"=>bytes2hex(sha256(read(@__FILE__))),
         "bounds_source_sha256"=>bytes2hex(
-            sha256(read(joinpath(@__DIR__, "../../../julia/src/CertifiedMPO/PolynomialBounds.jl"))),
+            sha256(read(joinpath(@__DIR__, "../../../../julia/src/CertifiedMPO/PolynomialBounds.jl"))),
         ),
         "rows"=>rows,
     )

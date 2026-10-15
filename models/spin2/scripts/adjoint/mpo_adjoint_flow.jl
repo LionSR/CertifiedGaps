@@ -1,4 +1,4 @@
-include(joinpath(@__DIR__, "verify_polynomial_flow.jl"))
+include(joinpath(@__DIR__, "../polynomial/verify_polynomial_flow.jl"))
 import CertifiedGaps
 using CertifiedGaps.Results: write_result
 const MP = CertifiedGaps.CertifiedMPO.Products

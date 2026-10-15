@@ -2,7 +2,7 @@ using Spin2Gap, LinearAlgebra, JSON3, Dates, SHA
 const ST = Spin2Gap.Trials
 BLAS.set_num_threads(1)
 function main()
-    source = joinpath(@__DIR__, "../results/trial-refinement.json")
+    source = joinpath(@__DIR__, "../../results/trial-refinement.json")
     input = JSON3.read(read(source, String), Dict{String,Any})
     rows = Any[]
     for row in input["runs"][1:2]
@@ -26,7 +26,7 @@ function main()
             ),
         )
         write_result(
-            joinpath(@__DIR__, "../results/trial-polished.json"),
+            joinpath(@__DIR__, "../../results/trial-polished.json"),
             Dict(
                 "status"=>"numerical-variational-search",
                 "certified"=>false,

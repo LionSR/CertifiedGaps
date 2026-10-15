@@ -1,12 +1,12 @@
 # Certify squaring/compression error for quantized thermal candidates.
 # Their initial distance from the physical Gibbs amplitude is not certified here.
-include(joinpath(@__DIR__, "mpo_gauge_probe.jl"))
+include(joinpath(@__DIR__, "../mpo_norm/mpo_gauge_probe.jl"))
 import CertifiedGaps
 using CertifiedGaps.Results: write_result
 const MS = CertifiedGaps.CertifiedMPO.Squaring
 
 function squaring_main(
-    output = joinpath(@__DIR__, "../results/mpo-squaring-probe.json");
+    output = joinpath(@__DIR__, "../../results/mpo-squaring-probe.json");
     lengths = (4, 8),
     maxdim = 8,
     beta = 0.125,
@@ -21,7 +21,7 @@ function squaring_main(
         "runs"=>Any[],
         "runner_sha256"=>bytes2hex(sha256(read(@__FILE__))),
         "squaring_module_sha256"=>bytes2hex(
-            sha256(read(joinpath(@__DIR__, "../../../julia/src/CertifiedMPO/Squaring.jl"))),
+            sha256(read(joinpath(@__DIR__, "../../../../julia/src/CertifiedMPO/Squaring.jl"))),
         ),
     )
     for n in lengths
@@ -99,6 +99,6 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     squaring_main(
-        isempty(ARGS) ? joinpath(@__DIR__, "../results/mpo-squaring-probe.json") : only(ARGS),
+        isempty(ARGS) ? joinpath(@__DIR__, "../../results/mpo-squaring-probe.json") : only(ARGS),
     )
 end

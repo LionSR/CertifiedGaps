@@ -3,8 +3,8 @@ const SV = Spin2Gap.Variational
 BLAS.set_num_threads(1)
 
 function main(
-    output = joinpath(@__DIR__, "../results/trial-preconditioned.json");
-    source = joinpath(@__DIR__, "../results/trial-large.json"),
+    output = joinpath(@__DIR__, "../../results/trial-preconditioned.json");
+    source = joinpath(@__DIR__, "../../results/trial-large.json"),
     multiplicities = nothing,
     batches = 4,
     iterations = 750,
@@ -30,7 +30,7 @@ function main(
         "certified"=>false,
         "uniform_gap_certified"=>false,
         "source_input_sha256"=>bytes2hex(sha256(read(source))),
-        "module_sha256"=>bytes2hex(sha256(read(joinpath(@__DIR__, "../src/Variational.jl")))),
+        "module_sha256"=>bytes2hex(sha256(read(joinpath(@__DIR__, "../../src/Variational.jl")))),
         "runner_sha256"=>bytes2hex(sha256(read(@__FILE__))),
         "runs"=>[
             Dict{String,Any}(
@@ -72,5 +72,5 @@ function main(
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
-    main(isempty(ARGS) ? joinpath(@__DIR__, "../results/trial-preconditioned.json") : only(ARGS))
+    main(isempty(ARGS) ? joinpath(@__DIR__, "../../results/trial-preconditioned.json") : only(ARGS))
 end

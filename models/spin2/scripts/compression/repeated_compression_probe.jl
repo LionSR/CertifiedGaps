@@ -50,7 +50,7 @@ function weighted_norm2(M)
 end
 
 function run_repeated(
-    output = joinpath(@__DIR__, "../results/repeated-positive-compression.json");
+    output = joinpath(@__DIR__, "../../results/repeated-positive-compression.json");
     rankcaps = (32, 64),
     beta_target = 4,
     doublings = 5,
@@ -66,7 +66,7 @@ function run_repeated(
         "runs"=>Any[],
         "runner_sha256"=>bytes2hex(sha256(read(@__FILE__))),
         "source_sha256"=>Dict(
-            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../src", name)))) for
+            name=>bytes2hex(sha256(read(joinpath(@__DIR__, "../../src", name)))) for
             name in ("../../../julia/src/CertifiedMPO/PositiveBounds.jl", "ThermalBounds.jl")
         ),
         "reference_runner_sha256"=>bytes2hex(
@@ -113,7 +113,7 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     run_repeated(
-        isempty(ARGS) ? joinpath(@__DIR__, "../results/repeated-positive-compression.json") :
+        isempty(ARGS) ? joinpath(@__DIR__, "../../results/repeated-positive-compression.json") :
         only(ARGS),
     )
 end

@@ -4,7 +4,7 @@ using JSON3, SHA
 const PG = CertifiedGaps.CertifiedMPO.PolynomialBounds
 
 function polynomial_targets(
-    output = joinpath(@__DIR__, "../results/polynomial-thermal-targets.json"),
+    output = joinpath(@__DIR__, "../../results/polynomial-thermal-targets.json"),
 )
     rows = Any[]
     for power in (24, 26, 28, 30)
@@ -36,7 +36,7 @@ function polynomial_targets(
         "thermal_trace_certified"=>false,
         "targets"=>rows,
         "source_sha256"=>bytes2hex(
-            sha256(read(joinpath(@__DIR__, "../../../julia/src/CertifiedMPO/PolynomialBounds.jl"))),
+            sha256(read(joinpath(@__DIR__, "../../../../julia/src/CertifiedMPO/PolynomialBounds.jl"))),
         ),
     )
     write_result(output, result)
@@ -44,7 +44,7 @@ end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     polynomial_targets(
-        isempty(ARGS) ? joinpath(@__DIR__, "../results/polynomial-thermal-targets.json") :
+        isempty(ARGS) ? joinpath(@__DIR__, "../../results/polynomial-thermal-targets.json") :
         only(ARGS),
     )
 end
