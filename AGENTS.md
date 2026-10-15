@@ -1,8 +1,9 @@
 # Instructions for coding agents
 
-This repository proves uniform spectral gaps of quantum spin chains with the two-purity
-doubling criterion, and certifies the finite inputs with exact or outward-rounded arithmetic.
-Read this file before starting any task.
+This repository proves uniform spectral gaps of quantum spin chains with the spacetime
+bootstrap (the two-purity doubling criterion; code identifiers keep the older "doubling" and
+"two-purity" names) and certifies its finite inputs by computer. Read this file before
+starting any task.
 
 ## The criterion (what a certificate must establish)
 
@@ -16,8 +17,10 @@ with a real on-site term o (equivalently the realignment R[−h] is Hermitian PS
 **seed defects** εₛ ≥ 1 − Pₛ(n₀, β₀), εₜ ≥ 1 − P_τ(2n₀, β₀) at one even n₀ lie in the
 admissible region (sufficient: both < 0.12731), then every even L ≥ n₀ has a unique ground
 state and Δ_L ≥ `certified_gap_bound(εₛ, εₜ, β₀).bound`. Constant energy shifts cancel in both
-purities. For c-site unit cells, lengths count cells and the cell must satisfy the reflection
-condition of `notes`/scope note (palindromic cell, h_{c−k} = h_k).
+purities. For c-site unit cells, lengths count cells and the cell may carry an internal
+reflection F (−h = Σ C_α ⊗ F conj(C_α) F, o real and F-invariant; palindromic cell,
+h_{c−k} = h_k), as in the scope note and the Lean `RPRing`. An odd n₀ needs an extra
+argument (see `models/spin1_dimerized/`).
 
 A **gap certificate** for a model consists of:
 
@@ -25,12 +28,19 @@ A **gap certificate** for a model consists of:
    with −h = Σ C_α ⊗ conj(C_α) verified by an exact identity, and o real. A floating-point
    `rp_test` is a screening step, not the proof.
 2. **Seed enclosures**: rigorous upper bounds on 1 − Pₛ(n₀, β₀) and 1 − P_τ(2n₀, β₀), from
-   rigorous enclosures of log Z_{n₀}(β₀), log Z_{2n₀}(β₀), log Z_{2n₀}(2β₀). Acceptable sources:
-   exact rational/integer arithmetic, Arb balls (Nemo), IntervalArithmetic, or verified
-   eigenvalue enclosures (e.g. Weyl/residual bounds computed in interval arithmetic) of the
-   full spectrum or of every symmetry block with its multiplicity. **No inequality may be
-   accepted on the strength of a `Float64` computation**, an ARPACK/Lanczos run, DMRG, or an
-   unverified dense eigensolve.
+   rigorous enclosures of log Z_{n₀}(β₀), log Z_{2n₀}(β₀), log Z_{2n₀}(2β₀). Accepted sources:
+   - exact rational/integer arithmetic, Arb balls (Nemo), or IntervalArithmetic;
+   - verified eigenvalue enclosures of the full spectrum, or of every symmetry block with its
+     multiplicity (summing to dⁿ): block entries enclosed exactly or in intervals, residual
+     and orthogonality norms computed in `Float64` (BLAS allowed) **with an explicit a priori
+     rounding-error bound** under the IEEE binary64 model (round-to-nearest, gradual
+     underflow, the standard γₙ dot-product bound valid for any summation order and FMA),
+     then a Weyl/polar-factor bound, and log Z summed in interval arithmetic. This is how
+     every certificate outside `spin1/` was made (`CertifiedGaps.VerifiedSpectra` implements
+     it); the README must state the arithmetic model as the trusted base.
+
+   Not accepted: a `Float64` number without a proven error bound, an ARPACK/Lanczos run, DMRG,
+   or an unverified dense eigensolve.
 3. **The bound**: `CertifiedGaps.certified_gap_bound` (interval) or
    `CertifiedGaps.Recurrence.rational_gap_chain` (exact rational) applied to the seed bounds.
 4. **A checker** that recomputes 1–3 from the stored certificate in a few minutes and fails
@@ -58,9 +68,9 @@ seed purities computable or boundable at sizes far beyond ED:
   field, strong rungs, large D) and carry a certified error (Duhamel, Peierls–Bogoliubov,
   Weyl, operator inequalities) to the model of interest. Track how far the admissible region
   (defects < 0.1273) lets you go.
-- **Smaller seeds.** The criterion needs only Pₛ(n₀, β₀) and P_τ(2n₀, β₀); by survey
-  Theorem 2.24(v), P_τ(2n₀) can be replaced by P_τ(n₀) and Pₛ(n₀, 2β₀), halving the largest
-  ring. Unequal defects are cheap in εₛ and expensive in εₜ; spend effort accordingly.
+- **Smaller seeds.** The criterion needs only Pₛ(n₀, β₀) and P_τ(2n₀, β₀); by Theorem
+  2.24(v) of the survey (kept locally, not in the repository), P_τ(2n₀) can be replaced by
+  P_τ(n₀) and Pₛ(n₀, 2β₀), halving the largest ring. Unequal defects are cheap in εₛ and expensive in εₜ; spend effort accordingly.
 - **Symmetry and exact counting.** Character formulas, SU(2) multiplet counting, sector
   inversion from twisted traces (as in `models/spin1/`) instead of enumerating states.
 - **Variational sandwiches.** Upper bounds on E₀(2n) from trial states (MPS) and lower bounds
@@ -75,14 +85,16 @@ because ...") is a result.
 
 - `outputs/`: LaTeX notes (main proof, scope, certificate method). Do not edit unless asked.
 - `julia/`: shared core package `CertifiedGaps` (recurrence and certified bounds, exact
-  arithmetic, results I/O, spin operators, RP test, exact diagonalisation, models, Nemo/Arb
-  certified MPO toolkit, ITensors purification extension). See `julia/README.md`.
+  arithmetic, results I/O, spin operators, RP tests and exact RP certificates, exact
+  diagonalisation, verified ring spectra and `certify_gap`, Nemo/Arb certified MPO toolkit,
+  ITensors purification extension). See `julia/README.md`.
 - `models/spin1/`: exact-arithmetic reproduction of the spin-1 Heisenberg certificate (integer
   Poisson trace recursion with twisted rings and symmetry representatives, polynomial
   filters, MPS trial contractions). The template for large-n certificates.
-- `models/spin2/`, `models/aklt/`: spin-2 and 2D AKLT investigations (no certificate yet).
-- `lean/`: Lean 4 formalisation of the abstract criterion (seeds are hypotheses).
-- `models/<model-slug>/`: **where new certificates go** (one directory per model).
+- `models/<model-slug>/`: **where new certificates go** (one directory per model). The root
+  `README.md` has the status table of all models; update its row when you add or change one.
+- `lean/`: Lean 4 formalisation of the criterion and of each certified model's gap theorem
+  (seeds are hypotheses).
 
 ## Environment
 
@@ -94,28 +106,33 @@ julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 
 A new certificate directory is its own Julia project depending on the core:
 `julia --project=models/<slug> -e 'using Pkg; Pkg.develop(path="julia")'` (adjust the
-relative path to `../../julia` inside the project). Set `OPENBLAS_NUM_THREADS=1` unless you
-need threaded BLAS.
+relative path to `../../julia` inside the project), or runs with `--project=julia`. Set
+`OPENBLAS_NUM_THREADS=1` unless you need threaded BLAS.
 
 ## Rules
 
 - Work only inside `models/<your-model-slug>/` unless the task says otherwise. If the
   core is missing something generic, add it to `julia/` in a separate, minimal commit with a
   test, and say why in the PR description.
+- Certificates record SHA-256 hashes of `julia/src`, and some checkers compare them with the
+  checkout. Any change to `julia/src` must keep every model checker passing; run them all.
 - Never modify `models/spin1/results`, `models/spin2/results`, `models/aklt/results` or anything under `lean/`.
 - No Python files: everything is Julia (and LaTeX for notes).
 - Certificate JSON stores every exact number as a string (`"num//den"`); use
   `CertifiedGaps.Results.write_result` and `parse_exact_json`. Record the code's SHA-256
   (`source_hashes`) and the Julia/package versions (`run_metadata`).
 - Each certificate directory has: `Project.toml`, `src/` or a single `certify.jl` that produces
-  `certificate.json`, `check.jl` that verifies it, `test/runtests.jl` (fast), and a `README.md`
+  the certificate, `check.jl` that verifies it, `test/runtests.jl` (fast), and a `README.md`
   stating the model, the RP basis, the seed (n₀, β₀), the certified bound, run time, and what
-  is and is not rigorous.
+  is and is not rigorous (including the arithmetic model trusted).
 - Report negative results too: if no admissible seed exists at accessible sizes, commit the
   scan with its (floating-point, clearly labelled) evidence and the estimated seed scale.
 - Code style: 100 columns, docstrings on public functions, comments that say why.
 
-## Known numbers (floating point, from a prior survey; to be certified)
+## Open targets (floating point, from a prior survey; not certified)
+
+Certified models are listed in the root `README.md`. Survey estimates for models without a
+certificate:
 
 | model | RP basis | seed (n₀, β₀) | float bound | exact gap |
 |---|---|---|---|---|
@@ -123,11 +140,5 @@ need threaded BLAS.
 | TFIM g = 1.25 | σᶻ | (144, 64) | 0.451 | 0.5 |
 | TFIM g = 1.1 | σᶻ | (384, 161) | 0.178 | 0.2 |
 | cluster −ΣZXZ − gΣX, g = 0.5 (2-site cells) | cell basis CS(H⊗H) | (128, 64) cells | 0.932 | 1 |
-| Heisenberg + staggered field h_s = 1 | sublattice-rotated, C = {Sˣ, iSʸ, Sᶻ} | (8, 5.25) | 1.149 | ≈1.874 |
-| dimerised Heisenberg δ = 0.5 (2-site cells) | rotated frame | (4, 6.25) cells | 0.533 | ≈1.19 |
-| dimerised Heisenberg δ = 0.3 | rotated frame | (4, 6.5) cells | 0.172 | ≈0.81 |
-| spin-1 Heisenberg + D(Sᶻ)², D = 4 | Cartesian, o = D·diag(1,1,0) | (6, 3) | 0.544 | ≈2.27 |
-| two-leg ladder J⊥ = 4 (1-rung cells) | checkerboard sublattice rotation | (4, 2) rungs | 1.102 | ≈3.14 |
 | XY in a field, JₓJ_y < 0 | standard basis | free fermions | — | — |
 | bilinear–biquadratic θ = −0.1 | Cartesian | ≈(34, 31) estimated | ≈0.107 | ≈0.338 |
-| spin-1 Heisenberg (the note) | Cartesian | (2304, 784) certified in `spin1/`; gap > 0.0729 for L ≥ 36 claimed in `models/spin1/experiments` | | 0.4105 |
