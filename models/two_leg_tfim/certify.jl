@@ -1,8 +1,12 @@
-include("src/Ladder.jl")
+# Certifies the best stored numerical seed at field g (default 3//1): verified dense spectra of
+# the rings n0 and 2n0, outward log Z, rational seeds, recurrence. Writes
+# results/certificate_g<g>_certifiedgaps.json, which test/runtests.jl also checks (~11 min).
+#     julia --project=models/two_leg_tfim models/two_leg_tfim/certify.jl 3//1
+include(joinpath(@__DIR__, "src", "Ladder.jl"))
 using .Ladder, CertifiedGaps, CertifiedGaps.Results, LinearAlgebra
 BLAS.set_num_threads(1)
 root=@__DIR__
-g=parse(Rational{Int},get(ARGS,1,"4//1"))
+g=parse(Rational{Int},get(ARGS,1,"3//1"))
 tag=replace(string(g),"//"=>"_")
 scan=read_exact_json(joinpath(root,"results","scan_g$tag.json"))
 @assert scan["best"] !== nothing "No eligible numerical seed"
@@ -26,7 +30,7 @@ payload=(;g=string(g),n0=n,beta=string(beta),epsilon_s=string(es),epsilon_t=stri
     logZ=[map(x->string(Rational{BigInt}(x)),v) for v in (ln,l2,l22)],
     spectra=specs,
     metadata=run_metadata((;g=string(g),n0=n,beta=string(beta));
-        source_sha256=merge(source_hashes(root;files=["certify.jl","scan.jl"]),
+        source_sha256=merge(source_hashes(root;files=["certify.jl"]),
             Dict("../../julia/"*k=>v for (k,v) in source_hashes(joinpath(root,"../../julia")))),
         packages=(CertifiedGaps,),status="certified",certified=true))
 write_result(joinpath(root,"results","certificate_g$(tag)_certifiedgaps.json"),payload)

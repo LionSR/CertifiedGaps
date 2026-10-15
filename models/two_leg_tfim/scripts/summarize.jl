@@ -1,7 +1,9 @@
+# Regenerates the "## Results" section of REPORT.md from the scan, spectra (scripts/scan.jl),
+# extrapolation and certificate files in results/.
 using CertifiedGaps.Results, Printf
-include("src/Provenance.jl")
+include(joinpath(dirname(@__DIR__), "src", "Provenance.jl"))
 using .Provenance
-root=@__DIR__; fields=["2_1","5_2","3_1","4_1"]
+root=dirname(@__DIR__); fields=["2_1","5_2","3_1","4_1"]
 io=IOBuffer()
 println(io,"All scan values below are **numerical, not certified**. The grid is β=1/8,2/8,…,32; n0=2,3,4.\n")
 println(io,"| g | best eligible n0 | β | numerical bound | ED gap (8 rungs) | spectral runtime (s) |")
@@ -27,7 +29,7 @@ for tag in fields
         @printf(io,"| %s | %s | %.9f | %.9f |\n",c["g"],r["n"],r["max_min_purity"],r["delta"])
     end
 end
-println(io,"\nFor the unsuccessful fields, a two-point fit δ(n)=δ(4)exp(−(n−4)/ξδ) to n=3,4, combined with an extensive dilute-excitation extrapolation of the eight-rung partition function, predicts the following first even seeds. These are **uncontrolled estimates**, not computed larger-ring spectra or certificates; near-critical finite-size effects can bias them substantially. `extrapolate.jl` records the explicit ansatz and grid.\n")
+println(io,"\nFor the unsuccessful fields, a two-point fit δ(n)=δ(4)exp(−(n−4)/ξδ) to n=3,4, combined with an extensive dilute-excitation extrapolation of the eight-rung partition function, predicts the following first even seeds. These are **uncontrolled estimates**, not computed larger-ring spectra or certificates; near-critical finite-size effects can bias them substantially. `scripts/extrapolate.jl` records the explicit ansatz and grid.\n")
 ex=read_exact_json(joinpath(root,"results","extrapolation.json"))
 for r in ex["out"]
     b=r["first_predicted_even_seed"]
@@ -46,7 +48,9 @@ for tag in fields
     c=read_certificate(p); e=c["spectra"][end]["energies"]
     @printf(io,"- **g=%s: Δ_L ≥ %.9f**, %s. Seed (n0,β)=(%s,%s); verification %.2f s; bound / 8-rung ED gap = %.6f.\n",c["g"],Float64(floor(BigInt,BigFloat(c["bound"])*big(10)^9))/1e9,c["validity"],c["n0"],c["beta"],c["seconds"],c["bound"]/(e[2]-e[1]))
     println(io,"  Returned `.bound` = `",repr(c["bound"]),"` (exact binary rational `",Rational{BigInt}(c["bound"]),"`); the displayed decimal lower bound is rounded downward.")
-    println(io,"  Exact rational seeds and per-sector eigenvalue radii are in `results/certificate_g",tag,".json.gz`.")
+    println(io,"  Exact rational seeds and per-sector eigenvalue radii are in ",
+        "`results/certificate_g",tag,".json.gz` (gzip of the original JSON; SHA-256 of the ",
+        "uncompressed bytes `aba98d98…a74928`).")
 end
 println(io,"\nCertified: the exact RP identity, whole-spectrum eigenvalue enclosures for the selected parameter/seed, outward log-partition and rational defect bounds, and the resulting uniform gap under the repository's two-purity theorem. Numerical: seed optimization, all nonverified scan spectra and finite-size gaps, the literature critical point, and comparisons to finite-ring reference gaps. The ED reference gap is not claimed to be an infinite-volume limit.\n")
 p=joinpath(root,"REPORT.md"); old=read(p,String)

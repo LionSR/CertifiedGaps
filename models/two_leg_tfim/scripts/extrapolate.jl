@@ -1,6 +1,7 @@
 # Exploratory extrapolation only; neither these spectra nor this ansatz are certified.
+# Needs results/spectra_g{2_1,5_2}.json from scripts/scan.jl; writes results/extrapolation.json.
 using CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds
-root=@__DIR__; out=[]
+root=dirname(@__DIR__); out=[]
 for tag in ("2_1","5_2")
     c=read_exact_json(joinpath(root,"results","scan_g$tag.json"))
     s=read_exact_json(joinpath(root,"results","spectra_g$tag.json"))
@@ -29,5 +30,5 @@ for tag in ("2_1","5_2")
         caveat="Uncontrolled extrapolation; finite-size gap and dilute-gas ansatz may be biased near criticality."))
 end
 write_result(joinpath(root,"results","extrapolation.json"),(;status="numerical, not certified",out,
-    source_hashes=source_hashes(root;files=["extrapolate.jl"])))
+    source_hashes=source_hashes(root;dirs=(),files=["scripts/extrapolate.jl"])))
 println(out)

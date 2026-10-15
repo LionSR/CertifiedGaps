@@ -4,6 +4,7 @@ using CertifiedGaps.Results
 export rp_identity, blocks, block_matrix, full_spectrum, verify_eigen, logz_interval
 BLAS.set_num_threads(1)
 
+"Exact rational check of −h_bond = Σ C⊗C (C = Z⊗I, I⊗Z) and of a real symmetric on-site term."
 function rp_identity(g::Rational)
     Z = Rational{BigInt}[1 0; 0 -1]; X = Rational{BigInt}[0 1; 1 0]
     I2 = Matrix{Rational{BigInt}}(I,2,2)
@@ -125,6 +126,10 @@ function verify_eigen(H,A,b,F)
         construction=string(dH), dimension=m)
 end
 
+"""
+All eigenvalues of the L-rung ladder at field g, block by block; with `verified=true` each
+block also carries its eigenvalues and a whole-spectrum enclosure radius (`verify_eigen`).
+"""
 function full_spectrum(L,g; verified=false)
     es=Float64[]; sectors=[]; bs=blocks(L); t=time()
     for b in bs

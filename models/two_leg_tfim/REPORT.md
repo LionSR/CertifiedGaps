@@ -89,6 +89,67 @@ are converted exactly from their binary BigFloat values to rational strings. The
 rationals and the exact dyadic β are passed to `certified_gap_bound` unmodified.
 The returned `.bound` is the uniform lower bound, not the finite-iteration upper rate.
 
+## Validation and environment
+
+The certificate was produced with Julia 1.12.4 (official versioned tarball);
+`results/environment.json` records package versions, the BLAS configuration, and hashes of the
+project, manifest, repository instructions and scope note at that time.
+
+The fast checker (`check.jl`, or `test/runtests.jl` directly) passes **70 tests in about
+35 s** on the current `CertifiedGaps` core: 10 exact-RP/symmetry checks, 58 stored-seed,
+recurrence and provenance checks (including the SHA-256 of the uncompressed certificate), and
+2 enclosure checks on an exactly soluble matrix. It recomputes log Z and the rational seeds
+from the stored eigenvalues and radii; it does not regenerate the residual bounds.
+`check.jl --full` and `scripts/replay_audit.jl` do.
+
+The verification kernel took 645.83 seconds (652.22 seconds including JSON serialization).
+Maximum eigenvalue enclosure radii were about 1.50e-10 for four rungs and 3.94e-5 for eight
+rungs. The outward rational defect bounds are εs ≈ 0.11240836635 and εt ≈ 0.05161523886;
+the exact fractions are in the certificate.
+
+Search scope is n0 ≤ 4, with doubled rings through eight rungs. This covers every even seed
+permitted by the scope-note theorem whose doubled ring fits the ten-rung cap. The odd
+n0 = 5 / ten-rung diagnostic was not computed. No impossibility at larger sizes or other
+temperatures is claimed.
+
+## Independent audit and fresh replay (2026-10-11)
+
+Audited certificate commit `d546444493b82f8bd9990d55dec585c2bb3ef30e`; certificate SHA-256
+(uncompressed) `aba98d9865f1b496a96e7a7e17dec0239ec07b34e012b73714d373c1e8a74928`.
+
+**Review.** An independent reviewer checked the exact RP and Pauli normalization, the full
+character-sector decomposition, the algebraic block construction, the BLAS error bounds and
+the polar/Weyl proof, interval directions, rational rounding, even-seed applicability and
+Perron–Frobenius uniqueness. No mathematical or rounding defect was found under the stated
+arithmetic assumptions. Higher precision alone is not claimed to prove an error bound:
+`verify_eigen` adds conservative binary64 matrix-product error bounds to the computed residual
+and orthogonality defect. All stored radius numerators fit in 256 bits and their denominators
+are powers of two, so their conversion at the stated precision is exact. The fast checker
+passed and all 47 certificate source hashes matched.
+
+**Fresh spectral replay.** The certificate stores no eigenvectors, so the fast checker cannot
+recompute the radii. `scripts/replay_audit.jl` closes that gap: it rebuilds all 32 dense
+sectors at four and eight rungs (256 and 65,536 states) from the model inputs, recomputes the
+residual and orthogonality enclosures, the outward partition intervals, the exact rational
+seeds and the recurrence, and only then reads the old certificate for comparison. Every
+eigenvalue, construction-error bound, residual bound, orthogonality bound and radius was
+identical to the original; so were the three log-partition intervals, both rational seeds
+(differences `0//1`) and the complete recurrence output. The returned bound is unchanged,
+**0.6363868632722607**. The kernel took 443.41 s (447.35 s with output). The separate
+`scripts/check_replay.jl` passed 262 tests in 5.42 s: it compares sector labels, dimensions,
+eigenvalues, every scalar verification bound, the log-partition intervals, the rational seeds
+and the recurrence output directly against the spectra, and records its own source hash and
+the replay SHA-256 (`279c7e4505e1e6c0c06a4424fbb76dae8fa6c8c60ef426847b4e5fb53dae30ce`).
+The replay JSON (5.3 MB) is regenerated rather than stored. Bit identity depends on the platform: a
+2026-10-14 replay on an Apple M5 (Julia 1.12.4) gave different last bits and the bound
+0.6364738604216351, so `check_replay.jl` flagged its 134 identity comparisons while all of its
+seed, bound and source-hash checks passed.
+
+**Rename to CertifiedGaps.** All 25 `julia/src` files and `src/Ladder.jl` were compared with
+the audited snapshot `8a1aad63e1a285392c97bf5cf17e8da03f0b8314` and were identical after the
+substitution `ThermalMPOGap` → `CertifiedGaps`; a second replay on `CertifiedGaps` 0.2.0
+reproduced every eigenvalue, radius, seed and the bound exactly.
+
 ## Results
 
 All scan values below are **numerical, not certified**. The grid is β=1/8,2/8,…,32; n0=2,3,4.
@@ -120,7 +181,7 @@ Spectral runtimes sum the measured dense-spectrum calls after orbit construction
 | 4//1 | 3 | 0.905693809 | 0.106397922 |
 | 4//1 | 4 | 0.969496099 | 0.026210081 |
 
-For the unsuccessful fields, a two-point fit δ(n)=δ(4)exp(−(n−4)/ξδ) to n=3,4, combined with an extensive dilute-excitation extrapolation of the eight-rung partition function, predicts the following first even seeds. These are **uncontrolled estimates**, not computed larger-ring spectra or certificates; near-critical finite-size effects can bias them substantially. `extrapolate.jl` records the explicit ansatz and grid.
+For the unsuccessful fields, a two-point fit δ(n)=δ(4)exp(−(n−4)/ξδ) to n=3,4, combined with an extensive dilute-excitation extrapolation of the eight-rung partition function, predicts the following first even seeds. These are **uncontrolled estimates**, not computed larger-ring spectra or certificates; near-critical finite-size effects can bias them substantially. `scripts/extrapolate.jl` records the explicit ansatz and grid.
 
 - g=2//1: ξδ=2.465543 rungs; predicted (n0,β)=(10,8.250), requiring 20 rungs for direct verification.
 - g=5//2: ξδ=1.394273 rungs; predicted (n0,β)=(6,2.500), requiring 12 rungs for direct verification.
@@ -141,27 +202,3 @@ For the unsuccessful fields, a two-point fit δ(n)=δ(4)exp(−(n−4)/ξδ) to 
 
 Certified: the exact RP identity, whole-spectrum eigenvalue enclosures for the selected parameter/seed, outward log-partition and rational defect bounds, and the resulting uniform gap under the repository's two-purity theorem. Numerical: seed optimization, all nonverified scan spectra and finite-size gaps, the literature critical point, and comparisons to finite-ring reference gaps. The ED reference gap is not claimed to be an infinite-volume limit.
 
-
-## Validation and environment
-
-The certificate was produced with Julia 1.12.4 (official versioned tarball);
-`results/environment.json` records package versions, BLAS configuration, and hashes of the
-project, manifest, repository instructions, and scope note at that time.
-
-The fast checker (`run_tests.jl`, or `test/runtests.jl` directly) passes **70 tests in about
-16 s** on the current `CertifiedGaps` core: 10 exact-RP/symmetry checks, 58 stored-seed,
-recurrence and provenance checks (including the SHA-256 of the uncompressed certificate), and
-2 enclosure checks on an exactly soluble matrix. `results/tests.json` records the runtime and
-source hashes. The fast checker recomputes log Z and the rational seeds from the stored
-eigenvalues and radii; it does not regenerate the residual bounds. `replay_audit.jl` does, in
-about 8 minutes (see AUDIT-2026-10-11.md).
-
-The completed verification kernel took 645.83 seconds; including final JSON serialization the
-script reported 652.22 seconds. Maximum eigenvalue enclosure radii were approximately 1.50e-10
-for four rungs and 3.94e-5 for eight rungs. The outward rational defect bounds have decimal
-approximations εs≈0.11240836635 and εt≈0.05161523886; exact fractions are in the certificate.
-
-Search scope is n0≤4, with doubled rings through eight rungs. This covers every even seed
-permitted by the scope-note theorem whose doubled ring fits the ten-rung cap. The odd
-n0=5 / ten-rung diagnostic was not computed. No conclusion of impossibility at larger sizes or
-other temperatures is claimed.

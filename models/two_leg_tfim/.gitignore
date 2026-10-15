@@ -1,0 +1,3 @@
+# Regenerable numerical data (scripts/scan.jl spectra, replay witnesses); see README.md.
+/results/spectra_g*.json
+/results/replay*.json
