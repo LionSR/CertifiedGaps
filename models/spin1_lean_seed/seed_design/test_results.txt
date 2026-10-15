@@ -1,0 +1,7 @@
+PASS small_simple exact scalar inequalities and ChainCertificate.Valid
+PASS small_relaxed exact scalar inequalities and ChainCertificate.Valid
+PASS real_even exact scalar inequalities and ChainCertificate.Valid
+Test Summary:                            | Pass  Total  Time
+exact scalar replay and forged witnesses |   46     46  4.0s
+Test Summary:                                     | Pass  Total  Time
+Float64 controls remain explicitly non-certifying |   64     64  0.1s
