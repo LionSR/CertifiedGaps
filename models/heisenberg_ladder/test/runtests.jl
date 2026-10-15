@@ -1,59 +1,105 @@
-using Test, CertifiedGaps, JSON3, LinearAlgebra
-using CertifiedGaps.Results
-BLAS.set_num_threads(1)
-include("../certify.jl")
-root=normpath(joinpath(@__DIR__,"../../.."))
-# The core commit the certificate was produced against (CertifiedGaps rename, 22b2759).
-const CERT_CORE_COMMIT="22b2759"
-parseq(s)=parse(Rational{BigInt},s)
-@testset "Exact reflection positivity" begin
-    for J in (4//1,7//2,3//1,5//2,2//1,3//2)
-        @test exact_rp(J)
+# Fast tests (under a minute): exact RP, the symmetry builder against an independent full
+# Hamiltonian, verified versus numerical spectra, the rejection witness, continuation, the
+# all-β exclusion and its checker, and the stored certificate without recomputing spectra.
+using Test, LinearAlgebra, IntervalArithmetic
+include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
+const HL = HeisenbergLadder
+using CertifiedGaps.ExactDiagonalization: Chain, sector_hamiltonian
+using CertifiedGaps.RingModels: verify_rp, encode_model, decode_model, encode_rp, decode_rp
+using CertifiedGaps.Results: parse_exact_json, sha256_file
+using CertifiedGaps: certified_gap_bound
+
+@testset "Exact RP and original-to-rotated identities" begin
+    for J in HL.COUPLINGS
+        @test HL.exact_rp(J)
+        model, rp = HL.rp_model(J)
+        @test verify_rp(model, rp)
+        @test decode_model(encode_model(model)).bond == model.bond
+        bad = deepcopy(encode_rp(rp))
+        bad["factors"][1]["weight"] = "2//1"
+        @test !verify_rp(model, decode_rp(bad))
     end
 end
-@testset "Stored rational certificate" begin
-    c=JSON3.read(read(joinpath(@__DIR__,"../results/certificate.json"),String))
-    @test iseven(c.n0)
-    b=certified_gap_bound(parseq(c.eps_s),parseq(c.eps_t),parseq(c.beta))
-    @test b.bound !== nothing
-    @test b.bound == c.bound
-    @test b.bound > 0
-    for L in (Int(c.n0),2Int(c.n0))
-        s=JSON3.read(read_result_text(joinpath(@__DIR__,"../results/verified_L$(L).json")))
-        @test sum(r.dimension*r.multiplicity for r in s.sectors)==4^L==s.dimension
-        @test length(s.energies)==length(s.radii)==4^L
-        @test all(parseq(r.orthogonality_upper)<1 for r in s.sectors)
-    end
-    # The certificate was produced when this directory lived at certificates/heisenberg_ladder;
-    # its own source hashes are historical provenance (the move edited path strings and the
-    # gzip loader). The shared core it ran on is identified by these hashes: a core file that
-    # has changed since must match them at the core commit used for certification. Soundness
-    # of the stored seeds is re-established below by fresh verified eigensolves, not by hashes.
-    for (path,hash) in pairs(c.metadata.source_sha256)
-        startswith(string(path),"julia/") || continue
-        sha256_file(joinpath(root,string(path)))==hash && (@test true; continue)
-        blob=try
-            read(pipeline(`git -C $root show $(CERT_CORE_COMMIT):$(path)`;stderr=devnull))
-        catch
-            nothing
+
+@testset "Sector reconstruction and complete small spectra" begin
+    for L in (2, 3, 4)
+        J = 7 // 2
+        H = zeros(4^L, 4^L)
+        for s in 0:4^L-1, (t, h) in HL.transitions(s, L, J)
+            H[t+1, s+1] = Float64(h)
         end
-        if blob===nothing
-            @warn "core commit $(CERT_CORE_COMMIT) unavailable; skipping hash of $path"
-            @test_skip false
-        else
-            @test mktemp() do p,io
-                write(io,blob); close(io); sha256_file(p)
-            end==hash
-        end
+        # Independent shared-core graph builder checks the bit transition convention.
+        x = [0.0 0.5; 0.5 0.0]
+        a = [0.0 0.5; -0.5 0.0]
+        z = [0.5 0; 0 -0.5]
+        bond = kron(x, x) - kron(a, a) + kron(z, z)
+        bonds = [(2j + 1, 2j + 2, Float64(J) * bond) for j in 0:L-1]
+        append!(bonds, [(2j + b, 2mod(j + 1, L) + b, bond) for j in 0:L-1 for b in 1:2])
+        chain = Chain(2, _ -> bonds)
+        @test H == Matrix(sector_hamiltonian(chain, 2L, collect(0:4^L-1)))
+        full, rad, _ = HL.verified_eigen(H, 0.0)
+        reduced = HL.full_spectrum(L, J; verified = true)
+        @test all(abs.(full - reduced.energies) .<= rad .+ reduced.radii)
+        # The floating-point scan path must agree with the verified one.
+        numerical = HL.full_spectrum(L, J)
+        @test all(abs.(numerical.energies - reduced.energies) .<= reduced.radii .+ 1e-10)
+        @test sum(d * m for (d, m) in values(HL.sector_dimensions(L))) == 4^L
+        # L=2 has doubled periodic leg bonds, so its second trace moment differs.
+        expected = big(4)^L * (3 // 16) * (L * J^2 + (L == 2 ? 8 : 2L))
+        total = sum((interval(e) + interval(-r, r))^2
+            for (e, r) in zip(reduced.energies, reduced.radii))
+        @test HL.Q(inf(total)) <= expected <= HL.Q(sup(total))
     end
 end
-include("../recheck_seeds.jl")
-@testset "Fresh full spectral verification" begin
-    cert=JSON3.read(read(joinpath(@__DIR__,"../results/certificate.json"),String))
-    n=Int(cert.n0); beta=parseq(cert.beta)
-    a=full_spectrum(n,4//1;verified=true)
-    b=full_spectrum(2n,4//1;verified=true)
-    la=enclosed_logZ(a,beta); lb=enclosed_logZ(b,beta); lc=enclosed_logZ(b,2beta)
-    @test Rational{BigInt}(sup(-expm1(lb-2la))) <= parseq(cert.eps_s)
-    @test Rational{BigInt}(sup(-expm1(lc-2lb))) <= parseq(cert.eps_t)
+
+@testset "Recurrence rejection is a positive proof" begin
+    @test HL.rejection(big(1) // 2, big(0) // 1) !== nothing
+    @test HL.rejection(big(0) // 1, big(1) // 2) !== nothing
+    @test HL.rejection(big(1) // 100, big(1) // 100) === nothing
+    @test_throws ErrorException HL.rejection(big(-1) // 100, big(1) // 100)
+    # Exact rational inequalities used in the arbitrary-size argument of PERTURBATION.md.
+    @test 1 + 1 + 1 // 2 > 2
+    @test 4 / (1 + 9 // 4)^2 == 64 // 169 < 1 // 2
+end
+
+@testset "Certified coupling continuation" begin
+    seed = Dict("n0" => "4//1", "beta0" => "2//1",
+        "eps_s_upper" => "3508321//100000000", "eps_t_upper" => "123121//5000000")
+    c = HL.continuation(seed, big(1) // 10000)
+    @test c !== nothing
+    @test HL.q(c["eps_s_upper"]) > HL.q(seed["eps_s_upper"])
+    @test HL.q(c["eps_t_upper"]) > HL.q(seed["eps_t_upper"])
+    @test HL.q(c["gap_lower_bound"]) > 0
+end
+
+@testset "Continuous-temperature negative certificate and coverage" begin
+    specs = Dict(L => HL.full_spectrum(L, 2 // 1; verified = true) for L in (2, 4))
+    record = HL.exclude_temperatures(specs, 2)
+    @test HL.check_exclusion(specs, record)
+    bad = deepcopy(record)
+    bad["windows"][1]["beta_from"] = "1//100"
+    @test_throws ErrorException HL.check_exclusion(specs, bad)
+    bad = deepcopy(record)
+    bad["tail"]["eps_s_lower"] = "0//1"
+    @test_throws ErrorException HL.check_exclusion(specs, bad)
+end
+
+@testset "Stored certificate: hashes, recurrence and claims (no spectra)" begin
+    cert = parse_exact_json(read(HL.CERTIFICATE, String))
+    @test cert["format"] == HL.FORMAT
+    for (file, hash) in cert["metadata"]["source_sha256"]
+        @test sha256_file(joinpath(HL.ROOT, file)) == hash
+    end
+    for result in cert["parameters"]
+        J = Rational{Int}(HL.q(result["J"]))
+        best = result["best"]
+        @test best == HL.best_row(result["grid"])
+        if best !== nothing
+            b = certified_gap_bound(HL.q(best["eps_s_upper"]), HL.q(best["eps_t_upper"]),
+                HL.q(best["beta0"])).bound
+            @test 0 < HL.q(best["gap_lower_bound"]) <= b
+            @test iseven(Int(HL.q(best["n0"])))
+        end
+        @test HL.check_claim(J, result)
+    end
 end
