@@ -94,9 +94,10 @@ because ...") is a result.
 - `models/<model-slug>/`: **where new certificates go** (one directory per model). The root
   `README.md` has the status table of all models; update its row when you add or change one.
 - `lean/`: Lean 4 formalisation of the criterion and of each certified model's gap theorem
-  (seeds are hypotheses).
-- `models/spin1_lean_seed/`, `models/lean_seed_small/`: studies toward seeds checked in the
-  Lean kernel (`decide +kernel` only; Julia generates, Lean checks).
+  (library `CertifiedGaps`, seeds are hypotheses), and the opt-in library `SeedKernel` of
+  kernel-checked seed arithmetic (`lake build SeedKernel`).
+- `models/lean_seeds/`: studies toward seeds checked in the Lean kernel (`decide +kernel` only;
+  Julia generates, Lean checks); its generators write the witness files of `lean/SeedKernel`.
 
 ## Directory format
 
@@ -160,7 +161,8 @@ relative path to `../../julia` inside the project), or runs with `--project=juli
   test, and say why in the PR description.
 - Certificates record SHA-256 hashes of `julia/src`, and some checkers compare them with the
   checkout. Any change to `julia/src` must keep every model checker passing; run them all.
-- Never modify `models/spin1/results`, `models/spin2/results`, `models/aklt/results` or anything under `lean/`.
+- Never modify `models/spin1/results`, `models/spin2/results`, `models/aklt/results` or anything under `lean/`
+  (one exception: `models/lean_seeds/certify.jl` regenerates the witness files of `lean/SeedKernel`).
 - No Python files: everything is Julia (and LaTeX for notes).
 - Certificate JSON stores every exact number as a string (`"num//den"`); use
   `CertifiedGaps.Results.write_result` and `parse_exact_json`. Record the code's SHA-256
