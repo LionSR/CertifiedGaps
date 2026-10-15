@@ -11,9 +11,35 @@
 #
 # Usage: julia lean/scripts/chain_certificate.jl εₛ εₜ β₀ [J] [digits]
 #   e.g. julia lean/scripts/chain_certificate.jl 577405872923865//9007199254740992 \
-#          45632040552745//1125899906842624 9//4 6
+#          45632040552745//1125899906842624 9//4 8
+# (this reproduces the `D = 4` point of `Models/SpinOneLargeD.lean`). The arguments are parsed
+# as literals, never evaluated: an integer, `a//b`, `a/b`, or a decimal such as `0.064` or
+# `6411e-5` (converted exactly in base ten).
 
-parse_rational(x) = (q = eval(Meta.parse(x)); Rational{BigInt}(q))
+"""
+    parse_rational(x) -> Rational{BigInt}
+
+Parse an exact rational from a string without evaluating it as code: an integer (`-12`), a
+fraction `a//b` or `a/b`, or a decimal with optional exponent (`0.064`, `6411e-5`, `1.5E+3`).
+Decimals are converted exactly, never through floating point.
+"""
+function parse_rational(x::AbstractString)
+    str = strip(x)
+    m = match(r"^([+-]?\d+)\s*//?\s*(\d+)$", str)
+    if m !== nothing
+        den = parse(BigInt, m[2])
+        iszero(den) && throw(ArgumentError("zero denominator in $(repr(x))"))
+        return parse(BigInt, m[1]) // den
+    end
+    m = match(r"^([+-]?)(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$", str)
+    frac = m === nothing || m[3] === nothing ? "" : m[3]
+    (m === nothing || isempty(m[2] * frac)) &&
+        throw(ArgumentError("not an exact rational literal: $(repr(x))"))
+    mant = parse(BigInt, m[2] * frac)
+    k = (m[4] === nothing ? 0 : parse(Int, m[4])) - length(frac)
+    q = k >= 0 ? (mant * big(10)^k) // big(1) : mant // big(10)^(-k)
+    return m[1] == "-" ? -q : q
+end
 
 z(a, b) = 1 - (1 - b) * (1 - a)^2
 f(x) = x^2 / (2 * (1 - x)^2)

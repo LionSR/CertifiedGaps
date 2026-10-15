@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
 import CertifiedGaps.Ring.Gap
-import CertifiedGaps.Models.Pauli
+import CertifiedGaps.Local.Pauli
 
 /-!
 # The Ising chain in transverse and longitudinal fields

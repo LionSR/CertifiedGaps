@@ -3,9 +3,9 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import CertifiedGaps.Models.TwoLegLadder
+import CertifiedGaps.Models.HeisenbergLadder
 import CertifiedGaps.Ring.Conjugation
-import CertifiedGaps.Models.SpinHalfRotation
+import CertifiedGaps.Local.SpinHalfRotation
 
 /-!
 # The two-leg ladder in the physical frame
@@ -13,13 +13,13 @@ import CertifiedGaps.Models.SpinHalfRotation
 `physicalHamiltonian J⊥ L = ∑_{legs} Sᵢ · Sⱼ + J⊥ ∑_{rungs} Sᵢ · Sⱼ` on a ring of `L` rungs. On an
 even ring it is the rotated ladder `model J⊥` conjugated by `e^{iπSʸ}` on the checkerboard
 sublattice (leg `b` of the even rungs and leg `a` of the odd rungs; `physicalHamiltonian_eq`),
-so the gap theorem holds for the physical ladder (`physical_gap_J4`).
+so the gap theorem holds for the physical ladder (`physical_gap`).
 -/
 
 open Matrix Real
 open scoped Kronecker
 
-namespace CertifiedGaps.TwoLegLadder
+namespace CertifiedGaps.HeisenbergLadder
 
 open SpinHalf
 
@@ -146,10 +146,11 @@ theorem physicalSpectrum_eq (Jperp : ℝ) {L : ℕ} (hL : Even L) :
   (model Jperp).eigenvalues_eq_spectrum _ (rungRot_mul_conjTranspose L) _
     (physicalHamiltonian_eq Jperp hL)
 
-/-- **The physical two-leg ladder at `J⊥ = 4`.** Every even ring of `L ≥ 4` rungs has a unique
-ground state and gap `Δ_L > log 9.033 / 2 ≈ 1.1004`. -/
-theorem physical_gap_J4 {L : ℕ} (hL : 4 ≤ L) (hLe : Even L) :
-    GapGT (physicalSpectrum 4 L) (log 9.033 / 2) := by
-  rw [physicalSpectrum_eq 4 hLe]; exact gap_J4 hL hLe
+/-- **The physical two-leg ladder.** At every point `p ∈ points`, every even ring of `L ≥ 4`
+rungs has a unique ground state and gap `Δ_L > log r / β₀` (`log 9.033 / 2 ≈ 1.1004` at
+`J⊥ = 4`). -/
+theorem physical_gap {p : Point} (hp : p ∈ points) {L : ℕ} (hL : 4 ≤ L) (hLe : Even L) :
+    GapGT (physicalSpectrum p.Jperp L) (log (p.cert.r : ℝ) / p.β₀) := by
+  rw [physicalSpectrum_eq _ hLe]; exact gap hp hL hLe
 
-end CertifiedGaps.TwoLegLadder
+end CertifiedGaps.HeisenbergLadder
