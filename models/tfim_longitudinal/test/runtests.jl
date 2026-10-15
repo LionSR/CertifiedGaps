@@ -1,6 +1,8 @@
-# Fast tests (~20 s): the full fast checker on all 30 certificates plus the seed table.
-using Test
-include(joinpath(@__DIR__, "..", "check.jl"))
+# Fast tests (~20 s): the fast checks of check.jl on all 30 certificates plus the seed table.
+using Test, JSON3
+include(joinpath(@__DIR__, "..", "src", "LongitudinalCertificate.jl"))
+using .LongitudinalCertificate
+const C=LongitudinalCertificate
 @testset "Exact RP, sector count, stored enclosures and recurrence" begin
     for g in C.GS, h in C.HS
         @test C.rp_check(g,h)
@@ -9,9 +11,9 @@ include(joinpath(@__DIR__, "..", "check.jl"))
         @test sum(C.sector_dimensions(C.orbits(L)))==2^L
     end
     paths=C.result_paths()
-    @test check_grid(paths)
+    @test C.check_grid(paths)
     for path in paths
-        @test check_result(path)
+        @test C.check_result(path)
     end
 end
 @testset "Compact seed table matches the certificates" begin

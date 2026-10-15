@@ -24,5 +24,7 @@ Uniqueness at every finite length follows independently by Perron--Frobenius: g>
 negative edges on the connected hypercube, so a scalar shift of -H is irreducible nonnegative.
 This alone does not establish a uniform gap.
 
-Outcome: the smallest even seed n₀ = 6 (rings of 6 and 12 sites) was admissible at all 30
+## Outcome
+
+The smallest even seed n₀ = 6 (rings of 6 and 12 sites) was admissible at all 30
 grid points, so the dense route sufficed and no larger rings were needed (see README.md).
