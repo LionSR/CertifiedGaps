@@ -45,7 +45,7 @@ From the repository root, with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1`:
 ```sh
 julia --project=models/two_leg_tfim -e 'using Pkg; Pkg.instantiate()'
 julia --project=models/two_leg_tfim models/two_leg_tfim/check.jl           # fast checker
-julia --project=models/two_leg_tfim models/two_leg_tfim/check.jl --full    # recertify, then check
+julia --project=models/two_leg_tfim models/two_leg_tfim/check.jl --full    # + fresh recertification
 # Fixed-seed replay from model inputs and its checker (output paths must be new):
 julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/replay_audit.jl results/replay.json
 julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/check_replay.jl \
@@ -56,8 +56,13 @@ julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/extrapolate.jl
 julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/summarize.jl
 ```
 
-`certify.jl [g]` (default `3//1`) reads the best seed from `results/scan_g<g>.json` and writes
-`results/certificate_g<g>_certifiedgaps.json`, which the fast checker also verifies. The
+`certify.jl [g] [OUTPUT]` (default `3//1`) reads the best seed from `results/scan_g<g>.json` and
+writes `OUTPUT` (default `results/certificate_g<g>_certifiedgaps.json`, which the fast checker
+also verifies). `check.jl --full` runs it at g = 3 into a temporary file, never into
+`results/`, checks that fresh certificate like the stored ones, and requires the same seed
+(g, n₀, β₀) and a bound at least that of `results/certificate_g3_1.json.gz`. The enclosure
+radii depend on the LAPACK run, so a fresh run need not be bit-identical: on a heavily loaded
+machine (7040 s) it gave the valid bound 0.636473… against the stored 0.636386…. The
 scan writes its spectra to `results/spectra_g<g>.json` (2.5 MB each, gitignored);
 `extrapolate.jl` and `summarize.jl` need them. `--project=julia` (the core environment) also
 works for every command.
@@ -94,7 +99,8 @@ gaps, and the literature critical field g_c ≈ 1.83214(5) (not a premise).
 
 - `certify.jl`, `check.jl`: certificate entry point and checker.
 - `src/Ladder.jl`: RP identity, symmetry blocks, block matrices, verified eigen-enclosures,
-  log Z intervals. `src/Provenance.jl`: gzip certificate loader and historical source hashes.
+  log Z intervals, and `seed_defects` (the one implementation of the step from two spectra to
+  the rational seeds, shared by `certify.jl`, the tests and the replay scripts). `src/Provenance.jl`: gzip certificate loader and historical source hashes.
 - `scripts/`: `scan.jl` (numerical seed scan), `extrapolate.jl`, `summarize.jl` (the
   "Results" section of METHOD.md), `replay_audit.jl` and `check_replay.jl` (full fixed-seed
   replay and its checker).
@@ -112,4 +118,8 @@ named `ThermalMPOGap`. Its `source_sha256` entries refer to the audited snapshot
 objects of that commit when it is available (and says so when it is not), and checks the
 SHA-256 `aba98d98…a74928` of the uncompressed certificate bytes. The rename changed only the
 namespace, and a replay on `CertifiedGaps` 0.2.0 reproduced every number exactly.
-`METHOD.md` was named `REPORT.md` until the format tidy-up.
+`METHOD.md` was named `REPORT.md` until the format tidy-up. Later the seed step that
+`certify.jl`, `test/runtests.jl`, `scripts/replay_audit.jl` and `scripts/check_replay.jl` each
+carried moved into `Ladder.seed_defects` (same operations, same rounding), `certify.jl` gained
+the optional output path, and `check.jl --full` stopped writing into `results/`. The stored
+certificate's provenance hashes refer to the historical snapshot and are unaffected.

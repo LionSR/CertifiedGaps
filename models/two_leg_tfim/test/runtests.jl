@@ -30,11 +30,13 @@ BLAS.set_num_threads(1)
         @test sort(ev) ≈ eigvals(Symmetric(H)) atol=1e-11
     end
 end
+# Certificate files passed as arguments (check.jl --full passes a fresh one) are checked too.
 @testset "Stored rational seed and outward recurrence" begin
     paths=filter(p->startswith(basename(p),"certificate_g") &&
         (endswith(p,".json") || endswith(p,".json.gz")),
         readdir(joinpath(@__DIR__,"../results");join=true))
     @test !isempty(paths)
+    append!(paths,abspath.(ARGS))
     for p in paths
         c=read_certificate(p)
         @test rp_identity(parse(Rational{BigInt},c["g"]))
@@ -43,14 +45,10 @@ end
         beta=parse(Rational{BigInt},c["beta"])
         n=parse(Int,c["n0"]); @test iseven(n)
         @test certified_gap_bound(es,et,beta).bound == c["bound"]
-        loaded=[(;sectors=[(;eigenvalues=Float64.(sec["eigenvalues"]),
-            verification=(;radius=sec["verification"]["radius"])) for sec in sp["sectors"]])
-            for sp in c["spectra"]]
-        ln=logz_interval(loaded[1],beta); l2=logz_interval(loaded[2],beta)
-        l22=logz_interval(loaded[2],2beta)
-        ls=Ladder.down(()->l2[1]-2ln[2]); lt=Ladder.down(()->l22[1]-2l2[2])
-        @test Rational{BigInt}(-Ladder.down(()->expm1(ls))) == es
-        @test Rational{BigInt}(-Ladder.down(()->expm1(lt))) == et
+        loaded=stored_spectra(c)
+        seeds=seed_defects(loaded[1],loaded[2],beta)
+        @test seeds.es == es
+        @test seeds.et == et
         # The original certificate's source hashes describe the audited historical snapshot
         # (when this directory was certificates/two_leg_tfim and the core was ThermalMPOGap).
         # They are provenance, not part of the mathematical check: verify them when that
