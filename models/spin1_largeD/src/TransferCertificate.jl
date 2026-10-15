@@ -21,6 +21,10 @@ const box = CertifiedGaps.to_interval
 const FORMAT = "spin1_largeD transfer and Weyl certificate v1"
 const VALIDITY = "unique ground state and gap >= bound for every even L >= n0 sites"
 const KEEP = 8192
+"The case ids `transfer_certify.jl` writes; `check_certificate` requires exactly these."
+const EXPECTED_CASES = ["reference-D4//1", "survey-D4-beta3",
+    ["space-lift-$k-D4//1" for k in 1:4]..., "transport-threshold-D4//1",
+    "reference-D1603//500", "transport-threshold-D1603//500"]
 exact(x) = string(Q(x))
 endpoints(x) = [exact(inf(x)), exact(sup(x))]
 upper(x) = box(max(0, sup(x)))
@@ -309,7 +313,9 @@ function check_certificate(path = joinpath(ROOT, "certificate.json"))
     parse(Int, data["partition_keep"]) == KEEP || error("unsupported partition cutoff")
     spectra = Dict(D => (reference_spectrum(D, 6), reference_spectrum(D, 12))
         for D in (4//1, 1603//500))
-    isempty(data["cases"]) && error("empty certificate")
+    # Require exactly the advertised cases, so a truncated certificate cannot pass.
+    ids = sort([case["id"] for case in data["cases"]])
+    ids == sort(EXPECTED_CASES) || error("certificate cases $ids differ from $EXPECTED_CASES")
     for case in data["cases"]
         a, b = spectra[parse(Q, case["reference_D"])]
         row = check_record(case, a, b)

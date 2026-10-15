@@ -55,3 +55,11 @@ end
         @test_throws ErrorException TC.check_record(changed, a, b)
     end
 end
+
+@testset "Certificate replay rejects a truncated case list" begin
+    data = TC.parse_exact_json(read(joinpath(TC.ROOT, "certificate.json"), String))
+    filter!(case -> case["id"] != "transport-threshold-D1603//500", data["cases"])
+    path = tempname() * ".json"
+    TC.write_result(path, data)
+    @test_throws ErrorException TC.check_certificate(path)
+end

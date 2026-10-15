@@ -12,7 +12,7 @@
         "../../julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
         "../../julia/src/ExactDiagonalization.jl": "3589e3461ea172adb4234fe52a8aa2ec8f36c939984e28e98559a1e9ec72c1d1",
         "../../julia/src/CertifiedGaps.jl": "958e839cff840169bfaeb0463a9f06f2a5276453b1472e478111ca36f48ba75b",
-        "src/TransferCertificate.jl": "737e293a93d556f031225fbd1caed14eca708a583fe20983b86321866ec009e1",
+        "src/TransferCertificate.jl": "3b9da220167c11f86df1ac962b9b542840eda90e1196fa237598d6f756a9c455",
         "check.jl": "4e441959f44bb87120dcd4f4c5ac94ab9637263ee302f2faa834ad06f4d74d56",
         "../../julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
         "Project.toml": "89cda383e17e9cdc166800d29d78817d486665bc598d1de80eb0fb67e4c1e0dd",
@@ -377,7 +377,7 @@
         "config": {
             "largest_ED_ring": "12"
         },
-        "created_utc": "2026-10-15T03:22:18.610",
+        "created_utc": "2026-10-15T03:34:52.263",
         "certified": true,
         "source_sha256": {
             "../../julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8",
@@ -392,7 +392,7 @@
             "../../julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
             "../../julia/src/ExactDiagonalization.jl": "3589e3461ea172adb4234fe52a8aa2ec8f36c939984e28e98559a1e9ec72c1d1",
             "../../julia/src/CertifiedGaps.jl": "958e839cff840169bfaeb0463a9f06f2a5276453b1472e478111ca36f48ba75b",
-            "src/TransferCertificate.jl": "737e293a93d556f031225fbd1caed14eca708a583fe20983b86321866ec009e1",
+            "src/TransferCertificate.jl": "3b9da220167c11f86df1ac962b9b542840eda90e1196fa237598d6f756a9c455",
             "check.jl": "4e441959f44bb87120dcd4f4c5ac94ab9637263ee302f2faa834ad06f4d74d56",
             "../../julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
             "Project.toml": "89cda383e17e9cdc166800d29d78817d486665bc598d1de80eb0fb67e4c1e0dd",
@@ -791,7 +791,7 @@
             "n0": "6"
         }
     ],
-    "wall_seconds": 3.040947198867798,
+    "wall_seconds": 7.101011037826538,
     "input_hashes": {
         "results/enclosed_D1603_500_L12.skeleton.json": "679258ed411ed2fb0361c651ccf625f915cc0fb42e0d631d191811e4d69305e0",
         "results/enclosed_D4_1_L12.levels.bin": "051b056b77109adec64f67b4bb495b1676dcc5330b37a1e6411ab3f463e0aa73",
