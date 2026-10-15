@@ -1,7 +1,7 @@
 using Test, CertifiedGaps, LinearAlgebra
 using CertifiedGaps.ExactDiagonalization
-include("../su2.jl")
-include("../dimensions.jl")
+include("../src/su2.jl")
+include("../src/dimensions.jl")
 BLAS.set_num_threads(1)
 @testset "Empty highest-weight sectors" begin
     for (L,S,k) in ((2,1,0),(2,2,1))

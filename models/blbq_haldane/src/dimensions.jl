@@ -10,6 +10,7 @@ function charge_count(L,M)
     coeff[M+L+1]
 end
 
+"Möbius function μ(n)."
 function mobius(n)
     sign=1
     for p in 2:n

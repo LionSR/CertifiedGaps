@@ -1,7 +1,9 @@
+# Assemble the complete weighted spectrum results/spectrum_L$L.json from all (S, k) sector
+# files, checking every dimension against the exact character formula. Usage: collect_su2.jl L
 using CertifiedGaps,CertifiedGaps.Results,JSON3,LinearAlgebra
 BLAS.set_num_threads(1)
-include("dimensions.jl")
-const ROOT=@__DIR__;const THETAS=[0.0,-0.1,-0.3,-0.5,-0.6,-0.7]
+include(joinpath(@__DIR__,"..","src","dimensions.jl"))
+const ROOT=normpath(joinpath(@__DIR__,".."));const THETAS=[0.0,-0.1,-0.3,-0.5,-0.6,-0.7]
 L=parse(Int,only(ARGS));files=String[];rows=Any[]
 levels=[Float64[] for _ in 1:6];weights=[Int[] for _ in 1:6]
 for S in 0:L,k in 0:L÷2
@@ -28,7 +30,8 @@ for t in 1:6
 end
 write_result(joinpath(ROOT,"results/spectrum_L$(L).json"),(;
     metadata=run_metadata((;L,method="all SU2 highest-weight/momentum sectors, dense solves");
-        source_sha256=source_hashes(ROOT;dirs=(),files=("collect_su2.jl","dimensions.jl")),
+        source_sha256=source_hashes(ROOT;dirs=(),
+            files=("scripts/collect_su2.jl","src/dimensions.jl")),
         packages=(CertifiedGaps,),status="complete weighted spectrum, numerical not certified"),
     input_hashes=file_hashes(joinpath(ROOT,"results"),files),
     L,dimension_sum=3^L,seconds=sum(r.seconds for r in rows),sectors=rows,

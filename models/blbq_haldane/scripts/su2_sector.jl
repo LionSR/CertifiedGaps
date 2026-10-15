@@ -1,13 +1,16 @@
+# One complete (S, k) highest-weight sector of the L-site ring, dense solves at all angles.
+# Usage: run.sh -t 4 scripts/su2_sector.jl L S k; driven by run_su2_grid.sh. Numerical only.
 using CertifiedGaps, CertifiedGaps.Results, LinearAlgebra, Serialization
-include("su2.jl")
+const ROOT=normpath(joinpath(@__DIR__,".."))
+include(joinpath(ROOT,"src","su2.jl"))
 BLAS.set_num_threads(1)
 const THETAS=[0.0,-0.1,-0.3,-0.5,-0.6,-0.7]
 L,S,k=parse.(Int,ARGS)
 started=time()
-hashes=source_hashes(@__DIR__;dirs=(),
-    files=("su2.jl","su2_sector.jl","sectors.jl","model.jl"))
-output=joinpath(@__DIR__,"results/su2_L$(L)_S$(S)_k$(k).json")
-cache=joinpath(@__DIR__,"runtime/su2_L$(L)_S$(S)_k$(k).bin")
+hashes=source_hashes(ROOT;dirs=(),
+    files=("src/su2.jl","scripts/su2_sector.jl","src/sectors.jl","src/model.jl"))
+output=joinpath(ROOT,"results/su2_L$(L)_S$(S)_k$(k).json")
+cache=joinpath(ROOT,"runtime/su2_L$(L)_S$(S)_k$(k).bin")
 if isfile(output)
     println("Already complete: $output")
     exit()

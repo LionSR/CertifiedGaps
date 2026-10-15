@@ -109,6 +109,12 @@ function highest_basis(D,L,S,k;memory_limit=12*2.0^30)
         orthonormalization="CholeskyQR2")
 end
 
+"""
+    su2_components(L, S, k; memory_limit)
+
+Bilinear and biquadratic components on the spin-`S` highest-weight space at momentum `k`
+(numerical orthonormal basis, see `highest_basis`), and construction diagnostics.
+"""
 function su2_components(L,S,k;memory_limit=12*2.0^30)
     o=orbits(L,S);A,B,active,U=momentum_components(L,k,o)
     n=length(active)

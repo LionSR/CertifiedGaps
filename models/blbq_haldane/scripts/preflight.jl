@@ -1,6 +1,9 @@
+# Exact integer sector dimensions (characters) and dense-memory projections for L = 10..16;
+# writes results/preflight.json. The dimensions are exact; the GiB figures are projections.
 using CertifiedGaps.Results, LinearAlgebra
 BLAS.set_num_threads(1)
-include("dimensions.jl")
+const ROOT=normpath(joinpath(@__DIR__,".."))
+include(joinpath(ROOT,"src","dimensions.jl"))
 rows=Any[]
 for L in (10,12,14,16)
     dims=[dimension(L,M,k) for M in -L:L,k in 0:L-1]
@@ -18,8 +21,9 @@ for L in (10,12,14,16)
         two_dense_matrices_GiB=16d^2/2.0^30,
         cubic_work_relative_L12=(d/dimension(12,1,1))^3))
 end
-write_result(joinpath(@__DIR__,"results/preflight.json"),(;
+write_result(joinpath(ROOT,"results/preflight.json"),(;
     metadata=run_metadata((;memory_limit_bytes=17179869184,cpu_quota=4);
-        source_sha256=source_hashes(@__DIR__;dirs=(),files=("preflight.jl","dimensions.jl")),
+        source_sha256=source_hashes(ROOT;dirs=(),
+            files=("scripts/preflight.jl","src/dimensions.jl")),
         status="exact integer dimensions, floating resource projections"),rows))
 println(rows)

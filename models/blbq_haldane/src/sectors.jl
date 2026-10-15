@@ -1,7 +1,9 @@
 using LinearAlgebra, SparseArrays
 include("model.jl")
 
+"Translate the base-3 product state `s` of an `L`-site ring by one site."
 rotate_state(s,L) = (s % 3^(L-1))*3 + s ÷ 3^(L-1)
+"Reflect the base-3 product state `s` of an `L`-site ring (reverse its digits)."
 function reflect_state(s,L)
     r=0
     for _ in 1:L
@@ -9,6 +11,7 @@ function reflect_state(s,L)
     end
     r
 end
+"Total magnetization M of the base-3 product state `s` (digit 0, 1, 2 means m = -1, 0, 1)."
 function charge(s,L)
     m=-L
     for _ in 1:L
@@ -83,7 +86,7 @@ function momentum_components(L,k,o)
         seen[i]=true;seen[j]=true
     end
     U=sparse(UI,UJ,UV,d,d)
-    @assert norm(U'*U-spdiagm(ones(d))) < 1e-10 # replaced below: I is transition index vector
+    @assert norm(U'*U-spdiagm(ones(d))) < 1e-10
     Ar=U'*A*U; Br=U'*B*U
     @assert norm(imag(Ar))<1e-9*max(1,norm(Ar))
     @assert norm(imag(Br))<1e-9*max(1,norm(Br))
@@ -120,6 +123,13 @@ function involution_bases(S)
     [sparse(ii[s],jj[s],vv[s],d,cols[s]) for s in 1:2]
 end
 
+"""
+    reduced_components(L, M, k, o)
+
+Real symmetric bilinear (`A`) and biquadratic (`B`) components of every block of magnetization
+`M` and momentum `k`, further split by spin flip (M = 0) and reflection (k = 0, π). The ring
+Hamiltonian at angle θ on a block is `cos(θ) A + sin(θ) B`.
+"""
 function reduced_components(L,M,k,o)
     A,B,active,U=momentum_components(L,k,o)
     lookup=zeros(Int,length(o.reps));lookup[active]=1:length(active)

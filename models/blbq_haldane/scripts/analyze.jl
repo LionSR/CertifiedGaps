@@ -1,12 +1,21 @@
+# Rebuilds results/scaling.json (grid maxima, best even seeds, energy scaling, extrapolations)
+# from the complete spectra results/spectrum_L*.json[.gz] and the references. The spectra are
+# not committed; regenerate them with scan.jl and the SU(2) pipeline first. Numerical only.
 using CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds
 using CertifiedGaps.ExactDiagonalization: PartialSpectrum
 using JSON3, LinearAlgebra, Printf
-include("result_io.jl")
+const ROOT=normpath(joinpath(@__DIR__,".."))
+include(joinpath(ROOT,"src","result_io.jl"))
 BLAS.set_num_threads(1)
-const ROOT=@__DIR__
 const THETAS=[0.0,-0.1,-0.3,-0.5,-0.6,-0.7]
 ratstr(x)=string(ceil(BigInt,BigFloat(x)*big(10)^15)//big(10)^15)
-# Linear least squares predictions, explicitly a heuristic and never a seed enclosure.
+"""
+    forecast(ns, ds, gap, style)
+
+First even n0 at which a dilute-triplet ansatz with assumed bulk `gap` and fitted mismatch
+tail (`style`: "exponential" or "exponential_sqrt") gives a positive recurrence bound.
+Linear least squares, explicitly a heuristic and never a seed enclosure.
+"""
 function forecast(ns,ds,gap,style)
     (length(ns)<2 || any(ds .<= 0) || gap<=0) && return nothing
     y=log.(ds) .+ (style=="exponential_sqrt" ? log.(ns)./2 : zeros(length(ns)))
@@ -31,6 +40,7 @@ function forecast(ns,ds,gap,style)
     end
     nothing
 end
+"Rebuild results/scaling.json from the (uncommitted) spectra and the references."
 function analyze()
     started=time()
     inputs=Dict{Int,Any}()
@@ -49,7 +59,7 @@ function analyze()
         specs=Dict(L=>result_spectrum(d,t) for (L,d) in inputs)
         results=scan_seeds(spectral_defects(specs),ns,0.125:0.125:64.0)
         eligible=filter(r->iseven(r.n₀),results)
-        @assert best_seed(eligible)===nothing "An eligible numerical seed appeared: implement rigorous recheck"
+        @assert best_seed(eligible)===nothing "eligible numerical seed: implement rigorous recheck"
         for n in ns
             row=argmax(r->min(1-r.εₛ,1-r.εₜ),filter(r->r.n₀==n,results))
             push!(allrows,(;theta,n,beta=row.β₀,spatial=1-row.εₛ,thermal=1-row.εₜ,
@@ -78,22 +88,30 @@ function analyze()
         glens=glens[max(1,end-2):end]
         estimates=Any[]
         for power in (1,2)
-            intercept,slope=hcat(ones(length(glens)),Float64.(glens).^(-power))\[gaps[L] for L in glens]
-            push!(estimates,(;method="gap intercept vs L^(-$power)",gap=intercept,lengths=glens,
-                finite_gaps=[gaps[L] for L in glens],forecasts=[forecast(fitns,ds,intercept,style) for style in ("exponential","exponential_sqrt")]))
+            design=hcat(ones(length(glens)),Float64.(glens).^(-power))
+            intercept,slope=design\[gaps[L] for L in glens]
+            forecasts=[forecast(fitns,ds,intercept,style)
+                for style in ("exponential","exponential_sqrt")]
+            push!(estimates,(;method="gap intercept vs L^(-$power)",gap=intercept,
+                lengths=glens,finite_gaps=[gaps[L] for L in glens],forecasts))
         end
         push!(extrapolations,(;theta,estimates))
     end
-    sources=source_hashes(ROOT;dirs=("test",),
-        files=("analyze.jl","result_io.jl","model.jl","sectors.jl","scan.jl","reference.jl"))
+    sources=source_hashes(ROOT;dirs=("src","test"),
+        files=("scripts/analyze.jl","scan.jl","scripts/reference.jl"))
+    inputs_used=filter(f->startswith(f,"spectrum_L")||startswith(f,"reference_L"),
+        readdir(joinpath(ROOT,"results")))
     data=(;metadata=run_metadata((;thetas=THETAS,beta_grid="1//8:1//8:64//1",n_grid=ns);
             source_sha256=sources,status="numerical negative grid survey, not certified"),
-        input_hashes=file_hashes(joinpath(ROOT,"results"),filter(f->startswith(f,"spectrum_L")||startswith(f,"reference_L"),readdir(joinpath(ROOT,"results")))),
-        seconds=time()-started,certified_gap=nothing,validity_range=nothing,best_even,grid_maxima=allrows,
+        input_hashes=file_hashes(joinpath(ROOT,"results"),inputs_used),
+        seconds=time()-started,certified_gap=nothing,validity_range=nothing,best_even,
+        grid_maxima=allrows,
         energy_scaling=scaling,extrapolations,
         rp=(;identity="-X=A; -X^2=-A/2-B",coefficient_G="cos(theta)-sin(theta)/2",
-            coefficient_Q="-sin(theta)",theta_exact=["0//1","-1//10","-3//10","-1//2","-3//5","-7//10"],
-            identity_arithmetic="Rational{BigInt} coefficient comparison; trigonometric parameters symbolic"))
+            coefficient_Q="-sin(theta)",
+            theta_exact=["0//1","-1//10","-3//10","-1//2","-3//5","-7//10"],
+            identity_arithmetic="Rational{BigInt} coefficient comparison; " *
+                "trigonometric parameters symbolic"))
     write_result(joinpath(ROOT,"results","scaling.json"),data)
     for row in allrows;println(row);end
     for row in extrapolations;println(row);end

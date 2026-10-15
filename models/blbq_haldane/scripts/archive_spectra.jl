@@ -1,6 +1,7 @@
+# Losslessly gzip complete spectra over 1 MB and record both hashes in results/archive.json.
 using CertifiedGaps.Results, LinearAlgebra, JSON3
 BLAS.set_num_threads(1)
-root=@__DIR__
+root=normpath(joinpath(@__DIR__,".."))
 record=joinpath(root,"results/archive.json")
 rows=isfile(record) ? Any[JSON3.read(read(record,String)).rows...] : Any[]
 for name in readdir(joinpath(root,"results"))
@@ -20,5 +21,6 @@ for name in readdir(joinpath(root,"results"))
 end
 write_result(joinpath(root,"results/archive.json"),(;
     metadata=run_metadata((;method="lossless gzip, original JSON written by Results.write_result");
-        source_sha256=source_hashes(root;dirs=(),files=("archive_spectra.jl","result_io.jl")),
+        source_sha256=source_hashes(root;dirs=(),
+            files=("scripts/archive_spectra.jl","src/result_io.jl")),
         status="lossless storage conversion"),rows))
