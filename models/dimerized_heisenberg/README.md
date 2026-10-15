@@ -1,4 +1,4 @@
-# Dimerised Heisenberg chain
+# Dimerized Heisenberg chain
 
 **Certified** at δ = 1/2, 3/10 and 1/4: for every even L ≥ 4 cells (N = 8, 12, 16, … spins,
 i.e. N divisible by 4) the ground state is unique and the gap is at least the bound below.
