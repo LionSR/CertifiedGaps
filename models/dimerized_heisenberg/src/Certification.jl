@@ -17,7 +17,7 @@ include("rp.jl")
 using .VerifiedSpectra, .DimerizedRP
 
 export generate, check_record, load_record, seed_intervals, dimer_bounds, provenance,
-    exact, endpoints, DELTAS, negative_cover, replay_spectra, ring_levels, stored_spectra,
+    core_provenance, exact, endpoints, DELTAS, negative_cover, replay_spectra, ring_levels, stored_spectra,
     seed_path
 
 const Q = Rational{BigInt}
@@ -29,15 +29,30 @@ exact(s) = (p = split(s, "//"); parse(BigInt, p[1]) // parse(BigInt, p[2]))
 endpoints(x) = string.([Q(inf(x)), Q(sup(x))])
 qinterval(x) = CertifiedGaps.to_interval(x)
 
-"SHA-256 of every source that produces or checks a seed certificate (by repository path)."
+"""
+    provenance()
+
+SHA-256 of the model-local sources that produce or check a seed certificate (by repository
+path). `check_record` requires exactly these keys and every digest to match. The shared core
+is recorded separately by `core_provenance` and is not enforced.
+"""
 function provenance()
     m = "models/dimerized_heisenberg"
-    source_hashes(ROOT; dirs=("julia/src",), files=(
+    source_hashes(ROOT; dirs=(), files=(
         "$m/src/Certification.jl", "$m/src/rp.jl", "$m/src/sectors.jl",
-        "$m/src/verified_spectra.jl", "$m/certify.jl", "$m/check.jl", "$m/METHOD.md",
-        "$m/Project.toml", "$m/Manifest.toml", "julia/Project.toml",
-        "notes/thermal-mpo-gap-note.tex", "notes/thermal-mpo-gap-scope.tex"))
+        "$m/src/verified_spectra.jl", "$m/src/provenance.jl", "$m/certify.jl",
+        "$m/check.jl", "$m/Project.toml", "$m/Manifest.toml"))
 end
+
+"""
+    core_provenance()
+
+SHA-256 of the shared core (`julia/src`, `julia/Project.toml`, `julia/Manifest.toml`), stored
+as `metadata["core_sha256"]`. Provenance only: no checker compares it with the checkout, so a
+core edit does not invalidate a certificate (the checker reruns the core arithmetic instead).
+"""
+core_provenance() = source_hashes(ROOT; dirs=("julia/src",),
+    files=("julia/Project.toml", "julia/Manifest.toml"))
 
 "Path of the seed certificate of `delta`."
 seed_path(delta) = joinpath(MODEL_DIR, "results",
@@ -311,9 +326,10 @@ function generate(delta::Q; exclude_all_beta=true)
             "eps_s_enclosure"=>endpoints(perturbation.s),
             "eps_t_enclosure"=>endpoints(perturbation.t)),
         "seconds_total"=>time()-start,
-        "metadata"=>run_metadata(Dict("delta"=>string(delta)); source_sha256=provenance(),
-            packages=(CertifiedGaps,IntervalArithmetic), status="recertified_v2",
-            certified=!isempty(seeds)))
+        "metadata"=>merge(run_metadata(Dict("delta"=>string(delta));
+                source_sha256=provenance(), packages=(CertifiedGaps,IntervalArithmetic),
+                status="recertified_v2", certified=!isempty(seeds)),
+            Dict("core_sha256"=>core_provenance())))
     path = chopsuffix(seed_path(delta), ".gz")
     write_result(path, record)
     run(`gzip -n -f $path`)

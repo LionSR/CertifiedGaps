@@ -159,14 +159,24 @@ relative path to `../../julia` inside the project), or runs with `--project=juli
 - Work only inside `models/<your-model-slug>/` unless the task says otherwise. If the
   core is missing something generic, add it to `julia/` in a separate, minimal commit with a
   test, and say why in the PR description.
-- Certificates record SHA-256 hashes of `julia/src`, and some checkers compare them with the
-  checkout. Any change to `julia/src` must keep every model checker passing; run them all.
+- Source hashes: a checker enforces (fails on mismatch) only **model-local** sources, i.e. the
+  model's own `src/`, `certify.jl`, `check.jl`, the scripts that produce the certificate, and
+  its `Project.toml`/`Manifest.toml`, recorded in `metadata["source_sha256"]`; if it checks
+  the recorded key set, it compares it with that model-local set only. The shared core
+  (`julia/src`, `julia/Project.toml`, `julia/Manifest.toml`) is recorded under
+  `metadata["core_sha256"]`, keyed by repository path (`julia/src/Results.jl`), as provenance
+  only: the checker reruns the core arithmetic instead of pinning its bytes. Do not hash
+  `notes/` or `METHOD.md`. So editing or adding core files, notes or a METHOD.md does not
+  invalidate a certificate. Some older tests (e.g. `two_leg_tfim`, `spin1_dimerized`) still
+  compare recorded core hashes; until they follow this policy, any change to `julia/src` must
+  keep every model checker and test passing, so run them all.
 - Never modify `models/spin1/results`, `models/spin2/results`, `models/aklt/results` or anything under `lean/`
   (one exception: `models/lean_seeds/certify.jl` regenerates the witness files of `lean/SeedKernel`).
 - No Python files: everything is Julia (and LaTeX for notes).
 - Certificate JSON stores every exact number as a string (`"num//den"`); use
   `CertifiedGaps.Results.write_result` and `parse_exact_json`. Record the code's SHA-256
-  (`source_hashes`) and the Julia/package versions (`run_metadata`).
+  (`source_hashes`, split as in "Source hashes" above) and the Julia/package versions
+  (`run_metadata`).
 - Every model directory follows "Directory format" above (files, `check.jl` modes, README
   headings).
 - Report negative results too: if no admissible seed exists at accessible sizes, commit the

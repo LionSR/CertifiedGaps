@@ -121,7 +121,7 @@
     "scope": "No common cell basis admits sum c*C tensor C for the stated inter-cell bond. The broader conjugate form is verified exactly and is not excluded.",
     "largest_exact_audit_matrix_dimension": 256,
     "bound_to_gap_ratio": null,
-    "audit_seconds": 0.503262542,
+    "audit_seconds": 8.523150375,
     "metadata": {
         "julia_threads": 1,
         "julia": "1.12.4",
@@ -130,9 +130,19 @@
             "model": "dimerized_heisenberg",
             "sites_per_cell": 2
         },
-        "created_utc": "2026-10-15T05:52:43.936",
+        "created_utc": "2026-10-15T09:34:15.560",
         "certified": false,
         "source_sha256": {
+            "models/dimerized_heisenberg/Manifest.toml": "0d4ecbe32240068e6b6ebdab7a7b54bebb9020f604412bf9df4fc49e53895036",
+            "models/dimerized_heisenberg/src/reflection_conventions.jl": "c23e164a0cae45071ef6aab0d8b2bdef51cc90b23180fee61316b66b7054be00",
+            "models/dimerized_heisenberg/src/rp.jl": "4517f478fd68090f857d60890ad0564a22755453835671599e2c80536077fe42",
+            "models/dimerized_heisenberg/check.jl": "07edfc32f9e22a96c1a6cf3fee1f53ee07971a1af81049514b9763bbf3af09df",
+            "models/dimerized_heisenberg/certify.jl": "479f18330141b08bfe03e8109cc10c27f8a305592caf9d54fbd714877146501d",
+            "models/dimerized_heisenberg/Project.toml": "5b0441ca80fc9450273dcb015ba0f8adf6d232ee7fb250cf98aa0d1e5f60fe96"
+        },
+        "CertifiedGaps": "0.2.0",
+        "blas_threads": 1,
+        "core_sha256": {
             "julia/src/ExactDiagonalization.jl": "3589e3461ea172adb4234fe52a8aa2ec8f36c939984e28e98559a1e9ec72c1d1",
             "julia/src/ReflectionPositivity.jl": "e8d5d3446f680f377bed27d0d9ba44dda8182b7c3055165b9b61701fe736040c",
             "julia/src/Recurrence.jl": "2dc12e517f9739e2064f5de119510c52caa0a2cfba53d0eb8b5d6c85e02f9729",
@@ -147,19 +157,14 @@
             "julia/src/CertifiedMPO/AdjointTrace.jl": "38f76a39b09196e1b1cd3d5fc754945e998c2b570d3ae277bd57765396908892",
             "julia/src/CertifiedMPO/Norms.jl": "6aa188bc7a1725a51e7dd0806b7f0565ac434e5bfc6aba84e5dfdce73d749f8d",
             "julia/src/CertifiedMPO/MPOAlgebra.jl": "e6da21eb0db582018d480677a4e8cb85e501277259c79d6035cea60f5c58811d",
-            "models/dimerized_heisenberg/check.jl": "07edfc32f9e22a96c1a6cf3fee1f53ee07971a1af81049514b9763bbf3af09df",
             "julia/src/Models.jl": "299d8bc7b0e377361276b26a99023e5a6130e73058639b0bdb13783b51855b2e",
-            "models/dimerized_heisenberg/certify.jl": "b964ed3f76c3d0b2dcd81648fa2217f73763deece4dabb0437dae7b99c200b14",
             "julia/src/Purification.jl": "ea8a4b1a03a8a38b01d0289b06da72a8ea255e79287008ccf58456cfda9fadf3",
-            "models/dimerized_heisenberg/src/reflection_conventions.jl": "c23e164a0cae45071ef6aab0d8b2bdef51cc90b23180fee61316b66b7054be00",
-            "models/dimerized_heisenberg/src/rp.jl": "4517f478fd68090f857d60890ad0564a22755453835671599e2c80536077fe42",
             "julia/src/ExactArithmetic.jl": "77feece9b1e56011667bd8241ff159864943433d2121f01f351dccefae769882",
             "julia/src/GapCertificates.jl": "a8497294951be57ebff526beae7732b6d91446d579eeb4c31cabc7d96174e311",
             "julia/src/Results.jl": "9aa080ae98e184280c1678ef825a6b85978bbbb47918200d94fec89ba6fc485c",
             "julia/src/CertifiedMPO/Products.jl": "5207b7d80375c538d531c67c699d048a0014409cf410425ffc633299959a9230",
             "julia/src/CertifiedMPO/Squaring.jl": "9e454f12d3149482d734f33d3a1f47b6c4dab21144329753cdd2826d05c5b03c",
             "julia/src/Spins.jl": "fb4d5c617531cd5e080eb166a495212d7d48ada62f9802f55e65e6bca0261855",
-            "notes/thermal-mpo-gap-scope.tex": "b68c5bc35afd94aa9d815b71312280b5f971f85046a469142b1615f7aa9b684a",
             "julia/src/CertifiedGaps.jl": "958e839cff840169bfaeb0463a9f06f2a5276453b1472e478111ca36f48ba75b",
             "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
             "julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
@@ -168,8 +173,6 @@
             "julia/Project.toml": "1043d2457f2be2f349c00ddd5b994dd5bd5566672813eab1f54671f8b53a99d1",
             "julia/src/CertifiedMPO/PositiveBounds.jl": "8921e7de4f45a27260dfc22e00719b06651674fc3dd792d6580e294b5fd68382",
             "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
-        },
-        "CertifiedGaps": "0.2.0",
-        "blas_threads": 1
+        }
     }
 }

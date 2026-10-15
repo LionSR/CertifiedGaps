@@ -44,14 +44,15 @@ function certify_rp()
             "seed_scan" => "see results/seed_delta_*.json.gz",
         ))
     end
-    hashes = source_hashes(repository_root(); dirs=("julia/src",), files=(
+    # Model-local sources are enforced by check.jl; the core is recorded as provenance only.
+    hashes = source_hashes(repository_root(); dirs=(), files=(
         "$MODEL/src/rp.jl", "$MODEL/src/reflection_conventions.jl", "$MODEL/certify.jl",
-        "$MODEL/check.jl", "julia/Project.toml", "julia/Manifest.toml",
-        "notes/thermal-mpo-gap-scope.tex"))
+        "$MODEL/check.jl", "$MODEL/Project.toml", "$MODEL/Manifest.toml"))
     data = Dict(
-        "metadata" => run_metadata(Dict("model" => "dimerized_heisenberg",
+        "metadata" => merge(run_metadata(Dict("model" => "dimerized_heisenberg",
                 "sites_per_cell" => 2); source_sha256=hashes, packages=(CertifiedGaps,),
             status="exact_obstruction_to_requested_real_RP_form", certified=false),
+            Dict("core_sha256" => core_provenance())),
         "exact_algebraic_audit" => true, "gap_certificate" => false,
         "arithmetic" => "Complex{Rational{BigInt}}; normalized basis evaluated with exact " *
             "denominators",
@@ -111,11 +112,12 @@ function certify_summary()
             "exclude other methods, other seed theorems or larger rings.",
         "ratio_scope" => "Certified lower bound divided by the enclosed 16-spin gap; not an " *
             "infinite-chain ratio",
-        "metadata" => run_metadata(Dict("model" => "dimerized_heisenberg");
+        "metadata" => merge(run_metadata(Dict("model" => "dimerized_heisenberg");
             source_sha256=source_hashes(repository_root(); dirs=(),
                 files=("$MODEL/certify.jl", "$MODEL/src/Certification.jl")),
             packages=(CertifiedGaps, IntervalArithmetic),
-            status="summary_of_seed_certificates", certified=true)))
+            status="summary_of_seed_certificates", certified=true),
+            Dict("core_sha256" => core_provenance()))))
     println("Wrote results/certificate.json")
 end
 

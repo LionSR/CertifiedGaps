@@ -87,9 +87,15 @@ end
 @testset "Stored certificate: hashes, recurrence and claims (no spectra)" begin
     cert = parse_exact_json(read(HL.CERTIFICATE, String))
     @test cert["format"] == HL.FORMAT
+    # Only model-local sources are enforced; the core hashes are provenance.
+    @test Set(String.(keys(cert["metadata"]["source_sha256"]))) == Set(keys(HL.local_hashes()))
     for (file, hash) in cert["metadata"]["source_sha256"]
         @test sha256_file(joinpath(HL.ROOT, file)) == hash
     end
+    @test !isempty(cert["metadata"]["core_sha256"])
+    bad = deepcopy(cert)
+    bad["metadata"]["source_sha256"]["julia/src/Results.jl"] = "0"^64
+    @test_throws ErrorException HL.check_header(bad)
     for result in cert["parameters"]
         J = Rational{Int}(HL.q(result["J"]))
         best = result["best"]

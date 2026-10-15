@@ -3,7 +3,7 @@
     "format": "dimerized-heisenberg-summary-v2",
     "parameters": [
         {
-            "seconds_total": 33.97968912124634,
+            "seconds_total": 468.7829430103302,
             "bound_to_gap16_interval": [
                 "1013048771312627//2251799813685248",
                 "8104410624941361//18014398509481984"
@@ -12,7 +12,7 @@
                 "23773//20000",
                 "1188653//1000000"
             ],
-            "sha256": "4686cd436b712fe1d4ed73bf9e9616e3d6d8a6edab31ba8a13c320870ee90f77",
+            "sha256": "951e3d53b74b1cf9d121b1cc5865150874ba619a1b8485ec982a90ebbec45abf",
             "negative_results": [
                 {
                     "status": "all_beta_rejected",
@@ -72,7 +72,7 @@
             }
         },
         {
-            "seconds_total": 30.461332082748413,
+            "seconds_total": 710.5407240390778,
             "bound_to_gap16_interval": [
                 "3846458934207591//18014398509481984",
                 "7692946320554457//36028797018963968"
@@ -81,7 +81,7 @@
                 "811143//1000000",
                 "405573//500000"
             ],
-            "sha256": "a7d03d099fbfff6132360df93e34d06aed0825551d07e596986befaa3682c09f",
+            "sha256": "98122b672e9b714906ab13239f5753fd9a07f167023d6e9abec0e08ac2c576b6",
             "negative_results": [
                 {
                     "status": "all_beta_rejected",
@@ -141,7 +141,7 @@
             }
         },
         {
-            "seconds_total": 40.94202995300293,
+            "seconds_total": 767.7236490249634,
             "bound_to_gap16_interval": [
                 "5914653312908531//72057594037927936",
                 "2957339163721481//36028797018963968"
@@ -150,7 +150,7 @@
                 "354673//500000",
                 "709349//1000000"
             ],
-            "sha256": "a225225d95508ede7f65314792fa41c79c8985fc99df69fef2a4706669750666",
+            "sha256": "7b79949709a0c499cb4534c525d132bc23e3eae02f2b86c00b1142dcbf780268",
             "negative_results": [
                 {
                     "status": "all_beta_rejected",
@@ -188,13 +188,13 @@
             "survey_seed": null
         },
         {
-            "seconds_total": 34.38180613517761,
+            "seconds_total": 722.7952990531921,
             "bound_to_gap16_interval": null,
             "reference_gap_16_interval": [
                 "604613//1000000",
                 "75577//125000"
             ],
-            "sha256": "66e1dd2ec89ae1b2ae1541fd78f5c16389a0cc7903f8ee9da271e402cd6e28e1",
+            "sha256": "9a37d0b5c84392643a76785c7df298c8b12b770e56dfdc088701eccd815f920b",
             "negative_results": [
                 {
                     "status": "all_beta_rejected",
@@ -214,13 +214,13 @@
             "survey_seed": null
         },
         {
-            "seconds_total": 30.953613996505737,
+            "seconds_total": 802.4078328609467,
             "bound_to_gap16_interval": null,
             "reference_gap_16_interval": [
                 "19933//40000",
                 "62291//125000"
             ],
-            "sha256": "55e3ec09e67a89d7036603d24f8a15f18987acebc4c50322e478488618ff3490",
+            "sha256": "a8c192a4e2d244203f43e7967898dc112ad80ef989d1e62a94586bde422c6163",
             "negative_results": [
                 {
                     "status": "all_beta_rejected",
@@ -240,13 +240,13 @@
             "survey_seed": null
         },
         {
-            "seconds_total": 26.055644989013672,
+            "seconds_total": 874.9557681083679,
             "bound_to_gap16_interval": null,
             "reference_gap_16_interval": [
                 "395027//1000000",
                 "39503//100000"
             ],
-            "sha256": "9ea1e0073da7bb501b287b270a6a8dd2170b4ccae2483b5e15eb67eed69b6f18",
+            "sha256": "9b47577b494d965928b0da4b788734b9d588a7381994f1a6a384fd688d53535f",
             "negative_results": [
                 {
                     "status": "all_beta_rejected",
@@ -272,19 +272,51 @@
     "maximum_certification_sites": "16",
     "negative_scope": "For delta=1/5,3/20,1/10 and n0=2,4 cells, every beta>0 fails the doubling recurrence of certified_gap_bound. This does not imply gaplessness or exclude other methods, other seed theorems or larger rings.",
     "metadata": {
+        "config": {
+            "model": "dimerized_heisenberg"
+        },
+        "created_utc": "2026-10-15T10:48:17.618",
+        "source_sha256": {
+            "models/dimerized_heisenberg/src/Certification.jl": "fcd1a9bc8342317a50badbc95deadef0768121ceb6747307d2e77dd9c344de1a",
+            "models/dimerized_heisenberg/certify.jl": "479f18330141b08bfe03e8109cc10c27f8a305592caf9d54fbd714877146501d"
+        },
+        "core_sha256": {
+            "julia/src/ExactDiagonalization.jl": "3589e3461ea172adb4234fe52a8aa2ec8f36c939984e28e98559a1e9ec72c1d1",
+            "julia/src/ReflectionPositivity.jl": "e8d5d3446f680f377bed27d0d9ba44dda8182b7c3055165b9b61701fe736040c",
+            "julia/src/Recurrence.jl": "2dc12e517f9739e2064f5de119510c52caa0a2cfba53d0eb8b5d6c85e02f9729",
+            "julia/src/RingModels.jl": "ee4347971bbce70809354c7232fec6514bb592f4462d6a57b239c393861f5c6c",
+            "julia/src/Seeds.jl": "a8239c9745b2aae6db03c8de535f6a6ecb3aab71ade5a50699ad03a96903abf7",
+            "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
+            "julia/src/VerifiedSpectra.jl": "f970f8186158bf0110e8124d647d1b8a7c3ff23ac194c3d569e372d833850df5",
+            "julia/src/CertifiedMPO/GaugeSearch.jl": "96d9fcdcf031b5b84c502a7582ae5715022752276d3385db724143477b2eb4f5",
+            "julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
+            "julia/src/CertifiedMPO/SchattenBridge.jl": "2300c4f86790906274adf9d50ac8bd43a7ef1ccbfc49e4a9aaafbbe2addc290f",
+            "julia/src/recurrence/rational.jl": "2200190e83ddfca094cdbf41b0c959c4254c9244b361fc0ee647b1a7ea2a49f7",
+            "julia/src/CertifiedMPO/AdjointTrace.jl": "38f76a39b09196e1b1cd3d5fc754945e998c2b570d3ae277bd57765396908892",
+            "julia/src/CertifiedMPO/Norms.jl": "6aa188bc7a1725a51e7dd0806b7f0565ac434e5bfc6aba84e5dfdce73d749f8d",
+            "julia/src/CertifiedMPO/MPOAlgebra.jl": "e6da21eb0db582018d480677a4e8cb85e501277259c79d6035cea60f5c58811d",
+            "julia/src/Models.jl": "299d8bc7b0e377361276b26a99023e5a6130e73058639b0bdb13783b51855b2e",
+            "julia/src/Purification.jl": "ea8a4b1a03a8a38b01d0289b06da72a8ea255e79287008ccf58456cfda9fadf3",
+            "julia/src/ExactArithmetic.jl": "77feece9b1e56011667bd8241ff159864943433d2121f01f351dccefae769882",
+            "julia/src/GapCertificates.jl": "a8497294951be57ebff526beae7732b6d91446d579eeb4c31cabc7d96174e311",
+            "julia/src/Results.jl": "9aa080ae98e184280c1678ef825a6b85978bbbb47918200d94fec89ba6fc485c",
+            "julia/src/CertifiedMPO/Products.jl": "5207b7d80375c538d531c67c699d048a0014409cf410425ffc633299959a9230",
+            "julia/src/CertifiedMPO/Squaring.jl": "9e454f12d3149482d734f33d3a1f47b6c4dab21144329753cdd2826d05c5b03c",
+            "julia/src/Spins.jl": "fb4d5c617531cd5e080eb166a495212d7d48ada62f9802f55e65e6bca0261855",
+            "julia/src/CertifiedGaps.jl": "958e839cff840169bfaeb0463a9f06f2a5276453b1472e478111ca36f48ba75b",
+            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+            "julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
+            "julia/Manifest.toml": "422dd9dcc0c0257c0ccd5852c56a5bb43b214080ece90651b2ddd9209eff9b7f",
+            "julia/src/CertifiedMPO/PolynomialBounds.jl": "7acd92b77ef6bf1c22322a93bc33ff1eae741f5cd0f43330f47a6c632ab3ec4a",
+            "julia/Project.toml": "1043d2457f2be2f349c00ddd5b994dd5bd5566672813eab1f54671f8b53a99d1",
+            "julia/src/CertifiedMPO/PositiveBounds.jl": "8921e7de4f45a27260dfc22e00719b06651674fc3dd792d6580e294b5fd68382",
+            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
+        },
         "julia_threads": 1,
         "julia": "1.12.4",
         "IntervalArithmetic": "1.0.12",
         "status": "summary_of_seed_certificates",
-        "config": {
-            "model": "dimerized_heisenberg"
-        },
-        "created_utc": "2026-10-15T05:56:06.978",
         "certified": true,
-        "source_sha256": {
-            "models/dimerized_heisenberg/src/Certification.jl": "92aa0f069fd6bb9f83e9f209d33212e2612882da941f4892a53e027dffc113ba",
-            "models/dimerized_heisenberg/certify.jl": "b964ed3f76c3d0b2dcd81648fa2217f73763deece4dabb0437dae7b99c200b14"
-        },
         "CertifiedGaps": "0.2.0",
         "blas_threads": 1
     }

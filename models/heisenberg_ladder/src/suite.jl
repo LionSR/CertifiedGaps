@@ -40,18 +40,26 @@ endpoints(x) = [token(inf(x)), token(sup(x))]
 """
     provenance(config; certified = false)
 
-Run metadata with SHA-256 of the shared core sources, this model's library, its entry points
-and environment. `check` re-hashes exactly these files. Exploratory scripts and tests are
-deliberately not hashed, so editing them does not invalidate the certificate.
+Run metadata with SHA-256 of this model's library, its entry points and environment under
+`source_sha256` (`check` requires exactly these keys and digests), and of the shared core under
+`core_sha256` (provenance only, never compared with the checkout: the checker reruns the core
+arithmetic instead). Exploratory scripts and tests are deliberately not hashed, so editing
+them does not invalidate the certificate.
 """
 function provenance(config; certified = false)
-    model = "models/heisenberg_ladder"
-    hashes = source_hashes(ROOT; dirs = ("julia/src", "$model/src"),
-        files = ("julia/Project.toml", "$model/Project.toml", "$model/Manifest.toml",
-            "$model/certify.jl", "$model/check.jl", "notes/thermal-mpo-gap-scope.tex"))
-    return run_metadata(config; source_sha256 = hashes,
+    meta = run_metadata(config; source_sha256 = local_hashes(),
         packages = (CertifiedGaps, IntervalArithmetic, JSON3),
         status = certified ? "certified" : "numerical, not certified", certified)
+    meta["core_sha256"] = source_hashes(ROOT; dirs = ("julia/src",),
+        files = ("julia/Project.toml", "julia/Manifest.toml"))
+    return meta
+end
+
+"SHA-256 of the model-local sources enforced by `check` (keyed by repository path)."
+function local_hashes()
+    model = "models/heisenberg_ladder"
+    return source_hashes(ROOT; dirs = ("$model/src",), files = ("$model/Project.toml",
+        "$model/Manifest.toml", "$model/certify.jl", "$model/check.jl"))
 end
 
 "Write `data` as single-line JSON, atomically (the pretty form is ~2.3 times larger)."
@@ -362,7 +370,10 @@ end
 function check_header(cert)
     cert["format"] == FORMAT || error("unknown certificate format")
     cert["validity"] == VALIDITY || error("incorrect validity claim")
-    for (file, hash) in cert["metadata"]["source_sha256"]
+    recorded = cert["metadata"]["source_sha256"]
+    Set(String.(keys(recorded))) == Set(keys(local_hashes())) ||
+        error("hashed source list differs from the model-local sources")
+    for (file, hash) in recorded
         full = joinpath(ROOT, file)
         isfile(full) || error("hashed source missing: $file")
         sha256_file(full) == hash || error("source mismatch: $file")
