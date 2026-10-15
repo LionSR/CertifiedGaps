@@ -1,0 +1,14 @@
+Baseline: 4.205s, 836952 KiB, exit 0
+Bench6: 2.265s, 839184 KiB, exit 0
+Bench8: 2.500s, 838748 KiB, exit 0
+Bench10: 6.457s, 1172716 KiB, exit 0
+Bench12: 72.996s, 5817684 KiB, exit 0
+H6: 3.596s, 837896 KiB, exit 0
+H8: 6.584s, 1632804 KiB, exit 0
+H10: 21.589s, 4241416 KiB, exit 0
+Matvec12: 27.960s, 3943244 KiB, exit 0
+Dot12: 56.997s, 2744304 KiB, exit 0
+Prepared12: 60.279s, 4921660 KiB, exit 0
+PreparedH8: 8.111s, 2465840 KiB, exit 0
+Gram6: 2.568s, 838712 KiB, exit 0
+Tests: 4.159s, 846892 KiB, exit 0

@@ -1,0 +1,3 @@
+'SeedPrototype.signed_h_cases' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SeedPrototype.signed_floor_case' depends on axioms: [propext]
+'SeedPrototype.gram_case' depends on axioms: [propext]
