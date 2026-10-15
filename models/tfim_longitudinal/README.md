@@ -5,6 +5,12 @@ and gap at least the stored bound. The smallest bound is 2749898627347949/360287
 ≈ 0.0763, at g = 1, h = 1/20 (n₀ = 6, β₀ = 13/2). Nothing is claimed between grid points, for
 odd L, or as h → 0.
 
+| parameters | seed (n₀ sites, β₀) | certified gap ≥ | lengths covered |
+|---|---|---:|---|
+| 30 points g ∈ {1/4, …, 2} × h ∈ {1/20, …, 1} | (6, 2 to 97/4 per point) | 0.0763 (g = 1, h = 1/20) to 3.7050 | every even L ≥ 6 |
+
+The per-point bounds are in the table under "Seeds and certified bounds".
+
 ## Model
 
 H_L = −Σ Z_j Z_{j+1} − g Σ X_j − h Σ Z_j on a periodic ring of L spin-1/2 sites (Pauli
@@ -18,7 +24,7 @@ spin-flip hypercube), but that alone gives no uniform gap.
 σᶻ basis: −h_bond = Z ⊗ Z (one term, C = Z, real, coefficient 1), on-site o = −gX − hZ real
 symmetric. `rp_check` verifies these identities in `Rational{BigInt}` at every grid point.
 
-## Seed and certified bound
+## Seeds and certified bounds
 
 n₀ = 6 at every point; β₀ ∈ (1/4)ℤ was chosen by a numerical scan over n₀ ∈ {2, 4, 6},
 β₀ ∈ {1/4, …, 64}. The rings of 6 and 12 sites are diagonalised densely in every momentum
@@ -56,7 +62,7 @@ From the repository root, Julia 1.12, `export OPENBLAS_NUM_THREADS=1`; `--projec
 ```sh
 julia --project=julia models/tfim_longitudinal/test/runtests.jl     # fast tests, ~15 s
 julia --project=julia models/tfim_longitudinal/check.jl             # fast checker, ~15 s
-DEEP_CHECK=1 julia --project=julia models/tfim_longitudinal/check.jl # full replay, ~6 min
+julia --project=julia models/tfim_longitudinal/check.jl --full      # full replay, ~6 min
 julia --project=julia models/tfim_longitudinal/scripts/final_audit.jl                # ~30 s
 julia --project=julia models/tfim_longitudinal/scripts/independent_residual_audit.jl # ~10 s
 julia --project=julia models/tfim_longitudinal/scripts/audit.jl                      # ~20 s
@@ -71,7 +77,7 @@ run it rewrites `results/seeds.json`. The audit scripts rewrite their `results/*
 - **Rigorous**: the RP identity (exact rationals); sector dimensions; eigenvalue enclosures for
   every eigenvalue with multiplicity; partition-function and seed enclosures; the uniform gap
   for every even L ≥ 6 at each grid point. The fast checker recomputes the partition intervals,
-  rational seeds and bounds from the stored eigenvalue intervals; `DEEP_CHECK=1` rebuilds every
+  rational seeds and bounds from the stored eigenvalue intervals; `--full` rebuilds every
   block, re-proves its enclosure and checks (in exact rationals) that the fresh interval of
   radius η lies inside the stored one of radius 2η. Accept regenerated certificates only after
   the deep replay.
@@ -97,7 +103,7 @@ computational-basis ED and the h = 0 free-fermion log Z (max error 7e−13).
 | path | role |
 |---|---|
 | `certify.jl` | numerical seed scan, rigorous enclosure of the best seed, writes results |
-| `check.jl` | checker (`DEEP_CHECK=1` for the full enclosure replay) |
+| `check.jl` | checker (`--full`, or `DEEP_CHECK=1`, for the full enclosure replay) |
 | `src/LongitudinalCertificate.jl` | momentum blocks, enclosures, seed enclosure, I/O |
 | `scripts/final_audit.jl` | independent stored-artifact audit → `results/final_audit.json` |
 | `scripts/independent_residual_audit.jl` | exact L = 6 residual audit → `results/independent_residual_audit.json` |
@@ -105,12 +111,13 @@ computational-basis ED and the h = 0 free-fermion log Z (max error 7e−13).
 | `test/runtests.jl` | fast tests (RP, sector counts, all 30 certificates, seed table) |
 | `METHOD.md` | the enclosure theorem and the rounding allowances |
 | `IDEAS.md` | candidate routes and the choice |
-| `results/g<g>_h<h>.json.gz` | per-point certificate: exact seeds, bound, all enclosed eigenvalues |
+| `results/certificate_g<g>_h<h>.json.gz` | per-point certificate: exact seeds, bound, all enclosed eigenvalues |
 | `results/seeds.json` | g, h, n₀, β₀, εₛ, εₜ, bound for all 30 points (exact) |
 
 The per-point certificates are gzip-compressed JSON (≈ 260 kB each uncompressed, mostly the
-4096 + 64 eigenvalue midpoints that the checker needs); `gzip -dc results/g1_1_h1_20.json.gz`
-shows one. Exact numbers are `"num//den"` strings.
+4096 + 64 eigenvalue midpoints that the checker needs);
+`gzip -dc results/certificate_g1_1_h1_20.json.gz` shows one. Exact numbers are
+`"num//den"` strings.
 
 ## History
 
@@ -124,4 +131,7 @@ and the report generator `report.jl` were folded into this README. Earlier remov
 (uncompressed JSONs, migration and validation records, run logs) and the removed files remain
 in the git history. The three `results/*audit*.json` files are kept as produced before the
 tidy-up (their source hashes name the old layout); all three audits were rerun afterwards and
-passed with the same counts.
+passed with the same counts. In the format tidy-up the per-point files were renamed from
+`results/g<g>_h<h>.json.gz` to `results/certificate_g<g>_h<h>.json.gz` (contents unchanged, so
+the `certificate_sha256` values in `results/final_audit.json` still apply; the `file` fields of
+`results/seeds.json` were updated), and `check.jl` gained `--full` as the name of the deep replay.

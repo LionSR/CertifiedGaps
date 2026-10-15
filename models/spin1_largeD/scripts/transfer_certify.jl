@@ -1,13 +1,13 @@
-# Stage 2: write certificate.json and results/finite_bridge.json (under a minute).
+# Stage 2: write results/certificate.json and results/finite_bridge.json (about 15 s).
 #
 #   OPENBLAS_NUM_THREADS=1 julia --project=models/spin1_largeD \
-#       models/spin1_largeD/transfer_certify.jl
+#       models/spin1_largeD/scripts/transfer_certify.jl
 #
 # Reads only the stored, hash-checked L = 6, 12 spectral enclosures and recomputes the small
 # L = 8, 10 bridge spectra. No floating-point shortcut decides acceptance: every candidate is
 # evaluated with interval log Z and exact rational defects, and a seed is kept only if
 # `certified_gap_bound` accepts it.
-include("src/TransferCertificate.jl")
+include(joinpath(dirname(@__DIR__), "src", "TransferCertificate.jl"))
 using .TransferCertificate, CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic
 const TC = TransferCertificate
 
@@ -29,7 +29,7 @@ end
     certify_transfer()
 
 Re-certify the ED seeds, search spatial lifts at each reference D, and bisect for the widest
-transported D interval below each reference D; write `certificate.json`.
+transported D interval below each reference D; write `results/certificate.json`.
 """
 function certify_transfer()
     started = time()
@@ -95,13 +95,13 @@ function certify_transfer()
             source_sha256 = hashes, packages = (CertifiedGaps, IntervalArithmetic),
             status = "verified moments, transfer squaring and centered Weyl transport",
             certified = true))
-    write_result(joinpath(@__DIR__, "certificate.json"), data)
+    write_result(joinpath(TC.ROOT, "results", "certificate.json"), data)
     return data
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     certify_transfer()
     bridge = TC.bridge_certificate()
-    write_result(joinpath(@__DIR__, "results", "finite_bridge.json"), bridge)
+    write_result(joinpath(TC.ROOT, "results", "finite_bridge.json"), bridge)
     println("finite bridge: ", [(r["L"], r["gap_interval"]) for r in bridge["rings"]])
 end

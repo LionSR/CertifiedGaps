@@ -1,4 +1,4 @@
-# Produce the per-point certificates results/g<g>_h<h>.json.gz and results/seeds.json.
+# Produce the per-point certificates results/certificate_g<g>_h<h>.json.gz and results/seeds.json.
 #
 # For each grid point: diagonalise every ring of n and 2n sites (n ∈ 2:2:NMAX) densely in
 # floating point, rank the seeds (n₀, β₀) numerically, then redo the best one with rigorous
@@ -51,7 +51,7 @@ for (g,h) in points
     data["seconds"]=time()-start
     certified=haskey(data,"certificate") && data["certificate"]["bound"]!==nothing
     data["metadata"]=C.metadata(Dict("g"=>C.str(g),"h"=>C.str(h),"nmax"=>nmax);certified)
-    out=joinpath(C.ROOT,"results",tag*".json"); write_result(out,data)
+    out=joinpath(C.ROOT,"results","certificate_"*tag*".json"); write_result(out,data)
     # Spectra make each file ~260 kB; store compressed (`gzip -dc` restores the JSON).
     run(`gzip -9 -n -f $out`)
 end

@@ -3,7 +3,12 @@
 **Certified at δ = 7/10: Δ_L ≥ 0.218794169839 and a unique ground state for every even
 L ≥ 3 cells** (N = 2L spins = 8, 12, 16, ...), and at δ = 9/10 with bound 0.528801949327.
 The method, the enclosure theorem, the odd-seed positivity argument, the numerical tables and
-the independent audit are in [REPORT.md](REPORT.md); the route memo is [IDEAS.md](IDEAS.md).
+the independent audit are in [METHOD.md](METHOD.md); the route memo is [IDEAS.md](IDEAS.md).
+
+| δ | seed (n₀ cells, β₀) | certified gap ≥ | lengths covered |
+|---|---|---:|---|
+| 9/10 | (2, 7/2) | 0.528801949327 | every even L ≥ 2 cells |
+| 7/10 | (3, 17/4) | 0.218794169839 | every even L ≥ 3 cells |
 
 ## Model
 
@@ -12,17 +17,17 @@ dimension 9) joined by the weak bond `1 − δ`; the strong bond `1 + δ` joins 
 cells. Lengths count cells (N = 2L spins). The grid is δ ∈ {9/10, 4/5, 7/10, 3/5, 1/2} with
 rings up to six cells.
 
-## RP basis
+## Reflection positivity
 
 Cartesian spin-1 basis, `S_a = −i G_a` with integer, real antisymmetric `G_a`, so
 `−S·S = Σ_a G_a ⊗ G_a` exactly. Inside the cell the on-site term `D = (1 − δ) S·S` is real
 symmetric and invariant under the internal swap `P`. The intercell bond is
 `−h = (1 + δ) Σ_a A_a ⊗ P conj(A_a) P` with `A_a = 1 ⊗ G_a`: the cell is internally reflected
 (palindromic cell), not `A ⊗ A`. `src/rp.jl` checks all identities over exact integers. The
-n₀ = 3 seed is odd; REPORT.md gives the positive cell-transfer argument (`X = K K*`) that
+n₀ = 3 seed is odd; METHOD.md gives the positive cell-transfer argument (`X = K K*`) that
 removes the even-n₀ restriction.
 
-## Seed and certified bound
+## Seeds and certified bounds
 
 | δ | seed (n₀ cells, β₀) | εₛ ≥ 1 − Pₛ(n₀, β₀) | εₜ ≥ 1 − P_τ(2n₀, β₀) | certified bound | 12-spin ED gap |
 |---|---|---|---|---:|---:|
@@ -36,7 +41,7 @@ seeds and log-partition enclosures are in `results/certificate_d9.json` and
 `results/certificate_d7.json`. δ = 7/10 is the smallest certified value on the grid; the
 failures at 3/5 and 1/2 (six-cell ring cap) are numerical evidence, not impossibility claims.
 
-## How to reproduce
+## Reproduce
 
 From the repository root, with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1`:
 
@@ -47,7 +52,7 @@ julia --project=models/spin1_dimerized models/spin1_dimerized/check.jl --full   
 # Recertify (rewrites results/certificate_d<d>.json unless SPIN1_DIMERIZED_REPLAY_PATH is set):
 julia --project=models/spin1_dimerized models/spin1_dimerized/certify.jl 9 2 7//2
 julia --project=models/spin1_dimerized models/spin1_dimerized/certify.jl 7
-# Numerical scan per δ = d/10, then the summary and the REPORT.md tables:
+# Numerical scan per δ = d/10, then the summary and the METHOD.md tables:
 for d in 9 8 7 6 5; do
     julia --project=models/spin1_dimerized models/spin1_dimerized/scripts/scan.jl $d 2,3,4,6
 done
@@ -59,9 +64,7 @@ its spectra in `results/spectrum_d<d>_c<cells>.json` (gitignored; the six-cell f
 15 MB each) and skips files that exist; `report.jl` needs all of them. `--project=julia` (the
 core environment) also works for every command.
 
-## Run time
-
-Julia 1.12, one BLAS thread:
+Run times (Julia 1.12, one BLAS thread):
 
 - fast checker (`check.jl`, = `test/runtests.jl`): 123 tests, about 55 s including compilation
   (of which about 12 s recertify δ = 9/10 from scratch);
@@ -82,17 +85,12 @@ The fast checker recomputes the seeds from the stored log-partition enclosures o
 certificates and recertifies δ = 9/10 from the model; for δ = 7/10 it treats the stored
 twelve-spin enclosures as inputs, and `check.jl --full` rebuilds them. Fresh runs on another
 machine differ from the stored enclosures in the last bits (LAPACK); the checks require
-overlapping log Z enclosures and a valid fresh bound, not bit equality (REPORT.md,
+overlapping log Z enclosures and a valid fresh bound, not bit equality (METHOD.md,
 "Validation and provenance"). A full replay of `certify.jl 7` on the renamed core
 reproduced every mathematical field of `certificate_d7.json` exactly.
 
 Numerical only: the scan grids, unverified ED reference gaps, parameter ranking and
 extrapolations. No Lean formalisation of the numerical inputs is claimed.
-
-Provenance: the certificates were made when this directory was `certificates/spin1_dimerized`
-and the core was named `ThermalMPOGap`; their `source_sha256` entries are checked against the
-archived commit `6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2` when it is reachable and skipped
-otherwise.
 
 ## Layout
 
@@ -101,7 +99,16 @@ otherwise.
   `src/enclosure.jl` (eigenvalue enclosures, log Z, certificate writer),
   `src/verified_blocks.jl` (exact projectors and verified blocks for the twelve-spin ring).
 - `scripts/`: `scan.jl` (numerical seed scan), `report.jl` (`results/summary.json` and the
-  REPORT.md tables).
+  "Results from completed runs" section of METHOD.md).
 - `test/runtests.jl`: the fast checker.
 - `results/certificate_d{7,9}.json`: the certificates. `results/scan_d*.json` (numerical
   scans) and `results/summary.json` (parameter comparison and extrapolation).
+- `METHOD.md`: method, proofs, numerical tables and the independent audit.
+
+## History
+
+The certificates were made when this directory was `certificates/spin1_dimerized` and the
+core was named `ThermalMPOGap`; their `source_sha256` entries are checked against the archived
+commit `6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2` when it is reachable and skipped otherwise.
+`METHOD.md` was named `REPORT.md` until the format tidy-up; the hashed sources are the
+archived ones, so the rename does not affect the provenance check.

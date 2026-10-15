@@ -1,15 +1,17 @@
-# Checker for the 30 longitudinal-field TFIM certificates in results/g*_h*.json.gz.
+# Checker for the 30 longitudinal-field TFIM certificates in results/certificate_g*_h*.json.gz.
 #
 # Fast mode (default, ~20 s): exact RP identity, momentum-sector dimensions, complete spectra,
 # the interval partition sums and rational seeds recomputed from the stored eigenvalue
 # intervals, and the recurrence bound. It trusts the stored eigenvalue radii.
-# DEEP_CHECK=1 (~6 min): also rebuilds every block and its rigorous enclosure with the
+# `--full` (or DEEP_CHECK=1, ~6 min): also rebuilds every block and its rigorous enclosure with the
 # current code and checks, in exact rationals, that each fresh interval lies inside the stored
 # one, so the radii are re-proved rather than trusted. Any failure throws.
 include(joinpath(@__DIR__, "src", "LongitudinalCertificate.jl"))
 using .LongitudinalCertificate, CertifiedGaps, JSON3, CertifiedGaps.Results
 using .LongitudinalCertificate: @check
 const C=LongitudinalCertificate
+"Whether to replay every enclosure (`check.jl --full`, or the older `DEEP_CHECK=1`)."
+const FULL="--full" in ARGS || get(ENV,"DEEP_CHECK","0")=="1"
 
 """
     check_result(path; partitions=true)
@@ -28,7 +30,7 @@ function check_result(path; partitions=true)
         @check [b["dimension"] for b in c[key]]==
             filter(!iszero,C.sector_dimensions(C.orbits(L)))
     end
-    if get(ENV,"DEEP_CHECK","0")=="1"
+    if FULL
         for (key,L) in (("small",n),("large",2n))
             fresh=C.ring_spectrum(L,g,h;rigorous=true)
             @check length(fresh.blocks)==length(c[key])
@@ -69,5 +71,5 @@ if abspath(PROGRAM_FILE)==@__FILE__
         println(basename(path),": ",check_result(path))
     end
     println("All $(length(paths)) certificates verified",
-        get(ENV,"DEEP_CHECK","0")=="1" ? " (deep replay)." : ".")
+        FULL ? " (deep replay)." : ".")
 end

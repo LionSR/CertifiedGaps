@@ -5,7 +5,34 @@
 of the honeycomb lattice, \(H=\sum_{\text{bonds}}P_{ij}(\text{total spin}=3)\), with this
 projector normalisation throughout.
 
-## Status
+## Model
+
+Each primitive cell contains `A(x,y)` and `B(x,y)`; the neighbours of `A(x,y)` are `B(x,y)`,
+`B(x-1,y)` and `B(x,y-1)`, both coordinates periodic. The pilot uses 2×2, 4×2 and 4×4 cells (8,
+16 and 32 spins). These small periodic quotients have short winding cycles, so they are
+implementation checks and finite-size diagnostics, not bulk evidence. The three bond directions
+are perfect matchings; a snake ordering is used only for the MPO, and every periodic bond is
+retained.
+
+The thermal code (`src/thermal.jl`, on the core's `purified_log_partition`) evolves the MPO
+amplitude \(e^{-\beta H/2}\) from the normalised identity, applying gates only to the ket
+indices. Each bond gate is the exact identity \(e^{-tP}=I+\operatorname{expm1}(-t)P\); the
+noncommuting product still has second-order Trotter error and truncation error. Accumulated
+Hilbert–Schmidt norms reconstruct the full, all-sector \(\log Z\); values with \(\log Z<0\) are
+flagged, not clipped. No ground energy is fitted or subtracted (the exact AKLT ground energy is 0).
+
+The reference diagonalisation (`src/exact.jl`) builds the projector from its polynomial in
+\(\mathbf S_i\cdot\mathbf S_j\), independently of the Clebsch–Gordan form used by the gates, and
+covers every total-\(S^z\) sector, counting \(S^z<0\) through spin flip. "Full" means no
+Hilbert-space truncation; eigenvalues are still `Float64`.
+
+For base geometry \((n,m)\) and inverse temperature \(\beta\) the diagnostics are
+\(R=Z(n,m,\beta)-1\) (weight outside one zero-energy state), the doubling coefficient
+\(C=[Z(2n,2m,2\beta)-1]/R^2\), the gluing defect \(G=\log Z(2n,2m,2\beta)-4\log Z(n,m,2\beta)\)
+split as \(G=2G_x+G_y\), and \(\max(G,0)/R^2\). The relevant condition is \(CR<1\) with a uniform
+bound on later scales; a small \(C\) is useless when \(R\) is large.
+
+## Result
 
 - **No gap certificate and no certified partition-function bound.** Every number this package
   produces is a `Float64` computation, stored with `certified=false`.
@@ -36,34 +63,7 @@ projector normalisation throughout.
 The next requirement is a contraction method that reproduces the eight-spin reference and keeps
 that accuracy as the width grows; until then this directory is an implementation check.
 
-## Geometry and method
-
-Each primitive cell contains `A(x,y)` and `B(x,y)`; the neighbours of `A(x,y)` are `B(x,y)`,
-`B(x-1,y)` and `B(x,y-1)`, both coordinates periodic. The pilot uses 2×2, 4×2 and 4×4 cells (8,
-16 and 32 spins). These small periodic quotients have short winding cycles, so they are
-implementation checks and finite-size diagnostics, not bulk evidence. The three bond directions
-are perfect matchings; a snake ordering is used only for the MPO, and every periodic bond is
-retained.
-
-The thermal code (`src/thermal.jl`, on the core's `purified_log_partition`) evolves the MPO
-amplitude \(e^{-\beta H/2}\) from the normalised identity, applying gates only to the ket
-indices. Each bond gate is the exact identity \(e^{-tP}=I+\operatorname{expm1}(-t)P\); the
-noncommuting product still has second-order Trotter error and truncation error. Accumulated
-Hilbert–Schmidt norms reconstruct the full, all-sector \(\log Z\); values with \(\log Z<0\) are
-flagged, not clipped. No ground energy is fitted or subtracted (the exact AKLT ground energy is 0).
-
-The reference diagonalisation (`src/exact.jl`) builds the projector from its polynomial in
-\(\mathbf S_i\cdot\mathbf S_j\), independently of the Clebsch–Gordan form used by the gates, and
-covers every total-\(S^z\) sector, counting \(S^z<0\) through spin flip. "Full" means no
-Hilbert-space truncation; eigenvalues are still `Float64`.
-
-For base geometry \((n,m)\) and inverse temperature \(\beta\) the diagnostics are
-\(R=Z(n,m,\beta)-1\) (weight outside one zero-energy state), the doubling coefficient
-\(C=[Z(2n,2m,2\beta)-1]/R^2\), the gluing defect \(G=\log Z(2n,2m,2\beta)-4\log Z(n,m,2\beta)\)
-split as \(G=2G_x+G_y\), and \(\max(G,0)/R^2\). The relevant condition is \(CR<1\) with a uniform
-bound on later scales; a small \(C\) is useless when \(R\) is large.
-
-## Run
+## Reproduce
 
 `AKLTPilot` uses the shared core `CertifiedGaps` (`../../julia`, a path dependency) for spin
 matrices, sector diagonalisation, purification and result output, with ITensors/ITensorMPS
@@ -82,6 +82,14 @@ The other configurations are `thermal-pilot.toml` (2×2 base, \(\chi\in\{16,32\}
 Each output records source and environment hashes, parameters, versions, thread counts,
 geometry, a `complete` flag and `certified=false`, and is rewritten after every finished sector
 or temperature, so an interrupted run is visible; use a fresh filename to keep an earlier run.
+
+## Layout
+
+- `src/AKLTPilot.jl` (module), `src/model.jl` (periodic honeycomb quotient geometry),
+  `src/thermal.jl` (thermal MPO purification), `src/exact.jl` (polynomial projector and
+  reference diagonalisation).
+- `scripts/run.jl`: runs one configuration from `configs/*.toml` and writes its JSON output.
+- `test/runtests.jl`: the tests.
 
 `results/` is gitignored and kept locally. The stored files were produced before the move to
 `models/`, with the `spin2` environment, so their `environment/` hashes refer to
