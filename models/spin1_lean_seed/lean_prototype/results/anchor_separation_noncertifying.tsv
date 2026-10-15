@@ -1,0 +1,4 @@
+# NON-CERTIFYING Float64; ideal Ritz values equal exact eigenvalues
+n	d	max_over_k_H0_lambda_kplus1_minus_H_lambda_k	best_k	viable_k_count
+6	729	-1.382576818186	1	0
+8	6561	-1.445376754516	1	0
