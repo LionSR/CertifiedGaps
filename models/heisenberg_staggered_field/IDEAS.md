@@ -22,3 +22,11 @@ frame and give momentum/charge blocks.
 First verify RP exactly and the environment. Search numerical spectra on a beta grid,
 then rerun the best feasible seed with enclosures. If computational resources limit a
 search, distinguish that from an actual absence of seeds or a physical gap threshold.
+
+## Outcome
+
+Route 1 certified all five fields at n0 = 8 from complete 8- and 16-site spectra. The best
+20-site candidates (n0 = 10) were found with partial Krylov spectra and remain uncertified:
+the largest 20-site block (dimension 18504) is beyond the dense verifier's memory budget. The
+shared-core cross-check (`scripts/core_certificate.jl`) reproduces the h = 1 seed with a
+different block structure and the exact rational chain.

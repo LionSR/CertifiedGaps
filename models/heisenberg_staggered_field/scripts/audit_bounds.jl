@@ -1,6 +1,9 @@
 # Independent interval accumulation checks of the residual/orthogonality bound.
-# This audits small dense blocks, not a new parameter or seed search.
-include("common.jl")
+# This audits small dense blocks, not a new parameter or seed search. Writes
+# results/audit_bounds.json.
+#     julia --project=models/heisenberg_staggered_field \
+#         models/heisenberg_staggered_field/scripts/audit_bounds.jl              (≈ 25 s)
+include(joinpath(dirname(@__DIR__), "src", "common.jl"))
 using Test
 rows=Any[]
 @testset "spin-half normalization and independently accumulated residuals" begin
@@ -38,5 +41,5 @@ rows=Any[]
 end
 write_result(joinpath(ROOT,"results","audit_bounds.json"),Dict(
     "description"=>"Independent scalar interval accumulation on small dense blocks; no search",
-    "source_hashes"=>file_hashes(ROOT,["common.jl","audit_bounds.jl"]),
+    "source_hashes"=>file_hashes(ROOT,["src/common.jl","scripts/audit_bounds.jl"]),
     "julia"=>string(VERSION),"rows"=>rows,"passed"=>true))

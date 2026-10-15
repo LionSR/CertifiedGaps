@@ -1,5 +1,8 @@
-using Test
-include("../common.jl")
+# Fast checker: exact RP, small-ring spectra against the core ED, sector counts, log Z and the
+# rational seeds recomputed from the stored eigenvalues and radii, the recurrence, the published
+# bounds, source provenance, and the exact parts of the shared-core cross-check certificate.
+using Test, SHA
+include(joinpath(@__DIR__, "..", "src", "common.jl"))
 @testset "exact RP and rotation" begin
     for h in FIELDS; @test exact_rp(h);end
 end
@@ -53,4 +56,47 @@ end
         @test published==floor(BigInt,min(Rational{BigInt}(r["bound"]),
             Rational{BigInt}(c["bound"]))*10^6)//big(10)^6
     end
+end
+@testset "provenance of the stored certificates" begin
+    # The certificates were made when this directory was certificates/heisenberg_staggered_field
+    # and the core was named ThermalMPOGap; their source hashes refer to the snapshot of those
+    # sources kept in historical_sources/ at commit HISTORICAL. They attest provenance, not
+    # correctness: checked when that commit is in the local object store, skipped otherwise.
+    HISTORICAL = "cb635a1cdf2ab06630b5b0838fac4356d3c33509"
+    available = success(pipeline(`git -C $REPO cat-file -e $HISTORICAL^\{commit\}`;
+        stderr=devnull))
+    for file in filter(f->startswith(f,"certificate_"),readdir(joinpath(ROOT,"results")))
+        c=JSON3.read(read(joinpath(ROOT,"results",file),String),Dict{String,Any})
+        hashes=c["metadata"]["source_sha256"]
+        @test haskey(c["metadata"],"ThermalMPOGap") && !isempty(hashes)
+        if !available
+            @warn "Historical snapshot $HISTORICAL unavailable; skipping provenance of $file"
+            @test_skip false
+            continue
+        end
+        for (path,hash) in hashes
+            spec="$HISTORICAL:certificates/heisenberg_staggered_field/historical_sources/$path"
+            @test bytes2hex(sha256(read(`git -C $REPO show $spec`)))==hash
+        end
+    end
+end
+module CoreCrossCheck
+    # The model definition used by scripts/core_certificate.jl (its main block does not run).
+    include(joinpath(@__DIR__, "..", "scripts", "core_certificate.jl"))
+end
+@testset "shared-core cross-check at h = 1 (exact parts)" begin
+    path=joinpath(ROOT,"results","core_certificate_1_1.json")
+    cert=CertifiedGaps.Results.read_exact_json(path)
+    # The stored model must be the intended Hamiltonian, not merely self-consistent.
+    model=CertifiedGaps.RingModels.decode_model(cert["model"])
+    reference=CoreCrossCheck.staggered(1)
+    @test model.d==reference.d && model.bond==reference.bond && model.onsite==reference.onsite
+    seed=cert["seed"]
+    c=JSON3.read(read(joinpath(ROOT,"results","certificate_1_1.json"),String),Dict{String,Any})
+    @test parse(Int,string(seed["n0"]))==c["n0"] && rat(seed["beta0"])==rat(c["beta"])
+    # Exact RP identity and the exact rational chain; the spectra are re-verified by
+    # `check.jl --full` (about 6 minutes).
+    recomputed=CertifiedGaps.GapCertificates.check_certificate(cert; spectra=false)
+    @test recomputed["gap_lower_bound"]==cert["gap_lower_bound"]
+    @test rat(cert["gap_lower_bound"])>1147699//1000000
 end
