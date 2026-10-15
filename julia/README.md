@@ -1,9 +1,9 @@
 # CertifiedGaps.jl
 
-The shared Julia core of this repository. `models/spin1`, `models/spin2` and `models/aklt` depend on it as a path
-dependency; anything two projects need lives here once.
+The shared Julia core of this repository. Every project under `models/` depends on it as a
+path dependency (or runs with `--project=julia`); anything two projects need lives here once.
 
-It holds the numerics of the two-purity doubling criterion. A ring with spatial and thermal
+It holds the numerics of the spacetime bootstrap, the two-purity doubling criterion. A ring with spatial and thermal
 purities Pₛ(n, β) = Z₂ₙ(β)/Zₙ(β)² and P_τ(n, β) = Zₙ(2β)/Zₙ(β)² has a uniform gap for every even
 L ≥ n₀ when its transfer operator is self-adjoint and the seed defects at (n₀, β₀) are admissible.
 
@@ -40,12 +40,17 @@ Each submodule is used on its own, so generic names never collide with a project
 
 ```sh
 julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
-julia --project=julia julia/scripts/constants.jl    # constants of survey §2
-julia --project=julia julia/scripts/tfim.jl         # free-fermion TFIM seeds
-julia --project=julia julia/scripts/ed_seeds.jl     # ED seed searches (≈15 min)
+julia --project=julia julia/scripts/constants.jl    # recurrence constants, outward rounded
+julia --project=julia julia/scripts/tfim.jl         # free-fermion TFIM seeds (BigFloat)
+julia --project=julia julia/scripts/ed_seeds.jl     # float ED seed scans (≈15 min)
 ```
 
-From another project: `Pkg.develop(path = "../julia")`, then e.g.
+The scripts reproduce numbers of the local survey (its section numbers appear in their
+comments); `ed_seeds.jl` is floating-point screening for the staggered-field and spin-1
+Heisenberg rings, and `tfim.jl` pads BigFloat defects heuristically, so neither is a
+certificate.
+
+From a project under `models/`: `Pkg.develop(path = "../../julia")`, then e.g.
 
 ```julia
 using CertifiedGaps                                  # doubling map and bounds
