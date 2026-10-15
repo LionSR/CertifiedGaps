@@ -1,7 +1,7 @@
 # Complete dense spectra of the BLBQ ring through L = 12, by magnetization, momentum, spin flip
 # and reflection sectors. Numerical only: dense LAPACK solves, no eigenvalue enclosures.
 # Usage (from the repository root):
-#     models/blbq_haldane/scripts/run.sh -t 4 \
+#     julia models/blbq_haldane/scripts/run.jl -t 4 \
 #         models/blbq_haldane/scripts/scan.jl 2 3 4 5 6 7 8 10 12
 using CertifiedGaps, CertifiedGaps.Results
 using LinearAlgebra, Printf
