@@ -4,8 +4,10 @@
 # seeds and the recurrence. This is a fresh execution of the same verifier in common.jl,
 # not an independent second implementation. Writes results/spectral_replay_summary.json;
 # with --full also writes the per-block fresh witnesses (about 5.7 MB, not committed) to
-# results/spectral_replay_full.json.
-include("common.jl")
+# results/spectral_replay_full.json (gitignored).
+#     julia --project=models/heisenberg_staggered_field \
+#         models/heisenberg_staggered_field/scripts/spectral_replay.jl [--full]   (≈ 3-4 min)
+include(joinpath(dirname(@__DIR__), "src", "common.jl"))
 start=time(); records=Any[]; full=Any[]
 for h in FIELDS
     path=joinpath(ROOT,"results","certificate_$(tag(h)).json")
@@ -63,7 +65,7 @@ write_result(joinpath(ROOT,"results","spectral_replay_summary.json"),Dict(
     "scope"=>"Reconstructed exact model blocks; recomputed complete dense eigenvectors, residuals, orthogonality defects, rigorous radii, logZ, rational seeds and recurrence. No parameter search; no saved eigenvalues or radii reused as verification inputs.",
     "implementation"=>"Fresh execution of existing verifier, not a second independently implemented spectral verifier",
     "acceptance"=>"Every fresh outward bound must be positive. Published bounds are rounded DOWN to six decimals from min(original, fresh).",
-    "source_sha256"=>file_hashes(ROOT,["common.jl","spectral_replay.jl"]),
+    "source_sha256"=>file_hashes(ROOT,["src/common.jl","scripts/spectral_replay.jl"]),
     "julia"=>string(VERSION),"blas_threads"=>BLAS.get_num_threads(),
     "seconds"=>time()-start,"records"=>records))
 "--full" in ARGS && write_result(joinpath(ROOT,"results","spectral_replay_full.json"),

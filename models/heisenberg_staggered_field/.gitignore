@@ -1,0 +1,3 @@
+# Regenerable numerical data (scan caches, full replay witnesses); see README.md.
+/results/spectrum_*.json
+/results/spectral_replay_full.json

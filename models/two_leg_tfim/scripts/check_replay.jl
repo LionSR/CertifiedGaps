@@ -1,9 +1,14 @@
+# Checks a replay written by replay_audit.jl against the stored certificate, recomputing the
+# comparison claims, log Z, the rational seeds and the bound rather than trusting saved flags.
+#     julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/check_replay.jl \
+#         results/replay.json results/replay_check.json
 using Test, SHA, CertifiedGaps, CertifiedGaps.Results
-include("src/Ladder.jl")
+const ROOT = dirname(@__DIR__)
+include(joinpath(ROOT, "src", "Ladder.jl"))
 using .Ladder
-include("src/Provenance.jl")
+include(joinpath(ROOT, "src", "Provenance.jl"))
 using .Provenance
-root=@__DIR__
+root=ROOT
 length(ARGS)>=1 || error("usage: check_replay.jl <replay.json> [<check-output.json>]")
 p=joinpath(root,ARGS[1])
 c=read_exact_json(p)
@@ -65,5 +70,5 @@ write_result(result_path,(;status="passed",seconds=time()-started,
     test_counts=string(Test.get_test_counts(checks)),
     original_certificate_sha256=bytes2hex(sha256(certificate_bytes(original))),
     replay_sha256=sha256_file(p),
-    source_hashes=source_hashes(root;dirs=("src",),files=["check_replay.jl","replay_audit.jl"]),
+    source_hashes=source_hashes(root;dirs=("src","scripts")),
     julia=string(VERSION)))

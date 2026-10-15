@@ -1,106 +1,120 @@
-# Staggered-field spin-1/2 Heisenberg certificate
+# Spin-1/2 Heisenberg chain in a staggered field
 
-Model: periodic spin-1/2 chain H = Σ_j S_j·S_{j+1} − h Σ_j (−1)^j S^z_j, exchange 1.
-See [REPORT.md](REPORT.md) for proof details, sector tables and numerical exploration,
-[AUDIT.md](AUDIT.md) for the review and the full spectral replay, and [IDEAS.md](IDEAS.md)
-for the route choice.
+**Certified at h = 1, 3/4, 1/2, 7/20, 1/4: a unique ground state and Δ_L ≥ 1.148261, 0.890782,
+0.594785, 0.383508, 0.214486 for every even L ≥ 8 sites.** The method, the enclosure theorem,
+the sector tables, the twenty-site exploration and the independent audit are in
+[REPORT.md](REPORT.md); the route memo is [IDEAS.md](IDEAS.md).
 
-## Result
+## Model
 
-| h | n0 (sites) | β0 | certified gap lower bound | numerical 16-site gap |
-|---|---:|---:|---:|---:|
-| 1 | 8 | 21/4 | 1.148261 | 1.87351193 |
-| 3/4 | 8 | 21/4 | 0.890782 | 1.57089206 |
-| 1/2 | 8 | 11/2 | 0.594785 | 1.23131976 |
-| 7/20 | 8 | 23/4 | 0.383508 | 0.994380622 |
-| 1/4 | 8 | 25/4 | 0.214486 | 0.812031433 |
-
-Each bound holds, together with uniqueness of the ground state, for **every even L ≥ 8**
-(lengths count single spins). Published bounds are rounded down to six decimals from the
-smaller of the original and the freshly replayed outward bound; both rational seed pairs
-prove them (checked in `test/runtests.jl`).
+Periodic spin-1/2 chain `H = Σ_j S_j·S_{j+1} − h Σ_j (−1)^j S^z_j`, exchange 1. The two-site
+ring keeps both periodic bonds, as in the core package. After the rotation below the model has
+a one-site cell, so lengths count single spins; the rotation closes only on even rings.
 
 ## RP basis
 
-Rotate odd sites by U = 2·iS^y (a π rotation about y; only consistent on even rings). With
-the exact rational matrices X = S^x, J = iS^y (real antisymmetric), Z = S^z, the rotated bond
-is h = −(X⊗X + J⊗J + Z⊗Z), so −h = Σ_α C_α ⊗ C_α with real C_α ∈ {X, J, Z}, and the
-staggered field becomes the uniform real on-site term o = −h Z. `exact_rp` in `common.jl`
-checks these identities in rational arithmetic for both bond orientations.
+Rotate odd sites by U = 2·iS^y (a π rotation about y). With the exact rational matrices
+X = S^x, J = iS^y (real antisymmetric) and Z = S^z, the rotated bond is
+h = −(X⊗X + J⊗J + Z⊗Z), so −h = Σ_α C_α ⊗ C_α with real C_α ∈ {X, J, Z}, and the staggered
+field becomes the uniform real on-site term o = −h Z. `exact_rp` in `src/common.jl` checks
+these identities in rational arithmetic for both bond orientations.
 
-## Seeds
+## Seed and certified bound
 
-`results/certificate_<h>.json` stores n0, β0 and the exact rational seed defects
-ε_s ≥ 1 − P_s(n0, β0), ε_t ≥ 1 − P_τ(2n0, β0) (strings `"num//den"`), plus every 8- and
-16-site momentum/S^z block with its multiplicity, all eigenvalues and a rigorous Weyl radius.
-The radii come from computed residual and orthogonality norms with explicit IEEE rounding
-allowances, a polar-factor bound, and interval enclosures of the exact block entries
-(REPORT.md). log Z is summed in IntervalArithmetic over every level with its multiplicity.
-`results/spectral_replay_summary.json` stores the seeds from a fresh, complete re-execution.
+| h | seed (n₀, β₀) | εₛ ≥ 1 − Pₛ(8, β₀) | εₜ ≥ 1 − P_τ(16, β₀) | certified bound | 16-site ED gap |
+|---|---|---:|---:|---:|---:|
+| 1 | (8, 21/4) | ≈ 6.937e-4 | ≈ 7.326e-4 | 1.148261 | 1.87351193 |
+| 3/4 | (8, 21/4) | ≈ 2.343e-3 | ≈ 3.122e-3 | 0.890782 | 1.57089206 |
+| 1/2 | (8, 11/2) | ≈ 1.074e-2 | ≈ 1.116e-2 | 0.594785 | 1.23131976 |
+| 7/20 | (8, 23/4) | ≈ 3.265e-2 | ≈ 2.744e-2 | 0.383508 | 0.994380622 |
+| 1/4 | (8, 25/4) | ≈ 7.987e-2 | ≈ 4.476e-2 | 0.214486 | 0.812031433 |
 
-## Commands
+The exact rational defects (`"num//den"`) are `epsilon_s` and `epsilon_t` in
+`results/certificate_<h>.json`; for h = 1 they are `3124087506499//4503599627370496` and
+`6599110342439//9007199254740992`. Each bound is `CertifiedGaps.certified_gap_bound(εₛ, εₜ,
+β₀).bound`. The published values are rounded down to six decimals from the smaller of the
+original and a freshly replayed bound, so both rational seed pairs prove them (checked by the
+fast checker; REPORT.md, "Independent audit"). ED gaps are numerical.
 
-From the repository root, Julia 1.12, `OPENBLAS_NUM_THREADS=1`. Either the core project
-(`--project=julia`) or this directory's own project
-(`--project=models/heisenberg_staggered_field`, which develops `../../julia`) works.
+Cross-check: `scripts/core_certificate.jl` certifies the h = 1 seed independently with
+`CertifiedGaps.GapCertificates` (its own RP identity, verified S^z-parity/momentum block
+spectra and the exact rational chain): gap > 1.147699 for every even L ≥ 8, with
+εₛ = `692723528103//10^15`, εₜ = `728796111263//10^15`, in `results/core_certificate_1_1.json`.
+
+## How to reproduce
+
+From the repository root, with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1`:
 
 ```sh
-# fast checker (about 30 s): RP, small-ring ED comparison, sector counts,
-# enclosure propagation from stored eigenvalues/radii, rational seeds, recurrence
-julia --project=julia models/heisenberg_staggered_field/test/runtests.jl
-# independent scalar-interval accumulation of residuals on small blocks (about 25 s)
-julia --project=julia models/heisenberg_staggered_field/audit_bounds.jl
-# full spectral replay of all 270 blocks for the five fields (about 3-4 min)
-julia --project=julia models/heisenberg_staggered_field/spectral_replay.jl [--full]
-# recertify one field at a given seed (about 1 min each)
-julia --project=julia models/heisenberg_staggered_field/certify.jl '1//1' 8 '21//4'
-# numerical seed search (writes spectrum_*/scan_* caches into results/)
-julia --project=julia models/heisenberg_staggered_field/scan.jl 16
-julia --project=julia models/heisenberg_staggered_field/scan.jl 20 '1//4'
+julia --project=models/heisenberg_staggered_field -e 'using Pkg; Pkg.instantiate()'
+julia --project=models/heisenberg_staggered_field models/heisenberg_staggered_field/check.jl
+julia --project=models/heisenberg_staggered_field models/heisenberg_staggered_field/check.jl --full
+# Recertify one field at a given seed (rewrites results/certificate_<h>.json):
+julia --project=models/heisenberg_staggered_field models/heisenberg_staggered_field/certify.jl \
+    '1//1' 8 '21//4'
+# Full spectral replay of all five certificates (rewrites results/spectral_replay_summary.json):
+julia --project=models/heisenberg_staggered_field \
+    models/heisenberg_staggered_field/scripts/spectral_replay.jl [--full]
+# Interval re-accumulation of residuals on small blocks; shared-core cross-check:
+julia --project=models/heisenberg_staggered_field \
+    models/heisenberg_staggered_field/scripts/audit_bounds.jl
+julia --project=models/heisenberg_staggered_field \
+    models/heisenberg_staggered_field/scripts/core_certificate.jl
+# Numerical seed search (all fields to 16 sites; one field to 20 sites):
+julia --project=models/heisenberg_staggered_field \
+    models/heisenberg_staggered_field/scripts/scan.jl 16
+julia --project=models/heisenberg_staggered_field \
+    models/heisenberg_staggered_field/scripts/scan.jl 20 '1//4'
 ```
 
-The fast checker does not rebuild the large eigenvector matrices; `spectral_replay.jl` and
-`certify.jl` do. `certify.jl h maxL` (two arguments) reads the seed from the scan cache.
+`certify.jl h maxL` (two arguments) reads the seed from `results/scan_<h>_<maxL>.json`. The
+scan caches its spectra in `results/spectrum_<h>_<L>.json` (gitignored). `--project=julia`
+(the core environment) also works for every command.
 
-## Rigorous vs numerical
+## Run time
+
+Julia 1.12, one BLAS thread:
+
+- fast checker (`check.jl`, = `test/runtests.jl`): 341 tests, about 45 s including compilation;
+- `check.jl --full`: adds about 6 minutes (verified spectra of the cross-check);
+- `certify.jl`: 44–80 s per field; `scripts/spectral_replay.jl`: about 190 s for all five;
+- `scripts/audit_bounds.jl`: about 25 s; `scripts/core_certificate.jl`: about 12 minutes.
+
+## What is rigorous
 
 Rigorous (under IEEE binary64 round-to-nearest, correctly rounded scalar operations, BLAS
 without fast-math, and IntervalArithmetic's outward rounding): the RP identity, complete
-sector coverage, eigenvalue enclosures, log Z intervals, rational seeds and the recurrence
-bounds. The radius argument uses a priori rounding-error bounds on Float64 matrix products
-rather than interval matrix products; see REPORT.md for the derivation.
+sector coverage (every 8- and 16-site momentum/S^z block with its multiplicity), the
+eigenvalue enclosures, the log Z intervals, the rational seeds and the recurrence bounds. The
+radius argument uses a priori rounding-error bounds on Float64 matrix products rather than
+interval matrix products (REPORT.md, "Eigenvalue-enclosure theorem").
 
-Numerical only: the (n0, β0) grid search, reference gaps and ratios, the 20-site partial
-(Krylov) spectra and candidates, the apparent search threshold between h = 0.10 and 0.15,
-and scaling extrapolations. No physical threshold is claimed.
+The fast checker recomputes log Z, the seeds and the bounds from the stored eigenvalues and
+radii, but does not rebuild the eigenvectors; `certify.jl` and `scripts/spectral_replay.jl`
+do, and `check.jl --full` re-verifies the cross-check's spectra with the shared core. It also
+checks that the cross-check certificate encodes the intended Hamiltonian, not merely a
+self-consistent one.
 
-## Removed from the tree
+Numerical only: the (n₀, β₀) grid search, reference gaps and ratios, the 20-site partial
+(Krylov) spectra and candidates, the apparent search threshold between h = 0.10 and 0.15, and
+the scaling extrapolations. No physical threshold is claimed.
 
-To keep the directory small (39 MB in 183 files before, about 4.5 MB now), the following
-were removed. All are in the branch history at commit `cb635a1` and can be regenerated:
+Provenance: the certificates were made when this directory was
+`certificates/heisenberg_staggered_field` and the core was named `ThermalMPOGap`. Their
+`metadata.source_sha256` entries refer to the snapshot of those sources kept in
+`historical_sources/` at commit `cb635a1cdf2ab06630b5b0838fac4356d3c33509`; the fast checker
+verifies all of them against that commit when it is in the local object store, and skips
+them with a warning otherwise.
 
-- `results/spectrum_<h>_<L>.json`, `results/scan_<h>_<L>.json` (numerical spectra and grid
-  scans): regenerate with `scan.jl 16` and `scan.jl 20 <h>`.
-- `results/spectral_replay.json`, `results/migration_spectral_replay.json` (5.7 MB each,
-  per-block fresh witnesses) and the two failed replay attempts with their scripts:
-  `spectral_replay.jl --full` regenerates the witnesses; the compact
-  `results/spectral_replay_summary.json` keeps the exact fresh seeds and bounds.
-- `historical_sources/` (the pre-rename `ThermalMPOGap` source snapshot named by the hashes
-  in the certificate metadata), the rename-migration scripts and records (`MIGRATION.md`,
-  `environment.jl`, `historical_provenance.jl`, `migration_check.jl`, `seal.jl`, manifests),
-  `report.jl` (generated REPORT.md from the caches), and all run logs.
+## Layout
 
-The `metadata.source_sha256` hashes inside the certificate JSONs refer to that pre-rename
-snapshot (recoverable from `cb635a1`). Since then `common.jl` and `scan.jl` changed only
-by the package name `ThermalMPOGap` → `CertifiedGaps`; `certify.jl` gained the explicit-seed
-option and `test/runtests.jl` gained the published-bound testset.
-
-## Cross-check with the shared core
-
-`core_certificate.jl` certifies the h = 1 seed independently with
-`CertifiedGaps.GapCertificates`: the same rotated basis and RP factors, its own verified block
-spectra (S^z parity and momentum blocks), and the exact rational chain instead of the interval
-bound. `results/core_certificate_1_1.json` gives gap > 1.147699 for every even L ≥ 8, with
-ε_s = 692723528103//10^15 and ε_t = 728796111263//10^15. Check it with
-`check_certificate(read_exact_json(path))` (≈ 5 min; `spectra = false` checks only the exact
-parts in seconds).
+- `certify.jl`, `check.jl`: certificate entry point and checker.
+- `src/common.jl`: exact RP, momentum blocks with interval entry enclosures, verified
+  eigenvalue enclosures, log Z and rational seeds.
+- `scripts/`: `scan.jl` (numerical seed scan), `spectral_replay.jl` (full replay),
+  `audit_bounds.jl` (independent residual accumulation), `core_certificate.jl` (shared-core
+  cross-check).
+- `test/runtests.jl`: the fast checker.
+- `results/certificate_<h>.json`: the five certificates. `spectral_replay_summary.json`
+  (fresh seeds and bounds from the replay, read by the checker), `core_certificate_1_1.json`
+  (cross-check), `audit_bounds.json` (residual audit record).

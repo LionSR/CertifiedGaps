@@ -1,4 +1,9 @@
-include("common.jl")
+# Numerical seed scan (not certified): spectra of rings up to maxL sites (partial Krylov spectra
+# above dimension 2500), cached in results/spectrum_<h>_<L>.json (gitignored), and a β grid
+# written to results/scan_<h>_<maxL>.json.
+#     julia --project=models/heisenberg_staggered_field \
+#         models/heisenberg_staggered_field/scripts/scan.jl 16 [h]
+include(joinpath(dirname(@__DIR__), "src", "common.jl"))
 maxL=length(ARGS)>0 ? parse(Int,ARGS[1]) : 16
 fields=length(ARGS)>1 ? [rat(ARGS[2])] : FIELDS
 for h in fields

@@ -1,4 +1,6 @@
-include("common.jl")
+# Rebuilds results/summary.json and the "## Results from completed runs" section of REPORT.md
+# from the scans, the certificates and the regenerated spectra (scripts/scan.jl, all c6 files).
+include(joinpath(dirname(@__DIR__), "src", "common.jl"))
 using Printf
 lower12(x) = let r=Rational{BigInt}(x), d=big(10)^12
     q=fld(numerator(r)*d,denominator(r))
@@ -32,7 +34,6 @@ for delta in DELTAS
     push!(rows,Dict("delta"=>ratstr(delta),"best_numerical_seed"=>scan.best,"purity_and_energy_scaling"=>scan.summary,"gap_12_spins_numerical"=>spec.gap,"certificate"=>cert===nothing ? nothing : Dict("n0"=>cert.n0,"beta0"=>cert.beta0,"bound"=>cert.bound,"seconds"=>cert.seconds,"ratio_to_12_spin_gap_numerical"=>cert.bound/spec.gap),"extrapolation_numerical_only"=>estimate_next(scan,spec.gap)))
 end
 metadata=provenance(Dict("purpose"=>"parameter comparison and numerical extrapolation"))
-metadata["source_sha256"]["report.jl"]=sha256_file(@__FILE__)
 write_result(joinpath(ROOT,"results","summary.json"),Dict("metadata"=>metadata,"parameters"=>rows))
 reportpath=joinpath(ROOT,"REPORT.md")
 base=first(split(read(reportpath,String),"\n## Results from completed runs"))
@@ -73,7 +74,8 @@ open(reportpath,"w") do io
         data=JSON3.read(read(joinpath(ROOT,"results","spectrum_d8_c$cells.json"),String))
         @printf(io,"| %d | %d | %d | %d | %d |\n",cells,2cells,9^cells,maximum(s.dimension for s in data.sectors),length(charge_groups(cells)[1]))
     end
-    println(io,"\nFull sector dimension lists and multiplicities are in `results/spectrum_d*_c*.json` and `results/certificate_d*.json`.\n")
+    println(io,"\nFull sector dimension lists and multiplicities are in `results/certificate_d*.json` ",
+        "and in the regenerated `results/spectrum_d*_c*.json` (`scripts/scan.jl`).\n")
     println(io,"| delta | dense search seconds (sum across sizes) | twelve-spin seconds |")
     println(io,"|---|---:|---:|")
     for delta in DELTAS

@@ -2,19 +2,22 @@ using CertifiedGaps, LinearAlgebra, SparseArrays, IntervalArithmetic, JSON3
 using CertifiedGaps.Results, CertifiedGaps.Seeds, CertifiedGaps.ExactDiagonalization
 using KrylovKit, Random
 BLAS.set_num_threads(1)
-const ROOT = @__DIR__
+# The model directory (this file is in src/); results/ and hashed paths are relative to it.
+const ROOT = dirname(@__DIR__)
 const REPO = normpath(joinpath(ROOT,"../.."))
 const FIELDS = [1//1,3//4,1//2,7//20,1//4]
 rat(x::AbstractString) = (p=split(x,"//"); parse(BigInt,p[1])//parse(BigInt,p[2]))
 tag(h) = replace(string(h),"//"=>"_")
 iv(x) = CertifiedGaps.Recurrence.to_interval(x)
 iv(x::Irrational) = interval(Float64,x)
+"Run metadata with SHA-256 of this model's sources and of the core (`core/...`)."
 function provenance(config; certified=false)
-    hashes = source_hashes(ROOT; dirs=("test",),files=("common.jl","scan.jl","certify.jl"))
+    hashes = source_hashes(ROOT; files=("certify.jl",))
     merge!(hashes, Dict("core/"*k=>v for (k,v) in source_hashes(joinpath(REPO,"julia"))))
     run_metadata(config;source_sha256=hashes,packages=(CertifiedGaps,IntervalArithmetic),
         status=certified ? "certified" : "numerical, not certified",certified)
 end
+"Exact rational check of the sublattice rotation, the RP identity −h = Σ C⊗C and o = −h Z."
 function exact_rp(h)
     X = [0//1 1//2;1//2 0//1]; J=[0//1 1//2;-1//2 0//1]
     Z=[1//2 0//1;0//1 -1//2]; U=2J; Id=Matrix{Rational{Int}}(I,2,2)
@@ -112,6 +115,11 @@ function enclose(H,F,entry_error,L,h)
     (;radius=sup(eta),residual_upper=sup(r),orthogonality_upper=sup(e),
         entry_error,dimension=n)
 end
+"""
+Spectrum of the L-site ring at field h from one representative per (S^z, momentum) equivalence
+class. With `verified=true` every block is dense and its record carries the eigenvalues and the
+`enclose` radius; otherwise blocks above `dense_max` are partial Krylov spectra (numerical).
+"""
 function all_spectra(L,h; verified=false,dense_max=2500,nev=80)
     start=time();levels=Float64[];records=Any[];N=0;cut=Inf
     for p in 0:L÷2
@@ -166,6 +174,7 @@ function enclosed_logz(records,beta)
     log(z)-b*iv(shift)
 end
 iv(a,b)=interval(a,b)
+"Rational upper bounds on 1 − Pₛ(n, β) and 1 − P_τ(2n, β) from the block records of n and 2n."
 function enclosed_seeds(a,b,beta)
     x=enclosed_logz(a,beta);y=enclosed_logz(b,beta);z=enclosed_logz(b,2beta)
     es=iv(1)-exp(y-iv(2)*x);et=iv(1)-exp(z-iv(2)*y)
