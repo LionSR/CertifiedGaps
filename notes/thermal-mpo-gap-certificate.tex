@@ -286,16 +286,57 @@ $n$ the coupling identity costs more than squaring gains.
 \end{itemize}
 This recovers the initial estimate of Ref.~\cite{main} (Proposition~5.5 of Ref.~\cite{source}); re-evaluating the recurrence from the rational definitions of $p_0$ and $q_0$ confirms agreement digit for digit.
 
-\emph{The weaker initial estimate and tighter seed chains.} Ref.~\cite{source} also certifies
-$\Ps(60,105/4),\ \Pt(120,105/4)>7/8$. That estimate uses a table at $b=21/2$ for
-$n\le10$, three twists, the trial vector at $N=120$, and a temperature lift
-$\sum z_i^{5/2}\le(\sum z_i)^{5/2}$. It gives the weaker bound
-$\Delta_L>\frac4{105}\log\frac{80}{79}$ for every even $L\ge60$. Evaluating the
-asymmetric rational recurrence directly from $(36,49/4)$ with temperature lifting
-sharpens the uniform bound to $\Delta_L>0.0729$ for every even $L\ge36$
-(\path{models/spin1}), while restricting to even-length traces $n\le12$ with real
-$\mathrm{SU}(2)$ twists yields $\Delta_L>0.039$ for every even $L\ge60$
-(\path{models/lean_seeds}).
+% Virtual-bond matrix gauge cancellation: W_j G_{j+1}^{-1} G_{j+1} W_{j+1}.
+\newcommand{\gaugecancel}{\tikz[tn]{
+ \draw (-.55,0)--(6.45,0);
+ \foreach \x in {.35,5.55}{\draw[phys] (\x,-.8)--(\x,.8);}
+ \node[mpo] at (.35,0) {$W_j$};
+ \node[sym,minimum height=.85em,inner xsep=1.5pt] at (2.05,0) {$G^{-1}$};
+ \node[sym,minimum height=.85em,inner xsep=2pt] at (3.75,0) {$G$};
+ \node[mpo] at (5.55,0) {$W_{j+1}$};}}
+\newcommand{\gaugedpair}{\tikz[tn]{
+ \draw (-.55,0)--(3.15,0);
+ \foreach \x in {.4,2.2}{\draw[phys] (\x,-.8)--(\x,.8);}
+ \node[mpo] at (.4,0) {$\widetilde W_j$};
+ \node[mpo] at (2.2,0) {$\widetilde W_{j+1}$};}}
+\emph{The weaker initial estimate and temperature lifting.}
+Ref.~\cite{source} also certifies $\Ps(60,105/4),\ \Pt(120,105/4)>7/8$ from a
+table at $b=21/2$ for $n\le10$, three twists, the $N=120$ trial vector, and
+$\sum z_i^{5/2}\le(\sum z_i)^{5/2}$, giving
+$\Delta_L>\frac4{105}\log\frac{80}{79}$ for even $L\ge60$. Applying temperature
+lifting directly to the $b_0=49/4$ table before reducing to two purities gives a
+$19.1\times$ larger bound (\path{models/spin1/experiments/}):
+for even $12\le k\le60$ and $r\ge1$, capped masses bound $Z_k(b_0)\le M_k:=\mathcal J(k)+3\mathcal N(k)$
+and $Z_k(b_0,P)\le\mathcal J(k)$ with $\mathcal J(k)=v_J^k+(m_J-v_J^{12})^{k/12}$
+and $\mathcal N(k)=v_N^k+(m_N-v_N^{12})^{k/12}$. Raising the positive Boltzmann
+weights of the self-adjoint twisted Hamiltonians to power $r$ gives
+$Z_k(rb_0)\le M_k^r=:D$ and $Z_k(rb_0,P)\le\mathcal J(k)^r=:E$, so at $b=rb_0$
+the $k$th spatial powers $w_i=|\lambda_i(b)|^k$ satisfy $\sum_i w_i\le D$,
+$J$-sector mass at most $\tau=(D+3E)/4$, and $\sum_i w_i^{2h}=Z_{120}(b)>1$
+($h=60/k$). Because each $N$ eigenvalue has multiplicity three, any $t>D/3$ with
+$Dt^{2h-1}<1$ forces $w_0\in J$ with $w_0>t$, leaving residual $s$th moment at
+most
+\begin{equation}
+ R_s(t)=\max\!\left\{3\Bigl(\frac{D-t}{3}\Bigr)^s,\
+ (\tau-t)^s+3\Bigl(\frac{D-\tau}{3}\Bigr)^s\right\},
+ \label{eq:c-resid-lift}
+\end{equation}
+upgraded whenever $(t')^{2h}+R_{2h}(t)<1$. Combining $Z_{120}(b_0)\le M_{120}$
+with $z_0(b_0)>1$ bounds $\sum_{i>0}(z_i/z_0)^r\le(M_{120}-1)^r$, yielding
+\begin{equation}
+ \begin{aligned}
+ \Ps(60,rb_0)&\ge\Bigl(1+\frac{R_h(t)}{t^h}\Bigr)^{-2},\\
+ \Pt(120,rb_0)&\ge\bigl(1+(M_{120}-1)^r\bigr)^{-2}.
+ \end{aligned}
+ \label{eq:c-templift}
+\end{equation}
+With the $(36,49/4)$ bridge covering $36\le L\le72$, Eq.~\eqref{eq:c-templift}
+certifies $\Delta_L>0.07045>7/100$ at $(k,r)=(30,2)$ and $\Delta_L>0.07290$ at
+$(28,17/8)$ for every even $L\ge36$. Without twisted traces, a single untwisted
+bound $\widehat Z_n(\beta)\le U$ and trial $E_0(2hn)<-2hn\kappa$ ($h,r\ge1$)
+similarly give $\Ps(hn,r\beta)\ge[1+((U^r-t)/t)^h]^{-2}$ and
+$\Pt(2hn,r\beta)\ge[1+(U^{2h}-1)^r]^{-2}$ whenever $t^{2h}+(U^r-t)^{2h}<1$
+(\path{models/spin2/scripts/one_trace_target.jl}).
 
 \section{Model-Dependent vs Universal Components}\label{app:c-general}
 Each ingredient is a closed network, and only a few of them depend on the
@@ -341,16 +382,64 @@ blocks (largest dimension $56$ vs.\ $162$ in $S^z$) speed up the exact
 length-$120$ trial contraction by $360\times$ (\path{models/spin1}). For spin~2
 ($5^{12}\simeq2.4\times10^8$ states, $\xi\approx49.5$), certified $\mathrm{SU}(2)$
 MPS trials reach $E_0(N)/N<-4.7595$ ($D=24$, integer) and $<-4.7612463$
-($D=295$, Arb) up to $N=1024$, reducing a conditional gap $\Delta_L>0.003019$ for
-even $L\ge512$ to a single shifted-trace bound $\widehat Z_{256}(64)\le1.08$
-(\path{models/spin2}). However, certified thermal MPO squaring
-(\path{CertifiedGaps.CertifiedMPO}) at $(n_0=256,\beta_0=64)$ for
-$K=H_{256}+256I\succeq0$ ($\beta_0\|K\|=81{,}920$) faces a starting-point
-barrier: global Taylor majorants $Q_d((\beta_0/m)K)\succeq e^{-(\beta_0/m)K}$
-require $(\beta_0/m)\|K\|\le1$, forcing $p=28$ squarings ($m=2^{28}\simeq2.7\times10^8$)
-for $d=2$ or $p=21$ ($m=2^{21}\simeq2.1\times10^6$) for $d=4$ from
-$\beta_0/m\le2^{-15}$, whereas local-gate Trotterization bounds the step error by
-local bond norms $\|h_{j,j+1}\|$ independent of $N$.
+($D=295$, Arb; largest reduced block $978$ vs.\ $295^2=87{,}025$) up to $N=1024$
+(\path{models/spin2}). By one-trace temperature lifting at $(n=256,\beta=64,h=2,r=3)$,
+a single shifted-trace bound $\widehat Z_{256}(64)\le1.08$ would certify
+$\Delta_L>0.003019$ for even $L\ge512$ (whereas the $(n=128,\beta=32)$ target at
+$\kappa=4.76122$ is ruled out by the $N=128$ trial lower bound
+$\widehat Z_{128}(32)>1.1967$). However, certified thermal MPO squaring
+(\path{CertifiedGaps.CertifiedMPO}) for $K=H_{256}+256I\succeq0$
+($\beta_0\|K\|=81{,}920$) faces a starting-point barrier: global Taylor majorants
+$Q_d(\delta K)\succeq e^{-\delta K}$ ($\delta=\beta_0/(2m)$) require
+$\delta\|K\|\le1$, forcing $p=28$ squarings ($m=2^{28}\simeq2.7\times10^8$) for
+$d=2$ or $p=21$ ($m=2^{21}\simeq2.1\times10^6$) for $d=4$, whereas local-gate
+Trotterization bounds the step error by local bond norms $\|h_{j,j+1}\|$
+independent of $N$.
+
+\emph{Certified MPO algebra and three-layer adjoint trace flows.}
+To certify MPO compressions along such squaring flows,
+\path{CertifiedGaps.CertifiedMPO} combines three exact tensor-network
+mechanisms (\path{julia/src/CertifiedMPO/}, \path{models/spin2}):
+\begin{itemize}
+\item \emph{Sum-of-squares Taylor majorants.} Writing $P_{2k}(x)=\sum_{j=0}^{2k}x^j/j!=\frac1{(2k)!}\int_0^\infty e^{-t}(t+x)^{2k}\,dt$
+and taking the exact rational $\mathrm{LDL}^{\mathsf T}$ factorization of the
+Laguerre moment Gram matrix expresses $P_{2k}(-\delta K)$ as a positive rational
+sum of squares of degree-$k$ polynomials, such as
+$P_4(x)=(1+\tfrac x2+\tfrac{x^2}{12})^2+\tfrac1{12}(x+\tfrac{x^2}2)^2+\tfrac1{72}(x^2)^2$,
+so degree-$4$ initialization ($p=21$ vs.\ $28$) reuses quadratic Gram certificates.
+\item \emph{Full-matrix Schmidt gauge balancing.} Diagonal bond rescalings leave
+the local core-norm product $\prod_j\|W_j\|_{\mathrm{local}}$ at $N=256$ a factor
+of $1.66\times10^{75}$ above the analytic seed norm $a_0$, whereas rational
+virtual-bond gauge transformations $\widetilde W_j=G_jW_jG_{j+1}^{-1}$ cancel on
+every internal virtual leg,
+\begin{equation}
+ \gaugedpair\ =\ \gaugecancel\,,
+ \label{eq:c-gauge}
+\end{equation}
+bringing the Cholesky-certified product $\prod_j\|\widetilde W_j\|_{\mathrm{local}}$
+within $1.000000701\,a_0$ at $N=256$.
+\item \emph{Three-layer signed overlaps and backward flows.} When a squared step
+$A=B^*B$ is compressed to $C$ with $\|A-C\|_{\mathrm F}\le\eta$, the exact identity
+\begin{equation}
+ \begin{aligned}
+ \tncolumn[ring]{B^*,B,B^*,B}
+ &=2\operatorname{Re}\tncolumn[ring]{C^*,B^*,B}-\tncolumn[ring]{C^*,C}\\
+ &\quad+\|B^*B-C\|_{\mathrm F}^2
+ \end{aligned}
+ \label{eq:c-overlap}
+\end{equation}
+replaces the four-layer trace by a three-layer signed overlap with quadratic
+residual $\eta^2$ ($297\times$ tighter single-step excess at $D=32$). Propagating
+approximate backward adjoints $G_j\approx B_j(S_j(G_{j+1})+S_j(G_{j+1})^*)/\kappa_j$
+(\path{AdjointTrace.jl}) telescopes the linear errors across all steps
+($1307\times$ narrower $N=16$ four-step enclosure), while backward Schatten
+propagation $m_{j-1}=\sqrt{\kappa_jm_j+\min\{\zeta_j,d_{\mathrm H}^{1/p_j}\sigma_j\}}$
+($d_{\mathrm H}=5^N$, $p_j=2^{k+1-j}$, \path{SchattenBridge.jl}) uses
+operator-norm errors $\sigma_j$ at early steps ($d_{\mathrm H}^{1/p_j}\approx1$)
+and Hilbert--Schmidt errors $\zeta_j$ at late steps without global
+operator-norm amplification.
+\end{itemize}
+
 \begin{thebibliography}{5}
 \bibitem{main}
 Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime

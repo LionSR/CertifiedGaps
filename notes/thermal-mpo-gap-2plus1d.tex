@@ -582,7 +582,7 @@ order only after each complete step. At bond dimension 128 and
 reducing repeated swaps does not resolve the benchmark discrepancy.
 
 Machine-readable spectra, convergence grids, and diagnostics are saved
-under \texttt{models/aklt/results/}, with source hashes, geometry, parameters,
+under \path{models/aklt/results/}, with source hashes, geometry, parameters,
 completion flags, and \texttt{certified=false}. The smallest-system
 checks compare the two independent projector constructions, the exact
 single-bond partition function, and full-spectrum four-site evolution,
@@ -724,17 +724,14 @@ This is stronger than the scalar squaring inequality
 has nonreal eigenvalues.
 
 \paragraph{Verification and remaining scope.}
-The directory \path{models/aklt/scripts/} contains the scripts
-\path{check_projection_transfer.py} and
-\path{check_projection_moment_bounds.py}, which record
-the transfer construction and the complete spectral bounds. In the
-physical basis change \(S=\operatorname{diag}\sqrt{\binom3a}\),
-\(a=0,1,2,3\), each bond gate becomes rational with denominator 60.
-Consequently \(60^8T\) is integral in the corresponding transfer
-basis. The checks use exact characteristic polynomials and root counts,
-and compare the transfer trace with an independent eight-spin tensor
-contraction. The JSON results include source hashes and distinguish
-the exact checks from numerical diagnostics.
+In the physical basis change \(S=\operatorname{diag}\sqrt{\binom3a}\),
+\(a=0,1,2,3\), each bond gate becomes rational with denominator 60, so
+\(60^8T\) is integral in the corresponding transfer basis; exact
+characteristic polynomials and root counts establish the spectral bounds above
+and match an independent eight-spin tensor contraction. The Julia pilot in
+\path{models/aklt/} (\path{scripts/run.jl}, \path{test/runtests.jl}) checks the
+bond projector polynomial, the quadrupole reflection obstruction
+\eqref{eq:quadrupole-trace}, and the exact and thermal-purification benchmarks.
 
 Equation~\eqref{eq:fixed-slice-result} holds at one fixed transverse
 width and one fixed depth. It does not control the mixed-width,
