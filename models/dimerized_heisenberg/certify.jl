@@ -12,13 +12,12 @@
 # different (equally valid) enclosures. Seed upper bounds are rounded up to a 1e-6 grid plus one
 # spare unit, so that the stored seeds survive a fresh replay on another BLAS (check.jl --full).
 using CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic, LinearAlgebra
-isdefined(@__MODULE__, :read_json_text) || include(joinpath(@__DIR__, "src", "provenance.jl"))
+isdefined(@__MODULE__, :check_source_hashes) || include(joinpath(@__DIR__, "src", "provenance.jl"))
 isdefined(@__MODULE__, :ReflectionConventions) ||
     include(joinpath(@__DIR__, "src", "reflection_conventions.jl"))
 isdefined(@__MODULE__, :Certification) ||
     include(joinpath(@__DIR__, "src", "Certification.jl"))
 using .Certification, .Certification.DimerizedRP
-using .Certification: exact # IntervalArithmetic also exports `exact`.
 BLAS.set_num_threads(1)
 
 const RESULTS_DIR = joinpath(@__DIR__, "results")
@@ -83,11 +82,11 @@ function certify_summary()
     rows = Any[]
     for delta in DELTAS
         path = seed_path(delta)
-        record = load_record(path)
-        lo, hi = exact.(record["reference_gap_16_interval"])
+        record = read_result(path)
+        lo, hi = parse_rational.(record["reference_gap_16_interval"])
         gap = interval(inf(CertifiedGaps.to_interval(lo)), sup(CertifiedGaps.to_interval(hi)))
         best = isempty(record["seeds"]) ? nothing :
-            maximum(exact(s["gap_lower"]) for s in record["seeds"])
+            maximum(parse_rational(s["gap_lower"]) for s in record["seeds"])
         ratio = best === nothing ? nothing :
             endpoints(CertifiedGaps.to_interval(best) / gap)
         push!(rows, Dict("delta" => string(delta), "source_file" => "results/" * basename(path),
@@ -99,7 +98,7 @@ function certify_summary()
                 "beta_boxes" => string(length(r["cover"]))) for r in record["negative_results"]]))
         println("delta=$delta bound=$(best === nothing ? "none" : Float64(best)) ratio=$ratio")
     end
-    certified = [exact(r["delta"]) for r in rows if !isempty(r["seeds"])]
+    certified = [parse_rational(r["delta"]) for r in rows if !isempty(r["seeds"])]
     write_result(joinpath(RESULTS_DIR, "certificate.json"), Dict(
         "format" => "dimerized-heisenberg-summary-v2", "parameters" => rows,
         "model" => "H = sum over a ring of 2n spins of (1+delta) S.S inside each two-spin " *

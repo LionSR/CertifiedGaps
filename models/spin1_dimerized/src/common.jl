@@ -2,19 +2,26 @@
 using CertifiedGaps, LinearAlgebra, SparseArrays, JSON3
 using CertifiedGaps.Results, CertifiedGaps.ExactDiagonalization, CertifiedGaps.Seeds
 using IntervalArithmetic
+using CertifiedGaps.ExactArithmetic: parse_rational, round_up
 BLAS.set_num_threads(1)
 # The model directory (this file is in src/); results/ and hashed paths are relative to it.
 const ROOT = dirname(@__DIR__)
 const REPO = normpath(joinpath(ROOT,"../.."))
 const DELTAS = [9//10, 4//5, 7//10, 3//5, 1//2]
 ratstr(x::Rational) = string(numerator(x),"//",denominator(x))
-parserat(s) = (a=split(s,"//");parse(BigInt,a[1])//parse(BigInt,a[2]))
-"Run metadata with SHA-256 of this model's sources, the core sources and its manifest."
+"""
+Run metadata with SHA-256 of this model's sources under `source_sha256` (keyed relative to
+this directory; the tests compare them with the checkout) and of the shared core under
+`core_sha256` (keyed by repository path; provenance only, never compared).
+"""
 function provenance(config; certified=false)
     hashes = source_hashes(ROOT; dirs=("src","scripts","test"),
-        files=("certify.jl","check.jl","Project.toml"))
-    merge!(hashes, Dict("../../"*k=>v for (k,v) in source_hashes(REPO;dirs=("julia/src",),files=("julia/Project.toml","julia/Manifest.toml"))))
-    run_metadata(config;source_sha256=hashes,packages=(CertifiedGaps,IntervalArithmetic,JSON3),status=certified ? "certified" : "numerical",certified)
+        files=("certify.jl","check.jl","Project.toml","Manifest.toml"))
+    meta = run_metadata(config;source_sha256=hashes,packages=(CertifiedGaps,IntervalArithmetic,JSON3),
+        status=certified ? "certified" : "numerical",certified)
+    meta["core_sha256"] = source_hashes(REPO;dirs=("julia/src",),
+        files=("julia/Project.toml","julia/Manifest.toml"))
+    meta
 end
 "Exact spin-1 Sz-basis Hamiltonian, scaled to an integer matrix."
 function integer_hamiltonian(cells, delta, states)

@@ -6,8 +6,10 @@
 # test/runtests.jl checks its exact parts; `check.jl --full` also re-verifies its spectra.
 
 using CertifiedGaps.RingModels, CertifiedGaps.GapCertificates, CertifiedGaps.Results
+using CertifiedGaps.Spins: exact_spin_half
 
-const X, J, Z = [0 1//2; 1//2 0], [0 1//2; -1//2 0], [1//2 0; 0 -1//2]
+# Spin-½ operators with the real antisymmetric J = iSʸ.
+const X, J, Z = let S = exact_spin_half(Rational{Int}); (S.x, S.iy, S.z) end
 
 "Rotated-frame staggered Heisenberg ring: h = −(X⊗X + J⊗J + Z⊗Z), o = −h_s Z."
 staggered(hs) = RingModel(2, -(kron(X, X) + kron(J, J) + kron(Z, Z)), -hs * Z;

@@ -116,7 +116,8 @@ Measured run times (Julia 1.12, 1 BLAS thread):
   using a priori $\gamma_k$ rounding-error bounds on `Float64` residual and Gram matrix products
   (see [`METHOD.md`](METHOD.md), "Eigenvalue-enclosure theorem"), the outward-rounded $\log Z$
   intervals, the exact rational seed defects, and the doubling recurrence bounds.
-- **Fast vs. full verification:** `check.jl` recomputes $\log Z$, the rational seed defects, and
+- **Fast vs. full verification:** `check.jl` recomputes $\log Z$, the rational seed defects (each
+  at most the stored one), and
   the gap bounds from the stored eigenvalue enclosures and checks the shared-core cross-check,
   while `certify.jl` and `scripts/spectral_replay.jl` rebuild every momentum block and re-verify
   all dense eigenvector residuals from scratch, and `check.jl --full` re-solves and re-verifies
@@ -152,3 +153,8 @@ These certificates were originally generated when the directory was located at
 Their `metadata.source_sha256` entries reference the source snapshot preserved in
 `historical_sources/` at commit `cb635a1cdf2ab06630b5b0838fac4356d3c33509`; `check.jl` verifies all
 recorded source hashes against that git commit when present in the local repository object store.
+Later, duplicated helpers moved into the shared core `CertifiedGaps` (`rat` → `ExactArithmetic.parse_rational`, the exact spin-½ matrices →
+`Spins.exact_spin_half`), and new results record model-local sources under `source_sha256` and the
+core under `core_sha256`. The stored certificates are unchanged. The fast checks of the seed defects are monotone: the defects recomputed from the stored
+enclosures (through the core `Seeds.seed_defects`) must be at most the stored εₛ, εₜ in exact
+rationals, rather than equal to them; the stored seeds and bounds are unchanged.

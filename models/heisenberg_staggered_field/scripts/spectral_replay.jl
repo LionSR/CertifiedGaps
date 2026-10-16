@@ -12,7 +12,7 @@ start=time(); records=Any[]; full=Any[]
 for h in FIELDS
     path=joinpath(ROOT,"results","certificate_$(tag(h)).json")
     c=JSON3.read(read(path,String),Dict{String,Any})
-    hh=rat(c["h"]);n=c["n0"];beta=rat(c["beta"])
+    hh=parse_rational(c["h"]);n=c["n0"];beta=parse_rational(c["beta"])
     @assert hh==h && exact_rp(hh)
     t=time()
     small=all_spectra(n,hh;verified=true)
@@ -39,13 +39,13 @@ for h in FIELDS
             maxrad=max(maxrad,b["radius"]-a["radius"]);blocks+=1
         end
     end
-    identical=exact_fields && seeds.s==rat(c["epsilon_s"]) &&
-        seeds.t==rat(c["epsilon_t"]) && bound.bound==c["bound"]
+    identical=exact_fields && seeds.s==parse_rational(c["epsilon_s"]) &&
+        seeds.t==parse_rational(c["epsilon_t"]) && bound.bound==c["bound"]
     push!(records,Dict("h"=>string(hh),"n0"=>n,"beta"=>string(beta),"seconds"=>time()-t,
         "epsilon_s"=>string(seeds.s),"epsilon_t"=>string(seeds.t),
         "original_epsilon_s"=>c["epsilon_s"],"original_epsilon_t"=>c["epsilon_t"],
-        "epsilon_s_difference"=>string(seeds.s-rat(c["epsilon_s"])),
-        "epsilon_t_difference"=>string(seeds.t-rat(c["epsilon_t"])),
+        "epsilon_s_difference"=>string(seeds.s-parse_rational(c["epsilon_s"])),
+        "epsilon_t_difference"=>string(seeds.t-parse_rational(c["epsilon_t"])),
         "logZ_intervals"=>seeds.logs,"bound"=>bound.bound,"original_bound"=>c["bound"],
         "supports_original_nine_decimal_bound"=>supports,
         "published_bound_rational"=>string(published),

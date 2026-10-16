@@ -9,15 +9,16 @@
 module Certification
 
 using CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic, LinearAlgebra
-using CertifiedGaps.ExactArithmetic: round_up, round_down
+using CertifiedGaps.ExactArithmetic: round_up, round_down, parse_rational
 using CertifiedGaps.RingModels: RingModel, rp_certificate, verify_rp, encode_model,
     encode_rp, decode_model, decode_rp
 include("verified_spectra.jl")
 include("rp.jl")
 using .VerifiedSpectra, .DimerizedRP
 
-export generate, check_record, load_record, seed_intervals, dimer_bounds, provenance,
-    core_provenance, exact, endpoints, DELTAS, negative_cover, replay_spectra, ring_levels, stored_spectra,
+export generate, check_record, seed_intervals, dimer_bounds, provenance,
+    core_provenance, parse_rational, endpoints, DELTAS, negative_cover, replay_spectra, ring_levels,
+    stored_spectra,
     seed_path
 
 const Q = Rational{BigInt}
@@ -25,7 +26,6 @@ const MODEL_DIR = normpath(joinpath(@__DIR__, ".."))
 const ROOT = normpath(joinpath(MODEL_DIR, "../.."))
 const DELTAS = Q[1//2, 3//10, 1//4, 1//5, 3//20, 1//10]
 const FORMAT = "dimerized-heisenberg-v2"
-exact(s) = (p = split(s, "//"); parse(BigInt, p[1]) // parse(BigInt, p[2]))
 endpoints(x) = string.([Q(inf(x)), Q(sup(x))])
 qinterval(x) = CertifiedGaps.to_interval(x)
 
@@ -58,9 +58,6 @@ core_provenance() = source_hashes(ROOT; dirs=("julia/src",),
 seed_path(delta) = joinpath(MODEL_DIR, "results",
     "seed_delta_$(numerator(delta))_$(denominator(delta)).json.gz")
 
-"Load exact JSON, including gzip artifacts, without routing integer tokens through Float64."
-load_record(path) = parse_exact_json(endswith(path, ".gz") ?
-    read(`gzip -dc $path`, String) : read(path, String))
 asint(x) = x isa AbstractString ? parse(Int, x) : Int(x)
 
 "Recover all eigenvalue intervals with every sector multiplicity."
@@ -68,12 +65,12 @@ function ring_levels(ring)
     energies = Float64[]
     radii = Q[]
     for block in ring["blocks"]
-        vals = exact.(block["eigenvalues"])
+        vals = parse_rational.(block["eigenvalues"])
         length(vals) == asint(block["dimension"]) || error("block dimension mismatch")
         all(x -> Q(Float64(x)) == x, vals) || error("nonbinary center")
         for _ in 1:asint(block["multiplicity"])
             append!(energies, Float64.(vals))
-            append!(radii, fill(exact(block["eigenvalue_radius"]), length(vals)))
+            append!(radii, fill(parse_rational(block["eigenvalue_radius"]), length(vals)))
         end
     end
     length(energies) == 2^asint(ring["spins"]) || error("incomplete spectrum")
@@ -96,18 +93,21 @@ function stored_spectra(record)
         L = asint(ring["spins"])
         bylabel = Dict{Tuple{Int,Int,Int},Any}()
         for b in ring["blocks"]
-            w = scalar_witness(asint(b["dimension"]), L, exact(b["h_component_max"]),
-                exact(b["q_component_max"]), exact(b["lambda_max_abs"]),
-                exact(b["raw_residual_component_max"]),
-                exact(b["raw_orthogonality_component_max"]), exact(b["matrix_error_upper"]))
+            w = scalar_witness(asint(b["dimension"]), L, parse_rational(b["h_component_max"]),
+                parse_rational(b["q_component_max"]), parse_rational(b["lambda_max_abs"]),
+                parse_rational(b["raw_residual_component_max"]),
+                parse_rational(b["raw_orthogonality_component_max"]),
+                parse_rational(b["matrix_error_upper"]))
             w.steps * VerifiedSpectra.UNIT < 1 || error("rounding model out of range")
-            w.coarse_ebound == exact(b["coarse_orthogonality_norm_upper"]) < 1 ||
+            w.coarse_ebound == parse_rational(b["coarse_orthogonality_norm_upper"]) < 1 ||
                 error("coarse orthogonality witness mismatch")
-            w.ebound == exact(b["orthogonality_norm_upper"]) < 1 ||
+            w.ebound == parse_rational(b["orthogonality_norm_upper"]) < 1 ||
                 error("orthogonality witness mismatch")
-            w.rbound == exact(b["residual_norm_upper"]) || error("residual witness mismatch")
-            w.radius == exact(b["eigenvalue_radius"]) > 0 || error("radius witness mismatch")
-            issorted(exact.(b["eigenvalues"])) || error("unsorted block spectrum")
+            w.rbound == parse_rational(b["residual_norm_upper"]) ||
+                error("residual witness mismatch")
+            w.radius == parse_rational(b["eigenvalue_radius"]) > 0 ||
+                error("radius witness mismatch")
+            issorted(parse_rational.(b["eigenvalues"])) || error("unsorted block spectrum")
             label = (asint(b["down_spins"]), asint(b["cell_momentum"]), parity(b))
             haskey(bylabel, label) && error("duplicate sector $label")
             bylabel[label] = b
@@ -264,8 +264,8 @@ function positive_seed(spectra, n, beta)
     result = certified_gap_bound(es, et, beta)
     result.bound === nothing && return nothing
     bound = round_down(Q(result.bound), big(10)^6)
-    logs = Dict(key=>string.([round_down(exact(val[1]),big(10)^6)-1//big(10)^6,
-        round_up(exact(val[2]),big(10)^6)+1//big(10)^6]) for (key,val) in fresh.logs)
+    logs = Dict(key=>string.([round_down(parse_rational(val[1]),big(10)^6)-1//big(10)^6,
+        round_up(parse_rational(val[2]),big(10)^6)+1//big(10)^6]) for (key,val) in fresh.logs)
     return Dict("n0_cells"=>string(n), "beta0"=>string(beta),
         "eps_s"=>string(es), "eps_t"=>string(et), "gap_lower"=>string(bound),
         "log_partition"=>logs,
@@ -296,7 +296,7 @@ function generate(delta::Q; exclude_all_beta=true)
         eligible = filter(r -> r["n0_cells"] == string(n), candidates)
         isempty(eligible) && continue
         best = argmax(r -> r["bound_float"], eligible)
-        seed = positive_seed(spectra, n, exact(best["beta0"]))
+        seed = positive_seed(spectra, n, parse_rational(best["beta0"]))
         seed === nothing || push!(seeds, seed)
     end
     # Re-certify the survey parameters independently of the beta-grid optimization.
@@ -330,16 +330,14 @@ function generate(delta::Q; exclude_all_beta=true)
                 source_sha256=provenance(), packages=(CertifiedGaps,IntervalArithmetic),
                 status="recertified_v2", certified=!isempty(seeds)),
             Dict("core_sha256"=>core_provenance())))
-    path = chopsuffix(seed_path(delta), ".gz")
-    write_result(path, record)
-    run(`gzip -n -f $path`)
-    println("SAVED $(path).gz seconds=$(record["seconds_total"]) seeds=$seeds")
+    path = write_result(seed_path(delta), record)          # gzip -n, level 6
+    println("SAVED $(path) seconds=$(record["seconds_total"]) seeds=$seeds")
     return record
 end
 
 "Rebuild every Hamiltonian block and residual; saved residual maxima are never trusted."
 function replay_spectra(record)
-    delta = exact(record["delta"])
+    delta = parse_rational(record["delta"])
     spectra = Dict{Int,Any}()
     for ring in record["rings"]
         L = asint(ring["spins"])
@@ -354,8 +352,9 @@ function replay_spectra(record)
             for key in ("dimension", "multiplicity")
                 asint(b[key]) == asint(stored[key]) || error("sector $key mismatch")
             end
-            vals, oldvals = exact.(b["eigenvalues"]), exact.(stored["eigenvalues"])
-            rho = exact(b["eigenvalue_radius"])+exact(stored["eigenvalue_radius"])
+            vals = parse_rational.(b["eigenvalues"])
+            oldvals = parse_rational.(stored["eigenvalues"])
+            rho = parse_rational(b["eigenvalue_radius"])+parse_rational(stored["eigenvalue_radius"])
             all(abs.(vals-oldvals) .<= rho) || error("stored spectrum disagrees with fresh solve")
         end
         spectra[L] = (E,r)
@@ -376,7 +375,7 @@ function check_record(record; spectra=nothing, check_hashes=true)
             sha256_file(joinpath(ROOT,path)) == digest || error("source hash mismatch: $path")
         end
     end
-    rp = audit_rp(exact(record["delta"]))
+    rp = audit_rp(parse_rational(record["delta"]))
     model = RingModel(4,rp.transformed_bond,rp.transformed_onsite)
     encode_model(model) == encode_model(decode_model(record["model"])) ||
         error("stored physical model mismatch")
@@ -385,37 +384,39 @@ function check_record(record; spectra=nothing, check_hashes=true)
     seeds = copy(record["seeds"])
     record["survey_seed"] === nothing || push!(seeds, record["survey_seed"])
     for seed in seeds
-        n, beta = asint(seed["n0_cells"]), exact(seed["beta0"])
+        n, beta = asint(seed["n0_cells"]), parse_rational(seed["beta0"])
         fresh = seed_intervals(spectra, n, beta)
-        es, et = exact(seed["eps_s"]), exact(seed["eps_t"])
+        es, et = parse_rational(seed["eps_s"]), parse_rational(seed["eps_t"])
         Q(sup(fresh.s)) <= es || error("spatial seed fails fresh verification")
         Q(sup(fresh.t)) <= et || error("thermal seed fails fresh verification")
         bound = certified_gap_bound(es, et, beta).bound
-        bound !== nothing && exact(seed["gap_lower"]) <= Q(bound) || error("gap bound fails")
-        Q(bound) == exact(seed["interval_bound_binary"]) || error("recurrence mismatch")
+        bound !== nothing && parse_rational(seed["gap_lower"]) <= Q(bound) ||
+            error("gap bound fails")
+        Q(bound) == parse_rational(seed["interval_bound_binary"]) || error("recurrence mismatch")
         for (key,values) in fresh.logs
-            stored = exact.(seed["log_partition"][key])
-            lo,hi = exact.(values)
+            stored = parse_rational.(seed["log_partition"][key])
+            lo,hi = parse_rational.(values)
             stored[1] <= lo <= hi <= stored[2] || error("log-partition enclosure mismatch")
         end
         seed["validity_sites"] == "N divisible by 4, N >= $(2n)" || error("invalid size claim")
     end
     # The dimer perturbation record is a documented (failing) route; recompute it exactly.
     dimer = record["dimer_perturbation"]
-    d = dimer_bounds(exact(record["delta"]), asint(dimer["n0"]), exact(dimer["beta0"]))
+    d = dimer_bounds(parse_rational(record["delta"]), asint(dimer["n0"]),
+        parse_rational(dimer["beta0"]))
     dimer["norm_small"] == string(d.norm_small) && dimer["eps_s_enclosure"] == endpoints(d.s) &&
         dimer["eps_t_enclosure"] == endpoints(d.t) || error("dimer perturbation mismatch")
     E,r = spectra[16]
     lows = sort([Q(e)-rr for (e,rr) in zip(E,r)])
     highs = sort([Q(e)+rr for (e,rr) in zip(E,r)])
-    lo,hi = exact.(record["reference_gap_16_interval"])
+    lo,hi = parse_rational.(record["reference_gap_16_interval"])
     lo <= lows[2]-highs[1] <= highs[2]-lows[1] <= hi || error("reference gap mismatch")
     for exclusion in record["negative_results"]
         exclusion["status"] == "all_beta_rejected" || error("unresolved beta region")
         n = asint(exclusion["n0_cells"])
         first = seed_intervals(spectra, n, 1//big(1))
         inf(first.t) >= 1//2 || error("small-beta exclusion failed")
-        tail = exact(exclusion["tail_beta"])
+        tail = parse_rational(exclusion["tail_beta"])
         en,rn = spectra[2n]; e2,r2 = spectra[4n]
         diff = minimum(Q(e)-r for (e,r) in zip(e2,r2)) -
             2minimum(Q(e)+r for (e,r) in zip(en,rn))
@@ -424,7 +425,7 @@ function check_record(record; spectra=nothing, check_hashes=true)
             error("large-beta exclusion failed")
         previous = 1//big(1)
         for box in exclusion["cover"]
-            a, b = exact(box["a"]), exact(box["b"])
+            a, b = parse_rational(box["a"]), parse_rational(box["b"])
             a == previous < b || error("beta cover has a gap or overlap")
             s, t = lower_defects(spectra[2n], spectra[4n], a, b)
             rejects(s,t) !== nothing || error("beta box is not excluded")

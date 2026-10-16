@@ -5,7 +5,7 @@
 #         models/heisenberg_staggered_field/scripts/scan.jl 16 [h]
 include(joinpath(dirname(@__DIR__), "src", "common.jl"))
 maxL=length(ARGS)>0 ? parse(Int,ARGS[1]) : 16
-fields=length(ARGS)>1 ? [rat(ARGS[2])] : FIELDS
+fields=length(ARGS)>1 ? [parse_rational(ARGS[2])] : FIELDS
 for h in fields
     spectra=Dict{Int,PartialSpectrum}(); timings=Dict(); sectors=Dict()
     lengths=sort!(unique(vcat(collect(2:2:maxL÷2),collect(4:4:maxL))))

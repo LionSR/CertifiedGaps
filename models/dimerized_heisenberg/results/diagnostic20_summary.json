@@ -15,7 +15,7 @@
             "decay_length_cells_4_5_float": 0.5623852602680235,
             "max_ritz_residual_float": 9.012842916631206e-12,
             "scaling_estimate_n0_float": 2.5198420997897464,
-            "verified_spectrum_input_sha256": "951e3d53b74b1cf9d121b1cc5865150874ba619a1b8485ec982a90ebbec45abf",
+            "verified_spectrum_input_sha256": "8ddc64946c774c0d4188e95fb112833a897591af6caff6a534e619ed8641c502",
             "ground_energy_defects_float": [
                 0.011523788633878596,
                 0.0018662798725337382,
@@ -64,7 +64,7 @@
             "decay_length_cells_4_5_float": 0.8447755387222903,
             "max_ritz_residual_float": 8.573857367309688e-12,
             "scaling_estimate_n0_float": 3.5421952306087037,
-            "verified_spectrum_input_sha256": "98122b672e9b714906ab13239f5753fd9a07f167023d6e9abec0e08ac2c576b6",
+            "verified_spectrum_input_sha256": "878bb45ff40714e5960897979c3526db2915b3c45b74ce0d726128435c74954b",
             "ground_energy_defects_float": [
                 0.051972698546719265,
                 0.015518137836560086,
@@ -113,7 +113,7 @@
             "decay_length_cells_4_5_float": 0.968167396297375,
             "max_ritz_residual_float": 9.195542223754236e-12,
             "scaling_estimate_n0_float": "4",
-            "verified_spectrum_input_sha256": "7b79949709a0c499cb4534c525d132bc23e3eae02f2b86c00b1142dcbf780268",
+            "verified_spectrum_input_sha256": "bb90e0582a303559f981e9c8c3d525ab80781d9f681b27592191d6afa2bc85dc",
             "ground_energy_defects_float": [
                 0.0726371365341425,
                 0.025383552176906576,
@@ -162,7 +162,7 @@
             "decay_length_cells_4_5_float": 1.1430300147880268,
             "max_ritz_residual_float": 4.589024094815937e-12,
             "scaling_estimate_n0_float": 4.641588833612779,
-            "verified_spectrum_input_sha256": "9a37d0b5c84392643a76785c7df298c8b12b770e56dfdc088701eccd815f920b",
+            "verified_spectrum_input_sha256": "ae8275e3faf05807df423b7450f15f70c7bf9bbca1844f50b53ca50487182c94",
             "ground_energy_defects_float": [
                 0.09961711689436381,
                 0.041005217489988866,
@@ -211,7 +211,7 @@
             "decay_length_cells_4_5_float": 1.4171247972615106,
             "max_ritz_residual_float": 8.933190291278025e-12,
             "scaling_estimate_n0_float": 5.622884435344995,
-            "verified_spectrum_input_sha256": "a8c192a4e2d244203f43e7967898dc112ad80ef989d1e62a94586bde422c6163",
+            "verified_spectrum_input_sha256": "7f8a9322b6c44c2cbdd19487e2ea078ce3447ddc48489a8abde5c9e1f2d3f71c",
             "ground_energy_defects_float": [
                 0.13308624818421677,
                 0.06500493799361529,
@@ -254,7 +254,7 @@
             "decay_length_cells_4_5_float": 1.9130341130867412,
             "max_ritz_residual_float": 9.404476083779983e-12,
             "scaling_estimate_n0_float": 7.368062997280773,
-            "verified_spectrum_input_sha256": "9b47577b494d965928b0da4b788734b9d588a7381994f1a6a384fd688d53535f",
+            "verified_spectrum_input_sha256": "45d426d0d0b9cf2722706f76cc8cec689934489691eaa16aa32ba9f20e091576",
             "ground_energy_defects_float": [
                 0.17059894477683546,
                 0.09923589992567816,

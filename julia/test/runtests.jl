@@ -99,6 +99,55 @@ using ITensors, ITensorMPS, CertifiedGaps.Purification
         end
     end
 
+    @testset "compressed and compact results, model provenance" begin
+        mktempdir() do dir
+            data = Dict("n" => typemax(Int64), "x" => "3//4", "v" => [1, 2])
+            pretty = write_result(joinpath(dir, "a.json"), data)
+            compact = write_result(joinpath(dir, "b.json"), data; compact = true)
+            packed = write_result(joinpath(dir, "c.json.gz"), data)
+            @test read(compact, String) == CertifiedGaps.Results.JSON3.write(data) * "\n"
+            @test read_result_bytes(packed) == read(pretty)          # gzip of the pretty text
+            @test read(`gzip -dc -- $packed`) == read(pretty) && !isfile(packed * ".tmp")
+            @test read_result(packed) == read_result(pretty) == read_exact_json(pretty)
+            @test read_result(packed)["n"] == string(typemax(Int64))         # exact token
+            @test read_result(packed; exact = false)["v"] == [1, 2]
+            @test read_result(packed, Dict{String,Any})["x"] == "3//4"
+            # Equal JSON gives equal compressed bytes (gzip -n: no name, no timestamp).
+            @test read(write_result(joinpath(dir, "d.json.gz"), data)) == read(packed)
+            @test_throws ArgumentError write_result(joinpath(dir, "e.json"), data; gzip = true)
+            @test_throws ArgumentError write_result(joinpath(dir, "e.gz"), data; gzip = false)
+
+            repo = joinpath(dir, "repo")
+            model = joinpath(repo, "models", "toy")
+            for (path, text) in (("models/toy/src/a.jl", "a = 1\n"),
+                ("models/toy/check.jl", "c = 1\n"), ("models/toy/Project.toml", ""),
+                ("models/toy/Manifest.toml", ""), ("julia/src/Core.jl", "k = 1\n"),
+                ("julia/Project.toml", ""), ("julia/Manifest.toml", ""))
+                mkpath(dirname(joinpath(repo, path)))
+                write(joinpath(repo, path), text)
+            end
+            p = model_provenance(model; files = ("check.jl", "Project.toml", "Manifest.toml"))
+            @test sort(collect(keys(p.source_sha256))) == ["models/toy/Manifest.toml",
+                "models/toy/Project.toml", "models/toy/check.jl", "models/toy/src/a.jl"]
+            @test sort(collect(keys(p.core_sha256))) ==
+                  ["julia/Manifest.toml", "julia/Project.toml", "julia/src/Core.jl"]
+            recorded = merge(p.source_sha256, p.core_sha256,
+                Dict("../outside.jl" => "0"^64))
+            @test verify_source_hashes(recorded, repo; scope = "models/toy/") == 4
+            # Editing the core does not matter in the model scope, editing the model does.
+            write(joinpath(repo, "julia/src/Core.jl"), "k = 2\n")
+            @test verify_source_hashes(recorded, repo; scope = "models/toy/") == 4
+            @test_throws ErrorException verify_source_hashes(recorded, repo)
+            write(joinpath(repo, "models/toy/src/a.jl"), "a = 2\n")
+            @test_throws ErrorException verify_source_hashes(recorded, repo;
+                scope = "models/toy/")
+            @test_throws ErrorException verify_source_hashes(recorded, repo; scope = "none/")
+            # Model-relative keys work with the model directory as root.
+            local_keys = source_hashes(model; dirs = ("src",))
+            @test verify_source_hashes(local_keys, model) == 1
+        end
+    end
+
     @testset "spin operators" begin
         for s in (1 // 2, 1, 3 // 2, 2)
             S = spin_matrices(s)
@@ -118,6 +167,24 @@ using ITensors, ITensorMPS, CertifiedGaps.Purification
             λ, anti = rp_test(m.rp_bond, m.d)
             @test λ > -1e-12 && anti < 1e-12
         end
+        # Exact spin-½ and Pauli matrices.
+        σ, S = exact_pauli(), exact_spin_half()
+        @test σ.x * σ.x == σ.id && σ.iy == im * σ.y && σ.x * σ.z == -σ.iy
+        @test eltype(σ.x) == Rational{BigInt} && eltype(exact_pauli(Int).z) == Int
+        @test S.x * S.y - S.y * S.x == im * S.z
+        @test S.x^2 + S.y^2 + S.z^2 == 3 // 4 * S.id
+        @test kron(S.x, S.x) - kron(S.iy, S.iy) + kron(S.z, S.z) ≈
+              real(sum(kron(A, A) for A in (spin_matrices(1 // 2).sx, spin_matrices(1 // 2).sy,
+            spin_matrices(1 // 2).sz)))
+        # Integer spin-1 Cartesian generators: S = −iG is a spin-1 representation.
+        G = integer_cartesian_generators()
+        @test eltype(G[1]) == Int && all(g -> transpose(g) == -g, G)
+        @test Float64.(G[1]) == cartesian_generators(1)[1] && G == map(g -> Int.(g),
+            cartesian_generators(1))
+        Sg = [-im * g for g in G]
+        @test Sg[1] * Sg[2] - Sg[2] * Sg[1] == im * Sg[3]
+        @test sum(s * s for s in Sg) == 2I
+        @test -sum(kron(s, s) for s in Sg) == sum(kron(g, g) for g in G)
         m = heisenberg(1)
         @test first(rp_test(m.chain.bonds(2)[1][3], 3)) ≈ -2       # standard basis is not RP
         Cs = rp_decomposition(m.rp_bond, m.d)
@@ -141,9 +208,48 @@ using ITensors, ITensorMPS, CertifiedGaps.Purification
         lo, hi = logZ_bounds(truncated, 0.5)
         exact, _ = logZ_bounds(s, 0.5)
         @test lo <= exact <= hi && exact ≈ log_partition(s.E, 0.5)
+        # Weighted spectra: multiplicities instead of repeated levels.
+        weighted = WeightedSpectrum([0.0, 1.0, 2.0], [1, 3, 5], 9, true)
+        expanded = PartialSpectrum([0.0; ones(3); fill(2.0, 5)], 9, true)
+        for β in (0.125, 1.0, 8.0)
+            wl, wh = logZ_bounds(weighted, β)
+            @test wl == wh
+            @test wl ≈ logZ_bounds(expanded, β)[1] atol = 1e-14
+        end
+        partial = WeightedSpectrum([0.0, 1.0], [1, 3], 9, false)
+        pl, ph = logZ_bounds(partial, 1.0)
+        @test pl < logZ_bounds(weighted, 1.0)[1] <= ph
         stag = staggered_heisenberg(1.0)
         rotated = Chain(2, ring_bonds(stag.rp_bond); onsite = -spin_matrices(1 // 2).sz)
         @test spectrum(stag.chain, 6).E ≈ spectrum(rotated, 6).E atol = 1e-12
+    end
+
+    @testset "rigorous seed defects from log Z enclosures" begin
+        t = tfim(2.0)
+        spectra = Dict(L => spectrum(t.chain, L) for L in (4, 8))
+        εₛ, εₜ = seed_defects(spectra, 4, 1.5)
+        # Thin intervals around the float values, widened by a margin for rounding.
+        w(x) = interval(x - 1e-12, x + 1e-12)
+        zn = w(logZ_bounds(spectra[4], 1.5)[1])
+        z2n = w(logZ_bounds(spectra[8], 1.5)[1])
+        z2n2 = w(logZ_bounds(spectra[8], 3.0)[1])
+        r = seed_defects(zn, z2n, z2n2)
+        @test r.eps_s isa Rational{BigInt} && r.eps_t isa Rational{BigInt}
+        @test inf(r.defect_s) <= εₛ <= r.eps_s && inf(r.defect_t) <= εₜ <= r.eps_t
+        @test r.eps_s <= Rational{BigInt}(sup(1 - exp(z2n - 2zn)))
+        @test r.eps_t <= Rational{BigInt}(sup(1 - exp(z2n2 - 2z2n)))
+        @test abs(Float64(r.eps_s) - εₛ) < 1e-9
+        es, et = r                                   # positional destructuring: εₛ, εₜ
+        @test (es, et) == (r.eps_s, r.eps_t)
+        # BigFloat inputs: the bound equals the directed-rounding −expm1 of the lower end.
+        setprecision(BigFloat, 256) do
+            a, b = interval(BigFloat, 1 // 10), interval(BigFloat, 3 // 20)
+            s = seed_defects(a, b, b)
+            x = setrounding(BigFloat, RoundDown) do
+                BigFloat(3 // 20, RoundDown) - 2 * BigFloat(1 // 10, RoundUp)
+            end
+            @test s.eps_s == Rational{BigInt}(-setrounding(() -> expm1(x), BigFloat, RoundDown))
+        end
     end
 
     @testset "TFIM: exact diagonalisation against free fermions" begin

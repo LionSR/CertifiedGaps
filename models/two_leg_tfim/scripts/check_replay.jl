@@ -14,11 +14,14 @@ p=joinpath(root,ARGS[1])
 c=read_exact_json(p)
 started=time()
 original=joinpath(root,ORIGINAL_CERTIFICATE)
-old=read_certificate(original)
+old=read_result(original)
 checks=@testset "Fresh spectral replay artifact" begin
-    @test bytes2hex(sha256(certificate_bytes(original)))==c["original_certificate_sha256"]
-    # A replay records the hashes of the sources it ran with; compare with current files.
+    @test bytes2hex(sha256(read_result_bytes(original)))==c["original_certificate_sha256"]
+    # A replay records the hashes of the model-local sources it ran with; compare them with
+    # the current files. Paths outside this directory (the core, in replays written before
+    # the model-local policy) are provenance only and are not compared.
     for (path,hash) in c["source_hashes"]
+        startswith(normpath(path),"..") && continue
         @test source_sha256(root,path)==hash
     end
     @test all(c["agreement"][key] for key in (
@@ -62,7 +65,7 @@ result_path=joinpath(root,get(ARGS,2,"results/replay_check.json"))
 @assert !isfile(result_path) "Choose a new checker-result filename"
 write_result(result_path,(;status="passed",seconds=time()-started,
     test_counts=string(Test.get_test_counts(checks)),
-    original_certificate_sha256=bytes2hex(sha256(certificate_bytes(original))),
+    original_certificate_sha256=bytes2hex(sha256(read_result_bytes(original))),
     replay_sha256=sha256_file(p),
     source_hashes=source_hashes(root;dirs=("src","scripts")),
     julia=string(VERSION)))

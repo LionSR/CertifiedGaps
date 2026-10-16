@@ -1,9 +1,10 @@
 using LinearAlgebra
+using CertifiedGaps.Spins: integer_cartesian_generators
 
 "Exact coefficient identities, hence valid for symbolic c=cos(theta), s=sin(theta)."
 function exact_rp()
-    G = [Rational{BigInt}.(a) for a in (
-        [0 0 0;0 0 1;0 -1 0], [0 0 -1;0 0 0;1 0 0], [0 1 0;-1 0 0;0 0 0])]
+    # (G_a)_{bc} = ε_{abc}, the real antisymmetric spin-one generators.
+    G = [Rational{BigInt}.(a) for a in integer_cartesian_generators()]
     Q = [-(G[a]*G[b]+G[b]*G[a])/2 for a in 1:3, b in 1:3]
     A = sum(kron(g,g) for g in G)
     B = sum(kron(q,q) for q in Q)

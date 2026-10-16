@@ -47,29 +47,20 @@ arithmetic instead). Exploratory scripts and tests are deliberately not hashed, 
 them does not invalidate the certificate.
 """
 function provenance(config; certified = false)
-    meta = run_metadata(config; source_sha256 = local_hashes(),
+    (; source_sha256, core_sha256) = model_hashes()
+    meta = run_metadata(config; source_sha256,
         packages = (CertifiedGaps, IntervalArithmetic, JSON3),
         status = certified ? "certified" : "numerical, not certified", certified)
-    meta["core_sha256"] = source_hashes(ROOT; dirs = ("julia/src",),
-        files = ("julia/Project.toml", "julia/Manifest.toml"))
+    meta["core_sha256"] = core_sha256
     return meta
 end
 
-"SHA-256 of the model-local sources enforced by `check` (keyed by repository path)."
-function local_hashes()
-    model = "models/heisenberg_ladder"
-    return source_hashes(ROOT; dirs = ("$model/src",), files = ("$model/Project.toml",
-        "$model/Manifest.toml", "$model/certify.jl", "$model/check.jl"))
-end
+# `model_provenance` of this directory: its library, entry points and environment.
+model_hashes() = model_provenance(BASE; dirs = ("src",),
+    files = ("Project.toml", "Manifest.toml", "certify.jl", "check.jl"), repo = ROOT)
 
-"Write `data` as single-line JSON, atomically (the pretty form is ~2.3 times larger)."
-function write_compact(path, data)
-    mkpath(dirname(abspath(path)))
-    temporary = path * ".tmp"
-    open(io -> (JSON3.write(io, data); println(io)), temporary, "w")
-    mv(temporary, path; force = true)
-    return path
-end
+"SHA-256 of the model-local sources enforced by `check` (keyed by repository path)."
+local_hashes() = model_hashes().source_sha256
 
 "Enclose both true seed defects using every verified eigenvalue and its multiplicity."
 function defects(specs, n, beta)
@@ -306,7 +297,7 @@ function produce(path = CERTIFICATE)
             "beta_grid" => "1//4:1//4:16//1",
             "source_of_spectra" => "fresh complete verification"); certified = true),
         "validity" => VALIDITY, "seconds" => time() - start)
-    write_compact(path, cert)
+    write_result(path, cert; compact = true)   # single line: the pretty form is ~2.3x larger
     return cert
 end
 
@@ -373,11 +364,8 @@ function check_header(cert)
     recorded = cert["metadata"]["source_sha256"]
     Set(String.(keys(recorded))) == Set(keys(local_hashes())) ||
         error("hashed source list differs from the model-local sources")
-    for (file, hash) in recorded
-        full = joinpath(ROOT, file)
-        isfile(full) || error("hashed source missing: $file")
-        sha256_file(full) == hash || error("source mismatch: $file")
-    end
+    verify_source_hashes(recorded, ROOT; scope = "models/heisenberg_ladder/") ==
+        length(recorded) || error("hashed source outside the model directory")
     q.(getindex.(cert["parameters"], "J")) == Q.(COUPLINGS) || error("couplings mismatch")
     return true
 end

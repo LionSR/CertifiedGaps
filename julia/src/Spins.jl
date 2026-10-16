@@ -7,13 +7,16 @@ Local spin operators in the three bases the projects use:
 * `integer_ladders(j)`: the basis m = −j, …, j (ascending) in the unnormalised binomial gauge,
   with integer entries, for exact arithmetic;
 * `cartesian_generators(s)`: a real basis in which G_α = iS^α are real antisymmetric, so that
-  −S·S = Σ_α G_α ⊗ G_α is reflection positive (s = 1, 2).
+  −S·S = Σ_α G_α ⊗ G_α is reflection positive (s = 1, 2);
+* exact matrices for RP identities: `exact_pauli`, `exact_spin_half` (any rational element
+  type) and `integer_cartesian_generators` (spin 1, integer entries).
 """
 module Spins
 
 using LinearAlgebra
 
-export spin_matrices, integer_ladders, binomial_weights, cartesian_generators, PAULI
+export spin_matrices, integer_ladders, binomial_weights, cartesian_generators, PAULI,
+    exact_pauli, exact_spin_half, integer_cartesian_generators
 
 """
     spin_matrices(s) -> (; sz, sp, sm, sx, sy)
@@ -67,11 +70,19 @@ function cartesian_generators(s::Integer)
 end
 
 # Real antisymmetric generators of rotations of ℝ³: (J_a)_{bc} = ε_{abc}.
-function _rotation_generator(a)
-    ε(a, b, c) = (a, b, c) in ((1, 2, 3), (2, 3, 1), (3, 1, 2)) ? 1.0 :
-                 (a, b, c) in ((1, 3, 2), (3, 2, 1), (2, 1, 3)) ? -1.0 : 0.0
-    return [ε(a, b, c) for b in 1:3, c in 1:3]
-end
+_rotation_generator(a) = Float64.(integer_cartesian_generators()[a])
+
+_levi_civita(a, b, c) = (a, b, c) in ((1, 2, 3), (2, 3, 1), (3, 1, 2)) ? 1 :
+                        (a, b, c) in ((1, 3, 2), (3, 2, 1), (2, 1, 3)) ? -1 : 0
+
+"""
+    integer_cartesian_generators() -> [G_x, G_y, G_z]
+
+Spin-1 Cartesian generators with integer entries, `(G_a)_{bc} = ε_{abc}` (`Matrix{Int}`): real
+antisymmetric, `S^a = −i G_a` satisfies [S^x, S^y] = iS^z and Σ_a (S^a)² = 2, and
+−S·S = Σ_a G_a ⊗ G_a. Equal to `cartesian_generators(1)` entry for entry.
+"""
+integer_cartesian_generators() = [[_levi_civita(a, b, c) for b in 1:3, c in 1:3] for a in 1:3]
 
 # Moved verbatim from spin2 `model.jl` (`real_generators`). Norm 2, not the spin-1 norm 1.
 function _quadrupole_generators()
@@ -88,6 +99,27 @@ function _quadrupole_generators()
         Float64[0 1 0; -1 0 0; 0 0 0],
     ]
     return [[dot(a, j * b - b * j) for a in basis, b in basis] for j in generators]
+end
+
+"""
+    exact_pauli(T = Rational{BigInt}) -> (; x, y, z, iy, id)
+
+Exact Pauli matrices with element type `T` (any exact real type): `x`, `z`, `id` and the real
+antisymmetric `iy = iσʸ = [0 1; −1 0]` are `Matrix{T}`, `y = σʸ` is `Matrix{Complex{T}}`.
+"""
+exact_pauli(::Type{T} = Rational{BigInt}) where {T<:Real} = (x = T[0 1; 1 0],
+    y = Complex{T}[0 -im; im 0], z = T[1 0; 0 -1], iy = T[0 1; -1 0], id = T[1 0; 0 1])
+
+"""
+    exact_spin_half(T = Rational{BigInt}) -> (; x, y, z, iy, id)
+
+Exact spin-½ operators S = σ/2 in the basis (↑, ↓): `x`, `z`, the real antisymmetric
+`iy = iSʸ = [0 1; −1 0]/2` and `id` are `Matrix{T}`, `y = Sʸ` is `Matrix{Complex{T}}`. `T` must
+represent halves exactly (a rational type). With real factors, S·S = x⊗x − iy⊗iy + z⊗z.
+"""
+function exact_spin_half(::Type{T} = Rational{BigInt}) where {T<:Real}
+    σ = exact_pauli(T)
+    return (x = σ.x / 2, y = σ.y / 2, z = σ.z / 2, iy = σ.iy / 2, id = σ.id)
 end
 
 "Pauli matrices and the identity."

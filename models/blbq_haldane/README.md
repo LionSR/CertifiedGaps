@@ -123,7 +123,7 @@ julia models/blbq_haldane/scripts/finalize_su2.jl  # collect, gzip, analyze, aud
 | `src/sectors.jl` | translation orbits and momentum / spin-flip / reflection blocks |
 | `src/su2.jl` | numerical $\mathrm{SU}(2)$ highest-weight blocks (Casimir projector + CholeskyQR2) |
 | `src/dimensions.jl` | exact character dimensions of magnetization and momentum sectors |
-| `src/result_io.jl` | I/O helpers for gzipped spectra, multiplet weights, and trace moments |
+| `src/result_io.jl` | spectra of stored results: multiplet weights, gaps and trace moments (reading is the core `Results.read_result`, weighted log Z the core `WeightedSpectrum`) |
 | `scripts/scan.jl` | complete dense spectra through $L = 12$ (writes `results/spectrum_L*.json`) |
 | `scripts/run.jl` | launcher: `julia --project=julia` from the repository root, one BLAS thread |
 | `scripts/reference.jl` | $L = 14, 16$ low-energy $M = 0$ Krylov references |
@@ -168,4 +168,8 @@ the paths inside them) and added `check.jl --full`. The `"scan.jl"` and `"run.sh
 their former top-level paths (see the git history); later regenerations hash them under `scripts/`.
 The shell drivers `run.sh`, `run_su2_grid.sh`, and `finalize_su2.sh` were later ported to the Julia
 scripts `run.jl`, `run_su2_grid.jl`, and `finalize_su2.jl` (same steps, same timeout); the `run.sh`
-hash in `results/environment.json` names the old wrapper.
+hash in `results/environment.json` names the old wrapper. Later, duplicated helpers moved into the shared core `CertifiedGaps`: `read_result_json` became
+`Results.read_result(path; exact = false)`, `WeightedSpectrum` and its `logZ_bounds` moved to
+`ExactDiagonalization` unchanged, and the Cartesian generators come from
+`Spins.integer_cartesian_generators` (same matrices; the stored hashes of `src/result_io.jl` and
+`src/model.jl` name the earlier versions).

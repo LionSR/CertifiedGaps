@@ -31,22 +31,21 @@ end
     @test !isempty(files)
     for file in files
         data=read_exact_json(joinpath(ROOT,"results",file))
-        @test check_rp(parserat(data["delta"]))
+        @test check_rp(parse_rational(data["delta"]))
         n=parse(Int,data["n0"]);@test n in (2,3)
         @test data["positive_transfer_gram_proof"]
-        es=parserat(data["epsilon_s"]);et=parserat(data["epsilon_t"])
-        beta=parserat(data["beta0"])
+        es=parse_rational(data["epsilon_s"]);et=parse_rational(data["epsilon_t"])
+        beta=parse_rational(data["beta0"])
         bound=certified_gap_bound(es,et,beta).bound
         @test bound!==nothing && bound>0
         @test bound==data["bound"]
-        @test Rational{BigInt}(bound)==parserat(data["bound_exact_binary"])
+        @test Rational{BigInt}(bound)==parse_rational(data["bound_exact_binary"])
         ti=CertifiedGaps.Recurrence.to_interval
-        z1hi=ti(parserat(data["logZ_n_beta"]["upper"]))
-        z2lo=ti(parserat(data["logZ_2n_beta"]["lower"]))
-        z2hi=ti(parserat(data["logZ_2n_beta"]["upper"]))
-        z22lo=ti(parserat(data["logZ_2n_2beta"]["lower"]))
-        @test Rational{BigInt}(sup(1-exp(z2lo-2z1hi)))<=es
-        @test Rational{BigInt}(sup(1-exp(z22lo-2z2hi)))<=et
+        # Stored log Z enclosures [lower, upper], then the core step to rational defects.
+        z(key)=hull(ti(parse_rational(data[key]["lower"])),ti(parse_rational(data[key]["upper"])))
+        d=seed_defects(z("logZ_n_beta"),z("logZ_2n_beta"),z("logZ_2n_2beta"))
+        @test d.eps_s<=es
+        @test d.eps_t<=et
         for (path,hash) in data["metadata"]["source_sha256"]
             if haskey(data["metadata"], "ThermalMPOGap")
                 # The stored hashes are provenance of the original run, made before the
@@ -62,6 +61,9 @@ end
                 else
                     @test_skip "archived source $spec unavailable"
                 end
+            elseif startswith(normpath(path),"..")
+                # Outside this directory (the shared core): provenance only, not compared.
+                continue
             else
                 @test sha256_file(joinpath(ROOT,path))==hash
             end
@@ -99,11 +101,11 @@ end
     end
     rm(path; force=true)
     @test fresh["bound"]>0
-    @test certified_gap_bound(parserat(fresh["epsilon_s"]),parserat(fresh["epsilon_t"]),
+    @test certified_gap_bound(parse_rational(fresh["epsilon_s"]),parse_rational(fresh["epsilon_t"]),
         7//2).bound==fresh["bound"]
     for key in ("logZ_n_beta","logZ_2n_beta","logZ_2n_2beta")
-        a=parserat.((stored[key]["lower"],stored[key]["upper"]))
-        b=parserat.((fresh[key]["lower"],fresh[key]["upper"]))
+        a=parse_rational.((stored[key]["lower"],stored[key]["upper"]))
+        b=parse_rational.((fresh[key]["lower"],fresh[key]["upper"]))
         @test max(a[1],b[1])<=min(a[2],b[2])
     end
     # Machine-level differences move the bound in the ninth decimal, not more.

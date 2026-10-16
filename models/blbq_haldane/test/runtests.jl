@@ -37,7 +37,7 @@ include("su2_small.jl")
         @test sort(E)≈direct atol=1e-10 rtol=1e-11
     end
 end
-qparse(s)=let a=split(s,"//");parse(BigInt,a[1])//parse(BigInt,a[2]);end
+using CertifiedGaps.ExactArithmetic: parse_rational
 const RESULTS=joinpath(@__DIR__,"../results")
 const THETAS=[0.0,-0.1,-0.3,-0.5,-0.6,-0.7]
 @testset "Stored rejected rational inputs and summary tables" begin
@@ -45,8 +45,8 @@ const THETAS=[0.0,-0.1,-0.3,-0.5,-0.6,-0.7]
     @test isfile(path)
     data=JSON3.read(read(path,String))
     for row in data.best_even
-        got=certified_gap_bound(qparse(row.epsilon_s_rational),
-            qparse(row.epsilon_t_rational),qparse(row.beta_rational)).bound
+        got=certified_gap_bound(parse_rational(row.epsilon_s_rational),
+            parse_rational(row.epsilon_t_rational),parse_rational(row.beta_rational)).bound
         @test got===nothing
         @test row.bound===nothing
     end

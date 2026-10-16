@@ -155,3 +155,11 @@ core hashes are provenance; the scope note is no longer hashed) regenerated
 `results/certificate.json`, `results/audit.json`, and `results/scan_replay.json`. A deep comparison
 of old and new JSON found every enclosure, defect, decision, exclusion, continuation, and bound
 identical; only hashes, timestamps, and timings changed.
+
+Later, duplicated helpers moved into the shared core `CertifiedGaps`: `write_compact` became
+`Results.write_result(path, data; compact = true)` (same bytes), the hashes come from
+`Results.model_provenance` (same keys) and are compared by `Results.verify_source_hashes`, and the
+exact spin-½ matrices come from `Spins.exact_spin_half`. Since these edits change hashed sources,
+`certify.jl`, `scripts/audit.jl`, and `scripts/replay_scans.jl` regenerated the three results; a deep
+comparison again found every certified number identical (only hashes, timestamps, and timings
+changed).

@@ -199,7 +199,7 @@ julia --project=models/dimerized_heisenberg models/dimerized_heisenberg/scripts/
 | `src/rp.jl`, `src/reflection_conventions.jl` | Exact rational reflection-positivity verifiers and basis-obstruction checks |
 | `src/sectors.jl` | Symmetry orbits and `Float64` sector eigensolver for exploratory scans |
 | `src/Diagnostics.jl` | 20-spin sparse Krylov diagnostics and summary generator |
-| `src/provenance.jl` | Gzip JSON reader and SHA-256 source-hash verification |
+| `src/provenance.jl` | Model-local source-hash check of stored results (via the core `verify_source_hashes`) |
 | `scripts/` | 20-spin scan, numerical scan and summary, and strict interval-containment review |
 | `test/runtests.jl` | Fast unit and regression test suite |
 | `METHOD.md` | Detailed mathematical derivations (RP matrices, enclosure theorem, recurrence, exclusions, dimer bound) |
@@ -237,3 +237,12 @@ provenance; notes and `METHOD.md` are no longer hashed) regenerated `rp_audit.js
 JSON found every eigenvalue, radius, witness, seed, $\log Z$ enclosure, exclusion box, and bound
 identical; only hashes, timestamps, and timings changed. The seed hashes recorded in
 `diagnostic20_summary.json` were updated by hand to the regenerated, content-identical seeds.
+
+Later, duplicated helpers moved into the shared core `CertifiedGaps`: `load_record` and
+`read_json_text` became `Results.read_result` (`.json` and `.json.gz`), `exact` and `parseq` became
+`ExactArithmetic.parse_rational`, the seed files are compressed by `Results.write_result` (same
+`gzip -n`), the source-hash check uses `Results.verify_source_hashes`, and the exact spin-½
+matrices come from `Spins.exact_spin_half`/`exact_pauli`. Since these edits change hashed sources,
+`certify.jl` regenerated `rp_audit.json`, the six seed files, and `certificate.json`; a deep
+comparison again found every certified number identical (only hashes, timestamps, and timings
+changed), and the seed hashes in `diagnostic20_summary.json` were updated to the regenerated files.

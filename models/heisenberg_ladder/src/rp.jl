@@ -11,10 +11,8 @@ orientations, with `-h_cell = Σ_C C ⊗ C` for the six real factors
 on-rung term. Throws on any failed identity.
 """
 function exact_rp(J::Rational)
-    x = Q[0 1; 1 0] / 2
-    y = Q[0 1; -1 0] / 2 # i Sʸ, real antisymmetric
-    z = Q[1 0; 0 -1] / 2
-    id = Matrix{Q}(I, 2, 2)
+    S = exact_spin_half(Q)
+    x, y, z, id = S.x, S.iy, S.z, S.id # y = i Sʸ, real antisymmetric
     u = 2y # exp(iπSʸ), exactly orthogonal
     # S·S written with real matrices: Sʸ⊗Sʸ = -(iSʸ)⊗(iSʸ).
     h = kron(x, x) - kron(y, y) + kron(z, z)
@@ -46,10 +44,8 @@ The rotated one-rung cell model as a core `RingModel` (d = 4) together with its 
 real reflection-positive factorisation, checked by `CertifiedGaps.RingModels.verify_rp`.
 """
 function rp_model(J)
-    x = Q[0 1; 1 0] / 2
-    a = Q[0 1; -1 0] / 2
-    z = Q[1 0; 0 -1] / 2
-    id = Matrix{Q}(I, 2, 2)
+    S = exact_spin_half(Q)
+    x, a, z, id = S.x, S.iy, S.z, S.id
     factors = vcat([kron(c, id) for c in (x, a, z)], [kron(id, c) for c in (x, a, z)])
     bond = -sum(kron(c, c) for c in factors)
     onsite = -J * (kron(x, x) + kron(a, a) + kron(z, z))

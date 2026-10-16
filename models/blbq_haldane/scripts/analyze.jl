@@ -47,7 +47,7 @@ function analyze()
     inputs=Dict{Int,Any}()
     for file in readdir(joinpath(ROOT,"results"))
         startswith(file,"spectrum_L") || continue
-        d=read_result_json(joinpath(ROOT,"results",file));inputs[d.L]=d
+        d=read_result(joinpath(ROOT,"results",file);exact=false);inputs[d.L]=d
     end
     references=Dict{Int,Any}()
     for file in readdir(joinpath(ROOT,"results"))

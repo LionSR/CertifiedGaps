@@ -5,6 +5,7 @@
 # condenses the six files into the tracked results/diagnostic20_summary.json.
 module Diagnostics
 using CertifiedGaps, CertifiedGaps.Results, KrylovKit, LinearAlgebra, Random, SparseArrays
+using CertifiedGaps.ExactArithmetic: parse_rational
 include("sectors.jl")
 
 export sparse_block, low_spectrum, run_diagnostic, summarize_diagnostics
@@ -123,8 +124,8 @@ function run_diagnostic(delta::Rational{BigInt})
     defect5 = large.E[1]-2small.E[1]
     current_path = joinpath(@__DIR__,"../results",
         "seed_delta_$(numerator(delta))_$(denominator(delta)).json.gz")
-    current = parse_exact_json(read(`gzip -dc $current_path`,String))
-    qfloat(s) = (p=split(s,"//"); Float64(parse(BigInt,p[1])//parse(BigInt,p[2])))
+    current = read_result(current_path)
+    qfloat(s) = Float64(parse_rational(s))
     ground(L) = minimum(qfloat(e) for ring in current["rings"]
         if parse(Int,string(ring["spins"])) == L for b in ring["blocks"] for e in b["eigenvalues"])
     defect4 = ground(16)-2ground(8)

@@ -9,6 +9,8 @@ allowances (see `METHOD.md`), interval partition sums and result I/O.
 module LongitudinalCertificate
 using LinearAlgebra, CertifiedGaps, IntervalArithmetic, JSON3
 using CertifiedGaps.Seeds, CertifiedGaps.Results, CertifiedGaps.Models
+using CertifiedGaps.ExactArithmetic: parse_rational
+using CertifiedGaps.Spins: exact_pauli
 BLAS.set_num_threads(1)
 # The rounding allowances assume gradual underflow (see METHOD.md).
 get_zero_subnormals() && error("flush-to-zero is enabled; the enclosures assume gradual underflow")
@@ -18,8 +20,6 @@ const ROOT = normpath(joinpath(@__DIR__, ".."))
 const GS = [1//4,1//2,3//4,1//1,3//2,2//1]
 "Longitudinal fields h of the certified grid."
 const HS = [1//20,1//10,1//4,1//2,1//1]
-"Parse an exact `\"num//den\"` string."
-rat(x::AbstractString) = let a=split(x,"//"); parse(BigInt,a[1])//parse(BigInt,a[2]) end
 "The exact rational value of a binary floating-point number."
 exact(x::AbstractFloat) = Rational{BigInt}(x)
 "Format an exact number as a `\"num//den\"` string."
@@ -39,7 +39,7 @@ end
 
 "Exact bond RP and real symmetric on-site identities, with Pauli (not spin) normalization."
 function rp_check(g,h)
-    X=Rational{BigInt}[0 1;1 0]; Z=Rational{BigInt}[1 0;0 -1]
+    (;x,z)=exact_pauli(); X,Z=x,z
     bond=Rational{BigInt}[-1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 -1]
     onsite=-g*X-h*Z
     @check -bond == (1//1)*kron(Z,Z)
@@ -177,12 +177,12 @@ end
 "Interval log partition function with a common exact shift; all eigenvalues counted."
 function enclosed_logz(blocks,b)
     iq(x)=CertifiedGaps.Recurrence.to_interval(x)
-    shift=minimum(rat(v) for block in blocks for v in block["values"])
+    shift=minimum(parse_rational(v) for block in blocks for v in block["values"])
     total=iq(0)
     for block in blocks
-        radius=iq(rat(block["radius"]))
+        radius=iq(parse_rational(block["radius"]))
         for v in block["values"]
-            value=iq(rat(v)-shift)+interval(-sup(radius),sup(radius))
+            value=iq(parse_rational(v)-shift)+interval(-sup(radius),sup(radius))
             total+=exp(-iq(b)*value)
         end
     end
@@ -192,48 +192,50 @@ end
     seed_enclosure(small, large, b)
 
 Exact rational upper bounds `es ≥ 1-Pₛ(n,b)` and `et ≥ 1-P_τ(2n,b)` from the enclosed
-spectra of the rings of n and 2n sites, with the three log-partition intervals.
+spectra of the rings of n and 2n sites, with the three log-partition intervals. The step from
+log Z to the defects is the core `Seeds.seed_defects`, whose bounds never exceed the plain
+`1-exp` evaluation that produced the stored certificates.
 """
 function seed_enclosure(small,large,b)
     a=enclosed_logz(small,b); c=enclosed_logz(large,b); d=enclosed_logz(large,2b)
-    es=exact(sup(1-exp(c-2a))); et=exact(sup(1-exp(d-2c)))
+    (;eps_s,eps_t)=seed_defects(a,c,d); es,et=eps_s,eps_t
     @check 0<=es<1 && 0<=et<1
     (;es,et,logs=[a,c,d])
 end
 "Paths of the 30 per-point certificates (gzip-compressed JSON, `results/certificate_g*.json.gz`)."
 result_paths()=sort(filter(p->startswith(basename(p),"certificate_g") && endswith(p,".json.gz"),
     readdir(joinpath(ROOT,"results");join=true)))
-"Read a per-point certificate; `.gz` files are decompressed with the system `gzip`."
-read_point(path)=JSON3.read(endswith(path,".gz") ? read(`gzip -dc $path`,String) :
-    read(path,String),Dict{String,Any})
 """
     hashes()
 
-SHA-256 of this model's Julia sources (top level, `src`, `scripts`, `test`) and of the core
-`julia/src`, `julia/Project.toml` and `julia/Manifest.toml`.
+`model_provenance` of this model: SHA-256 of its Julia sources (top level, `src`, `scripts`,
+`test`) and environment under `source_sha256`, and of the shared core under `core_sha256`
+(provenance only), both keyed by repository path.
 """
 function hashes()
-    own=Tuple(filter(p->endswith(p,".jl"),readdir(ROOT)))
-    merge(source_hashes(ROOT;dirs=("src","scripts","test"),files=own),
-        Dict("../../julia/"*k=>v for (k,v) in source_hashes(joinpath(ROOT,"../../julia");
-        dirs=("src",),files=("Project.toml","Manifest.toml"))))
+    own=filter(p->endswith(p,".jl"),readdir(ROOT))
+    model_provenance(ROOT;dirs=("src","scripts","test"),
+        files=(own...,"Project.toml","Manifest.toml"))
 end
 "Run metadata (versions, threads, source hashes) for a result written by these scripts."
 function metadata(config;certified=false)
-    run_metadata(config;source_sha256=hashes(),packages=(CertifiedGaps,IntervalArithmetic,JSON3),
+    (;source_sha256,core_sha256)=hashes()
+    meta=run_metadata(config;source_sha256,packages=(CertifiedGaps,IntervalArithmetic,JSON3),
         status=certified ? "certified" : "numerical, not certified",certified)
+    meta["core_sha256"]=core_sha256
+    meta
 end
 
 "Exact seed rows (g, h, n₀, β₀, εₛ, εₜ, bound) read from the per-point certificates."
 function seed_rows()
     rows=Dict{String,Any}[]
     for path in result_paths()
-        d=read_point(path); c=d["certificate"]
+        d=read_result(path,Dict{String,Any}); c=d["certificate"]
         push!(rows,Dict{String,Any}("g"=>d["g"],"h"=>d["h"],"n0"=>c["n"],"beta0"=>c["beta"],
             "epsilon_s"=>c["epsilon_s"],"epsilon_t"=>c["epsilon_t"],
             "bound_exact_binary"=>c["bound_exact_binary"],"file"=>basename(path)))
     end
-    sort!(rows;by=r->(rat(r["g"]),rat(r["h"])))
+    sort!(rows;by=r->(parse_rational(r["g"]),parse_rational(r["h"])))
 end
 
 """
