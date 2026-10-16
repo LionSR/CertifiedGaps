@@ -62,6 +62,9 @@ end
                 else
                     @test_skip "archived source $spec unavailable"
                 end
+            elseif startswith(normpath(path),"..")
+                # Outside this directory (the shared core): provenance only, not compared.
+                continue
             else
                 @test sha256_file(joinpath(ROOT,path))==hash
             end

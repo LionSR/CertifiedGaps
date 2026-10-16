@@ -63,6 +63,9 @@ end
             @test_skip false
         else
             for (rel,hash) in c["metadata"]["source_sha256"]
+                # A current certificate enforces only model-local sources; a path outside
+                # this directory (the shared core) is provenance and is not compared.
+                !historical && startswith(normpath(rel),"..") && continue
                 snapshot=historical ? HISTORICAL_SNAPSHOT : nothing
                 @test source_sha256(joinpath(@__DIR__,".."),rel;snapshot)==hash
             end

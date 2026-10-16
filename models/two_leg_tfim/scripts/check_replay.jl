@@ -17,8 +17,11 @@ original=joinpath(root,ORIGINAL_CERTIFICATE)
 old=read_certificate(original)
 checks=@testset "Fresh spectral replay artifact" begin
     @test bytes2hex(sha256(certificate_bytes(original)))==c["original_certificate_sha256"]
-    # A replay records the hashes of the sources it ran with; compare with current files.
+    # A replay records the hashes of the model-local sources it ran with; compare them with
+    # the current files. Paths outside this directory (the core, in replays written before
+    # the model-local policy) are provenance only and are not compared.
     for (path,hash) in c["source_hashes"]
+        startswith(normpath(path),"..") && continue
         @test source_sha256(root,path)==hash
     end
     @test all(c["agreement"][key] for key in (

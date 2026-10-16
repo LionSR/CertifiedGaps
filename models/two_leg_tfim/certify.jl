@@ -27,9 +27,12 @@ payload=(;g=string(g),n0=n,beta=string(beta),epsilon_s=string(es),epsilon_t=stri
     validity="even L >= $n rungs (2L spin sites, multiples of four, >= $(2n) sites)",
     logZ=[map(x->string(Rational{BigInt}(x)),v) for v in logZ],
     spectra=specs,
-    metadata=run_metadata((;g=string(g),n0=n,beta=string(beta));
-        source_sha256=merge(source_hashes(root;files=["certify.jl"]),
-            Dict("../../julia/"*k=>v for (k,v) in source_hashes(joinpath(root,"../../julia")))),
-        packages=(CertifiedGaps,),status="certified",certified=true))
+    # Model-local sources are enforced by the checker; the core is provenance only.
+    metadata=merge(run_metadata((;g=string(g),n0=n,beta=string(beta));
+        source_sha256=source_hashes(root;dirs=("src",),
+            files=["certify.jl","Project.toml","Manifest.toml"]),
+        packages=(CertifiedGaps,),status="certified",certified=true),
+        Dict("core_sha256"=>source_hashes(normpath(joinpath(root,"../.."));
+            dirs=("julia/src",),files=("julia/Project.toml","julia/Manifest.toml")))))
 write_result(output,payload)
 println("CERTIFIED g=$g n0=$n beta=$beta bound=$(bound.bound), seconds=$(time()-t), output=$output")
