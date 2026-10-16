@@ -286,16 +286,62 @@ $n$ the coupling identity costs more than squaring gains.
 \end{itemize}
 This recovers the initial estimate of Ref.~\cite{main} (Proposition~5.5 of Ref.~\cite{source}); re-evaluating the recurrence from the rational definitions of $p_0$ and $q_0$ confirms agreement digit for digit.
 
-\emph{The weaker initial estimate and tighter seed chains.} Ref.~\cite{source} also certifies
-$\Ps(60,105/4),\ \Pt(120,105/4)>7/8$. That estimate uses a table at $b=21/2$ for
-$n\le10$, three twists, the trial vector at $N=120$, and a temperature lift
-$\sum z_i^{5/2}\le(\sum z_i)^{5/2}$. It gives the weaker bound
-$\Delta_L>\frac4{105}\log\frac{80}{79}$ for every even $L\ge60$. Evaluating the
-asymmetric rational recurrence directly from $(36,49/4)$ with temperature lifting
-sharpens the uniform bound to $\Delta_L>0.0729$ for every even $L\ge36$
-(\path{models/spin1}), while restricting to even-length traces $n\le12$ with real
-$\mathrm{SU}(2)$ twists yields $\Delta_L>0.039$ for every even $L\ge60$
-(\path{models/lean_seeds}).
+% Virtual-bond matrix gauge cancellation: W_j G_{j+1}^{-1} G_{j+1} W_{j+1}.
+\newcommand{\gaugecancel}{\tikz[tn]{
+ \draw (-.55,0)--(6.45,0);
+ \foreach \x in {.35,5.55}{\draw[phys] (\x,-.8)--(\x,.8);}
+ \node[mpo] at (.35,0) {$W_j$};
+ \node[sym,minimum height=.85em,inner xsep=1.5pt] at (2.05,0) {$G^{-1}$};
+ \node[sym,minimum height=.85em,inner xsep=2pt] at (3.75,0) {$G$};
+ \node[mpo] at (5.55,0) {$W_{j+1}$};}}
+\newcommand{\gaugedpair}{\tikz[tn]{
+ \draw (-.55,0)--(3.15,0);
+ \foreach \x in {.4,2.2}{\draw[phys] (\x,-.8)--(\x,.8);}
+ \node[mpo] at (.4,0) {$\widetilde W_j$};
+ \node[mpo] at (2.2,0) {$\widetilde W_{j+1}$};}}
+\emph{The weaker initial estimate and temperature lifting.}
+Ref.~\cite{source} also certifies $\Ps(60,105/4),\ \Pt(120,105/4)>7/8$ from a
+table at $b=21/2$ for $n\le10$, three twists, the $N=120$ trial vector, and
+$\sum_m z_m^{5/2}\le(\sum_m z_m)^{5/2}$ for the Boltzmann factors $z_m=e^{-bE_m}$,
+giving $\Delta_L>\frac4{105}\log\frac{80}{79}$ for even $L\ge60$. Checking the
+finite prefix intervals $[n_j,2n_j]$ via $\Pt(L,b_j)\ge(1-p_j)^2(1-q_j)$ and
+sharpening $(v_J,v_N,\ell)$ in Eq.~\eqref{eq:c-seed} to
+$(1.001351,0.871256,0.999998)$ already extends the $(36,49/4)$ certificate to
+all even $L\ge36$ with $\Delta_L>0.01697$ (\path{models/spin1/experiments/}).
+Raising the inverse temperature directly on the $b_0=49/4$ sector moments before
+reducing to two purities gives a $19.1\times$ larger bound than Ref.~\cite{main}:
+for even $12\le k\le60$ and $r\ge1$, Eq.~\eqref{eq:c-capped} bounds
+$Z_k(b_0,P)\le J_k\le\mathcal C(m_J,v_J^{12},k/12)$ and
+$Z_k(b_0)\le M_k:=\mathcal C(m_J,v_J^{12},k/12)+3\,\mathcal C(m_N,v_N^{12},k/12)$.
+Raising the positive Boltzmann factors of the self-adjoint twisted Hamiltonians
+to power $r$ gives $Z_k(rb_0)\le M_k^r=:D$ and
+$Z_k(rb_0,P)\le\mathcal C(m_J,v_J^{12},k/12)^r=:E$, so at $b=rb_0$ the spatial
+weights $u_i=|\lambda_i(b)|^k$ satisfy $\sum_i u_i\le D$, $J$-sector mass at
+most $\tau=(D+3E)/4$, and $\sum_i u_i^{2h}=Z_{120}(b)>1$ ($h=60/k$). Because
+each $N$ eigenvalue has multiplicity three, any $t>D/3$ with $Dt^{2h-1}<1$
+forces $u_0\in J$ with $u_0>t$, leaving residual $s$th moment at most
+\begin{equation}
+ R_s(t)=\max\!\left\{3\Bigl(\frac{D-t}{3}\Bigr)^s,\
+ (\tau-t)^s+3\Bigl(\frac{D-\tau}{3}\Bigr)^s\right\},
+ \label{eq:c-resid-lift}
+\end{equation}
+upgraded whenever $(t')^{2h}+R_{2h}(t)<1$. For the physical Boltzmann factors
+$z_m=e^{-b_0E_m(120)}$, $Z_{120}(b_0)\le M_{120}$ and $z_0>1$ give
+$\sum_{m>0}(z_m/z_0)^r\le(M_{120}-1)^r$, yielding
+\begin{equation}
+ \begin{aligned}
+ \Ps(60,rb_0)&\ge\Bigl(1+\frac{R_h(t)}{t^h}\Bigr)^{-2},\\
+ \Pt(120,rb_0)&\ge\bigl(1+(M_{120}-1)^r\bigr)^{-2}.
+ \end{aligned}
+ \label{eq:c-templift}
+\end{equation}
+Combined with the $(36,49/4)$ prefix on $36\le L\le72$, Eq.~\eqref{eq:c-templift}
+certifies $\Delta_L>0.07045>7/100$ at $(k,r)=(30,2)$ and $\Delta_L>0.07290$ at
+$(28,17/8)$ for every even $L\ge36$. With a single untwisted bound
+$Z_n(b_0)\le U$ and trial $Z_{2hn}(b_0)>1$ ($h,r\ge1$), the same argument with
+$D=U^r$ and $t>D/2$ gives $\Ps(hn,rb_0)\ge[1+((D-t)/t)^h]^{-2}$ and
+$\Pt(2hn,rb_0)\ge[1+(U^{2h}-1)^r]^{-2}$ whenever $t^{2h}+(D-t)^{2h}<1$
+(\path{models/spin2/scripts/one_trace_target.jl}).
 
 \section{Model-Dependent vs Universal Components}\label{app:c-general}
 Each ingredient is a closed network, and only a few of them depend on the
@@ -313,44 +359,92 @@ masses, and the doubling of Eq.~\eqref{eq:c-update}.
  \end{itemize}
 \end{itemize}
 
-\emph{Kernel-checked seed designs and local spectral anchors.}
-Three simplified seed designs in \path{models/lean_seeds} reduce the finite
-trace inputs needed for a Lean~4 kernel proof: restricting the $b=21/2$ table to
-even lengths $n\in\{6,8,10\}$ with twists $I,P,C$ and trace error $3\times10^{-4}$
-certifies $\Delta_L>0.005966$ for even $L\ge60$ while cutting the total
-symmetry-sector trace dimension $\sum d_{\mathrm{rep}}$ from $1{,}594{,}242$
-($n\le12$) to $199{,}017$ (an $8.01\times$ reduction), whereas even
-$n\in\{4,6,8,10,12\}$ with real twists $I,P$ at $b=49/4\to49/2$ and error
-$10^{-3}$ certifies $\Delta_L>0.039036$ for even $L\ge60$ (dropping $C$ at
-$n\le10$ fails at defect $0.2956$). Replacing the short-ring Poisson recursion by
-low-energy Ritz states \specbars{.92,.06,.02} requires resolving the levels below
-the tail cutoff ($26$ for $I$ and $34$ for $P$ at $n=12,b=49/4$; $22,30,26$ for
-$I,P,C$ at $n=10,b=21/2$) and anchoring the remaining spectrum via a
-two-half-chain comparison $H\succeq H_0=A_\ell\otimes I+I\otimes A_\ell+2cI$
-($\ell=n/2$) with $\mathrm{SU}(2)$ boundary terms $B=uh+vh^2$. Exact rational
-$81\times81$ block $\mathrm{LDL}^{\mathsf T}$ factorization and a $32$-bin tail
-histogram reduce the $n=12,S^z=0$ comparison count from $191\to121\to49$ against
-$8$ physical levels, while base-3 packed \texttt{Nat} kernels in
-\path{lean/SeedKernel/Spin1/} check $n=12$ matvec-plus-dot products in
-$9.6\text{--}26\text{ s}$.
+\emph{Smaller seed inputs for formal verification.}
+Five studies in \path{models/lean_seeds} examine how to discharge the spin-1
+seed inside the Lean~4 kernel (\path{lean/SeedKernel/}). First, even lengths
+alone suffice: $n\in\{4,6,8,10,12\}$ with the two real twists $g\in\{1,P\}$ at
+$b=49/4\to49/2$ and trace error $10^{-3}$ certifies $\Delta_L>0.039036$ for even
+$L\ge60$, while $n\in\{6,8,10\}$ with twists $1,P,C$ ($C$ the $2\pi/3$ axis
+permutation) at $b=21/2$ and error $3\times10^{-4}$ certifies
+$\Delta_L>0.005966$ while cutting the orbit-trace dimension by $8.01\times$.
+Second, replacing Poisson uniformization by low-energy trial eigenstates
+\specbars{.92,.06,.02} (as done unconditionally for the two-state Ising seed in
+Ref.~\cite{scope}) and a half-chain comparison operator
+$H_n\succeq H_0=A_{n/2}\otimes I+I\otimes A_{n/2}+2cI$ (certified by exact
+rational $81\times81$ block $\mathrm{LDL}^{\mathsf T}$ factorization) checks
+$n=12$ packed \texttt{Nat} matrix-vector products in $9.6\text{--}26\text{ s}$.
+Unlike the Ising seed, however, spin~1 at $n=12,b=49/4$ has $26$ ($g=1$) and
+$34$ ($g=P$) eigenstates below the tail cutoff, and the $S^z=0$ comparison count
+($49$ with a $32$-bin tail vs.\ $8$ physical levels) does not yet close without
+homotopy continuation, so a kernel-checked spin-1 seed remains open.
 
-\emph{$\mathrm{SU}(2)$ trial blocks and the spin-2 starting-point barrier.}
-For spin~1 ($3^{12}\simeq5.3\times10^5$ states), shift-add bond kernels and
-decomposing the $D=26$ MPS transfer matrix into six $\mathrm{SU}(2)$ multiplicity
-blocks (largest dimension $56$ vs.\ $162$ in $S^z$) speed up the exact
-length-$120$ trial contraction by $360\times$ (\path{models/spin1}). For spin~2
-($5^{12}\simeq2.4\times10^8$ states, $\xi\approx49.5$), certified $\mathrm{SU}(2)$
-MPS trials reach $E_0(N)/N<-4.7595$ ($D=24$, integer) and $<-4.7612463$
-($D=295$, Arb) up to $N=1024$, reducing a conditional gap $\Delta_L>0.003019$ for
-even $L\ge512$ to a single shifted-trace bound $\widehat Z_{256}(64)\le1.08$
-(\path{models/spin2}). However, certified thermal MPO squaring
-(\path{CertifiedGaps.CertifiedMPO}) at $(n_0=256,\beta_0=64)$ for
-$K=H_{256}+256I\succeq0$ ($\beta_0\|K\|=81{,}920$) faces a starting-point
-barrier: global Taylor majorants $Q_d((\beta_0/m)K)\succeq e^{-(\beta_0/m)K}$
-require $(\beta_0/m)\|K\|\le1$, forcing $p=28$ squarings ($m=2^{28}\simeq2.7\times10^8$)
-for $d=2$ or $p=21$ ($m=2^{21}\simeq2.1\times10^6$) for $d=4$ from
-$\beta_0/m\le2^{-15}$, whereas local-gate Trotterization bounds the step error by
-local bond norms $\|h_{j,j+1}\|$ independent of $N$.
+\emph{Spin-2 trial certificates and the conditional one-trace target.}
+For spin~1, shift-add bond kernels and decomposing the $D=26$ MPS transfer
+matrix into six $\mathrm{SU}(2)$ multiplicity blocks (largest dimension $56$
+vs.\ $162$ in $S^z$) speed up the exact length-$120$ trial contraction by
+$360\times$ (\path{models/spin1}). For spin~2 ($\bm S^2=6I$, $5^{12}\simeq2.4\times10^8$
+states, $\xi\approx49.5$), the reflection-positive bond form and the bootstrap
+recurrence carry over unchanged, and $\mathrm{SU}(2)$-invariant MPS trials
+certify $E_0(N)/N<-4.7595$ ($D=24$, integer) and $<-4.7612463$ ($D=295$, Arb;
+reduced by Schur's lemma and the $\pi$-rotation involution from
+$295^2=87{,}025$ to blocks of size at most $978$) up to $N=1024$
+(\path{models/spin2}). By the untwisted one-trace bound above at
+$(n,b_0,h,r)=(256,64,2,3)$ with shift $\kappa=4.7612463$, a single thermal upper
+bound $Z_{256}(64)\le1.08$ would certify $\Delta_L>0.003019$ for even
+$L\ge512$ (whereas the $(128,32)$ target at $\kappa=4.76122$ is ruled out by
+the $N=128$ trial lower bound $Z_{128}(32)>1.1967$). Certifying
+$Z_{256}(64)\le1.08$ remains open.
+
+\emph{Certified thermal MPO compression.}
+Two routes in \path{models/spin2} bound $Z_N(b)$ from above before MPO
+compression (\path{models/spin2/IDEAS.md}): shifting $K=H_N+NI\succeq0$
+($\|K\|\le5N$), a degree-$d$ Taylor majorant
+$Q_d(K)=\sum_{j=0}^d(-\delta K)^j/j!+rI\succeq e^{-\delta K}$ ($\delta=b/(2m)$,
+$m=2^p$) gives $Z_N(b)\le e^{(1-\kappa)bN}\Tr Q_d(K)^{2m}$, where the extensive
+norm $\delta\|K\|\le5N\delta$ requires $p=28$ squarings at $N=256,b=64$ for
+$d=2$, or $p=21$ for $d=4$ (factored into a positive rational sum of squares of
+quadratics via the $\mathrm{LDL}^{\mathsf T}$ decomposition of the Laguerre
+moment matrix, $P_4(x)=(1+\tfrac x2+\tfrac{x^2}{12})^2+\tfrac1{12}(x+\tfrac{x^2}2)^2+\tfrac1{72}(x^2)^2$);
+alternatively, the Araki--Lieb--Thirring inequality for even and odd bond layers
+$H_N=A+B$ gives $Z_N(b)\le\Tr[(e^{-bA/m}e^{-bB/m})^m]$ with step error governed
+by the local bond norm rather than $N$. To certify MPO compressions along
+repeated squarings, \path{CertifiedGaps.CertifiedMPO} (\path{julia/src/CertifiedMPO/})
+uses two tensor-network mechanisms:
+\begin{itemize}
+\item \emph{Rational matrix gauges.} Diagonal virtual-bond rescalings leave the
+local core-norm product $\prod_j\|W_j\|_{\mathrm{local}}$ at $N=256$ a factor of
+$1.66\times10^{75}$ above the analytic upper bound $a_0$ on $\|Q_2/5^{N/2}\|$,
+whereas invertible rational gauge matrices $\widetilde W_j=G_jW_jG_{j+1}^{-1}$
+derived from the Schmidt decomposition cancel on every internal virtual bond,
+\begin{equation}
+ \gaugedpair\ =\ \gaugecancel\,,
+ \label{eq:c-gauge}
+\end{equation}
+bringing the Cholesky-certified product
+$\prod_j\|\widetilde W_j\|_{\mathrm{local}}$ within $1.000000701\,a_0$.
+\item \emph{Three-layer trace correction and backward error propagation.} When a
+squared step $A=B^*B$ is compressed to $C$ with $\|A-C\|_{\mathrm F}\le\eta$,
+the identity
+\begin{equation}
+ \begin{aligned}
+ \tncolumn[ring]{B^*,B,B^*,B}
+ &=2\operatorname{Re}\tncolumn[ring]{C^*,B^*,B}-\tncolumn[ring]{C^*,C}\\
+ &\quad+\|B^*B-C\|_{\mathrm F}^2
+ \end{aligned}
+ \label{eq:c-overlap}
+\end{equation}
+replaces the four-layer trace $\Tr(A^2)$ and linear triangle error
+$(\|C\|_{\mathrm F}+\eta)^2$ by a three-layer signed overlap with quadratic
+residual $\eta^2$ ($297\times$ tighter single-step excess at $D=32$). Across a
+multi-step flow, propagating approximate backward adjoints (\path{AdjointTrace.jl})
+retains the signed linear errors across steps ($1307\times$ narrower $N=16$
+four-step enclosure), while backward Schatten bounds (\path{SchattenBridge.jl})
+track $\|B_j\|_{p_j}$ with $p_j=2^{k+1-j}$ to use operator-norm residuals at
+early steps and Hilbert--Schmidt residuals near the final trace. These
+certificates pass replay on $4$- and $16$-site flows and the first two squarings
+at $N=256$ ($b=2^{-20}$), leaving $26$ squarings to $b=64$ open.
+\end{itemize}
+
 \begin{thebibliography}{5}
 \bibitem{main}
 Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime
