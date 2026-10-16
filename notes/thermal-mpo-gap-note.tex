@@ -12,6 +12,22 @@
  \node[mpo] at (0,0) {$W$};
  \node[anchor=east] at (-1,0) {$a$}; \node[anchor=west] at (1,0) {$b$};
  \node[anchor=south] at (0,1) {$s$}; \node[anchor=north] at (0,-1) {$s'$};}}
+% Inside W: one site's worldline in imaginary time, hit by events of its left
+% bond (a) and right bond (b); read bottom (s') to top (s).
+\newcommand{\worldline}{\tikz[tn,tn centered,y=1.45em]{
+ \draw[densely dotted,black!55] (-2.3,-1.6)--(-2.3,1.6) (2.3,-1.6)--(2.3,1.6);
+ \draw[line width=.8pt,mpoblue] (0,-1.6)--(0,1.6);
+ \node[anchor=north] at (0,-1.65) {$s'$}; \node[anchor=south] at (0,1.65) {$s$};
+ \node[anchor=north,black!60] at (-2.3,-1.65) {$a$};
+ \node[anchor=north,black!60] at (2.3,-1.65) {$b$};
+ \foreach \y/\lab/\t in {-.9/x/\tau_1, .9/y/\tau_3}{
+  \draw (0,\y)--(-2.3,\y); \fill (0,\y) circle[radius=.13];
+  \node[anchor=south,inner sep=1pt] at (-1.15,\y) {$\scriptstyle\lab$};
+  \node[anchor=east,inner sep=2pt] at (-2.3,\y) {$\scriptstyle\t$};}
+ \draw (0,0)--(2.3,0); \fill (0,0) circle[radius=.13];
+ \node[anchor=south,inner sep=1pt] at (1.15,0) {$\scriptstyle z$};
+ \node[anchor=west,inner sep=2pt] at (2.3,0) {$\scriptstyle\tau_2$};
+ \draw[->,black!55] (3.6,-1.5)--(3.6,1.5) node[midway,right] {$\tau$};}}
 % Folded contraction: the upper row is a ket, the lower row its adjoint.
 \newcommand{\folded}[1]{\tikz[tn,tn centered]{
  \begin{scope}[yshift=.8em]\tnchainpath[capr=v_j,name=u]{#1}\end{scope}
@@ -82,6 +98,17 @@ To obtain a real symmetric transfer operator, use the Cartesian spin
 basis $s,s'\in\{x,y,z\}$. The matrices
 $(S^\alpha)_{ss'}=-i\epsilon_{\alpha ss'}$ give real operators $G_\alpha=iS^\alpha$,
 $\|G_\alpha\|=1$, and $-H_L=\sum_{j,\alpha}G_{\alpha,j}G_{\alpha,j+1}$.
+The variable $\tau$ below is imaginary time. Because the ordered region
+$0<\tau_1<\cdots<\tau_k<\beta$ has volume $\beta^k/k!$, the exponential series
+of any matrix $A$ can be written as a sum over ordered event times,
+\begin{equation}
+ e^{\beta A}=\sum_{k\ge0}\int_{0<\tau_1<\cdots<\tau_k<\beta}
+ d\tau_1\cdots d\tau_k\,\underbrace{A\cdots A}_{k}.
+ \label{eq:events}
+\end{equation}
+For $A=-H_L$, each factor selects one bond and one label $\alpha$, so each
+term of Eq.~\eqref{eq:events} is a set of \emph{bond events} $(\tau,\alpha)$,
+drawn as rungs between the worldlines of neighboring sites.
 Each bond event $(\tau,\alpha)$ in the exponential expansion inserts
 $G_\alpha$ at both endpoints. Let $a,b$ record these events on the two bonds
 adjacent to a site, with $0<\tau<\beta$. The local MPO tensor is
@@ -91,7 +118,20 @@ adjacent to a site, with $0<\tau<\beta$. The local MPO tensor is
  \prod_{(\tau,\alpha)\in a\cup b}G_\alpha\right|s'\right\rangle,
  \label{eq:local}
 \end{equation}
-where $\mathcal T_\tau$ places later times to the left. Summing event
+where $\mathcal T_\tau$ places later times to the left. Inside the box, $W$
+is the site's worldline read from bottom to top: for
+$a=\{(\tau_1,x),(\tau_3,y)\}$, $b=\{(\tau_2,z)\}$ and
+$\tau_1<\tau_2<\tau_3$, the tensor $W_\beta^{ss'}(a,b)$ is
+\begin{equation}
+ \worldline\;=\;\langle s|G_yG_zG_x|s'\rangle.
+ \label{eq:worldline}
+\end{equation}
+Operators on different sites commute, so once the events on every bond
+are fixed, the time-ordered product over the ring splits into one such
+worldline per site. The events on a bond therefore play the role of the
+spin between two transfer matrices of the classical Ising chain,
+$Z_n=\Tr T^n$, with the $2\times2$ matrix $T$ replaced by an operator on
+event histories. Summing event
 labels and integrating ordered times defines a measure $\mu_\beta$ of
 mass $e^{3\beta}$, with unit mass on the empty history. Contracting $n$
 tensors around the ring recovers the absolutely convergent exponential
@@ -103,6 +143,11 @@ truncation~\cite{tang,pirvu}:
 \end{equation}
 Tracing the physical index, \Wtrace${}={}$\Xvertex, gives the spatial
 transfer kernel $X_\beta(a,b)=\sum_s W_\beta^{ss}(a,b)$.
+Since $a$ and $b$ enter Eq.~\eqref{eq:local} only through their union,
+$X_\beta(a,b)=X_\beta(b,a)$. This left-right symmetry is what the classical
+Ising $T$ has for free; for the quantum chain it holds because each event
+inserts the same real matrix at both ends of its bond, the special case of
+reflection positivity used here.
 It is real, symmetric, and bounded in absolute value by three, hence
 self-adjoint and Hilbert--Schmidt on $L^2(\mu_\beta)$.
 Closing the ring of transfer vertices gives, for even $n$,
@@ -369,6 +414,9 @@ B. Pirvu, V. Murg, J. I. Cirac, and F. Verstraete,
 \href{https://doi.org/10.1088/1367-2630/12/2/025012}
 {Matrix product operator representations},
 New J. Phys. \textbf{12}, 025012 (2010).
+\bibitem{kennedy}
+T. Kennedy, Exact diagonalisations of open spin-1 chains,
+J. Phys.: Condens. Matter \textbf{2}, 5737 (1990).
 \end{thebibliography}
 
 \clearpage
@@ -386,10 +434,27 @@ endpoint fields. On $n$ spin-1 sites, with $\sum_\alpha(S^\alpha)^2=2I$, let
 For every odd $n\ge1921$, the Hamiltonian~\eqref{eq:b-model} has a unique
 ground state and $\Delta_n>(\log10)/392\simeq0.005874$.
 \end{theorem}
-Only one ingredient is new. A periodic network is closed by a trace,
-\tnchain[node=xvertex,ring]{,\cdots,}, which always contains the leading transfer
-eigenvector; an open chain is closed by two boundary vectors,
-\tnchain[node=xvertex,caps]{,\cdots,}, which could be orthogonal to it. The proof therefore
+Only one ingredient is new. On a ring, every virtual leg of
+Eq.~\eqref{eq:mpo} joins two tensors. On an open chain, the outer legs of
+the first and last sites have no partner, and a vector on the virtual space
+must be inserted there. This is the quantum counterpart of the open
+classical Ising chain, whose partition function is $u^{\mathsf T}T^{n-1}u$,
+with $u=(e^{\beta h},e^{-\beta h})$ for a field $h$ on each end spin.
+
+The fields are needed: without them, each end of the open spin-1 chain
+carries an effective spin $\tfrac12$, and the four lowest states are split
+only by an amount exponentially small in $n$~\cite{kennedy}. A field on an
+end spin enters the network as half a bond, whose events insert $G_z$ on the
+end site and a number outside it [Eq.~\eqref{eq:b-vector} below].
+
+The boundary vectors also change which eigenvectors of $X_\beta$ the
+network sees. A periodic network is closed by a trace,
+\tnchain[node=xvertex,ring]{,\cdots,}, in which every eigenvector, the
+leading one included, enters with weight one. An open chain is closed by two
+boundary vectors, \tnchain[node=xvertex,caps]{,\cdots,}, which weight the
+leading eigenvector by its squared overlap with the boundary vector
+[Eq.~\eqref{eq:b-overlap}]; this overlap vanishes if the two are
+orthogonal. The proof therefore
 tracks this \emph{boundary overlap} alongside the thermal purity. As in
 Eqs.~\eqref{eq:target} and \eqref{eq:weight}, it suffices to bound the
 equal-field thermal purity $\Pt^{\same}(n,\beta)=\sum_mw_m^2$ from below, since
