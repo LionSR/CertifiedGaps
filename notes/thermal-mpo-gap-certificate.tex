@@ -313,38 +313,44 @@ masses, and the doubling of Eq.~\eqref{eq:c-update}.
  \end{itemize}
 \end{itemize}
 
-\emph{Multi-level spectral cutout and trace reduction.}
-In Eq.~\eqref{eq:c-seed}, bounding $Z_{72}(2b)>1$ from a single trial vector
-retains only the ground bar \specbars{.76} and discards the thermally populated
-single-magnon band \specbars{.76,.11,.05,.04}, leaving $q_0=0.1815>\varepsilon_*$
-and requiring six pre-doublings from $n_0=36$ to $2304$ (and twisted traces
-through $n=12$, with $1.31\times10^8$ sparse nonzeros). At the seed scale
-$(n_0=60,\,2n_0=120,\,b=49/4)$, retaining the lowest $7$ eigenvalues ($27$
-states with multiplicity) in $Z_{120}(2b)$ raises the base-scale thermal purity
-from $0.761$ to $0.9613>1-\varepsilon_*$, eliminating all six pre-doublings and
-allowing the Poisson trace table to stop at $n\le10$ ($8.92\times10^6$ nonzeros,
-a $14.7\times$ reduction; \path{models/lean_seeds}). Certifying those $7$ levels
-at $N=120$ requires a subspace deflation inequality
-$H_{120}\succeq E_{\mathrm{cut}}(I-QQ^\dagger)+Q\Lambda Q^\dagger$, because
-periodic-cluster Temple--Kato bounds have a negative denominator at $N=120$ and
-ungrouped Krylov residual disks overlap across the $2.6\times10^{-3}$ multiplet
-splitting.
+\emph{Kernel-checked seed designs and local spectral anchors.}
+Three simplified seed designs in \path{models/lean_seeds} reduce the finite
+trace inputs needed for a Lean~4 kernel proof: restricting the $b=21/2$ table to
+even lengths $n\in\{6,8,10\}$ with twists $I,P,C$ and trace error $3\times10^{-4}$
+certifies $\Delta_L>0.005966$ for even $L\ge60$ while cutting the total
+symmetry-sector trace dimension $\sum d_{\mathrm{rep}}$ from $1{,}594{,}242$
+($n\le12$) to $199{,}017$ (an $8.01\times$ reduction), whereas even
+$n\in\{4,6,8,10,12\}$ with real twists $I,P$ at $b=49/4\to49/2$ and error
+$10^{-3}$ certifies $\Delta_L>0.039036$ for even $L\ge60$ (dropping $C$ at
+$n\le10$ fails at defect $0.2956$). Replacing the short-ring Poisson recursion by
+low-energy Ritz states \specbars{.92,.06,.02} requires resolving the levels below
+the tail cutoff ($26$ for $I$ and $34$ for $P$ at $n=12,b=49/4$; $22,30,26$ for
+$I,P,C$ at $n=10,b=21/2$) and anchoring the remaining spectrum via a
+two-half-chain comparison $H\succeq H_0=A_\ell\otimes I+I\otimes A_\ell+2cI$
+($\ell=n/2$) with $\mathrm{SU}(2)$ boundary terms $B=uh+vh^2$. Exact rational
+$81\times81$ block $\mathrm{LDL}^{\mathsf T}$ factorization and a $32$-bin tail
+histogram reduce the $n=12,S^z=0$ comparison count from $191\to121\to49$ against
+$8$ physical levels, while base-3 packed \texttt{Nat} kernels in
+\path{lean/SeedKernel/Spin1/} check $n=12$ matvec-plus-dot products in
+$9.6\text{--}26\text{ s}$.
 
-\emph{Fast exact traces and the spin-2 starting-point barrier.}
-For spin~1, rings of twelve sites have $3^{12}\simeq5.3\times10^5$ states; fused
-three-step integer Horner kernels and packed 64-bit orbit lookup tables evaluate
-all eighteen twisted traces through $n=12$ in under one minute on ten CPU threads
-(\path{models/spin1}). For spin~2, twelve-site rings have $5^{12}\simeq2.4\times10^8$
-states and the correlation length is roughly eight times longer ($\xi\approx49$).
-Beyond that dimension growth, certified thermal MPO squaring
-(\texttt{CertifiedGaps.MPO}) at the estimated spin-2 seed $(n_0=256,\beta_0=64)$
-($\beta_0\|H\|\approx9.8\times10^4$) faces a scalar starting-point barrier:
-initializing from a global quadratic polynomial
-$I-(\beta_0/2m)H+c(\beta_0/2m)^2H^2$ requires $m\sim10^6\text{--}10^7$ ($\ge20$
-squarings) before bond truncation enters, whereas local-gate Trotterization
-reduces the initial slice count by two orders of magnitude alongside a certified
-rational $D=4$ matrix-product upper bound $E_0(256)/256\le-4.725068$
-(\path{models/spin2}).
+\emph{$\mathrm{SU}(2)$ trial blocks and the spin-2 starting-point barrier.}
+For spin~1 ($3^{12}\simeq5.3\times10^5$ states), shift-add bond kernels and
+decomposing the $D=26$ MPS transfer matrix into six $\mathrm{SU}(2)$ multiplicity
+blocks (largest dimension $56$ vs.\ $162$ in $S^z$) speed up the exact
+length-$120$ trial contraction by $360\times$ (\path{models/spin1}). For spin~2
+($5^{12}\simeq2.4\times10^8$ states, $\xi\approx49.5$), certified $\mathrm{SU}(2)$
+MPS trials reach $E_0(N)/N<-4.7595$ ($D=24$, integer) and $<-4.7612463$
+($D=295$, Arb) up to $N=1024$, reducing a conditional gap $\Delta_L>0.003019$ for
+even $L\ge512$ to a single shifted-trace bound $\widehat Z_{256}(64)\le1.08$
+(\path{models/spin2}). However, certified thermal MPO squaring
+(\path{CertifiedGaps.CertifiedMPO}) at $(n_0=256,\beta_0=64)$ for
+$K=H_{256}+256I\succeq0$ ($\beta_0\|K\|=81{,}920$) faces a starting-point
+barrier: global Taylor majorants $Q_d((\beta_0/m)K)\succeq e^{-(\beta_0/m)K}$
+require $(\beta_0/m)\|K\|\le1$, forcing $p=28$ squarings ($m=2^{28}\simeq2.7\times10^8$)
+for $d=2$ or $p=21$ ($m=2^{21}\simeq2.1\times10^6$) for $d=4$ from
+$\beta_0/m\le2^{-15}$, whereas local-gate Trotterization bounds the step error by
+local bond norms $\|h_{j,j+1}\|$ independent of $N$.
 \begin{thebibliography}{5}
 \bibitem{main}
 Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime

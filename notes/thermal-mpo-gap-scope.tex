@@ -207,8 +207,8 @@ with its reflected partner $a$ in the right cell,
 \end{equation*}
 and conjugating the physical loop by $F$ in Lemma~\ref{lem:mirror} gives
 $\overline{X_\beta(a,b)}=X_\beta(b,a)$ on the ring of $L$ cells (\texttt{RPRing}
-in \path{lean/CertifiedGaps/Ring/Transfer.lean} and \path{Transfer/}). For a
-two-spin dimer $(a,b)$ with swap $F=P$, $C_\alpha=I\otimes G_\alpha$ gives
+in \path{lean/CertifiedGaps/Ring/Model.lean} and \path{Ring/Transfer.lean}). For
+a two-spin dimer $(a,b)$ with swap $F=P$, $C_\alpha=I\otimes G_\alpha$ gives
 $F\overline{C_\alpha}F=\overline{G_\alpha}\otimes I$, linking spin~$b$ of
 cell~$j$ to spin~$a$ of cell~$j+1$.
 
@@ -339,7 +339,9 @@ $\varepsilon_{\mathrm s}\to0$:
  \fill[mpoblue] (.0479,.1815) circle[radius=.004]
    node[above right,mpoblue!85!black] {spin-1 ($n_0{=}36$)};
  \fill[mpored] (.1856,.0511) circle[radius=.004]
-   node[above right,mpored!85!black] {ladder, large-$D$, Ising};
+   node[above right,mpored!85!black] {ladder, large-$D$};
+ \fill[mpored] (.1840,.0074) circle[radius=.004]
+   node[above right,mpored!85!black] {Ising};
  \node[black!55] at (.064,.055) {$[0,\varepsilon_*)^2$};
 \end{tikzpicture}
 \end{proofdiagram}
@@ -347,7 +349,7 @@ $\varepsilon_{\mathrm s}\to0$:
 under Eq.~\eqref{eq:asym}: the spin-1 seed $(0.0479,0.1815)$ of
 Ref.~\cite{cert} lies in the upper wing, while the $J_\perp=5/2$ ladder
 $(0.1856,0.0511)$, $D=3.206$ large-$D$ $(0.1916,0.0465)$, and $(g,h)=(1,1/20)$
-Ising $(0.1840,0.0460)$ seeds lie in the right-hand wing.
+Ising $(0.1840,0.0074)$ seeds lie in the right-hand wing.
 
 Furthermore, reading the four-torus coupling identity of Ref.~\cite{main} to
 solve for $\Pt(2n_0,\beta_0)$ yields
@@ -451,7 +453,7 @@ Staggered Heisenberg & 1 site, $2iS^y$ & $h\in\{1,\tfrac34,\tfrac12,\tfrac7{20},
 Dimerized spin-$\tfrac12$ & dimer, swap $F$ & $\delta\in\{\tfrac12,\tfrac3{10},\tfrac14\}$ & $(4,\,6\dots29/4)$ & $0.534,\,0.173,\,0.058$ & $L\ge4$ cells \\
 Dimerized spin-1 & dimer, $KK^*$ & $\delta\in\{\tfrac9{10},\tfrac7{10}\}$ & $(2,7/2),\,(3,17/4)^{\mathrm a}$ & $0.528,\,0.218$ & $L\ge2,\,4$ cells \\
 Spin-1 large-$D$ & 1 site, $D(S^z)^2$ & $D=4;\,[3.2059998,3.206]$ & $(12,29/10)^{\mathrm b},(6,3.048)$ & $0.899;\,0.0010$ & $L\ge6$ \\
-Heisenberg ladder & rung, $u=2iS^y$ & $J_\perp\in\{4,\tfrac72,3,\tfrac52,2.488\}$ & $(4,\,2\dots3)$ & $1.102\dots0.0015$ & $L\ge4$ rungs \\
+Heisenberg ladder & rung, $u=2iS^y$ & $J_\perp\in\{4,\tfrac72,3,\tfrac52,\tfrac{163069}{65536}\}$ & $(4,\,2\dots3)$ & $1.102\dots0.0015$ & $L\ge4$ rungs \\
 Ising ladder & rung, $Z_1,Z_2$ & $g=3$ & $(4,3/2)$ & $0.636$ & $L\ge4$ rungs \\
 Longitudinal Ising & 1 site, $-gX-hZ$ & 30 pts in $[\tfrac14,2]{\times}[\tfrac1{20},1]$ & $(6,\,2\dots97/4)$ & $0.0763\dots3.705$ & $L\ge6$ \\
 \end{tabular}
@@ -550,7 +552,7 @@ $A\mapsto\Tr[A\theta(A)e^{-\beta H}]$ relative to the largest, minimized over
 $\Theta=VK$.
 \item \emph{Realignment test} (\path{CertifiedGaps.rp_test}).
 Checks Eq.~\eqref{eq:rpform} via the bond realignment matrix
-$R[-h]_{(ik),(jl)}=-h_{(ij),(kl)}$ with an optimized on-site shift.
+$R[-h]_{(ij),(kl)}=-h_{(ik),(jl)}$ with an optimized on-site shift.
 \end{itemize}
 The screening results match Propositions~\ref{prop:xyz} and~\ref{prop:blbq}:
 \begin{itemize}
