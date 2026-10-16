@@ -194,9 +194,10 @@ relative path `../../julia` inside the project), or run scripts directly with `-
   `metadata["core_sha256"]`, keyed by repository path (`julia/src/Results.jl`), as provenance
   only: the checker reruns the core arithmetic instead of pinning its bytes. Do not hash
   `notes/` or `METHOD.md`. Editing or adding core files, notes, or a `METHOD.md` therefore does
-  not invalidate a certificate. Some older tests (e.g. `two_leg_tfim`, `spin1_dimerized`) still
-  compare recorded core hashes; until they follow this policy, any change to `julia/src` must
-  keep every model checker and test passing, so run them all.
+  not invalidate a certificate, but checkers rerun the core arithmetic, so any change to
+  `julia/src` must keep every model checker and test passing; run them all. Use
+  `Results.model_provenance` to record both hash sets and `Results.verify_source_hashes` to check
+  the model-local set.
 - Never modify `models/spin1/results`, `models/spin2/results`, `models/aklt/results`, or anything under
   `lean/` (except when running `models/lean_seeds/certify.jl` to regenerate the witness files in
   `lean/SeedKernel`).
