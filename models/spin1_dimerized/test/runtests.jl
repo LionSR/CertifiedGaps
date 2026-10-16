@@ -41,12 +41,11 @@ end
         @test bound==data["bound"]
         @test Rational{BigInt}(bound)==parse_rational(data["bound_exact_binary"])
         ti=CertifiedGaps.Recurrence.to_interval
-        z1hi=ti(parse_rational(data["logZ_n_beta"]["upper"]))
-        z2lo=ti(parse_rational(data["logZ_2n_beta"]["lower"]))
-        z2hi=ti(parse_rational(data["logZ_2n_beta"]["upper"]))
-        z22lo=ti(parse_rational(data["logZ_2n_2beta"]["lower"]))
-        @test Rational{BigInt}(sup(1-exp(z2lo-2z1hi)))<=es
-        @test Rational{BigInt}(sup(1-exp(z22lo-2z2hi)))<=et
+        # Stored log Z enclosures [lower, upper], then the core step to rational defects.
+        z(key)=hull(ti(parse_rational(data[key]["lower"])),ti(parse_rational(data[key]["upper"])))
+        d=seed_defects(z("logZ_n_beta"),z("logZ_2n_beta"),z("logZ_2n_2beta"))
+        @test d.eps_s<=es
+        @test d.eps_t<=et
         for (path,hash) in data["metadata"]["source_sha256"]
             if haskey(data["metadata"], "ThermalMPOGap")
                 # The stored hashes are provenance of the original run, made before the

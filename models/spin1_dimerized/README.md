@@ -137,4 +137,7 @@ commit `6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2` and are verified against that 
 in the local git object store. New results record only model-local sources under `source_sha256`
 (compared by the tests) and the core under `core_sha256` (provenance only). Later, duplicated helpers moved into the shared core `CertifiedGaps`
 (`parserat` → `ExactArithmetic.parse_rational`, the Cartesian generators →
-`Spins.integer_cartesian_generators`); the stored certificates are unchanged.
+`Spins.integer_cartesian_generators`); the stored certificates are unchanged. The seed step of
+`certify_selected` and of the stored-seed test now goes through the core `Seeds.seed_defects`
+(never above the earlier `1 − exp` bound); the test still requires the result to be at most the
+stored εₛ, εₜ.

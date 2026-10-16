@@ -60,7 +60,7 @@ julia --project=. certify.jl                             # regenerate all result
 
 ## What is rigorous
 
-- **Verified by the checker:** the exact rational RP identity; translation sector dimensions; complete eigenvalue enclosures with multiplicity; interval partition sums and exact rational seed defects; and the uniform gap bound for all even $L \ge 6$ at each of the 30 grid points. The fast checker (`check.jl`) recomputes the partition intervals, rational seeds, and recurrence bounds from the stored eigenvalue enclosures; `check.jl --full` rebuilds every momentum block from scratch, re-proves its eigenvalue enclosure of radius $\eta$, and verifies in exact rational arithmetic that each fresh interval lies inside the stored interval of radius $2\eta$.
+- **Verified by the checker:** the exact rational RP identity; translation sector dimensions; complete eigenvalue enclosures with multiplicity; interval partition sums and exact rational seed defects; and the uniform gap bound for all even $L \ge 6$ at each of the 30 grid points. The fast checker (`check.jl`) recomputes the partition intervals, rational seeds (each at most the stored one), and recurrence bounds from the stored eigenvalue enclosures; `check.jl --full` rebuilds every momentum block from scratch, re-proves its eigenvalue enclosure of radius $\eta$, and verifies in exact rational arithmetic that each fresh interval lies inside the stored interval of radius $2\eta$.
 - **Independent audits:** `scripts/final_audit.jl` independently verifies sector dimensions via Ramanujan sums, exact Pauli trace moments $\operatorname{Tr} H$ and $\operatorname{Tr}(H^2)$, 256-bit interval partition ratios, and all 30 seeds and gap bounds (1,592 checks). `scripts/independent_residual_audit.jl` checks the residual and orthogonality error bounds on all 180 $L = 6$ momentum blocks in exact rational arithmetic (360 inequalities; maximum exact-to-allowed error ratios $0.005$ and $0.017$). `scripts/audit.jl` cross-checks against full computational-basis exact diagonalization and the $h = 0$ free-fermion partition function (maximum discrepancy $7 \times 10^{-13}$).
 - **Trusted base:** the IEEE binary64 / MPFR / IntervalArithmetic rounding model with gradual underflow (checked at load time) and single-threaded OpenBLAS without fast-math, under the explicit rounding-error allowances derived in [`METHOD.md`](METHOD.md).
 - **Numerical only:** seed selection ranking, 12-site ED reference gaps, finite-size diagnostics, and the $h = 0$ free-fermion comparison.
@@ -107,4 +107,8 @@ dropped. Behavior and checks are unchanged. Later, duplicated helpers moved into
 `Results.read_result`, `rat` became `ExactArithmetic.parse_rational`, the Pauli matrices come from
 `Spins.exact_pauli`, `certify.jl` compresses through `write_result` (same `gzip -9 -n`), and new
 results record the core under `core_sha256` instead of `source_sha256`. The stored certificates
-are unchanged; their recorded hashes name the earlier sources.
+are unchanged; their recorded hashes name the earlier sources. The fast checks of the seed defects are monotone: the defects recomputed from the stored
+enclosures (through the core `Seeds.seed_defects`) must be at most the stored εₛ, εₜ in exact
+rationals, rather than equal to them; the stored seeds and bounds are unchanged. (The core step
+takes the smaller of the `1 − exp` and `−expm1` upper ends, which is strictly smaller for 59 of the
+60 stored defects.)

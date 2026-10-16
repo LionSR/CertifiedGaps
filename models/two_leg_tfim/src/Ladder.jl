@@ -2,6 +2,8 @@ module Ladder
 using LinearAlgebra, SparseArrays, CertifiedGaps
 using CertifiedGaps.Results
 using CertifiedGaps.Spins: exact_pauli
+import CertifiedGaps.Seeds
+using IntervalArithmetic: interval
 export rp_identity, blocks, block_matrix, full_spectrum, verify_eigen, logz_interval,
     seed_defects, stored_spectra
 BLAS.set_num_threads(1)
@@ -174,15 +176,15 @@ Rational upper bounds `es ≥ 1 − Z_{2n}(β)/Z_n(β)²` and `et ≥ 1 − Z_{2
 enclosed spectra of the rings of n and 2n rungs, with the three directed log Z intervals
 `logZ = (log Z_n(β), log Z_{2n}(β), log Z_{2n}(2β))`. The single implementation of the seed
 step, used by certify.jl, the tests and the replay scripts; it rounds in the ambient BigFloat
-precision (256 bits by default).
+precision (256 bits by default). The step from the log Z intervals to the rational defects is
+the core `Seeds.seed_defects` (correctly rounded −expm1 of the directed lower end, as before).
 """
 function seed_defects(small,large,beta)
     ln=logz_interval(small,beta); l2=logz_interval(large,beta)
     l22=logz_interval(large,2beta)
-    ls=down(()->l2[1]-2ln[2]); lt=down(()->l22[1]-2l2[2])
-    es=Rational{BigInt}(-down(()->expm1(ls)))
-    et=Rational{BigInt}(-down(()->expm1(lt)))
-    (;es,et,logZ=(ln,l2,l22))
+    enclose((lo,hi))=interval(lo,hi)
+    (;eps_s,eps_t)=Seeds.seed_defects(enclose(ln),enclose(l2),enclose(l22))
+    (;es=eps_s,et=eps_t,logZ=(ln,l2,l22))
 end
 
 "The `spectra` of a stored certificate or replay, in the form `logz_interval` reads."

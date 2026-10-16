@@ -67,7 +67,7 @@ Measured run times (Julia 1.12.4, one BLAS thread):
 ## What is rigorous
 
 - **Verified enclosures and recurrence:** the exact RP identity; complete dense spectra of all 32 symmetry sectors at $4$ and $8$ rungs (dimension sums $256$ and $65{,}536$), each enclosed by a polar/Weyl whole-spectrum bound that accounts for algebraic matrix-construction error and explicit binary64 BLAS rounding error bounds; outward-rounded MPFR log-partition intervals; exact rational seed defects; and the two-purity doubling recurrence. The enclosures rely on IEEE binary64 round-to-nearest arithmetic with gradual underflow and standard BLAS dot-product error bounds (see [`METHOD.md`](METHOD.md)).
-- **Fast vs. full verification:** `check.jl` (fast) uses the stored per-sector eigenvalue radii to recompute $\log Z$, the rational seed defects, and the recurrence bound. `check.jl --full` and `scripts/replay_audit.jl` rebuild every eigenpair and enclosure radius from the Hamiltonian. On the original Linux OpenBLAS machine, `replay_audit.jl` reproduced the stored certificate bit for bit; on an Apple M5, LAPACK tie-breaking produces slightly tighter radii and a valid bound of $0.6364738604216351$ (so `check_replay.jl` flags the bit-identity comparisons while passing all seed, bound, and source-hash checks).
+- **Fast vs. full verification:** `check.jl` (fast) uses the stored per-sector eigenvalue radii to recompute $\log Z$, the rational seed defects (each at most the stored one; they coincide), and the recurrence bound. `check.jl --full` and `scripts/replay_audit.jl` rebuild every eigenpair and enclosure radius from the Hamiltonian. On the original Linux OpenBLAS machine, `replay_audit.jl` reproduced the stored certificate bit for bit; on an Apple M5, LAPACK tie-breaking produces slightly tighter radii and a valid bound of $0.6364738604216351$ (so `check_replay.jl` flags the bit-identity comparisons while passing all seed, bound, and source-hash checks).
 - **Numerical only (not used in the proof):** the seed search ($g \in \{2, 5/2, 3, 4\}$, $n_0 \in \{2, 3, 4\}$, $\beta = 1/8 : 1/8 : 32$), the uncertified $g = 4$ candidate, the negative scan results at $g = 2$ and $5/2$, the extrapolated seed sizes, finite-ring ED reference gaps, and the literature critical field $g_c \approx 1.83214(5)$.
 
 ## Layout
@@ -104,4 +104,8 @@ hashes refer to the historical snapshot and are unaffected. Fresh certificates (
 `replay_audit.jl`) now record only model-local sources under `source_sha256` (compared by the
 tests) and the core under `core_sha256` (provenance only). Later, duplicated helpers moved into the shared core `CertifiedGaps`: the gzip
 loaders `certificate_bytes`/`read_certificate` became `Results.read_result_bytes`/`read_result`,
-and the exact Pauli matrices come from `Spins.exact_pauli`.
+and the exact Pauli matrices come from `Spins.exact_pauli`. The fast checks of the seed defects are monotone: the defects recomputed from the stored
+enclosures (through the core `Seeds.seed_defects`) must be at most the stored εₛ, εₜ in exact
+rationals, rather than equal to them; the stored seeds and bounds are unchanged. For this certificate the
+recomputed defects equal the stored ones (`Ladder.seed_defects` now calls the core step, which
+reproduces the directed-rounding `−expm1`).

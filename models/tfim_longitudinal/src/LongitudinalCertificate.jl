@@ -192,11 +192,13 @@ end
     seed_enclosure(small, large, b)
 
 Exact rational upper bounds `es ≥ 1-Pₛ(n,b)` and `et ≥ 1-P_τ(2n,b)` from the enclosed
-spectra of the rings of n and 2n sites, with the three log-partition intervals.
+spectra of the rings of n and 2n sites, with the three log-partition intervals. The step from
+log Z to the defects is the core `Seeds.seed_defects`, whose bounds never exceed the plain
+`1-exp` evaluation that produced the stored certificates.
 """
 function seed_enclosure(small,large,b)
     a=enclosed_logz(small,b); c=enclosed_logz(large,b); d=enclosed_logz(large,2b)
-    es=exact(sup(1-exp(c-2a))); et=exact(sup(1-exp(d-2c)))
+    (;eps_s,eps_t)=seed_defects(a,c,d); es,et=eps_s,eps_t
     @check 0<=es<1 && 0<=et<1
     (;es,et,logs=[a,c,d])
 end

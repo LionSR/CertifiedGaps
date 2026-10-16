@@ -37,8 +37,9 @@ function check_result(path; partitions=true, full=false)
     b=parse_rational(c["beta"])
     es=parse_rational(c["epsilon_s"]); et=parse_rational(c["epsilon_t"])
     if partitions
+        # The recomputed defects are valid upper bounds; the stored seeds may only be larger.
         seeds=seed_enclosure(c["small"],c["large"],b)
-        @check seeds.es==es && seeds.et==et
+        @check seeds.es<=es && seeds.et<=et
     end
     bound=certified_gap_bound(es,et,b).bound
     @check bound!==nothing && bound>0

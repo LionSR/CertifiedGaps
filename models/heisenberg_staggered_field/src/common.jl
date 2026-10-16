@@ -182,9 +182,9 @@ iv(a,b)=interval(a,b)
 "Rational upper bounds on 1 − Pₛ(n, β) and 1 − P_τ(2n, β) from the block records of n and 2n."
 function enclosed_seeds(a,b,beta)
     x=enclosed_logz(a,beta);y=enclosed_logz(b,beta);z=enclosed_logz(b,2beta)
-    es=iv(1)-exp(y-iv(2)*x);et=iv(1)-exp(z-iv(2)*y)
-    # Rationalize the binary upper endpoints exactly; no decimal conversion.
-    s=Rational{BigInt}(sup(es));t=Rational{BigInt}(sup(et))
+    # Core step from log Z to exact rational defects (binary upper endpoints, no decimal
+    # rounding); never above the plain 1 - exp evaluation of the stored certificates.
+    (;eps_s,eps_t)=seed_defects(x,y,z); s,t=eps_s,eps_t
     @assert 0<=s<1 && 0<=t<1
     (;s,t,logs=[[inf(x),sup(x)],[inf(y),sup(y)],[inf(z),sup(z)]])
 end

@@ -2,7 +2,7 @@
 using CertifiedGaps, LinearAlgebra, SparseArrays, JSON3
 using CertifiedGaps.Results, CertifiedGaps.ExactDiagonalization, CertifiedGaps.Seeds
 using IntervalArithmetic
-using CertifiedGaps.ExactArithmetic: parse_rational
+using CertifiedGaps.ExactArithmetic: parse_rational, round_up
 BLAS.set_num_threads(1)
 # The model directory (this file is in src/); results/ and hashed paths are relative to it.
 const ROOT = dirname(@__DIR__)

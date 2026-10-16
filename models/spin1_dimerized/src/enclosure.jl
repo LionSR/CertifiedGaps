@@ -71,11 +71,8 @@ function verified_logz(vals,radii,beta)
     end
     log(total)-b*interval(shift)
 end
-"Upper end of an interval, rounded up to a rational with denominator 10^digits."
-function rational_upper(x; digits=12)
-    y=Rational{BigInt}(sup(x)); d=big(10)^digits
-    cld(numerator(y)*d,denominator(y))//d
-end
+"An exact rational rounded up to the grid with denominator 10^digits."
+rational_upper(y::Rational; digits=12) = round_up(Rational{BigInt}(y),big(10)^digits)
 """
     certify_selected(delta; n0, beta0, output_path) -> Dict
 
@@ -94,7 +91,8 @@ function certify_selected(delta; n0=nothing, beta0=nothing, output_path=nothing)
         v2,r2,s2,t2=(2n<=4 ? verified_spectrum : verified_block_spectrum)(2n,delta)
         z1=verified_logz(v1,r1,beta);z2=verified_logz(v2,r2,beta)
         z22=verified_logz(v2,r2,2beta)
-        es=rational_upper(1-exp(z2-2z1));et=rational_upper(1-exp(z22-2z2))
+        seeds=seed_defects(z1,z2,z22)    # core step; never above the plain 1 - exp bound
+        es=rational_upper(seeds.eps_s);et=rational_upper(seeds.eps_t)
         @assert 0<es<1 && 0<et<1
         bound=certified_gap_bound(es,et,beta)
         @assert bound.bound!==nothing && bound.bound>0
