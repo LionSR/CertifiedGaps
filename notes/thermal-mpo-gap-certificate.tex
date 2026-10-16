@@ -31,7 +31,7 @@
 
 \begin{document}
 \title{How the Initial Estimate Is Certified}
-\date{October 10, 2026}
+\date{October 15, 2026}
 \begin{abstract}
 The finite-scale input $\Ps(2304,784), \Pt(4608,784) \ge 0.99$ of Ref.~\cite{main} is established without direct tensor contraction at that scale.
 Ref.~\cite{source} certifies a pair of bounds at length $36$ and $\beta=49/4$, which are then propagated to $(2304,784)$ through six scale doublings with decoupled defects.
@@ -286,11 +286,16 @@ $n$ the coupling identity costs more than squaring gains.
 \end{itemize}
 This recovers the initial estimate of Ref.~\cite{main} (Proposition~5.5 of Ref.~\cite{source}); re-evaluating the recurrence from the rational definitions of $p_0$ and $q_0$ confirms agreement digit for digit.
 
-\emph{The weaker initial estimate.} Ref.~\cite{source} also certifies
+\emph{The weaker initial estimate and tighter seed chains.} Ref.~\cite{source} also certifies
 $\Ps(60,105/4),\ \Pt(120,105/4)>7/8$. That estimate uses a table at $b=21/2$ for
 $n\le10$, three twists, the trial vector at $N=120$, and a temperature lift
 $\sum z_i^{5/2}\le(\sum z_i)^{5/2}$. It gives the weaker bound
-$\Delta_L>\frac4{105}\log\frac{80}{79}$ for every even $L\ge60$.
+$\Delta_L>\frac4{105}\log\frac{80}{79}$ for every even $L\ge60$. Evaluating the
+asymmetric rational recurrence directly from $(36,49/4)$ with temperature lifting
+sharpens the uniform bound to $\Delta_L>0.0729$ for every even $L\ge36$
+(\path{models/spin1}), while restricting to even-length traces $n\le12$ with real
+$\mathrm{SU}(2)$ twists yields $\Delta_L>0.039$ for every even $L\ge60$
+(\path{models/lean_seeds}).
 
 \section{Model-Dependent vs Universal Components}\label{app:c-general}
 Each ingredient is a closed network, and only a few of them depend on the
@@ -307,10 +312,39 @@ masses, and the doubling of Eq.~\eqref{eq:c-update}.
  \item the sizes at which the filters isolate one eigenvalue.
  \end{itemize}
 \end{itemize}
-For spin~1 those sizes are rings of twelve sites, $3^{12}\simeq5\times10^5$
-states. For spin~2 the same rings have $5^{12}\simeq2.4\times10^8$ states,
-and the correlation length is roughly eight times longer. That cost is the
-main obstacle to a spin-2 certificate.
+
+\emph{Multi-level spectral cutout and trace reduction.}
+In Eq.~\eqref{eq:c-seed}, bounding $Z_{72}(2b)>1$ from a single trial vector
+retains only the ground bar \specbars{.76} and discards the thermally populated
+single-magnon band \specbars{.76,.11,.05,.04}, leaving $q_0=0.1815>\varepsilon_*$
+and requiring six pre-doublings from $n_0=36$ to $2304$ (and twisted traces
+through $n=12$, with $1.31\times10^8$ sparse nonzeros). At the seed scale
+$(n_0=60,\,2n_0=120,\,b=49/4)$, retaining the lowest $7$ eigenvalues ($27$
+states with multiplicity) in $Z_{120}(2b)$ raises the base-scale thermal purity
+from $0.761$ to $0.9613>1-\varepsilon_*$, eliminating all six pre-doublings and
+allowing the Poisson trace table to stop at $n\le10$ ($8.92\times10^6$ nonzeros,
+a $14.7\times$ reduction; \path{models/lean_seeds}). Certifying those $7$ levels
+at $N=120$ requires a subspace deflation inequality
+$H_{120}\succeq E_{\mathrm{cut}}(I-QQ^\dagger)+Q\Lambda Q^\dagger$, because
+periodic-cluster Temple--Kato bounds have a negative denominator at $N=120$ and
+ungrouped Krylov residual disks overlap across the $2.6\times10^{-3}$ multiplet
+splitting.
+
+\emph{Fast exact traces and the spin-2 starting-point barrier.}
+For spin~1, rings of twelve sites have $3^{12}\simeq5.3\times10^5$ states; fused
+three-step integer Horner kernels and packed 64-bit orbit lookup tables evaluate
+all eighteen twisted traces through $n=12$ in under one minute on ten CPU threads
+(\path{models/spin1}). For spin~2, twelve-site rings have $5^{12}\simeq2.4\times10^8$
+states and the correlation length is roughly eight times longer ($\xi\approx49$).
+Beyond that dimension growth, certified thermal MPO squaring
+(\texttt{CertifiedGaps.MPO}) at the estimated spin-2 seed $(n_0=256,\beta_0=64)$
+($\beta_0\|H\|\approx9.8\times10^4$) faces a scalar starting-point barrier:
+initializing from a global quadratic polynomial
+$I-(\beta_0/2m)H+c(\beta_0/2m)^2H^2$ requires $m\sim10^6\text{--}10^7$ ($\ge20$
+squarings) before bond truncation enters, whereas local-gate Trotterization
+reduces the initial slice count by two orders of magnitude alongside a certified
+rational $D=4$ matrix-product upper bound $E_0(256)/256\le-4.725068$
+(\path{models/spin2}).
 \begin{thebibliography}{5}
 \bibitem{main}
 Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime

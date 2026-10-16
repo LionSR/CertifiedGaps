@@ -47,12 +47,31 @@
  \draw[mpored,domain=0:.1405,samples=30,smooth]
    plot (\x,{.5*(1/((1-\x)*(1-\x)*(1-\x))-1)*(1/((1-\x)*(1-\x)*(1-\x))-1)});
  \fill (.1273,.1273) circle[radius=.035em];}}
+% A staggered longitudinal field along a chain, matching \fieldsame and \fieldopp.
+\newcommand{\fieldstag}{\tikz[baseline=0pt,x=1em,y=1em,line width=.5pt]{
+ \draw[black!55] (0,.4)--(1.8,.4);
+ \foreach \x/\s in {0/1,.6/-1,1.2/1,1.8/-1}{
+   \fill (\x,.4) circle[radius=.08];
+   \draw[-{Latex[length=.95mm,width=.8mm]},mpored,line width=.6pt]
+     (\x,{.4-.36*\s})--(\x,{.4+.36*\s});}}}
+% Two-site unit cell with internal swap F across an inter-cell mirror cut.
+\newcommand{\cellbondform}{\tikz[tn,tn centered]{
+ \draw[rounded corners=1.5pt,fill=mpoblue!10,draw=black!45] (-.95,-.65) rectangle (1.15,.65);
+ \draw[rounded corners=1.5pt,fill=mpoblue!10,draw=black!45] (2.45,-.65) rectangle (4.55,.65);
+ \draw[phys] (-.55,-1)--(-.55,1); \draw[phys] (.65,-1)--(.65,1);
+ \draw[phys] (2.95,-1)--(2.95,1); \draw[phys] (4.15,-1)--(4.15,1);
+ \draw (.65,0)--(2.95,0);
+ \draw[black!45,densely dashed,line width=.35pt] (1.8,-1.15)--(1.8,1.15);
+ \node[xop,fill=white] at (.65,0) {$C_\alpha$};
+ \node[xop,fill=white] at (2.95,0) {$F\overline{C_\alpha}F$};
+ \node[font=\tiny,black!65] at (-.55,0) {$a$};
+ \node[font=\tiny,black!65] at (4.15,0) {$b$};}}
 
 \begin{document}
 \title{Scope of the Spacetime Bootstrap}
-\date{October 8, 2026}
+\date{October 15, 2026}
 \begin{abstract}
-The spacetime bootstrap establishes a uniform spectral gap from bond reflection positivity and certified finite-scale purity bounds. Bond reflection positivity ensures that the continuous-time spatial transfer operator is self-adjoint, enabling spatial scale doubling dual to imaginary time. We formalize the method as a general criterion for one-dimensional translation-invariant lattice systems and classify standard spin Hamiltonians according to their reflection positivity.
+The spacetime bootstrap establishes a uniform spectral gap from bond reflection positivity and certified finite-scale purity bounds. Bond reflection positivity ensures that the continuous-time spatial transfer operator is self-adjoint, enabling spatial scale doubling dual to imaginary time. We formalize the method as a general criterion for one-dimensional translation-invariant lattice systems, extend it to multi-site unit cells with internal reflection and odd seed lengths, classify standard spin and ladder Hamiltonians, and summarize the computer-verified gap certificates across eight model families.
 \end{abstract}
 \maketitle
 \setlength{\abovedisplayskip}{5pt plus 2pt minus 1pt}
@@ -73,8 +92,8 @@ Self-adjointness of $X_\beta$ represents the spatial counterpart of Euclidean ti
 The three hypotheses are therefore:
 \begin{itemize}
 \item[(H1)] \emph{Locality.} A translation-invariant chain with finite local
-dimension and nearest-neighbour terms. Finite-range interactions reduce to
-this by blocking sites.
+dimension and nearest-neighbor terms. Finite-range interactions reduce to
+this by blocking sites into unit cells.
 \item[(H2)] \emph{Bond reflection positivity} (Sec.~\ref{app:rp}).
 \item[(H3)] \emph{Input.} Both purities are near one at a single scale
 (Sec.~\ref{app:criterion}).
@@ -86,11 +105,11 @@ Let $\Theta$ be an antiunitary map on one site with $\Theta^2=\pm1$, for
 example complex conjugation $K$ in a chosen basis. For an operator $C$ on one site write
 $\Theta(C)=\Theta C\Theta^{-1}$.
 \begin{itemize}
-\item \emph{Reflection.} Cut the chain between two neighbouring sites. Mirror
+\item \emph{Reflection.} Cut the chain between two neighboring sites. Mirror
 the chain across the cut and apply $\Theta$ on every site. Call the result
 $\theta$. It is antilinear, it maps the operators on the left half to those
 on the right half, and $\theta^2=1$.
-\item \emph{Bond form.} A nearest-neighbour Hamiltonian is in \emph{bond
+\item \emph{Bond form.} A nearest-neighbor Hamiltonian is in \emph{bond
 reflection-positive form}~\cite{dls,fils,biskup,jaffejanssens} if it reads
 \begin{equation}
  H=\sum_jD_j-\sum_{j,k}c_k\,C_{k,j}\,\Theta(C_k)_{j+1},\qquad c_k>0,
@@ -125,7 +144,7 @@ bounds and chessboard estimates~\cite{fss,fils,dls}. For spins and
 Majoranas, Jaffe and Janssens characterize exactly which couplings are
 reflection positive~\cite{jaffejanssens}. The spacetime bootstrap needs only
 the weaker consequence that follows: the network cut at a single bond is
-Hermitian. This is the Lüscher statement with space and time exchanged.
+Hermitian. This is the L\"uscher statement with space and time exchanged.
 
 \begin{lemma}[Mirror is conjugation]\label{lem:mirror}
 Under Eq.~\eqref{eq:rpform}, build the continuous-time MPO as in
@@ -168,21 +187,63 @@ and it is Hermitian by Lemma~\ref{lem:mirror}. The remaining statements are
 those of Ref.~\cite{main} for a self-adjoint $X_\beta$.
 \end{proof}
 
+\emph{Multi-site unit cells and internal reflection.}
+When $c$ sites are blocked into a unit cell on a ring of $L$ cells,
+$H_L=\sum_{j=1}^L h_{j,j+1}+\sum_{j=1}^L o_j$, a mirror cut across an
+inter-cell bond swaps the left and right virtual legs of each cell while
+reversing the site order inside the cell. Let $F$ be a real symmetric
+involution ($F=F^{\mathsf T}$, $F^2=I$) that reverses the internal site order.
+If the inter-cell bond $h$ and on-site cell operator $o$ satisfy
+\begin{equation}
+ -h=\sum_\alpha C_\alpha\otimes F\overline{C_\alpha}F,\qquad
+ FoF=o,\qquad o=\overline{o},
+ \label{eq:rpcell}
+\end{equation}
+then $\Theta(C)=F\overline{C}F$ is antiunitary with $\Theta^2=1$ and
+$\Theta(o)=o$. Each inter-cell bond event pairs site $b$ of the left cell
+with its reflected partner $a$ in the right cell,
+\begin{equation*}
+ -h_{j,j+1}=\sum_\alpha\;\cellbondform\,,
+\end{equation*}
+and conjugating the physical loop by $F$ in Lemma~\ref{lem:mirror} gives
+$\overline{X_\beta(a,b)}=X_\beta(b,a)$ on the ring of $L$ cells (\texttt{RPRing}
+in \path{lean/CertifiedGaps/Ring/Transfer.lean} and \path{Transfer/}). For a
+two-spin dimer $(a,b)$ with swap $F=P$, $C_\alpha=I\otimes G_\alpha$ gives
+$F\overline{C_\alpha}F=\overline{G_\alpha}\otimes I$, linking spin~$b$ of
+cell~$j$ to spin~$a$ of cell~$j+1$.
+
+\emph{Positive cell-transfer operators and odd seed lengths.}
+Theorem~\ref{thm:space} restricts $Z_n(\beta)=\sum_i\lambda_i(\beta)^n$ to
+even $n$ because a self-adjoint $X_\beta$ may have negative eigenvalues. In a
+two-spin dimer cell $(a,b)$ whose intra-cell bond is also reflection positive
+with real factors, cutting the cell across its internal bond factors the
+cell transfer operator into a half-cell product,
+\begin{equation}
+ X_\beta=\tnchain[node=xop]{K,K^*}=KK^*\succeq0 .
+ \label{eq:cellpos}
+\end{equation}
+Every transfer eigenvalue $\lambda_i(\beta)$ is then nonnegative, so
+$\sigma_n(\beta)=X_\beta^n/Z_n(\beta)\ge0$, the squaring map, and $\ell^p$
+interpolation hold at odd as well as even cell counts $n_0$. In the
+dimerized spin-1 chain (\path{models/spin1_dimerized}), Eq.~\eqref{eq:cellpos}
+enables an odd seed of $n_0=3$ dimer cells ($6$ and $12$ spins), bypassing the
+$2n_0=8$-cell ($16$-spin, $3^{16}=4.3\times10^7$-state) ring required by
+$n_0=4$.
+
 \emph{Relation to the sign problem.} A Hamiltonian is stoquastic if, in some basis, every
 configuration of a quantum Monte Carlo expansion has a nonnegative weight.
 Reflection positivity asks less of individual configurations and more of their
-structure: a weight may be negative, but each configuration paired with
-its mirror image contributes a square $|\cdot|^2$.
+structure: a weight may be negative, provided each configuration paired with
+its mirror image contributes $|\cdot|^2$.
 \begin{itemize}
 \item In Ref.~\cite{main} the event measure is positive, but the entries of
 $W$ and $X_\beta$ carry signs, because the $G_\alpha$ are real antisymmetric
 matrices. A sampler over histories would meet a sign problem; the spectral
 argument does not, since $\sum_i\lambda_i^n>0$.
-\item Neither property implies the other. The quantum Heisenberg ferromagnet
-is stoquastic but not reflection positive~\cite{speer}; see also
-Proposition~\ref{prop:xyz}.
-\item The sign-free fermion Monte Carlo methods based on time reversal or
-Majorana symmetry exploit the same mirror-squared factorization,
+\item Neither property implies the other: the Heisenberg ferromagnet is
+stoquastic but not reflection positive~\cite{speer} (Proposition~\ref{prop:xyz}).
+\item Sign-free fermion Monte Carlo methods based on time reversal or Majorana
+symmetry use the same mirror-squared factorization
 $\det M\cdot\overline{\det M}$~\cite{wuzhang,wei,li,jaffe}.
 \end{itemize}
 
@@ -227,13 +288,79 @@ $(0,\varepsilon_*)$.
 Since $3\varepsilon_j<1/2$, the interpolation and gap-recovery steps of
 Ref.~\cite{main} give uniqueness and $e^{-\beta_j\Delta_L}\le
 3\varepsilon_j/(1-3\varepsilon_j)$ whenever $n_j\le L\le2n_j$.
-Every term of the infimum is positive. Since
+Every term of the infimum is positive; since
 $\delta(\varepsilon)\le K\varepsilon^2$ near zero, $\varepsilon_j$ falls
-doubly exponentially. The terms therefore converge to a positive limit, and
-the infimum is positive.
+doubly exponentially, so the terms converge to a positive limit.
 \end{proof}
 With $(n_0,\beta_0,\varepsilon_0)=(2304,784,1/100)$ this is the theorem of
 Ref.~\cite{main}, with $c\ge(\log20)/784$.
+
+\emph{Asymmetric defects and four-torus seed lifting.}
+In Theorem~\ref{thm:criterion}, the initial spatial defect
+$\varepsilon_{\mathrm s}\ge1-\Ps(n_0,\beta_0)$ and thermal defect
+$\varepsilon_\tau\ge1-\Pt(2n_0,\beta_0)$ need not be equal. Tracking
+$(\varepsilon_{\mathrm s,j},\varepsilon_{\tau,j})$ separately through Moves~1--4
+gives the asymmetric recurrence
+\begin{equation}
+ \begin{aligned}
+ \varepsilon_{\mathrm s,j+1}&=f\bigl(1-(1-\varepsilon_{\mathrm s,j})^2(1-\varepsilon_{\tau,j})\bigr),\\
+ \varepsilon_{\tau,j+1}&=f\bigl(1-(1-\varepsilon_{\tau,j})^2(1-\varepsilon_{\mathrm s,j+1})\bigr),
+ \end{aligned}
+ \label{eq:asym}
+\end{equation}
+where $f(z)=z^2/[2(1-z)^2]$. Because the second line uses the updated spatial
+defect $\varepsilon_{\mathrm s,j+1}$ from Move~2 rather than
+$\varepsilon_{\mathrm s,j}$, the basin of attraction in the
+$(\varepsilon_{\mathrm s},\varepsilon_\tau)$ plane extends well outside the
+symmetric square $[0,\varepsilon_*)^2$, reaching $\varepsilon_{\mathrm s}\simeq0.2176$
+as $\varepsilon_\tau\to0$ and $\varepsilon_\tau\simeq0.2006$ as
+$\varepsilon_{\mathrm s}\to0$:
+\begin{proofdiagram}
+\begin{tikzpicture}[x=10.4cm,y=10.4cm,font=\scriptsize]
+ % Asymmetric admissible region in (eps_s, eps_t) plane
+ \fill[mpoblue!14]
+   (0,0)--(0,.2006)--(.02,.1940)--(.04,.1860)--(.06,.1762)--(.08,.1645)
+   --(.10,.1506)--(.12,.1341)--(.1273,.1273)--(.14,.1145)--(.16,.0915)
+   --(.18,.0644)--(.20,.0326)--(.2176,0)--cycle;
+ % Symmetric square [0, eps_*]^2
+ \draw[black!45,densely dashed,line width=.4pt]
+   (0,.1273)--(.1273,.1273)--(.1273,0);
+ % Asymmetric boundary curve
+ \draw[mpored,line width=.75pt]
+   (0,.2006)--(.02,.1940)--(.04,.1860)--(.06,.1762)--(.08,.1645)
+   --(.10,.1506)--(.12,.1341)--(.1273,.1273)--(.14,.1145)--(.16,.0915)
+   --(.18,.0644)--(.20,.0326)--(.2176,0);
+ % Axes
+ \draw[black!55,line width=.4pt] (0,0)--(.235,0) node[right,black!75] {$\varepsilon_{\mathrm s}$};
+ \draw[black!55,line width=.4pt] (0,0)--(0,.216) node[above,black!75] {$\varepsilon_\tau$};
+ % Diagonal fixed point and certified asymmetric seeds
+ \fill[black!70] (.1273,.1273) circle[radius=.0036]
+   node[above right,black!75] {$\varepsilon_*$};
+ \fill[mpoblue] (.0479,.1815) circle[radius=.004]
+   node[above right,mpoblue!85!black] {spin-1 ($n_0{=}36$)};
+ \fill[mpored] (.1856,.0511) circle[radius=.004]
+   node[above right,mpored!85!black] {ladder, large-$D$, Ising};
+ \node[black!55] at (.064,.055) {$[0,\varepsilon_*)^2$};
+\end{tikzpicture}
+\end{proofdiagram}
+\noindent Certified seeds in both wings outside $[0,\varepsilon_*)^2$ close
+under Eq.~\eqref{eq:asym}: the spin-1 seed $(0.0479,0.1815)$ of
+Ref.~\cite{cert} lies in the upper wing, while the $J_\perp=5/2$ ladder
+$(0.1856,0.0511)$, $D=3.206$ large-$D$ $(0.1916,0.0465)$, and $(g,h)=(1,1/20)$
+Ising $(0.1840,0.0460)$ seeds lie in the right-hand wing.
+
+Furthermore, reading the four-torus coupling identity of Ref.~\cite{main} to
+solve for $\Pt(2n_0,\beta_0)$ yields
+\begin{equation}
+ \Pt(2n_0,\beta_0)=\frac{\Zt42}{\Ztsq41}
+ =\frac{\Ps(n_0,2\beta_0)\,\Pt(n_0,\beta_0)^2}{\Ps(n_0,\beta_0)^2},
+ \label{eq:seedlift}
+\end{equation}
+bounding $\Pt(2n_0,\beta_0)$ from length-$n_0$ and length-$2n_0$ partition
+functions at $\beta_0$ and $2\beta_0$ without a ring of length $4n_0$. At $D=4$
+(\path{models/spin1_largeD}), combining Eq.~\eqref{eq:seedlift} at $2n=12$ with
+transfer squaring lifts the seed from $n_0=6$ to $n_0=12$ using only $6$- and
+$12$-site spectra, raising the gap bound from $0.695$ to $0.899$.
 
 \begin{corollary}[What (H3) excludes]\label{cor:obstruct}
 Under (H1) and (H2), Eq.~\eqref{eq:H3} cannot hold at any scale
@@ -244,15 +371,14 @@ with $k\ge2$, because $\Pt\le w_0\le1/k$ there, a spectrum like \specbars{.49,.4
 Theorem~\ref{thm:criterion} would contradict it.
 \end{itemize}
 \end{corollary}
-Corollary~\ref{cor:obstruct} rules out gapless chains, symmetry-broken
-chains, and chains whose ground state on the ring is asymptotically
-degenerate.
+Corollary~\ref{cor:obstruct} rules out gapless, symmetry-broken, and
+asymptotically degenerate chains on the ring.
 
 The converse is expected but not proved. In a gapped chain with a unique
 ground state and correlation length $\xi$, one expects
 $1-\Ps\sim e^{-n/\xi}$ and $1-\Pt\sim n\,e^{-\beta\Delta}$. Both vanish
 along the doubling sequence \torusseq, so Eq.~\eqref{eq:H3} should hold at
-some finite scale, though perhaps a very large one.
+some finite scale.
 
 For a conformal critical chain the picture is different. The extensive free
 energy cancels in each torus ratio, so $\Ps$ and $\Pt$ approach ratios of
@@ -260,7 +386,7 @@ the universal torus partition function at a fixed aspect ratio. These are
 numbers below one, so the defect stalls instead of collapsing.
 
 \section{Classification of Reflection-Positive Hamiltonians}\label{app:catalogue}
-\emph{Bilinear spin couplings.} Consider spin~$S$ with a nearest-neighbour
+\emph{Bilinear spin couplings.} Consider spin~$S$ with a nearest-neighbor
 coupling matrix $J$ (real symmetric) and a uniform field $\bm h$,
 \begin{equation}
  H=\sum_j\bm S_j^{\mathsf T}J\,\bm S_{j+1}+\bm h\cdot\bm S_j .
@@ -268,11 +394,10 @@ coupling matrix $J$ (real symmetric) and a uniform field $\bm h$,
 \end{equation}
 \begin{proposition}\label{prop:xyz}
 Suppose there is a symmetric orthogonal $O$ with $\det O=-1$ such that
-$-JO\succeq0$ and $O\bm h=\bm h$. Then Eq.~\eqref{eq:bilinear} is in the form
-of Eq.~\eqref{eq:rpform}, for every $S$. For diagonal
+$-JO\succeq0$ and $O\bm h=\bm h$. Then Eq.~\eqref{eq:bilinear} has the form
+of Eq.~\eqref{eq:rpform} for every $S$. For diagonal
 $J=\operatorname{diag}(J_x,J_y,J_z)$ with nonzero entries and $\bm h=0$, such
-an $O$ exists exactly when an even number of $J_x,J_y,J_z$ are negative
-(ferromagnetic).
+an $O$ exists if and only if an even number of $J_x,J_y,J_z$ are negative.
 \end{proposition}
 \begin{proof}
 $O=-R$ with $R$ the identity or a $\pi$ rotation. Let $T$ be time reversal,
@@ -282,35 +407,58 @@ $-JO=\sum_kv_kv_k^{\mathsf T}$ with real $v_k$ and set
 $C_k=v_k\cdot\bm S$. Then
 $\sum_kC_k\otimes\Theta(C_k)=\sum\bm S^{\mathsf T}(-JO)O\bm S
 =-\bm S^{\mathsf T}J\bm S$, and $\Theta(\bm h\cdot\bm S)=(O\bm h)\cdot\bm S$.
-For diagonal $J$ the polar factor is unique: $O=\operatorname{sign}(-J)$,
-and $\det O=-1$ counts the ferromagnetic entries modulo two.
+For diagonal $J$, $O=\operatorname{sign}(-J)$, so $\det O=-1$ counts the
+ferromagnetic entries modulo two.
 \end{proof}
 \noindent The proposition sorts the standard spin chains as follows.
 \begin{itemize}
 \item \emph{Reflection positive:}
  \begin{itemize}
- \item the Heisenberg antiferromagnet for every $S$, with $O=-1$;
+ \item the Heisenberg antiferromagnet for any $S$ ($O=-1$);
  \item XXZ chains $S^xS^x+S^yS^y+\Delta S^zS^z$ with $\Delta\ge0$;
- \item the XY model with any signs, since a zero entry frees $O_{zz}$;
- \item the transverse-field Ising chain with either sign, with $O$ fixing
- the field axis.
+ \item the XY model with any signs ($J_z=0$ frees $O_{zz}$);
+ \item the transverse-field Ising chain with either sign ($O$ fixes the field
+ axis), including a longitudinal field $-h\sum_j Z_j$ ($C_1=Z$, $o=-gX-hZ$).
  \end{itemize}
 \item \emph{Not of this form:}
  \begin{itemize}
- \item the Heisenberg ferromagnet (three ferromagnetic entries);
+ \item the Heisenberg ferromagnet (three negative entries);
  \item XXZ chains with $\Delta<0$;
  \item the antiferromagnet in a uniform field, since $O=-1$ reverses $\bm h$.
  \end{itemize}
 \end{itemize}
 
-The sublattice rotations by $\pi$ that map antiferromagnets to ferromagnets
-change two signs at once, so they never alter this parity.
+Sublattice rotations by $\pi$ change two signs at once and never alter the bond
+parity, but they reverse a \emph{staggered} field $-h\sum_j(-1)^jS_j^z$,
+\fieldstag: applying $U=2iS^y$ on odd sites maps the antiferromagnetic bond to
+$-h_{\mathrm{rot}}=X\otimes X+G_y\otimes G_y+Z\otimes Z$ ($G_y=iS^y$) while
+negating $S^z$ on odd sites, converting the staggered field into a uniform
+reflection-even term $+h\sum_jS_j^z$ with a single-spin cell
+(\path{models/heisenberg_staggered_field}). Similarly, in Ref.~\cite{main}
+(Appendix~A) the open chain is built with opposite endpoint fields \fieldopp{}
+because $\theta(-hS^z_1)=+hS^z_n$ is mirror symmetric, and the equal-field chain
+\fieldsame{} is reached via $U_P$.
 
-The uniform-field obstruction explains a choice made in Ref.~\cite{main},
-Appendix~A. There the boundary chain is built with opposite endpoint fields
-\fieldopp, since $\theta(-hS^z_1)=+hS^z_n$ makes that chain mirror
-symmetric. The equal-field chain \fieldsame{} is reached only through the
-symmetry $U_P$.
+\begin{table*}[t]
+\caption{Computer-certified uniform spectral gaps $\Delta_L=E_1(L)-E_0(L)$ established via the spacetime bootstrap (\texttt{models/}; $L,n_0$ count unit cells), proving ground-state uniqueness and $\Delta_L\ge\Delta_{\mathrm{cert}}$ for even $L$ in the stated range (odd $n$ in row~2). Lean~4 (\texttt{lean/CertifiedGaps/}, checked by \texttt{lean/scripts/check\_seeds.jl}) covers rows 1, 3, 4, 8, 9 (with $(1/4,1/20)$ proved unconditionally in \texttt{lean/SeedKernel/}), $\delta=9/10$ in row~5, $D\in\{4,1603/500\}$ at $n_0=6$ in row~6, and $J_\perp=4$ in row~7.\label{tab:certified}}
+\begin{ruledtabular}
+\begin{tabular}{llllll}
+Model & Cell / RP form & Certified parameters & Seed $(n_0,\beta_0)$ & $\Delta_{\mathrm{cert}}$ & Range \\
+\hline
+Spin-1 Heisenberg & 1 site, $G_\alpha$ & isotropic ($J=1$) & $(36,49/4)\to(2304,784)$ & $(\log 20)/784$ & $L\ge2304$ \\
+Spin-1 open~\cite{main} & 1 site, caps $v_\beta$ & fields $h=3/5$ & $(120,49)\to(1920,392)$ & $(\log 10)/392$ & odd $n\ge1921$ \\
+Staggered Heisenberg & 1 site, $2iS^y$ & $h\in\{1,\tfrac34,\tfrac12,\tfrac7{20},\tfrac14\}$ & $(8,\,21/4\dots25/4)$ & $1.148\dots0.214$ & $L\ge8$ \\
+Dimerized spin-$\tfrac12$ & dimer, swap $F$ & $\delta\in\{\tfrac12,\tfrac3{10},\tfrac14\}$ & $(4,\,6\dots29/4)$ & $0.534,\,0.173,\,0.058$ & $L\ge4$ cells \\
+Dimerized spin-1 & dimer, $KK^*$ & $\delta\in\{\tfrac9{10},\tfrac7{10}\}$ & $(2,7/2),\,(3,17/4)^{\mathrm a}$ & $0.528,\,0.218$ & $L\ge2,\,4$ cells \\
+Spin-1 large-$D$ & 1 site, $D(S^z)^2$ & $D=4;\,[3.2059998,3.206]$ & $(12,29/10)^{\mathrm b},(6,3.048)$ & $0.899;\,0.0010$ & $L\ge6$ \\
+Heisenberg ladder & rung, $u=2iS^y$ & $J_\perp\in\{4,\tfrac72,3,\tfrac52,2.488\}$ & $(4,\,2\dots3)$ & $1.102\dots0.0015$ & $L\ge4$ rungs \\
+Ising ladder & rung, $Z_1,Z_2$ & $g=3$ & $(4,3/2)$ & $0.636$ & $L\ge4$ rungs \\
+Longitudinal Ising & 1 site, $-gX-hZ$ & 30 pts in $[\tfrac14,2]{\times}[\tfrac1{20},1]$ & $(6,\,2\dots97/4)$ & $0.0763\dots3.705$ & $L\ge6$ \\
+\end{tabular}
+\end{ruledtabular}
+\footnotetext[1]{Odd cell seed $n_0=3$ ($6$ and $12$ spins) enabled by the positive cell-transfer factorization~\eqref{eq:cellpos} ($\delta=9/10$ uses the even seed $n_0=2$).}
+\footnotetext[2]{Lifted from $n_0=6$ to $n_0=12$ via spatial transfer squaring and Eq.~\eqref{eq:seedlift}, with verified dense bridges at $L=6,8,10$.}
+\end{table*}
 
 \emph{Spin-1 bilinear--biquadratic chain.}
 Consider $H=\sum_j\cos\vartheta\,\bm S_j\cdot\bm S_{j+1}
@@ -330,16 +478,16 @@ $-\pi+\arctan2\le\vartheta\le0$.
 \end{proposition}
 \begin{proof}
 The condition holds if both coefficients in Eq.~\eqref{eq:blbq} are
-nonnegative, which is the stated window. For the converse, the form exists exactly
-when the realigned bond matrix becomes positive semidefinite after some
-on-site shift. Maximizing its least eigenvalue over all shifts gives a negative
-value outside the window, for example $-0.087$ at $\vartheta=-0.66\pi$ and
-$-0.156$ at $\vartheta=0.05\pi$ (Sec.~\ref{app:checks}).
+nonnegative, which is the stated window. Conversely, the form exists exactly
+when the realigned bond matrix is positive semidefinite after an on-site
+shift; maximizing its least eigenvalue over all shifts gives a negative value
+outside the window ($-0.087$ at $\vartheta=-0.66\pi$ and $-0.156$ at
+$\vartheta=0.05\pi$; Sec.~\ref{app:checks}).
 \end{proof}
 
 \begin{proofdiagram}
 \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
- \def\R{1.35}
+ \def\R{1.15}
  % reflection-positive window [-pi+arctan 2, 0], in degrees [-116.57, 0]
  \fill[mpored!14] (0,0)--(0:\R) arc[start angle=0,end angle=-116.57,radius=\R]--cycle;
  \draw[black!35,line width=.4pt] (0,0) circle[radius=\R];
@@ -348,10 +496,10 @@ $-0.156$ at $\vartheta=0.05\pi$ (Sec.~\ref{app:checks}).
  \draw[mpoblue,line width=2.2pt] (0:{\R+.12}) arc[start angle=0,end angle=-45,radius={\R+.12}];
  % phase boundaries
  \foreach \a in {45,90,-45,-135}{\draw[black!55,line width=.4pt] (\a:{\R-.12})--(\a:{\R+.12});}
- \node[black!70] at (-22:{\R+.75}) {Haldane};
- \node[black!70] at (67.5:{\R+.4}) {critical};
- \node[black!70] at (180:{\R+.45}) {FM};
- \node[black!70] at (-90:{\R+.38}) {dimerized};
+ \node[black!70] at (-22:{\R+.72}) {Haldane};
+ \node[black!70] at (67.5:{\R+.38}) {critical};
+ \node[black!70] at (180:{\R+.42}) {FM};
+ \node[black!70] at (-90:{\R+.36}) {dimerized};
  % special points
  \foreach \a in {0,18.43,45,-45,-116.57}{\fill (\a:\R) circle[radius=1.4pt];}
  \node[anchor=west,font=\scriptsize] at (18.43:{\R+.08}) {AKLT};
@@ -359,61 +507,96 @@ $-0.156$ at $\vartheta=0.05\pi$ (Sec.~\ref{app:checks}).
  \node[anchor=south west,font=\scriptsize] at (45:{\R+.02}) {ULS};
  \node[anchor=north west,font=\scriptsize] at (-45:{\R+.14}) {TB};
  \node[anchor=north east,font=\scriptsize] at (-116.57:{\R+.02}) {$-\pi{+}\arctan2$};
- \draw[flow,black!40] (0,0)--(35:.6) node[pos=1.15,black!60,font=\scriptsize] {$\vartheta$};
+ \draw[flow,black!40] (0,0)--(35:.55) node[pos=1.15,black!60,font=\scriptsize] {$\vartheta$};
 \end{tikzpicture}
 \end{proofdiagram}
-The red arc in the figure is the reflection-positive window. The blue arc,
-$-\pi/4<\vartheta\le0$, is where it meets the Haldane phase, so
-Theorem~\ref{thm:criterion} can apply there. Elsewhere in the window
-Corollary~\ref{cor:obstruct} excludes it: the dimerized ground states are
-degenerate, and the Takhtajan--Babujian point TB is critical.
+The red arc is the reflection-positive window; the blue arc,
+$-\pi/4<\vartheta\le0$, is where it meets the Haldane phase so
+Theorem~\ref{thm:criterion} applies. Elsewhere in the window
+Corollary~\ref{cor:obstruct} excludes it (degenerate dimerized ground states and
+critical point TB). The Heisenberg chain sits on the edge of the window, while
+AKLT and ULS lie outside it because the positive biquadratic coefficient has the
+wrong sign, and optimizing over all on-site $\Theta$ finds none (Sec.~\ref{app:checks}).
 
-The Heisenberg chain sits exactly on the edge of the window. The AKLT and
-ULS points lie outside it: the positive biquadratic coefficient has the
-wrong sign. Proving the AKLT gap this way would need a different $\Theta$, a
-different cut, or blocking: a numerical search over every on-site
-$\Theta$ finds none (Sec.~\ref{app:checks}).
-
-\emph{Beyond the chain.} Finite-range couplings fit after blocking: put $r$
-sites in a unit cell and reflect within the block. Reflection-positive
-fermion models~\cite{jaffe} and two-dimensional lattices with reflection
-planes~\cite{fils,biskup} supply the structural property (H2). In
-two dimensions the spatial transfer operator acts on a whole column, so
-(H3) becomes much harder to verify.
-
-\section{Numerical checks}\label{app:checks}
-The checks are short floating-point scripts kept outside this repository. Two tests are used.
+\emph{Anisotropy, dimerized cells, and ladders.}
+Any real symmetric on-site or intra-cell operator $o_j=\overline{o_j}$
+preserves bond reflection positivity without requiring integrability:
 \begin{itemize}
-\item \emph{Gram test} (\texttt{rp\_check.py}). This tests
-Eq.~\eqref{eq:rp} on open chains of $4$ and $6$ sites,
-$\beta\in[0.3,3]$. The left-half operators $A$ index a Hermitian form, and
-the test reports its least eigenvalue relative to the largest, minimized over
-the on-site antiunitary $\Theta=VK$.
-\item \emph{Realignment test} (\texttt{t4.py}). This checks the form of
-Eq.~\eqref{eq:rpform} directly, with the on-site shift optimized.
+\item \emph{Single-ion anisotropy.} In the Cartesian spin-1 basis,
+$o=D(S^z)^2=D\operatorname{diag}(1,1,0)$ is real diagonal and leaves
+$-\bm S_j\cdot\bm S_{j+1}$ unchanged (\path{models/spin1_largeD}).
+\item \emph{Dimerized chains.} Bond-alternating spin-$\tfrac12$ and spin-1
+chains with couplings $1\pm\delta$ group into two-spin cells with swap $F=P$
+under Eq.~\eqref{eq:rpcell} (\path{models/dimerized_heisenberg},
+\path{models/spin1_dimerized}).
+\item \emph{Two-leg ladders.} Grouping each two-spin rung into a four-state
+site ($F=I$) places the rung coupling in $o_j$ and the leg couplings in
+$-h_{\mathrm{cell}}=\sum_\alpha C_\alpha\otimes C_\alpha$, covering both the
+Ising ladder ($C_{1,2}=Z\otimes I,\,I\otimes Z$; \path{models/two_leg_tfim})
+and, under a checkerboard $\pi$-rotation $u=2iS^y$ on one spin per rung, the
+spin-$\tfrac12$ Heisenberg ladder (\path{models/heisenberg_ladder}).
 \end{itemize}
-The results:
+Reflection-positive fermion models~\cite{jaffe} and two-dimensional lattices
+with reflection planes~\cite{fils,biskup} also satisfy (H2), with $X_\beta$
+acting on a transverse column in 2D.
+
+\section{Numerical Checks and Certified Models}\label{app:checks}
+\emph{Reflection-positivity screening.}
+Two floating-point tests screen Hamiltonians before algebraic certification:
+\begin{itemize}
+\item \emph{Gram test.} Tests Eq.~\eqref{eq:rp} on open chains of $4$ and $6$
+sites, $\beta\in[0.3,3]$, reporting the least eigenvalue of
+$A\mapsto\Tr[A\theta(A)e^{-\beta H}]$ relative to the largest, minimized over
+$\Theta=VK$.
+\item \emph{Realignment test} (\path{CertifiedGaps.rp_test}).
+Checks Eq.~\eqref{eq:rpform} via the bond realignment matrix
+$R[-h]_{(ik),(jl)}=-h_{(ij),(kl)}$ with an optimized on-site shift.
+\end{itemize}
+The screening results match Propositions~\ref{prop:xyz} and~\ref{prop:blbq}:
 \begin{itemize}
 \item \emph{Spin-$\tfrac12$ XYZ chain.} All eight sign patterns of
-$(J_x,J_y,J_z)=(\pm1,\pm.7,\pm.4)$ follow the parity rule: those with zero
-or two ferromagnetic entries give $\ge-10^{-12}$ after optimizing $V$, and
-the other four give $-0.048$. The antiferromagnet in a uniform field gives
-$-0.095$, and the transverse-field Ising chain gives $\ge-10^{-12}$.
-\item \emph{Spin-1, Cartesian $\Theta=K$.} The Heisenberg antiferromagnet
-and $-(\bm S\cdot\bm S)^2$ pass. The ferromagnet fails at $-0.39$ and AKLT
-fails at $-0.04$. Over $\vartheta$, the test is nonnegative at the sampled points inside the
-window of Proposition~\ref{prop:blbq}, $\vartheta/\pi\in[-.62,0]$, and negative at the sampled points
-outside it, $\vartheta/\pi\in\{-1,-.88,-.75\}\cup[.12,1]$.
+$(J_x,J_y,J_z)=(\pm1,\pm.7,\pm.4)$ follow the parity rule: zero or two
+ferromagnetic entries give $\ge-10^{-12}$ after optimizing $V$, while the other
+four give $-0.048$; the uniform-field antiferromagnet gives $-0.095$ and the
+transverse-field Ising chain gives $\ge-10^{-12}$.
+\item \emph{Spin-1, Cartesian $\Theta=K$.} The Heisenberg antiferromagnet and
+$-(\bm S\cdot\bm S)^2$ pass; the ferromagnet ($-0.39$) and AKLT ($-0.04$) fail.
+Over $\vartheta$, the test is nonnegative on $\vartheta/\pi\in[-.62,0]$
+(Proposition~\ref{prop:blbq}) and negative on
+$\vartheta/\pi\in\{-1,-.88,-.75\}\cup[.12,1]$.
 \item \emph{Spin-1, every on-site $\Theta=VK$.} Minimizing over $V\in U(3)$
-with twelve restarts does not help: AKLT stays at $-0.040$, ULS at $-0.18$,
-$\vartheta=-0.75\pi$ at $-0.15$, and the ferromagnet improves only to $-0.15$.
+with twelve restarts leaves AKLT at $-0.040$, ULS at $-0.18$, and
+$\vartheta=-0.75\pi$ and the ferromagnet at $-0.15$.
 \end{itemize}
-These tests are necessary conditions for a particular $\theta$. A failure
-excludes that $\Theta$, not every possible proof.
-\begin{thebibliography}{13}
+A failure excludes that on-site $\Theta$, not every block or cut.
+
+\emph{Certified model suite and full-spectrum enclosures.}
+Beyond the spin-1 Heisenberg chain (Ref.~\cite{cert}), the repository certifies
+seven additional model families (Table~\ref{tab:certified}). For seed rings up
+to $16$ spin-$\tfrac12$ or $12$ spin-1 sites, \path{CertifiedGaps.VerifiedSpectra}
+assembles symmetry blocks (whose exact multiplicities sum to $d^n$) in interval
+arithmetic, diagonalizes them in IEEE binary64, and encloses every eigenvalue
+via polar-factor orthogonalization, Weyl's inequality, and a priori rounding
+bounds ($\gamma_k=ku/(1-ku)$ with gradual underflow) before summing $\log Z$
+and iterating Eq.~\eqref{eq:asym}. Centered operator-norm bounds on $\sum_j o_j$
+extend point certificates to coupling intervals ($D\in[3.2059998,3.206]$ in
+\path{models/spin1_largeD} and $|J_\perp-J_*|\le10^{-4}$ in
+\path{models/heisenberg_ladder}, where independent-rung Weyl bounds fail for
+all $n\ge2$, $\beta>0$, $0<J_\perp\le4$). Conversely, bounding the monotone
+factors $W_L(\beta)=e^{\beta E_0(L)}Z_L(\beta)$ over interval coverings of
+$(0,\infty)$ rules out all $\beta_0>0$ at $n_0\in\{2,4\}$ for the dimerized
+spin-$\tfrac12$ chain at $\delta\le1/5$ and the Heisenberg ladder at
+$J_\perp\in\{3/2,2\}$. At $(g,h)=(1/4,1/20)$ in the longitudinal-field Ising
+chain, \path{lean/SeedKernel/} verifies the integer moments and seed bounds
+in the Lean~4 kernel (\texttt{decide +kernel}), proving an unconditional gap.
+
+\begin{thebibliography}{14}
 \bibitem{main}
 Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime
-tensor networks}, \texttt{notes/thermal-mpo-gap-note.tex} (2026).
+tensor networks} (\texttt{thermal-mpo-gap-note.tex}, 2026).
+\bibitem{cert}
+Companion note, \emph{How the initial estimate is certified}
+(\texttt{thermal-mpo-gap-certificate.tex}, 2026).
 \bibitem{os}
 K. Osterwalder and R. Schrader,
 \href{https://doi.org/10.1007/BF01645738}{Axioms for Euclidean Green's

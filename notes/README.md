@@ -1,16 +1,16 @@
 # LaTeX Notes
 
 This directory contains the REVTeX 4.2 notes that develop the spacetime bootstrap, its scope across
-reflection-positive spin chains, and the diagrammatic certification of the spin-1 Haldane gap seed. Each
-`.tex` source file has its compiled `.pdf` alongside it. The main document `thermal-mpo-gap-note.tex`
-also inputs `thermal-mpo-gap-scope.tex` (Appendices D–H) and `thermal-mpo-gap-certificate.tex`
-(Appendices I–M), which can be compiled either as part of the main note or as standalone documents.
+reflection-positive spin and ladder models, and the diagrammatic certification of the finite seed
+inputs. Each `.tex` source file has its compiled `.pdf` alongside it. The companion notes
+`thermal-mpo-gap-scope.tex` (Appendices D–H) and `thermal-mpo-gap-certificate.tex` (Appendices I–M)
+continue the appendix numbering of `thermal-mpo-gap-note.tex` (Appendices A–C).
 
 | note | PDF | content |
 |---|---|---|
 | [`thermal-mpo-gap-note.tex`](thermal-mpo-gap-note.tex) | [PDF](thermal-mpo-gap-note.pdf) | *A Diagrammatic Proof of the Haldane Gap via Spacetime Tensor Networks*. Main text: proves a uniform spectral gap $\Delta_L > (\log 20)/784 \approx 0.003821$ for the periodic spin-1 antiferromagnetic Heisenberg chain for all even $L \ge 2304$, using an exact continuous-time thermal MPO and a scale-doubling iteration on spatial and thermal purities. Appendices A–C treat open chains with equal endpoint fields $h = 3/5$, proving $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$. |
-| [`thermal-mpo-gap-scope.tex`](thermal-mpo-gap-scope.tex) | [PDF](thermal-mpo-gap-scope.pdf) | *Scope of the Spacetime Bootstrap* (Appendices D–H). Characterizes which Hamiltonians the method covers: nearest-neighbor bond reflection positivity (including multi-site unit cells with an internal reflection $F$) makes the spatial transfer operator $X_\beta$ self-adjoint, so bounds on the two purities at one finite scale imply a uniform spectral gap. |
-| [`thermal-mpo-gap-certificate.tex`](thermal-mpo-gap-certificate.tex) | [PDF](thermal-mpo-gap-certificate.pdf) | *How the Initial Estimate Is Certified* (Appendices I–M). Presents the finite seed certificate at $(n_0, \beta_0) = (2304, 784)$ in tensor-network diagrams: twisted partition functions, symmetry-sector projectors, Chebyshev polynomial filters, a matrix-product trial vector at $n = 36$, and six unequal-defect doubling steps from $n = 36$ to $n = 2304$. |
+| [`thermal-mpo-gap-scope.tex`](thermal-mpo-gap-scope.tex) | [PDF](thermal-mpo-gap-scope.pdf) | *Scope of the Spacetime Bootstrap* (Appendices D–H). Formalizes the general criterion for translation-invariant chains and extends it to multi-site unit cells with internal reflection $F$ (`RPRing`), positive cell-transfer factorizations $X_\beta = KK^* \succeq 0$ for odd seed lengths, the asymmetric $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ recurrence basin, and four-torus seed lifting; classifies bilinear, biquadratic, staggered-field, anisotropic, dimerized, and two-leg ladder Hamiltonians; and summarizes the computer-verified gap certificates across eight model families (`CertifiedGaps.VerifiedSpectra`, local coupling continuation, all-$\beta_0$ exclusions, and `SeedKernel`). |
+| [`thermal-mpo-gap-certificate.tex`](thermal-mpo-gap-certificate.tex) | [PDF](thermal-mpo-gap-certificate.pdf) | *How the Initial Estimate Is Certified* (Appendices I–M). Presents the finite seed certificate at $(n_0, \beta_0) = (2304, 784)$ in tensor-network diagrams: twisted partition functions, symmetry-sector projectors, Chebyshev polynomial filters, a matrix-product trial vector at $n = 36$, and six unequal-defect doubling steps from $(36, 49/4)$ (including the temperature-lifted chain $\Delta_L > 0.0729$ for even $L \ge 36$ and the even-length real-$\mathrm{SU}(2)$-twist chain $\Delta_L > 0.039$ for even $L \ge 60$), followed by the 7-level spectral cutout ($14.7\times$ trace reduction at $N = 120$) and the spin-2 starting-point barrier. |
 | [`thermal-mpo-gap-2plus1d.tex`](thermal-mpo-gap-2plus1d.tex) | [PDF](thermal-mpo-gap-2plus1d.pdf) | *The Thermal-Purity Recursion in 2+1 Dimensions*. Develops the partition-function-excess recursion for frustration-free Hamiltonians in two spatial dimensions, tested numerically on the hexagonal spin-3/2 AKLT model in [`../models/aklt/`](../models/aklt/). |
 
 ## Build
@@ -43,8 +43,8 @@ than as one-off macros:
   top-to-bottom in two parallel lanes, with one box per inequality and one numbered circle per deductive
   step (a thin gray arrow into a circle marks a secondary input).
 - `\sparkline{min}{max}{data}`, `\specbars{data}`, and inline word-sized glyphs (`\levels`,
-  `\decayglyph`, `\fcurve`, `\overlapglyph`, `\fieldsame`, `\fieldopp`, `\stackbar`, `\torusseq`,
-  `\Zt`, `\Zbox`, `\virtleg`, `\physleg`).
+  `\decayglyph`, `\fcurve`, `\overlapglyph`, `\fieldsame`, `\fieldopp`, `\fieldstag`, `\stackbar`,
+  `\torusseq`, `\Zt`, `\Zbox`, `\virtleg`, `\physleg`).
 
 Only three genuinely two-dimensional diagrams are defined as standalone macros in the note's preamble
 (`\Wlegs`, `\folded`, `\stackedmpo`). Use the canonical notation table below across all notes and
