@@ -2,10 +2,13 @@
     CertifiedGaps.Seeds
 
 Seed search: seed defects from exact spectra, and the certified bound over a grid of seed
-lengths and inverse temperatures.
+lengths and inverse temperatures; and the rigorous step from log Z enclosures to exact rational
+seed defects.
 """
 module Seeds
 
+using IntervalArithmetic
+using ..ExactArithmetic: RationalBig
 using ..ExactDiagonalization: logZ_bounds
 using ..Recurrence: certified_gap_bound
 
@@ -22,6 +25,34 @@ function seed_defects(spectra, n::Integer, β::Real)
     l2lo, l2hi = logZ_bounds(spectra[2n], β)
     l22lo, _ = logZ_bounds(spectra[2n], 2β)
     return -expm1(l2lo - 2lnhi), -expm1(l22lo - 2l2hi)
+end
+
+"""
+    seed_defects(logZn, logZ2n, logZ2n_2β) -> (; eps_s, eps_t, defect_s, defect_t)
+
+Rigorous seed defects from interval enclosures (`Interval{Float64}` or `Interval{BigFloat}`)
+of log Z_n(β), log Z_{2n}(β) and log Z_{2n}(2β):
+
+    1 − Pₛ(n, β) = 1 − exp(log Z_{2n}(β) − 2 log Z_n(β)),
+    1 − P_τ(2n, β) = 1 − exp(log Z_{2n}(2β) − 2 log Z_{2n}(β)).
+
+`defect_s`, `defect_t` are interval enclosures, and `eps_s`, `eps_t` exact rationals (the
+binary upper endpoints, converted without rounding) with εₛ ≥ 1 − Pₛ and εₜ ≥ 1 − P_τ. Each
+is the smaller of the upper ends of `1 − exp(x)` and `−expm1(x)`, both valid enclosures, so it
+never exceeds the plain `1 − exp` evaluation on the same inputs and, with correctly rounded
+`expm1` (the default), equals a directed-rounding `−expm1`. No sign is imposed: callers that
+need 0 ≤ ε < 1 check it.
+"""
+function seed_defects(logZn::Interval, logZ2n::Interval, logZ2n_2β::Interval)
+    defect_s, eps_s = _defect(logZ2n - 2logZn)
+    defect_t, eps_t = _defect(logZ2n_2β - 2logZ2n)
+    return (; eps_s, eps_t, defect_s, defect_t)
+end
+
+# Enclosure of 1 − eˣ and its exact rational upper bound.
+function _defect(x::Interval)
+    a, b = 1 - exp(x), -expm1(x)
+    return a, min(RationalBig(sup(a)), RationalBig(sup(b)))
 end
 
 "Seed defects as a function of (n, β), from ring spectra keyed by length."

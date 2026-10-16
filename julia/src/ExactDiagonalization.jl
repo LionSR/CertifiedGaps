@@ -13,7 +13,7 @@ module ExactDiagonalization
 using KrylovKit, LinearAlgebra, SparseArrays
 
 export Chain, ring_bonds, open_bonds, graph_bonds, sectors, sector_states,
-    sector_hamiltonian, PartialSpectrum, spectrum, logZ_bounds, log_partition
+    sector_hamiltonian, PartialSpectrum, WeightedSpectrum, spectrum, logZ_bounds, log_partition
 
 """
     Chain(d, bonds; onsite = nothing, charge = nothing)
@@ -194,6 +194,36 @@ function logZ_bounds(spec::PartialSpectrum, β::Real)
     hi = spec.exact ? lo :
          _logaddexp(lo, log(spec.N - length(spec.E)) - β * (spec.E[end] - E₀))
     return lo - β * E₀, hi - β * E₀
+end
+
+"""
+    WeightedSpectrum(E, weights, N, exact)
+
+Distinct levels `E` (sorted ascending) with exact integer multiplicities `weights`, of an
+operator of dimension `N`; `exact` when `sum(weights) == N` (every level listed). For
+symmetry-resolved spectra, e.g. SU(2) multiplets with weight 2S + 1 times a sector count.
+"""
+struct WeightedSpectrum
+    E::Vector{Float64}
+    weights::Vector{Int}
+    N::Int
+    exact::Bool
+end
+
+"""
+    logZ_bounds(spec::WeightedSpectrum, β) -> (lo, hi)
+
+log Σᵢ wᵢ e^{−βEᵢ}, shifted by E[1] for stability; both ends equal for an exact spectrum.
+Otherwise the N − Σw unlisted states, each at least E[end], give the upper end. Floating point
+(a screening tool, not an enclosure).
+"""
+function logZ_bounds(s::WeightedSpectrum, β::Real)
+    e0 = s.E[1]
+    z = sum(w * exp(-β * (e - e0)) for (e, w) in zip(s.E, s.weights))
+    lo = log(z) - β * e0
+    s.exact && return lo, lo
+    missing_states = s.N - sum(s.weights)
+    return lo, log(z + missing_states * exp(-β * (s.E[end] - e0))) - β * e0
 end
 
 _logaddexp(a, b) = max(a, b) + log1p(exp(-abs(a - b)))
