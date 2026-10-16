@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spacetime Bootstrap Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap">
+<script>window.MathJax = { tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]']] }, svg: { fontCache: 'local' }, options: { enableMenu: false } };</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" defer></script>
+<script src="core.js"></script>
+<script src="chapters.js"></script>
+<script src="open_chapters.js"></script>
+<style>
+/* Layout: a Tufte page. One text column (about 60%), a right margin for notes and figure captions; figures without frames. */
+:root {
+  --bg: #fffff8; --ink: #111111; --mute: #6b6b66; --line: #d9d6c6; --space: #a2322e; --time: #34628f; --proved: #8f6412; --ok: #2f6b3d; --fail: #a2322e;
+  --space-f: rgba(162,50,46,.08); --time-f: rgba(52,98,143,.08); --proved-f: rgba(143,100,18,.10); --torus-fill: #efede2; --surface: #fffff8;
+  --heat-lo: #f3f1e4; --heat-none: #dedbcb; --stage: var(--bg);
+  --serif: "EB Garamond", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #151515; --ink: #dddddd; --mute: #9a9a94; --line: #3a3a37; --space: #e0786c; --time: #84aad4; --proved: #d4a64a; --ok: #7fbf8f; --fail: #e0786c;
+  --space-f: rgba(224,120,108,.10); --time-f: rgba(132,170,212,.10); --proved-f: rgba(212,166,74,.12); --torus-fill: #26262a; --surface: #151515;
+  --heat-lo: #222220; --heat-none: #33332f; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #151515; --ink: #dddddd; --mute: #9a9a94; --line: #3a3a37; --space: #e0786c; --time: #84aad4; --proved: #d4a64a; --ok: #7fbf8f; --fail: #e0786c;
+  --space-f: rgba(224,120,108,.10); --time-f: rgba(132,170,212,.10); --proved-f: rgba(212,166,74,.12); --torus-fill: #26262a; --surface: #151515;
+  --heat-lo: #222220; --heat-none: #33332f; color-scheme: dark; }
+body { background: var(--bg); color: var(--ink); font: 19px/1.55 var(--serif); font-variant-numeric: oldstyle-nums; }
+article { max-width: 1240px; margin: 0 auto; padding-block: 48px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font-weight: 400; font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: 1.1; margin: 0; }
+.subtitle { font-style: italic; font-size: 1.45rem; margin: 6px 0 0; color: var(--ink); }
+h2 { font-weight: 400; font-style: italic; font-size: 1.8rem; line-height: 1.2; margin: 0 0 14px; }
+h2 .n { font-style: normal; font-size: .95rem; color: var(--mute); margin-right: 14px; font-variant-numeric: lining-nums; }
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+code { font: .78em ui-monospace, "SFMono-Regular", Menlo, monospace; }
+.r { display: grid; grid-template-columns: minmax(0, 62%) minmax(0, 1fr); gap: 0 4%; align-items: start; }
+.r > * { min-width: 0; }
+.prose p, .intro p { margin: 0 0 .9em; max-width: 36em; }
+.prose ol { margin: 0 0 .9em; padding-left: 1.3em; max-width: 36em; }
+.side { font-size: .9rem; line-height: 1.4; color: var(--ink); }
+.side .note { margin: .25em 0 0; }
+.ch { padding-block: 44px 8px; }
+.player canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.player { margin: 18px 0 6px; }
+.pmeta { margin-top: 10px; }
+.pcap { margin: 0; font-size: 1.02rem; line-height: 1.45; min-height: 4.4em; font-style: italic; max-width: 36em; }
+.pctl { margin: 0; font-size: .85rem; color: var(--mute); }
+.pctl button { font: inherit; font-variant: small-caps; letter-spacing: .04em; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.pctl .bt { display: block; margin-top: 4px; font-style: italic; }
+.pmeta input[type=range] { width: 100%; margin-top: 8px; }
+input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; height: 18px; }
+input[type=range]::-webkit-slider-runnable-track { height: 1px; background: var(--mute); }
+input[type=range]::-moz-range-track { height: 1px; background: var(--mute); }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--ink); margin-top: -5px; border: 0; }
+input[type=range]::-moz-range-thumb { width: 11px; height: 11px; border-radius: 50%; background: var(--ink); border: 0; }
+.eqs { margin-top: 6px; }
+.eqs p { margin: 0 0 .6em; }
+mjx-container[display="true"] { margin: .6em 0 !important; overflow-x: auto; overflow-y: hidden; }
+.toc { font-size: .95rem; line-height: 1.8; max-width: 44em; }
+.toc a { white-space: nowrap; }
+video { width: 100%; aspect-ratio: 16 / 9; display: block; background: var(--bg); }
+details.try { margin-top: 12px; }
+details.try > summary { cursor: pointer; font-style: italic; color: var(--ink); }
+details.try > summary::marker { color: var(--mute); }
+.tryin { padding: 6px 0 4px; }
+.two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+.two-col > * { min-width: 0; }
+.two-col canvas { width: 100%; height: auto; display: block; }
+.fig { width: 100%; max-width: 560px; height: auto; display: block; }
+.small { font-size: .82rem; color: var(--mute); margin: 4px 0; font-style: italic; }
+.ctrl { display: grid; grid-template-columns: minmax(7em, auto) 1fr minmax(6ch, auto); gap: 4px 12px; align-items: center; font-size: .9rem; color: var(--mute); margin-top: 8px; }
+.ctrl output { color: var(--ink); text-align: right; font-variant-numeric: lining-nums tabular-nums; }
+button { font: .85rem var(--serif); color: var(--ink); background: none; border: 0; border-bottom: 1px solid var(--line); padding: 2px 2px; cursor: pointer; }
+button:hover { border-bottom-color: var(--ink); }
+button:focus-visible, input:focus-visible, a:focus-visible, summary:focus-visible, canvas:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
+.presets button.on { border-bottom: 2px solid var(--ink); }
+.row { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; align-items: center; }
+.verdict { font-size: .92rem; margin-top: 8px; }
+.big { font-size: 1.6rem; color: var(--ink); font-variant-numeric: lining-nums; }
+table { border-collapse: collapse; font-size: .82rem; width: 100%; font-variant-numeric: lining-nums tabular-nums; }
+th, td { text-align: right; padding: 2px 6px; white-space: nowrap; }
+th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1px solid var(--line); }
+.tbl { overflow: auto; max-height: 200px; margin-top: 8px; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 18px; margin: 14px 0; max-width: 62%; }
+.stat .k { font-size: .8rem; color: var(--mute); font-style: italic; }
+.stat .v { font-size: 1.15rem; overflow-wrap: anywhere; font-variant-numeric: lining-nums; }
+.g { color: var(--ink); }
+.chip { display: inline-block; font-size: .85rem; padding: 0 6px; margin: 2px; border-bottom: 1px solid; }
+.chip.cl { color: var(--proved); } .chip.cr { color: var(--time); }
+.part { padding-top: 72px; border-top: 1px solid var(--line); margin-top: 56px; }
+.parth { font-size: clamp(2rem, 4vw, 2.8rem); }
+.foot { color: var(--mute); font-size: .85rem; margin-top: 40px; max-width: 62%; }
+@media (max-width: 760px) {
+  .r { grid-template-columns: minmax(0, 1fr); }
+  .side { margin: 4px 0 12px; padding-left: 12px; border-left: 1px solid var(--line); }
+  .side:empty { display: none; }
+  .pcap { min-height: 0; }
+  .two-col { grid-template-columns: minmax(0, 1fr); }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+  .foot { max-width: none; }
+}
+</style>
+</head>
+<body>
+<article>
+  <header>
+    <h1>The spacetime bootstrap</h1>
+    <p class="subtitle">A proof that the spin-1 Heisenberg ring has a spectral gap, in sixteen figures, with an open-chain sequel</p>
+  </header>
+  <div class="r" style="margin-top: 28px"><div class="main intro">
+    <p>A gap is a decay rate: at low temperature, excited states fade like \(e^{-\beta\Delta}\). The proof measures how pure the thermal state is on one finite
+      ring, then shows that doubling the ring and the inverse temperature together makes the purity better by itself, all the way to infinity.
+      Each section states one idea in words, shows it in a figure that runs step by step, and ends with the formula.</p>
+    <p class="toc"><a href="#gap">What is a gap?</a> · <a href="#rate">A gap is a decay rate</a> · <a href="#imag">Imaginary time</a> · <a href="#paths">A sum over histories</a> · <a href="#torus">The partition function is a torus</a> · <a href="#chain">Histories of a chain</a> · <a href="#slice">Two ways to slice the torus</a> · <a href="#purity">Purity, seen as squares</a> · <a href="#two">Two purities from one torus</a> · <a href="#square">Squaring sharpens</a> · <a href="#couple">Space and time are tied</a> · <a href="#rpwhy">Why the proof needs a symmetric transfer matrix</a> · <a href="#rpwhere">Where the symmetry comes from</a> · <a href="#rptest">Testing a bond for reflection positivity</a> · <a href="#double">One doubling step</a> · <a href="#iterate">Repeat, and read off the gap</a> · <a href="#seedtoy">The starting numbers, worked on a toy</a> · <a href="#seed">The real certificate</a> · <a href="#lab">the whole machine on a solvable chain</a> · <a href="#part2"><i>Part II: open chains</i></a></p></div>
+    <aside class="side"><p class="note">Figures play when they come into view. Use <i>back</i> and <i>next</i> to step, or drag the slider. Red marks space, blue imaginary time.</p></aside></div>
+  <div class="r" style="margin-top: 18px"><div class="main"><video src="film.mp4" poster="poster.jpg" controls preload="metadata" playsinline></video></div>
+    <aside class="side"><p class="note">The same figures as one film, with the step captions, about five and a half minutes.</p></aside></div>
+  <section class="ch" id="gap">
+    <h2><span class="n">1</span>What is a gap?</h2>
+    <div class="r"><div class="main prose"><p>A spin chain has discrete energy levels. The gap \(\Delta_L\) is the distance from the lowest level to the next one. Haldane predicted in 1983 that the
+spin-1 chain keeps a gap as the ring grows; numerics give \(\Delta\approx0.41\). For decades there was no proof that some fixed \(c>0\) bounds \(\Delta_L\) for every \(L\).</p></div><aside class="side"><p class="note">Haldane, 1983. The theorem here is from OpenAI’s 2026 preprint; this page follows <code>notes/thermal-mpo-gap-note.tex</code>.</p></aside></div>
+    <div class="player" data-ch="gap"></div>
+    <div class="r"><div class="main eqs">\[ H_L=\sum_{j=1}^{L}\mathbf S_j\cdot\mathbf S_{j+1},\qquad \Delta_L=E_1(L)-E_0(L). \]
+<p class="thm">Theorem: \(\Delta_L>\log 20/784\approx0.0038\) for every even \(L\ge2304\), and the ground state is unique.</p></div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="rate">
+    <h2><span class="n">2</span>A gap is a decay rate</h2>
+    <div class="r"><div class="main prose"><p>At inverse temperature \(\beta\), level \(m\) has probability \(w_m=e^{-\beta E_m}/Z\). The first two weights have ratio \(e^{-\beta\Delta}\).
+So it is enough to show that the excited weight decays at least like \(e^{-c\beta}\), with the same \(c\) for every ring. Everything that follows controls excited weight
+at low temperature on arbitrarily long rings.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="rate"></div>
+    <div class="r"><div class="main eqs">\[ \frac{w_1}{w_0}=e^{-\beta\Delta_L}\le e^{-c\beta}\ \text{ for all }\beta\quad\Longrightarrow\quad\Delta_L\ge c. \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="imag">
+    <h2><span class="n">3</span>Imaginary time</h2>
+    <div class="r"><div class="main prose"><p>Expand a state in energy eigenstates, \(\psi=\sum_mc_m|m\rangle\). Real-time evolution multiplies \(c_m\) by the phase \(e^{-iE_mt}\): every probability \(|c_m|^2\) stays the same forever.
+Put \(t=-i\tau\) and the phase becomes a real factor \(e^{-\tau E_m}\). Nothing rotates any more; each component shrinks, higher energies faster.
+After rescaling, the ground state wins, and the first excited level loses at rate \(\Delta\). At \(\tau=\beta\) the factors are the Boltzmann weights: "long imaginary time" and "low temperature" are the same statement.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="imag"></div>
+    <div class="r"><div class="main eqs">\[ e^{-iHt}\psi=\sum_m c_me^{-iE_mt}|m\rangle\ \xrightarrow{\ t=-i\tau\ }\ e^{-\tau H}\psi=\sum_m c_me^{-\tau E_m}|m\rangle,\qquad \frac{|c_1(\tau)|}{|c_0(\tau)|}\propto e^{-\tau\Delta}. \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="paths">
+    <h2><span class="n">4</span>A sum over histories</h2>
+    <div class="r"><div class="main prose"><p>One fact does all the work: an entry of a matrix power \(A^M\) is a sum over paths through \(M\) steps, each path weighted by the product of the entries it uses
+(the same fact that counts walks on a graph). Write \(e^{-\beta H}=A^M\) with \(A=e^{-d\tau H}\) and \(M=\beta/d\tau\). For one spin with \(H=-\sigma^x\),
+\(A\approx\begin{pmatrix}1&d\tau\\d\tau&1\end{pmatrix}\): staying costs 1, flipping costs \(d\tau\). As \(d\tau\to0\) a path is a world line with a few flips; \(k\) flips can sit
+anywhere, which gives weight \(\beta^k/k!\). The trace keeps only paths that return to their start, so time is periodic. Summing gives \(2\cosh\beta\), the exact answer.
+That sum over histories is the Euclidean, or imaginary-time, path integral.</p></div><aside class="side"><p class="note">The same identity counts walks on a graph: (Aᴹ)ᵢⱼ with A the adjacency matrix.</p></aside></div>
+    <div class="player" data-ch="paths"></div>
+    <div class="r"><div class="main eqs">\[ (A^M)_{ij}=\sum_{\text{paths }i\to j}\ \prod_{\text{steps}}A_{s_ts_{t+1}},\qquad \operatorname{Tr}e^{\beta\sigma^x}=\sum_{k\ \mathrm{even}}\frac{2\beta^k}{k!}=2\cosh\beta . \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main"><details class="try"><summary>Try it: add up the histories yourself</summary>
+  <div class="tryin"><svg class="fig" id="pathSvg" viewBox="0 0 520 200" role="img" aria-label="Contributions of histories with k flips"></svg>
+  <div class="ctrl"><label for="pathB">β</label><input id="pathB" type="range" min="0.2" max="5" step="0.05" value="2"><output id="pathBOut"></output></div>
+  <div class="ctrl"><label for="pathK">max flips kept</label><input id="pathK" type="range" min="0" max="20" step="2" value="4"><output id="pathKOut"></output></div>
+  <p class="small" id="pathOut"></p></div></details></div><aside class="side"></aside></div>
+  </section>
+  <section class="ch" id="torus">
+    <h2><span class="n">5</span>The partition function is a torus</h2>
+    <div class="r"><div class="main prose"><p>Split \(e^{-\beta H}\) into many short steps in imaginary time. The trace glues the last step to the first, so imaginary time is a circle of length \(\beta\).
+The ring is a circle in space. The partition function is a sum over histories on an \(L\times\beta\) torus. The proof uses an exact continuous-time version of this picture,
+with no discretization error.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="torus"></div>
+    <div class="r"><div class="main eqs">\[ Z_L(\beta)=\operatorname{Tr}e^{-\beta H_L}=\operatorname{Tr}\big(e^{-\beta H_L/M}\big)^M . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="chain">
+    <h2><span class="n">6</span>Histories of a chain</h2>
+    <div class="r"><div class="main prose"><p>The classical Ising ring has \(Z=\operatorname{Tr}T^L\): a 2×2 matrix passes one spin from site to site. The quantum chain works the same way after one change of what is passed along.
+Each bond term \(\mathbf S_j\cdot\mathbf S_{j+1}=-\sum_\alpha G_{\alpha,j}G_{\alpha,j+1}\) fires events at random imaginary times, and an event of type \(\alpha\) puts the real 3×3 matrix
+\(G_\alpha=iS^\alpha\) on both of its sites. The thing passed along the ring is the list of events on a bond. A site with events \(a\) on its left bond and \(b\) on its right
+contributes \(X(a,b)\): the trace of its \(G\)'s multiplied in time order. Examples: no events gives 3; one \(z\)-event on each side gives \(\operatorname{Tr}G_zG_z=-2\).</p></div><aside class="side"><p class="note">G<sub>α</sub> = iS<sup>α</sup> in the Cartesian basis |x⟩, |y⟩, |z⟩ are real antisymmetric 3 × 3 matrices.</p></aside></div>
+    <div class="player" data-ch="chain"></div>
+    <div class="r"><div class="main eqs">\[ X_\beta(a,b)=\operatorname{Tr}\Big[\mathcal T\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\Big],\qquad Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}\quad\big(\text{cf. }Z=\operatorname{Tr}T^L\big). \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main"><details class="try"><summary>Try it: compute X(a, b) yourself</summary>
+  <div class="tryin"><p class="small">Add events in time order. Each event puts \(G_x\), \(G_y\) or \(G_z\) on the site, from the left bond (a) or the right bond (b).
+  X is the trace of the product, later events on the left.</p>
+  <div class="row" id="xabBtns"></div>
+  <div class="row" id="xabSeq" style="min-height: 2.2em"></div>
+  <p class="verdict" id="xabOut"></p></div></details></div><aside class="side"></aside></div>
+  </section>
+  <section class="ch" id="slice">
+    <h2><span class="n">7</span>Two ways to slice the torus</h2>
+    <div class="r"><div class="main prose"><p>Horizontal slices give the familiar sum over energies. Vertical slices give a transfer matrix \(X_\beta\) that carries one site's whole time history along the ring.
+A ring of \(L\) sites is \(X_\beta^{\,L}\), traced. The eigenvalues \(\lambda_i\) depend on \(\beta\) but not on \(L\). This is the classical Ising transfer matrix,
+except that each "spin" is now a history in imaginary time.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="slice"></div>
+    <div class="r"><div class="main eqs">\[ Z_L(\beta)=\sum_m e^{-\beta E_m}=\operatorname{Tr}X_\beta^{\,L}=\sum_i\lambda_i(\beta)^L . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="purity">
+    <h2><span class="n">8</span>Purity, seen as squares</h2>
+    <div class="r"><div class="main prose"><p>Purity measures how close a distribution, or a density matrix, is to a single state. Lay the probabilities along a unit segment and draw a square on each:
+all squares fit under the tallest one, so the purity is at most the largest probability. A purity of 0.99 means one state holds at least 99%.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="purity"></div>
+    <div class="r"><div class="main eqs">\[ P=\sum_ip_i^2\ \le\ p_0\sum_ip_i=p_0 . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="two">
+    <h2><span class="n">9</span>Two purities from one torus</h2>
+    <div class="r"><div class="main prose"><p>Normalize the torus two ways: cut it in space, \(\sigma_n=X^n/Z_n\), or take the Gibbs state \(\rho_n=e^{-\beta H}/Z_n\). The purity of \(\sigma\) glues two tori side by side;
+the purity of \(\rho\) stacks two. Both are ratios of partition functions, and adding a constant to \(H\) changes neither.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="two"></div>
+    <div class="r"><div class="main eqs">\[ P_{\mathrm s}(n,\beta)=\frac{Z_{2n}(\beta)}{Z_n(\beta)^2},\qquad P_\tau(n,\beta)=\frac{Z_n(2\beta)}{Z_n(\beta)^2}. \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="square">
+    <h2><span class="n">10</span>Squaring sharpens</h2>
+    <div class="r"><div class="main prose"><p>Squaring a normalized state doubles the torus in one direction: \(\sigma_n^2=P_{\mathrm s}\,\sigma_{2n}\) and \(\rho_n^2=P_\tau\,\rho_n(2\beta)\).
+On the probabilities this is \(p_i\to p_i^2/P\). The new defect is at most \(f\) of the old one, about half its square, whenever the old defect is below \(\tfrac12\).</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="square"></div>
+    <div class="r"><div class="main eqs">\[ 1-P'\le f(1-P),\qquad f(z)=\frac{z^2}{2(1-z)^2}. \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="couple">
+    <h2><span class="n">11</span>Space and time are tied</h2>
+    <div class="r"><div class="main prose"><p>At fixed \(\beta\), a longer ring loses purity, so length and \(\beta\) must double together. Gluing four tori into one twice as wide and twice as tall,
+rows first or columns first, gives one identity. Since every purity is at most 1, it turns a spatial bound at \(\beta\) and a thermal bound at \(2n\) into a spatial bound at \(2\beta\).</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="couple"></div>
+    <div class="r"><div class="main eqs">\[ P_{\mathrm s}(n,2\beta)\,P_\tau(n,\beta)^2=\frac{Z_{2n}(2\beta)}{Z_n(\beta)^4}=P_{\mathrm s}(n,\beta)^2\,P_\tau(2n,\beta). \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="rpwhy">
+    <h2><span class="n">12</span>Why the proof needs a symmetric transfer matrix</h2>
+    <div class="r"><div class="main prose"><p>The squaring step treats \(p_i=\lambda_i^n/Z_n\) as probabilities, so it needs the eigenvalues of the transfer matrix to be real. A two-by-two example makes the
+danger concrete. For the symmetric matrix \(\begin{pmatrix}0.9&0.3\\0.3&0.5\end{pmatrix}\) the "spatial purity" \(Z_{2n}/Z_n^2\) runs 0.63, 0.83, 0.94, 0.98, … up to 1.
+For the slightly rotated matrix \(\begin{pmatrix}0.9&-0.4\\0.4&0.9\end{pmatrix}\), whose eigenvalues are complex, the same ratio is 0.40, −0.11, −4.2, −47: no
+probability can do that, and the argument would collapse.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="rpwhy"></div>
+    <div class="r"><div class="main eqs">\[ P_{\mathrm s}(n)=\frac{Z_{2n}}{Z_n^2}=\sum_ip_i^2\in(0,1]\quad\text{only if}\quad p_i=\frac{\lambda_i^n}{Z_n}\ \text{are real and}\ \ge0 . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="rpwhere">
+    <h2><span class="n">13</span>Where the symmetry comes from</h2>
+    <div class="r"><div class="main prose"><p>Symmetry of \(X\) comes from the bond. In \(X(a,b)\) a site multiplies the matrices of all events in time order, those arriving from its left bond (\(a\)) and
+from its right bond (\(b\)). For the Heisenberg chain every event inserts the same real matrix \(G_\alpha\) from either side, so the site cannot tell the sides apart:
+with \(a=\{G_z\ \text{at}\ 0.2,\ G_x\ \text{at}\ 0.6\}\) and \(b=\{G_y\ \text{at}\ 0.4\}\), both \(X(a,b)\) and \(X(b,a)\) equal \(\operatorname{Tr}G_xG_yG_z=1\).
+A bond that inserts different matrices on its two sides breaks this: with \(G_z\) on the left site and \(P=\mathrm{diag}(1,0,0)\) on the right, two events give 1 from one
+side and −2 from the other. Reflection positivity is the general condition that the bond looks the same from both sides, \(-h=\sum_kC_k\otimes\Theta(C_k)\), with positive weights.</p></div><aside class="side"><p class="note">Formal statement and classification of reflection-positive chains: <code>notes/thermal-mpo-gap-scope.tex</code>, appendices D–F.</p></aside></div>
+    <div class="player" data-ch="rpwhere"></div>
+    <div class="r"><div class="main eqs">\[ -\mathbf S_j\cdot\mathbf S_{j+1}=+\sum_\alpha G_\alpha\otimes G_\alpha\quad\Longrightarrow\quad X(a,b)=X(b,a)\in\mathbb R . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="rptest">
+    <h2><span class="n">14</span>Testing a bond for reflection positivity</h2>
+    <div class="r"><div class="main prose"><p>To test any bond, regroup the 81 entries of \(-h\) so that rows carry both indices of the left site and columns both indices of the right site. This realignment
+turns a product \(A\otimes B\) into an outer product \(\mathrm{vec}(A)\,\mathrm{vec}(B)^{\mathsf T}\). A reflection-positive bond becomes a sum of squares \(\sum vv^\dagger\),
+whose eigenvalues are all \(\ge0\). The spin-1 antiferromagnet gives 2, 2, 2 and zeros; the ferromagnet gives −2, −2, −2 and fails, and no on-site constant can repair it.</p></div><aside class="side"><p class="note">Rule for bilinear chains: reflection positive exactly when an even number of couplings J<sub>x</sub>, J<sub>y</sub>, J<sub>z</sub> are ferromagnetic.</p></aside></div>
+    <div class="player" data-ch="rptest"></div>
+    <div class="r"><div class="main eqs">\[ R\big[A\otimes B\big]=\mathrm{vec}(A)\,\mathrm{vec}(B)^{\mathsf T},\qquad R\big[-\mathbf S_j\cdot\mathbf S_{j+1}\big]=\sum_\alpha\mathrm{vec}(G_\alpha)\,\mathrm{vec}(G_\alpha)^{\mathsf T}\succeq0 . \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main"><details class="try"><summary>Try it: XXZ anisotropy, coupling signs, and the spin-1 phase diagram</summary>
+  <div class="tryin"><p class="small">Spin-1 XXZ bond \(S^xS^x+S^yS^y+\Delta S^zS^z\): eigenvalues of the realigned \(-h\), computed live.</p>
+  <svg class="fig" id="xxzSvg" viewBox="0 0 520 170" role="img" aria-label="Realigned eigenvalues for the XXZ bond"></svg>
+  <div class="ctrl"><label for="xxzD">Δ</label><input id="xxzD" type="range" min="-1" max="2" step="0.01" value="1"><output id="xxzOut"></output></div>
+  <p class="small">General rule for \(\sum J_xS^xS^x+J_yS^yS^y+J_zS^zS^z\): reflection positive exactly when an even number of couplings are negative. Click to flip signs.</p>
+  <div class="row" id="xyzBtns"></div><div class="verdict" id="xyzOut"></div>
+  <p class="small">Spin-1 bilinear–biquadratic chain \(\cos\vartheta\,\mathbf S\cdot\mathbf S+\sin\vartheta(\mathbf S\cdot\mathbf S)^2\): red arc is reflection positive, blue arc is also in the Haldane phase.</p>
+  <svg class="fig" id="dialSvg" viewBox="0 0 420 320" role="img" aria-label="Reflection-positive window of the bilinear-biquadratic chain"></svg>
+  <div class="ctrl"><label for="thSl">angle ϑ</label><input id="thSl" type="range" min="-180" max="180" step="0.5" value="0"><output id="thOut"></output></div>
+  <div class="verdict" id="thVerdict"></div></div></details></div><aside class="side"></aside></div>
+  </section>
+  <section class="ch" id="double">
+    <h2><span class="n">15</span>One doubling step</h2>
+    <div class="r"><div class="main prose"><p>Four moves turn bounds at \((n,\beta)\) into bounds at \((2n,2\beta)\). Moves 1 and 3 use the coupling identity and cost a factor of about 3 in \(\varepsilon\).
+Moves 2 and 4 square and turn \(3\varepsilon\) into about \(\tfrac92\varepsilon^2\). Net: \(\varepsilon\to5\varepsilon^2\) for \(\varepsilon\le1/100\).
+The exact map keeps improving as long as \(\varepsilon<\varepsilon_*\approx0.127\).</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="double"></div>
+    <div class="r"><div class="main eqs">\[ P_{\mathrm s}(n,\beta),\,P_\tau(2n,\beta)\ge1-\varepsilon\ \Longrightarrow\ P_{\mathrm s}(2n,2\beta),\,P_\tau(4n,2\beta)\ge1-5\varepsilon^2 . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="iterate">
+    <h2><span class="n">16</span>Repeat, and read off the gap</h2>
+    <div class="r"><div class="main prose"><p>Start from \(\varepsilon_0=1/100\) at \((2304,784)\). After \(j\) steps, \(\varepsilon_j=20^{-2^j}/5\) at \(\beta_j=784\cdot2^j\), which is \(\tfrac15e^{-\beta_j\log20/784}\):
+exponential decay in \(\beta\). Lengths between doublings follow from the real eigenvalues (\(\ell^p\)-norm monotonicity). The thermal purity then exceeds \(\tfrac12\),
+the ground state is unique, and the weight ratio gives the gap.</p></div><aside class="side"><p class="note">The recurrence and the gap deduction are formalized in Lean 4: <code>lean/CertifiedGaps/PurityCriterion.lean</code>.</p></aside></div>
+    <div class="player" data-ch="iterate"></div>
+    <div class="r"><div class="main eqs">\[ e^{-\beta_j\Delta_L}=\frac{w_1}{w_0}\le\frac{3\varepsilon_j}{1-3\varepsilon_j}<20^{-2^j}\quad\Longrightarrow\quad\Delta_L>\frac{\log20}{784}. \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main"><details class="try"><summary>Try it: the gap certified by any seed</summary>
+  <div class="tryin two-col"><div>
+  <p class="small">Exact doubling map from <code>julia/src/recurrence/map.jl</code>. Presets are seeds certified in this repository.</p>
+  <div class="row presets" id="presets"></div>
+  <div class="ctrl"><label for="sSl">log₁₀ εₛ</label><input id="sSl" type="range" min="-6" max="-0.3" step="0.01" value="-2"><output id="sOut"></output></div>
+  <div class="ctrl"><label for="tSl">log₁₀ ε_τ</label><input id="tSl" type="range" min="-6" max="-0.3" step="0.01" value="-2"><output id="tOut"></output></div>
+  <div class="ctrl"><label for="bSl">β₀</label><input id="bSl" type="range" min="0.5" max="1000" step="0.25" value="784"><output id="bOut"></output></div>
+  <div class="small">gap bound</div><div class="big" id="gapOut">–</div>
+  <div class="tbl"><table id="orbitTbl"></table></div></div>
+  <div><canvas id="mapCv" width="640" height="460" aria-label="Seeds that close the recurrence"></canvas>
+  <p class="small">β₀ × gap bound over (εₛ, ε_τ). Grey: no certificate. Dot: your seed. Spatial defects are tolerated far more than thermal ones.</p></div></div></details></div><aside class="side"></aside></div>
+  </section>
+  <section class="ch" id="seedtoy">
+    <h2><span class="n">17</span>The starting numbers, worked on a toy</h2>
+    <div class="r"><div class="main prose"><p>The certificate never sees the eigenvalues of \(X\); it sees exact traces \(Z_n\) of small rings. Here is the whole logic on a toy with hidden eigenvalues
+1, 0.6, −0.5, 0.4. The sixth moment \(Z_6=1.0664\) caps every \(|\lambda|\) at 1.011. A trial state gives \(Z_{24}\ge1\); if all \(|\lambda|\le0.97\), the sixth-moment
+mass could produce at most 0.484, so one eigenvalue must exceed 0.97. The rest then carry at most 0.233 of the mass, which bounds their contribution and gives
+\(P_{\mathrm s}(24)\ge0.988\). The real certificate runs the same three steps with 12-site rings, exact integers, symmetry sectors and a 72-site trial state.</p></div><aside class="side"><p class="note">Toy numbers are exact to the digits shown; the real certificate uses capped masses with degree-12 filters, as in <code>notes/thermal-mpo-gap-certificate.tex</code>.</p></aside></div>
+    <div class="player" data-ch="seedtoy"></div>
+    <div class="r"><div class="main eqs">\[ \sum_i\lambda_i^{24}\le\underbrace{0.833^4+(1.0664-0.833)^4}_{0.484}<1\le Z_{24}\ \Rightarrow\ \lambda_0>0.97,\qquad P_{\mathrm s}(24)\ge\Big(1+\frac{0.233^4}{0.97^{24}}\Big)^{-2}=0.988 . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="seed">
+    <h2><span class="n">18</span>The real certificate</h2>
+    <div class="r"><div class="main prose"><p>The input is both purities \(\ge0.99\) at \((2304,784)\). A ring of 2304 spin-1 sites has \(3^{2304}\) states, so it is never computed. Instead:</p>
+<ol><li>exact integer computation of \(Z_n\) for rings of up to 12 sites;</li>
+<li>symmetry and polynomial filters turn these into caps on every transfer eigenvalue;</li>
+<li>a 72-site trial state and the variational principle force one dominant eigenvalue;</li>
+<li>this gives purities at length 36, and six doublings carry them to 2304.</li></ol>
+<p>Every number is an integer or an exact fraction. The other models in this repository diagonalize 16-spin rings completely and bound every floating-point rounding error.</p></div><aside class="side"><p class="note">Every number in the spin-1 seed is an integer or an exact fraction: <code>models/spin1/results/scalars.json</code>.</p></aside></div>
+    <div class="player" data-ch="seed"></div>
+    <div class="r"><div class="main eqs">\[ |\lambda|\le Z_k^{1/k}\ (k\ \text{even}),\qquad Z_{72}>1\ \Rightarrow\ \lambda_0>0.999, \]
+\[ (0.0479,\ 0.1815)\ \xrightarrow{\ \times6\ }\ (0.0084513,\ 0.0054986). \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="lab">
+    <h2><span class="n">17</span>The whole machine on a solvable chain</h2>
+    <div class="r"><div class="main prose">
+      <p>Transverse-field Ising ring \(H=-\sum Z_jZ_{j+1}-g\sum X_j\): free fermions give \(Z_n(\beta)\) exactly at any size. Pick a seed size \(n_0\) and temperature \(\beta_0\);
+      the page computes both defects, runs the recurrence, and compares the certified gap with the true gap \(2|1-g|\). For \(g&lt;1\) there are two ground states and every seed fails, as it must.
+      Floating point here, so this is a diagnostic, not a certificate. At \(g=2\), \((128,32)\) it reproduces the survey value 1.885 in <code>AGENTS.md</code>.</p></div><aside class="side"><p class="note">Floating point, not a certificate. Free-fermion formulas with the ground-energy mismatch summed by Poisson summation, so tiny defects are not lost to cancellation.</p></aside></div>
+    <div class="r"><div class="main"><div class="ctrl"><label for="gSl">field g</label><input id="gSl" type="range" min="0.6" max="3" step="0.01" value="1.25"><output id="gOut"></output></div>
+      <div class="ctrl"><label for="n0Sl">seed length n₀</label><input id="n0Sl" type="range" min="1" max="9" step="any" value="5"><output id="n0Out"></output></div>
+      <div class="ctrl"><label for="bdSl">β₀ · Δ (log)</label><input id="bdSl" type="range" min="-1" max="6" step="any" value="3"><output id="bdOut"></output></div>
+      <div class="row presets" id="labPresets"></div></div><aside class="side"></aside></div>
+    <div class="stats">
+      <div class="stat"><div class="k">εₛ</div><div class="v" id="labEs">–</div></div>
+      <div class="stat"><div class="k">ε_τ</div><div class="v" id="labEt">–</div></div>
+      <div class="stat"><div class="k">gap bound</div><div class="v g" id="labBound">–</div></div>
+      <div class="stat"><div class="k">true gap</div><div class="v" id="labTrue">–</div></div></div>
+    <div class="two-col">
+      <div><canvas id="heatCv" width="560" height="460" tabindex="0" aria-label="Bound over seed choices; click to pick"></canvas>
+        <p class="small">bound / true gap over (n₀, β₀Δ); gold → 1, grey: seed fails. Click to pick a seed. <span id="heatStatus"></span></p></div>
+      <div><canvas id="truthCv" width="560" height="460" aria-label="True defects versus guarantees"></canvas>
+        <p class="small">along the doublings: dashed = guarantees from the recurrence, solid = true defects. Guarantees stay above.</p></div></div>
+  </section>
+  <section class="part" id="part2">
+    <h1 class="parth">Part II · Open chains</h1>
+    <div class="r" style="margin-top: 18px"><div class="main prose"><p>A chain with two ends and a small field on the end spins. The ring proof carries over with one new ingredient:
+      the ends are closed by boundary vectors instead of a trace, and the proof must show that they overlap the dominant state. Eight figures, following Appendices A–C of the note.</p></div>
+      <aside class="side"><p class="note">Theorem from OpenAI’s boundary-field preprint; this part follows <code>notes/thermal-mpo-gap-note.tex</code>, Appendices A–C.</p></aside></div>
+    <div class="r" style="margin-top: 14px"><div class="main"><video src="open-chains.mp4" poster="poster-open.jpg" controls preload="metadata" playsinline></video></div>
+      <aside class="side"><p class="note">The eight open-chain figures as one film, about two and a half minutes.</p></aside></div>
+  </section>
+  <section class="ch" id="oedge">
+    <h2><span class="n">II.1</span>Ends carry free spins</h2>
+    <div class="r"><div class="main prose"><p>Opening the ring changes the physics before it changes the proof. In the valence-bond picture each spin 1 is a pair of spin-½, and neighbouring
+halves bind into singlets; at each end one spin-½ is left over. Exact diagonalization of small chains shows the consequence. Without a field, even chains have three
+states just above the ground state, at 0.51, 0.31, 0.20, 0.14, 0.10 for n = 4, …, 12, and odd chains have a three-fold degenerate ground state. With a field
+\(h=3/5\) on the two end spins, odd chains have a single ground state and a gap of 0.72, 0.64, 0.58, 0.55 for n = 5, …, 11.</p></div><aside class="side"><p class="note">Levels from floating-point exact diagonalization with conserved S<sup>z</sup> (n ≤ 12), a diagnostic and not part of the proof. With an odd number of sites both ends lie on the same sublattice, so equal fields suit both.</p></aside></div>
+    <div class="player" data-ch="oedge"></div>
+    <div class="r"><div class="main eqs">\[ H_n=\sum_{i=1}^{n-1}\mathbf S_i\cdot\mathbf S_{i+1}-h\,(S_1^z+S_n^z),\qquad h=\tfrac35 . \]
+<p>Theorem: for every odd \(n\ge1921\) the ground state is unique and \(\Delta_n>\log10/392\approx0.0059\).</p></div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="ocyl">
+    <h2><span class="n">II.2</span>A cylinder, not a torus</h2>
+    <div class="r"><div class="main prose"><p>The partition function of the open chain is still a trace, so imaginary time is still periodic. Space is not: the chain has two ends.
+The spacetime is a cylinder, and the network that computes \(Z\) is a row of transfer matrices closed by a vector at each end instead of a trace.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="ocyl"></div>
+    <div class="r"><div class="main eqs">\[ \text{ring: }\ \operatorname{Tr}X^n\qquad\text{open chain: }\ \langle\bar v|\,X^n\,|v\rangle . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="ovec">
+    <h2><span class="n">II.3</span>What a boundary vector is</h2>
+    <div class="r"><div class="main prose"><p>The end field acts on one site, so expanding \(e^{-\beta H}\) puts field events on that site's world line, each inserting \(G_z=iS^z\).
+The list of field events is a history, just like the list of events on a bond, and its weight defines a vector on histories:
+\(v(a)=(ih)^d\) when all \(d\) events are of type \(z\). With field \(-h\) on one end and \(+h\) on the other, the two caps are the same vector, one conjugated,
+so every even power is a squared norm by the mirror argument of section 12. The equal-field chain of the theorem is reached by a \(\pi\) rotation \(U_P\) on one cap.</p></div><aside class="side"><p class="note">The left cap is conjugated: its events carry (−ih)G<sub>z</sub> = +hS<sup>z</sup>, adding −hS<sub>1</sub><sup>z</sup>; the right cap adds +hS<sub>n</sub><sup>z</sup>.</p></aside></div>
+    <div class="player" data-ch="ovec"></div>
+    <div class="r"><div class="main eqs">\[ v_\beta(a)=(ih)^d\ \ (\text{all labels }z),\qquad \|v_\beta\|^2=e^{\beta h^2},\qquad Y^{\mathrm{same}}_n=\langle\bar v|X^nU_P|v\rangle . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="over">
+    <h2><span class="n">II.4</span>The overlap</h2>
+    <div class="r"><div class="main prose"><p>A trace always contains the top eigenvector of the transfer matrix; a boundary vector might not. Split the normalized transfer matrix into its top
+eigenvector and the rest, \(T=|\psi\rangle\langle\psi|+R\) with \(\|R\|<1\). Repeated application keeps the component of \(v\) along \(\psi\) and shrinks the rest,
+so the open-chain network splits into a fixed overlap \(c\) and a remainder that dies with length. The boundary defect \(e\) measures the remainder's share;
+any \(e<1\) proves \(c>0\).</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="over"></div>
+    <div class="r"><div class="main eqs">\[ B_m=\langle v|T^m|v\rangle=\underbrace{|\langle\psi,v\rangle|^2}_{c}+\underbrace{\langle v|R^m|v\rangle}_{D_m},\qquad e_m=\frac{D_m}{B_m}=1-\frac{c}{B_m}. \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main"><details class="try"><summary>Try it: overlap versus chain length</summary>
+  <div class="tryin"><svg class="fig" id="ovSvg" viewBox="0 0 520 210" role="img" aria-label="Overlap and remainder versus chain length"></svg>
+  <div class="ctrl"><label for="ovC">overlap c</label><input id="ovC" type="range" min="0" max="1" step="0.01" value="0.3"><output id="ovCOut"></output></div>
+  <div class="ctrl"><label for="ovM">length m</label><input id="ovM" type="range" min="2" max="40" step="2" value="8"><output id="ovMOut"></output></div></div></details></div><aside class="side"></aside></div>
+  </section>
+  <section class="ch" id="ofold">
+    <h2><span class="n">II.5</span>Why the remainder is a square</h2>
+    <div class="r"><div class="main prose"><p>For even \(m\) the remainder folds in half: the two halves of the strip are mirror images, so \(D_m\) is a squared norm. Absorbing \(k/2\) factors
+into each end leaves a middle of norm at most \(\|R\|^{m-k}\), which shrinks the remainder geometrically while the overlap \(c\) is unchanged.
+This is how a longer chain improves the boundary defect.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="ofold"></div>
+    <div class="r"><div class="main eqs">\[ D_m=\big\|R^{m/2}v\big\|^2\ge0,\qquad D_m\le\|R\|^{m-k}D_k . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="omoves">
+    <h2><span class="n">II.6</span>Three moves per scale</h2>
+    <div class="r"><div class="main prose"><p>The open-chain bootstrap tracks two numbers per scale: the boundary defect and the thermal purity of the open chain at length \(M_j\).
+Move 1 uses the geometric suppression at the next temperature to squeeze the boundary defect. Move 2 doubles the length, which costs little once the overlap is
+controlled. Move 3 squares the Gibbs state. One step sends a defect \(x\) to \(10x^2\).</p></div><aside class="side"><p class="note">Composition in imaginary time links the scales: B<sub>m</sub>(j+1) = P<sub>τ</sub><sup>opp</sup>(m, β<sub>j</sub>) r<sub>j</sub><sup>−m</sup> B<sub>m</sub>(j)<sup>2</sup>.</p></aside></div>
+    <div class="player" data-ch="omoves"></div>
+    <div class="r"><div class="main eqs">\[ e_{M_j/2}(j)\le x,\ \ P_\tau^{\mathrm{opp}}(M_j,\beta_j)\ge1-x\ \Longrightarrow\ e_{M_j}(j{+}1)\le10x^2,\ \ P_\tau^{\mathrm{opp}}(2M_j,\beta_{j+1})\ge1-10x^2 . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="onum">
+    <h2><span class="n">II.7</span>One open-chain step, in numbers</h2>
+    <div class="r"><div class="main prose"><p>The first open-chain step with every number shown. Starting from boundary defect 0.14 and thermal defect 0.21 at \(\beta=49\), the overlap recurrence
+gives \(0.1655\times0.7115=0.118\), and doubling then squaring gives \(f(0.352)=0.147\). Both shrink; two more steps reach 0.001, after which the rule \(x\to10x^2\) takes over.</p></div><aside class="side"><p class="note">Recomputed from the formulas of Appendix C; each result lies at or below the rational table entry of the note.</p></aside></div>
+    <div class="player" data-ch="onum"></div>
+    <div class="r"><div class="main eqs">\[ E'\le\frac{q}{1-q}\Big[\frac{1}{(1-E)^2(1-\eta)}-1\Big],\qquad \eta'\le f\big(1-(1-\eta)(1-\varepsilon_j)(1-\varepsilon_{j+1})(1-E')\big). \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="ostart">
+    <h2><span class="n">II.8</span>Starting numbers</h2>
+    <div class="r"><div class="main prose"><p>The iteration starts at \(\beta=49\) from four certified numbers: periodic purities at length 120 and 240, and two open-chain bounds
+from the boundary-field paper. Three rounds bring both defects to 0.001 at \(\beta=392\), length 1920. From there \(x\to10x^2\) gives
+\(x_j=10^{-1-2^{j-5}}\).</p></div><aside class="side"><p class="note">Rows j = 2…5 are the rational table of the note; recomputing the recurrence gives values at or below each entry.</p></aside></div>
+    <div class="player" data-ch="ostart"></div>
+    <div class="r"><div class="main eqs">\[ P_{\mathrm s}(120,49),\,P_\tau(240,49)\ge0.948,\quad e_{142}\le0.14,\quad P_\tau^{\mathrm{opp}}(240,49)\ge0.79 . \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <section class="ch" id="ogap">
+    <h2><span class="n">II.9</span>Odd lengths, and the gap</h2>
+    <div class="r"><div class="main prose"><p>For odd \(n\) the remainder \(R^n\) need not be positive. Putting \(M/2\) factors on each end leaves a middle \(R^{n-M}U_P\) of norm at most 1,
+so the remainder is bounded by \(D_M\) whatever its sign, and the rotation \(U_P\) acts trivially next to the top eigenvector. The windows \([M_j,2M_j]\)
+cover every \(n\ge1920\); in window \(j\) the thermal purity is at least \(1-4x_j>\tfrac12\), the ground state is unique, and the weight ratio gives the gap.</p></div><aside class="side"></aside></div>
+    <div class="player" data-ch="ogap"></div>
+    <div class="r"><div class="main eqs">\[ e^{-\beta_j\Delta_n}\le\frac{4x_j}{1-4x_j}<10^{-2^{j-5}},\quad\beta_j=392\cdot2^{j-5}\quad\Longrightarrow\quad\Delta_n>\frac{\log10}{392}. \]</div><aside class="side"></aside></div>
+    
+  </section>
+  <p class="foot">Sources: <code>notes/thermal-mpo-gap-note.tex</code>, <code>notes/thermal-mpo-gap-scope.tex</code>, <code>notes/thermal-mpo-gap-certificate.tex</code>,
+    <code>julia/src/recurrence/</code>. Curves in section 1 are schematic.</p>
+</article>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function el(tag, attrs = {}, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e); return e;
+}
+function txt(parent, x, y, s, attrs = {}) {
+  const t = el('text', Object.assign({x, y, 'font-family': 'IBM Plex Mono, monospace', 'font-size': 12, fill: 'var(--mute)'}, attrs), parent);
+  t.textContent = s; return t;
+}
+function barsSvg(svg, x, y, w, h, vals, color) {
+  const gap = 6, bw = (w - gap*(vals.length - 1)) / vals.length;
+  el('line', {x1: x, y1: y+h, x2: x+w, y2: y+h, stroke: 'var(--line)'}, svg);
+  vals.forEach((v, i) => {
+    el('rect', {x: x + i*(bw+gap), y: y + h - v*h, width: bw, height: Math.max(0, v*h), fill: color, opacity: i ? .5 : 1, rx: 2}, svg);
+    if (v > .04) txt(svg, x + i*(bw+gap) + bw/2, y + h - v*h - 5, v.toFixed(2), {'text-anchor': 'middle', fill: 'var(--ink)', 'font-size': 11});
+  });
+}
+const sup = n => String(n).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹⁻'['0123456789-'.indexOf(c)] || c).join('');
+function sci(x, d = 2) {
+  if (!isFinite(x)) return '–'; if (x === 0) return '0';
+  const e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  return Math.abs(e) < 3 ? x.toPrecision(d + 1) : `${m.toFixed(d)}×10${sup(e)}`;
+}
+const fmtLog = l => { if (!isFinite(l)) return '0'; const e = l / Math.LN10, ei = Math.floor(e); return e > -300 ? sci(Math.exp(l)) : `${Math.pow(10, e - ei).toFixed(2)}×10${sup(ei)}`; };
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- theme ----------
+let TH = null;
+function readTheme() {
+  const g = v => css(v);
+  TH = {bg: g('--stage'), surface: g('--surface'), ink: g('--ink'), mute: g('--mute'), line: g('--line'), space: g('--space'), time: g('--time'),
+    proved: g('--proved'), ok: g('--ok'), fail: g('--fail'), spaceF: g('--space-f'), timeF: g('--time-f'), provedF: g('--proved-f'), torusFill: g('--torus-fill')};
+}
+readTheme();
+
+// ---------- TeX on canvas ----------
+const TEXC = new Map(); let texReady = false;
+function texImg(src, color, px) {
+  const key = src + '|' + color + '|' + px; const hit = TEXC.get(key);
+  if (hit) return hit === 'pending' ? null : hit;
+  if (!texReady) return null;
+  TEXC.set(key, 'pending');
+  try {
+    const node = MathJax.tex2svg(src, {display: true}), svg = node.querySelector('svg'), ex = px * .45;
+    const w = parseFloat(svg.getAttribute('width')) * ex, h = parseFloat(svg.getAttribute('height')) * ex, k = 2;
+    svg.setAttribute('width', w * k); svg.setAttribute('height', h * k);
+    const img = new Image();
+    img.onload = () => { TEXC.set(key, {img, w, h}); redrawAll(); };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.outerHTML.replace(/currentColor/g, color));
+  } catch (e) { TEXC.delete(key); }
+  return null;
+}
+
+// ---------- players ----------
+const PLAYERS = [];
+function makePlayer(host) {
+  const ch = [...STBV.CH, ...(STBV.OPEN || [])].find(c => c.id === host.dataset.ch); if (!ch) return;
+  host.innerHTML = `<canvas width="960" height="540" aria-label="${ch.title} animation"></canvas>
+    <div class="r pmeta"><p class="main pcap" aria-live="polite"></p><div class="side"><p class="pctl"><button type="button" class="pp">play</button> · <button type="button" class="pv">back</button> · <button type="button" class="nx">next</button>
+    <span class="bt"></span></p><input type="range" min="0" max="${ch.dur}" step="0.01" aria-label="Scrub"></div></div>`;
+  const cv = host.querySelector('canvas'), cap = host.querySelector('.pcap'), pp = host.querySelector('.pp'), sl = host.querySelector('input'), bt = host.querySelector('.bt');
+  const P = {ch, t: ch.dur, playing: false, seen: false};
+  function size() { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = 960 * dpr; cv.height = 540 * dpr; P.dpr = dpr; }
+  size();
+  P.draw = () => {
+    const ctx = cv.getContext('2d'); ctx.setTransform(P.dpr, 0, 0, P.dpr, 0, 0);
+    ctx.fillStyle = TH.bg; ctx.fillRect(0, 0, 960, 540);
+    ch.draw(STBV.kit(ctx, TH, texImg), P.t);
+    let bi = 0; ch.beats.forEach((b, i) => { if (P.t >= b[0] - 1e-6) bi = i; });
+    if (cap.dataset.bi !== String(bi)) { cap.textContent = ch.beats[bi][1]; cap.dataset.bi = bi; }
+    sl.value = P.t; bt.textContent = `step ${bi + 1} of ${ch.beats.length}`;
+    pp.textContent = P.playing ? 'pause' : (P.t >= ch.dur - .01 ? 'replay' : 'play'); pp.setAttribute('aria-label', P.playing ? 'Pause' : 'Play');
+  };
+  const beatIdx = () => { let bi = 0; ch.beats.forEach((b, i) => { if (P.t >= b[0] - 1e-6) bi = i; }); return bi; };
+  pp.addEventListener('click', () => { if (P.playing) P.playing = false; else { if (P.t >= ch.dur - .01) P.t = 0; P.playing = true; } P.draw(); });
+  host.querySelector('.nx').addEventListener('click', () => { const bi = beatIdx(); P.playing = false; P.t = bi + 1 < ch.beats.length ? ch.beats[bi + 1][0] + 2.5 : ch.dur; P.t = Math.min(P.t, bi + 2 < ch.beats.length ? ch.beats[bi + 2][0] - .01 : ch.dur); P.draw(); });
+  host.querySelector('.pv').addEventListener('click', () => { const bi = beatIdx(); P.playing = false; P.t = bi > 0 ? Math.min(ch.beats[bi - 1][0] + 2.5, ch.beats[bi][0] - .01) : 0; P.draw(); });
+  sl.addEventListener('input', () => { P.playing = false; P.t = +sl.value; P.draw(); });
+  PLAYERS.push(P);
+  new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting && !P.seen && !reduce) { P.seen = true; P.t = 0; P.playing = true; } }), {threshold: .55}).observe(host);
+}
+document.querySelectorAll('.player').forEach(makePlayer);
+function redrawAll() { PLAYERS.forEach(P => P.draw()); }
+let last = performance.now();
+function tick(now) {
+  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  for (const P of PLAYERS) if (P.playing) { P.t = Math.min(P.ch.dur, P.t + dt); if (P.t >= P.ch.dur) P.playing = false; P.draw(); }
+  requestAnimationFrame(tick);
+}
+redrawAll(); requestAnimationFrame(tick);
+(function waitMJ() { if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => { texReady = true; redrawAll(); }); else setTimeout(waitMJ, 100); })();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(redrawAll);
+
+// ---------- widgets ----------
+// ---------- step 6 ----------
+const PRESETS = [
+  ['spin-1 Heisenberg', 1e-2, 1e-2, 784], ['staggered field h = 1', 6.937e-4, 7.326e-4, 5.25],
+  ['ladder J⊥ = 4', 0.03508321, 0.02462420, 2], ['ladder J⊥ = 5/2', 0.18558434, 0.05114736, 3],
+];
+let exact = null;
+const pre = $('presets');
+PRESETS.forEach(([name, s, t, b]) => {
+  const btn = document.createElement('button'); btn.type = 'button'; btn.textContent = name;
+  btn.addEventListener('click', () => {
+    $('sSl').value = Math.log10(s); $('tSl').value = Math.log10(t); $('bSl').value = b; exact = {s, t}; updateExplorer();
+    pre.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === btn));
+  });
+  pre.appendChild(btn);
+});
+for (const id of ['sSl', 'tSl', 'bSl']) $(id).addEventListener('input', () => { exact = null; pre.querySelectorAll('button').forEach(x => x.classList.remove('on')); updateExplorer(); });
+const mapCv = $('mapCv'), mctx = mapCv.getContext('2d'), EMAX = .3, GRID = 160;
+let mapImg = null;
+const hexRgb = h => { h = h.trim(); if (h[0] !== '#' || h.length !== 7) return [128, 128, 128]; return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); };
+function buildMap() {
+  const img = mctx.createImageData(GRID, GRID), lo = hexRgb(css('--heat-lo')), hi = hexRgb(css('--proved')), none = hexRgb(css('--heat-none'));
+  for (let i = 0; i < GRID; i++) for (let k = 0; k < GRID; k++) {
+    const b = STB.scaledBound((i + .5) / GRID * EMAX, (GRID - k - .5) / GRID * EMAX), o = (k*GRID + i) * 4;
+    let c = none; if (b !== null) { const u = Math.min(1, Math.log1p(b) / Math.log1p(6)); c = lo.map((v, q) => v + (hi[q] - v) * (.15 + .85*u)); }
+    img.data[o] = c[0]; img.data[o+1] = c[1]; img.data[o+2] = c[2]; img.data[o+3] = 255;
+  }
+  const off = document.createElement('canvas'); off.width = off.height = GRID; off.getContext('2d').putImageData(img, 0, 0); mapImg = off;
+}
+function drawMap(es, et) {
+  const W = mapCv.width, H = mapCv.height, pl = 74, pb = 48, pt = 14, pr = 30, w = W - pl - pr, h = H - pt - pb;
+  mctx.clearRect(0, 0, W, H); mctx.imageSmoothingEnabled = false; mctx.drawImage(mapImg, pl, pt, w, h);
+  mctx.strokeStyle = css('--mute'); mctx.setLineDash([5, 4]); mctx.beginPath();
+  mctx.moveTo(pl, pt + h); mctx.lineTo(pl + .12731/EMAX*w, pt + h - .12731/EMAX*h); mctx.stroke(); mctx.setLineDash([]);
+  mctx.fillStyle = css('--mute'); mctx.font = '20px IBM Plex Mono, monospace'; mctx.textAlign = 'center';
+  for (const v of [0, .1, .2, .3]) { mctx.fillText(v.toFixed(1), pl + v/EMAX*w, H - 18); mctx.textAlign = 'right'; mctx.fillText(v.toFixed(1), pl - 10, pt + h - v/EMAX*h + 6); mctx.textAlign = 'center'; }
+  mctx.fillText('εₛ (spatial)', pl + w/2, H - 0);
+  mctx.save(); mctx.translate(18, pt + h/2); mctx.rotate(-Math.PI/2); mctx.fillText('ε_τ (thermal)', 0, 0); mctx.restore();
+  if (es <= EMAX && et <= EMAX) {
+    mctx.fillStyle = css('--space'); mctx.strokeStyle = css('--ink'); mctx.lineWidth = 2; mctx.beginPath();
+    mctx.arc(pl + es/EMAX*w, pt + h - et/EMAX*h, 8, 0, 7); mctx.fill(); mctx.stroke();
+  }
+}
+function updateExplorer() {
+  const es = exact ? exact.s : Math.pow(10, +$('sSl').value), et = exact ? exact.t : Math.pow(10, +$('tSl').value), b0 = +$('bSl').value;
+  $('sOut').textContent = sci(es); $('tOut').textContent = sci(et); $('bOut').textContent = b0;
+  const {rows} = STB.orbit(es, et, 60), sb = STB.scaledBound(es, et);
+  $('gapOut').textContent = sb === null ? 'no certificate from this seed' : (sb / b0).toPrecision(6);
+  $('gapOut').style.color = sb === null ? 'var(--fail)' : 'var(--proved)';
+  $('orbitTbl').innerHTML = '<tr><th>j</th><th>sⱼ</th><th>tⱼ</th><th>zⱼ</th><th>rate bⱼ</th></tr>' + rows.slice(0, 10).map(r =>
+    `<tr><td>${r.j}</td><td>${fmtLog(r.ls)}</td><td>${fmtLog(r.lt)}</td><td>${fmtLog(r.lz)}</td><td>${isFinite(r.rate) ? (r.rate / b0).toPrecision(5) : '—'}</td></tr>`).join('');
+  drawMap(es, et);
+}
+
+// ---------- step 7: TFIM lab ----------
+const lab = {heat: null, job: 0, NX: 48, NY: 40};
+const LAB_PRESETS = [['g = 2, (128, 32)', 2, 128, 64], ['g = 1.25, (144, 64)', 1.25, 144, 32], ['g = 1.1, (384, 161)', 1.1, 384, 32.2], ['ordered g = 0.8', 0.8, 32, 8]];
+const n0Of = () => Math.max(2, 2 * Math.round(Math.pow(2, +$('n0Sl').value) / 2));
+const xOfN = n => (Math.log2(n) - 1) / 8;   // n0 in [2, 512]
+const yOfBd = bd => (Math.log2(bd) + 1) / 7;   // beta0*Delta in [1/2, 64], log scale
+LAB_PRESETS.forEach(([name, g, n, bd]) => {
+  const btn = document.createElement('button'); btn.type = 'button'; btn.textContent = name;
+  btn.addEventListener('click', () => { $('gSl').value = g; $('n0Sl').value = Math.log2(n); $('bdSl').value = Math.log2(bd); labChanged(true); });
+  $('labPresets').appendChild(btn);
+});
+function labState() {
+  const g = +$('gSl').value, Del = STB.tfimGap(g), n0 = n0Of(), bd = Math.pow(2, +$('bdSl').value);
+  return {g, Del, n0, bd, b0: Del > 0 ? bd / Del : NaN};
+}
+function labNumbers() {
+  const S = labState();
+  $('gOut').textContent = S.g.toFixed(2); $('n0Out').textContent = S.n0; $('bdOut').textContent = S.bd.toFixed(1) + (isFinite(S.b0) ? ` (β₀ = ${S.b0.toFixed(1)})` : '');
+  if (!(S.Del > 1e-9)) { ['labEs', 'labEt', 'labBound'].forEach(id => $(id).textContent = '–'); $('labTrue').textContent = '0 (critical)'; return null; }
+  const [es, et] = STB.tfimSeed(S.n0, S.b0, S.g), sb = STB.scaledBound(es, et);
+  $('labEs').textContent = sci(es); $('labEt').textContent = sci(et);
+  $('labTrue').textContent = S.g < 1 ? `${S.Del.toFixed(3)} (pair split)` : S.Del.toFixed(4);
+  $('labBound').textContent = sb === null ? 'seed fails' : `${(sb / S.b0).toFixed(4)}  (${(100 * sb / S.b0 / S.Del).toFixed(0)}%)`;
+  $('labBound').style.color = sb === null ? 'var(--fail)' : 'var(--proved)';
+  return {S, es, et};
+}
+function buildHeat() {
+  const job = ++lab.job, S = labState(), {NX, NY} = lab;
+  const img = new ImageData(NX, NY), lo = hexRgb(css('--heat-lo')), hi = hexRgb(css('--proved')), none = hexRgb(css('--heat-none'));
+  let i = 0; $('heatStatus').textContent = 'computing…';
+  const step = () => {
+    if (job !== lab.job) return;
+    const t0 = performance.now();
+    while (i < NX && performance.now() - t0 < 30) {
+      const n = Math.max(2, 2 * Math.round(Math.pow(2, 1 + 8 * i / (NX - 1)) / 2));
+      for (let k = 0; k < NY; k++) {
+        const bd = Math.pow(2, -1 + 7 * (NY - 1 - k) / (NY - 1)), o = (k*NX + i) * 4;
+        let c = none;
+        if (S.Del > 1e-9) {
+          const b0 = bd / S.Del, [es, et] = STB.tfimSeed(n, b0, S.g), sb = STB.scaledBound(es, et);
+          if (sb !== null) { const u = Math.max(0, Math.min(1, sb / b0 / S.Del)); c = lo.map((v, q) => v + (hi[q] - v) * (.12 + .88*u)); }
+        }
+        img.data[o] = c[0]; img.data[o+1] = c[1]; img.data[o+2] = c[2]; img.data[o+3] = 255;
+      }
+      i++;
+    }
+    const off = document.createElement('canvas'); off.width = NX; off.height = NY; off.getContext('2d').putImageData(img, 0, 0);
+    lab.heat = off; drawHeat();
+    if (i < NX) requestAnimationFrame(step); else $('heatStatus').textContent = '';
+  };
+  step();
+}
+const HP = {pl: 70, pr: 16, pt: 16, pb: 56};
+function drawHeat() {
+  const cv = $('heatCv'), c = cv.getContext('2d'), W = cv.width, H = cv.height, w = W - HP.pl - HP.pr, h = H - HP.pt - HP.pb;
+  c.clearRect(0, 0, W, H);
+  if (lab.heat) { c.imageSmoothingEnabled = false; c.drawImage(lab.heat, HP.pl, HP.pt, w, h); }
+  c.fillStyle = css('--mute'); c.font = '18px IBM Plex Mono, monospace'; c.textAlign = 'center';
+  [2, 8, 32, 128, 512].forEach(n => c.fillText(String(n), HP.pl + xOfN(n) * w, H - 30));
+  c.fillText('seed length n₀', HP.pl + w/2, H - 6);
+  c.textAlign = 'right'; [1, 4, 16, 64].forEach(v => c.fillText(String(v), HP.pl - 8, HP.pt + h * (1 - yOfBd(v)) + 6));
+  c.save(); c.translate(18, HP.pt + h/2); c.rotate(-Math.PI/2); c.textAlign = 'center'; c.fillText('β₀ · Δ', 0, 0); c.restore();
+  const S = labState();
+  const mx = HP.pl + xOfN(S.n0) * w, my = HP.pt + h * (1 - yOfBd(S.bd));
+  c.strokeStyle = css('--ink'); c.lineWidth = 3; c.beginPath(); c.arc(mx, my, 9, 0, 7); c.stroke();
+  c.strokeStyle = css('--bg'); c.lineWidth = 1.5; c.beginPath(); c.arc(mx, my, 12, 0, 7); c.stroke();
+}
+function drawTruth(info) {
+  const cv = $('truthCv'), c = cv.getContext('2d'), W = cv.width, H = cv.height, pl = 76, pr = 16, pt = 16, pb = 56;
+  const w = W - pl - pr, h = H - pt - pb; c.clearRect(0, 0, W, H);
+  c.font = '18px IBM Plex Mono, monospace'; c.fillStyle = css('--mute');
+  if (!info) { c.textAlign = 'center'; c.fillText('critical point: gapless', W/2, H/2); return; }
+  const {S, es, et} = info, {rows} = STB.orbit(es, et, 6);
+  const J = Math.min(rows.length, 1 + Math.floor(Math.log2(16000 / S.n0)), 5);
+  const data = rows.slice(0, J).map(r => {
+    const nj = S.n0 * 2**r.j, bj = S.b0 * 2**r.j, ts = STB.tfimDefects(nj, bj, S.g)[0], tt = STB.tfimDefects(2*nj, bj, S.g)[1];
+    return {j: r.j, gs: r.ls / Math.LN10, gt: r.lt / Math.LN10, ts: Math.log10(ts), tt: Math.log10(tt)};
+  });
+  const all = data.flatMap(d => [d.gs, d.gt, d.ts, d.tt]).filter(isFinite);
+  const top = Math.min(0, Math.ceil(Math.max(...all))), bot = Math.max(-300, Math.floor(Math.min(...all, top - 1) / 5) * 5);
+  const X = j => pl + 20 + (w - 40) * (J > 1 ? j / (J - 1) : .5), Y = v => pt + h * (top - Math.max(bot, v)) / (top - bot);
+  c.strokeStyle = css('--line'); c.lineWidth = 1; c.strokeRect(pl, pt, w, h);
+  const stepT = Math.max(1, Math.ceil((top - bot) / 6 / 5) * 5);
+  c.textAlign = 'right';
+  for (let v = top; v >= bot; v -= stepT) { c.beginPath(); c.moveTo(pl, Y(v)); c.lineTo(pl + w, Y(v)); c.stroke(); c.fillText(v ? `10${sup(v)}` : '1', pl - 8, Y(v) + 6); }
+  c.textAlign = 'center'; data.forEach(d => c.fillText(`j=${d.j}`, X(d.j), H - 30)); c.fillText('doubling scale', pl + w/2, H - 6);
+  const line = (key, col, dash) => {
+    c.strokeStyle = col; c.fillStyle = col; c.lineWidth = 3; c.setLineDash(dash ? [9, 7] : []);
+    c.beginPath(); data.forEach((d, i) => i ? c.lineTo(X(d.j), Y(d[key])) : c.moveTo(X(d.j), Y(d[key]))); c.stroke(); c.setLineDash([]);
+    data.forEach(d => { c.beginPath(); c.arc(X(d.j), Y(d[key]), 5, 0, 7); c.fill(); });
+  };
+  if (STB.scaledBound(es, et) === null) { c.fillStyle = css('--fail'); c.textAlign = 'center'; c.fillText('seed fails: the recurrence does not close', pl + w/2, pt + 30); }
+  line('gs', css('--space'), true); line('gt', css('--time'), true); line('ts', css('--space'), false); line('tt', css('--time'), false);
+  c.textAlign = 'left'; c.fillStyle = css('--space'); c.fillText('spatial', pl + 12, pt + h - 34); c.fillStyle = css('--time'); c.fillText('thermal', pl + 12, pt + h - 12);
+}
+let heatTimer = 0, lastG = null;
+function labChanged() {
+  const info = labNumbers(); drawTruth(info);
+  const g = +$('gSl').value;
+  if (g !== lastG) { lastG = g; clearTimeout(heatTimer); heatTimer = setTimeout(buildHeat, 120); } else drawHeat();
+}
+['gSl', 'n0Sl', 'bdSl'].forEach(id => $(id).addEventListener('input', () => labChanged()));
+$('heatCv').addEventListener('click', e => {
+  const cv = $('heatCv'), r = cv.getBoundingClientRect(), sx = cv.width / r.width, sy = cv.height / r.height;
+  const x = (e.clientX - r.left) * sx, y = (e.clientY - r.top) * sy, w = cv.width - HP.pl - HP.pr, h = cv.height - HP.pt - HP.pb;
+  const u = (x - HP.pl) / w, v = 1 - (y - HP.pt) / h; if (u < 0 || u > 1 || v < 0 || v > 1) return;
+  $('n0Sl').value = 1 + 8 * u; $('bdSl').value = (-1 + 7 * v).toFixed(2); labChanged();
+});
+
+// C: which chains qualify
+const xyz = [1, 1, 1];
+function drawXYZ() {
+  const box = $('xyzBtns'); box.innerHTML = '';
+  ['Jx', 'Jy', 'Jz'].forEach((nm, i) => {
+    const b = document.createElement('button'); b.type = 'button';
+    b.textContent = `${nm} ${xyz[i] > 0 ? '> 0 AF' : '< 0 FM'}`; b.style.color = xyz[i] > 0 ? 'var(--ink)' : 'var(--space)';
+    b.addEventListener('click', () => { xyz[i] *= -1; drawXYZ(); }); box.appendChild(b);
+  });
+  const fm = xyz.filter(v => v < 0).length, ok = fm % 2 === 0;
+  const names = {'1,1,1': 'Heisenberg / XXZ antiferromagnet', '-1,-1,-1': 'Heisenberg ferromagnet: sign-free, yet not reflection positive',
+    '1,1,-1': 'XXZ with Δ < 0'};
+  const nm = names[xyz.join(',')] || '';
+  const o = $('xyzOut'); o.style.color = ok ? 'var(--ok)' : 'var(--fail)';
+  o.textContent = `${fm} ferromagnetic → ${ok ? 'reflection positive ✓' : 'not reflection positive ✗'}${nm ? ' · ' + nm : ''}`;
+}
+const RPLO = -180 + Math.atan(2) * 180 / Math.PI;   // −116.57°
+function drawDial() {
+  const th = +$('thSl').value, svg = $('dialSvg'); svg.innerHTML = '';
+  const cx = 210, cy = 150, R = 105, P = (deg, r) => [cx + r * Math.cos(deg * Math.PI / 180), cy - r * Math.sin(deg * Math.PI / 180)];
+  const arc = (a0, a1, r, stroke, w) => {
+    const [x0, y0] = P(a0, r), [x1, y1] = P(a1, r), large = Math.abs(a1 - a0) > 180 ? 1 : 0, sweep = a1 > a0 ? 0 : 1;
+    el('path', {d: `M${x0} ${y0} A${r} ${r} 0 ${large} ${sweep} ${x1} ${y1}`, fill: 'none', stroke, 'stroke-width': w}, svg);
+  };
+  el('circle', {cx, cy, r: R, fill: 'none', stroke: 'var(--line)'}, svg);
+  arc(RPLO, 0, R, 'var(--space)', 6);
+  arc(-45, 0, R + 9, 'var(--time)', 5);
+  for (const [a, nm, r, anc] of [[0, 'Haldane', 150, 'start'], [67.5, 'critical', 130, 'middle'], [170, 'ferromagnet', 120, 'end'], [-90, 'dimerized', 128, 'middle']]) {
+    const [x, y] = P(a, r); txt(svg, x - (anc === 'start' ? 22 : 0), y + 4, nm, {'text-anchor': anc, fill: 'var(--ink)'});
+  }
+  for (const a of [45, 90, -45, -135]) { const [x0, y0] = P(a, R - 8), [x1, y1] = P(a, R + 8); el('line', {x1: x0, y1: y0, x2: x1, y2: y1, stroke: 'var(--mute)'}, svg); }
+  for (const [a, nm] of [[0, 'Heis.'], [18.43, 'AKLT'], [45, 'ULS'], [-45, 'TB']]) {
+    const [x, y] = P(a, R); el('circle', {cx: x, cy: y, r: 3.5, fill: 'var(--ink)'}, svg);
+    const [lx, ly] = P(a, R - 22); txt(svg, lx, ly + 4, nm, {'text-anchor': 'middle', 'font-size': 10});
+  }
+  const [nx, ny] = P(th, R - 4);
+  el('line', {x1: cx, y1: cy, x2: nx, y2: ny, stroke: 'var(--proved)', 'stroke-width': 3}, svg);
+  el('circle', {cx, cy, r: 4, fill: 'var(--proved)'}, svg);
+  txt(svg, 10, 314, 'red: reflection positive   blue: also in the Haldane phase', {'font-size': 11});
+  const r = th * Math.PI / 180, a = Math.cos(r) - .5 * Math.sin(r), b = -Math.sin(r), ok = a >= -1e-12 && b >= -1e-12;
+  const phase = th > -45 && th < 45 ? 'Haldane' : th >= 45 && th <= 90 ? 'critical' : th > 90 || th < -135 ? 'ferromagnetic' : th === -45 ? 'critical (TB)' : 'dimerized';
+  $('thOut').textContent = th.toFixed(1) + '°';
+  const v = $('thVerdict'); v.style.color = ok ? 'var(--ok)' : 'var(--fail)';
+  v.textContent = `weights ${a.toFixed(3)} (on G⊗Ḡ) and ${b.toFixed(3)} (on Q⊗Q̄): ${ok ? 'reflection positive' : 'not reflection positive'} · ${phase} phase` +
+    (ok && th > -45 ? ' · the criterion can apply' : ok ? ' · but no unique gapped ground state' : '');
+}
+$('thSl').addEventListener('input', drawDial);
+
+
+// paths: sum over histories of one flipping spin
+function drawPaths() {
+  const beta = +$('pathB').value, kmax = +$('pathK').value, svg = $('pathSvg'); svg.innerHTML = '';
+  $('pathBOut').textContent = beta.toFixed(2); $('pathKOut').textContent = kmax;
+  const exact = 2 * Math.cosh(beta), gx = 40, gy = 14, gw = 460, gh = 150; let fact = 1, run = 0; const terms = [];
+  for (let k = 0; k <= 20; k++) { if (k > 0) fact *= k; if (k % 2 === 0) terms.push([k, 2 * Math.pow(beta, k) / fact]); }
+  const Y = v => gy + gh - v / exact * gh, bw = gw / terms.length - 4;
+  terms.forEach(([k, v], i) => { const kept = k <= kmax, y0 = Y(run), y1 = Y(run + v); if (kept) run += v;
+    el('rect', {x: gx + i * (bw + 4), y: kept ? y1 : Y(v), width: bw, height: kept ? y0 - y1 : Y(0) - Y(v), fill: kept ? 'var(--space)' : 'var(--line)', rx: 2}, svg);
+    txt(svg, gx + i * (bw + 4) + bw / 2, gy + gh + 16, String(k), {'text-anchor': 'middle', 'font-size': 10}); });
+  el('line', {x1: gx, y1: Y(exact), x2: gx + gw, y2: Y(exact), stroke: 'var(--proved)', 'stroke-dasharray': '5 4', 'stroke-width': 2}, svg);
+  txt(svg, gx + gw, Y(exact) + 14, '2 cosh β', {'text-anchor': 'end', fill: 'var(--proved)'});
+  $('pathOut').textContent = `histories with up to ${kmax} flips: ${run.toFixed(5)}   exact 2 cosh β: ${exact.toFixed(5)}   (red bars stack the kept terms 2βᵏ/k!)`;
+}
+['pathB', 'pathK'].forEach(id => $(id).addEventListener('input', drawPaths));
+// XXZ realignment test
+function drawXXZ() {
+  const D = +$('xxzD').value, ev = STBV.eigSym(STBV.realign(STBV.minusH(1, D))), svg = $('xxzSvg'); svg.innerHTML = '';
+  $('xxzOut').textContent = D.toFixed(2);
+  const gx = 30, gy = 14, gw = 460, gh = 110, Y = v => gy + gh / 2 - v / 4.2 * gh, bw = gw / 9 - 6;
+  el('line', {x1: gx, y1: Y(0), x2: gx + gw, y2: Y(0), stroke: 'var(--mute)'}, svg);
+  ev.forEach((v, i) => el('rect', {x: gx + i * (bw + 6), y: Math.min(Y(0), Y(v)), width: bw, height: Math.max(1.5, Math.abs(Y(v) - Y(0))), fill: v < -1e-9 ? 'var(--fail)' : 'var(--ok)', rx: 2}, svg));
+  const ok = ev[ev.length - 1] > -1e-9;
+  txt(svg, gx, gy + gh + 30, `eigenvalues ${ev.filter(v => Math.abs(v) > 1e-9).map(v => v.toFixed(2)).join(', ')} (rest 0): ${ok ? 'reflection positive' : 'not reflection positive'}`, {fill: ok ? 'var(--ok)' : 'var(--fail)'});
+}
+$('xxzD').addEventListener('input', drawXXZ);
+
+// X(a,b) by hand: time-ordered product of real generators on one site
+const GG = {x: [[0, 0, 0], [0, 0, 1], [0, -1, 0]], y: [[0, 0, -1], [0, 0, 0], [1, 0, 0]], z: [[0, 1, 0], [-1, 0, 0], [0, 0, 0]]};
+let XAB = [['L', 'z'], ['R', 'z']];
+function drawXab() {
+  const box = $('xabBtns'); if (!box.childElementCount) {
+    for (const side of ['L', 'R']) for (const al of ['x', 'y', 'z']) { const b = document.createElement('button'); b.type = 'button';
+      b.textContent = `+ G_${al} from ${side === 'L' ? 'left (a)' : 'right (b)'}`; b.addEventListener('click', () => { XAB.push([side, al]); drawXab(); }); box.appendChild(b); }
+    const sw = document.createElement('button'); sw.type = 'button'; sw.textContent = 'swap left ↔ right'; sw.addEventListener('click', () => { XAB = XAB.map(([s, a]) => [s === 'L' ? 'R' : 'L', a]); drawXab(); }); box.appendChild(sw);
+    const cl = document.createElement('button'); cl.type = 'button'; cl.textContent = 'clear'; cl.addEventListener('click', () => { XAB = []; drawXab(); }); box.appendChild(cl);
+  }
+  $('xabSeq').innerHTML = XAB.length ? XAB.map(([s, a], i) => `<span class="chip ${s === 'L' ? 'cl' : 'cr'}">${i + 1}. G<sub>${a}</sub> ${s === 'L' ? '← a' : 'b →'}</span>`).join('') : '<span class="small">no events</span>';
+  let P = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+  for (const [, a] of XAB) P = GG[a].map((r, i) => P[0].map((_, j) => r.reduce((s, v, k) => s + v * P[k][j], 0)));
+  const tr = P[0][0] + P[1][1] + P[2][2];
+  $('xabOut').textContent = `X(a, b) = Tr(${XAB.length ? XAB.map(([, a]) => 'G_' + a).reverse().join(' ') : '1'}) = ${tr}`;
+}
+
+// open-chain overlap
+function drawOverlap() {
+  const c = +$('ovC').value, m = +$('ovM').value, svg = $('ovSvg'); svg.innerHTML = '';
+  $('ovCOut').textContent = c.toFixed(2); $('ovMOut').textContent = m;
+  const rs = [.85, .7, -.6, .4], wts = rs.map((_, i) => (1 - c) * [.4, .3, .2, .1][i]);
+  const gx = 50, gy = 16, gw = 440, gh = 140, Mx = 40, Y = v => gy + gh - Math.min(1.2, v) / 1.2 * gh;
+  el('rect', {x: gx, y: gy, width: gw, height: gh, fill: 'none', stroke: 'var(--line)'}, svg);
+  for (let k = 2; k <= Mx; k += 2) {
+    const D = wts.reduce((s, w, i) => s + w * Math.pow(rs[i], k), 0), x = gx + (k - 2) / (Mx - 2) * (gw - 10);
+    const hc = Y(0) - Y(c), hd = Y(c) - Y(c + D);
+    el('rect', {x, y: Y(c), width: 8, height: hc, fill: 'var(--space)', opacity: k === m ? 1 : .55}, svg);
+    el('rect', {x, y: Y(c + D), width: 8, height: hd, fill: 'var(--mute)', opacity: k === m ? 1 : .45}, svg);
+  }
+  [0, .5, 1].forEach(v => txt(svg, gx - 6, Y(v) + 4, String(v), {'text-anchor': 'end'}));
+  txt(svg, gx, gy + gh + 18, 'chain length m →'); txt(svg, gx + gw, gy + gh + 18, 'red: overlap c   grey: remainder Dₘ', {'text-anchor': 'end'});
+  const D = wts.reduce((s, w, i) => s + w * Math.pow(rs[i], m), 0), B = c + D, e = D / B;
+  txt(svg, gx, gy + gh + 42, c === 0 ? 'c = 0: e = 1 at every m; the top eigenvector is never seen' :
+    `m = ${m}: B = ${B.toFixed(3)}, defect e = D/B = ${e.toFixed(3)}, shrinking with m`, {fill: c === 0 ? 'var(--fail)' : 'var(--ink)'});
+}
+['ovC', 'ovM'].forEach(id => $(id).addEventListener('input', drawOverlap));
+
+drawPaths(); drawXXZ(); drawXab(); drawXYZ(); drawDial(); buildMap(); updateExplorer(); drawOverlap(); labChanged();
+
+// ---------- nav ----------
+const links = [...document.querySelectorAll('#toc a')];
+const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id)); }), {rootMargin: '-40% 0px -55% 0px'});
+document.querySelectorAll('section.ch').forEach(s => io.observe(s));
+function themeRedraw() { readTheme(); TEXC.clear(); redrawAll(); buildMap(); updateExplorer(); buildHeat(); labChanged(); drawDial(); drawOverlap(); drawPaths(); drawXXZ(); }
+try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeRedraw); } catch (e) {}
+new MutationObserver(themeRedraw).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+</script>
+
+</body>
+</html>

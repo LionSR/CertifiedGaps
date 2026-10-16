@@ -1,0 +1,64 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:#fffff8}canvas{display:block}</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap">
+<script>window.MathJax = {svg: {fontCache: 'local'}, startup: {typeset: false}};</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+<script src="core.js"></script><script src="chapters.js"></script>
+</head><body><canvas id="c" width="1920" height="1080"></canvas>
+<script>
+const S = 2, cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const TH = {bg: '#fffff8', surface: '#fffff8', ink: '#111111', mute: '#6b6b66', line: '#d9d6c6', space: '#a2322e', time: '#34628f', proved: '#8f6412',
+  ok: '#2f6b3d', fail: '#a2322e', spaceF: 'rgba(162,50,46,.08)', timeF: 'rgba(52,98,143,.08)', provedF: 'rgba(143,100,18,.10)', torusFill: '#efede2'};
+const TEXC = new Map();
+function texImg(src, color, px) { const h = TEXC.get(src + '|' + color + '|' + px); return h && h !== 'p' ? h : null; }
+// collect every TeX request by dry-running all frames, then load them
+async function preload() {
+  const want = new Map();
+  const probe = (src, color, px) => { want.set(src + '|' + color + '|' + px, [src, color, px]); return null; };
+  for (const ch of LIST) for (let t = 0; t <= ch.dur; t += .5) { ctx.save(); ch.draw(STBV.kit(ctx, TH, probe), t); ctx.restore(); }
+  await MathJax.startup.promise;
+  await Promise.all([...want.entries()].map(([key, [src, color, px]]) => new Promise(res => {
+    const svg = MathJax.tex2svg(src, {display: true}).querySelector('svg'), ex = px * .45;
+    const w = parseFloat(svg.getAttribute('width')) * ex, h = parseFloat(svg.getAttribute('height')) * ex;
+    svg.setAttribute('width', w * S); svg.setAttribute('height', h * S);
+    const img = new Image(); img.onload = () => { TEXC.set(key, {img, w, h}); res(); };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.outerHTML.replace(/currentColor/g, color));
+  })));
+}
+const LIST = STBV.CH.filter(c => c.id !== 'open'), PREFIX = '', TITLE = 'The spacetime bootstrap', SUB = 'How the spin-1 Haldane gap is proved, from imaginary time up';
+const INTRO = 5, GAP = 0;
+const starts = []; let acc = INTRO; for (const ch of LIST) { starts.push(acc); acc += ch.dur + GAP; }
+const TOTAL = acc;
+const seg = (t, a, b) => Math.max(0, Math.min(1, (t - a) / (b - a)));
+function caption(text, alpha) {
+  ctx.save(); ctx.globalAlpha = alpha; ctx.font = 'italic 20px "EB Garamond", Palatino, serif'; ctx.textAlign = 'center';
+  const words = text.split(' '), lines = []; let cur = '';
+  for (const w of words) { const tryL = cur ? cur + ' ' + w : w; if (ctx.measureText(tryL).width > 820) { lines.push(cur); cur = w; } else cur = tryL; }
+  lines.push(cur);
+  const h = 26 * lines.length + 14, y0 = 487 + (52 - h) / 2 + (lines.length > 1 ? 0 : 0);
+  
+  ctx.fillStyle = TH.ink; lines.forEach((l, i) => ctx.fillText(l, 480, y0 + 26 + i * 26)); ctx.restore();
+}
+function draw(t) {
+  ctx.setTransform(S, 0, 0, S, 0, 0); ctx.fillStyle = TH.bg; ctx.fillRect(0, 0, 960, 540);
+  if (t < INTRO) {
+    const a = Math.min(seg(t, 0, .8), 1 - seg(t, INTRO - .5, INTRO));
+    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = TH.ink; ctx.textAlign = 'center';
+    ctx.font = '400 54px "EB Garamond", Palatino, serif'; ctx.fillText(TITLE, 480, 240);
+    ctx.font = 'italic 24px "EB Garamond", Palatino, serif'; ctx.fillStyle = TH.ink;
+    ctx.fillText(SUB, 480, 285); ctx.restore();
+  } else {
+    let i = starts.length - 1; while (i > 0 && t < starts[i]) i--;
+    const ch = LIST[i], lt = t - starts[i], fade = Math.min(seg(lt, 0, .4), 1 - seg(lt, ch.dur - .4, ch.dur));
+    ctx.save(); ctx.globalAlpha = fade; ctx.translate(72, 18); ctx.scale(.85, .85); ch.draw(STBV.kit(ctx, TH, texImg), Math.min(lt, ch.dur)); ctx.restore();
+    ctx.save(); ctx.globalAlpha = fade * (1 - seg(lt, 3.5, 4.5) * .55); ctx.fillStyle = TH.mute; ctx.font = 'italic 16px "EB Garamond", Palatino, serif';
+    ctx.fillText(`${PREFIX}${i + 1}  ${ch.title}`, 24, 30); ctx.restore();
+    let bi = 0; ch.beats.forEach((b, k) => { if (lt >= b[0]) bi = k; });
+    const nb = ch.beats[bi + 1] ? ch.beats[bi + 1][0] : ch.dur;
+    caption(ch.beats[bi][1], fade * Math.min(seg(lt, ch.beats[bi][0], ch.beats[bi][0] + .3), 1 - seg(lt, nb - .25, nb)));
+  }
+  ctx.fillStyle = TH.ink; ctx.fillRect(0, 539, 960 * t / TOTAL, 1);
+}
+window.TOTAL = TOTAL; window.draw = draw;
+window.READY = (async () => { if (document.fonts) await document.fonts.ready; await preload(); draw(0); })();
+</script></body></html>
