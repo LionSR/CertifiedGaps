@@ -588,9 +588,97 @@ all $n\ge2$, $\beta>0$, $0<J_\perp\le4$). Conversely, bounding the monotone
 factors $W_L(\beta)=e^{\beta E_0(L)}Z_L(\beta)$ over interval coverings of
 $(0,\infty)$ rules out all $\beta_0>0$ at $n_0\in\{2,4\}$ for the dimerized
 spin-$\tfrac12$ chain at $\delta\le1/5$ and the Heisenberg ladder at
-$J_\perp\in\{3/2,2\}$. At $(g,h)=(1/4,1/20)$ in the longitudinal-field Ising
-chain, \path{lean/SeedKernel/} verifies the integer moments and seed bounds
-in the Lean~4 kernel (\texttt{decide +kernel}), proving an unconditional gap.
+$J_\perp\in\{3/2,2\}$. At $(g,h)=(1/4,1/20)$ in the longitudinal-field Ising chain the seed itself
+is proved in Lean, so that gap theorem has no hypotheses (see below).
+
+\emph{Exact rational chains.}
+The proof of Theorem~\ref{thm:criterion} runs Eq.~\eqref{eq:asym} only until
+both defects are small, and a computer can check those finitely many steps in
+exact rational arithmetic. Write $z(a,b)=1-(1-b)(1-a)^2$, so the recurrence
+reads $\varepsilon_{\mathrm s,j+1}=f(z(\varepsilon_{\mathrm s,j},\varepsilon_{\tau,j}))$
+and $\varepsilon_{\tau,j+1}=f(z(\varepsilon_{\tau,j},\varepsilon_{\mathrm s,j+1}))$.
+A \emph{chain certificate} consists of rationals $s_0,\dots,s_J$,
+$t_0,\dots,t_J$, a rate $r>0$, and $\varepsilon\le1/100$ such that
+\begin{itemize}
+\item $z_j=z(s_j,t_j)<1$, $f(z_j)\le s_{j+1}$, $z(t_j,s_{j+1})<1$ and
+$f(z(t_j,s_{j+1}))\le t_{j+1}$ for $j<J$;
+\item $r^{2^j}z_j<1-z_j$ for $j<J$;
+\item $s_J,t_J\le\varepsilon$ and $r^{2^J}\,5\varepsilon\le1$.
+\end{itemize}
+If $s_0$ and $t_0$ bound the seed defects at $(n_0,\beta_0)$, then $s_j$ and
+$t_j$ bound the defects at $(2^jn_0,2^j\beta_0)$. Every even $L$ with
+$2^jn_0\le L\le2^{j+1}n_0$ has $\Pt(L,2^j\beta_0)\ge1-z_j$, hence
+$e^{-2^j\beta_0\Delta_L}\le z_j/(1-z_j)<r^{-2^j}$. The second condition
+therefore gives $\Delta_L>(\log r)/\beta_0$ at the first $J$ scales, and the
+third hands the remaining scales to the symmetric argument with
+$\varepsilon_0=\varepsilon$. The conclusion is a uniform gap
+$\Delta_L>(\log r)/\beta_0$ for every even $L\ge n_0$. The Julia side
+(\path{CertifiedGaps.Recurrence.rational_gap_chain}) produces such chains from
+certified seed defects. Lean checks them with \texttt{decide +kernel}
+(\path{lean/CertifiedGaps/ChainCheck.lean}) and proves the implication
+(\path{gapGT_of_chainCertificate} in \path{lean/CertifiedGaps/Chain.lean}).
+For the Ising seed below, $J=8$ and $s_8\approx1.2\cdot10^{-1058}$.
+
+\emph{An unconditional gap: the longitudinal Ising seed in Lean.}
+For $H_L=-\sum_jZ_jZ_{j+1}-\tfrac14\sum_jX_j-\tfrac1{20}\sum_jZ_j$, the
+Lean library \path{lean/SeedKernel/Ising/} proves (as \path{SeedKernel.Ising.ising_gap}), with no hypotheses, no
+\texttt{sorry} and only the standard axioms, that every even ring of
+$L\ge6$ sites has a unique ground state and
+\begin{equation}
+\Delta_L>\frac{\log13480}{97/4}\approx0.3921.
+\label{eq:isinggap}
+\end{equation}
+The seed is $(n_0,\beta_0)=(6,97/4)$ with
+$1-\Ps(6,97/4)\le9064\cdot10^{-9}$ and $1-\Pt(12,97/4)\le3141\cdot10^{-8}$.
+These two bounds feed the chain certificate above. They are proved from the
+spectra of the rings of $L=6$ and $L=12$ sites by the following four steps.
+\begin{enumerate}
+\item \emph{Two eigenvalues from residuals.} Two trial vectors per ring, with
+integer entries at scale $2^{52}$, are checked by \texttt{decide +kernel}:
+their squared norms equal $2^{104}$ to relative accuracy $10^{-12}$, and their
+residuals $\|Hx-\theta x\|$ are small enough for the next bound. For a
+Hermitian $H$ with eigenvalues $\lambda_i$, diagonalizing $H$ unitarily gives
+some $i$ with $(\lambda_i-\theta)^2\|x\|^2\le\|Hx-\theta x\|^2$. Each check
+thus places an eigenvalue within $r=10^{-10}$ of $\theta$, at
+$\theta_0\approx-6.3918$, $\theta_1\approx-5.7966$ for $L=6$ and at
+$\theta_0\approx-12.7835$, $\theta_1\approx-11.5932$ for $L=12$. The two
+eigenvalues are distinct because $\theta_1-\theta_0>2r$.
+\item \emph{All other eigenvalues by comparison.} In the $Z$ basis,
+$(Hx)(\sigma)=E(\sigma)x(\sigma)-g\sum_jx(\sigma^{(j)})$, where $E$ is the
+classical energy and $\sigma^{(j)}$ flips spin $j$. Hence
+$\operatorname{Re}\langle x,Hx\rangle\ge\sum_\sigma(E(\sigma)-gL)|x(\sigma)|^2$.
+Let $B$ be the set of configurations with $E(\sigma)-gL<\rho$. Every $x$
+vanishing on $B$ has $\operatorname{Re}\langle x,Hx\rangle\ge\rho\|x\|^2$.
+If more than $|B|$ eigenvalues were below $\rho$, their span would meet this
+subspace of codimension $|B|$ in a nonzero vector. So at most $|B|$
+eigenvalues lie below $\rho$. A kernel count gives $|B|=2$ at $\rho=-3.7$
+($L=6$) and $\rho=-11.5$ ($L=12$), both above $\theta_1+r$. Every eigenvalue
+other than the two from step~1 is therefore at least $\rho$.
+\item \emph{Partition-function bounds.} With
+$\theta_0,\theta_1,\rho$ as above and $\beta>0$,
+\[
+\begin{aligned}
+Z_L(\beta)&\ge e^{-\beta(\theta_0+r)},\\
+Z_L(\beta)&\le e^{-\beta(\theta_0-r)}\bigl[1+e^{-\beta(\theta_1-\theta_0)}\\
+&\qquad+2^Le^{-\beta(\rho-\theta_0+r)}\bigr].
+\end{aligned}
+\]
+At $\beta=97/4$ each correction term is at most a power of $e^{-14}$.
+Lean bounds these powers using $e>2.7182818283$ (Mathlib's
+\path{Real.exp_one_gt_d9}).
+\item \emph{Purities.} Write the upper bound on the denominator $Z_1$
+($Z_6(\beta_0)$ or $Z_{12}(\beta_0)$) as $A(1+t)$ with $A=e^{-\beta_0(\theta_0-r)}$, and
+the lower bound on the numerator $Z_2$ ($Z_{12}(\beta_0)$ or $Z_{12}(2\beta_0)$) as
+$A^2e^{-x}$. Then $Z_2/Z_1^2\ge(1-x)/(1+t)^2$, and the right side is checked
+against both seed bounds in exact rational arithmetic.
+\end{enumerate}
+The arithmetic is done on bit-packed integer vectors, with the $L=12$ sums
+split into 64 chunks of 64 configurations. The checker's integer sums are
+identified with the Lean Hamiltonian
+(\path{Ising/Bridge.lean}, \path{Ising/Hamiltonian.lean}). No step uses
+\texttt{native\_decide}. The remaining 29 points of row~9 of
+Table~\ref{tab:certified} keep their seeds as hypotheses in
+\path{lean/CertifiedGaps/Models/IsingLongitudinal.lean}.
 
 \begin{thebibliography}{14}
 \bibitem{main}
