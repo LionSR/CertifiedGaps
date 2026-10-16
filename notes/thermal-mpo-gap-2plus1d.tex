@@ -176,17 +176,17 @@ necessarily individual spins. We use even periods throughout.
 Write \(v=(n,m,\beta)\), with commuting doubling operations
 \[
 	D_xv=(2n,m,\beta),\quad D_yv=(n,2m,\beta),\quad
-	D_tv=(n,m,2\beta).
+	D_\tau v=(n,m,2\beta).
 \]
 Define
 \begin{align}
 	P_x(v) & =\frac{Z(2n,m,\beta)}{Z(n,m,\beta)^2}, &
 	P_y(v) & =\frac{Z(n,2m,\beta)}{Z(n,m,\beta)^2}, &
-	P_t(v) & =\frac{Z(n,m,2\beta)}{Z(n,m,\beta)^2}.
+	P_\tau(v) & =\frac{Z(n,m,2\beta)}{Z(n,m,\beta)^2}.
 	\label{eq:purities}
 \end{align}
-Here \(t\) denotes imaginary time. The temporal ratio is always the
-purity of \(\rho_v=e^{-\beta H_{n,m}}/Z(v)\).
+Here \(\tau\) denotes imaginary time. The thermal purity \(P_\tau(v)\) is always
+\(\Tr\rho_v^2\) for \(\rho_v=e^{-\beta H_{n,m}}/Z(v)\).
 
 \paragraph{Spatial-transfer hypothesis.}
 For every transverse period and inverse temperature used below, assume
@@ -208,13 +208,13 @@ For even \(n,m\), the trace-one operators
 \[
 	\sigma_x(v)=\frac{T_x(m,\beta)^n}{Z(v)},\qquad
 	\sigma_y(v)=\frac{T_y(n,\beta)^m}{Z(v)},\qquad
-	\sigma_t(v)=\rho_v
+	\sigma_\tau(v)=\rho_v
 \]
 are positive, and \(P_a(v)=\tr\sigma_a(v)^2\). Consequently,
 \begin{equation}
 	0<P_a(v)\le1,\qquad
 	\sigma_a(D_av)=\frac{\sigma_a(v)^2}{P_a(v)},
-	\qquad a\in\{x,y,t\}.
+	\qquad a\in\{x,y,\tau\}.
 	\label{eq:square-states}
 \end{equation}
 An exact tensor-network representation alone does not imply
@@ -243,9 +243,9 @@ Every pair of directions also satisfies the exact identity
 \end{equation}
 This follows by cancellation of partition functions and requires no
 transfer assumption. The same cancellation on the three-dimensional
-cube gives, for any permutation \((a,b,c)\) of \((x,y,t)\),
+cube gives, for any permutation \((a,b,c)\) of \((x,y,\tau)\),
 \begin{equation}
-	Q(v):=\frac{Z(D_xD_yD_tv)}{Z(v)^8}
+	Q(v):=\frac{Z(D_xD_yD_\tau v)}{Z(v)^8}
 	=P_a(v)^4P_b(D_av)^2P_c(D_bD_av).
 	\label{eq:cube}
 \end{equation}
@@ -264,66 +264,66 @@ At the base point \(v\), assume
 \begin{equation}
 	P_x(v)\ge1-\ee_x,\qquad
 	P_y(D_xv)\ge1-\ee_y,\qquad
-	P_t(D_yD_xv)\ge1-\ee_t.
+	P_\tau(D_yD_xv)\ge1-\ee_\tau.
 	\label{eq:seed}
 \end{equation}
-These are the three edges of the path \(x,y,t\) through one cube.
-Put \(v'=D_xD_yD_tv\). The next-scale quantities occupy the same
+These are the three edges of the path \(x,y,\tau\) through one cube.
+Put \(v'=D_xD_yD_\tau v\). The next-scale quantities occupy the same
 staggered positions:
 \begin{equation}
-	P_x(v'),\qquad P_y(D_xv'),\qquad P_t(D_yD_xv').
+	P_x(v'),\qquad P_y(D_xv'),\qquad P_\tau(D_yD_xv').
 	\label{eq:target}
 \end{equation}
 In coordinates, the input and output are
 \[
 	\begin{array}{c|c|c}
-		  & \text{input}     & \text{output}      \\ \hline
-		x & P_x(n,m,\beta)   & P_x(2n,2m,2\beta)  \\
-		y & P_y(2n,m,\beta)  & P_y(4n,2m,2\beta)  \\
-		t & P_t(2n,2m,\beta) & P_t(4n,4m,2\beta).
+		     & \text{input}        & \text{output}         \\ \hline
+		x    & P_x(n,m,\beta)      & P_x(2n,2m,2\beta)     \\
+		y    & P_y(2n,m,\beta)     & P_y(4n,2m,2\beta)     \\
+		\tau & P_\tau(2n,2m,\beta) & P_\tau(4n,4m,2\beta).
 	\end{array}
 \]
 
 \begin{theorem}[Three-component update]
 	Define successively
 	\begin{align}
-		u_x      & =(1-\ee_x)^4(1-\ee_y)^2(1-\ee_t),       &
-		\delta_x & =f(1-u_x),\label{eq:update-x}             \\
-		u_y      & =(1-\ee_y)^4(1-\ee_t)^2(1-\delta_x),    &
-		\delta_y & =f(1-u_y),\label{eq:update-y}             \\
-		u_t      & =(1-\ee_t)^4(1-\delta_x)^2(1-\delta_y), &
-		\delta_t & =f(1-u_t).\label{eq:update-t}
+		u_x         & =(1-\ee_x)^4(1-\ee_y)^2(1-\ee_\tau),         &
+		\delta_x    & =f(1-u_x),\label{eq:update-x}                  \\
+		u_y         & =(1-\ee_y)^4(1-\ee_\tau)^2(1-\delta_x),      &
+		\delta_y    & =f(1-u_y),\label{eq:update-y}                  \\
+		u_\tau      & =(1-\ee_\tau)^4(1-\delta_x)^2(1-\delta_y),   &
+		\delta_\tau & =f(1-u_\tau).\label{eq:update-t}
 	\end{align}
 	Provided the input defects lie in \([0,1)\) and
 	\(\delta_x,\delta_y<1\), the output defects in
-	\eqref{eq:target} are bounded by \(\delta_x,\delta_y,\delta_t\),
+	\eqref{eq:target} are bounded by \(\delta_x,\delta_y,\delta_\tau\),
 	respectively.
 \end{theorem}
 
 \begin{proof}
-	First use the cube at \(v\). Its path \(x,y,t\) gives
-	\(Q(v)\ge u_x\). Reorder the path to \(y,t,x\); by
+	First use the cube at \(v\). Its path \(x,y,\tau\) gives
+	\(Q(v)\ge u_x\). Reorder the path to \(y,\tau,x\); by
 	\eqref{eq:last-edge},
-	\(P_x(D_yD_tv)\ge u_x\).
+	\(P_x(D_yD_\tau v)\ge u_x\).
 	Squaring in \(x\) yields \(P_x(v')\ge1-\delta_x\).
 
-	Next use the cube based at \(D_xv\). Its path \(y,t,x\) uses two
+	Next use the cube based at \(D_xv\). Its path \(y,\tau,x\) uses two
 	old bounds and the just-proved bound:
 	\[
-		Q(D_xv)=P_y(D_xv)^4P_t(D_yD_xv)^2P_x(v')\ge u_y.
+		Q(D_xv)=P_y(D_xv)^4P_\tau(D_yD_xv)^2P_x(v')\ge u_y.
 	\]
-	Reordering to \(x,t,y\) gives
-	\(P_y(D_x^2D_tv)\ge u_y\).
+	Reordering to \(x,\tau,y\) gives
+	\(P_y(D_x^2D_\tau v)\ge u_y\).
 	Squaring in \(y\) yields \(P_y(D_xv')\ge1-\delta_y\).
 
-	Finally use the cube based at \(D_xD_yv\). Its path \(t,x,y\)
+	Finally use the cube based at \(D_xD_yv\). Its path \(\tau,x,y\)
 	gives
 	\[
-		Q(D_xD_yv)=P_t(D_xD_yv)^4P_x(v')^2P_y(D_xv')\ge u_t.
+		Q(D_xD_yv)=P_\tau(D_xD_yv)^4P_x(v')^2P_y(D_xv')\ge u_\tau.
 	\]
-	Reordering to \(x,y,t\) gives
-	\(P_t(D_x^2D_y^2v)\ge u_t\).
-	Squaring in \(t\) yields \(P_t(D_xD_yv')\ge1-\delta_t\).
+	Reordering to \(x,y,\tau\) gives
+	\(P_\tau(D_x^2D_y^2v)\ge u_\tau\).
+	Squaring in \(\tau\) yields \(P_\tau(D_xD_yv')\ge1-\delta_\tau\).
 \end{proof}
 
 \begin{theorem}[Closed scalar recursion]
@@ -350,7 +350,7 @@ In coordinates, the input and output are
 	\(\delta_x\le g(\ee)\le\ee\).
 	This implies \(u_y\ge(1-\ee)^7\), hence the same bound on
 	\(\delta_y\); it then implies the corresponding bound on
-	\(\delta_t\). Thus the recursion closes.
+	\(\delta_\tau\). Thus the recursion closes.
 \end{proof}
 
 \section{Uniform Spectral Gap from Certified Seeds}
@@ -359,7 +359,7 @@ Suppose three finite-scale certificates establish
 \begin{equation}
 	P_x(n_0,m_0,\beta_0),\quad
 	P_y(2n_0,m_0,\beta_0),\quad
-	P_t(2n_0,2m_0,\beta_0)\ \ge0.999.
+	P_\tau(2n_0,2m_0,\beta_0)\ \ge0.999.
 	\label{eq:certificates}
 \end{equation}
 Set
@@ -389,7 +389,7 @@ expresses \(Z\) as an even spectral moment. Monotonicity of the
 \end{align*}
 With \(\alpha=L_xL_y/(4n_jm_j)\in[1/4,1]\), this implies
 \begin{align}
-	P_t(L_x,L_y,\beta_j)
+	P_\tau(L_x,L_y,\beta_j)
 	 & \ge Q(n_j,m_j,\beta_j)^\alpha\notag         \\
 	 & \ge(1-\ee_j)^{7\alpha}\ge1-7\ee_j>\tfrac12.
 	\label{eq:interpolation}

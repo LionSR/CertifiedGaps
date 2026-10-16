@@ -208,15 +208,15 @@ with its reflected partner $a$ in the right cell,
 and conjugating the physical loop by $F$ in Lemma~\ref{lem:mirror} gives
 $\overline{X_\beta(a,b)}=X_\beta(b,a)$ on the ring of $L$ cells (\texttt{RPRing}
 in \path{lean/CertifiedGaps/Ring/Model.lean} and \path{Ring/Transfer.lean}). For
-a two-spin dimer $(a,b)$ with swap $F=P$, $C_\alpha=I\otimes G_\alpha$ gives
-$F\overline{C_\alpha}F=\overline{G_\alpha}\otimes I$, linking spin~$b$ of
-cell~$j$ to spin~$a$ of cell~$j+1$. The internal swap $F$ is essential: any unreflected real form
-$\sum_\alpha C_\alpha\otimes C_\alpha$ ($F=I$) commutes with the outer cell swap
-$F_{\mathrm{outer}}$, whereas the inter-cell dimer bond has
-$\|h-F_{\mathrm{outer}}hF_{\mathrm{outer}}\|_{\mathrm F}^2=6(1-\delta)^2>0$
-in every single-cell basis (\path{models/dimerized_heisenberg}); diagonalizing
-$F=\frac12MM^{\mathsf T}$ via $U_{\mathrm{cell}}=\frac1{\sqrt2}(I\otimes 2iS^y)M$
-turns $\Theta(C)=F\overline CF$ into entrywise conjugation.
+a two-spin dimer $(a,b)$ with the two-spin swap $F$, $C_\alpha=I\otimes G_\alpha$
+gives $F\overline{C_\alpha}F=\overline{G_\alpha}\otimes I$, linking spin~$b$ of
+cell~$j$ to spin~$a$ of cell~$j+1$. The internal swap $F$ is essential: any
+unreflected real form $\sum_\alpha C_\alpha\otimes C_\alpha$ ($F=I$) is symmetric
+under the two-cell swap $S(x\otimes y)=y\otimes x$, whereas the inter-cell bond
+has $\|h-ShS\|_{\mathrm F}^2=6(1-\delta)^2>0$ for $\delta\ne1$ in every
+single-cell basis (\path{models/dimerized_heisenberg}). Diagonalizing $F$
+orthogonally and multiplying its $-1$ eigenspace by $i$ reduces
+$\Theta(C)=F\overline CF$ to entrywise conjugation.
 
 \emph{Positive cell-transfer operators and odd seed lengths.}
 Theorem~\ref{thm:space} restricts $Z_n(\beta)=\sum_i\lambda_i(\beta)^n$ to
@@ -301,7 +301,7 @@ doubly exponentially, so the terms converge to a positive limit.
 With $(n_0,\beta_0,\varepsilon_0)=(2304,784,1/100)$ this is the theorem of
 Ref.~\cite{main}, with $c\ge(\log20)/784$.
 
-\emph{Asymmetric defects and four-torus seed lifting.}
+\emph{Asymmetric defects and half-length seeds.}
 In Theorem~\ref{thm:criterion}, the initial spatial defect
 $\varepsilon_{\mathrm s}\ge1-\Ps(n_0,\beta_0)$ and thermal defect
 $\varepsilon_\tau\ge1-\Pt(2n_0,\beta_0)$ need not be equal. Tracking
@@ -357,8 +357,8 @@ Ref.~\cite{cert} lies in the upper wing, while the $J_\perp=5/2$ ladder
 $(0.1856,0.0511)$, $D=3.206$ large-$D$ $(0.1916,0.0465)$, and $(g,h)=(1,1/20)$
 Ising $(0.1840,0.0074)$ seeds lie in the right-hand wing.
 
-Furthermore, reading the four-torus coupling identity of Ref.~\cite{main} to
-solve for $\Pt(2n_0,\beta_0)$ yields
+Furthermore, the coupling identity of Ref.~\cite{main} expresses
+$\Pt(2n_0,\beta_0)$ in terms of length-$n_0$ purities,
 \begin{equation}
  \Pt(2n_0,\beta_0)=\frac{\Zt42}{\Ztsq41}
  =\frac{\Ps(n_0,2\beta_0)\,\Pt(n_0,\beta_0)^2}{\Ps(n_0,\beta_0)^2},
@@ -521,14 +521,15 @@ $\vartheta=0.05\pi$; Sec.~\ref{app:checks}).
 The red arc is the reflection-positive window; the blue arc,
 $-\pi/4<\vartheta\le0$, is where it meets the Haldane phase so
 Theorem~\ref{thm:criterion} applies. Within this arc, scans up to $n_0=6$
-(\path{models/blbq_haldane}) show that the ground-energy mismatch
-$\delta(n)=E_0(2n)-2E_0(n)>0$ ($\delta(6)\in[0.365,0.920]$) caps
-$\Ps(n,\beta)\lesssim e^{-\beta\delta(n)}$ against $\beta\gtrsim1/\Delta$,
-delaying admissible seeds until $n_0\approx20\text{--}48$. Elsewhere in the window
+(\path{models/blbq_haldane}) show a positive ground-energy doubling mismatch
+$E_0(2n)-2E_0(n)\in[0.365,0.920]$ at $n=6$, which caps
+$\Ps(n,\beta)\lesssim e^{-\beta[E_0(2n)-2E_0(n)]}$ against $\beta\gtrsim1/\Delta$
+and delays admissible seeds to $n_0\approx20\text{--}48$. Elsewhere in the window
 Corollary~\ref{cor:obstruct} excludes it (degenerate dimerized ground states and
-critical point TB). The Heisenberg chain sits on the edge of the window, while
-AKLT and ULS lie outside it because the positive biquadratic coefficient has the
-wrong sign, and optimizing over all on-site $\Theta$ finds none (Sec.~\ref{app:checks}).
+the critical Takhtajan--Babujian point TB). The Heisenberg chain sits on the edge
+of the window, while AKLT and ULS lie outside it because the positive biquadratic
+coefficient has the wrong sign, and optimizing over all on-site $\Theta$ finds
+none (Sec.~\ref{app:checks}).
 
 \emph{Anisotropy, dimerized cells, and ladders.}
 Any real symmetric on-site or intra-cell operator $o_j=\overline{o_j}$
@@ -538,8 +539,8 @@ preserves bond reflection positivity without requiring integrability:
 $o=D(S^z)^2=D\operatorname{diag}(1,1,0)$ is real diagonal and leaves
 $-\bm S_j\cdot\bm S_{j+1}$ unchanged (\path{models/spin1_largeD}).
 \item \emph{Dimerized chains.} Bond-alternating spin-$\tfrac12$ and spin-1
-chains with couplings $1\pm\delta$ group into two-spin cells with swap $F=P$
-under Eq.~\eqref{eq:rpcell} (\path{models/dimerized_heisenberg},
+chains with couplings $1\pm\delta$ group into two-spin cells with the two-spin
+swap $F$ under Eq.~\eqref{eq:rpcell} (\path{models/dimerized_heisenberg},
 \path{models/spin1_dimerized}).
 \item \emph{Two-leg ladders.} Grouping each two-spin rung into a four-state
 site ($F=I$) places the rung coupling in $o_j$ and the leg couplings in
@@ -590,13 +591,13 @@ assembles symmetry blocks (whose exact multiplicities sum to $d^n$) in interval
 arithmetic, diagonalizes them in IEEE binary64, and encloses every eigenvalue
 via polar-factor orthogonalization, Weyl's inequality, and a priori rounding
 bounds ($\gamma_k=ku/(1-ku)$ with gradual underflow) before summing $\log Z$
-and iterating Eq.~\eqref{eq:asym}. Centered operator-norm bounds on $\sum_j o_j$
-extend point certificates to coupling intervals ($D\in[3.2059998,3.206]$ in
-\path{models/spin1_largeD} and $|J_\perp-J_*|\le10^{-4}$ in
-\path{models/heisenberg_ladder}), whereas independent-rung Weyl bounds
-$|\log Z_L-\log Z_L^{(0)}|\le\beta L$ fail for all $n\ge2$, $\beta>0$,
-$0<J_\perp\le4$ ($\beta n\ge1/8\Rightarrow(1-\varepsilon_{\mathrm s})^2\le e^{-1}<1/2$;
-$\beta n<1/8\Rightarrow1-\varepsilon_\tau\le(64/169)^{2n}<1/2$). Conversely, bounding the monotone
+and iterating Eq.~\eqref{eq:asym}. Perturbing a certified seed by an
+operator-norm bound on $\sum_j\delta o_j$ extends point certificates to coupling
+intervals ($D\in[3.2059998,3.206]$ in \path{models/spin1_largeD} and
+$|J_\perp-J_*|\le10^{-4}$ in \path{models/heisenberg_ladder}), whereas a naive
+Weyl bound around the decoupled-rung limit $J_{\mathrm{leg}}=0$ loses a factor
+$e^{4\beta n}$ in $\Ps(n,\beta)$ and fails at every $(n,\beta)$ for
+$0<J_\perp\le4$. Conversely, bounding the monotone
 factors $W_L(\beta)=e^{\beta E_0(L)}Z_L(\beta)$ over interval coverings of
 $(0,\infty)$ rules out all $\beta_0>0$ at $n_0\in\{2,4\}$ for the dimerized
 spin-$\tfrac12$ chain at $\delta\le1/5$ and the Heisenberg ladder at
@@ -688,20 +689,20 @@ The arithmetic is done on bit-packed integer vectors, with the $L=12$ sums
 split into 64 chunks of 64 configurations. The checker's integer sums are
 identified with the Lean Hamiltonian
 (\path{Ising/Bridge.lean}, \path{Ising/Hamiltonian.lean}). No step uses
-\texttt{native\_decide}. Across the 43-point seed inventory
-(\path{models/lean_seeds/}), $(1/4,1/20)$ has $k=2$ states below the cutoff
-$E_0+(\log d^L+\log(1/\eta))/\beta_0$ at $\beta_0=97/4$ (vs.\ $k\in[1,145]$
-across the $30$ Ising points and $k\in[195,2465]$ across the other seven
-families); the other 29 points of row~9 of Table~\ref{tab:certified} keep their
-seeds as hypotheses in \path{lean/CertifiedGaps/Models/IsingLongitudinal.lean}.
+\texttt{native\_decide}. This point is the cheapest seed in
+Table~\ref{tab:certified} because only two states lie below $\rho$, whereas the
+seeds in the other seven model families require resolving $195\text{--}2465$
+low-lying states (\path{models/lean_seeds/}). The remaining 29 points of row~9
+keep their seeds as hypotheses in
+\path{lean/CertifiedGaps/Models/IsingLongitudinal.lean}.
 
 \begin{thebibliography}{14}
 \bibitem{main}
 Companion note, \emph{A diagrammatic proof of the Haldane gap via spacetime
-tensor networks} (\texttt{thermal-mpo-gap-note.tex}, 2026).
+tensor networks}, \texttt{notes/thermal-mpo-gap-note.tex} (2026).
 \bibitem{cert}
-Companion note, \emph{How the initial estimate is certified}
-(\texttt{thermal-mpo-gap-certificate.tex}, 2026).
+Companion note, \emph{How the initial estimate is certified},
+\texttt{notes/thermal-mpo-gap-certificate.tex} (2026).
 \bibitem{os}
 K. Osterwalder and R. Schrader,
 \href{https://doi.org/10.1007/BF01645738}{Axioms for Euclidean Green's
