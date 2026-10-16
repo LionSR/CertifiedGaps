@@ -8,14 +8,14 @@
   const ease = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
   const lerp = (a, b, s) => a + (b - a) * s;
   // Tufte: one serif face throughout, thin strokes, no rounded panels, direct labels.
-  const SERIF = '"EB Garamond", Palatino, "DejaVu Serif", serif', SANS = SERIF, MONO = SERIF;
+  const SERIF = '"EB Garamond", Palatino, "DejaVu Serif", serif';
 
   // ---------- drawing kit ----------
   function kit(ctx, th, texImg) {
     const K = {ctx, th, W, H, seg, ease, lerp, clamp};
     K.text = (s, x, y, o = {}) => {
       ctx.save(); ctx.globalAlpha *= o.alpha ?? 1; ctx.fillStyle = o.color || th.ink;
-      ctx.font = `${o.italic ? 'italic ' : ''}${o.weight || 400} ${Math.round((o.size || 16) * 1.12)}px ${o.font || SANS}`; ctx.textAlign = o.align || 'left';
+      ctx.font = `${o.italic ? 'italic ' : ''}${o.weight || 400} ${Math.round((o.size || 16) * 1.12)}px ${SERIF}`; ctx.textAlign = o.align || 'left';
       ctx.textBaseline = o.base || 'alphabetic'; ctx.fillText(s, x, y); ctx.restore();
     };
     K.tex = (src, x, y, o = {}) => {
@@ -84,7 +84,7 @@
       E.forEach((e, i) => K.line(lx, base - e * sc, lx + 170, base - e * sc, {color: i ? th.mute : th.ink, w: i ? 2 : 4, alpha: a * seg(t, .2 + i * .1, .6 + i * .1)}));
       const g = seg(t, 1.5, 2.3);
       K.arrow(lx + 200, base, lx + 200, base - .9 * sc + 2, {color: th.proved, w: 2.5, alpha: g}); K.arrow(lx + 200, base - .9 * sc, lx + 200, base - 2, {color: th.proved, w: 2.5, alpha: g});
-      K.text('Δ', lx + 214, base - .45 * sc + 8, {size: 26, font: SERIF, color: th.proved, alpha: g});
+      K.text('Δ', lx + 214, base - .45 * sc + 8, {size: 26, color: th.proved, alpha: g});
       K.text('E₀', lx - 10, base + 6, {align: 'right', color: th.mute, alpha: a}); K.text('energy', lx, 110, {color: th.mute, alpha: a, size: 14});
       // plot of Δ_L versus L
       const px = 380, py = 110, pw = 520, ph = 290, b = seg(t, 4.5, 5.3);
@@ -103,7 +103,7 @@
       const c = seg(t, 10, 11);
       K.rect(px, Y(.25), pw, Y(0) - Y(.25), {fill: th.provedF, alpha: c});
       K.line(px, Y(.25), px + pw, Y(.25), {color: th.proved, dash: [7, 5], w: 2.5, alpha: c});
-      K.text('c', px + pw + 10, Y(.25) + 6, {size: 22, font: SERIF, color: th.proved, alpha: c});
+      K.text('c', px + pw + 10, Y(.25) + 6, {size: 22, color: th.proved, alpha: c});
       K.text('every spin-1 dot must stay above the dashed line', px, py + ph + 56, {color: th.proved, alpha: seg(t, 11.5, 12.5), size: 15});
     }
   });
@@ -114,12 +114,11 @@
     beats: [[0, 'At inverse temperature β, level m has probability e^(−βEₘ)/Z.'],
             [4, 'Cooling down empties the excited levels. The ratio of the first two weights is exactly e^(−βΔ).'],
             [9.5, 'So it is enough to show: excited weight ≤ e^(−cβ) on every ring. Then Δ ≥ c.']],
-    tex: ['\\frac{w_1}{w_0}=e^{-\\beta\\Delta}'],
     draw(K, t) {
       const {th} = K, E = [0, 1, 1, 1, 1.6, 2, 2.4], beta = lerp(.15, 4.5, ease(seg(t, 2, 9)));
       const w = E.map(e => Math.exp(-beta * e)), Z = w.reduce((x, y) => x + y);
       K.bars(70, 110, 330, 280, w.map(v => v / Z), th.time, {labels: true, alpha: seg(t, 0, .8)});
-      K.text(`β = ${beta.toFixed(2)}`, 70, 440, {font: MONO, size: 18, alpha: seg(t, 0, .8)});
+      K.text(`β = ${beta.toFixed(2)}`, 70, 440, {size: 18, alpha: seg(t, 0, .8)});
       K.text('levels  E = 0, 1, 1, 1, 1.6, 2, 2.4', 70, 470, {color: th.mute, size: 14, alpha: seg(t, 0, .8)});
       const px = 500, py = 110, pw = 400, ph = 280, b = seg(t, 4, 4.8), Y = v => py - v / 4.5 * ph;
       K.axes(px, py, pw, ph, {alpha: b});
@@ -140,7 +139,6 @@
             [9.5, 'Now replace t by −iτ. The same formula gives e^(−τH): no turning at all. Arrow m shrinks by the factor e^(−τEₘ); high energies shrink fastest.'],
             [14, 'Rescale so the probabilities add to 1. The ground state takes over, and the first excited level loses like e^(−τΔ). The gap is the speed.'],
             [18.5, 'At τ = β the shrink factors are exactly the Boltzmann weights e^(−βE). Low temperature and long imaginary time are the same thing.']],
-    tex: ['e^{-\\tau H}\\psi=\\sum_m c_m\\,e^{-\\tau E_m}|m\\rangle'],
     draw(K, t) {
       const {th} = K, E = [0, 1, 1.5, 2.2], c = [.45, .6, .45, .5], cols = [th.space, th.time, th.proved, th.ok];
       const real = t >= 5 && t < 9.5, tr = real ? (t - 5) * 1.3 : 0, tau = t >= 9.5 ? lerp(0, 3, ease(seg(t, 10, 13.5))) : 0;
@@ -153,11 +151,11 @@
         K.circle(x, y, R, {color: th.line, w: 1.5});
         K.arrow(x, y, x + len * Math.cos(ang), y - len * Math.sin(ang), {color: cols[m], w: 3.5, head: 9});
         K.text(m ? `level ${m}` : 'ground', x, y - R - 12, {align: 'center', color: cols[m], size: 14});
-        K.text(`E = ${e}`, x, y + R + 22, {align: 'center', color: th.mute, size: 13, font: MONO});
+        K.text(`E = ${e}`, x, y + R + 22, {align: 'center', color: th.mute, size: 13});
         const p = Math.pow(amp[m] * scale, 2), bh = 110;
-        K.rect(x - 22, 400 - p * bh, 44, p * bh, {fill: cols[m], alpha: .85, r: 2});
-        K.text(p.toFixed(2), x, 392 - p * bh, {align: 'center', color: th.mute, size: 12, font: MONO});
-        if (t >= 18.5) K.text(`e^(−βE) = ${Math.exp(-3 * e).toFixed(3)}`, x, 432, {align: 'center', color: th.proved, size: 13, font: MONO, alpha: seg(t, 18.8, 19.5)});
+        K.rect(x - 22, 400 - p * bh, 44, p * bh, {fill: cols[m], alpha: .85});
+        K.text(p.toFixed(2), x, 392 - p * bh, {align: 'center', color: th.mute, size: 12});
+        if (t >= 18.5) K.text(`e^(−βE) = ${Math.exp(-3 * e).toFixed(3)}`, x, 432, {align: 'center', color: th.proved, size: 13, alpha: seg(t, 18.8, 19.5)});
       });
       K.line(90, 400, 610, 400, {color: th.line, w: 1.5}); K.text('prob.', 60, 404, {color: th.mute, size: 13, align: 'right'});
       // ratio panel
@@ -183,7 +181,6 @@
             [12.5, 'Make the steps tiny. A path becomes a world line that mostly stays and flips a few times. With k flips its weight is dτᵏ, and there are about (β/dτ)ᵏ/k! places for them: βᵏ/k! in total.'],
             [19, 'The trace keeps only paths that end where they started. So k is even, and the time axis closes into a circle.'],
             [23, 'Add all paths: Σ 2βᵏ/k! over even k = 2 cosh β, the exact answer. This is the Euclidean path integral: quantum mechanics as a sum over histories.']],
-    tex: ['A=\\begin{pmatrix}1&d\\tau\\\\ d\\tau&1\\end{pmatrix}', 'Z=\\sum_{k\\ \\mathrm{even}}\\frac{2\\beta^k}{k!}=2\\cosh\\beta'],
     draw(K, t) {
       const {th} = K, A1 = 1 - seg(t, 12.2, 12.8);
       const ROWS = [150, 260], lab = ['↑', '↓'];
@@ -205,7 +202,7 @@
         K.tex('A=\\begin{pmatrix}1&d\\tau\\\\ d\\tau&1\\end{pmatrix}', 780, 200, {align: 'center', size: 24, alpha: A1 * seg(t, 6.5, 7.5)});
         K.text('stay: weight 1', 700, 290, {color: th.ink, size: 15, alpha: A1 * seg(t, 7, 8)});
         K.text('flip: weight dτ', 700, 314, {color: th.proved, size: 15, alpha: A1 * seg(t, 7.5, 8.5)});
-        K.text('e^(−βH) = Aᴹ,  M = β / dτ', 700, 350, {color: th.ink, size: 15, font: MONO, alpha: A1 * seg(t, 9, 10)});
+        K.text('e^(−βH) = Aᴹ,  M = β / dτ', 700, 350, {color: th.ink, size: 15, alpha: A1 * seg(t, 9, 10)});
       }
       const B = seg(t, 12.8, 13.4) * (1 - seg(t, 22.7, 23.3));
       if (B > 0) {
@@ -220,7 +217,7 @@
           K.path(pts, {color: th.space, w: 4, alpha: al});
           fl.forEach(f => K.dot(Xt(f), (yU + yD) / 2, 5, th.proved, al));
           K.text('↑', x0 - 22, yU + 6, {align: 'center', alpha: al}); K.text('↓', x0 - 22, yD + 6, {align: 'center', alpha: al});
-          K.text(`k = ${fl.length}:  weight βᵏ/k! = ${(Math.pow(2, fl.length) / [1, 1, 2, 6, 24][fl.length]).toFixed(2)} (β = 2)`, x1, yD + 26, {align: 'right', color: th.mute, size: 13, font: MONO, alpha: al});
+          K.text(`k = ${fl.length}:  weight βᵏ/k! = ${(Math.pow(2, fl.length) / [1, 1, 2, 6, 24][fl.length]).toFixed(2)} (β = 2)`, x1, yD + 26, {align: 'right', color: th.mute, size: 13, alpha: al});
         });
         K.text('imaginary time τ: 0 → β', x0, 92, {color: th.time, size: 14, alpha: B});
         const c = seg(t, 19, 20);
@@ -233,10 +230,10 @@
         const gx = 160, gy = 110, gw = 420, gh = 300, mx = 8, X = i => gx + 30 + i * 78, Y = v => gy + gh - v / mx * gh;
         K.axes(gx, gy, gw, gh, {alpha: C});
         let run = 0; const nshow = Math.floor(lerp(1, 5.99, seg(t, 24, 26.5)));
-        terms.forEach((v, i) => { if (i >= nshow) return; K.rect(X(i), Y(run + v), 50, Y(run) - Y(run + v), {fill: th.space, alpha: C * .85}); K.text(`k=${2 * i}`, X(i) + 25, gy + gh + 20, {align: 'center', color: th.mute, size: 12, font: MONO, alpha: C}); run += v; });
+        terms.forEach((v, i) => { if (i >= nshow) return; K.rect(X(i), Y(run + v), 50, Y(run) - Y(run + v), {fill: th.space, alpha: C * .85}); K.text(`k=${2 * i}`, X(i) + 25, gy + gh + 20, {align: 'center', color: th.mute, size: 12, alpha: C}); run += v; });
         K.line(gx, Y(2 * Math.cosh(beta)), gx + gw, Y(2 * Math.cosh(beta)), {color: th.proved, dash: [6, 4], w: 2, alpha: C});
         K.text(`2 cosh 2 = ${(2 * Math.cosh(2)).toFixed(3)}`, gx + gw, Y(2 * Math.cosh(beta)) - 8, {align: 'right', color: th.proved, size: 14, alpha: C});
-        K.text(`running sum = ${run.toFixed(3)}`, gx, gy - 14, {font: MONO, size: 15, alpha: C});
+        K.text(`running sum = ${run.toFixed(3)}`, gx, gy - 14, {size: 15, alpha: C});
         K.tex('Z=\\sum_{k\\ \\mathrm{even}}\\frac{2\\beta^k}{k!}=2\\cosh\\beta', 780, 260, {align: 'center', size: 24, alpha: C * seg(t, 25, 26)});
       }
     }
@@ -279,11 +276,11 @@
         for (let i = 0; i < n; i++) {
           const x = x0 + i * dx, up = [1, 1, -1, 1, -1, 1][i] > 0;
           K.circle(x, y, 26, {color: th.ink, w: 2, alpha: A}); K.arrow(x, y + (up ? 14 : -14), x, y + (up ? -14 : 14), {color: up ? th.space : th.time, w: 3, alpha: A, head: 8});
-          K.rect(x + 36, y - 16, dx - 72, 32, {fill: th.provedF, stroke: th.proved, w: 1.5, r: 6, alpha: A * seg(t, 1.5, 2.2)});
-          K.text('T', x + dx / 2, y + 6, {align: 'center', color: th.proved, size: 16, font: SERIF, alpha: A * seg(t, 1.5, 2.2)});
+          K.rect(x + 36, y - 16, dx - 72, 32, {fill: th.provedF, stroke: th.proved, w: 1.5, alpha: A * seg(t, 1.5, 2.2)});
+          K.text('T', x + dx / 2, y + 6, {align: 'center', color: th.proved, size: 16, alpha: A * seg(t, 1.5, 2.2)});
         }
         K.text('spins ±1 on sites; T(s, s′) = e^(K s s′) on bonds; the last bond wraps around', W / 2, 310, {align: 'center', color: th.mute, size: 15, alpha: A});
-        K.text('Z = Tr Tᴸ', W / 2, 370, {align: 'center', size: 26, font: SERIF, alpha: A * seg(t, 2.5, 3.3)});
+        K.text('Z = Tr Tᴸ', W / 2, 370, {align: 'center', size: 26, alpha: A * seg(t, 2.5, 3.3)});
       }
       const B = seg(t, 5.2, 5.8);
       if (B > 0) {
@@ -299,18 +296,18 @@
         }));
         K.text('site', X(0) - 30, y1 + 22, {align: 'right', color: th.mute, size: 13, alpha: B});
         K.text('τ ↑', X(0) - 30, y0 + 10, {align: 'right', color: th.time, size: 14, alpha: B});
-        K.text('a', X(1) + dx / 2, y0 - 12, {align: 'center', color: th.proved, size: 22, font: SERIF, alpha: hi * B});
-        K.text('b', X(2) + dx / 2, y0 - 12, {align: 'center', color: th.time, size: 22, font: SERIF, alpha: hi * B});
+        K.text('a', X(1) + dx / 2, y0 - 12, {align: 'center', color: th.proved, size: 22, alpha: hi * B});
+        K.text('b', X(2) + dx / 2, y0 - 12, {align: 'center', color: th.time, size: 22, alpha: hi * B});
         const c = seg(t, 15, 15.8);
         if (c > 0) {
           const px = 640, rows = [['a', 'b', 'X(a, b)'], ['none', 'none', 'Tr 1 = 3'], ['z', 'none', 'Tr G_z = 0'], ['z', 'z', 'Tr G_zG_z = −2'], ['z', 'x', 'Tr G_zG_x = 0']];
           rows.forEach((r, i) => { const yy = 120 + i * 40, al = c * seg(t, 15 + i * .5, 15.6 + i * .5);
-            K.text(r[0], px, yy, {color: i ? th.proved : th.mute, size: 15, font: MONO, alpha: al}); K.text(r[1], px + 70, yy, {color: i ? th.time : th.mute, size: 15, font: MONO, alpha: al});
-            K.text(r[2], px + 140, yy, {color: i ? th.ink : th.mute, size: 15, font: MONO, alpha: al});
+            K.text(r[0], px, yy, {color: i ? th.proved : th.mute, size: 15, alpha: al}); K.text(r[1], px + 70, yy, {color: i ? th.time : th.mute, size: 15, alpha: al});
+            K.text(r[2], px + 140, yy, {color: i ? th.ink : th.mute, size: 15, alpha: al});
             if (i === 0) K.line(px, yy + 10, px + 300, yy + 10, {color: th.line, w: 1, alpha: al}); });
           K.text('entries can be negative: that is fine', px, 340, {color: th.mute, size: 14, alpha: c * seg(t, 18, 19)});
         }
-        K.text('Z = Tr Xᴸ', 760, 420, {align: 'center', size: 28, font: SERIF, color: th.space, alpha: seg(t, 21, 22)});
+        K.text('Z = Tr Xᴸ', 760, 420, {align: 'center', size: 28, color: th.space, alpha: seg(t, 21, 22)});
       }
     }
   });
@@ -321,12 +318,11 @@
     beats: [[0, 'Slice across: each row is a step of time evolution. Summing over energies gives Z = Σ e^(−βE).'],
             [5, 'Slice up: each column is one site carried along the ring by a transfer matrix X. Then Z = Tr Xᴸ = Σ λᴸ.'],
             [10.5, 'Same number, two sums. On a long ring the largest λ wins, just as at low temperature the lowest E wins.']],
-    tex: ['Z=\\sum_m e^{-\\beta E_m}', 'Z=\\operatorname{Tr}X^L=\\sum_i\\lambda_i^{\\,L}'],
     draw(K, t) {
       const {th} = K, x = 70, y = 120, c = 40, cols = 8, rows = 6;
       K.torus(x, y, cols, rows, c);
       K.text('L sites', x + cols * c / 2, y + rows * c + 28, {align: 'center', color: th.space, size: 15});
-      K.text('β', x - 18, y + rows * c / 2 + 6, {align: 'center', color: th.time, size: 18, font: SERIF});
+      K.text('β', x - 18, y + rows * c / 2 + 6, {align: 'center', color: th.time, size: 18});
       if (t < 5) { const r = Math.floor(seg(t, .5, 4.5) * rows * 1.999) % rows; K.rect(x, y + r * c, cols * c, c, {fill: th.timeF, stroke: th.time, w: 2, alpha: seg(t, .3, .8)}); }
       else if (t < 10.5) { const k = Math.floor(seg(t, 5.3, 10) * cols * 1.999) % cols; K.rect(x + k * c, y, c, rows * c, {fill: th.spaceF, stroke: th.space, w: 2, alpha: seg(t, 5, 5.5)}); }
       K.tex('Z=\\sum_m e^{-\\beta E_m}', 640, 160, {align: 'center', size: 26, color: th.time, alpha: seg(t, 1, 2)});
@@ -357,8 +353,8 @@
       K.rect(x0, base - p[0] * U, U, p[0] * U, {stroke: th.ink, w: 2, dash: [7, 5], alpha: r});
       K.text('height p₀', x0 + U + 10, base - p[0] * U + 6, {color: th.ink, alpha: r, size: 15});
       const P = p.reduce((s, v) => s + v * v, 0);
-      K.text(`P = Σp² = ${P.toFixed(3)}`, 600, 200, {font: MONO, size: 22, alpha: seg(t, 2, 3)});
-      K.text(`p₀ = ${p[0].toFixed(3)}`, 600, 240, {font: MONO, size: 22, alpha: r});
+      K.text(`P = Σp² = ${P.toFixed(3)}`, 600, 200, {size: 22, alpha: seg(t, 2, 3)});
+      K.text(`p₀ = ${p[0].toFixed(3)}`, 600, 240, {size: 22, alpha: r});
       K.text('squares ⊂ dashed box  ⇒  P ≤ p₀', 600, 300, {size: 18, color: th.proved, alpha: seg(t, 6.5, 7.5)});
     }
   });
@@ -369,7 +365,6 @@
     beats: [[0, 'Normalize the torus in space or in time and you get two density matrices, σ and ρ.'],
             [3, 'The purity of σ glues two copies side by side: the spatial purity Pₛ.'],
             [7.5, 'The purity of ρ stacks two copies: the thermal purity Pτ. Both are ratios of partition functions a computer can evaluate.']],
-    tex: ['P_{\\mathrm s}(n,\\beta)=\\frac{Z_{2n}(\\beta)}{Z_n(\\beta)^2}', 'P_\\tau(n,\\beta)=\\frac{Z_n(2\\beta)}{Z_n(\\beta)^2}'],
     draw(K, t) {
       const {th} = K, c = 26;
       const m1 = ease(seg(t, 3.5, 5.5)), x1 = 90, y1 = 200;
@@ -390,7 +385,6 @@
     beats: [[0, 'Square every probability and renormalize. The leader pulls ahead.'],
             [5, 'Gluing two copies of a torus is exactly this squaring. A defect ε = 1 − P becomes about ε²/2.'],
             [10, 'Start below ½ and repeated squaring drives the defect to zero: the cobweb drops off the diagonal.']],
-    tex: ['f(z)=\\frac{z^2}{2(1-z)^2}'],
     draw(K, t) {
       const {th} = K;
       let p = [.5, .3, .2]; const k = seg(t, .8, 8) * 3, n = Math.floor(k), fr = ease(k - n);
@@ -399,8 +393,8 @@
       const nx = n < 3 ? sq(p) : p, cur = p.map((v, i) => lerp(v, nx[i], n < 3 ? fr : 0));
       K.bars(70, 110, 300, 300, cur, th.ink, {labels: true});
       const P = cur.reduce((u, v) => u + v * v, 0);
-      K.text(`squarings: ${Math.min(n, 3)}`, 70, 450, {font: MONO, size: 16});
-      K.text(`defect 1 − P = ${(1 - P).toFixed(4)}`, 70, 478, {font: MONO, size: 16, color: th.proved});
+      K.text(`squarings: ${Math.min(n, 3)}`, 70, 450, {size: 16});
+      K.text(`defect 1 − P = ${(1 - P).toFixed(4)}`, 70, 478, {size: 16, color: th.proved});
       const gx = 480, gy = 100, gw = 410, gh = 330, zm = .5, X = z => gx + z / zm * gw, Y = z => gy + gh - z / zm * gh, b = seg(t, 5, 5.8);
       K.axes(gx, gy, gw, gh, {alpha: b});
       K.line(X(0), Y(0), X(zm), Y(zm), {color: th.mute, dash: [4, 4], alpha: b, w: 1.5});
@@ -422,7 +416,6 @@
             [2.5, 'Glue four copies into one twice as long and twice as tall: rows first …'],
             [6.5, '… or columns first. Both give the same torus.'],
             [10.5, 'Writing each step as a purity gives one identity linking the spatial and thermal purities.']],
-    tex: ['P_{\\mathrm s}(n,2\\beta)\\,P_\\tau(n,\\beta)^2=P_{\\mathrm s}(n,\\beta)^2\\,P_\\tau(2n,\\beta)'],
     draw(K, t) {
       const {th} = K, c = 14, L = 150, R = 600, T = 70, B = 290;
       const g1 = ease(seg(t, 3, 4.5)), g2 = ease(seg(t, 4.5, 6)), h1 = ease(seg(t, 7, 8.5)), h2 = ease(seg(t, 8.5, 10));
@@ -489,7 +482,7 @@
       K.text('negative, or far above 1  ✗', 560, 410, {size: 17, color: th.fail, alpha: seg(t, 24.5, 25.5)});
       K.text('the purities of a genuine state are always between 0 and 1', W / 2, 470, {align: 'center', size: 17, italic: true, alpha: seg(t, 28, 29)});
       if (t < 6) {
-        K.text('pᵢ = λᵢⁿ / Zₙ', W / 2, 230, {align: 'center', size: 34, font: SERIF, alpha: seg(t, .5, 1.5)});
+        K.text('pᵢ = λᵢⁿ / Zₙ', W / 2, 230, {align: 'center', size: 34, alpha: seg(t, .5, 1.5)});
         K.text('must be probabilities: real, ≥ 0, adding to 1', W / 2, 280, {align: 'center', size: 18, italic: true, alpha: seg(t, 2, 3)});
       }
     }
@@ -520,9 +513,9 @@
           K.text(`τ = ${f}`, sx + s * 150 + (s > 0 ? 6 : -6), y + 5, {align: s > 0 ? 'left' : 'right', color: th.mute, size: 13, alpha: al});
         });
         K.text('time-ordered product (later on the left):', 560, 170, {size: 16, alpha: A * seg(t, 14, 14.8)});
-        K.text('X = Tr(G_x G_y G_z) = 1', 560, 205, {size: 22, font: SERIF, alpha: A * seg(t, 15, 15.8)});
+        K.text('X = Tr(G_x G_y G_z) = 1', 560, 205, {size: 22, alpha: A * seg(t, 15, 15.8)});
         K.text(sw > .5 ? 'sides swapped: same matrices, same times' : '', 560, 260, {size: 16, color: th.ok, alpha: A * seg(t, 19.5, 20.2)});
-        K.text('X(a, b) = X(b, a) = 1', 560, 295, {size: 22, font: SERIF, color: th.ok, alpha: A * seg(t, 20, 20.8)});
+        K.text('X(a, b) = X(b, a) = 1', 560, 295, {size: 22, color: th.ok, alpha: A * seg(t, 20, 20.8)});
       }
       const B = seg(t, 22.2, 23);
       if (B > 0) {
@@ -534,7 +527,7 @@
           [.3, .7].forEach(f => { const y = 400 - f * 230; K.line(x + side * 120, y, x, y, {color: side < 0 ? th.proved : th.time, w: 3, alpha: al}); K.dot(x, y, 5, th.ink, al);
             K.text(label, x + (side > 0 ? 14 : -14), y - 8, {align: side > 0 ? 'left' : 'right', size: 16, alpha: al}); });
           K.text(side < 0 ? 'two events from the left' : 'the same events from the right', x, 430, {align: 'center', color: th.mute, size: 14, alpha: al});
-          K.text(val, x, 470, {align: 'center', size: 22, font: SERIF, alpha: B * seg(t, at + 3, at + 3.8)});
+          K.text(val, x, 470, {align: 'center', size: 22, alpha: B * seg(t, at + 3, at + 3.8)});
         };
         panel(140, -1, 'P', 'Tr(P P) = 1', 23);
         panel(520, 1, 'G_z', 'Tr(G_z G_z) = −2', 25);
@@ -582,12 +575,12 @@
         const [p, q] = labelsH(r), al = 1;
         const rowL = mv < .5 ? [IX[p], th.proved, IX[q], th.time] : [IX[p], th.proved, IX[q], th.proved];
         const colL = mv < .5 ? [IX[p], th.proved, IX[q], th.time] : [IX[p], th.time, IX[q], th.time];
-        K.text(rowL[0], ox - 26, oy + r * cs + cs / 2 + 5, {align: 'center', color: rowL[1], size: 12, font: MONO, alpha: al});
-        K.text(rowL[2], ox - 14, oy + r * cs + cs / 2 + 5, {align: 'center', color: rowL[3], size: 12, font: MONO, alpha: al});
-        K.text(colL[0], ox + r * cs + cs / 2 - 5, oy - 8, {align: 'center', color: colL[1], size: 12, font: MONO, alpha: al});
-        K.text(colL[2], ox + r * cs + cs / 2 + 5, oy - 8, {align: 'center', color: colL[3], size: 12, font: MONO, alpha: al});
+        K.text(rowL[0], ox - 26, oy + r * cs + cs / 2 + 5, {align: 'center', color: rowL[1], size: 12, alpha: al});
+        K.text(rowL[2], ox - 14, oy + r * cs + cs / 2 + 5, {align: 'center', color: rowL[3], size: 12, alpha: al});
+        K.text(colL[0], ox + r * cs + cs / 2 - 5, oy - 8, {align: 'center', color: colL[1], size: 12, alpha: al});
+        K.text(colL[2], ox + r * cs + cs / 2 + 5, oy - 8, {align: 'center', color: colL[3], size: 12, alpha: al});
       }
-      K.text(mv < .5 ? 'rows (i, j)   columns (k, l)' : 'rows (i, k)   columns (j, l)', ox, oy + 9 * cs + 28, {color: th.mute, size: 14, font: MONO});
+      K.text(mv < .5 ? 'rows (i, j)   columns (k, l)' : 'rows (i, k)   columns (j, l)', ox, oy + 9 * cs + 28, {color: th.mute, size: 14});
       K.rect(ox - 2, oy - 2, 9 * cs + 4, 9 * cs + 4, {stroke: th.line, w: 1.5});
       for (let a = 1; a < 3; a++) { K.line(ox + a * 3 * cs, oy, ox + a * 3 * cs, oy + 9 * cs, {color: th.line, w: 1}); K.line(ox, oy + a * 3 * cs, ox + 9 * cs, oy + a * 3 * cs, {color: th.line, w: 1}); }
       for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) for (let k = 0; k < 3; k++) for (let l = 0; l < 3; l++) {
@@ -595,11 +588,11 @@
         const special = i === 0 && j === 0 && k === 1 && l === 1;
         const f = special ? Math.max(one, mv) : mv;
         const r = lerp(i * 3 + j, i * 3 + k, f), c = lerp(k * 3 + l, j * 3 + l, f);
-        K.rect(ox + c * cs + 2, oy + r * cs + 2, cs - 4, cs - 4, {fill: v > 0 ? th.proved : th.time, r: 4, alpha: special && t >= 5.5 && t < 12 ? 1 : .8});
-        if (special && t >= 5.5 && t < 12) K.rect(ox + c * cs, oy + r * cs, cs, cs, {stroke: th.ink, w: 2.5, r: 5});
-        K.text(v > 0 ? '+' : '−', ox + c * cs + cs / 2, oy + r * cs + cs / 2 + 5, {align: 'center', size: 13, font: MONO, color: th.bg});
+        K.rect(ox + c * cs + 2, oy + r * cs + 2, cs - 4, cs - 4, {fill: v > 0 ? th.proved : th.time, alpha: special && t >= 5.5 && t < 12 ? 1 : .8});
+        if (special && t >= 5.5 && t < 12) K.rect(ox + c * cs, oy + r * cs, cs, cs, {stroke: th.ink, w: 2.5});
+        K.text(v > 0 ? '+' : '−', ox + c * cs + cs / 2, oy + r * cs + cs / 2 + 5, {align: 'center', size: 13, color: th.bg});
       }
-      if (t >= 5.5 && t < 12) K.text('⟨x x| −h |y y⟩ = +1  →  row (x, y), column (x, y)', 470, 120, {size: 15, font: MONO, alpha: seg(t, 5.8, 6.5)});
+      if (t >= 5.5 && t < 12) K.text('⟨x x| −h |y y⟩ = +1  →  row (x, y), column (x, y)', 470, 120, {size: 15, alpha: seg(t, 5.8, 6.5)});
       const D = seg(t, 12, 12.8) * (1 - seg(t, 17.6, 18.2));
       if (D > 0) {
         K.text('realigned −h  =', 470, 150, {size: 17, alpha: D});
@@ -608,7 +601,7 @@
           const bx = 470 + a * 150, by = 180, c2 = 13;
           for (let r = 0; r < 9; r++) for (let cc = 0; cc < 9; cc++) { const x = v[r] * v[cc] * (fm ? -1 : 1); if (!x) continue; K.rect(bx + cc * c2, by + r * c2, c2 - 1, c2 - 1, {fill: x > 0 ? th.proved : th.time, alpha: D * seg(t, 12.5 + a * .6, 13.1 + a * .6)}); }
           K.rect(bx - 1, by - 1, 9 * c2 + 1, 9 * c2 + 1, {stroke: th.line, w: 1, alpha: D});
-          K.text(`vec(G_${IX[a]}) vec(G_${IX[a]})ᵀ`, bx + 58, by + 9 * c2 + 22, {align: 'center', size: 12, font: MONO, color: th.mute, alpha: D});
+          K.text(`vec(G_${IX[a]}) vec(G_${IX[a]})ᵀ`, bx + 58, by + 9 * c2 + 22, {align: 'center', size: 12, color: th.mute, alpha: D});
           if (a < 2) K.text('+', bx + 9 * c2 + 15, by + 64, {align: 'center', size: 22, alpha: D});
         }
         K.text('each term is a square (v vᵀ): never negative', 470, 380, {color: th.ok, size: 15, alpha: D * seg(t, 14.5, 15.3)});
@@ -617,7 +610,7 @@
       if (E2 > 0) {
         const ev = eigSym(realign(M)), gx = 500, gy = 140, gw = 380, gh = 230, Y = v => gy + gh / 2 - v / 2.4 * gh / 2, bw = gw / 9 - 6;
         K.line(gx, Y(0), gx + gw, Y(0), {color: th.mute, w: 1.5, alpha: E2});
-        ev.forEach((v, i) => K.rect(gx + i * (bw + 6), Math.min(Y(0), Y(v)), bw, Math.max(2, Math.abs(Y(v) - Y(0))), {fill: v < -1e-9 ? th.fail : th.ok, alpha: E2, r: 2}));
+        ev.forEach((v, i) => K.rect(gx + i * (bw + 6), Math.min(Y(0), Y(v)), bw, Math.max(2, Math.abs(Y(v) - Y(0))), {fill: v < -1e-9 ? th.fail : th.ok, alpha: E2}));
         K.text('eigenvalues of the realigned matrix', gx, gy - 14, {color: th.mute, size: 14, alpha: E2});
         K.text(fm ? 'ferromagnet: −2, −2, −2  ✗ not reflection positive' : 'antiferromagnet: 2, 2, 2, 0, …  ✓ reflection positive', gx, gy + gh + 34, {color: fm ? th.fail : th.ok, size: 16, alpha: E2});
       }
@@ -635,7 +628,7 @@
     draw(K, t) {
       const {th} = K, e = .01, d = .5 * Math.pow(Math.pow(1 - e, -3) - 1, 2);
       const xs = 90, xt = 520, bw = 350, bh = 50, rows = [70, 160, 250, 340, 430];
-      const box = (x, r, col, s, at, dash) => { const al = seg(t, at, at + .7); K.rect(x, rows[r], bw, bh, {fill: th.surface, stroke: col, w: 2, r: 8, dash, alpha: al}); K.text(s, x + 16, rows[r] + 32, {font: MONO, size: 15, alpha: al}); };
+      const box = (x, r, col, s, at, dash) => { const al = seg(t, at, at + .7); K.rect(x, rows[r], bw, bh, {fill: th.surface, stroke: col, w: 2, dash, alpha: al}); K.text(s, x + 16, rows[r] + 32, {size: 15, alpha: al}); };
       box(xs, 0, th.space, 'Pₛ(n,β) ≥ 1 − ε = 0.99', .3); box(xt, 0, th.time, 'Pτ(2n,β) ≥ 1 − ε = 0.99', .3);
       box(xs, 1, th.space, `Pₛ(n,2β) ≥ (1−ε)³ = ${Math.pow(1 - e, 3).toFixed(4)}`, 3, [6, 5]);
       box(xs, 2, th.space, `Pₛ(2n,2β) ≥ 1 − ${d.toFixed(5)}`, 6.5);
@@ -645,7 +638,7 @@
       mv(xs + 40, 0, 1, '①', 'couple', 3); mv(xs + 40, 1, 2, '②', 'square', 6.5); mv(xt + 40, 0, 3, '③', 'couple', 10); mv(xt + 40, 3, 4, '④', 'square', 12);
       K.arrow(xs + bw, rows[2] + bh / 2, xt - 6, rows[3] + 10, {color: th.mute, w: 1.5, alpha: seg(t, 9.5, 10)});
       K.arrow(xt, rows[0] + bh / 2, xs + bw - 30, rows[1] + 4, {color: th.mute, w: 1.5, alpha: seg(t, 2.5, 3)});
-      K.text('(n, β, ε)  →  (2n, 2β, 5ε²)', xs, 515, {font: SERIF, size: 24, color: th.proved, alpha: seg(t, 13.5, 14.5)});
+      K.text('(n, β, ε)  →  (2n, 2β, 5ε²)', xs, 515, {size: 24, color: th.proved, alpha: seg(t, 13.5, 14.5)});
     }
   });
 
@@ -659,7 +652,7 @@
       const {th} = K, gx = 110, gy = 60, gw = 760, gh = 360, bmax = 13000, lmin = -24;
       const X = b => gx + b / bmax * gw, Y = l => gy + l / lmin * gh;
       K.axes(gx, gy, gw, gh);
-      [0, -5, -10, -15, -20].forEach(l => { K.line(gx, Y(l), gx + gw, Y(l), {color: th.line, w: 1}); K.text(l ? `10${String(l).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹⁻'['0123456789-'.indexOf(c)]).join('')}` : '1', gx - 8, Y(l) + 5, {align: 'right', color: th.mute, size: 13, font: MONO}); });
+      [0, -5, -10, -15, -20].forEach(l => { K.line(gx, Y(l), gx + gw, Y(l), {color: th.line, w: 1}); K.text(l ? `10${String(l).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹⁻'['0123456789-'.indexOf(c)]).join('')}` : '1', gx - 8, Y(l) + 5, {align: 'right', color: th.mute, size: 13}); });
       [784, 1568, 3136, 6272, 12544].forEach((b, j) => {
         const l = -Math.pow(2, j) * Math.log10(20) - Math.log10(5), al = seg(t, .5 + j * 1.1, 1.1 + j * 1.1);
         K.dot(X(b), Y(l), 6, th.proved, al);
@@ -670,7 +663,7 @@
       const s = seg(t, 6, 8), slope = -Math.log10(20) / 784;
       K.line(X(0), Y(-Math.log10(5)), X(bmax * s), Y(-Math.log10(5) + slope * bmax * s), {color: th.ink, w: 2, alpha: .8});
       K.text('slope: −log 20 / 784 per unit of β', X(5600), Y(-17.5), {color: th.ink, size: 16, alpha: seg(t, 8, 9)});
-      K.text('Δ(L) > log 20 / 784', X(8200), Y(-5), {color: th.proved, size: 24, font: SERIF, alpha: seg(t, 11, 12)});
+      K.text('Δ(L) > log 20 / 784', X(8200), Y(-5), {color: th.proved, size: 24, alpha: seg(t, 11, 12)});
     }
   });
 
@@ -735,10 +728,10 @@
         const lam = [1, .86, -.8, .62, .5, -.35, .2], k = 2 * Math.max(1, Math.round(lerp(1, 10, ease(seg(t, 1, 6.5))))), Zk = lam.reduce((s, l) => s + Math.pow(l, k), 0), bd = Math.min(1.7, Math.pow(Zk, 1 / k));
         const cx = 330, sc = 160, y = 170, X = v => cx + v * sc;
         K.line(X(-1.75), y, X(1.75), y, {color: th.mute, w: 1.5, alpha: A});
-        [-1.5, -1, -.5, 0, .5, 1, 1.5].forEach(v => K.text(String(v), X(v), y + 32, {align: 'center', color: th.mute, size: 12, font: MONO, alpha: A}));
+        [-1.5, -1, -.5, 0, .5, 1, 1.5].forEach(v => K.text(String(v), X(v), y + 32, {align: 'center', color: th.mute, size: 12, alpha: A}));
         K.rect(X(-bd), y - 18, X(bd) - X(-bd), 36, {fill: th.provedF, stroke: th.proved, w: 2, alpha: A});
         lam.forEach((l, i) => K.line(X(l), y - 14, X(l), y + 14, {color: i ? th.ink : th.space, w: i ? 2 : 3.5, alpha: A}));
-        K.text(`k = ${k}:  |λ| ≤ ${Math.pow(Zk, 1 / k).toFixed(3)}`, X(1.8), y + 6, {font: MONO, size: 16, color: th.proved, alpha: A});
+        K.text(`k = ${k}:  |λ| ≤ ${Math.pow(Zk, 1 / k).toFixed(3)}`, X(1.8), y + 6, {size: 16, color: th.proved, alpha: A});
         K.text('hidden eigenvalues (ticks); the box is all a computer can certify from Zₖ', 60, 90, {color: th.mute, size: 14, alpha: A});
         const b = seg(t, 7, 7.8) * A;
         K.bars(80, 290, 300, 150, [.999, .999, .99, .98, .97, .96].map(v => v * .95), th.fail, {alpha: b, flat: true});
@@ -751,7 +744,7 @@
         const gx = 120, gy = 70, gw = 700, gh = 340, lo = -2.4, hi = -.6, X = j => gx + j / 6 * gw, Y = v => gy + gh * (hi - Math.log10(v)) / (hi - lo);
         K.axes(gx, gy, gw, gh, {alpha: B});
         [[.12731, 'ε* ≈ 0.127', th.mute], [.01, 'target 0.01', th.proved]].forEach(([v, nm, col]) => { K.line(gx, Y(v), gx + gw, Y(v), {color: col, dash: [6, 5], alpha: B, w: 1.5}); K.text(nm, gx + gw + 8, Y(v) + 5, {color: col, size: 14, alpha: B}); });
-        DBLV.forEach((r, j) => K.text(String(r[0]), X(j), gy + gh + 22, {align: 'center', color: th.mute, size: 13, font: MONO, alpha: B}));
+        DBLV.forEach((r, j) => K.text(String(r[0]), X(j), gy + gh + 22, {align: 'center', color: th.mute, size: 13, alpha: B}));
         K.text('ring length (β doubles alongside, 12¼ → 784)', gx, gy + gh + 46, {color: th.mute, size: 14, alpha: B});
         const prog = ease(seg(t, 13, 19)) * 6;
         [[1, th.space, 'spatial defect'], [2, th.time, 'thermal defect']].forEach(([k, col, nm], q) => {
@@ -763,54 +756,27 @@
     }
   });
 
-  // 13 -----------------------------------------------------------------
-  chapter({
-    id: 'open', title: 'Open chains', dur: 22,
-    beats: [[0, 'An open spin-1 chain has a free spin-½ at each end. A small field on the end spins pins them.'],
-            [6, 'A ring closes with a trace. An open chain closes with a boundary vector v. Apply the transfer matrix again and again …'],
-            [11.5, '… the part of v along the top eigenvector ψ survives; the rest shrinks. Its squared length c is what the long chain sees.'],
-            [16.5, 'If v missed ψ, nothing would survive. The open-chain proof tracks c and shows it stays positive at every scale.']],
-    draw(K, t) {
-      const {th} = K, A = 1 - seg(t, 5.6, 6.2);
-      if (A > 0) {
-        const N = 7, x0 = 220, dx = 86, y = 230, fon = seg(t, 3, 4);
-        for (let i = 0; i < N; i++) {
-          const x = x0 + i * dx;
-          K.ctx.save(); K.ctx.globalAlpha = A; K.ctx.setLineDash([4, 3]); K.ctx.strokeStyle = th.mute; K.ctx.lineWidth = 1.5; K.ctx.beginPath(); K.ctx.ellipse(x, y, 30, 20, 0, 0, 7); K.ctx.stroke(); K.ctx.restore();
-          if (i < N - 1) K.line(x + 13, y, x + dx - 13, y, {color: th.time, w: 3.5, alpha: A});
-          K.dot(x - 13, y, 6.5, th.ink, A); K.dot(x + 13, y, 6.5, th.ink, A);
-        }
-        for (const x of [x0 - 13, x0 + (N - 1) * dx + 13]) { K.circle(x, y, 11, {color: th.proved, w: 3, alpha: A}); K.arrow(x, y - 18, x, y - 62, {color: th.space, w: 3, alpha: A * fon}); }
-        K.text('each spin 1 = two spin-½; neighbours pair into singlets (blue)', W / 2, 320, {align: 'center', color: th.mute, size: 15, alpha: A});
-        K.text('one spin-½ left at each end', W / 2, 350, {align: 'center', color: th.proved, size: 17, alpha: A * (1 - fon)});
-        K.text('end fields pin them: one ground state', W / 2, 350, {align: 'center', color: th.space, size: 17, alpha: A * fon});
-      }
-      const B = seg(t, 6.2, 7);
-      if (B > 0) {
-        const ox = 330, oy = 380, sc = 260, ang = t < 16.5 ? 1.05 : Math.PI / 2;
-        const sw = seg(t, 16.5, 17.2), aa = lerp(1.05, Math.PI / 2, sw);
-        K.arrow(ox - 20, oy, ox + sc + 60, oy, {color: th.space, w: 2, alpha: B}); K.text('top eigenvector ψ', ox + sc + 64, oy + 5, {color: th.space, size: 15, alpha: B});
-        K.arrow(ox, oy + 20, ox, oy - sc - 30, {color: th.mute, w: 2, alpha: B}); K.text('everything else', ox + 8, oy - sc - 34, {color: th.mute, size: 15, alpha: B});
-        const vx = Math.cos(aa), vy = Math.sin(aa), steps = Math.floor(seg(t, 7.5, 11.5) * 6 + seg(t, 17.3, 20) * 6 * (t > 17.3));
-        const r = .55; let px = vx, py = vy; const trail = [[px, py]];
-        const nS = t < 16.5 ? Math.floor(seg(t, 7.5, 11.5) * 6) : Math.floor(seg(t, 17.3, 20.5) * 6);
-        for (let k = 0; k < nS; k++) { py *= r; trail.push([px, py]); }
-        trail.forEach(([a, b], k) => K.dot(ox + a * sc, oy - b * sc, k === trail.length - 1 ? 0 : 3.5, th.mute, B * .7));
-        K.line(ox, oy, ox + vx * sc, oy - vy * sc, {color: th.proved, w: 1.5, dash: [5, 4], alpha: B * .5});
-        const [ex, ey] = trail[trail.length - 1];
-        K.arrow(ox, oy, ox + ex * sc, oy - ey * sc, {color: th.proved, w: 3.5, alpha: B});
-        K.text(nS ? `after ${nS} more sites` : 'boundary vector v', ox + ex * sc + 12, oy - ey * sc - 8, {color: th.proved, size: 15, alpha: B});
-        const c = seg(t, 12, 13) * (1 - sw);
-        K.line(ox, oy + 2, ox + vx * sc, oy + 2, {color: th.space, w: 6, alpha: c * B});
-        K.text(`√c = |⟨ψ, v⟩| = ${vx.toFixed(2)}`, ox + vx * sc / 2, oy + 34, {align: 'center', color: th.space, size: 16, font: MONO, alpha: c * B});
-        K.text('the projection never shrinks', 640, 170, {color: th.ink, size: 17, alpha: seg(t, 13, 14) * (1 - sw)});
-        K.text('v ⟂ ψ: the arrow shrinks to zero', 640, 170, {color: th.fail, size: 17, alpha: seg(t, 18, 19)});
-      }
-    }
-  });
+  // Stretch a chapter's clock by S, so the densest figures play more slowly.
+  function slow(list, id, S) {
+    const c = list.find(x => x.id === id), d0 = c.draw;
+    c.dur *= S; c.beats = c.beats.map(([b, txt]) => [b * S, txt]); c.draw = (K, t) => d0(K, t / S);
+  }
+  slow(CH, 'rptest', 1.35); slow(CH, 'seed', 1.35);
 
-  // play the densest figures more slowly
-  function slow(id, S) { const c = CH.find(x => x.id === id); if (!c) return; const d0 = c.draw; c.dur *= S; c.beats = c.beats.map(([b, txt]) => [b * S, txt]); c.draw = (K, t) => d0(K, t / S); }
-  slow('rptest', 1.35); slow('seed', 1.35);
-  root.STBV = {CH, kit, W, H, minusH, realign, eigSym, slow};
+  // Index of the caption beat showing at time t.
+  function beatAt(ch, t) { let bi = 0; ch.beats.forEach((b, i) => { if (t >= b[0] - 1e-6) bi = i; }); return bi; }
+
+  // Typeset TeX with MathJax into an image drawn at px font size; resolves to {img, w, h} in
+  // logical pixels, rasterized at twice that resolution.
+  function texImage(src, color, px) {
+    return new Promise((resolve, reject) => {
+      const svg = MathJax.tex2svg(src, {display: true}).querySelector('svg'), ex = px * .45;
+      const w = parseFloat(svg.getAttribute('width')) * ex, h = parseFloat(svg.getAttribute('height')) * ex;
+      svg.setAttribute('width', w * 2); svg.setAttribute('height', h * 2);
+      const img = new Image(); img.onload = () => resolve({img, w, h}); img.onerror = reject;
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.outerHTML.replace(/currentColor/g, color));
+    });
+  }
+
+  root.STBV = {CH, kit, W, H, SERIF, clamp, seg, ease, lerp, slow, beatAt, texImage, minusH, realign, eigSym};
 })(typeof window !== 'undefined' ? window : globalThis);

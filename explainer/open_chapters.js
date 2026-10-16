@@ -2,12 +2,7 @@
 // Same drawing kit and 960x540 canvas as chapters.js; these figures form their own film.
 (function (root) {
   'use strict';
-  const {W, H} = root.STBV;
-  const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
-  const seg = (t, a, b) => clamp((t - a) / (b - a));
-  const ease = x => { x = clamp(x); return x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
-  const lerp = (a, b, s) => a + (b - a) * s;
-  const SERIF = '"EB Garamond", Palatino, "DejaVu Serif", serif';
+  const {W, seg, ease, lerp, slow} = root.STBV;
   const OPEN = [];
   const chapter = c => OPEN.push(c);
 
@@ -33,12 +28,12 @@
       const x = x0 + i * dx; xs.push(x);
       const hl = o.hl ? o.hl(i) : null;
       K.rect(x - 15, y - 15, 30, 30, {fill: hl || th.bg, stroke: o.color || th.space, w: 2, alpha: al});
-      K.text(o.label ? o.label(i) : 'X', x, y + 6, {align: 'center', color: o.color || th.space, size: 15, font: SERIF, alpha: al});
+      K.text(o.label ? o.label(i) : 'X', x, y + 6, {align: 'center', color: o.color || th.space, size: 15, alpha: al});
     }
     if (o.caps !== false) {
       for (const [x, l] of [[x0 - dx, o.left || 'v̄'], [x0 + n * dx, o.right || 'v']]) {
         K.circle(x, y, 15, {color: th.proved, w: 2.5, alpha: al});
-        K.text(l, x, y + 6, {align: 'center', color: th.proved, size: 16, font: SERIF, alpha: al});
+        K.text(l, x, y + 6, {align: 'center', color: th.proved, size: 16, alpha: al});
       }
     }
     return xs;
@@ -52,7 +47,6 @@
             [5.5, 'Real numbers, no field (exact diagonalization, n = 4 … 12). Even n: three states sit just above the ground state, at 0.51, 0.31, 0.20, 0.14, 0.10. Odd n: the ground state itself is three-fold degenerate. No uniform gap.'],
             [13.5, 'Now put h = 3/5 on the two end spins. For odd n the ground state is alone, with gap 0.72, 0.64, 0.58, 0.55, levelling off. Even n are worse: the two ends prefer opposite directions.'],
             [20.5, 'That is the chain of the theorem: H = Σ S·S − h(S₁ᶻ + Sₙᶻ), h = 3/5, n odd.']],
-    tex: ['H_n=\\sum_{i=1}^{n-1}\\mathbf S_i\\cdot\\mathbf S_{i+1}-h\\,(S_1^z+S_n^z),\\qquad h=\\tfrac35'],
     draw(K, t) {
       const {th} = K, fon = seg(t, 13.5, 14.5);
       vbChain(K, 180, 90, 7, 100, seg(t, 0, .8), fon);
@@ -153,7 +147,7 @@
             [17, 'The boundary defect e = Dₘ / Bₘ is the share not carried by ψ. Any e < 1 proves c > 0: a long chain does see the ground state.']],
     draw(K, t) {
       const {th} = K, ox = 120, oy = 400, sc = 280, vx = Math.cos(1.05), vy = Math.sin(1.05);
-      K.arrow(ox - 20, oy, ox + sc + 40, oy, {color: th.space, w: 2}); K.text('ψ', ox + sc + 48, oy + 6, {color: th.space, size: 20, font: SERIF});
+      K.arrow(ox - 20, oy, ox + sc + 40, oy, {color: th.space, w: 2}); K.text('ψ', ox + sc + 48, oy + 6, {color: th.space, size: 20});
       K.arrow(ox, oy + 20, ox, oy - sc - 10, {color: th.mute, w: 2}); K.text('everything else', ox + 8, oy - sc - 14, {color: th.mute, size: 14});
       const nS = Math.floor(seg(t, 5.5, 10.5) * 7), trail = [[vx, vy]];
       for (let k = 0; k < nS; k++) trail.push([vx, trail[trail.length - 1][1] * .6]);
@@ -163,7 +157,7 @@
       K.arrow(ox, oy, ox + ex * sc, oy - ey * sc, {color: th.proved, w: 3.5});
       K.text(nS ? `Tᵐv, m = ${nS}` : 'v', ox + ex * sc + 10, oy - ey * sc - 8, {color: th.proved, size: 16});
       K.line(ox, oy + 3, ox + vx * sc, oy + 3, {color: th.space, w: 7, alpha: seg(t, 11, 12)});
-      K.text('√c', ox + vx * sc / 2, oy + 26, {align: 'center', color: th.space, size: 17, font: SERIF, alpha: seg(t, 11, 12)});
+      K.text('√c', ox + vx * sc / 2, oy + 26, {align: 'center', color: th.space, size: 17, alpha: seg(t, 11, 12)});
       const b = seg(t, 11, 11.8);
       if (b > 0) {
         const gx = 520, gy = 110, gw = 380, gh = 270, Y = v => gy + gh - v / 1.05 * gh, c = vx * vx;
@@ -203,11 +197,11 @@
           const x = x0 + i * dx, right = i >= n / 2;
           const xx = right ? lerp(x, 2 * mid - x, f) : x, yy = right ? lerp(y, y - 90, f) : y;
           K.rect(xx - 15, yy - 15, 30, 30, {fill: th.bg, stroke: th.space, w: 2, alpha: C});
-          K.text('R', xx, yy + 6, {align: 'center', color: th.space, size: 15, font: SERIF, alpha: C});
+          K.text('R', xx, yy + 6, {align: 'center', color: th.space, size: 15, alpha: C});
         }
         const lx = x0 - dx, rx = x0 + n * dx, rxx = lerp(rx, 2 * mid - rx, f), ryy = lerp(y, y - 90, f);
-        K.circle(lx, y, 15, {color: th.proved, w: 2.5, alpha: C}); K.text('v̄', lx, y + 6, {align: 'center', color: th.proved, size: 16, font: SERIF, alpha: C});
-        K.circle(rxx, ryy, 15, {color: th.proved, w: 2.5, alpha: C}); K.text('v', rxx, ryy + 6, {align: 'center', color: th.proved, size: 16, font: SERIF, alpha: C});
+        K.circle(lx, y, 15, {color: th.proved, w: 2.5, alpha: C}); K.text('v̄', lx, y + 6, {align: 'center', color: th.proved, size: 16, alpha: C});
+        K.circle(rxx, ryy, 15, {color: th.proved, w: 2.5, alpha: C}); K.text('v', rxx, ryy + 6, {align: 'center', color: th.proved, size: 16, alpha: C});
         K.line(mid, y - 120, mid, y + 40, {color: th.mute, dash: [5, 4], w: 1.5, alpha: C * (1 - f)});
         if (f > .98) { K.line(x0 + (n / 2 - 1) * dx + 20, y, x0 + (n / 2 - 1) * dx + 46, y - 45, {color: th.mute, w: 1.5, alpha: C}); K.line(x0 + (n / 2 - 1) * dx + 46, y - 45, x0 + (n / 2 - 1) * dx + 20, y - 90, {color: th.mute, w: 1.5, alpha: C}); }
         K.text('fold', mid, y + 60, {align: 'center', color: th.mute, size: 14, alpha: C * (1 - f)});
@@ -219,10 +213,10 @@
         strip(K, xs0, 220, m, d2, {alpha: D, label: () => 'R', hl: i => (i < k / 2 || i >= m - k / 2) ? th.provedF : null});
         K.rect(xs0 - d2 - 22, 180, d2 * (k / 2 + 1) + 14, 80, {stroke: th.proved, w: 1.5, dash: [5, 4], alpha: D * seg(t, 12, 13)});
         K.rect(xs0 + (m - k / 2) * d2 - 22, 180, d2 * (k / 2 + 1) + 14, 80, {stroke: th.proved, w: 1.5, dash: [5, 4], alpha: D * seg(t, 12, 13)});
-        K.text('w', xs0 - 10, 290, {align: 'center', color: th.proved, size: 20, font: SERIF, alpha: D * seg(t, 12, 13)});
-        K.text('w', xs0 + (m - 1) * d2 + 10, 290, {align: 'center', color: th.proved, size: 20, font: SERIF, alpha: D * seg(t, 12, 13)});
+        K.text('w', xs0 - 10, 290, {align: 'center', color: th.proved, size: 20, alpha: D * seg(t, 12, 13)});
+        K.text('w', xs0 + (m - 1) * d2 + 10, 290, {align: 'center', color: th.proved, size: 20, alpha: D * seg(t, 12, 13)});
         K.text('middle: norm ≤ ‖R‖^(m−k)', W / 2, 160, {align: 'center', color: th.space, size: 16, alpha: D * seg(t, 13, 14)});
-        K.text('Dₘ ≤ ‖R‖^(m−k) · Dₖ', W / 2, 360, {align: 'center', size: 24, font: SERIF, alpha: D * seg(t, 14, 15)});
+        K.text('Dₘ ≤ ‖R‖^(m−k) · Dₖ', W / 2, 360, {align: 'center', size: 24, alpha: D * seg(t, 14, 15)});
         const gx = 330, gy = 400, gw = 300, gh = 80;
         for (let mm = 4; mm <= 20; mm += 2) { const v = Math.pow(.7, mm - 4), x = gx + (mm - 4) / 16 * gw; K.rect(x, gy + gh - v * gh, 10, v * gh, {fill: th.mute, alpha: D * seg(t, 16.5, 17.5) * .6}); }
         K.text('remainder versus m', gx + gw + 14, gy + gh, {color: th.mute, size: 13, alpha: D * seg(t, 16.5, 17.5)});
@@ -251,7 +245,7 @@
       mv(xp + 40, rows[2] + bh, xp + 40, rows[3] - 2, '③', 'square in time', 11.5);
       K.arrow(xp, rows[0] + bh / 2, xe + bw - 20, rows[1] + 6, {color: th.mute, w: 1.5, alpha: seg(t, 3.5, 4)});
       K.arrow(xe + bw, rows[1] + bh / 2, xp - 6, rows[2] + 12, {color: th.mute, w: 1.5, alpha: seg(t, 7.5, 8)});
-      K.text('(M, β, x)  →  (2M, 2β, 10x²)', xe, 470, {size: 24, font: SERIF, color: th.proved, alpha: seg(t, 14, 15)});
+      K.text('(M, β, x)  →  (2M, 2β, 10x²)', xe, 470, {size: 24, color: th.proved, alpha: seg(t, 14, 15)});
     }
   });
 
@@ -316,7 +310,6 @@
             [6, 'What is left in the middle, R^(n−M) U, has norm at most 1. So the remainder is at most ‖w‖² = D(M), whatever its sign.'],
             [11.5, 'Every n ≥ 1920 lies in a window [Mⱼ, 2Mⱼ] with βⱼ = 392·2^(j−5). In that window the thermal purity is at least 1 − 4xⱼ > ½.'],
             [18, 'So the ground state is unique and e^(−βⱼΔ) < 10^(−2^(j−5)). Dividing by βⱼ: Δₙ > log 10 / 392 ≈ 0.0059 for every odd n ≥ 1921.']],
-    tex: ['\\Delta_n>\\frac{\\log 10}{392}\\approx0.0059'],
     draw(K, t) {
       const {th} = K, A = 1 - seg(t, 11.2, 11.8);
       if (A > 0) {
@@ -326,12 +319,12 @@
         const g = seg(t, 1.5, 2.5);
         K.rect(xs0 - d2 - 22, 180, d2 * (k / 2 + 1) + 14, 80, {stroke: th.proved, w: 1.5, dash: [5, 4], alpha: A * g});
         K.rect(xs0 + (n - k / 2) * d2 - 22, 180, d2 * (k / 2 + 1) + 14, 80, {stroke: th.proved, w: 1.5, dash: [5, 4], alpha: A * g});
-        K.text('w', xs0 - 10, 290, {align: 'center', color: th.proved, size: 20, font: SERIF, alpha: A * g});
-        K.text('w', xs0 + (n - 1) * d2 + 10, 290, {align: 'center', color: th.proved, size: 20, font: SERIF, alpha: A * g});
+        K.text('w', xs0 - 10, 290, {align: 'center', color: th.proved, size: 20, alpha: A * g});
+        K.text('w', xs0 + (n - 1) * d2 + 10, 290, {align: 'center', color: th.proved, size: 20, alpha: A * g});
         const ux = xs0 + (n - k / 2 - .5) * d2, u = seg(t, 6, 7);
         K.rect(ux - 11, 209, 22, 22, {fill: th.bg, stroke: th.time, w: 1.5, alpha: A * u}); K.text('U', ux, 226, {align: 'center', color: th.time, size: 13, alpha: A * u});
         K.text('middle: ‖R^(n−M) U‖ ≤ 1', W / 2, 330, {align: 'center', color: th.space, size: 17, alpha: A * u});
-        K.text('|remainder| ≤ ‖w‖² = D(M)', W / 2, 380, {align: 'center', size: 24, font: SERIF, alpha: A * seg(t, 7.5, 8.5)});
+        K.text('|remainder| ≤ ‖w‖² = D(M)', W / 2, 380, {align: 'center', size: 24, alpha: A * seg(t, 7.5, 8.5)});
       }
       const B = seg(t, 11.8, 12.6);
       if (B > 0) {
@@ -353,6 +346,6 @@
     }
   });
 
-  for (const id of ['ocyl', 'ovec', 'over', 'ofold', 'omoves', 'ostart', 'ogap']) root.STBV.slow && (() => { const c = OPEN.find(x => x.id === id), S = 1.3, d0 = c.draw; c.dur *= S; c.beats = c.beats.map(([b, x]) => [b * S, x]); c.draw = (K, tt) => d0(K, tt / S); })();
+  for (const id of ['ocyl', 'ovec', 'over', 'ofold', 'omoves', 'ostart', 'ogap']) slow(OPEN, id, 1.3);
   root.STBV.OPEN = OPEN;
 })(typeof window !== 'undefined' ? window : globalThis);

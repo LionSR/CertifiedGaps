@@ -9,9 +9,10 @@ an exposition only: nothing here is part of any certificate.
 | file | content |
 |---|---|
 | `index.html` | the explainer page: imaginary time and path sums, the spacetime torus, the two purities, squaring lemma, coupling identity, reflection positivity (with the realignment test), four-move doubling, the numerical seed, and the open-chain argument of Appendices A–C, each with an interactive figure and a worked example |
-| `film.html`, `film_open.html` | animation pages for the two films (main proof; open chains), drawn frame by frame by `window.draw(t)` |
+| `film.html`, `film_open.html` | animation pages for the two films (main proof; open chains); each only names its chapter list and title |
+| `film.js` | the shared film player: TeX preloading, captions, and the frame-deterministic `window.draw(t)` |
 | `core.js` | the exact two-purity recurrence in log space (mirrors `julia/src/recurrence/map.jl`), transverse-field Ising free-fermion purities, and the spacetime-sheet → torus renderer |
-| `chapters.js`, `open_chapters.js` | the film chapters (shared by the page figures and the films) |
+| `chapters.js`, `open_chapters.js` | the film chapters (shared by the page figures and the films); `chapters.js` also holds the drawing kit and the helpers both files use |
 | `render.mjs` | renders a film page to MP4 |
 | `poster.jpg`, `poster-open.jpg` | video posters |
 

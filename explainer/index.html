@@ -480,21 +480,14 @@ function texImg(src, color, px) {
   if (hit) return hit === 'pending' ? null : hit;
   if (!texReady) return null;
   TEXC.set(key, 'pending');
-  try {
-    const node = MathJax.tex2svg(src, {display: true}), svg = node.querySelector('svg'), ex = px * .45;
-    const w = parseFloat(svg.getAttribute('width')) * ex, h = parseFloat(svg.getAttribute('height')) * ex, k = 2;
-    svg.setAttribute('width', w * k); svg.setAttribute('height', h * k);
-    const img = new Image();
-    img.onload = () => { TEXC.set(key, {img, w, h}); redrawAll(); };
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.outerHTML.replace(/currentColor/g, color));
-  } catch (e) { TEXC.delete(key); }
+  STBV.texImage(src, color, px).then(im => { TEXC.set(key, im); redrawAll(); }, () => TEXC.delete(key));
   return null;
 }
 
 // ---------- players ----------
 const PLAYERS = [];
 function makePlayer(host) {
-  const ch = [...STBV.CH, ...(STBV.OPEN || [])].find(c => c.id === host.dataset.ch); if (!ch) return;
+  const ch = [...STBV.CH, ...STBV.OPEN].find(c => c.id === host.dataset.ch); if (!ch) return;
   host.innerHTML = `<canvas width="960" height="540" aria-label="${ch.title} animation"></canvas>
     <div class="r pmeta"><p class="main pcap" aria-live="polite"></p><div class="side"><p class="pctl"><button type="button" class="pp">play</button> · <button type="button" class="pv">back</button> · <button type="button" class="nx">next</button>
     <span class="bt"></span></p><input type="range" min="0" max="${ch.dur}" step="0.01" aria-label="Scrub"></div></div>`;
@@ -502,16 +495,16 @@ function makePlayer(host) {
   const P = {ch, t: ch.dur, playing: false, seen: false};
   function size() { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = 960 * dpr; cv.height = 540 * dpr; P.dpr = dpr; }
   size();
+  const beatIdx = () => STBV.beatAt(ch, P.t);
   P.draw = () => {
     const ctx = cv.getContext('2d'); ctx.setTransform(P.dpr, 0, 0, P.dpr, 0, 0);
     ctx.fillStyle = TH.bg; ctx.fillRect(0, 0, 960, 540);
     ch.draw(STBV.kit(ctx, TH, texImg), P.t);
-    let bi = 0; ch.beats.forEach((b, i) => { if (P.t >= b[0] - 1e-6) bi = i; });
+    const bi = beatIdx();
     if (cap.dataset.bi !== String(bi)) { cap.textContent = ch.beats[bi][1]; cap.dataset.bi = bi; }
     sl.value = P.t; bt.textContent = `step ${bi + 1} of ${ch.beats.length}`;
     pp.textContent = P.playing ? 'pause' : (P.t >= ch.dur - .01 ? 'replay' : 'play'); pp.setAttribute('aria-label', P.playing ? 'Pause' : 'Play');
   };
-  const beatIdx = () => { let bi = 0; ch.beats.forEach((b, i) => { if (P.t >= b[0] - 1e-6) bi = i; }); return bi; };
   pp.addEventListener('click', () => { if (P.playing) P.playing = false; else { if (P.t >= ch.dur - .01) P.t = 0; P.playing = true; } P.draw(); });
   host.querySelector('.nx').addEventListener('click', () => { const bi = beatIdx(); P.playing = false; P.t = bi + 1 < ch.beats.length ? ch.beats[bi + 1][0] + 2.5 : ch.dur; P.t = Math.min(P.t, bi + 2 < ch.beats.length ? ch.beats[bi + 2][0] - .01 : ch.dur); P.draw(); });
   host.querySelector('.pv').addEventListener('click', () => { const bi = beatIdx(); P.playing = false; P.t = bi > 0 ? Math.min(ch.beats[bi - 1][0] + 2.5, ch.beats[bi][0] - .01) : 0; P.draw(); });

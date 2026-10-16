@@ -10,8 +10,7 @@ const browser = await chromium.launch();
 const tab = await browser.newPage({ viewport: { width: 1920, height: 1080 } });
 tab.on('pageerror', e => console.error('page error:', e.message));
 await tab.goto('file://' + path.resolve(page));
-await tab.waitForFunction(() => window.READY);
-await tab.evaluate(() => window.READY);
+await tab.evaluate(() => window.READY);  // set synchronously by film.js; resolves once TeX is loaded
 const total = await tab.evaluate(() => window.TOTAL);
 const ff = spawn('ffmpeg', ['-y', '-f', 'image2pipe', '-framerate', fps, '-i', '-', '-c:v', 'libx264', '-pix_fmt', 'yuv420p',
   '-crf', '22', '-preset', 'slow', '-movflags', '+faststart', out], { stdio: ['pipe', 'ignore', 'inherit'] });
