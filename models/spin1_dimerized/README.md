@@ -134,4 +134,7 @@ Measured run times (Julia 1.12, 1 BLAS thread):
 The certificates were generated when this directory was located at `certificates/spin1_dimerized`
 and the core package was named `ThermalMPOGap`; their `source_sha256` entries reference archived
 commit `6c375b5981f1f7c7813bce53ca01a1ce1c04c9f2` and are verified against that commit when present
-in the local git object store.
+in the local git object store. New results record only model-local sources under `source_sha256`
+(compared by the tests) and the core under `core_sha256` (provenance only). Later, duplicated helpers moved into the shared core `CertifiedGaps`
+(`parserat` → `ExactArithmetic.parse_rational`, the Cartesian generators →
+`Spins.integer_cartesian_generators`); the stored certificates are unchanged.

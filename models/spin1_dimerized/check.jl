@@ -16,8 +16,8 @@ if "--full" in ARGS
         rm(path; force = true)
         @test fresh["bound"] > 0
         for key in ("logZ_n_beta", "logZ_2n_beta", "logZ_2n_2beta")
-            a = parserat.((stored[key]["lower"], stored[key]["upper"]))
-            b = parserat.((fresh[key]["lower"], fresh[key]["upper"]))
+            a = parse_rational.((stored[key]["lower"], stored[key]["upper"]))
+            b = parse_rational.((fresh[key]["lower"], fresh[key]["upper"]))
             @test max(a[1], b[1]) <= min(a[2], b[2])
         end
         @test abs(fresh["bound"] - stored["bound"]) < 1e-8

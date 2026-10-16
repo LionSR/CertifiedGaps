@@ -1,28 +1,7 @@
-using JSON3
-
-"Read a result JSON, including losslessly gzip-compressed complete spectra."
-function read_result_json(path)
-    raw=endswith(path,".gz") ? read(`gzip -dc -- $path`,String) : read(path,String)
-    JSON3.read(raw)
-end
-
-using CertifiedGaps.ExactDiagonalization: PartialSpectrum
-import CertifiedGaps.ExactDiagonalization: logZ_bounds
-
-"A complete numerical spectrum represented by levels and exact integer multiplicities."
-struct WeightedSpectrum
-    E::Vector{Float64}
-    weights::Vector{Int}
-    N::Int
-    exact::Bool
-end
-"Numerical log Z of a complete weighted spectrum (both returned values equal; no enclosure)."
-function logZ_bounds(s::WeightedSpectrum,beta::Real)
-    e0=s.E[1]
-    z=sum(w*exp(-beta*(e-e0)) for (e,w) in zip(s.E,s.weights))
-    value=log(z)-beta*e0
-    value,value
-end
+# Spectra of stored results. Reading (plain or gzip-compressed JSON) is
+# `CertifiedGaps.Results.read_result(path; exact=false)`; complete multiplet-weighted spectra
+# and their numerical log Z are the core's `WeightedSpectrum` and `logZ_bounds`.
+using CertifiedGaps.ExactDiagonalization: PartialSpectrum, WeightedSpectrum, logZ_bounds
 "Spectrum at angle index `t` of a complete-spectrum result (weighted if SU(2)-resolved)."
 function result_spectrum(result,t)
     row=result.spectra[t]

@@ -52,9 +52,8 @@ for (g,h) in points
     data["seconds"]=time()-start
     certified=haskey(data,"certificate") && data["certificate"]["bound"]!==nothing
     data["metadata"]=C.metadata(Dict("g"=>C.str(g),"h"=>C.str(h),"nmax"=>nmax);certified)
-    out=joinpath(C.ROOT,"results","certificate_"*tag*".json"); write_result(out,data)
-    # Spectra make each file ~260 kB; store compressed (`gzip -dc` restores the JSON).
-    run(`gzip -9 -n -f $out`)
+    # Spectra make each file ~260 kB; store compressed (`read_result` restores the JSON).
+    write_result(joinpath(C.ROOT,"results","certificate_"*tag*".json.gz"),data;level=9)
 end
 # The seed table is rebuilt from every stored certificate, not only the points just run.
 length(C.result_paths())==length(C.GS)*length(C.HS) && C.write_seed_table()

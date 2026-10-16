@@ -11,6 +11,7 @@ module PolynomialMPO
 
 using LinearAlgebra, SparseArrays
 import Nemo
+using CertifiedGaps.Spins: integer_ladders
 import CertifiedGaps.CertifiedMPO: Squaring, Norms, PolynomialBounds, MPOAlgebra
 using CertifiedGaps.CertifiedMPO.MPOAlgebra:
     WEIGHTS,
@@ -31,12 +32,9 @@ const PG = PolynomialBounds
 const MA = MPOAlgebra
 const F = MN.F
 
+"Spin-2 ladder operators in the binomial gauge (m = −2, …, 2), `S^z`, and the identity."
 function local_spins()
-    plus, minus = zeros(F, 5, 5), zeros(F, 5, 5)
-    for k in 0:3
-        plus[k+2, k+1] = 4-k
-        minus[k+1, k+2] = k+1
-    end
+    plus, minus = F.(integer_ladders(2)[1]), F.(integer_ladders(2)[2])
     return (; identity = Matrix{F}(I, 5, 5), z = Matrix(Diagonal(F.(-2:2))), plus, minus)
 end
 

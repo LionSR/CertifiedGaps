@@ -76,7 +76,8 @@ Measured run times (Julia 1.12.4, one BLAS thread):
 - `src/Ladder.jl`: exact RP identity, symmetry sector orbits, block matrices, verified eigenvalue
   enclosures, $\log Z$ intervals, and `seed_defects` (the single implementation of the step from two
   spectra to the rational seeds, shared by `certify.jl`, the tests, and the replay scripts).
-- `src/Provenance.jl`: gzip certificate loader and historical source-hash verification.
+- `src/Provenance.jl`: the historical snapshot constants and source-hash verification (the gzip
+  certificate is read with the core `Results.read_result` / `read_result_bytes`).
 - `scripts/`: `scan.jl` (numerical seed scan), `extrapolate.jl`, `summarize.jl` (updates the
   `## Results` section of `METHOD.md`), `replay_audit.jl`, and `check_replay.jl` (full fixed-seed
   replay and its checker).
@@ -99,4 +100,8 @@ and a replay on `CertifiedGaps` 0.2.0 reproduced every number exactly. `METHOD.m
 `test/runtests.jl`, `scripts/replay_audit.jl`, and `scripts/check_replay.jl` each carried moved
 into `Ladder.seed_defects` (same operations, same rounding), `certify.jl` gained the optional output
 path, and `check.jl --full` stopped writing into `results/`. The stored certificate's provenance
-hashes refer to the historical snapshot and are unaffected.
+hashes refer to the historical snapshot and are unaffected. Fresh certificates (`certify.jl`,
+`replay_audit.jl`) now record only model-local sources under `source_sha256` (compared by the
+tests) and the core under `core_sha256` (provenance only). Later, duplicated helpers moved into the shared core `CertifiedGaps`: the gzip
+loaders `certificate_bytes`/`read_certificate` became `Results.read_result_bytes`/`read_result`,
+and the exact Pauli matrices come from `Spins.exact_pauli`.

@@ -2,13 +2,13 @@
 using CertifiedGaps, LinearAlgebra, SparseArrays, JSON3
 using CertifiedGaps.Results, CertifiedGaps.ExactDiagonalization, CertifiedGaps.Seeds
 using IntervalArithmetic
+using CertifiedGaps.ExactArithmetic: parse_rational
 BLAS.set_num_threads(1)
 # The model directory (this file is in src/); results/ and hashed paths are relative to it.
 const ROOT = dirname(@__DIR__)
 const REPO = normpath(joinpath(ROOT,"../.."))
 const DELTAS = [9//10, 4//5, 7//10, 3//5, 1//2]
 ratstr(x::Rational) = string(numerator(x),"//",denominator(x))
-parserat(s) = (a=split(s,"//");parse(BigInt,a[1])//parse(BigInt,a[2]))
 """
 Run metadata with SHA-256 of this model's sources under `source_sha256` (keyed relative to
 this directory; the tests compare them with the checkout) and of the shared core under

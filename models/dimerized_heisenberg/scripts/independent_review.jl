@@ -10,7 +10,7 @@ reviewrecords = Any[]
 elapsed = @elapsed @testset "Independent acceptance: containment from fresh full spectra" begin
     for delta in DELTAS
         path = seed_path(delta)
-        record = load_record(path)
+        record = read_result(path)
         println("ACCEPTANCE RERUN delta=", delta); flush(stdout)
         fresh = Dict{Int,Any}(); mismatches = Dict{String,Int}(); minmargin = nothing
         for stored in record["rings"]
@@ -28,8 +28,8 @@ elapsed = @elapsed @testset "Independent acceptance: containment from fresh full
                     a[key] == b[key] || (mismatches[key] = get(mismatches, key, 0) + 1)
                 end
                 w = refined_witness(a, L)
-                av = parseq.(a["eigenvalues"]); bv = parseq.(b["eigenvalues"])
-                margin = parseq(b["eigenvalue_radius"]) - maximum(abs.(av .- bv)) - w.radius
+                av = parse_rational.(a["eigenvalues"]); bv = parse_rational.(b["eigenvalues"])
+                margin = parse_rational(b["eigenvalue_radius"]) - maximum(abs.(av .- bv)) - w.radius
                 # Ordered Weyl intervals regenerated around the fresh centres lie wholly inside
                 # the stored intervals, including multiplicities.
                 @test margin >= 0
@@ -45,12 +45,12 @@ elapsed = @elapsed @testset "Independent acceptance: containment from fresh full
         seeds = copy(record["seeds"])
         record["survey_seed"] === nothing || push!(seeds, record["survey_seed"])
         for seed in seeds
-            n = parse(Int, seed["n0_cells"]); beta = parseq(seed["beta0"])
+            n = parse(Int, seed["n0_cells"]); beta = parse_rational(seed["beta0"])
             f = seed_intervals(fresh, n, beta)
             es = rational_upper(f.s); et = rational_upper(f.t)
-            @test es <= parseq(seed["eps_s"]) && et <= parseq(seed["eps_t"])
+            @test es <= parse_rational(seed["eps_s"]) && et <= parse_rational(seed["eps_t"])
             b = certified_gap_bound(es, et, beta).bound
-            @test b !== nothing && b >= parseq(seed["gap_lower"])
+            @test b !== nothing && b >= parse_rational(seed["gap_lower"])
             push!(bounds, Dict("n0_cells" => n, "beta0" => string(beta),
                 "fresh_refined_bound" => b, "stored_bound" => seed["gap_lower"]))
         end

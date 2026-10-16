@@ -38,7 +38,7 @@ end
     @test !isempty(paths)
     append!(paths,abspath.(ARGS))
     for p in paths
-        c=read_certificate(p)
+        c=read_result(p)
         @test rp_identity(parse(Rational{BigInt},c["g"]))
         es=parse(Rational{BigInt},c["epsilon_s"])
         et=parse(Rational{BigInt},c["epsilon_t"])
@@ -55,7 +55,7 @@ end
         # commit is in the local object store, and say loudly when it is not.
         historical=basename(p)=="certificate_g3_1.json.gz"
         if historical
-            @test certificate_bytes(p) |> sha256 |> bytes2hex == ORIGINAL_CERTIFICATE_SHA256
+            @test read_result_bytes(p) |> sha256 |> bytes2hex == ORIGINAL_CERTIFICATE_SHA256
         end
         if historical && !snapshot_available(joinpath(@__DIR__,".."))
             @warn "Historical snapshot $(HISTORICAL_SNAPSHOT) not in the Git object store; " *

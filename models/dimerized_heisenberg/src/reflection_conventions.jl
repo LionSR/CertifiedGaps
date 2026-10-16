@@ -1,12 +1,13 @@
 # Exact audit of internal reflection, alternating orientations, and larger blocks.
 module ReflectionConventions
 using LinearAlgebra
+using CertifiedGaps.Spins: exact_spin_half
 export audit_conventions
 const Q=Rational{BigInt}
 function audit_conventions()
     I2=Matrix{Q}(I,2,2)
     # Real event channels for the sublattice-rotated elementary bond.
-    channels=[Q[0 1;1 0]/2,Q[0 1;-1 0]/2,Q[1 0;0 -1]/2]
+    S=exact_spin_half(Q); channels=[S.x,S.iy,S.z]
     bond=-sum(kron(C,C) for C in channels)
     results=Any[]
     for c in (2,4)

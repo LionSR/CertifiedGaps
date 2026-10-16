@@ -1,9 +1,10 @@
 using LinearAlgebra
+using CertifiedGaps.Spins: integer_cartesian_generators
 "Exact Cartesian site RP and reflection within the two-site cell."
 function check_rp(delta)
     @assert -1<delta<1
-    G=[BigInt[0 0 0;0 0 -1;0 1 0],BigInt[0 0 1;0 0 0;-1 0 0],BigInt[0 -1 0;1 0 0;0 0 0]]
-    G=[-g for g in G]
+    # (G_a)_{bc} = ε_{abc}: real antisymmetric, S = −iG.
+    G=[BigInt.(g) for g in integer_cartesian_generators()]
     S=[-im*g for g in G]
     @assert sum(s*s for s in S)==2Matrix{BigInt}(I,3,3)
     @assert S[1]*S[2]-S[2]*S[1]==im*S[3]

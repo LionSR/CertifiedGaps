@@ -152,3 +152,6 @@ These certificates were originally generated when the directory was located at
 Their `metadata.source_sha256` entries reference the source snapshot preserved in
 `historical_sources/` at commit `cb635a1cdf2ab06630b5b0838fac4356d3c33509`; `check.jl` verifies all
 recorded source hashes against that git commit when present in the local repository object store.
+Later, duplicated helpers moved into the shared core `CertifiedGaps` (`rat` → `ExactArithmetic.parse_rational`, the exact spin-½ matrices →
+`Spins.exact_spin_half`), and new results record model-local sources under `source_sha256` and the
+core under `core_sha256`. The stored certificates are unchanged.

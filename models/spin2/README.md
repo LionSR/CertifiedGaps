@@ -195,3 +195,5 @@ module hashes) are provenance and are not compared with the checkout.
   apart from script paths); `configs/` moved to `scripts/configs/`; the flat `scripts/` was grouped
   by topic (subdirectories above), with `certify_trial.jl` and the externally cited drivers left at
   the top; `check.jl` and a model `.gitignore` were added.
+- `PolynomialMPO.local_spins` takes its ladder operators from the core `Spins.integer_ladders(2)`
+  (same integer matrices) instead of building them locally.

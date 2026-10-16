@@ -29,7 +29,7 @@ start=time(); comparisons=Any[]; maxerror=0.0
         s=C.ring_spectrum(L,0//1,1//10;rigorous=true)
         exactlevels=sort([-(L-2count_ones(xor(t,C.rotate(t,L))))-(1//10)*(L-2count_ones(t))
             for t in 0:(1<<L)-1])
-        radius=maximum(C.rat(b["radius"]) for b in s.blocks)
+        radius=maximum(C.parse_rational(b["radius"]) for b in s.blocks)
         @test all(abs(C.exact(v)-e)<=radius for (v,e) in zip(s.E,exactlevels))
     end
 end

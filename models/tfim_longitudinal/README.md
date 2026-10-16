@@ -103,4 +103,8 @@ In the directory-format standardization the per-point files were renamed from
 `results/seeds.json` were updated), and `check.jl` gained `--full` as the name of the deep replay.
 Later the checks moved from `check.jl` into `src/checks.jl`, so that `check.jl` is the entry point
 and `test/runtests.jl` no longer includes it; the earlier environment-variable alias of `--full` was
-dropped. Behavior and checks are unchanged.
+dropped. Behavior and checks are unchanged. Later, duplicated helpers moved into the shared core `CertifiedGaps`: `read_point` became
+`Results.read_result`, `rat` became `ExactArithmetic.parse_rational`, the Pauli matrices come from
+`Spins.exact_pauli`, `certify.jl` compresses through `write_result` (same `gzip -9 -n`), and new
+results record the core under `core_sha256` instead of `source_sha256`. The stored certificates
+are unchanged; their recorded hashes name the earlier sources.

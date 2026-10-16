@@ -49,8 +49,8 @@ include("verified_independent.jl")
                 U = CQ.(dec.vectors)
                 R = CQ.(H) * U - U * Diagonal(Q.(dec.values))
                 G = U' * U - I
-                @test sum(abs2, R) <= parseq(record["residual_norm_upper"])^2
-                @test sum(abs2, G) <= parseq(record["orthogonality_norm_upper"])^2
+                @test sum(abs2, R) <= parse_rational(record["residual_norm_upper"])^2
+                @test sum(abs2, G) <= parse_rational(record["orthogonality_norm_upper"])^2
                 blocks += 1
             end
         end
@@ -103,7 +103,7 @@ include(joinpath(@__DIR__, "..", "src", "Diagnostics.jl"))
 end
 
 @testset "Checker rejects corrupted theorem inputs" begin
-    record = load_record(seed_path(1 // big(2)))
+    record = read_result(seed_path(1 // big(2)))
     spectra = stored_spectra(record)
     @test check_record(record; spectra, check_hashes=false) === spectra
     for (key, value) in (("eps_s", "0//1"), ("eps_t", "0//1"),
@@ -131,7 +131,7 @@ end
     for key in ("eigenvalue_radius", "raw_residual_component_max")
         corrupted = deepcopy(record)
         block = argmax(b -> Certification.asint(b["dimension"]), corrupted["rings"][end]["blocks"])
-        block[key] = string(exact(block[key]) / 2)
+        block[key] = string(parse_rational(block[key]) / 2)
         @test_throws ErrorException stored_spectra(corrupted)
     end
     corrupted = deepcopy(record)

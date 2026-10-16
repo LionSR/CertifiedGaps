@@ -7,8 +7,7 @@ include(joinpath(dirname(@__DIR__), "src", "common.jl"))
 using Test
 rows=Any[]
 @testset "spin-half normalization and independently accumulated residuals" begin
-    X=[0//1 1//2;1//2 0//1]; J=[0//1 1//2;-1//2 0//1]
-    Z=[1//2 0//1;0//1 -1//2]; H2=kron(X,X)-kron(J,J)+kron(Z,Z)
+    S=exact_spin_half(Rational{Int}); X,J,Z=S.x,S.iy,S.z; H2=kron(X,X)-kron(J,J)+kron(Z,Z)
     @test X^2-J^2+Z^2 == 3//4*Matrix{Rational{Int}}(I,2,2)
     @test (H2-1//4*I)*(H2+3//4*I)==zeros(Rational{Int},4,4)
     @test tr(H2)==0

@@ -45,7 +45,7 @@ end
 println(io,"\n### Certified results\n")
 for tag in fields
     p=joinpath(root,"results","certificate_g$tag.json.gz"); isfile(p)||continue
-    c=read_certificate(p); e=c["spectra"][end]["energies"]
+    c=read_result(p); e=c["spectra"][end]["energies"]
     @printf(io,"- **g=%s: Δ_L ≥ %.9f**, %s. Seed (n0,β)=(%s,%s); verification %.2f s; bound / 8-rung ED gap = %.6f.\n",c["g"],Float64(floor(BigInt,BigFloat(c["bound"])*big(10)^9))/1e9,c["validity"],c["n0"],c["beta"],c["seconds"],c["bound"]/(e[2]-e[1]))
     println(io,"  Returned `.bound` = `",repr(c["bound"]),"` (exact binary rational `",Rational{BigInt}(c["bound"]),"`); the displayed decimal lower bound is rounded downward.")
     println(io,"  Exact rational seeds and per-sector eigenvalue radii are in ",

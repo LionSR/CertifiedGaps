@@ -15,8 +15,8 @@ isdefined(@__MODULE__, :check_seed_certificates) || include(joinpath(@__DIR__, "
                 Q=CQ.(decomposition.vectors); Hq=CQ.(H); V=QQ.(decomposition.values)
                 R=Hq*Q-Q*Diagonal(V)
                 defect=Q'*Q-Matrix{CQ}(I,d,d)
-                @test sum(abs2,R)<=parseq(record["residual_norm_upper"])^2
-                @test sum(abs2,defect)<=parseq(record["orthogonality_norm_upper"])^2
+                @test sum(abs2,R)<=parse_rational(record["residual_norm_upper"])^2
+                @test sum(abs2,defect)<=parse_rational(record["orthogonality_norm_upper"])^2
                 # Deliberately wrong zero bound must be rejected for nonzero residual.
                 @test iszero(sum(abs2,R)) || !(sum(abs2,R)<=0)
                 for _ in 1:(flip ? 1 : 2)

@@ -5,7 +5,7 @@ using LinearAlgebra, IntervalArithmetic, CertifiedGaps, CertifiedGaps.Results, J
 using Test
 BLAS.set_num_threads(1)
 const AUDIT_ROOT = normpath(joinpath(@__DIR__, ".."))
-parseq(s) = let a=split(s,"//"); parse(BigInt,a[1])//parse(BigInt,a[2]) end
+using CertifiedGaps.ExactArithmetic: parse_rational
 qstr(q) = string(numerator(q),"//",denominator(q))
 biginterval(q::Rational) = interval(BigFloat,numerator(q))/interval(BigFloat,denominator(q))
 
@@ -30,12 +30,12 @@ function character_dimensions(L)
 end
 
 function independent_logz(blocks,beta)
-    center=minimum(parseq(v) for block in blocks for v in block["values"])
+    center=minimum(parse_rational(v) for block in blocks for v in block["values"])
     total=interval(BigFloat,0)
     for block in blocks
-        radius=parseq(block["radius"])
+        radius=parse_rational(block["radius"])
         for v in block["values"]
-            q=parseq(v)-center
+            q=parse_rational(v)-center
             lo=inf(biginterval(q-radius)); hi=sup(biginterval(q+radius))
             total+=exp(-biginterval(beta)*interval(BigFloat,lo,hi))
         end
@@ -49,9 +49,9 @@ paths=sort(filter(p->startswith(basename(p),"certificate_g") && endswith(p,".jso
 @testset "Independent final artifact audit" begin
     @test length(paths)==30
     for path in paths
-        data=JSON3.read(read(`gzip -dc $path`,String),Dict{String,Any})
-        g=parseq(data["g"]); h=parseq(data["h"]); push!(pairs,(g,h))
-        cert=data["certificate"]; n=cert["n"]; beta=parseq(cert["beta"])
+        data=read_result(path,Dict{String,Any})
+        g=parse_rational(data["g"]); h=parse_rational(data["h"]); push!(pairs,(g,h))
+        cert=data["certificate"]; n=cert["n"]; beta=parse_rational(cert["beta"])
         @test n==6 && iseven(n) && beta>0 && g>0 && h>0
         # Independently specified Pauli matrices and exact local terms.
         Z=diagm(Rational{BigInt}[1,-1]); X=Rational{BigInt}[0 1;1 0]
@@ -65,10 +65,10 @@ paths=sort(filter(p->startswith(basename(p),"certificate_g") && endswith(p,".jso
             tr=interval(BigFloat,0); tr2=interval(BigFloat,0)
             for block in blocks
                 @test block["dimension"]==length(block["values"])
-                radius=parseq(block["radius"])
-                @test radius>0 && 0<=parseq(block["orthogonality"])<1//2
+                radius=parse_rational(block["radius"])
+                @test radius>0 && 0<=parse_rational(block["orthogonality"])<1//2
                 for token in block["values"]
-                    v=parseq(token)
+                    v=parse_rational(token)
                     x=interval(BigFloat,inf(biginterval(v-radius)),
                         sup(biginterval(v+radius)))
                     tr+=x; tr2+=x*x
@@ -86,12 +86,12 @@ paths=sort(filter(p->startswith(basename(p),"certificate_g") && endswith(p,".jso
         lower_ps=exp(interval(BigFloat,inf(b))-2interval(BigFloat,sup(a)))
         lower_pt=exp(interval(BigFloat,inf(c))-2interval(BigFloat,sup(b)))
         es=interval(BigFloat,1)-lower_ps; et=interval(BigFloat,1)-lower_pt
-        stored_s=parseq(cert["epsilon_s"]); stored_t=parseq(cert["epsilon_t"])
+        stored_s=parse_rational(cert["epsilon_s"]); stored_t=parse_rational(cert["epsilon_t"])
         @test Rational{BigInt}(sup(es))<=stored_s<1
         @test Rational{BigInt}(sup(et))<=stored_t<1
         answer=certified_gap_bound(stored_s,stored_t,beta)
         @test answer.bound!==nothing && answer.bound>0
-        @test Rational{BigInt}(answer.bound)==parseq(cert["bound_exact_binary"])
+        @test Rational{BigInt}(answer.bound)==parse_rational(cert["bound_exact_binary"])
         @test answer.j_admissible!==nothing
         push!(rows,Dict("g"=>qstr(g),"h"=>qstr(h),"n"=>n,"beta"=>qstr(beta),
             "independent_epsilon_s_upper"=>qstr(Rational{BigInt}(sup(es))),
@@ -105,7 +105,7 @@ paths=sort(filter(p->startswith(basename(p),"certificate_g") && endswith(p,".jso
         for h in (1//20,1//10,1//4,1//2,1//1))
     @test pairs==expected
 end
-worst=argmin(r->parseq(r["stored_bound_exact"]),rows)
+worst=argmin(r->parse_rational(r["stored_bound_exact"]),rows)
 write_result(joinpath(AUDIT_ROOT,"results","final_audit.json"),Dict(
     "status"=>"passed","parameters"=>rows,"worst"=>worst,"seconds"=>time()-started,
     "method"=>"Independent character dimensions, Pauli trace moments, " *

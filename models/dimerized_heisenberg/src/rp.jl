@@ -1,5 +1,6 @@
 module DimerizedRP
 using LinearAlgebra
+using CertifiedGaps.Spins: exact_spin_half, exact_pauli
 export audit_rp
 const Q = Rational{BigInt}
 const CQ = Complex{Q}
@@ -7,9 +8,8 @@ const CQ = Complex{Q}
 "Exact audit of the requested real identical-factor RP form, plus the broader conjugate form."
 function audit_rp(delta::Q)
     ident = Matrix{CQ}(I, 2, 2)
-    sx = CQ[0 1; 1 0] / 2
-    sy = CQ[0 -im; im 0] / 2
-    sz = CQ[1 0; 0 -1] / 2
+    S = exact_spin_half(Q)
+    sx, sy, sz = CQ.(S.x), S.y, CQ.(S.z)
     spins = (sx, sy, sz)
     A = [kron(s, ident) for s in spins]
     B = [kron(ident, s) for s in spins]
@@ -24,7 +24,7 @@ function audit_rp(delta::Q)
     defect_norm2 = sum(abs2, defect)
     @assert defect_norm2 == 6*weak^2
     # A cellwise pi rotation about y on the second spin.
-    J = CQ[0 1; -1 0]
+    J = CQ.(exact_pauli(Q).iy)
     rotation = kron(ident, J)
     internal_swap = CQ[1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1]
     Drot = rotation'*onsite*rotation

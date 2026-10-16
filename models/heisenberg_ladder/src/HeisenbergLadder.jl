@@ -16,6 +16,7 @@ using CertifiedGaps, LinearAlgebra, SparseArrays, Printf, JSON3, IntervalArithme
 using CertifiedGaps.Results, CertifiedGaps.ExactDiagonalization, CertifiedGaps.Seeds
 using CertifiedGaps.RingModels
 using CertifiedGaps.ExactArithmetic: round_up, round_down
+using CertifiedGaps.Spins: exact_spin_half
 
 "Repository root, against which source hashes are keyed."
 const ROOT = normpath(joinpath(@__DIR__, "..", "..", ".."))

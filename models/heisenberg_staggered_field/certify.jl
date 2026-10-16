@@ -3,9 +3,9 @@
 # Usage: certify.jl [h] [maxL]          (seed read from results/scan_<h>_<maxL>.json)
 #        certify.jl h n0 beta           (seed given explicitly, e.g. '1//1' 8 '21//4')
 include(joinpath(@__DIR__, "src", "common.jl"))
-h=isempty(ARGS) ? 1//1 : rat(ARGS[1])
+h=isempty(ARGS) ? 1//1 : parse_rational(ARGS[1])
 if length(ARGS)>=3
-    n=parse(Int,ARGS[2]);beta=rat(ARGS[3])
+    n=parse(Int,ARGS[2]);beta=parse_rational(ARGS[3])
 else
     maxL=length(ARGS)>1 ? parse(Int,ARGS[2]) : 16
     scan=JSON3.read(read(joinpath(ROOT,"results","scan_$(tag(h))_$(maxL).json"),String),Dict{String,Any})

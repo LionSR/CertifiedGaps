@@ -27,8 +27,8 @@ if full
     # `original_bound_supported`). The radii depend on the LAPACK/BLAS run, so the enclosures
     # need not be bit-identical: a run on a loaded machine gave 0.636473... vs 0.636386....
     @testset "Fresh certificate supports the stored one" begin
-        new = read_certificate(fresh)
-        old = read_certificate(joinpath(@__DIR__, ORIGINAL_CERTIFICATE))
+        new = read_result(fresh)
+        old = read_result(joinpath(@__DIR__, ORIGINAL_CERTIFICATE))
         for key in ("g", "n0", "beta")
             @test new[key] == old[key]
         end

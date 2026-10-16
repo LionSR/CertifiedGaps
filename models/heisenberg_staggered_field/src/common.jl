@@ -1,26 +1,31 @@
 using CertifiedGaps, LinearAlgebra, SparseArrays, IntervalArithmetic, JSON3
 using CertifiedGaps.Results, CertifiedGaps.Seeds, CertifiedGaps.ExactDiagonalization
 using KrylovKit, Random
+using CertifiedGaps.ExactArithmetic: parse_rational
+using CertifiedGaps.Spins: exact_spin_half
 BLAS.set_num_threads(1)
 # The model directory (this file is in src/); results/ and hashed paths are relative to it.
 const ROOT = dirname(@__DIR__)
 const REPO = normpath(joinpath(ROOT,"../.."))
 const FIELDS = [1//1,3//4,1//2,7//20,1//4]
-rat(x::AbstractString) = (p=split(x,"//"); parse(BigInt,p[1])//parse(BigInt,p[2]))
 tag(h) = replace(string(h),"//"=>"_")
 iv(x) = CertifiedGaps.Recurrence.to_interval(x)
 iv(x::Irrational) = interval(Float64,x)
-"Run metadata with SHA-256 of this model's sources and of the core (`core/...`)."
+"""
+Run metadata with SHA-256 of this model's sources under `source_sha256` and of the shared core
+under `core_sha256` (provenance only), both keyed by repository path (`model_provenance`).
+"""
 function provenance(config; certified=false)
-    hashes = source_hashes(ROOT; files=("certify.jl",))
-    merge!(hashes, Dict("core/"*k=>v for (k,v) in source_hashes(joinpath(REPO,"julia"))))
-    run_metadata(config;source_sha256=hashes,packages=(CertifiedGaps,IntervalArithmetic),
+    (;source_sha256,core_sha256) = model_provenance(ROOT; dirs=("src","scripts"),
+        files=("certify.jl","check.jl","Project.toml","Manifest.toml"))
+    meta = run_metadata(config;source_sha256,packages=(CertifiedGaps,IntervalArithmetic),
         status=certified ? "certified" : "numerical, not certified",certified)
+    meta["core_sha256"] = core_sha256
+    meta
 end
 "Exact rational check of the sublattice rotation, the RP identity −h = Σ C⊗C and o = −h Z."
 function exact_rp(h)
-    X = [0//1 1//2;1//2 0//1]; J=[0//1 1//2;-1//2 0//1]
-    Z=[1//2 0//1;0//1 -1//2]; U=2J; Id=Matrix{Rational{Int}}(I,2,2)
+    S = exact_spin_half(Rational{Int}); X, J, Z, Id = S.x, S.iy, S.z, S.id; U=2J
     original=kron(X,X)-kron(J,J)+kron(Z,Z)
     rotated=-kron(X,X)-kron(J,J)-kron(Z,Z)
     @assert kron(U,Id)*original*kron(U',Id)==rotated

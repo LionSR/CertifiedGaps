@@ -1,14 +1,14 @@
 module Ladder
 using LinearAlgebra, SparseArrays, CertifiedGaps
 using CertifiedGaps.Results
+using CertifiedGaps.Spins: exact_pauli
 export rp_identity, blocks, block_matrix, full_spectrum, verify_eigen, logz_interval,
     seed_defects, stored_spectra
 BLAS.set_num_threads(1)
 
 "Exact rational check of −h_bond = Σ C⊗C (C = Z⊗I, I⊗Z) and of a real symmetric on-site term."
 function rp_identity(g::Rational)
-    Z = Rational{BigInt}[1 0; 0 -1]; X = Rational{BigInt}[0 1; 1 0]
-    I2 = Matrix{Rational{BigInt}}(I,2,2)
+    (; x, z, id) = exact_pauli(); X, Z, I2 = x, z, id
     C = [kron(Z,I2), kron(I2,Z)]
     # Independent four-spin construction, order (a,b,a′,b′).
     h = -kron(Z,I2,Z,I2)-kron(I2,Z,I2,Z)

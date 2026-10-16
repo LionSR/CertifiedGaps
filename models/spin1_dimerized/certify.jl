@@ -11,6 +11,6 @@ include(joinpath(@__DIR__, "src", "enclosure.jl"))
 if abspath(PROGRAM_FILE) == @__FILE__
     certify_selected(parse(Int, ARGS[1]) // 10;
         n0 = length(ARGS) > 1 ? parse(Int, ARGS[2]) : nothing,
-        beta0 = length(ARGS) > 2 ? parserat(ARGS[3]) : nothing,
+        beta0 = length(ARGS) > 2 ? parse_rational(ARGS[3]) : nothing,
         output_path = get(ENV, "SPIN1_DIMERIZED_REPLAY_PATH", nothing))
 end

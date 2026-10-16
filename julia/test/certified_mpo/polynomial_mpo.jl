@@ -9,13 +9,11 @@ const F = MA.F
 const WEIGHTS = MA.WEIGHTS
 
 # The spin-2 constructions stay in spin2 (`Spin2PolynomialMPO`). These test-local copies,
-# verbatim apart from calling `MA.`, exercise the generic MPO algebra on the same operators.
+# verbatim apart from calling `MA.` and the core `integer_ladders`, exercise the generic MPO
+# algebra on the same operators.
 function local_spins()
-    plus, minus = zeros(F, 5, 5), zeros(F, 5, 5)
-    for k in 0:3
-        plus[k+2, k+1] = 4-k
-        minus[k+1, k+2] = k+1
-    end
+    plus, minus = F.(CertifiedGaps.Spins.integer_ladders(2)[1]),
+        F.(CertifiedGaps.Spins.integer_ladders(2)[2])
     return (; identity = Matrix{F}(I, 5, 5), z = Matrix(Diagonal(F.(-2:2))), plus, minus)
 end
 

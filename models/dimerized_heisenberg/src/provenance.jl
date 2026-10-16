@@ -1,9 +1,6 @@
-# Shared loaders and source-hash checks for the stored results.
-using SHA, Test
-
-"Read a JSON document as text; `.json.gz` files are decompressed with the system `gzip`."
-read_json_text(path) = endswith(path, ".gz") ? read(pipeline(`gzip -dc $path`), String) :
-    read(path, String)
+# Source-hash checks for the stored results (reading them is `CertifiedGaps.Results.read_result`).
+using Test
+using CertifiedGaps.Results: verify_source_hashes
 
 "Repository root (three levels above this src/ directory)."
 repository_root() = normpath(joinpath(@__DIR__, "..", "..", ".."))
@@ -22,8 +19,6 @@ function check_source_hashes(metadata)
     hashes = metadata[key("source_sha256")]
     @test !isempty(hashes)
     @test all(startswith(String(file), "models/dimerized_heisenberg/") for file in keys(hashes))
-    root = repository_root()
-    for (file, digest) in hashes
-        @test bytes2hex(sha256(read(joinpath(root, String(file))))) == String(digest)
-    end
+    @test verify_source_hashes(hashes, repository_root();
+        scope = "models/dimerized_heisenberg/") == length(hashes)
 end

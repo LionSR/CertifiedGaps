@@ -17,7 +17,7 @@ root=dirname(@__DIR__)
 original=joinpath(root,ORIGINAL_CERTIFICATE)
 output=joinpath(root,get(ARGS,1,"results/replay.json"))
 @assert !isfile(output) "Audit outputs are immutable: choose a new output filename"
-original_hash=bytes2hex(sha256(certificate_bytes(original)))
+original_hash=bytes2hex(sha256(read_result_bytes(original)))
 @assert original_hash==ORIGINAL_CERTIFICATE_SHA256
 base_commit=strip(read(`git -C $root rev-parse HEAD`,String))
 started=string(now(UTC)); t=time()
@@ -29,7 +29,7 @@ fresh=[full_spectrum(L,g;verified=true) for L in (n,2n)]
 result=certified_gap_bound(es,et,beta)
 @assert result.bound !== nothing
 # The old numerical values first enter here, exclusively for comparison.
-old=read_certificate(original)
+old=read_result(original)
 @assert parse(Int,old["n0"])==n && parse(Rational{BigInt},old["beta"])==beta
 @assert parse(Rational{BigInt},old["g"])==g
 comparisons=[]
@@ -64,7 +64,7 @@ if snapshot_available(root)
 else
     @warn "Historical snapshot $(HISTORICAL_SNAPSHOT) unavailable; provenance hashes unchecked"
 end
-@assert bytes2hex(sha256(certificate_bytes(original)))==original_hash
+@assert bytes2hex(sha256(read_result_bytes(original)))==original_hash
 agreement=(;all_eigenvalues_identical=all(c.eigenvalues_identical for c in comparisons),
     all_radii_identical=all(c.radius_identical for c in comparisons),
     all_residual_bounds_identical=all(c.residual_identical for c in comparisons),
