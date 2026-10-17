@@ -302,7 +302,7 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 
 | File | Role |
 |---|---|
-| `PurityCriterion.lean` | Abstract two-purity criterion: squaring inequality, thermal-spatial coupling, scale doubling, $\beta$-interpolation, and gap deduction for equal seed defects $\le 1/100$ |
+| `PurityCriterion.lean` | Abstract two-purity criterion: squaring inequality, thermal-spatial coupling, one exact doubling step for arbitrary defects, $\beta$-interpolation, the purity-to-gap bound, and their equal-defect case (seed defects $\le 1/100$) |
 | `Chain.lean` | Exact asymmetric doubling recurrence for unequal seed defects and `gapGT_of_chain` with bound `log r / β₀` |
 | `ChainCheck.lean` | Decidable rational `ChainCertificate` structure discharging the hypotheses of `gapGT_of_chain` |
 | `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`) and expansion of $\operatorname{Tr} T^N$ as a sum over closed label paths |
