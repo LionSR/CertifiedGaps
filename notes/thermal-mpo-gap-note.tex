@@ -83,17 +83,30 @@ uniformly in $L$. Squaring in imaginary time improves purity at fixed $L$
 $L$ and $\beta$ together requires a spatial transfer operator.
 
 \emph{Thermal MPO.---}
-For the classical Ising chain, $Z_n=\Tr K^n$ with a $2\times2$ transfer matrix
-$K$ stepping along the ring; here we construct a real symmetric operator
-$X_\beta$ on the virtual bond space with $Z_n(\beta)=\trv X_\beta^n$. In the Cartesian basis
+The model is the classical Ising ring with spins $s_j=\pm1$. Its Boltzmann
+weight $\prod_je^{\beta s_js_{j+1}}$ is a product of entries of the $2\times2$
+matrix $K_{ss'}=e^{\beta ss'}$, and each spin appears in exactly two
+neighboring factors. Summing a spin shared by two factors is a matrix product,
+$\sum_{s_2}K_{s_1s_2}K_{s_2s_3}=(K^2)_{s_1s_3}$, which is what a joined leg
+\tnchain[node=xvertex]{,} means; summing every spin multiplies $K$ around the
+ring, and the closure $s_{n+1}=s_1$ turns the last sum into a trace,
+$Z_n=\Tr K^n$. Here we construct a real symmetric operator $X_\beta$ on the
+virtual bond space that plays the role of $K$, with $Z_n(\beta)=\trv X_\beta^n$. In the Cartesian basis
 $s,s'\in\{x,y,z\}$, $(S^\alpha)_{ss'}=-i\epsilon_{\alpha ss'}$ gives real
-operators $G_\alpha=iS^\alpha$, $\|G_\alpha\|=1$, and
+operators $G_\alpha=iS^\alpha$ with entries $(G_\alpha)_{ss'}=\epsilon_{\alpha ss'}$:
+$G_\alpha v=v\times e_\alpha$ turns the plane perpendicular to $e_\alpha$ by a
+quarter turn and annihilates $e_\alpha$ (for example $G_z e_x=-e_y$ and
+$G_z^2=\operatorname{diag}(-1,-1,0)$), so $\|G_\alpha\|=1$. Because
+$G_\alpha\otimes G_\alpha=i^2S^\alpha\otimes S^\alpha$,
 $-H_L=\sum_{j,\alpha}G_{\alpha,j}G_{\alpha,j+1}$. Since the simplex
 $0<\tau_1<\cdots<\tau_k<\beta$ in imaginary time $\tau$ has volume
 $\beta^k/k!$, $e^{\beta A}=\sum_{k\ge0}\int_{0<\tau_1<\cdots<\tau_k<\beta}d\tau_1\cdots d\tau_k\,A^k$.
-For $A=-H_L$, each factor selects a bond and label $\alpha$, inserting
-$G_\alpha$ on both sites of that bond at time $\tau$. For bond events
-$(\tau,\alpha)$ in $a,b$ on the left and right bonds of a site, the local MPO
+For $A=-H_L$, each factor selects a bond and a label $\alpha$, inserting
+$G_\alpha$ on both sites of that bond at time $\tau$. We call such a factor an
+\emph{event} $(\tau,\alpha)$ on its bond, and the finite set of events on one
+bond its \emph{bond history}; each term of the expansion is a choice of
+history on every bond. For the histories $a$ and $b$ of the left and right
+bonds of a site, the local MPO
 tensor multiplies the matrices hitting its worldline in time order ($\mathcal T_\tau$ placing later times to the left):
 \begin{equation}
  \Wlegs=W_\beta^{ss'}(a,b)=
@@ -164,21 +177,39 @@ $\tau_1<\tau_2<\tau_3$, the site worldline and its physical trace
 \end{proofdiagram}
 Operators on different sites commute, so once the events on every bond are
 fixed, the time-ordered product over the ring splits into one worldline per
-site: the bond history plays the role of the Ising spin between two copies of
-$K$. Summing the three labels $\alpha\in\{x,y,z\}$ and integrating ordered
+site, whose physical trace is $X_\beta(a,b)=\sum_sW_\beta^{ss}(a,b)$. The bond
+history plays the role of the Ising spin, and $X_\beta$ the role of $K$.
+Summing the three labels $\alpha\in\{x,y,z\}$ and integrating ordered
 times defines a measure $\mu_\beta$ of mass $\sum_{k\ge0}(3\beta)^k/k!=e^{3\beta}$
-(unit mass on the empty history).
+(unit mass on the empty history). With $a_j$ the history of bond $(j,j+1)$ and
+$a_0=a_n$,
+\begin{equation}
+ Z_n(\beta)=\int\prod_{j=1}^nd\mu_\beta(a_j)\;\prod_{j=1}^nX_\beta(a_{j-1},a_j),
+ \label{eq:factor}
+\end{equation}
+and integrating each shared history $a_j$ is the matrix product of the Ising
+ring, now on $L^2(\mu_\beta)$.
 Contracting $n$ tensors around the ring recovers the convergent exponential
 series as an exact MPO on $L^2(\mu_\beta)$ without bond truncation~\cite{tang,pirvu}:
 \begin{equation}
  e^{-\beta H_n}=\tnchain[node=mpo,legs,ring]{W,W,\cdots,W,W}.
  \label{eq:mpo}
 \end{equation}
-Because $a$ and $b$ enter Eq.~\eqref{eq:local} through $a\cup b$ and each event
+The left leg $a$ is the row index of $X_\beta$ and the right leg $b$ its
+column index, so symmetry means that a site cannot tell its left bond from its
+right one. Because $a$ and $b$ enter Eq.~\eqref{eq:local} through $a\cup b$ and each event
 inserts the same real matrix $G_\alpha$ at both ends of its bond (\emph{bond
 reflection positivity}, $-\bm S_j\cdot\bm S_{j+1}=\sum_\alpha G_{\alpha,j}G_{\alpha,j+1}$),
-the spatial transfer kernel $X_\beta(a,b)=\sum_s W_\beta^{ss}(a,b)$ is real and
-symmetric ($X_\beta(a,b)=X_\beta(b,a)$). Since $\|G_\alpha\|=1$ on $\mathbb C^3$,
+the spatial transfer kernel $X_\beta$ is real and
+symmetric ($X_\beta(a,b)=X_\beta(b,a)$). The condition is not automatic: for a
+bond term $G_z\otimes P$ with $P=\operatorname{diag}(1,0,0)$, a site receives
+$P$ through its left bond and $G_z$ through its right one, so two events give
+$\Tr P^2=1$ from the left but $\Tr G_z^2=-2$ from the right. In general,
+regrouping the four legs of $-h$ by site (rows $s_js_j'$, columns
+$s_{j+1}s_{j+1}'$) turns $-h=\sum_\alpha G_\alpha\otimes G_\alpha$ into the
+$9\times9$ matrix $\sum_\alpha\operatorname{vec}G_\alpha\operatorname{vec}G_\alpha^{\mathsf T}$,
+a sum of squares; a positive semidefinite regrouped bond is the reflection
+positivity that the general criterion requires (Appendix~E). Since $\|G_\alpha\|=1$ on $\mathbb C^3$,
 $|X_\beta(a,b)|\le\Tr I=3$; with the finite mass $e^{6\beta}$ of
 $\mu_\beta\times\mu_\beta$, $X_\beta$ is self-adjoint and Hilbert--Schmidt on
 $L^2(\mu_\beta)$, giving a discrete real spectrum
@@ -195,8 +226,10 @@ $\lambda_0$:
 \emph{Spatial and thermal purities.---}
 The transfer operator gives space its own density operator. Cut the ring of
 Eq.~\eqref{eq:moment} at one bond,
-\tnchain[node=xvertex,ring]{,\cdots,}${}\mapsto{}$\tnchain[node=xvertex]{,\cdots,},
-and normalize both the transfer and Gibbs operators:
+\tnchain[node=xvertex,ring]{,\cdots,}${}\mapsto{}$\tnchain[node=xvertex]{,\cdots,}:
+what is left is $X_\beta^n$ with two open virtual legs. Cutting the torus
+instead along one time slice leaves $e^{-\beta H_n}$ with open physical legs,
+Eq.~\eqref{eq:mpo}. Normalizing both to unit trace gives
 \begin{equation}
  \sigma_n(\beta)=\frac{\tnchain[node=xvertex]{,,\cdots,,}}{Z_n(\beta)}=\frac{X_\beta^n}{Z_n(\beta)},\qquad
  \rho_n(\beta)=\frac{e^{-\beta H_n}}{Z_n(\beta)}.
@@ -211,16 +244,20 @@ $Z_n(\beta)$ as a spacetime torus \Zbox[.7]21{} of width $n$ and height $\beta$
 \begin{equation}
  \begin{aligned}
  \Ps(n,\beta)&=\trv\sigma_n^2=\tnchain[ring]{\sigma_n,\sigma_n}
-   =\frac{Z_{2n}(\beta)}{Z_n(\beta)^2}=\frac{\Zt41}{\Ztsq21},\\[2pt]
+   =\frac{\trv X_\beta^{2n}}{Z_n(\beta)^2}\\
+ &=\frac{Z_{2n}(\beta)}{Z_n(\beta)^2}=\frac{\Zt41}{\Ztsq21},\\[2pt]
  \Pt(n,\beta)&=\Tr\rho_n^2\;=\tncolumn[ring]{\rho_n,\rho_n}
-   =\frac{Z_n(2\beta)}{Z_n(\beta)^2}=\frac{\Zt22}{\Ztsq21}.
+   =\frac{\Tr e^{-2\beta H_n}}{Z_n(\beta)^2}\\
+ &=\frac{Z_n(2\beta)}{Z_n(\beta)^2}=\frac{\Zt22}{\Ztsq21}.
  \end{aligned}
  \label{eq:purities}
 \end{equation}
 
 \emph{Squaring.---}
 Squaring improves a purity: squaring $\sigma_n$ doubles the length; squaring
-$\rho_n$ doubles the inverse temperature:
+$\rho_n$ doubles the inverse temperature. Indeed
+$\sigma_n^2=X_\beta^{2n}/Z_n^2=(Z_{2n}/Z_n^2)\,\sigma_{2n}$, and likewise for
+$\rho_n^2$:
 \begin{equation}
  \tnchain{\sigma_n,\sigma_n}=\Ps(n,\beta)\,\tnchain{\sigma_{2n}},\quad
  \tncolumn{\rho_n,\rho_n}=\Pt(n,\beta)\,\tncolumn[item={minimum height=1.6em}]{\rho_n(2\beta)}.
@@ -242,7 +279,7 @@ diagonal, \fcurve{} for $0\le z\le.3$.
 
 \emph{Spacetime coupling identities.---}
 Each squaring doubles one side of the torus: space ($n\to 2n$), \Zt21${}\mapsto{}$\Zt41, or imaginary time ($\beta\to 2\beta$), \Zt21${}\mapsto{}$\Zt22. Because a uniform gap needs both sides to grow together, we need identities trading purity in one direction for purity in the other.
-Contracting four copies of $Z_n(\beta)$ in either spatial or temporal order yields the composite torus $Z_{2n}(2\beta)$ (red arrows join copies in space, blue in time, labeled by the purity factor they multiply by):
+Each gluing multiplies by exactly one purity, because each purity is a ratio of tori [Eq.~\eqref{eq:purities}]: $Z_{2n}(\beta)=\Ps(n,\beta)\,Z_n(\beta)^2$ and $Z_n(2\beta)=\Pt(n,\beta)\,Z_n(\beta)^2$. Starting from four tori $Z_n(\beta)^4$, gluing pairs first in space and then in time, or first in time and then in space, reaches the same doubled torus $Z_{2n}(2\beta)$ (red arrows glue in space, blue in time, labeled by the purity factor they multiply by):
 \begin{proofdiagram}
 \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
  % One n x beta torus = 2 x 1 cells; gaps close as copies are joined.
@@ -347,9 +384,20 @@ $1/100$. Proposition~5.5 of Ref.~\cite{source} gives the $j=0$ starting estimate
  \Ps(2304,784),\ \Pt(4608,784)\ge0.99.
  \label{eq:input}
 \end{equation}
-In Ref.~\cite{source}, shifting $H_L\to H_L+\kappa L I$ ($\kappa=700741/500000$)
-normalizes $\lambda_0>1$; the factor $e^{-\kappa\beta L}$ in $Z_L(\beta)$
-cancels from both purity ratios~\eqref{eq:purities}.
+Equation~\eqref{eq:input} cannot come from diagonalizing $X_\beta$, which acts
+on whole bond histories; Ref.~\cite{source} uses only traces of small rings and
+one variational bound. It shifts $H_L\to H_L+\kappa L I$, with
+$\kappa=700741/500000$ chosen so that $-\kappa$ lies just above the energy per
+site of a matrix-product trial state $\psi$ on $N=72$ sites; the factor
+$e^{-\kappa\beta L}$ in $Z_L(\beta)$ cancels from both purity
+ratios~\eqref{eq:purities}. Since $Z_N(\beta)$ is a sum of positive Boltzmann
+factors and the variational principle gives
+$E_0(N)\le\langle\psi|H_N|\psi\rangle/\langle\psi|\psi\rangle<-\kappa N$, the
+ground-state factor alone gives $Z_N(\beta)>1$. Combined with eigenvalue bounds
+from the traces $Z_n=\sum_i|\lambda_i|^n$ of rings of at most twelve sites,
+this forces a dominant $\lambda_0$; Appendices~I--M of the companion
+certificate note draw these networks and six doublings from $(36,49/4)$ to
+Eq.~\eqref{eq:input}.
 After $j\ge0$ doublings, set
 \begin{equation}
  n_j=2304\,2^j,\qquad \beta_j=784\,2^j,\qquad
