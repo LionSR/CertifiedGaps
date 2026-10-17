@@ -84,7 +84,7 @@ The spacetime bootstrap establishes a uniform spectral gap from bond reflection 
 \section{Prerequisites of the Spacetime Bootstrap}\label{app:uses}
 To see which Hamiltonians admit the spacetime-bootstrap proof of Ref.~\cite{main}, we isolate the three operations its scale-doubling iteration uses:
 \begin{itemize}
-\item \emph{Coupling identities.} Torus partition-function identities such as $\Zt42/\Ztsq[4]21$, which hold universally for every translation-invariant lattice Hamiltonian.
+\item \emph{Coupling identities.} Identities between torus partition-function ratios such as $\Zt42/\Ztsq[4]21$, which hold universally for every translation-invariant lattice Hamiltonian.
 \item \emph{Temporal squaring.} The relation $\tncolumn{\rho_n,\rho_n}\propto\rho_n(2\beta)$ requires only positivity of the Gibbs operator, $e^{-\beta H}=e^{-\beta H/2}(e^{-\beta H/2})^\dagger\ge0$, which holds generally by Euclidean time reflection.
 \item \emph{Spatial squaring.} The dual relation $\tnchain{\sigma_n,\sigma_n}\propto\sigma_{2n}$ requires positivity of the spatial transfer operator, $\sigma_n=X_\beta^n/Z_n\ge0$. This holds whenever $X_\beta$ is self-adjoint ($X_\beta=X_\beta^\dagger$), which additionally guarantees that $Z_n=\sum_i\lambda_i^n$ with real eigenvalues $\lambda_i$, permitting power-sum interpolation to non-dyadic intermediate lengths.
 \end{itemize}
@@ -681,10 +681,10 @@ the lower bound on the numerator $Z_2$ ($Z_{12}(\beta_0)$ or $Z_{12}(2\beta_0)$)
 $A^2e^{-x}$. Then $Z_2/Z_1^2\ge(1-x)/(1+t)^2$, and the right side is checked
 against both seed bounds in exact rational arithmetic.
 \end{enumerate}
-The arithmetic uses bit-packed integer vectors (splitting $L=12$ into $64$
-chunks of $64$ configurations) identified with the Lean Hamiltonian
-(\path{Ising/Bridge.lean}, \path{Ising/Hamiltonian.lean}), without
-\texttt{native\_decide}. This point is the cheapest seed in
+The arithmetic uses bit-packed integer vectors, splitting the $L=12$ sums into
+$64$ chunks of $64$ configurations. The checker's integer sums are identified
+with the Lean Hamiltonian (\path{Ising/Bridge.lean},
+\path{Ising/Hamiltonian.lean}), without \texttt{native\_decide}. This point is the cheapest seed in
 Table~\ref{tab:certified} because only two states lie below $\rho$, whereas the
 other seven model families require resolving $195\text{--}2465$ low-lying
 states (\path{models/lean_seeds/}). The remaining $29$ points of row~9 keep

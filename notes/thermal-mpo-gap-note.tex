@@ -46,8 +46,7 @@ boundary conditions $\bm S_{L+1}=\bm S_1$ and $J=k_B=1$:
  Z_L(\beta)=\Tr e^{-\beta H_L}.
  \label{eq:model}
 \end{equation}
-We take even $L\ge4$ so the ring is bipartite and the transfer trace is an
-even power. Let $E_0(L)\le E_1(L)\le\cdots$ include multiplicities, with gap
+We take even $L\ge4$ so the transfer trace is an even power. Let $E_0(L)\le E_1(L)\le\cdots$ include multiplicities, with gap
 $\Delta_L=E_1(L)-E_0(L)$ (\levels) and Gibbs weights
 $w_m=e^{-\beta E_m(L)}/Z_L(\beta)$:
 \begin{equation}
@@ -83,13 +82,13 @@ uniformly in $L$. Squaring in imaginary time improves purity at fixed $L$
 $L$ and $\beta$ together requires a spatial transfer operator.
 
 \emph{Thermal MPO.---}
-The model is the classical Ising ring with spins $s_j=\pm1$. Its Boltzmann
-weight $\prod_je^{\beta s_js_{j+1}}$ is a product of entries of the $2\times2$
-matrix $K_{ss'}=e^{\beta ss'}$, and each spin appears in exactly two
+As a warm-up, consider the classical Ising ring with spins $t_j=\pm1$. Its
+Boltzmann weight $\prod_je^{\beta t_jt_{j+1}}$ is a product of entries of the
+$2\times2$ matrix $K_{tt'}=e^{\beta tt'}$, and each spin appears in exactly two
 neighboring factors. Summing a spin shared by two factors is a matrix product,
-$\sum_{s_2}K_{s_1s_2}K_{s_2s_3}=(K^2)_{s_1s_3}$, which is what a joined leg
+$\sum_{t_2}K_{t_1t_2}K_{t_2t_3}=(K^2)_{t_1t_3}$, which is what a joined leg
 \tnchain[node=xvertex]{,} means; summing every spin multiplies $K$ around the
-ring, and the closure $s_{n+1}=s_1$ turns the last sum into a trace,
+ring, and the closure $t_{n+1}=t_1$ turns the last sum into a trace,
 $Z_n=\Tr K^n$. Here we construct a real symmetric operator $X_\beta$ on the
 virtual bond space that plays the role of $K$, with $Z_n(\beta)=\trv X_\beta^n$. In the Cartesian basis
 $s,s'\in\{x,y,z\}$, $(S^\alpha)_{ss'}=-i\epsilon_{\alpha ss'}$ gives real
@@ -202,14 +201,16 @@ inserts the same real matrix $G_\alpha$ at both ends of its bond (\emph{bond
 reflection positivity}, $-\bm S_j\cdot\bm S_{j+1}=\sum_\alpha G_{\alpha,j}G_{\alpha,j+1}$),
 the spatial transfer kernel $X_\beta$ is real and
 symmetric ($X_\beta(a,b)=X_\beta(b,a)$). The condition is not automatic: for a
-bond term $G_z\otimes P$ with $P=\operatorname{diag}(1,0,0)$, a site receives
-$P$ through its left bond and $G_z$ through its right one, so two events give
-$\Tr P^2=1$ from the left but $\Tr G_z^2=-2$ from the right. In general,
+bond term $-h=Q\otimes P$ with $Q=\operatorname{diag}(1,1,0)$ and
+$P=\operatorname{diag}(1,0,0)$, a site receives $P$ through its left bond and
+$Q$ through its right one, so a history $a$ of two events, with the empty history
+$\emptyset$ on the other bond, gives $X_\beta(a,\emptyset)=\Tr P^2=1$ from the left but
+$X_\beta(\emptyset,a)=\Tr Q^2=2$ from the right. In general,
 regrouping the four legs of $-h$ by site (rows $s_js_j'$, columns
 $s_{j+1}s_{j+1}'$) turns $-h=\sum_\alpha G_\alpha\otimes G_\alpha$ into the
 $9\times9$ matrix $\sum_\alpha\operatorname{vec}G_\alpha\operatorname{vec}G_\alpha^{\mathsf T}$,
 a sum of squares; a positive semidefinite regrouped bond is the reflection
-positivity that the general criterion requires (Appendix~E). Since $\|G_\alpha\|=1$ on $\mathbb C^3$,
+positivity that the general criterion requires~\cite{scope}. Since $\|G_\alpha\|=1$ on $\mathbb C^3$,
 $|X_\beta(a,b)|\le\Tr I=3$; with the finite mass $e^{6\beta}$ of
 $\mu_\beta\times\mu_\beta$, $X_\beta$ is self-adjoint and Hilbert--Schmidt on
 $L^2(\mu_\beta)$, giving a discrete real spectrum
@@ -394,8 +395,9 @@ ratios~\eqref{eq:purities}. Since $Z_N(\beta)$ is a sum of positive Boltzmann
 factors and the variational principle gives
 $E_0(N)\le\langle\psi|H_N|\psi\rangle/\langle\psi|\psi\rangle<-\kappa N$, the
 ground-state factor alone gives $Z_N(\beta)>1$. Combined with eigenvalue bounds
-from the traces $Z_n=\sum_i|\lambda_i|^n$ of rings of at most twelve sites,
-this forces a dominant $\lambda_0$; Appendices~I--M of the companion
+from the twisted traces $\trv(X_\beta^nU_g)$ of rings of at most twelve
+sites, with a spin rotation $U_g$ of the histories on one virtual bond, this
+forces a dominant $\lambda_0$; Appendices~I--M of the companion
 certificate note draw these networks and six doublings from $(36,49/4)$ to
 Eq.~\eqref{eq:input}.
 After $j\ge0$ doublings, set
@@ -460,7 +462,7 @@ The scale-doubling recurrence and the gap deduction are formally verified in Lea
 
 
 \section*{Discussion: Representation in Machine-Assisted Proofs}
-The uniform spectral gap theorems for the periodic and boundary-field spin-1 Heisenberg chains, together with the certified starting estimates, come from the machine-assisted proofs of OpenAI~\cite{source,boundary}. Those thirty-page proofs locate eigenvalues and connect scales through explicit coordinate constructions, such as degree-12 polynomial spectral filters and dihedral character projectors, alongside lemmas unused in the final inequality: working by local symbolic rewriting in a fixed basis without the geometric pictures of many-body physics, long chains of deductions naturally build up intermediate algebra to stay sound.
+The uniform spectral gap theorems for the periodic and boundary-field spin-1 Heisenberg chains, together with the certified starting estimates, come from the machine-assisted proofs of OpenAI~\cite{source,boundary}. Those thirty-page proofs locate eigenvalues and connect scales through explicit coordinate constructions, such as degree-12 polynomial spectral filters and dihedral character projectors, alongside lemmas unused in the final inequality. Automated provers work by local symbolic rewriting in a fixed basis; without the geometric pictures of many-body physics, their long chains of deductions naturally build up intermediate algebra to stay sound.
 
 Here, the authors asked GPT-6 to re-examine the argument in terms of spacetime tensor networks and worked through the resulting structure interactively. Treating imaginary time and space alike on a torus reduces the self-adjoint spatial transfer operator and the contractive scale-doubling iteration to short identities between planar diagrams. Tensor-network diagrams are thus useful not only for calculation, but also for reading, simplifying, and extracting the physical mechanism of a machine-generated proof. The authors checked all mathematical and formal proofs.
 
@@ -482,6 +484,12 @@ B. Pirvu, V. Murg, J. I. Cirac, and F. Verstraete,
 \href{https://doi.org/10.1088/1367-2630/12/2/025012}
 {Matrix product operator representations},
 New J. Phys. \textbf{12}, 025012 (2010).
+\bibitem{scope}
+Companion note, \emph{Scope of the spacetime bootstrap}
+(\texttt{thermal-mpo-gap-scope.tex}, 2026), Appendix~E.
+\bibitem{kennedy}
+T. Kennedy, Exact diagonalisations of open spin-1 chains,
+J. Phys.: Condens. Matter \textbf{2}, 5737 (1990).
 \end{thebibliography}
 
 \clearpage
@@ -501,11 +509,12 @@ For every odd $n\ge1921$, the Hamiltonian~\eqref{eq:b-model} has a unique
 ground state and $\Delta_n>(\log10)/392\simeq0.005874$.
 \end{theorem}
 Boundary fields are essential here: without them, each end of the open spin-1
-chain carries an effective spin-$1/2$ boundary mode, leaving four nearly
-degenerate low-lying states; equal fields lift this boundary degeneracy on odd
-chains~\cite{boundary}. As on the ring, by Eqs.~\eqref{eq:target} and
-\eqref{eq:weight}, to prove Theorem~\ref{thm:b-gap} it suffices to bound the
-equal-field thermal purity $\Pt^{\same}(n,\beta)=\sum_mw_m^2$ above $1/2$:
+chain carries an effective spin-$1/2$ boundary mode, and the four lowest states
+are split only by an amount exponentially small in $n$~\cite{kennedy}; equal
+fields lift this boundary degeneracy on odd chains~\cite{boundary}. As on the
+ring, by Eqs.~\eqref{eq:target} and \eqref{eq:weight}, to prove
+Theorem~\ref{thm:b-gap} it suffices to bound the equal-field thermal purity
+$\Pt^{\same}(n,\beta)=\sum_mw_m^2$ from below:
 \begin{equation}
  e^{-\beta\Delta_n}=\frac{w_1}{w_0}
  \le\frac{1-\Pt^{\same}(n,\beta)}{\Pt^{\same}(n,\beta)}.
@@ -518,7 +527,8 @@ close: its partition function is not a trace of $X_\beta^n$, so there is no
 spatial purity to square. Its bulk, however, shares the periodic transfer
 operator $X_\beta$, and on an open chain the outer virtual legs of the first
 and last sites are closed by boundary vectors (the quantum counterpart of
-$u^{\mathsf T}K^{n-1}u$ for an open classical Ising chain in an endpoint field).
+$u^{\mathsf T}K^{n-1}u$ for an open classical Ising chain, with
+$u=(e^{\beta h},e^{-\beta h})$ for a field $h$ on each end spin).
 Whereas a periodic trace \tnchain[node=xvertex,ring]{,\cdots,} weights every
 eigenvector of $X_\beta$ by one, an open chain
 \tnchain[node=xvertex,caps]{,\cdots,} weights the leading eigenvalue
@@ -538,21 +548,21 @@ boundary defect $e$ that shrinks as the chain grows.
 The open chain uses the tensor $W_\beta$ of Eq.~\eqref{eq:local}, with the
 per-site energy shift $\kappa=700741/500000$ of Ref.~\cite{boundary} (called
 $a$ there) absorbed into each tensor as a factor $e^{-\kappa\beta}$, i.e.,
-$H_n^\nu\to H_n^\nu+\kappa nI$; this normalizes the leading periodic
-eigenvalue $\lambda_0(\beta_j)>1$ at the certified scales while
-canceling from every Gibbs state and purity ratio.
+$H_n^\nu\to H_n^\nu+\kappa nI$; this makes the leading periodic
+eigenvalue $\lambda_0(\beta_j)$ close to one at the certified scales and
+cancels from every Gibbs state and purity ratio.
 On an end site, the field $\pm hS^z=\mp(ih)G_z$ enters the imaginary-time
-expansion as half a bond: for a history $a$ of $k$ events, define the
+expansion as half a bond: for a history $a$ with $|a|$ events, define the
 boundary vector on $L^2(\mu_\beta)$ by
 \begin{equation}
  v_\beta(a)=
- \begin{cases}(ih)^k,&\text{all }k\text{ labels are }z,\\0,&\text{otherwise},
+ \begin{cases}(ih)^{|a|},&\text{all labels are }z,\\0,&\text{otherwise},
  \end{cases}
  \qquad \|v_\beta\|^2=e^{\beta h^2},
  \label{eq:b-vector}
 \end{equation}
-with value one on the empty history ($k=0$) and
-$\|v_\beta\|^2=\sum_{k\ge0}(\beta h^2)^k/k!$ from the $z$-event time integrals.
+with value one on the empty history ($|a|=0$); the $z$-event time integrals
+give $\|v_\beta\|^2$ as the sum of $(\beta h^2)^{|a|}/|a|!$ over $|a|\ge0$.
 The conjugated left cap $\bar v_\beta$ weights each $z$ event by
 $(-ih)G_z=+hS^z$, adding $-hS_1^z$ to the Hamiltonian, whereas the unbarred
 right cap $v_\beta$ weights each $z$ event by $(ih)G_z=-hS^z$ and adds
@@ -640,10 +650,10 @@ nonzero overlap with the leading eigenvector.
 \emph{Spatial remainder suppression.---}
 A longer chain shrinks the remainder while leaving the leading overlap $c_j$
 unchanged. For even $m\ge k$, moving $k/2$ factors of $R_j$ onto each boundary
-vector gives $u=R_j^{k/2}v_j$ and
+vector gives $y=R_j^{k/2}v_j$ and
 \begin{equation}
- D_m(j)=\tnchain[capl={\bar u},capr={u}]{R_j^{m-k}}
- \le\|R_j\|^{m-k}\underbrace{\|u\|^2}_{D_k(j)},
+ D_m(j)=\tnchain[capl={\bar y},capr={y}]{R_j^{m-k}}
+ \le\|R_j\|^{m-k}\underbrace{\|y\|^2}_{D_k(j)},
  \label{eq:b-residual}
 \end{equation}
 decaying geometrically by $\|R_j\|^{m-k}$ \decayglyph[black!50] and ensuring
@@ -658,6 +668,8 @@ in imaginary time couples temperatures:
  =\underbrace{\tnchain[node=mpo,legs=1.9em,caps,item={minimum height=1.3em}]{W_{2\beta},W_{2\beta},\cdots,W_{2\beta}}}_{e^{-2\beta H_m^{\opp}}}.
  \label{eq:b-stack-mpo}
 \end{equation}
+This identity holds between the operators; it does not assert that two
+$W_\beta$ tensors fuse into one $W_{2\beta}$ site by site.
 Normalizing the trace defines the opposite-field Gibbs state
 $\rho_m^{\opp}(\beta)=e^{-\beta H_m^{\opp}}/Y_m(\beta)$ and its thermal purity:
 \begin{equation}
@@ -773,13 +785,13 @@ Thus $Q_j(n):=Y_n^{\same}(\beta_j)/\lambda_j^n$ shares the leading value $c_j$.
 For any even $M\le n$, commuting $U_P$ through the right-hand tensors ($[U_P,R_j]=0$) isolates the remainder:
 \begin{align}
  Q_j(n)-c_j&=\tnchain[capl=\bar v_j,capr=v_j]{R_j^{M/2},R_j^{n-M}U_P,R_j^{M/2}}\notag\\
- &=\tnchain[capl={\bar u},capr={u}]{R_j^{n-M}U_P},\qquad
- u=R_j^{M/2}v_j.
+ &=\tnchain[capl={\bar y},capr={y}]{R_j^{n-M}U_P},\qquad
+ y=R_j^{M/2}v_j.
  \label{eq:b-signed}
 \end{align}
 Because $\|R_j^{n-M}U_P\|\le1$,
 \begin{equation}
- |Q_j(n)-c_j|\le\|u\|^2=D_M(j),
+ |Q_j(n)-c_j|\le\|y\|^2=D_M(j),
  \label{eq:b-odd-bound}
 \end{equation}
 bounding the odd-length remainder by $D_M(j)$ without requiring positivity of $R_j^n$.
@@ -807,11 +819,8 @@ the equal-field purity:
 \end{align}
 
 \begin{proof}[Proof of Theorem~\ref{thm:b-gap}]
-The intervals $[M_j,2M_j]$ cover every integer $n\ge M_5=1920$, and
-Eq.~\eqref{eq:b-final-purity} holds for all such $n$ (Theorem~\ref{thm:b-gap}
-states odd $n=2L+1\ge1921$ to match the site-centered reflection setting of
-Tasaki's index theorem in Ref.~\cite{boundary}). For any such $n$, choose
-$j\ge5$ with $M_j\le n\le2M_j$.
+The intervals $[M_j,2M_j]$ cover every integer $n\ge M_5=1920$.
+For odd $n\ge1921$, choose $j\ge5$ with $M_j\le n\le2M_j$.
 The largest Gibbs weight satisfies $w_0\ge\Pt^{\same}(n,\beta_j)\ge1-4x_j>1/2$:
 the spectrum looks like \specbars{.97,.02,.01}, so the ground state is unique.
 Equation~\eqref{eq:b-target} gives
