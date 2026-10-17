@@ -172,10 +172,12 @@ with no discretization error.</p></div><aside class="side"></aside></div>
     <h2><span class="n">6</span>Histories of a chain</h2>
     <div class="r"><div class="main prose"><p>The classical Ising ring has \(Z=\operatorname{Tr}T^L\): a 2×2 matrix passes one spin from site to site. The quantum chain works the same way after one change of what is passed along.
 Each bond term \(\mathbf S_j\cdot\mathbf S_{j+1}=-\sum_\alpha G_{\alpha,j}G_{\alpha,j+1}\) fires events at random imaginary times, and an event of type \(\alpha\) puts the real 3×3 matrix
-\(G_\alpha=iS^\alpha\) on both of its sites. The thing passed along the ring is the list of events on a bond. A site with events \(a\) on its left bond and \(b\) on its right
-contributes \(X(a,b)\): the trace of its \(G\)'s multiplied in time order. Examples: no events gives 3; one \(z\)-event on each side gives \(\operatorname{Tr}G_zG_z=-2\).</p></div><aside class="side"><p class="note">G<sub>α</sub> = iS<sup>α</sup> in the Cartesian basis |x⟩, |y⟩, |z⟩ are real antisymmetric 3 × 3 matrices.</p></aside></div>
+\(G_\alpha=iS^\alpha\) on both of its sites. The thing passed along the ring is the list of events on a bond. On a single site's world line from \(|s'\rangle\) at \(\tau=0\) to \(\langle s|\) at \(\tau=\beta\),
+events \(a\) from the left bond and \(b\) from the right bond multiply in time order (\(\mathcal T_\tau\) puts later times on the left) to form the local tensor \(W_\beta^{ss'}(a,b)\).
+Gluing \(\tau=\beta\) back to \(\tau=0\) (\(s=s'\)) traces that product into the transfer kernel \(X_\beta(a,b)\): no events gives \(\operatorname{Tr}I=3\); one \(z\)-event on each side gives \(\operatorname{Tr}G_zG_z=-2\).</p></div><aside class="side"><p class="note">G<sub>α</sub> = iS<sup>α</sup> in the Cartesian basis |x⟩, |y⟩, |z⟩ are real antisymmetric 3 × 3 matrices.</p></aside></div>
+    <div class="player" data-ch="ising"></div>
     <div class="player" data-ch="chain"></div>
-    <div class="r"><div class="main eqs">\[ X_\beta(a,b)=\operatorname{Tr}\Big[\mathcal T\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\Big],\qquad Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}\quad\big(\text{cf. }Z=\operatorname{Tr}T^L\big). \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main eqs">\[ W_\beta^{ss'}(a,b)=\Big\langle s\,\Big|\,\mathcal T_\tau\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\,\Big|\,s'\Big\rangle,\qquad X_\beta(a,b)=\sum_s W_\beta^{ss}(a,b)=\operatorname{Tr}\Big[\mathcal T_\tau\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\Big],\qquad Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}. \]</div><aside class="side"></aside></div>
     <div class="r"><div class="main"><details class="try"><summary>Try it: compute X(a, b) yourself</summary>
   <div class="tryin"><p class="small">Add events in time order. Each event puts \(G_x\), \(G_y\) or \(G_z\) on the site, from the left bond (a) or the right bond (b).
   X is the trace of the product, later events on the left.</p>
