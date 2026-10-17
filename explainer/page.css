@@ -80,6 +80,14 @@ th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1p
 .g { color: var(--ink); }
 .chip { display: inline-block; font-size: .85rem; padding: 0 6px; margin: 2px; border-bottom: 1px solid; }
 .chip.cl { color: var(--proved); } .chip.cr { color: var(--time); }
+/* word-sized inline graphics: a tall (red) bar against small (grey) bars, drawn in the text line */
+.glyph { display: inline-block; height: 1em; width: auto; vertical-align: -0.12em; overflow: visible; }
+.glyph .t { fill: var(--space); } .glyph .o { fill: var(--mute); } .glyph .b { fill: var(--time); }
+.glyph .base { stroke: var(--line); stroke-width: .6; } .glyph .cap { stroke: var(--mute); stroke-width: .7; stroke-dasharray: 1.4 1; fill: none; }
+/* the labeled claims a section must establish, stated before its proof */
+.claims { list-style: none; padding-left: 0; margin: .6em 0; }
+.claims li { margin: .35em 0 .35em 2.6em; text-indent: -2.6em; }
+.claims .lab { display: inline-block; width: 2.6em; text-indent: 0; font-style: normal; color: var(--space); }
 .part { padding-top: 72px; border-top: 1px solid var(--line); margin-top: 56px; }
 .parth { font-size: clamp(2rem, 4vw, 2.8rem); }
 .foot { color: var(--mute); font-size: .85rem; margin-top: 40px; max-width: 62%; }
