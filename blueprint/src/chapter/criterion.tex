@@ -1,16 +1,19 @@
 \chapter{The two-purity criterion}
 \label{chap:criterion}
 
-This chapter presents the abstract part of the argument, formalized in
-\texttt{CertifiedGaps/PurityCriterion.lean}. It applies to any family of finite spectra
-\(E_L \colon \iota_L \to \R\), \(L \in \N\), over finite nonempty index types, whose partition
+The doubling step from seed purities to a uniform spectral gap depends only on algebraic relations
+among partition functions, not on the microscopic Hilbert space of a spin chain. Formalized in
+\texttt{CertifiedGaps/PurityCriterion.lean}, the criterion applies to any family of finite spectra
+\(E_L \colon \iota_L \to \R\), \(L \in \N\), over finite nonempty index types whose partition
 functions satisfy the three spatial moment inequalities of Definition~\ref{def:moment-bounds}.
 
 \section{Partition functions, purities and gaps}
 
-We first define the partition function and the spatial and thermal purities of a spectral family,
-together with the order-free gap predicate \(\GapGT(e, c)\) that records ground-state uniqueness and
-a lower bound \(c\) on the spectral gap simultaneously.
+For each system size, the partition function sums the Boltzmann weights of the energy levels, and
+the spatial and thermal purities compare partition functions at doubled length or doubled inverse
+temperature. To state spectral gap bounds without sorting eigenvalues, the predicate
+\(\GapGT(e, c)\) asks for a single ground state separated from all other levels by more than
+\(c\).
 
 \begin{definition}[Partition function]
   \label{def:partition-function}
@@ -27,7 +30,7 @@ a lower bound \(c\) on the spectral gap simultaneously.
   \uses{def:partition-function}
   The thermal purity is \(\Pt(L, \beta) = Z_L(2\beta)/Z_L(\beta)^2\) and the spatial purity is
   \(\Ps(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2\). Their complements \(1 - \Pt\) and \(1 - \Ps\) are
-  the thermal and spatial \emph{purity defects}.
+  the \emph{thermal defect} and \emph{spatial defect}.
 \end{definition}
 
 \begin{definition}[Gap predicate]
@@ -48,8 +51,9 @@ a lower bound \(c\) on the spectral gap simultaneously.
 \end{lemma}
 \begin{proof}
   \leanok
-  If the distinguished index is \(m_0 = 0\), apply the defining inequality to \(m = 1\). Otherwise
-  apply it to \(m = 0\) and use \(e_0 \le e_{m_0}\) and \(e_0 \le e_1\); this case is impossible.
+  If the minimizing index is \(m_0 = 0\), evaluating the defining inequality at \(m = 1\) gives the
+  bound. Otherwise, evaluating it at \(m = 0\) and combining it with \(e_0 \le e_{m_0}\) and
+  \(e_0 \le e_1\) again gives the bound.
 \end{proof}
 
 \begin{lemma}[Elementary bounds]
@@ -63,17 +67,18 @@ a lower bound \(c\) on the spectral gap simultaneously.
 \end{lemma}
 \begin{proof}
   \leanok
-  Positivity holds because each term \(e^{-\beta E_L(m)}\) is positive and the index type is
-  nonempty. Since \(Z_L(2\beta) = \sum_m (e^{-\beta E_L(m)})^2\), the bound \(\Pt \le 1\) is the
-  inequality \(\sum p_m^2 \le (\sum p_m)^2\) for \(p_m \ge 0\).
+  Positivity holds because each Boltzmann weight \(e^{-\beta E_L(m)}\) is positive and the index
+  type is nonempty. Since \(Z_L(2\beta) = \sum_m (e^{-\beta E_L(m)})^2\), the bound \(\Pt \le 1\)
+  reduces to the inequality \(\sum p_m^2 \le (\sum p_m)^2\) for \(p_m \ge 0\).
 \end{proof}
 
 \section{The squaring lemma}
 
-Squaring a positive trace-one operator replaces its eigenvalues \(p_i\) with \(p_i^2/P\), which
-quadratically suppresses the purity defect \(1 - P\) via the rational map
-\(f(z) = z^2/[2(1-z)^2]\). To apply this bound to both finite Boltzmann sums and spatial partition
-functions, we formulate it in homogeneous power-sum form in terms of \(S_1, S_2, S_4\).
+When a positive operator with trace one and eigenvalues \(p_i\) is squared and renormalized, its
+eigenvalues become \(p_i^2/P\) and its purity defect \(1 - P\) is bounded after one step by the
+rational map \(f(z) = z^2/[2(1-z)^2]\). Stated in homogeneous form for the power sums
+\(S_1, S_2, S_4\), the same inequality applies to both finite Boltzmann sums and unnormalized
+spatial partition functions.
 
 \begin{lemma}[Power sums]
   \label{lem:power-sums}
@@ -86,10 +91,11 @@ functions, we formulate it in homogeneous power-sum form in terms of \(S_1, S_2,
 \end{lemma}
 \begin{proof}
   \leanok
-  For finite families, induct on the support: adding a term \(a \ge 0\) to a family with sum
-  \(s\) and \(T = s^2 - S_2 \ge 0\) changes both sides by amounts controlled by the nonnegative
-  products \(a s T\) and \(a^2 T\). The summable case follows by passing to the limit over finite
-  subsets, since both inequalities are closed.
+  For finite families, induct on the support. Adding a term \(a \ge 0\) to a family with sum \(s\)
+  and difference \(T = s^2 - S_2 \ge 0\) increases the right-hand side by at least as much as the
+  left-hand side, since their difference changes by nonnegative multiples of \(a s T\) and
+  \(a^2 T\). The summable case follows by taking the limit over finite subsets, because both
+  inequalities are closed.
 \end{proof}
 
 \begin{definition}[Squaring bound]
@@ -108,7 +114,8 @@ functions, we formulate it in homogeneous power-sum form in terms of \(S_1, S_2,
 \end{lemma}
 \begin{proof}
   \leanok
-  For \(0 \le z \le w < 1\), \(z (1 - w) \le w (1 - z)\); square both sides and divide.
+  For \(0 \le z \le w < 1\), expanding the products shows \(z (1 - w) \le w (1 - z)\); squaring
+  both sides and dividing by the positive denominators gives the bound.
 \end{proof}
 
 \begin{lemma}[Squaring, homogeneous form]
@@ -121,8 +128,9 @@ functions, we formulate it in homogeneous power-sum form in terms of \(S_1, S_2,
 \end{lemma}
 \begin{proof}
   \leanok
-  The left- and right-hand sides equal \((s_2^2 - s_4)/s_2^2\) and \((s_1^2 - s_2)^2 / (2 s_2^2)\),
-  respectively, after clearing denominators.
+  Rewriting the left- and right-hand sides as \((s_2^2 - s_4)/s_2^2\) and
+  \((s_1^2 - s_2)^2 / (2 s_2^2)\) reduces the claim to the assumed inequality divided by the
+  positive denominator.
 \end{proof}
 
 \begin{lemma}[Squaring]
@@ -136,8 +144,8 @@ functions, we formulate it in homogeneous power-sum form in terms of \(S_1, S_2,
 \begin{proof}
   \leanok
   The families \(p_i^2\) and \(p_i^4\) are summable because \(0 \le p_i \le 1\), and \(P > 0\)
-  because \(\sum p_i = 1\). Then \(P' = S_4 / S_2^2\), and Lemma~\ref{lem:power-sums} combined with
-  Lemma~\ref{lem:squaring-homogeneous} gives the claim.
+  follows from \(\sum p_i = 1\). Writing the new purity as \(P' = S_4 / S_2^2\) and applying
+  Lemma~\ref{lem:power-sums} together with Lemma~\ref{lem:squaring-homogeneous} gives the bound.
 \end{proof}
 
 \begin{lemma}
@@ -149,8 +157,9 @@ functions, we formulate it in homogeneous power-sum form in terms of \(S_1, S_2,
 \end{lemma}
 \begin{proof}
   \leanok
-  With \(u = (1 - \varepsilon)^3\), one has \(1 - 3\varepsilon \le u \le 1\), so
-  \((1 - u)^2 \le 9 \varepsilon^2\) and \(9 \le 10 u^2\).
+  Setting \(u = (1 - \varepsilon)^3\) gives \(1 - 3\varepsilon \le u \le 1\), which implies
+  \((1 - u)^2 \le 9 \varepsilon^2\) and \(9 \le 10 u^2\); combining the two bounds yields the
+  inequality.
 \end{proof}
 
 \begin{lemma}[Squaring step]
@@ -165,20 +174,20 @@ functions, we formulate it in homogeneous power-sum form in terms of \(S_1, S_2,
 \end{lemma}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:squaring-homogeneous} bounds the new defect by \(f(1 - s_2/s_1^2)\), which is at
-  most \(f(1 - (1-\varepsilon)^3)\) by Lemma~\ref{lem:f-mono}, and hence at most \(5\varepsilon^2\)
-  by Lemma~\ref{lem:f-numerical}.
+  By Lemma~\ref{lem:squaring-homogeneous}, the defect after squaring is at most
+  \(f(1 - s_2/s_1^2)\). Monotonicity makes this at most \(f(1 - (1-\varepsilon)^3)\) by
+  Lemma~\ref{lem:f-mono}, which is bounded by \(5\varepsilon^2\) by Lemma~\ref{lem:f-numerical}.
 \end{proof}
 
 \section{The spatial moment interface}
 
-The doubling argument uses the spatial transfer operator only through three inequalities among the
-partition functions \(Z_L(\beta)\) at a single inverse temperature: two power-sum inequalities for
-spatial squaring and one power-sum interpolation inequality for intermediate even lengths. Because
-each inequality involves only finitely many values \(Z_L(\beta)\), the interface is closed under
-pointwise limits (Lemma~\ref{lem:moment-bounds-limit}). This allows Chapter~\ref{chap:rings} to
-prove the inequalities for finite-dimensional Trotter transfer matrices and pass to the
-continuous-time limit without formalizing infinite-dimensional path-space operators.
+The doubling recurrence uses the spatial transfer operator only through three inequalities among
+the partition functions \(Z_L(\beta)\) at a fixed inverse temperature, namely two power-sum
+inequalities for spatial squaring and one power-sum monotonicity inequality to interpolate across
+intermediate even lengths. Because each inequality involves only finitely many values
+\(Z_L(\beta)\), the condition is preserved under pointwise limits
+(Lemma~\ref{lem:moment-bounds-limit}), which Chapter~\ref{chap:rings} uses to pass from finite
+Trotter approximations to the continuous-time partition function.
 
 \begin{definition}[Moment form]
   \label{def:moment-form}
@@ -186,7 +195,7 @@ continuous-time limit without formalizing infinite-dimensional path-space operat
   \leanok
   \uses{def:partition-function}
   A sequence \(Z \colon \N \to \R\) has the \emph{moment form} above \(n_0\) if there exist
-  \(\mu_i \ge 0\), \(i \in \N\), with \(Z(L) = \sum_i \mu_i^L\) (a convergent sum) for every even
+  \(\mu_i \ge 0\), \(i \in \N\), with convergent sum \(Z(L) = \sum_i \mu_i^L\) for every even
   \(L \ge n_0\). A spectral family has the spatial moment form if \(L \mapsto Z_L(\beta)\) has the
   moment form for every \(\beta > 0\).
 \end{definition}
@@ -214,8 +223,8 @@ continuous-time limit without formalizing infinite-dimensional path-space operat
 \end{lemma}
 \begin{proof}
   \leanok
-  Each term \(\mu_i^p\) is at most \(Z_p = \sum_i \mu_i^p\), so
-  \(\mu_i^q = (\mu_i^p)^{q/p} \le Z_p^{q/p - 1} \mu_i^p\); summing over \(i\) gives the bound.
+  Every term \(\mu_i^p\) is bounded by the total sum \(Z_p = \sum_i \mu_i^p\), so
+  \(\mu_i^q = (\mu_i^p)^{q/p} \le Z_p^{q/p - 1} \mu_i^p\). Summing over \(i\) gives the bound.
 \end{proof}
 
 \begin{proposition}
@@ -240,29 +249,34 @@ continuous-time limit without formalizing infinite-dimensional path-space operat
     CertifiedGaps.SpatialMomentBounds.of_tendsto_hasMomentForm}
   \leanok
   \uses{def:moment-bounds, prop:moment-form-bounds}
-  If eventually along a filter the sequences \(Z_a\) satisfy the spatial moment inequalities
-  above \(n_0 > 0\) (for instance because they have the moment form), and \(Z_a(L) \to Z(L)\) for
-  every even \(L \ge n_0\), then \(Z\) satisfies them too. Moreover, the inequalities above \(n_0\)
-  imply those above any \(n_1 \ge n_0\).
+  If the sequences \(Z_a\) eventually satisfy the spatial moment inequalities above \(n_0 > 0\)
+  along a filter (for instance because they have the moment form), and \(Z_a(L) \to Z(L)\) for
+  every even \(L \ge n_0\), then \(Z\) satisfies them as well. Moreover, the inequalities above
+  \(n_0\) imply those above any \(n_1 \ge n_0\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Each inequality is a non-strict inequality between continuous functions of finitely many values
-  \(Z(L)\), and is therefore closed under pointwise limits. The \(q/p\)-th power is continuous
-  because \(q/p \ge 0\).
+  Each of the three bounds is a non-strict inequality between continuous functions of finitely many
+  values \(Z(L)\), and is therefore preserved by pointwise limits. Continuity of the \(q/p\)-th
+  power holds because \(q/p \ge 0\).
 \end{proof}
 
 \begin{remark}
-  Lemma~\ref{lem:moment-bounds-limit} is what lets the formalization avoid an
-  infinite-dimensional transfer operator: finite Trotter transfer matrices have the moment form,
-  and the moment inequalities survive the continuous-time limit (Chapter~\ref{chap:rings}).
+  Closure under pointwise limits in Lemma~\ref{lem:moment-bounds-limit} avoids formalizing an
+  infinite-dimensional path-space transfer operator, since the limit of the Trotter approximations
+  of
+  \(Z_L(\beta)\) in Chapter~\ref{chap:rings} is taken directly inside the three real-valued
+  inequalities.
 \end{remark}
 
 \section{Coupling, squaring and the purity-to-gap bound}
 
-We now specialize the squaring bound to thermal and spatial purities, state the two algebraic
-spacetime coupling identities that trade purity between space and imaginary time, and prove the
-purity-to-gap inequality \(e^{-\beta(E_L(m) - E_L(m_0))} \le (1 - \Pt(L, \beta))/\Pt(L, \beta)\).
+Applying the homogeneous squaring lemma to the Boltzmann weights and to the spatial moment
+inequalities bounds the thermal purity at doubled inverse temperature and the spatial purity at
+doubled length. To advance length and inverse temperature together, two algebraic coupling
+identities relate the purities across doubled scales, and the ratio bound
+\(e^{-\beta(E_L(m) - E_L(m_0))} \le (1 - \Pt(L, \beta))/\Pt(L, \beta)\) converts a thermal purity
+near one into a lower bound on the spectral gap.
 
 \begin{lemma}[Squaring the Gibbs and spatial spectra]
   \label{lem:purity-squaring}
@@ -279,7 +293,7 @@ purity-to-gap inequality \(e^{-\beta(E_L(m) - E_L(m_0))} \le (1 - \Pt(L, \beta))
   \leanok
   For the thermal purity, apply Lemma~\ref{lem:squaring-step} to the Boltzmann weights
   \(e^{-\beta E_L(m)}\), whose power sums are \(Z_L(\beta), Z_L(2\beta), Z_L(4\beta)\). For the
-  spatial purity, the required power-sum inequalities are inequalities (1) and (2) of
+  spatial purity, apply the same lemma using inequalities (1) and (2) of
   Definition~\ref{def:moment-bounds}.
 \end{proof}
 
@@ -296,8 +310,10 @@ purity-to-gap inequality \(e^{-\beta(E_L(m) - E_L(m_0))} \le (1 - \Pt(L, \beta))
 \end{lemma}
 \begin{proof}
   \leanok
-  Both equations are identities between ratios of the four positive numbers \(Z_n(\beta),
-  Z_n(2\beta), Z_{2n}(\beta), Z_{2n}(2\beta)\), and respectively \(Z_{2n}(\beta), Z_{2n}(2\beta),
+  Expanding each purity by its definition expresses both sides of the first equation in terms of
+  the four positive numbers \(Z_n(\beta),
+  Z_n(2\beta), Z_{2n}(\beta), Z_{2n}(2\beta)\), and both sides of the second in terms of
+  \(Z_{2n}(\beta), Z_{2n}(2\beta),
   Z_{4n}(\beta), Z_{4n}(2\beta)\).
 \end{proof}
 
@@ -313,10 +329,11 @@ purity-to-gap inequality \(e^{-\beta(E_L(m) - E_L(m_0))} \le (1 - \Pt(L, \beta))
 \end{lemma}
 \begin{proof}
   \leanok
-  Write \(a_k = e^{-\beta E_L(k)}\), \(Z = \sum a_k\), and \(S = \sum a_k^2\). Since \(a_{m_0}\) is
-  the largest weight, \(S \le a_{m_0} Z\); since \(m \ne m_0\), \(a_m + a_{m_0} \le Z\). Hence
-  \(a_m S \le (Z - a_{m_0}) S \le Z^2 a_{m_0} - S a_{m_0}\), which gives the claim after dividing
-  by \(a_{m_0} S\).
+  Write \(a_k = e^{-\beta E_L(k)}\), \(Z = \sum a_k\), and \(S = \sum a_k^2\). Because \(a_{m_0}\)
+  is the largest Boltzmann weight, \(S \le a_{m_0} Z\), and because \(m \ne m_0\), the two terms
+  satisfy \(a_m + a_{m_0} \le Z\). Multiplying gives
+  \(a_m S \le (Z - a_{m_0}) S \le Z^2 a_{m_0} - S a_{m_0}\), and dividing by \(a_{m_0} S\) yields
+  the inequality.
 \end{proof}
 
 \section{Doubling and the uniform gap}
@@ -339,12 +356,12 @@ uniform gap for all even \(L \ge n_0\).
 \end{lemma}
 \begin{proof}
   \leanok
-  By the first coupling identity and \(\Pt(n, \beta) \le 1\),
-  \(\Ps(n, 2\beta) \ge (1-\varepsilon)^2 (1-\varepsilon)\); squaring the spatial spectrum
-  (Lemma~\ref{lem:purity-squaring}) gives \(\Ps(2n, 2\beta) \ge 1 - 5\varepsilon^2\). By the
-  second coupling identity and \(\Ps(2n, \beta) \le 1\),
-  \(\Pt(4n, \beta) \ge (1-\varepsilon)^2 \Ps(2n, 2\beta) \ge (1-\varepsilon)^3\), using
-  \(5\varepsilon^2 \le \varepsilon\); squaring the Gibbs spectrum gives
+  Combining the first coupling identity with \(\Pt(n, \beta) \le 1\) gives
+  \(\Ps(n, 2\beta) \ge (1-\varepsilon)^2 (1-\varepsilon)\), and spatial squaring
+  (Lemma~\ref{lem:purity-squaring}) yields \(\Ps(2n, 2\beta) \ge 1 - 5\varepsilon^2\). Combining
+  the second coupling identity with \(\Ps(2n, \beta) \le 1\) gives
+  \(\Pt(4n, \beta) \ge (1-\varepsilon)^2 \Ps(2n, 2\beta) \ge (1-\varepsilon)^3\) since
+  \(5\varepsilon^2 \le \varepsilon\), and thermal squaring yields
   \(\Pt(4n, 2\beta) \ge 1 - 5\varepsilon^2\).
 \end{proof}
 
@@ -399,9 +416,9 @@ uniform gap for all even \(L \ge n_0\).
 \end{theorem}
 \begin{proof}
   \leanok
-  Choose the dyadic window \(n_j \le L \le 2n_j\) (Lemma~\ref{lem:dyadic-window}) and set
-  \(\beta = \beta_j\), \(\varepsilon = \varepsilon_j\). \emph{Interpolation:} with
-  \(r = L/(2n_j) \in (0, 1]\), inequality (3) of Definition~\ref{def:moment-bounds} at \(\beta\)
+  Choose the dyadic window \(n_j \le L \le 2n_j\) from Lemma~\ref{lem:dyadic-window} and set
+  \(\beta = \beta_j\) and \(\varepsilon = \varepsilon_j\). To interpolate across the window, let
+  \(r = L/(2n_j) \in (0, 1]\); inequality (3) of Definition~\ref{def:moment-bounds} at \(\beta\)
   and at \(2\beta\) gives \(Z_L(\beta)^2 \le Z_{n_j}(\beta)^{4r}\) and
   \(Z_{2n_j}(2\beta)^r \le Z_L(2\beta)\), so
   \[
@@ -409,8 +426,8 @@ uniform gap for all even \(L \ge n_0\).
     x = \frac{Z_{2n_j}(2\beta)}{Z_{n_j}(\beta)^4} = \Pt(2n_j, \beta)\, \Ps(n_j, \beta)^2
       \in \bigl[(1-\varepsilon)^3, 1\bigr],
   \]
-  hence \(\Pt(L, \beta) \ge 1 - 3\varepsilon\) by Lemma~\ref{lem:induction-on-scale}.
-  \emph{Gap:} Lemma~\ref{lem:purity-to-gap} at the minimizer \(m_0\) bounds
+  and hence \(\Pt(L, \beta) \ge 1 - 3\varepsilon\) by Lemma~\ref{lem:induction-on-scale}.
+  Applying Lemma~\ref{lem:purity-to-gap} at a ground state \(m_0\) then bounds
   \(e^{-\beta (E_L(m) - E_L(m_0))}\) by \((1 - \Pt)/\Pt < (5\varepsilon_0)^{2^j}\). Taking
   logarithms and dividing by \(\beta = 2^j \beta_0\) gives
   \(E_L(m) - E_L(m_0) > \log(1/(5\varepsilon_0)) / \beta_0\).

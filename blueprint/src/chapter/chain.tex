@@ -1,29 +1,32 @@
 \chapter{Unequal seed defects and rational chain certificates}
 \label{chap:chain}
 
-Theorem~\ref{thm:gap-of-seeds} requires both starting defects to be at most \(1/100\). Certified
-seeds on small rings are usually larger and unequal, for example \((\es, \et) \approx (0.064,
-0.041)\), and reach the \(\le 1/100\) regime only after a few doubling steps. This chapter (Lean
-files \texttt{CertifiedGaps/Chain.lean} and \texttt{CertifiedGaps/ChainCheck.lean}) runs the exact
-asymmetric doubling recurrence for finitely many steps and then hands the tail over to
-Theorem~\ref{thm:gap-of-seeds}. All step conditions reduce to rational inequalities checked inside
-the Lean kernel.
+Theorem~\ref{thm:gap-of-seeds} requires both seed defects to be at most \(1/100\). On small rings,
+certified seed defects are typically larger and unequal, such as \((\es, \et) \approx (0.064,
+0.041)\), and enter the \(\le 1/100\) regime only after several doubling steps. To cover these
+seeds, the Lean files \texttt{CertifiedGaps/Chain.lean} and \texttt{CertifiedGaps/ChainCheck.lean}
+iterate the exact asymmetric doubling recurrence for finitely many steps until both defects are
+small enough for Theorem~\ref{thm:gap-of-seeds} to apply at all larger scales. Because the
+recurrence maps are rational functions, every step condition reduces to a rational inequality
+verified inside the Lean kernel.
 
 \section{One step of the exact recurrence}
 
-Rather than bounding both defects by a single common \(\varepsilon\), we track separate upper
-bounds \(s\) and \(t\) on \(1 - \Ps(n, \beta)\) and \(1 - \Pt(2n, \beta)\) through the exact
-coupling defect \(z(a, b) = 1 - (1 - b)(1 - a)^2\) and the squaring map \(f(z)\). Because the
-thermal half of the step (Lemma~\ref{lem:doubling-step}) uses the already-squared spatial defect
-\(s' \ge f(z(s, t))\) in place of \(s\), this asymmetric step tolerates substantially
-larger initial defects.
+Rather than bounding both defects by a single common value \(\varepsilon\), the exact recurrence
+tracks separate upper bounds \(s\) and \(t\) on the spatial defect \(1 - \Ps(n, \beta)\) and the
+thermal defect \(1 - \Pt(2n, \beta)\) through the coupling map \(z(a, b) = 1 - (1 - b)(1 - a)^2\)
+and the squaring map \(f(z)\). Because the thermal half of the step (Lemma~\ref{lem:doubling-step})
+uses the reduced spatial defect \(s' \ge f(z(s, t))\) obtained from spatial squaring rather than
+the initial defect \(s\), this asymmetric recurrence tolerates substantially larger initial
+defects.
 
 \begin{definition}[Coupling defect]
   \label{def:coupling-defect}
   \lean{CertifiedGaps.couplingDefect}
   \leanok
-  For defects \(a, b \in \R\), define \(z(a, b) = 1 - (1 - b)(1 - a)^2\). If \(\Ps \ge 1 - a\) and
-  \(\Pt \ge 1 - b\), the coupled purity of Lemma~\ref{lem:coupling} is at least \(1 - z(a, b)\).
+  For defects \(a, b \in \R\), define \(z(a, b) = 1 - (1 - b)(1 - a)^2\). Whenever \(\Ps \ge 1 - a\)
+  and \(\Pt \ge 1 - b\), the coupled purity in Lemma~\ref{lem:coupling} is at least
+  \(1 - z(a, b)\).
 \end{definition}
 
 \begin{lemma}
@@ -35,7 +38,7 @@ larger initial defects.
 \end{lemma}
 \begin{proof}
   \leanok
-  The same minimizer witnesses \(\GapGT(e, c')\).
+  The same minimizing index witnesses \(\GapGT(e, c')\).
 \end{proof}
 
 \begin{lemma}[Defect form of squaring]
@@ -51,9 +54,9 @@ larger initial defects.
 \end{lemma}
 \begin{proof}
   \leanok
-  Apply Lemma~\ref{lem:squaring-homogeneous} to the Boltzmann weights, and respectively to
-  inequality (2) of Definition~\ref{def:moment-bounds}; the final claim follows from
-  Lemma~\ref{lem:f-mono}.
+  Apply Lemma~\ref{lem:squaring-homogeneous} to the Boltzmann weights for the thermal purity and to
+  inequality (2) of Definition~\ref{def:moment-bounds} for the spatial purity; the final inequality
+  follows from the monotonicity of the squaring map in Lemma~\ref{lem:f-mono}.
 \end{proof}
 
 \begin{lemma}[Doubling step]
@@ -70,11 +73,11 @@ larger initial defects.
 \end{lemma}
 \begin{proof}
   \leanok
-  As in Lemma~\ref{lem:doubling}, the first coupling identity and \(\Pt(n,\beta) \le 1\) give
-  \(\Ps(n, 2\beta) \ge 1 - z(s, t)\), and squaring the spatial spectrum gives the bound on
-  \(\Ps(2n, 2\beta)\). The second coupling identity and \(\Ps(2n, \beta) \le 1\) give
-  \(\Pt(4n, \beta) \ge 1 - z(t, s')\), and squaring the Gibbs spectrum gives the bound on
-  \(\Pt(4n, 2\beta)\).
+  As in the proof of Lemma~\ref{lem:doubling}, the first coupling identity and
+  \(\Pt(n,\beta) \le 1\) give \(\Ps(n, 2\beta) \ge 1 - z(s, t)\), and squaring the spatial purity
+  bounds \(\Ps(2n, 2\beta)\). Substituting that new spatial bound into the second coupling identity
+  along with \(\Ps(2n, \beta) \le 1\) gives \(\Pt(4n, \beta) \ge 1 - z(t, s')\), and squaring the
+  thermal purity bounds \(\Pt(4n, 2\beta)\).
 \end{proof}
 
 \begin{lemma}[Interpolation]
@@ -88,7 +91,7 @@ larger initial defects.
 \end{lemma}
 \begin{proof}
   \leanok
-  Follow the interpolation step in the proof of Theorem~\ref{thm:gap-of-seeds}:
+  Repeating the interpolation estimate from the proof of Theorem~\ref{thm:gap-of-seeds} gives
   \(\Pt(L, \beta) \ge x^{L/(2n)} \ge x = \Pt(2n, \beta)\, \Ps(n, \beta)^2 \ge 1 - z(s, t)\).
 \end{proof}
 
@@ -102,17 +105,18 @@ larger initial defects.
 \end{lemma}
 \begin{proof}
   \leanok
-  By Lemma~\ref{lem:purity-to-gap},
-  \(e^{-\beta (E_L(m) - E_L(m_0))} \le (1 - \Pt)/\Pt \le z/(1-z) < e^{-\beta c}\).
+  At any excited level, Lemma~\ref{lem:purity-to-gap} gives
+  \(e^{-\beta (E_L(m) - E_L(m_0))} \le (1 - \Pt)/\Pt \le z/(1-z) < e^{-\beta c}\); taking
+  logarithms and dividing by the inverse temperature yields the gap bound.
 \end{proof}
 
 \section{The chain criterion}
 
-A finite chain \((s_j, t_j)_{j \le J}\) of defect bounds bridges the initial seed at \(j = 0\) to
-scale \(J\), where \(s_J, t_J \le \varepsilon \le 1/100\). On each prefix window
-\([n_0 2^j, 2n_0 2^j]\) with \(j < J\), Lemma~\ref{lem:window} and Lemma~\ref{lem:thermal-gap}
-certify the gap directly; for \(j \ge J\), Theorem~\ref{thm:gap-of-seeds} takes over from scale
-\((n_0 2^J, \beta_0 2^J)\).
+A finite sequence of defect pairs \((s_j, t_j)_{j \le J}\) connects the initial seed at \(j = 0\)
+to step \(J\), where both defects satisfy \(s_J, t_J \le \varepsilon \le 1/100\). On each dyadic
+interval \([n_0 2^j, 2n_0 2^j]\) with \(j < J\), Lemma~\ref{lem:window} and
+Lemma~\ref{lem:thermal-gap} bound the gap directly; for all lengths \(L \ge n_0 2^J\),
+Theorem~\ref{thm:gap-of-seeds} applies starting from the rescaled seed \((n_0 2^J, \beta_0 2^J)\).
 
 \begin{lemma}[Purities along a chain]
   \label{lem:chain-purities}
@@ -149,13 +153,13 @@ certify the gap directly; for \(j \ge J\), Theorem~\ref{thm:gap-of-seeds} takes 
 \end{theorem}
 \begin{proof}
   \leanok
-  Choose the dyadic window \(n_0 2^j \le L \le 2 n_0 2^j\). If \(j < J\), Lemma~\ref{lem:window}
+  Choose the dyadic window \(n_0 2^j \le L \le 2 n_0 2^j\). When \(j < J\), Lemma~\ref{lem:window}
   gives \(\Pt(L, \beta_0 2^j) \ge 1 - z(s_j, t_j)\), and Lemma~\ref{lem:thermal-gap} with
-  \(e^{\beta_0 2^j \log r / \beta_0} = r^{2^j}\) gives the gap. If \(j \ge J\), apply
-  Theorem~\ref{thm:gap-of-seeds} with seed scale \((n_0 2^J, \beta_0 2^J)\) and defect
-  \(\varepsilon\); its bound \(\log(1/(5\varepsilon)) / (\beta_0 2^J)\) is at least
-  \(\log r / \beta_0\) because \(r^{2^J} \le 1/(5\varepsilon)\), so Lemma~\ref{lem:gapgt-mono}
-  completes the proof.
+  \(e^{\beta_0 2^j \log r / \beta_0} = r^{2^j}\) yields the gap bound. When \(j \ge J\),
+  Theorem~\ref{thm:gap-of-seeds} at the seed scale \((n_0 2^J, \beta_0 2^J)\) with defect
+  \(\varepsilon\) gives the lower bound \(\log(1/(5\varepsilon)) / (\beta_0 2^J)\), which is at
+  least \(\log r / \beta_0\) because \(r^{2^J} \le 1/(5\varepsilon)\); Lemma~\ref{lem:gapgt-mono}
+  then completes the proof.
 \end{proof}
 
 \section{Rational certificates}
@@ -170,8 +174,9 @@ kernel checks by \texttt{decide +kernel}.
   \leanok
   \uses{def:coupling-defect, def:squaring-defect}
   A chain certificate consists of rational lists \(s = (s_0, \dots, s_J)\) and
-  \(t = (t_0, \dots, t_J)\), a rate \(r \in \Q\), and a hand-over defect \(\varepsilon \in \Q\). It
-  is \emph{valid} if \(r > 0\), \(0 < \varepsilon \le 1/100\), \(s_J, t_J \le \varepsilon\),
+  \(t = (t_0, \dots, t_J)\), a rate \(r \in \Q\), and a terminal defect bound \(\varepsilon \in
+  \Q\).
+  It is \emph{valid} if \(r > 0\), \(0 < \varepsilon \le 1/100\), \(s_J, t_J \le \varepsilon\),
   \(r^{2^J} \cdot 5 \varepsilon \le 1\), \(s_j, t_j \le 1\) for \(j \le J\), and, for \(j < J\),
   the step conditions \(z(s_j, t_j) < 1\), \(f(z(s_j, t_j)) \le s_{j+1}\),
   \(z(t_j, s_{j+1}) < 1\), \(f(z(t_j, s_{j+1})) \le t_{j+1}\), and
@@ -189,7 +194,8 @@ kernel checks by \texttt{decide +kernel}.
 \end{lemma}
 \begin{proof}
   \leanok
-  Both are identical rational expressions; push the ring casts through the operations.
+  Both maps are given by the same rational expressions over the two fields, and the inclusion of
+  the rationals into the reals commutes with the field operations, division included.
 \end{proof}
 
 \begin{theorem}[Two-purity criterion from a rational certificate]
@@ -209,7 +215,7 @@ kernel checks by \texttt{decide +kernel}.
 \end{proof}
 
 \begin{remark}
-  The certificates are generated by \texttt{lean/scripts/chain\_certificate.jl} from the certified
-  seed defects. The Julia script only finds the rational numbers; Lean's kernel re-checks every
-  inequality.
+  The script \texttt{lean/scripts/chain\_certificate.jl} computes the rational entries of each
+  certificate from the certified seed defects. This external computation need not be trusted,
+  because the Lean kernel checks every step inequality.
 \end{remark}
