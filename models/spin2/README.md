@@ -161,7 +161,6 @@ minutes to hours.
 | `scripts/benchmarks/` | Arb product and charge-block benchmarks |
 | `test/runtests.jl` and standalone `test/*.jl` | tests (see "Reproduce") |
 | `results/trial-certificate.json`, `trial-137-certificate.json`, `trial-295-symmetric-certificate.json` | the tracked certificates; everything else in `results/` is gitignored |
-| `.JuliaFormatter.toml` | formatter settings (editor tooling; kept, not data) |
 
 The generic certified-MPO modules developed during this investigation now live in the shared core
 under `julia/src/CertifiedMPO/`, with their unit tests in `julia/test/certified_mpo/`.

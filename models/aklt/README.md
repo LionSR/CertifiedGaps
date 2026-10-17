@@ -129,7 +129,6 @@ function) hold in exact arithmetic, but the tests evaluate them in `Float64`.
 | `scripts/run.jl` | Command-line runner executing a `.toml` configuration from `scripts/configs/` and writing JSON results |
 | `scripts/configs/*.toml` | The four run configurations listed under "Reproduce" |
 | `test/runtests.jl` | Unit tests verifying projector identities, lattice geometry, and small-system consistency |
-| `.JuliaFormatter.toml` | Formatter settings for this directory (editor tooling, not data) |
 | `.gitignore` | Keeps `results/` local |
 
 `results/` is gitignored; run the configurations under `## Reproduce` to generate the JSON outputs

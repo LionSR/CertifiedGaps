@@ -18,9 +18,8 @@
 /survey/
 
 # Not part of the repository: downloaded papers and upstream evidence (fetch the evidence
-# spin1 needs with `julia tools/fetch_upstream.jl`), scratch reproductions
+# spin1 needs with `julia tools/fetch_upstream.jl`)
 /references/
-/working/
 
 # No Python in this repository (local analysis helpers stay local)
 *.py
