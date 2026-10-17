@@ -2,9 +2,9 @@
 
 Anyone can add a result to the leaderboard of proven gaps. A result can be a proven gap for a new
 model, a larger proven gap for a known point, or a Lean theorem for a bound that so far has a
-computer proof. The [contribute page](https://sirui-lu.com/haldane-gap-diagrams/contribute.html)
+computer proof. The [contribute page](https://sirui-lu.com/CertifiedGaps/contribute.html)
 of the website explains each case (source: [`home_page/contribute.md`](home_page/contribute.md)).
-The [leaderboard](https://sirui-lu.com/haldane-gap-diagrams/leaderboard.html) lists the results
+The [leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) lists the results
 and the open challenges.
 
 ## In short

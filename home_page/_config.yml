@@ -11,11 +11,11 @@
 
 title: Proven energy gaps of quantum spin chains
 description: Lower bounds on the energy gap that hold for every ring length, checked by computer and in the Lean proof assistant
-baseurl: "/haldane-gap-diagrams" # the subpath of the site
+baseurl: "/CertifiedGaps" # the subpath of the site
 url: "https://sirui-lu.com" # the base hostname and protocol of the site
 twitter_username:
 github_username: LionSR
-repository: LionSR/haldane-gap-diagrams
+repository: LionSR/CertifiedGaps
 branch: main # the branch that certificate and checker links point to
 
 # Build settings

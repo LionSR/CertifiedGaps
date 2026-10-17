@@ -23,9 +23,9 @@ The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), ha
    preprint [*The periodic spin-one Haldane gap*](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026);
    and for the other models using verified eigenvalue enclosures of complete seed-ring spectra.
 
-**Website:** the [project home page](https://sirui-lu.com/haldane-gap-diagrams/) gathers the
+**Website:** the [project home page](https://sirui-lu.com/CertifiedGaps/) gathers the
 notes, the explainer, the blueprint and the Lean documentation. Its
-[leaderboard](https://sirui-lu.com/haldane-gap-diagrams/leaderboard.html) lists every proven gap,
+[leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) lists every proven gap,
 how it is proved, and the open challenges. To submit a result, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Spin-1 Heisenberg chain
