@@ -10,6 +10,11 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 
 \section{Rings, bonds and the Hamiltonian}
 
+We first represent operators on an \(L\)-cell ring as matrices on functions
+\((\mathrm{Fin}\,L \to d) \to \C\), define the \texttt{RPRing} structure encoding a reflection-positive bond
+and symmetric on-site term, and identify its matrix trace \(\operatorname{Re}\Tr e^{-\beta H_L}\) with
+the spectral sum of Chapter~\ref{chap:criterion}.
+
 \begin{definition}[Operators on a ring]
   \label{def:ring-operators}
   \lean{CertifiedGaps.piTensor, CertifiedGaps.bondOp, CertifiedGaps.siteOp}
@@ -51,6 +56,7 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 \end{lemma}
 \begin{proof}
   \leanok
+  Each term satisfies
   \((C_\alpha \otimes F C_\alpha F)^\dagger = C_\alpha^{\mathsf T} \otimes F C_\alpha^{\mathsf T} F\),
   and the two signs from an antisymmetric \(C_\alpha\) cancel. Hermitian one- and two-site
   operators embed as Hermitian operators on the ring.
@@ -61,8 +67,8 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
   \lean{CertifiedGaps.RPRing.spectrum, CertifiedGaps.RPRing.partitionFunction}
   \leanok
   \uses{lem:rpring-hermitian}
-  \(E_L\) is the family of eigenvalues of \(H_L\) with multiplicity, indexed by configurations, and
-  \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\).
+  The spectrum \(E_L\) is the family of eigenvalues of \(H_L\) with multiplicity, indexed by
+  configurations, and the partition function is \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\).
 \end{definition}
 
 \begin{lemma}
@@ -82,6 +88,12 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 \end{proof}
 
 \section{Trotter slices and the transfer matrix}
+
+To exhibit the spatial moment form at finite Trotter number \(M\), we split each slice into even
+bonds, on-site terms, and odd bonds. Expanding the bond factors turns the \(M\)-slice trace on a
+ring of \(2N\) cells into a product of single-cell time-word traces \(\mathcal F_{pq}\). Reflection
+positivity guarantees that \(\mathcal F\) has real entries, so the two-cell spatial transfer matrix
+\(T = \mathcal F^{\mathsf T} \mathcal F = \mathcal F^\dagger \mathcal F\) is positive semidefinite.
 
 \begin{definition}[Trotter slice]
   \label{def:trotter}
@@ -121,14 +133,14 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
     CertifiedGaps.trace_piTensor, CertifiedGaps.list_prod_ofFn_sum}
   \leanok
   \uses{def:ring-operators}
-  \(\Tr T^N = \sum_{q} \prod_{k} T_{q_k, q_{k+1}}\) over closed paths
-  \(q \colon \mathrm{Fin}\,N \to D\) (indices cyclic). Tensor products multiply sitewise, and
-  \(\Tr \bigotimes_i A_i = \prod_i \Tr A_i\). An ordered product of sums is the sum of the ordered
-  products.
+  The trace of a matrix power expands as \(\Tr T^N = \sum_{q} \prod_{k} T_{q_k, q_{k+1}}\) over
+  closed paths \(q \colon \mathrm{Fin}\,N \to D\) (with cyclic indices). Tensor products multiply
+  sitewise, and \(\Tr \bigotimes_i A_i = \prod_i \Tr A_i\). An ordered product of sums is the sum of
+  the ordered products.
 \end{lemma}
 \begin{proof}
   \leanok
-  Expand matrix powers as sums over paths by induction; the other identities are entrywise.
+  Expand matrix powers as sums over paths by induction; the other identities hold entrywise.
 \end{proof}
 
 \begin{lemma}[A slice as a sum of tensor products]
@@ -154,7 +166,7 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
   \leanok
   \uses{lem:bond-expansion}
   For time-label sequences \(p, q \colon \mathrm{Fin}\,M \to \iota \sqcup \{\varnothing\}\), let
-  \(\mathcal F_{pq} = \Tr \prod_{t} C^\tau_{p_t}\, O\, F C^\tau_{q_t} F\), the trace of the
+  \(\mathcal F_{pq} = \Tr \prod_{t} C^\tau_{p_t}\, O\, F C^\tau_{q_t} F\) denote the trace of the
   time-ordered word on one cell over \(M\) slices.
 \end{definition}
 
@@ -163,7 +175,7 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
   \lean{CertifiedGaps.RPRing.trace_oddWord}
   \leanok
   \uses{def:cell-transfer}
-  \(\Tr \prod_t F C^\tau_{p_t} F\, O\, C^\tau_{q_t} = \mathcal F_{pq}\).
+  The odd-cell word has trace \(\Tr \prod_t F C^\tau_{p_t} F\, O\, C^\tau_{q_t} = \mathcal F_{pq}\).
 \end{lemma}
 \begin{proof}
   \leanok
@@ -198,11 +210,11 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
     CertifiedGaps.RPRing.conjTranspose_cellTransfer}
   \leanok
   \uses{def:cell-transfer}
-  \(\mathcal F\) has real entries, so \(\mathcal F^\dagger = \mathcal F^{\mathsf T}\).
+  The matrix \(\mathcal F\) has real entries, so \(\mathcal F^\dagger = \mathcal F^{\mathsf T}\).
 \end{lemma}
 \begin{proof}
   \leanok
-  \(\mathcal F_{pq}\) is the image under \(\R \to \C\) of the trace of a product of real
+  Each entry \(\mathcal F_{pq}\) is the image under \(\R \to \C\) of the trace of a product of real
   matrices. This is where reflection positivity enters: the bond is a sum of squares
   \(C_\alpha \otimes F C_\alpha F\) of \emph{real} matrices.
 \end{proof}
@@ -217,7 +229,7 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 \end{theorem}
 \begin{proof}
   \leanok
-  \(T = \mathcal F^\dagger \mathcal F = \mathcal F^{\mathsf T} \mathcal F \succeq 0\).
+  Set \(T = \mathcal F^\dagger \mathcal F = \mathcal F^{\mathsf T} \mathcal F \succeq 0\).
 \end{proof}
 
 \begin{lemma}
@@ -228,7 +240,7 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 \end{lemma}
 \begin{proof}
   \leanok
-  Spectral theorem.
+  This follows immediately from the spectral theorem.
 \end{proof}
 
 \begin{proposition}[Moment form from a positive semidefinite transfer matrix]
@@ -241,7 +253,8 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 \end{proposition}
 \begin{proof}
   \leanok
-  \(\operatorname{Re}\Tr T^N = \sum_i \lambda_i^N = \sum_i \mu_i^{2N}\) with \(\lambda_i \ge 0\).
+  By Lemma~\ref{lem:trace-pow-eig}, \(\operatorname{Re}\Tr T^N = \sum_i \lambda_i^N = \sum_i \mu_i^{2N}\)
+  with \(\lambda_i \ge 0\).
 \end{proof}
 
 \begin{lemma}
@@ -254,10 +267,15 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 \end{lemma}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:psd-transfer} with \(\tau = \beta/M\) and Proposition~\ref{prop:moment-psd}.
+  Combine Theorem~\ref{thm:psd-transfer} at \(\tau = \beta/M\) with
+  Proposition~\ref{prop:moment-psd}.
 \end{proof}
 
 \section{The Lie--Trotter product formula}
+
+To pass from the \(M\)-slice approximants \(Z^{(M)}_L(\beta)\) to the exact partition function
+\(Z_L(\beta)\) at each fixed ring length \(L\), we prove the matrix Lie--Trotter product formula by
+telescoping powers in a normed algebra.
 
 \begin{lemma}[Telescoping]
   \label{lem:telescoping}
@@ -268,7 +286,7 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 \end{lemma}
 \begin{proof}
   \leanok
-  Induction on \(k\), from \(X^{k+1} - Y^{k+1} = X (X^k - Y^k) + (X - Y) Y^k\).
+  Use induction on \(k\), starting from \(X^{k+1} - Y^{k+1} = X (X^k - Y^k) + (X - Y) Y^k\).
 \end{proof}
 
 \begin{lemma}[Chernoff]
@@ -320,6 +338,10 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 
 \section{The criterion for reflection-positive rings}
 
+Combining the finite-\(M\) moment form with the Lie--Trotter limit shows that every
+reflection-positive ring satisfies the spatial moment inequalities, so a valid chain certificate and
+two seed bounds immediately imply a uniform spectral gap.
+
 \begin{theorem}[Spatial moment inequalities for every reflection-positive ring]
   \label{thm:rp-moment-bounds}
   \lean{CertifiedGaps.RPRing.spatialMomentBounds, CertifiedGaps.RPRing.hasSpatialMomentBounds}
@@ -347,8 +369,8 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
   \lean{CertifiedGaps.RPRing.spatialPurity, CertifiedGaps.RPRing.thermalPurity}
   \leanok
   \uses{def:ring-spectrum}
-  \(\Ps(n, \beta)\) and \(\Pt(L, \beta)\) of Definition~\ref{def:purities}, computed from
-  \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\).
+  The ring purities \(\Ps(n, \beta)\) and \(\Pt(L, \beta)\) are defined as in
+  Definition~\ref{def:purities}, computed from \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\).
 \end{definition}
 
 \begin{theorem}[Two-purity criterion for a reflection-positive ring]
@@ -363,7 +385,7 @@ form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bound
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:gap-of-chain-certificate} with the moment inequalities of
+  Apply Theorem~\ref{thm:gap-of-chain-certificate} with the moment inequalities of
   Theorem~\ref{thm:rp-moment-bounds}, rewriting the purities by Lemma~\ref{lem:ring-trace-exp}.
 \end{proof}
 
@@ -399,7 +421,7 @@ physical one.
 \end{theorem}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:conj-ops} bond by bond and site by site; \(j \ne j+1\) because \(L \ge 2\).
+  Apply Lemma~\ref{lem:conj-ops} bond by bond and site by site; \(j \ne j+1\) because \(L \ge 2\).
 \end{proof}
 
 \begin{theorem}[Spectra agree]
@@ -412,6 +434,7 @@ physical one.
 \end{theorem}
 \begin{proof}
   \leanok
-  \(\det(t - U A U^\dagger) = \det(t - A U^\dagger U) = \det(t - A)\), and the eigenvalue family
-  of a Hermitian matrix is determined by its characteristic polynomial.
+  Because \(\det(t - U A U^\dagger) = \det(t - A U^\dagger U) = \det(t - A)\), the characteristic
+  polynomial is unchanged, and the eigenvalue family of a Hermitian matrix is determined by its
+  characteristic polynomial.
 \end{proof}

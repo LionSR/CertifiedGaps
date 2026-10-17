@@ -1,13 +1,17 @@
 \chapter{The spin-1 Heisenberg ring}
 \label{chap:heisenberg}
 
-The headline application (Lean files \texttt{CertifiedGaps/Heisenberg/*.lean}): for every even
-\(L \ge 2304\), the periodic spin-1 antiferromagnetic Heisenberg ring has a unique ground state and
+This chapter presents our headline application (Lean files
+\texttt{CertifiedGaps/Heisenberg/*.lean}): for every even \(L \ge 2304\), the periodic spin-1
+antiferromagnetic Heisenberg ring has a unique ground state and
 \(\Delta_L > (\log 20)/784 \approx 0.003821\), conditional on two finite seed inequalities. The
 seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmetic in
 \texttt{models/spin1/}.
 
 \section{The Hamiltonian}
+
+We define the spin-1 Heisenberg Hamiltonian directly in the Cartesian basis so that the main theorem
+statement refers only to standard spin-1 exchange matrices.
 
 \begin{definition}[Spin-1 Heisenberg ring]
   \label{def:heisenberg}
@@ -29,9 +33,9 @@ seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmeti
     CertifiedGaps.SpinOneHeisenberg.spatialPurity, CertifiedGaps.SpinOneHeisenberg.thermalPurity}
   \leanok
   \uses{def:heisenberg}
-  \(H_L\) is Hermitian; \(E_L\) is its eigenvalue family,
-  \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), and \(\Ps\), \(\Pt\) are formed from these
-  traces as in Definition~\ref{def:purities}.
+  The Hamiltonian \(H_L\) is Hermitian; \(E_L\) denotes its eigenvalue family,
+  \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\) is its partition function, and \(\Ps\),
+  \(\Pt\) are formed from these traces as in Definition~\ref{def:purities}.
 \end{definition}
 
 \begin{lemma}
@@ -41,21 +45,26 @@ seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmeti
     CertifiedGaps.SpinOneHeisenberg.partitionFunction_spectrum}
   \leanok
   \uses{def:heisenberg-spectrum, lem:ring-trace-exp}
-  \(Z_L(\beta) = \sum_m e^{-\beta E_L(m)}\), the partition function of the abstract criterion.
+  The matrix trace satisfies \(Z_L(\beta) = \sum_m e^{-\beta E_L(m)}\), matching the partition
+  function of the abstract criterion.
 \end{lemma}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:ring-trace-exp} for the Hermitian matrix \(H_L\).
+  Apply Lemma~\ref{lem:ring-trace-exp} to the Hermitian matrix \(H_L\).
 \end{proof}
 
 \section{The Heisenberg ring is reflection positive}
+
+Because \(iS^\alpha\) is real and antisymmetric in the Cartesian basis, the negated exchange bond is
+a sum of squares of real matrices, placing the Heisenberg chain (and its single-ion anisotropic
+extension) inside the \texttt{RPRing} class of Chapter~\ref{chap:rings}.
 
 \begin{definition}[Real spin-1 generators]
   \label{def:spin-one-generators}
   \lean{CertifiedGaps.SpinOne.G, CertifiedGaps.SpinOne.G_transpose}
   \leanok
   \uses{def:heisenberg}
-  \(G_\alpha = i S^\alpha\) has real antisymmetric entries \((G_\alpha)_{ss'} =
+  Each generator \(G_\alpha = i S^\alpha\) has real antisymmetric entries \((G_\alpha)_{ss'} =
   \epsilon_{\alpha s s'}\), and \(-\mathbf S \cdot \mathbf S = \sum_\alpha G_\alpha \otimes
   G_\alpha\).
 \end{definition}
@@ -65,8 +74,9 @@ seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmeti
   \lean{CertifiedGaps.SpinOneLargeD.Sz2, CertifiedGaps.SpinOneLargeD.model}
   \leanok
   \uses{def:rpring, def:spin-one-generators}
-  For \(D \in \R\), the reflection-positive ring with bond factors \(C_\alpha = G_\alpha\), on-site
-  term \(o = D\,(S^z)^2 = D \operatorname{diag}(1, 1, 0)\) and \(F = 1\).
+  For \(D \in \R\), the anisotropic spin-1 ring is the reflection-positive ring with bond factors
+  \(C_\alpha = G_\alpha\), on-site term \(o = D\,(S^z)^2 = D \operatorname{diag}(1, 1, 0)\), and
+  internal reflection \(F = 1\).
 \end{definition}
 
 \begin{lemma}
@@ -81,9 +91,9 @@ seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmeti
 \end{lemma}
 \begin{proof}
   \leanok
-  \(-\sum_\alpha G_\alpha \otimes G_\alpha = -\sum_\alpha (iS^\alpha) \otimes (iS^\alpha) =
-  \sum_\alpha S^\alpha \otimes S^\alpha\), entrywise from \(i^2 = -1\). At \(D = 0\) the on-site
-  terms vanish.
+  The bond identity \(-\sum_\alpha G_\alpha \otimes G_\alpha = -\sum_\alpha (iS^\alpha) \otimes
+  (iS^\alpha) = \sum_\alpha S^\alpha \otimes S^\alpha\) holds entrywise from \(i^2 = -1\). At
+  \(D = 0\) the on-site terms vanish.
 \end{proof}
 
 \begin{theorem}[Spatial moment inequalities for the Heisenberg ring]
@@ -96,21 +106,25 @@ seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmeti
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-moment-bounds} for the ring of Definition~\ref{def:spin-one-large-d} at
+  Apply Theorem~\ref{thm:rp-moment-bounds} to the ring of Definition~\ref{def:spin-one-large-d} at
   \(D = 0\), whose partition functions are the Heisenberg ones by
   Lemma~\ref{lem:large-d-heisenberg}.
 \end{proof}
 
 \section{The gap from thermal-MPO inputs}
 
+We package the spatial moment inequalities and the two seed purity bounds into a single hypothesis
+record \texttt{ThermalMPOInputs} and specialize the symmetric doubling theorem
+(Theorem~\ref{thm:gap-of-seeds}) to obtain the gap bound \(\log(1/(5\varepsilon_0))/\beta_0\).
+
 \begin{definition}[Thermal-MPO inputs]
   \label{def:thermal-mpo-inputs}
   \lean{CertifiedGaps.SpinOneHeisenberg.ThermalMPOInputs}
   \leanok
   \uses{def:heisenberg-spectrum, def:moment-bounds}
-  \(\mathrm{Inputs}(n_0, \beta_0, \varepsilon_0)\) consists of the spatial moment inequalities
-  above \(n_0\) at every \(\beta > 0\), and the seeds \(\Ps(n_0, \beta_0) \ge 1 - \varepsilon_0\)
-  and \(\Pt(2n_0, \beta_0) \ge 1 - \varepsilon_0\).
+  The structure \(\mathrm{Inputs}(n_0, \beta_0, \varepsilon_0)\) packages the spatial moment
+  inequalities above \(n_0\) at every \(\beta > 0\) together with the seeds
+  \(\Ps(n_0, \beta_0) \ge 1 - \varepsilon_0\) and \(\Pt(2n_0, \beta_0) \ge 1 - \varepsilon_0\).
 \end{definition}
 
 \begin{theorem}[Gap from inputs]
@@ -127,23 +141,26 @@ seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmeti
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:gap-of-seeds}, with the partition functions identified by
+  Apply Theorem~\ref{thm:gap-of-seeds}, identifying the partition functions by
   Lemma~\ref{lem:heisenberg-trace}.
 \end{proof}
 
 \section{The seeds and the main theorem}
+
+Combining the unconditional spatial moment inequalities (Theorem~\ref{thm:heisenberg-moments}) with
+the two seed inequalities at \((n_0, \beta_0) = (2304, 784)\) yields the uniform Haldane gap bound.
 
 \begin{lemma}[Spatial seed]
   \label{lem:heisenberg-seed-spatial}
   \lean{CertifiedGaps.SpinOneHeisenberg.seed_spatial}
   \leanok
   \uses{def:heisenberg-spectrum}
-  \(\Ps(2304, 784) \ge 99/100\).
+  The spatial purity at \((2304, 784)\) satisfies \(\Ps(2304, 784) \ge 99/100\).
 \end{lemma}
 \begin{proof}
-  Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact integer and rational arithmetic
-  in \texttt{models/spin1/}; see also~\cite{CertificateNote}. Not yet proved in Lean: it is a
-  finite numerical statement about rings of \(2304\) and \(4608\) sites.
+  This is Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact integer and rational
+  arithmetic in \texttt{models/spin1/}; see also~\cite{CertificateNote}. It is not yet proved in
+  Lean, as it is a finite numerical statement about rings of \(2304\) and \(4608\) sites.
 \end{proof}
 
 \begin{lemma}[Thermal seed]
@@ -151,10 +168,10 @@ seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmeti
   \lean{CertifiedGaps.SpinOneHeisenberg.seed_thermal}
   \leanok
   \uses{def:heisenberg-spectrum}
-  \(\Pt(4608, 784) \ge 99/100\).
+  The thermal purity at \((4608, 784)\) satisfies \(\Pt(4608, 784) \ge 99/100\).
 \end{lemma}
 \begin{proof}
-  As for Lemma~\ref{lem:heisenberg-seed-spatial}. Not yet proved in Lean.
+  This is certified alongside Lemma~\ref{lem:heisenberg-seed-spatial} and is not yet proved in Lean.
 \end{proof}
 
 \begin{theorem}[The spin-1 Heisenberg gap]
@@ -175,7 +192,7 @@ seeds are Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact arithmeti
 \end{proof}
 
 \begin{remark}
-  \texttt{\#print axioms spin\_one\_heisenberg\_gap} reports \texttt{sorryAx} only through the two
-  seed lemmas. Smaller seed routes for a kernel-checked proof of the spin-1 seed are studied in
-  \texttt{models/lean\_seeds/}; see Chapter~\ref{chap:seedkernel}.
+  In Lean, \texttt{\#print axioms spin\_one\_heisenberg\_gap} reports \texttt{sorryAx} only through
+  the two seed lemmas. Smaller seed routes for a kernel-checked proof of the spin-1 seed are studied
+  in \texttt{models/lean\_seeds/}; see Chapter~\ref{chap:seedkernel}.
 \end{remark}

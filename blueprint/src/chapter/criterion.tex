@@ -1,12 +1,16 @@
 \chapter{The two-purity criterion}
 \label{chap:criterion}
 
-This chapter is the abstract part of the argument (Lean file
-\texttt{CertifiedGaps/PurityCriterion.lean}). It applies to any family of finite spectra
-\(E_L \colon \iota_L \to \R\), \(L \in \N\), over finite nonempty index types, for which the
-partition functions satisfy the spatial moment inequalities of Definition~\ref{def:moment-bounds}.
+This chapter presents the abstract part of the argument, formalized in
+\texttt{CertifiedGaps/PurityCriterion.lean}. It applies to any family of finite spectra
+\(E_L \colon \iota_L \to \R\), \(L \in \N\), over finite nonempty index types, whose partition
+functions satisfy the three spatial moment inequalities of Definition~\ref{def:moment-bounds}.
 
 \section{Partition functions, purities and gaps}
+
+We first define the partition function and the spatial and thermal purities of a spectral family,
+together with the order-free gap predicate \(\GapGT(e, c)\) that records ground-state uniqueness and
+a lower bound \(c\) on the spectral gap simultaneously.
 
 \begin{definition}[Partition function]
   \label{def:partition-function}
@@ -23,15 +27,15 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
   \uses{def:partition-function}
   The thermal purity is \(\Pt(L, \beta) = Z_L(2\beta)/Z_L(\beta)^2\) and the spatial purity is
   \(\Ps(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2\). Their complements \(1 - \Pt\) and \(1 - \Ps\) are
-  the thermal and spatial \emph{defects}.
+  the thermal and spatial \emph{purity defects}.
 \end{definition}
 
 \begin{definition}[Gap predicate]
   \label{def:gapgt}
   \lean{CertifiedGaps.GapGT}
   \leanok
-  For \(e \colon \kappa \to \R\) and \(c \in \R\), \(\GapGT(e, c)\) holds if there is \(m_0\) with
-  \(e(m_0) + c < e(m)\) for every \(m \ne m_0\).
+  For \(e \colon \kappa \to \R\) and \(c \in \R\), the predicate \(\GapGT(e, c)\) holds if there is
+  an index \(m_0\) with \(e(m_0) + c < e(m)\) for every \(m \ne m_0\).
 \end{definition}
 
 \begin{lemma}
@@ -39,13 +43,13 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
   \lean{CertifiedGaps.GapGT.lt_sub_of_monotone}
   \leanok
   \uses{def:gapgt}
-  If \(e_0 \le e_1 \le \cdots \le e_{N+1}\) is ordered and \(\GapGT(e, c)\), then
+  If \(e_0 \le e_1 \le \cdots \le e_{N+1}\) is ordered and \(\GapGT(e, c)\) holds, then
   \(e_1 - e_0 > c\).
 \end{lemma}
 \begin{proof}
   \leanok
-  If the distinguished index is \(0\), apply the defining inequality to \(m = 1\). Otherwise apply
-  it to \(m = 0\) and use \(e_0 \le e_{m_0}\) and \(e_0 \le e_1\); this case is impossible.
+  If the distinguished index is \(m_0 = 0\), apply the defining inequality to \(m = 1\). Otherwise
+  apply it to \(m = 0\) and use \(e_0 \le e_{m_0}\) and \(e_0 \le e_1\); this case is impossible.
 \end{proof}
 
 \begin{lemma}[Elementary bounds]
@@ -54,16 +58,22 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
     CertifiedGaps.spatialPurity_pos, CertifiedGaps.thermalPurity_le_one}
   \leanok
   \uses{def:purities, lem:power-sums}
-  \(Z_L(\beta) > 0\), both purities are positive, and \(\Pt(L, \beta) \le 1\).
+  For every \(L\) and \(\beta\), \(Z_L(\beta) > 0\), both purities are positive, and
+  \(\Pt(L, \beta) \le 1\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Positivity holds because each term \(e^{-\beta E}\) is positive and the index type is nonempty.
-  Since \(Z_L(2\beta) = \sum_m (e^{-\beta E_L(m)})^2\), the bound \(\Pt \le 1\) is
-  \(\sum p_m^2 \le (\sum p_m)^2\) for \(p_m \ge 0\).
+  Positivity holds because each term \(e^{-\beta E_L(m)}\) is positive and the index type is
+  nonempty. Since \(Z_L(2\beta) = \sum_m (e^{-\beta E_L(m)})^2\), the bound \(\Pt \le 1\) is the
+  inequality \(\sum p_m^2 \le (\sum p_m)^2\) for \(p_m \ge 0\).
 \end{proof}
 
 \section{The squaring lemma}
+
+Squaring a positive trace-one operator replaces its eigenvalues \(p_i\) with \(p_i^2/P\), which
+quadratically suppresses the purity defect \(1 - P\) via the rational map
+\(f(z) = z^2/[2(1-z)^2]\). To apply this bound to both finite Boltzmann sums and spatial partition
+functions, we formulate it in homogeneous power-sum form in terms of \(S_1, S_2, S_4\).
 
 \begin{lemma}[Power sums]
   \label{lem:power-sums}
@@ -86,7 +96,7 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
   \label{def:squaring-defect}
   \lean{CertifiedGaps.squaringDefect}
   \leanok
-  \(f(z) = z^2 / \bigl(2 (1 - z)^2\bigr)\).
+  The squaring-defect function is \(f(z) = z^2 / \bigl(2 (1 - z)^2\bigr)\).
 \end{definition}
 
 \begin{lemma}
@@ -94,11 +104,11 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
   \lean{CertifiedGaps.squaringDefect_mono}
   \leanok
   \uses{def:squaring-defect}
-  \(f\) is nondecreasing on \([0, 1)\).
+  The function \(f\) is nondecreasing on \([0, 1)\).
 \end{lemma}
 \begin{proof}
   \leanok
-  For \(0 \le z \le w < 1\), \(z (1 - w) \le w (1 - z)\); square and divide.
+  For \(0 \le z \le w < 1\), \(z (1 - w) \le w (1 - z)\); square both sides and divide.
 \end{proof}
 
 \begin{lemma}[Squaring, homogeneous form]
@@ -111,8 +121,8 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
 \end{lemma}
 \begin{proof}
   \leanok
-  Both sides equal \((s_2^2 - s_4)/s_2^2\) and \((s_1^2 - s_2)^2 / (2 s_2^2)\) after clearing
-  denominators.
+  The left- and right-hand sides equal \((s_2^2 - s_4)/s_2^2\) and \((s_1^2 - s_2)^2 / (2 s_2^2)\),
+  respectively, after clearing denominators.
 \end{proof}
 
 \begin{lemma}[Squaring]
@@ -121,12 +131,12 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
   \leanok
   \uses{lem:power-sums, lem:squaring-homogeneous}
   Let \(p_i \ge 0\) with \(\sum_i p_i = 1\) and purity \(P = \sum_i p_i^2\). The squared
-  distribution \(p_i^2 / P\) has purity \(P'\) with \(1 - P' \le f(1 - P)\).
+  distribution \(p_i^2 / P\) has purity \(P'\) satisfying \(1 - P' \le f(1 - P)\).
 \end{lemma}
 \begin{proof}
   \leanok
   The families \(p_i^2\) and \(p_i^4\) are summable because \(0 \le p_i \le 1\), and \(P > 0\)
-  because \(\sum p_i = 1\). Then \(P' = S_4 / S_2^2\), and Lemma~\ref{lem:power-sums} with
+  because \(\sum p_i = 1\). Then \(P' = S_4 / S_2^2\), and Lemma~\ref{lem:power-sums} combined with
   Lemma~\ref{lem:squaring-homogeneous} gives the claim.
 \end{proof}
 
@@ -139,7 +149,7 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
 \end{lemma}
 \begin{proof}
   \leanok
-  With \(u = (1 - \varepsilon)^3\) one has \(1 - 3\varepsilon \le u \le 1\), so
+  With \(u = (1 - \varepsilon)^3\), one has \(1 - 3\varepsilon \le u \le 1\), so
   \((1 - u)^2 \le 9 \varepsilon^2\) and \(9 \le 10 u^2\).
 \end{proof}
 
@@ -156,21 +166,26 @@ partition functions satisfy the spatial moment inequalities of Definition~\ref{d
 \begin{proof}
   \leanok
   Lemma~\ref{lem:squaring-homogeneous} bounds the new defect by \(f(1 - s_2/s_1^2)\), which is at
-  most \(f(1 - (1-\varepsilon)^3)\) by Lemma~\ref{lem:f-mono}, hence at most \(5\varepsilon^2\) by
-  Lemma~\ref{lem:f-numerical}.
+  most \(f(1 - (1-\varepsilon)^3)\) by Lemma~\ref{lem:f-mono}, and hence at most \(5\varepsilon^2\)
+  by Lemma~\ref{lem:f-numerical}.
 \end{proof}
 
 \section{The spatial moment interface}
 
 The doubling argument uses the spatial transfer operator only through three inequalities among the
-moments \(Z_L(\beta)\) at a single inverse temperature.
+partition functions \(Z_L(\beta)\) at a single inverse temperature: two power-sum inequalities for
+spatial squaring and one power-sum interpolation inequality for intermediate even lengths. Because
+each inequality involves only finitely many values \(Z_L(\beta)\), the interface is closed under
+pointwise limits (Lemma~\ref{lem:moment-bounds-limit}). This allows Chapter~\ref{chap:rings} to
+prove the inequalities for finite-dimensional Trotter transfer matrices and pass to the
+continuous-time limit without formalizing infinite-dimensional path-space operators.
 
 \begin{definition}[Moment form]
   \label{def:moment-form}
   \lean{CertifiedGaps.HasMomentForm, CertifiedGaps.HasSpatialMomentForm}
   \leanok
   \uses{def:partition-function}
-  A sequence \(Z \colon \N \to \R\) has the \emph{moment form} above \(n_0\) if there are
+  A sequence \(Z \colon \N \to \R\) has the \emph{moment form} above \(n_0\) if there exist
   \(\mu_i \ge 0\), \(i \in \N\), with \(Z(L) = \sum_i \mu_i^L\) (a convergent sum) for every even
   \(L \ge n_0\). A spectral family has the spatial moment form if \(L \mapsto Z_L(\beta)\) has the
   moment form for every \(\beta > 0\).
@@ -182,7 +197,7 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
   \leanok
   \uses{def:partition-function}
   A sequence \(Z\) satisfies the spatial moment inequalities above \(n_0\) if, for all even
-  \(n_0 \le n\) and even \(n_0 \le p \le q\),
+  \(n \ge n_0\) and even \(q \ge p \ge n_0\),
   \begin{enumerate}
     \item \(Z(2n) \le Z(n)^2\);
     \item \(2\bigl(Z(2n)^2 - Z(4n)\bigr) \le \bigl(Z(n)^2 - Z(2n)\bigr)^2\);
@@ -191,7 +206,7 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
   A spectral family satisfies them if \(L \mapsto Z_L(\beta)\) does for every \(\beta > 0\).
 \end{definition}
 
-\begin{lemma}[Monotonicity of \(\ell^p\) norms]
+\begin{lemma}[Power-sum monotonicity]
   \label{lem:lp-mono}
   \lean{CertifiedGaps.hasSum_pow_le_rpow}
   \leanok
@@ -199,8 +214,8 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
 \end{lemma}
 \begin{proof}
   \leanok
-  Each \(\mu_i^p\) is at most \(Z_p = \sum_i \mu_i^p\), so
-  \(\mu_i^q = (\mu_i^p)^{q/p} \le Z_p^{q/p - 1} \mu_i^p\); sum over \(i\).
+  Each term \(\mu_i^p\) is at most \(Z_p = \sum_i \mu_i^p\), so
+  \(\mu_i^q = (\mu_i^p)^{q/p} \le Z_p^{q/p - 1} \mu_i^p\); summing over \(i\) gives the bound.
 \end{proof}
 
 \begin{proposition}
@@ -214,11 +229,12 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
 \end{proposition}
 \begin{proof}
   \leanok
-  Inequalities (1) and (2) are Lemma~\ref{lem:power-sums} for the family \(\mu_i^n\), whose power
-  sums are \(Z(n), Z(2n), Z(4n)\). Inequality (3) is Lemma~\ref{lem:lp-mono}.
+  Inequalities (1) and (2) follow from Lemma~\ref{lem:power-sums} applied to the family
+  \(\mu_i^n\), whose power sums are \(Z(n), Z(2n), Z(4n)\). Inequality (3) follows from
+  Lemma~\ref{lem:lp-mono}.
 \end{proof}
 
-\begin{lemma}[Limits]
+\begin{lemma}[Closure under pointwise limits]
   \label{lem:moment-bounds-limit}
   \lean{CertifiedGaps.SpatialMomentBounds.of_tendsto, CertifiedGaps.SpatialMomentBounds.mono,
     CertifiedGaps.SpatialMomentBounds.of_tendsto_hasMomentForm}
@@ -226,14 +242,14 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
   \uses{def:moment-bounds, prop:moment-form-bounds}
   If eventually along a filter the sequences \(Z_a\) satisfy the spatial moment inequalities
   above \(n_0 > 0\) (for instance because they have the moment form), and \(Z_a(L) \to Z(L)\) for
-  every even \(L \ge n_0\), then \(Z\) satisfies them too. The inequalities above \(n_0\) imply
-  those above any \(n_1 \ge n_0\).
+  every even \(L \ge n_0\), then \(Z\) satisfies them too. Moreover, the inequalities above \(n_0\)
+  imply those above any \(n_1 \ge n_0\).
 \end{lemma}
 \begin{proof}
   \leanok
   Each inequality is a non-strict inequality between continuous functions of finitely many values
-  \(Z(L)\), hence closed under pointwise limits. The \(q/p\)-th power is continuous because
-  \(q/p \ge 0\).
+  \(Z(L)\), and is therefore closed under pointwise limits. The \(q/p\)-th power is continuous
+  because \(q/p \ge 0\).
 \end{proof}
 
 \begin{remark}
@@ -244,22 +260,26 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
 
 \section{Coupling, squaring and the purity-to-gap bound}
 
+We now specialize the squaring bound to thermal and spatial purities, state the two algebraic
+spacetime coupling identities that trade purity between space and imaginary time, and prove the
+purity-to-gap inequality \(e^{-\beta(E_L(m) - E_L(m_0))} \le (1 - \Pt(L, \beta))/\Pt(L, \beta)\).
+
 \begin{lemma}[Squaring the Gibbs and spatial spectra]
   \label{lem:purity-squaring}
   \lean{CertifiedGaps.thermalPurity_two_mul_ge, CertifiedGaps.spatialPurity_le_one,
     CertifiedGaps.spatialPurity_two_mul_ge}
   \leanok
   \uses{lem:squaring-step, lem:purity-basic, def:moment-bounds}
-  Let \(0 \le \varepsilon \le 1/100\). If \(\Pt(L, \beta) \ge (1-\varepsilon)^3\) then
+  Let \(0 \le \varepsilon \le 1/100\). If \(\Pt(L, \beta) \ge (1-\varepsilon)^3\), then
   \(\Pt(L, 2\beta) \ge 1 - 5 \varepsilon^2\). Under the spatial moment inequalities above \(n_0\),
   for even \(n \ge n_0\) and \(\beta > 0\), \(\Ps(n, \beta) \le 1\), and
   \(\Ps(n, \beta) \ge (1-\varepsilon)^3\) implies \(\Ps(2n, \beta) \ge 1 - 5\varepsilon^2\).
 \end{lemma}
 \begin{proof}
   \leanok
-  For the thermal purity apply Lemma~\ref{lem:squaring-step} to the Boltzmann weights
+  For the thermal purity, apply Lemma~\ref{lem:squaring-step} to the Boltzmann weights
   \(e^{-\beta E_L(m)}\), whose power sums are \(Z_L(\beta), Z_L(2\beta), Z_L(4\beta)\). For the
-  spatial purity the two power-sum inequalities are inequalities (1) and (2) of
+  spatial purity, the required power-sum inequalities are inequalities (1) and (2) of
   Definition~\ref{def:moment-bounds}.
 \end{proof}
 
@@ -276,9 +296,9 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
 \end{lemma}
 \begin{proof}
   \leanok
-  Both are identities between ratios of the four positive numbers \(Z_n(\beta), Z_n(2\beta),
-  Z_{2n}(\beta), Z_{2n}(2\beta)\), respectively \(Z_{2n}(\beta), Z_{2n}(2\beta), Z_{4n}(\beta),
-  Z_{4n}(2\beta)\).
+  Both equations are identities between ratios of the four positive numbers \(Z_n(\beta),
+  Z_n(2\beta), Z_{2n}(\beta), Z_{2n}(2\beta)\), and respectively \(Z_{2n}(\beta), Z_{2n}(2\beta),
+  Z_{4n}(\beta), Z_{4n}(2\beta)\).
 \end{proof}
 
 \begin{lemma}[From thermal purity to a gap]
@@ -293,20 +313,26 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
 \end{lemma}
 \begin{proof}
   \leanok
-  Write \(a_k = e^{-\beta E_L(k)}\), \(Z = \sum a_k\), \(S = \sum a_k^2\). Since \(a_{m_0}\) is
+  Write \(a_k = e^{-\beta E_L(k)}\), \(Z = \sum a_k\), and \(S = \sum a_k^2\). Since \(a_{m_0}\) is
   the largest weight, \(S \le a_{m_0} Z\); since \(m \ne m_0\), \(a_m + a_{m_0} \le Z\). Hence
-  \(a_m S \le (Z - a_{m_0}) S \le Z^2 a_{m_0} - S a_{m_0}\), which is the claim after dividing by
-  \(a_{m_0} S\).
+  \(a_m S \le (Z - a_{m_0}) S \le Z^2 a_{m_0} - S a_{m_0}\), which gives the claim after dividing
+  by \(a_{m_0} S\).
 \end{proof}
 
 \section{Doubling and the uniform gap}
+
+Alternating the two coupling identities with spatial and thermal squaring advances \((n, \beta)\)
+to \((2n, 2\beta)\) while mapping a defect bound \(\varepsilon \le 1/100\) to \(5\varepsilon^2\).
+Iterating this step produces doubly exponential defect decay along dyadic scales
+\((n_0 2^j, \beta_0 2^j)\), and interpolating across each dyadic window \([n_j, 2n_j]\) yields a
+uniform gap for all even \(L \ge n_0\).
 
 \begin{lemma}[Doubling]
   \label{lem:doubling}
   \lean{CertifiedGaps.doubling}
   \leanok
   \uses{lem:coupling, lem:purity-squaring, lem:purity-basic}
-  Assume the spatial moment inequalities above \(n_0\). Let \(n \ge n_0\) be even, \(\beta > 0\)
+  Assume the spatial moment inequalities above \(n_0\). Let \(n \ge n_0\) be even, \(\beta > 0\),
   and \(0 \le \varepsilon \le 1/100\). If \(\Ps(n, \beta) \ge 1 - \varepsilon\) and
   \(\Pt(2n, \beta) \ge 1 - \varepsilon\), then
   \(\Ps(2n, 2\beta) \ge 1 - 5\varepsilon^2\) and \(\Pt(4n, 2\beta) \ge 1 - 5\varepsilon^2\).
@@ -326,8 +352,9 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
   \label{def:defect}
   \lean{CertifiedGaps.defect, CertifiedGaps.defect_succ, CertifiedGaps.defect_le}
   \leanok
-  \(\varepsilon_j = \tfrac15 (5\varepsilon_0)^{2^j}\). It satisfies \(\varepsilon_{j+1} =
-  5\varepsilon_j^2\), and \(\varepsilon_j \le 1/100\) whenever \(0 \le \varepsilon_0 \le 1/100\).
+  For \(\varepsilon_0 \in \R\), define \(\varepsilon_j = \tfrac15 (5\varepsilon_0)^{2^j}\). It
+  satisfies \(\varepsilon_{j+1} = 5\varepsilon_j^2\), and \(\varepsilon_j \le 1/100\) whenever
+  \(0 \le \varepsilon_0 \le 1/100\).
 \end{definition}
 
 \begin{lemma}[Induction on scale]
@@ -343,18 +370,18 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
 \end{lemma}
 \begin{proof}
   \leanok
-  Induction on \(j\), applying Lemma~\ref{lem:doubling} at \((n_j, \beta_j, \varepsilon_j)\).
+  Induct on \(j\), applying Lemma~\ref{lem:doubling} at \((n_j, \beta_j, \varepsilon_j)\).
 \end{proof}
 
 \begin{lemma}[Dyadic windows]
   \label{lem:dyadic-window}
   \lean{CertifiedGaps.exists_dyadic_window}
   \leanok
-  If \(0 < n_0 \le L\) then \(n_0 2^j \le L \le 2 n_0 2^j\) for some \(j\).
+  If \(0 < n_0 \le L\), then \(n_0 2^j \le L \le 2 n_0 2^j\) for some \(j \in \N\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Take \(j = \lfloor \log_2 (L / n_0) \rfloor\) with integer division.
+  Take \(j = \lfloor \log_2 (L / n_0) \rfloor\) using integer division.
 \end{proof}
 
 \begin{theorem}[Two-purity criterion]
@@ -395,11 +422,11 @@ moments \(Z_L(\beta)\) at a single inverse temperature.
   \leanok
   \uses{thm:gap-of-seeds, prop:moment-form-bounds}
   Assume the spatial moment form above an even \(n_0 > 0\) and \(\Ps(n_0, \beta_0),
-  \Pt(2n_0, \beta_0) \ge 0.99\). Then \(\GapGT(E_L, \log 20 / \beta_0)\) for every even
+  \Pt(2n_0, \beta_0) \ge 0.99\). Then \(\GapGT(E_L, \log 20 / \beta_0)\) holds for every even
   \(L \ge n_0\).
 \end{corollary}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:gap-of-seeds} with \(\varepsilon_0 = 1/100\), using
+  Apply Theorem~\ref{thm:gap-of-seeds} with \(\varepsilon_0 = 1/100\), using
   Proposition~\ref{prop:moment-form-bounds}.
 \end{proof}

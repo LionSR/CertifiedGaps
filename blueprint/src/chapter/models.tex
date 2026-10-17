@@ -11,13 +11,18 @@ named in each statement. Ring lengths count unit cells.
 
 \section{Local building blocks}
 
+We first record the local spin-\(\tfrac12\) operators, the bipartite sublattice rotation
+\(e^{i\pi S^y}\), and the two-site cell swap \(F\) shared by the spin-\(\tfrac12\) and dimerized
+models.
+
 \begin{definition}[Real Pauli and spin-\(\tfrac12\) factors]
   \label{def:local-spin-half}
   \lean{CertifiedGaps.pauliZ, CertifiedGaps.pauliX, CertifiedGaps.pauliZ_transpose,
     CertifiedGaps.pauliX_transpose, CertifiedGaps.SpinHalf.P, CertifiedGaps.SpinHalf.P_symm}
   \leanok
-  The real Pauli matrices \(Z = \operatorname{diag}(1, -1)\) and \(X\), both symmetric, and the
-  real spin-\(\tfrac12\) factors \(P_\alpha = (S^x, iS^y, S^z)\), each symmetric or antisymmetric.
+  Let \(Z = \operatorname{diag}(1, -1)\) and \(X\) be the real symmetric Pauli matrices, and let
+  \(P_\alpha = (S^x, iS^y, S^z)\) be the real spin-\(\tfrac12\) factors, each symmetric or
+  antisymmetric.
 \end{definition}
 
 \begin{lemma}[Sublattice rotation]
@@ -34,7 +39,7 @@ named in each statement. Ring lengths count unit cells.
 \end{lemma}
 \begin{proof}
   \leanok
-  Direct computation with \(2 \times 2\) matrices.
+  This follows by direct computation with \(2 \times 2\) matrices.
 \end{proof}
 
 \begin{definition}[Cell swap]
@@ -45,7 +50,7 @@ named in each statement. Ring lengths count unit cells.
   \leanok
   The swap \(F\) of the two sites of a cell is a real symmetric involution with
   \(F (A \otimes B) F = B \otimes A\); it commutes with every intra-cell exchange
-  \(c \sum_k A_k \otimes A_k\). It is the internal reflection of the dimerized models.
+  \(c \sum_k A_k \otimes A_k\). It serves as the internal reflection of the dimerized models.
 \end{definition}
 
 \section{Spin-1 chain with single-ion anisotropy}
@@ -55,9 +60,9 @@ named in each statement. Ring lengths count unit cells.
   \lean{CertifiedGaps.SpinOneLargeD.Point, CertifiedGaps.SpinOneLargeD.points}
   \leanok
   \uses{def:spin-one-large-d, def:chain-certificate}
-  The model \(\sum_j \mathbf S_j \cdot \mathbf S_{j+1} + D \sum_j (S^z_j)^2\) of
+  We instantiate the model \(\sum_j \mathbf S_j \cdot \mathbf S_{j+1} + D \sum_j (S^z_j)^2\) of
   Definition~\ref{def:spin-one-large-d} at the two points \(D = 4\) (\(\beta_0 = 9/4\),
-  \(r = 4.755\)) and \(D = 1603/500\) (\(\beta_0 = 381/125\), \(r = 1.0065429\)), seed length
+  \(r = 4.755\)) and \(D = 1603/500\) (\(\beta_0 = 381/125\), \(r = 1.0065429\)), with seed length
   \(n_0 = 6\) sites (\texttt{models/spin1\_largeD}).
 \end{definition}
 
@@ -66,11 +71,11 @@ named in each statement. Ring lengths count unit cells.
   \lean{CertifiedGaps.SpinOneLargeD.points_valid, CertifiedGaps.SpinOneLargeD.points_β₀_pos}
   \leanok
   \uses{def:large-d-points}
-  Both certificates are valid and both \(\beta_0 > 0\).
+  Both certificates are valid and both satisfy \(\beta_0 > 0\).
 \end{lemma}
 \begin{proof}
   \leanok
-  \texttt{decide +kernel}.
+  Both conditions are checked by \texttt{decide +kernel}.
 \end{proof}
 
 \begin{lemma}[Seeds]
@@ -81,7 +86,7 @@ named in each statement. Ring lengths count unit cells.
   At each point, \(\Ps(6, \beta_0) \ge 1 - s_0\) and \(\Pt(12, \beta_0) \ge 1 - t_0\).
 \end{lemma}
 \begin{proof}
-  Certified in \texttt{models/spin1\_largeD}. Not yet proved in Lean.
+  These bounds are certified in \texttt{models/spin1\_largeD} and are not yet proved in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -95,7 +100,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-gap}.
+  Apply Theorem~\ref{thm:rp-gap}.
 \end{proof}
 
 \section{Dimerized spin-1 chain}
@@ -106,11 +111,11 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.SpinOneDimerized.points}
   \leanok
   \uses{def:rpring, def:spin-one-generators, def:cell-swap, def:chain-certificate}
-  \(H = \sum_j (1-\delta)\, \mathbf S_{2j} \cdot \mathbf S_{2j+1} + (1+\delta)\,
-  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) as a ring of weak pairs: bond factors
-  \(C_\alpha = \sqrt{1+\delta}\,(1 \otimes G_\alpha)\), internal reflection \(F\) the cell swap,
-  and on-site term \(o = -(1-\delta) \sum_\alpha G_\alpha \otimes G_\alpha\). One point,
-  \(\delta = 9/10\), with \(n_0 = 2\) cells, \(\beta_0 = 7/2\), \(r = 6.339\)
+  We write \(H = \sum_j (1-\delta)\, \mathbf S_{2j} \cdot \mathbf S_{2j+1} + (1+\delta)\,
+  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) as a ring of weak pairs with bond factors
+  \(C_\alpha = \sqrt{1+\delta}\,(1 \otimes G_\alpha)\), internal reflection \(F\) given by the cell
+  swap, and on-site term \(o = -(1-\delta) \sum_\alpha G_\alpha \otimes G_\alpha\). We record one
+  certified point, \(\delta = 9/10\), with \(n_0 = 2\) cells, \(\beta_0 = 7/2\), and \(r = 6.339\)
   (\texttt{models/spin1\_dimerized}).
 \end{definition}
 
@@ -123,7 +128,7 @@ named in each statement. Ring lengths count unit cells.
 \end{lemma}
 \begin{proof}
   \leanok
-  \texttt{decide +kernel}.
+  This is checked by \texttt{decide +kernel}.
 \end{proof}
 
 \begin{lemma}[Seeds]
@@ -131,10 +136,10 @@ named in each statement. Ring lengths count unit cells.
   \lean{CertifiedGaps.SpinOneDimerized.seeds}
   \leanok
   \uses{def:spin-one-dimerized, def:rp-purities}
-  \(\Ps(2, 7/2) \ge 1 - 0.04972\) and \(\Pt(4, 7/2) \ge 1 - 0.03206\).
+  The seed purities satisfy \(\Ps(2, 7/2) \ge 1 - 0.04972\) and \(\Pt(4, 7/2) \ge 1 - 0.03206\).
 \end{lemma}
 \begin{proof}
-  Certified in \texttt{models/spin1\_dimerized}. Not yet proved in Lean.
+  These bounds are certified in \texttt{models/spin1\_dimerized} and are not yet proved in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -147,7 +152,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-gap}.
+  Apply Theorem~\ref{thm:rp-gap}.
 \end{proof}
 
 \section{Two-leg transverse-field Ising ladder}
@@ -158,10 +163,10 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.TwoLegIsing.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:chain-certificate}
-  \(H = -\sum_{\text{legs}} Z_i Z_j - \sum_{\text{rungs}} Z_i Z_j - g \sum_i X_i\) as a ring of
-  rungs with bond factors \(Z \otimes 1\), \(1 \otimes Z\) and on-site term
-  \(o = -Z \otimes Z - g (X \otimes 1 + 1 \otimes X)\). One point, \(g = 3\), with \(n_0 = 4\)
-  rungs, \(\beta_0 = 3/2\), \(r = 2.585\) (\texttt{models/two\_leg\_tfim}).
+  We write \(H = -\sum_{\text{legs}} Z_i Z_j - \sum_{\text{rungs}} Z_i Z_j - g \sum_i X_i\) as a
+  ring of rungs with bond factors \(Z \otimes 1\), \(1 \otimes Z\) and on-site term
+  \(o = -Z \otimes Z - g (X \otimes 1 + 1 \otimes X)\). We record one certified point, \(g = 3\),
+  with \(n_0 = 4\) rungs, \(\beta_0 = 3/2\), and \(r = 2.585\) (\texttt{models/two\_leg\_tfim}).
 \end{definition}
 
 \begin{lemma}
@@ -173,7 +178,7 @@ named in each statement. Ring lengths count unit cells.
 \end{lemma}
 \begin{proof}
   \leanok
-  \texttt{decide +kernel}.
+  This is checked by \texttt{decide +kernel}.
 \end{proof}
 
 \begin{lemma}[Seeds]
@@ -181,10 +186,10 @@ named in each statement. Ring lengths count unit cells.
   \lean{CertifiedGaps.TwoLegIsing.seeds}
   \leanok
   \uses{def:two-leg-ising, def:rp-purities}
-  \(\Ps(4, 3/2) \ge 1 - 0.1125\) and \(\Pt(8, 3/2) \ge 1 - 0.05162\).
+  The seed purities satisfy \(\Ps(4, 3/2) \ge 1 - 0.1125\) and \(\Pt(8, 3/2) \ge 1 - 0.05162\).
 \end{lemma}
 \begin{proof}
-  Certified in \texttt{models/two\_leg\_tfim}. Not yet proved in Lean.
+  These bounds are certified in \texttt{models/two\_leg\_tfim} and are not yet proved in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -197,7 +202,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-gap}.
+  Apply Theorem~\ref{thm:rp-gap}.
 \end{proof}
 
 \section{Ising chain in transverse and longitudinal fields}
@@ -208,11 +213,11 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.IsingLongitudinal.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:chain-certificate}
-  \(H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j\) as a ring with the single bond
-  factor \(Z\) and on-site term \(-gX - hZ\); non-integrable for \(h \ne 0\). Thirty grid points
-  \(g \in [1/4, 2]\), \(h \in [1/20, 1]\), including the critical value \(g = 1\) and the ordered
-  phase \(g < 1\) (the longitudinal field lifts the degeneracy), each with seed length \(n_0 = 6\)
-  (\texttt{models/tfim\_longitudinal}).
+  We write \(H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j\) as a ring with the single
+  bond factor \(Z\) and on-site term \(-gX - hZ\), which is non-integrable for \(h \ne 0\). We
+  record thirty certified grid points \(g \in [1/4, 2]\), \(h \in [1/20, 1]\), including the
+  critical value \(g = 1\) and the ordered phase \(g < 1\) (where the longitudinal field lifts the
+  degeneracy), each with seed length \(n_0 = 6\) (\texttt{models/tfim\_longitudinal}).
 \end{definition}
 
 \begin{lemma}
@@ -221,11 +226,11 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.IsingLongitudinal.points_β₀_pos}
   \leanok
   \uses{def:ising-longitudinal}
-  All thirty certificates are valid and every \(\beta_0 > 0\).
+  All thirty certificates are valid and every point satisfies \(\beta_0 > 0\).
 \end{lemma}
 \begin{proof}
   \leanok
-  \texttt{decide +kernel}.
+  All thirty certificates are checked by \texttt{decide +kernel}.
 \end{proof}
 
 \begin{lemma}[Seeds]
@@ -236,8 +241,8 @@ named in each statement. Ring lengths count unit cells.
   At each point, \(\Ps(6, \beta_0) \ge 1 - s_0\) and \(\Pt(12, \beta_0) \ge 1 - t_0\).
 \end{lemma}
 \begin{proof}
-  Certified in \texttt{models/tfim\_longitudinal}. Not yet proved in Lean as a whole; the first
-  point is proved in the kernel (Theorem~\ref{thm:ising-seeds}).
+  These bounds are certified in \texttt{models/tfim\_longitudinal}. They are not yet proved in Lean
+  as a whole, although the first point is proved in the kernel (Theorem~\ref{thm:ising-seeds}).
 \end{proof}
 
 \begin{theorem}
@@ -251,7 +256,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-gap}.
+  Apply Theorem~\ref{thm:rp-gap}.
 \end{proof}
 
 \section{Spin-\(\tfrac12\) Heisenberg chain in a staggered field}
@@ -262,9 +267,9 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.StaggeredHeisenberg.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:chain-certificate}
-  The rotated chain: bond factors \(P_\alpha\) and on-site term \(-h S^z\). Five points
-  \(h = 1, 3/4, 1/2, 7/20, 1/4\) with \(n_0 = 8\) and \(\beta_0 = 21/4, 21/4, 11/2, 23/4, 25/4\)
-  (\texttt{models/heisenberg\_staggered\_field}).
+  We define the rotated chain as the reflection-positive ring with bond factors \(P_\alpha\) and
+  on-site term \(-h S^z\), at the five points \(h = 1, 3/4, 1/2, 7/20, 1/4\) with \(n_0 = 8\) and
+  \(\beta_0 = 21/4, 21/4, 11/2, 23/4, 25/4\) (\texttt{models/heisenberg\_staggered\_field}).
 \end{definition}
 
 \begin{lemma}
@@ -273,11 +278,11 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.StaggeredHeisenberg.points_β₀_pos}
   \leanok
   \uses{def:staggered}
-  All five certificates are valid and every \(\beta_0 > 0\).
+  All five certificates are valid and every point satisfies \(\beta_0 > 0\).
 \end{lemma}
 \begin{proof}
   \leanok
-  \texttt{decide +kernel}.
+  All five certificates are checked by \texttt{decide +kernel}.
 \end{proof}
 
 \begin{lemma}[Seeds]
@@ -288,7 +293,8 @@ named in each statement. Ring lengths count unit cells.
   At each point, \(\Ps(8, \beta_0) \ge 1 - s_0\) and \(\Pt(16, \beta_0) \ge 1 - t_0\).
 \end{lemma}
 \begin{proof}
-  Certified in \texttt{models/heisenberg\_staggered\_field}. Not yet proved in Lean.
+  These bounds are certified in \texttt{models/heisenberg\_staggered\_field} and are not yet proved
+  in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -301,7 +307,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-gap}.
+  Apply Theorem~\ref{thm:rp-gap}.
 \end{proof}
 
 \begin{definition}[Physical chain]
@@ -310,8 +316,9 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.StaggeredHeisenberg.physicalSpectrum, CertifiedGaps.StaggeredHeisenberg.rotation}
   \leanok
   \uses{def:ring-operators, lem:spin-half-rotation}
-  \(H_L = \sum_j \mathbf S_j \cdot \mathbf S_{j+1} - h \sum_j (-1)^j S^z_j\), and the rotation
-  \(e^{i\pi S^y}\) on the odd sites.
+  The physical chain has Hamiltonian
+  \(H_L = \sum_j \mathbf S_j \cdot \mathbf S_{j+1} - h \sum_j (-1)^j S^z_j\), related to the
+  rotated chain by the sublattice rotation \(e^{i\pi S^y}\) on the odd sites.
 \end{definition}
 
 \begin{lemma}
@@ -342,7 +349,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:staggered-physical-eq} and Theorem~\ref{thm:staggered-gap}.
+  Combine Lemma~\ref{lem:staggered-physical-eq} with Theorem~\ref{thm:staggered-gap}.
 \end{proof}
 
 \section{Dimerized spin-\(\tfrac12\) Heisenberg chain}
@@ -353,9 +360,9 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.DimerizedHeisenberg.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:cell-swap, def:chain-certificate}
-  The rotated chain as a ring of strong pairs: bond factors
-  \(C_\alpha = \sqrt{1-\delta}\,(1 \otimes P_\alpha)\), internal reflection the cell swap, and
-  on-site term \(o = -(1+\delta) \sum_\alpha P_\alpha \otimes P_\alpha\). Three points
+  We define the rotated chain as a ring of strong pairs with bond factors
+  \(C_\alpha = \sqrt{1-\delta}\,(1 \otimes P_\alpha)\), internal reflection given by the cell swap,
+  and on-site term \(o = -(1+\delta) \sum_\alpha P_\alpha \otimes P_\alpha\), at the three points
   \(\delta = 1/2, 3/10, 1/4\) with \(n_0 = 4\) cells and \(\beta_0 = 6, 13/2, 29/4\)
   (\texttt{models/dimerized\_heisenberg}).
 \end{definition}
@@ -371,7 +378,7 @@ named in each statement. Ring lengths count unit cells.
 \end{lemma}
 \begin{proof}
   \leanok
-  \texttt{decide +kernel}.
+  All three conditions are checked by \texttt{decide +kernel}.
 \end{proof}
 
 \begin{lemma}[Seeds]
@@ -382,7 +389,8 @@ named in each statement. Ring lengths count unit cells.
   At each point, \(\Ps(4, \beta_0) \ge 1 - s_0\) and \(\Pt(8, \beta_0) \ge 1 - t_0\).
 \end{lemma}
 \begin{proof}
-  Certified in \texttt{models/dimerized\_heisenberg}. Not yet proved in Lean.
+  These bounds are certified in \texttt{models/dimerized\_heisenberg} and are not yet proved in
+  Lean.
 \end{proof}
 
 \begin{theorem}
@@ -395,7 +403,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-gap}.
+  Apply Theorem~\ref{thm:rp-gap}.
 \end{proof}
 
 \begin{definition}[Physical chain]
@@ -404,9 +412,10 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.DimerizedHeisenberg.physicalSpectrum, CertifiedGaps.DimerizedHeisenberg.cellRot}
   \leanok
   \uses{def:ring-operators, lem:spin-half-rotation}
+  The physical chain has Hamiltonian
   \(H = \sum_j (1+\delta)\, \mathbf S_{2j} \cdot \mathbf S_{2j+1} + (1-\delta)\,
-  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) as a ring of strong pairs, and the rotation
-  \(1 \otimes e^{i\pi S^y}\) of every cell.
+  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) written as a ring of strong pairs, related to the
+  rotated chain by the rotation \(1 \otimes e^{i\pi S^y}\) on every cell.
 \end{definition}
 
 \begin{lemma}
@@ -436,7 +445,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:dimerized-physical-eq} and Theorem~\ref{thm:dimerized-gap}.
+  Combine Lemma~\ref{lem:dimerized-physical-eq} with Theorem~\ref{thm:dimerized-gap}.
 \end{proof}
 
 \section{Spin-\(\tfrac12\) two-leg Heisenberg ladder}
@@ -447,10 +456,11 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.HeisenbergLadder.Point, CertifiedGaps.HeisenbergLadder.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:chain-certificate}
-  The rotated ladder as a ring of rungs: bond factors \(P_\alpha \otimes 1\) and
-  \(1 \otimes P_\alpha\), and the rung as on-site term
-  \(o = -J_\perp \sum_\alpha P_\alpha \otimes P_\alpha\). One point, \(J_\perp = 4\), with
-  \(n_0 = 4\) rungs, \(\beta_0 = 2\), \(r = 9.033\) (\texttt{models/heisenberg\_ladder}).
+  We define the rotated ladder as a ring of rungs with bond factors \(P_\alpha \otimes 1\) and
+  \(1 \otimes P_\alpha\) and the rung exchange as the on-site term
+  \(o = -J_\perp \sum_\alpha P_\alpha \otimes P_\alpha\). We record one certified point,
+  \(J_\perp = 4\), with \(n_0 = 4\) rungs, \(\beta_0 = 2\), and \(r = 9.033\)
+  (\texttt{models/heisenberg\_ladder}).
 \end{definition}
 
 \begin{lemma}
@@ -462,7 +472,7 @@ named in each statement. Ring lengths count unit cells.
 \end{lemma}
 \begin{proof}
   \leanok
-  \texttt{decide +kernel}.
+  This is checked by \texttt{decide +kernel}.
 \end{proof}
 
 \begin{lemma}[Seeds]
@@ -470,10 +480,10 @@ named in each statement. Ring lengths count unit cells.
   \lean{CertifiedGaps.HeisenbergLadder.seeds}
   \leanok
   \uses{def:ladder, def:rp-purities}
-  \(\Ps(4, 2) \ge 1 - 0.03509\) and \(\Pt(8, 2) \ge 1 - 0.02463\).
+  The seed purities satisfy \(\Ps(4, 2) \ge 1 - 0.03509\) and \(\Pt(8, 2) \ge 1 - 0.02463\).
 \end{lemma}
 \begin{proof}
-  Certified in \texttt{models/heisenberg\_ladder}. Not yet proved in Lean.
+  These bounds are certified in \texttt{models/heisenberg\_ladder} and are not yet proved in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -486,7 +496,7 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-gap}.
+  Apply Theorem~\ref{thm:rp-gap}.
 \end{proof}
 
 \begin{definition}[Physical ladder]
@@ -495,9 +505,10 @@ named in each statement. Ring lengths count unit cells.
     CertifiedGaps.HeisenbergLadder.physicalSpectrum, CertifiedGaps.HeisenbergLadder.rungRot}
   \leanok
   \uses{def:ring-operators, lem:spin-half-rotation}
+  The physical ladder has Hamiltonian
   \(H = \sum_{\text{legs}} \mathbf S_i \cdot \mathbf S_j + J_\perp \sum_{\text{rungs}}
-  \mathbf S_i \cdot \mathbf S_j\), and the checkerboard rotation \(e^{i\pi S^y}\) on the sites
-  \((1, j)\), \(j\) odd, and \((2, j)\), \(j\) even.
+  \mathbf S_i \cdot \mathbf S_j\), related to the rotated ladder by the checkerboard rotation
+  \(e^{i\pi S^y}\) on the sites \((1, j)\) for odd \(j\) and \((2, j)\) for even \(j\).
 \end{definition}
 
 \begin{lemma}
@@ -526,5 +537,5 @@ named in each statement. Ring lengths count unit cells.
 \end{theorem}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:ladder-physical-eq} and Theorem~\ref{thm:ladder-gap}.
+  Combine Lemma~\ref{lem:ladder-physical-eq} with Theorem~\ref{thm:ladder-gap}.
 \end{proof}

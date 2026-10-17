@@ -11,6 +11,12 @@ unconditional gap theorem.
 
 \section{Two eigenvalue bounds}
 
+To bracket the partition functions \(Z_6(\beta)\) and \(Z_{12}(\beta)\) inside the Lean kernel
+without diagonalizing \(64 \times 64\) and \(4096 \times 4096\) matrices, we combine two elementary
+tools: a Ritz residual bound that encloses the two lowest eigenvalues from approximate integer
+eigenvectors, and a subspace comparison lemma that bounds all remaining \(2^L - 2\) eigenvalues from
+below.
+
 \begin{lemma}[Residual bound]
   \label{lem:residual}
   \lean{SeedKernel.Ising.exists_eigenvalue_near}
@@ -41,6 +47,10 @@ unconditional gap theorem.
 \end{proof}
 
 \section{The Ising Hamiltonian in the computational basis}
+
+In the \(Z\)-basis, the longitudinal-field Ising Hamiltonian is diagonal up to single-spin flips of
+strength \(g\), so its quadratic form is bounded below by the classical Ising energy minus \(gL\)
+and its action on bit-encoded configurations reduces to exact integer arithmetic.
 
 \begin{lemma}[Action of the Hamiltonian]
   \label{lem:ising-action}
@@ -88,6 +98,10 @@ unconditional gap theorem.
 \end{proof}
 
 \section{The seed and the unconditional gap}
+
+Combining the two Ritz enclosures with the classical-energy floor bounds \(Z_6(97/4)\),
+\(Z_{12}(97/4)\), and \(Z_{12}(97/2)\) tightly enough to discharge the seed hypothesis at
+\((g, h) = (1/4, 1/20)\) and yield a fully axiom-free gap theorem.
 
 \begin{definition}[Low spectrum]
   \label{def:low-spectrum}
