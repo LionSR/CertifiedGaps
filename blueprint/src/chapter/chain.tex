@@ -13,9 +13,10 @@ the Lean kernel.
 
 Rather than bounding both defects by a single common \(\varepsilon\), we track separate upper
 bounds \(s\) and \(t\) on \(1 - \Ps(n, \beta)\) and \(1 - \Pt(2n, \beta)\) through the exact
-coupling defect \(z(a, b) = 1 - (1 - b)(1 - a)^2\) and the squaring map \(f(z)\). Because Move~3
-uses the already-squared spatial defect \(s' \ge f(z(s, t))\) in place of \(s\), this asymmetric
-step tolerates substantially larger initial defects.
+coupling defect \(z(a, b) = 1 - (1 - b)(1 - a)^2\) and the squaring map \(f(z)\). Because the
+thermal half of the step (Lemma~\ref{lem:doubling-step}) uses the already-squared spatial defect
+\(s' \ge f(z(s, t))\) in place of \(s\), this asymmetric step tolerates substantially
+larger initial defects.
 
 \begin{definition}[Coupling defect]
   \label{def:coupling-defect}

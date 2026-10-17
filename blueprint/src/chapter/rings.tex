@@ -91,9 +91,11 @@ the spectral sum of Chapter~\ref{chap:criterion}.
 
 To exhibit the spatial moment form at finite Trotter number \(M\), we split each slice into even
 bonds, on-site terms, and odd bonds. Expanding the bond factors turns the \(M\)-slice trace on a
-ring of \(2N\) cells into a product of single-cell time-word traces \(\mathcal F_{pq}\). Reflection
-positivity guarantees that \(\mathcal F\) has real entries, so the two-cell spatial transfer matrix
-\(T = \mathcal F^{\mathsf T} \mathcal F = \mathcal F^\dagger \mathcal F\) is positive semidefinite.
+ring of \(2N\) cells into a sum, over time-label sequences on the bonds, of products of
+single-cell traces \(\mathcal F_{pq}\); this sum is \(\Tr (\mathcal F^{\mathsf T} \mathcal F)^N\).
+Reflection positivity guarantees that \(\mathcal F\) has real entries, so the two-cell spatial
+transfer matrix \(T = \mathcal F^{\mathsf T} \mathcal F = \mathcal F^\dagger \mathcal F\) is
+positive semidefinite.
 
 \begin{definition}[Trotter slice]
   \label{def:trotter}

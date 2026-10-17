@@ -40,3 +40,4 @@ lean/.lake
 /blueprint/lean_decls
 /blueprint/src/web.bbl
 /blueprint/src/web.paux
+/docbuild/

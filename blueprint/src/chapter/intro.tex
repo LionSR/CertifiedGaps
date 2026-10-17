@@ -16,11 +16,14 @@ unit cells, write \(Z_L(\beta) = \Tr e^{-\beta H_L}\) and define the \emph{spati
   \Ps(n,\beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
   \Pt(n,\beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
 \]
-A thermal purity \(\Pt(L, \beta)\) near one means that the ground state carries almost all of the
-Boltzmann weight, which forces a unique ground state and bounds the spectral gap
-\(\Delta_L = E_1(L) - E_0(L)\) from below whenever the purity defect \(1 - \Pt(L, \beta)\) decays
-exponentially in \(\beta\). Squaring the Gibbs operator in imaginary time improves \(\Pt\) at fixed
-\(L\), but advancing \(L\) and \(\beta\) together requires a spatial transfer operator. If the bond
+A thermal purity \(\Pt(L, \beta) > 1/2\) means that the ground state carries most of the
+Boltzmann weight. It forces a unique ground state and bounds the spectral gap,
+\(\Delta_L = E_1(L) - E_0(L) \ge \beta^{-1} \log\bigl(\Pt(L, \beta) / (1 - \Pt(L, \beta))\bigr)\)
+(Lemma~\ref{lem:purity-to-gap}). The bound is uniform in \(L\) when the defect
+\(1 - \Pt(L, \beta)\) is bounded uniformly in \(L\), and it stays bounded away from zero as
+\(\beta\) grows only if the defect falls like \(e^{-c\beta}\). Squaring the Gibbs operator in
+imaginary time improves \(\Pt\) at fixed \(L\), but advancing \(L\) and \(\beta\) together requires
+a spatial transfer operator. If the bond
 interaction is reflection positive, \(-h = \sum_\alpha C_\alpha \otimes \overline{C_\alpha}\) in a
 local basis with a real symmetric on-site term \(o\), then \(Z_L(\beta)\) is a moment sum
 \(\sum_i \mu_i^L\) of a positive transfer operator at even lengths \(L\), and both purities improve
@@ -42,7 +45,7 @@ The blueprint follows the five layers of the formalization:
     moment inequalities, via Trotterized positive semidefinite transfer matrices and a Lie--Trotter
     product formula (Theorem~\ref{thm:rp-moment-bounds}), giving the end-to-end criterion for rings
     (Theorem~\ref{thm:rp-gap}).
-  \item Chapters~\ref{chap:heisenberg} and~\ref{chap:models}: the spin-1 Heisenberg ring and eight
+  \item Chapters~\ref{chap:heisenberg} and~\ref{chap:models}: the spin-1 Heisenberg ring and seven
     further model families, each a gap theorem whose only open hypotheses are its two seed
     inequalities.
   \item Chapter~\ref{chap:seedkernel}: seed inequalities proved inside the Lean kernel. For the
