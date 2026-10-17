@@ -36,6 +36,8 @@ structure Head where
   β : Nat
   /-- The positions of `n₀`, `s`, `t`, for a seeded record. -/
   seeds : Option (Nat × Nat × Nat)
+  /-- The positions of the interval ends `a`, `b`, for a record on a parameter interval. -/
+  interval : Option (Nat × Nat) := none
 
 /-- The record heads of `Leaderboard/Record.lean`, with their argument positions. -/
 def heads : List Head := [
@@ -44,7 +46,10 @@ def heads : List Head := [
     spectrum := 1, L₀ := 2, r := 3, β := 4, seeds := none },
   -- `Seeded {d} [Fintype d] [DecidableEq d] spectrum L₀ r β n₀ s t`
   { name := `Leaderboard.Record.Seeded, kind := "conditional", arity := 10,
-    spectrum := 3, L₀ := 4, r := 5, β := 6, seeds := some (7, 8, 9) }]
+    spectrum := 3, L₀ := 4, r := 5, β := 6, seeds := some (7, 8, 9) },
+  -- `SeededOn {d} [Fintype d] [DecidableEq d] family a b L₀ r β n₀ s t`
+  { name := `Leaderboard.Record.SeededOn, kind := "conditional", arity := 12,
+    spectrum := 3, L₀ := 6, r := 7, β := 8, seeds := some (9, 10, 11), interval := some (4, 5) }]
 
 /-- The record head of a statement and its arguments, after unfolding reducible definitions
 only (so that no model definition is unfolded). -/
@@ -116,21 +121,26 @@ def explicitArgs (e : Expr) : MetaM (Array Expr) := do
 /-- The spectrum of a record as `{model, frame, params, printed}`. For `R.spectrum` of a
 reflection-positive ring `R = M p₁ … pₖ` the model is `M` and the frame `spectrum`; otherwise
 (`physicalSpectrum p₁ … pₖ`, `SpinOneHeisenberg.spectrum`) the model is the head constant and
-the frame its last name component. `printed` is the full term without notation. -/
+the frame its last name component. For the family `fun x ↦ …` of a record on an interval, the
+parameter `x` is listed as `"x"`. `printed` is the full term without notation. -/
 def spectrumJson (e : Expr) : MetaM Json := do
   let e ← instantiateMVars e
-  let (frame, m) := match e.getAppFn.constName? with
-    | some `CertifiedGaps.RPRing.spectrum => ("spectrum", e.getAppArgs.back!)
-    | some n => (n.componentsRev.head!.toString, e)
-    | none => ("", e)
-  let some model := m.getAppFn.constName? |
-    throwError "the spectrum must be a constant applied to numerals, not {e}"
-  let params ← (← explicitArgs m).mapM fun a ↦ return ratString (← evalNumeral a)
   let opts := ({} : Options) |>.set `pp.notation false |>.set `pp.fieldNotation false
     |>.set `pp.fullNames true
   let printed := (← withOptions (fun _ ↦ opts) (ppExpr e)).pretty 100000
-  return Json.mkObj [("model", toJson model.toString), ("frame", toJson frame),
-    ("params", toJson params), ("printed", toJson printed)]
+  lambdaTelescope e fun xs e ↦ do
+    let param (a : Expr) : MetaM String := do
+      if xs.contains a then return "x"
+      return ratString (← evalNumeral a)
+    let (frame, m) := match e.getAppFn.constName? with
+      | some `CertifiedGaps.RPRing.spectrum => ("spectrum", e.getAppArgs.back!)
+      | some n => (n.componentsRev.head!.toString, e)
+      | none => ("", e)
+    let some model := m.getAppFn.constName? |
+      throwError "the spectrum must be a constant applied to numerals, not {e}"
+    let params ← (← explicitArgs m).mapM param
+    return Json.mkObj [("model", toJson model.toString), ("frame", toJson frame),
+      ("params", toJson params), ("printed", toJson printed)]
 
 /-- The JSON entry of the record `n` of module `mod`, whose statement has head `h` applied to
 `args`. Throws on a disallowed axiom or on arguments that are not literals. -/
@@ -145,11 +155,14 @@ def recordJson (n mod : Name) (h : Head) (args : Array Expr) : MetaM Json := do
       pure [("n0", toJson (← evalNat args[n₀]!)), ("s", toJson (← evalRat args[s]!)),
         ("t", toJson (← evalRat args[t]!))]
     | none => pure [("n0", Json.null), ("s", Json.null), ("t", Json.null)]
+  let interval ← match h.interval with
+    | some (a, b) => pure (toJson [← evalRat args[a]!, ← evalRat args[b]!])
+    | none => pure Json.null
   return Json.mkObj <| [
     ("name", toJson n.toString), ("module", toJson mod.toString), ("kind", toJson h.kind),
     ("spectrum", ← spectrumJson args[h.spectrum]!), ("L0", toJson (← evalNat args[h.L₀]!)),
     ("r", toJson (← evalRat args[h.r]!)), ("beta", toJson (← evalRat args[h.β]!))] ++ seeds ++
-    [("axioms", toJson (axioms.map (·.toString) |>.qsort (· < ·)))]
+    [("interval", interval), ("axioms", toJson (axioms.map (·.toString) |>.qsort (· < ·)))]
 
 /-- Every record of the `Leaderboard.Records.*` modules, sorted by name, and every problem. -/
 def run : MetaM (Array (Name × Json) × Array String) := do

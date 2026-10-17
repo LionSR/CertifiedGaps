@@ -8,7 +8,6 @@
 - date: "2026-09-24"
   text: 'OpenAI posts two preprints that prove the spin-1 Haldane gap, for the ring and for the open chain with end fields.'
   link: 'https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026'
-  records: [spin1-source1]
 - date: "2026-10-10"
   text: 'This repository reproduces the finite computations of the periodic preprint in exact integer arithmetic.'
   link: '/leaderboard.html#spin1-source1'
@@ -43,3 +42,7 @@
   text: 'The leaderboard of proven gaps opens for contributions.'
   link: '/leaderboard.html'
   prs: [53]
+- date: "2026-10-17"
+  text: 'Lean now checks the rest of the proof, after the two computed inequalities, for 50 of the 52 computer-checked gaps. The spin-1 bound for rings of 2304 sites or more rises from 0.00382 to 0.00474.'
+  link: '/leaderboard.html#spin1-source1'
+  records: [spin1-source1, ising-g-1-4-h-1-20]

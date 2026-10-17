@@ -196,6 +196,29 @@ function check_lean_seeds!(report, where, rec, lean, leanjson, rowcert, root)
 end
 
 """
+    check_lean_interval!(report, where, rec, leanjson)
+
+A row on a parameter interval (params `<p>_min`, `<p>_max`) needs a Lean record on the same
+interval (`Record.SeededOn`, whose `interval` is `[a, b]`), and a Lean record on an interval
+needs such a row.
+"""
+function check_lean_interval!(report, where, rec, leanjson)
+    params = something(getk(rec, "params"), Dict())
+    lo = [k for k in keys(params) if endswith(k, "_min")]
+    interval = get(leanjson, :interval, nothing)
+    if isempty(lo)
+        interval === nothing || err!(report, "$where: the Lean record is on an interval but the row is a point")
+        return report
+    end
+    length(lo) == 1 || return err!(report, "$where: more than one parameter interval")
+    hi = replace(lo[1], r"_min$" => "_max")
+    interval === nothing && return err!(report, "$where: the row is an interval but the Lean record is a point")
+    [parse_exact(params[lo[1]]), parse_exact(get(params, hi, "0"))] == parse_exact.(string.(interval)) ||
+        err!(report, "$where: the Lean interval $(collect(interval)) is not [$(lo[1]), $hi] of the row")
+    return report
+end
+
+"""
     lean_covers(bound, lean, headline, leanbound, lengths) -> Bool
 
 Whether the Lean theorem Δ_L > log(r)/β for every even L ≥ L0 implies the headline claim: the
@@ -321,6 +344,7 @@ function check_record!(report, rec, ctx)
             haskey(LEAN_KIND, tier) && kind isa AbstractString && kind != LEAN_KIND[tier] &&
                 err!(report, "$where: tier $tier but the Lean record is $kind")
             kind == "conditional" && check_lean_seeds!(report, where, rec, lean, json[name], rowcert, root)
+            haskey(json, name) && check_lean_interval!(report, where, rec, json[name])
         end
     end
 
