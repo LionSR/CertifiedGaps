@@ -1,0 +1,70 @@
+name: Kernel re-check
+
+# Replay every declaration of the Leaderboard library and of the repository modules it imports
+# through the Lean kernel with leanchecker (bundled with the toolchain; the upstreamed
+# lean4checker). This catches `set_option debug.skipKernelTC true` and declarations written into
+# the environment by metaprograms. It runs apart from the deploy (blueprint.yml), so it never
+# blocks the site.
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "leaderboard/**"
+      - "lean/**"
+      - "lakefile.toml"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+  push:
+    branches:
+      - main
+    paths:
+      - "leaderboard/**"
+      - "lean/**"
+      - "lakefile.toml"
+      - "lake-manifest.json"
+      - "lean-toolchain"
+  schedule:
+    - cron: "41 4 * * 1" # Mondays 04:41 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: kernel-check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  leanchecker:
+    name: leanchecker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      # Installs elan and the toolchain and fetches the Mathlib cache; the build is the next step.
+      - name: Set up Lean
+        uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1.6.2
+        with:
+          auto-config: false
+          build: false
+          use-mathlib-cache: true
+
+      # Only the Leaderboard library and what it imports, so that the build directory holds
+      # exactly the modules to re-check (not the SeedKernel spin-1 benchmarks).
+      - name: Build the Leaderboard library
+        run: ~/.elan/bin/lake build Leaderboard
+
+      # One leanchecker process over the exact module list, with one thread: it replays the
+      # modules one after another and frees each environment, so the peak memory is that of the
+      # largest module (SeedKernel.Ising.Seed, about 9 GB) instead of the sum of parallel imports.
+      - name: Re-check every built module in the kernel
+        env:
+          LEAN_NUM_THREADS: "1"
+        run: |
+          mods=$(cd .lake/build/lib/lean && find . -name '*.olean' \
+            | sed -e 's|^\./||' -e 's|\.olean$||' -e 's|/|.|g' | sort)
+          echo "Modules: $(echo "$mods" | wc -l)"
+          # shellcheck disable=SC2086 # one argument per module
+          ~/.elan/bin/lake env leanchecker -v $mods

@@ -1,0 +1,29 @@
+name: Take on a challenge
+description: Say that you are working on an open challenge or on improving a leaderboard result.
+title: "Challenge: "
+labels: ["challenge"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue lets others see who is working on what. The leaderboard's "Take this on" and
+        "Improve this record" buttons fill in the challenge below.
+  - type: input
+    id: challenge
+    attributes:
+      label: Challenge or leaderboard row
+      description: The identifier from the leaderboard, for example ladder-Jperp-3-lean.
+    validations:
+      required: true
+  - type: textarea
+    id: plan
+    attributes:
+      label: Plan
+      description: How you intend to get the result, for example a larger starting ring, a sharper computation, or a Lean proof.
+    validations:
+      required: true
+  - type: textarea
+    id: help
+    attributes:
+      label: Questions
+      description: Anything you would like help with.

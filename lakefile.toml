@@ -38,24 +38,16 @@ srcDir = "lean"
 roots = []
 globs = ["SeedKernel.Bench.+"]
 
-# Leaderboard of certified spectral-gap records (leaderboard/README.md): record statements, the
-# `@[gap_record]` tag and the records proved so far.
+# Leaderboard of certified spectral-gap records (leaderboard/README.md): record statements and
+# the records proved so far.
 [[lean_lib]]
 name = "Leaderboard"
 srcDir = "leaderboard"
 
-# `lake exe leaderboard_audit <out.json>`: lists every `@[gap_record]` theorem with its statement
-# and axioms, and fails on `sorryAx`, `native_decide` or any non-standard axiom.
+# `lake exe leaderboard_audit <out.json>`: lists every record of Leaderboard.Records.* as JSON, and
+# fails on any axiom outside propext, Classical.choice, Quot.sound.
 [[lean_exe]]
 name = "leaderboard_audit"
 srcDir = "leaderboard"
 root = "Leaderboard.Audit.Main"
-supportInterpreter = true
-
-# `lake exe leaderboard_recheck`: replays the Leaderboard modules and their in-repository
-# dependencies through the kernel (the check of the toolchain's `leanchecker`).
-[[lean_exe]]
-name = "leaderboard_recheck"
-srcDir = "leaderboard"
-root = "Leaderboard.Recheck.Main"
 supportInterpreter = true

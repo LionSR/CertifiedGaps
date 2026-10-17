@@ -26,8 +26,8 @@
     <a href="{{ '/' | relative_url }}" class="btn">Home</a>
     <a href="{{ '/leaderboard.html' | relative_url }}" class="btn">Leaderboard</a>
     <a href="{{ '/explainer/' | relative_url }}" class="btn">Explainer</a>
-    <a href="{{ '/blueprint/' | relative_url }}" class="btn">Blueprint (web)</a>
-    <a href="{{ '/docs/' | relative_url }}" class="btn">Lean API docs</a>
+    <a href="{{ '/blueprint/' | relative_url }}" class="btn">Lean blueprint</a>
+    <a href="{{ '/docs/' | relative_url }}" class="btn">Lean documentation</a>
     <a href="{{ '/contribute.html' | relative_url }}" class="btn">Contribute</a>
     <a href="{{ repo_url }}" class="btn">GitHub</a>
   </header>
@@ -36,8 +36,7 @@
     {{ content }}
 
     <footer class="site-footer">
-      <span class="site-footer-owner"><a href="{{ repo_url }}">{{ site.repository }}</a>
-        is maintained by the thermal-mpo-gap contributors. Visit the GitHub repository for more information.</span>
+      <span class="site-footer-owner">Code, data and proofs: <a href="{{ repo_url }}">{{ site.repository }}</a> on GitHub.</span>
     </footer>
   </main>
 </body>

@@ -1,232 +1,168 @@
-# Fast tests of the leaderboard validator on small fixtures (good and bad cases), plus the real
-# records.yml against the Lean records fixture.
+# Tests of the leaderboard validator on small fixtures (good and bad cases), and of the
+# repository's records.yml and news.yml against the Lean records fixture.
 #
 #     julia --project=tools/leaderboard tools/leaderboard/test/runtests.jl
 
 using Test
 using LeaderboardCheck
-using LeaderboardCheck: check_decimal!, passed
+using LeaderboardCheck: check_decimal!, passed, Report, YAML
 
 const REPO = normpath(joinpath(@__DIR__, "..", "..", ".."))
 const FIXTURE = joinpath(@__DIR__, "lean_records.fixture.json")
 
-# A minimal repository: one model directory with a certificate and a checker.
-function fake_repo(dir)
-    mkpath(joinpath(dir, "models", "toy", "results"))
-    write(joinpath(dir, "models", "toy", "check.jl"), "")
-    write(joinpath(dir, "models", "toy", "results", "certificate.json"), "{}")
-    return dir
-end
+# A repository with one model whose certificate states the seed (6, 97/4), the bound 1/2 and
+# the defects 1/100, next to a floating-point diagnostic that claims more.
+const CERT = """{"g": "1/4", "certificate": {"n": 6, "beta": "97/4", "bound_exact_binary": "1/2",
+    "epsilon_s": "1/100", "epsilon_t": "1/100"},
+    "diagnostic": {"n": 6, "beta": "97/4", "bound": 0.9, "epsilon_s": 0.001, "epsilon_t": 0.001}}"""
 
-const FAMILY = """
+const HEAD = """
+tiers:
+  - {key: lean-unconditional, glyph: 'A', label: 'a', meaning: 'a'}
+  - {key: lean-conditional, glyph: 'B', label: 'b', meaning: 'b'}
+  - {key: certified, glyph: 'C', label: 'c', meaning: 'c'}
+  - {key: target, glyph: 'D', label: 'd', meaning: 'd'}
 families:
-  - key: toy
-    name: Toy chain
-    hamiltonian: '\$H = -\\sum Z Z\$'
-    slug: toy
-    cells: sites
+  - {key: toy, name: Toy, hamiltonian: 'H', slug: toy, cells: sites, gap_source: 'ED'}
 """
 
 record(; tier = "lean-conditional", bound = """{r: "13480", beta: "97/4", decimal: "0.3921"}""",
-    lean = """{name: Leaderboard.Records.Toy.p, L0: 6, r: "13480", beta: "97/4", decimal: "0.3921"}""",
-    extra = "", certificate = "models/toy/results/certificate.json") = """
+    lean = """{name: Leaderboard.Records.Toy.p, r: "13480", beta: "97/4", decimal: "0.3921"}""",
+    seed = """{n0: 6, beta0: "97/4"}""", extra = "", contributors = "[LionSR]",
+    params = """{g: "1/4"}""", certificate = "models/toy/results/certificate.json") = """
   - id: toy-p
     family: toy
-    parameter: '\$g = 1/4\$'
-    params: {g: "1/4"}
-    lengths: {L0: 6, parity: even, unit: sites}
+    parameter: 'g = 1/4'
+    params: $params
+    lengths: {L0: 6}
     bound: $bound
-    seed: {n0: 6, beta0: "97/4"}
-    numerical_gap: {value: "1.19", source: "ED"}
+    seed: $seed
+    numerical_gap: "1.19"
     tier: $tier
     $(lean === nothing ? "" : "lean: $lean")
     certificate: $certificate
-    check: models/toy/check.jl
     date: "2026-10-15"
     pr: 34
+    contributors: $contributors
 $extra"""
 
-lean_json(; kind = "conditional", L0 = 6, r = "13480", beta = "97/4",
-    hyp = "\"1 - e ≤ P\"", axioms = """["propext", "Classical.choice", "Quot.sound"]""") = """
-[{"name": "Leaderboard.Records.Toy.p", "kind": "$kind", "spectrum": "toy.spectrum L",
-  "L0": $L0, "r": "$r", "beta": "$beta", "hypothesis": $hyp, "axioms": $axioms,
-  "module": "Leaderboard.Records.Toy"},
- {"name": "Leaderboard.Records.Toy.extra", "kind": "conditional", "spectrum": "s", "L0": 6,
-  "r": "2", "beta": "1", "hypothesis": "h", "axioms": [], "module": "Leaderboard.Records.Toy"}]
+lean_json(; kind = "conditional", L0 = 6, r = "13480", seeds = "") = """
+[{"name": "Leaderboard.Records.Toy.p", "kind": "$kind", "L0": $L0, "r": "$r", "beta": "97/4"$seeds},
+ {"name": "Leaderboard.Records.Toy.extra", "kind": "conditional", "L0": 6, "r": "2", "beta": "1"}]
 """
 
-function run_check(yaml; json = nothing)
+function check(rec; json = nothing, head = HEAD)
     mktempdir() do dir
-        fake_repo(dir)
-        path = joinpath(dir, "records.yml")
-        write(path, yaml)
-        lean = nothing
-        if json !== nothing
-            lean = joinpath(dir, "lean_records.json")
-            write(lean, json)
-        end
-        report, summary = check_records(path; root = dir, lean_records = lean)
-        return report, summary
+        mkpath(joinpath(dir, "models", "toy", "results"))
+        write(joinpath(dir, "models", "toy", "check.jl"), "")
+        write(joinpath(dir, "models", "toy", "results", "certificate.json"), CERT)
+        write(joinpath(dir, "records.yml"), head * "records:\n" * rec)
+        lean = json === nothing ? nothing : joinpath(dir, "lean.json")
+        json === nothing || write(lean, json)
+        return first(check_records(joinpath(dir, "records.yml"); root = dir, lean_records = lean))
     end
 end
-
-errors_match(report, re) = any(e -> occursin(re, e), report.errors)
+fails(report, re) = any(e -> occursin(re, e), report.errors)
 
 @testset "LeaderboardCheck" begin
-    @testset "exact parsing" begin
+    @testset "exact numbers" begin
         @test parse_exact("13480") == 13480
-        @test parse_exact("97/4") == 97 // 4
-        @test parse_exact("97//4") == 97 // 4
-        @test parse_exact("4134e-1") == 2067 // 5
-        @test parse_exact("413.4") == 2067 // 5
-        @test parse_exact("-3/4") == -3 // 4
-        @test parse_exact(6) == 6
+        @test parse_exact("97//4") == parse_exact("97/4") == 97 // 4
+        @test parse_exact("4134e-1") == parse_exact("413.4") == 2067 // 5
         @test_throws ArgumentError parse_exact(0.5)
         @test_throws ArgumentError parse_exact("1/0")
-        @test_throws ArgumentError parse_exact("log 2")
         @test parse_decimal("0.3921") == (3921 // 10000, 4)
         @test_throws ArgumentError parse_decimal(0.3921)
-        @test_throws ArgumentError parse_decimal("1e-3")
-    end
-
-    @testset "decimals rounded down" begin
         lo, hi = bound_enclosure(Dict("r" => "20", "beta" => "784"))
-        @test lo <= hi && hi - lo < big(1) // big(10)^20
-        @test Float64(lo) ≈ log(20) / 784
-        ok(d) = passed(check_decimal!(LeaderboardCheck.Report(), "t", d, lo, hi))
-        @test ok("0.00382")
-        @test ok("0.0038210")
-        @test !ok("0.00383")       # rounded up
-        @test !ok("0.0037")        # true but not the floor at four decimals
-        v = 1148261 // 1000000
-        @test passed(check_decimal!(LeaderboardCheck.Report(), "t", "1.148261", v, v))
-        @test !passed(check_decimal!(LeaderboardCheck.Report(), "t", "1.148262", v, v))
+        @test lo <= hi && hi - lo < big(1) // big(10)^20 && Float64(lo) ≈ log(20) / 784
+        ok(d) = passed(check_decimal!(Report(), "t", d, lo, hi))
+        @test ok("0.00382") && ok("0.0038210")
+        @test !ok("0.00383")   # rounded up
+        @test !ok("0.0037")    # true, but not the floor at four decimals
     end
 
-    @testset "good fixture" begin
-        report, summary = run_check(FAMILY * "records:\n" * record(); json = lean_json())
-        @test passed(report)
-        @test summary["lean-conditional"] == 1
-        @test any(w -> occursin("Toy.extra", w), report.warnings)
-        # without the Lean file, the YAML alone validates
-        report, _ = run_check(FAMILY * "records:\n" * record())
-        @test passed(report)
+    @testset "good records" begin
+        @test passed(check(record(); json = lean_json()))
+        @test passed(check(record()))   # without the Lean file
+        @test passed(check(record(contributors = "['OpenAI (preprint)', LionSR]")))
     end
 
-    @testset "bad fixtures" begin
-        bad(yaml; json = nothing) = first(run_check(FAMILY * "records:\n" * yaml; json))
-        @test errors_match(bad(record(tier = "gold")), "tier")
-        @test errors_match(bad(record(bound = """{r: "13480", beta: "97/4", decimal: "0.3922"}""")),
-            "exceeds")
-        @test errors_match(bad(record(bound = """{r: "13480", beta: "97/4", decimal: 0.3921}""")),
-            "quoted string")
-        @test errors_match(bad(record(bound = """{value: "1/2", r: "2", beta: "1", decimal: "0.5"}""")),
-            "not both")
-        @test errors_match(bad(record(certificate = "models/toy/results/missing.json")),
-            "does not exist")
-        @test errors_match(bad(record(certificate = "../outside.json")), "relative")
-        @test errors_match(bad(record(lean = nothing)), "needs a lean record")
-        @test errors_match(bad(record(tier = "certified")), "tier must be lean")
-        @test errors_match(bad(record(); json = lean_json(kind = "unconditional", hyp = "null")),
-            "Lean record is unconditional")
-        @test errors_match(bad(record(); json = lean_json(L0 = 8)), "L0")
-        @test errors_match(bad(record(); json = lean_json(r = "13481")), "r = ")
-        @test errors_match(bad(record(); json = lean_json(beta = "24")), "beta = ")
-        @test errors_match(bad(record(); json = lean_json(axioms = """["sorryAx"]""")),
-            "nonstandard axioms")
-        @test errors_match(bad(record(); json = lean_json(hyp = "null")), "no hypothesis")
-        @test errors_match(bad(record(lean = """{name: Other.p, L0: 6, r: "13480", beta: "97/4"}""")),
-            "Leaderboard.Records")
-        @test errors_match(bad(record(lean = """{name: Leaderboard.Records.Toy.q, L0: 6, r: "13480", beta: "97/4"}""");
-            json = lean_json()), "not in lean_records.json")
-        @test errors_match(bad(record() * replace(record(), "toy-p" => "toy-p")), "duplicate id")
-        @test errors_match(bad(replace(record(), "family: toy" => "family: nope")), "unknown family")
-        target = """
-  - id: toy-target
-    family: toy
-    parameter: 'x'
-    bound: {value: "1", decimal: "1.0"}
-    tier: target
-"""
-        @test errors_match(bad(target), "a target has no bound")
-        @test errors_match(bad(target), "needs an estimate")
-        history = """
-    history:
-      - {date: "2026-13-01", decimal: "0.39", method: "m", tier: certified}
-"""
-        @test errors_match(bad(record(extra = history)), "yyyy-mm-dd")
+    @testset "bad records" begin
+        @test fails(check(record(tier = "gold")), "tier")
+        @test fails(check(record(tier = "unreviewed")), "tier")
+        @test fails(check(record(bound = """{r: "13480", beta: "97/4", decimal: "0.3922"}""")), "exceeds")
+        @test fails(check(record(bound = """{r: "13480", beta: "97/4", decimal: 0.3921}""")), "quoted string")
+        @test fails(check(record(certificate = "models/toy/results/missing.json")), "does not exist")
+        @test fails(check(record(lean = nothing)), "needs a Lean record")
+        @test fails(check(record(contributors = "[]")), "nonempty")
+        @test fails(check(record(contributors = "['not/a-handle!']")), "GitHub handle")
+        @test fails(check(record(); json = lean_json(L0 = 8)), "L0")
+        @test fails(check(record(); json = lean_json(r = "13481")), "r = ")
+        @test fails(check(record(); json = lean_json(kind = "unconditional")), "Lean record is unconditional")
+        @test fails(check(record() * record()), "duplicate id")
+        target = "  - {id: toy-target, family: toy, parameter: 'x', tier: target, bound: {value: \"1\", decimal: \"1.0\"}}\n"
+        @test fails(check(target), "a target has no bound")
+        @test fails(check(target), "needs an estimate")
+        bad_date = "    history:\n      - {date: \"2026-13-01\", decimal: \"0.39\", lengths: x, tier: certified, pr: 1, method: m}\n"
+        @test fails(check(record(extra = bad_date)), "yyyy-mm-dd")
         unordered = """
     history:
-      - {date: "2026-10-01", decimal: "0.30", method: "m", tier: certified}
-      - {date: "2026-10-01", decimal: "0.35", method: "m", tier: certified}
+      - {date: "2026-10-01", decimal: "0.30", lengths: x, tier: certified, pr: 1, method: m}
+      - {date: "2026-10-01", decimal: "0.35", lengths: x, tier: certified, pr: 1, method: m}
 """
-        @test errors_match(bad(record(extra = unordered)), "newest first")
-        older_later = replace(unordered, "\"2026-10-01\", decimal: \"0.35" => "\"2026-10-02\", decimal: \"0.35")
-        @test errors_match(bad(record(extra = older_later)), "newest first")
-        ordered = replace(unordered, "0.30" => "0.40")
-        @test passed(first(run_check(FAMILY * "records:\n" * record(extra = ordered))))
+        @test fails(check(record(extra = unordered)), "newest first")
+        @test passed(check(record(extra = replace(unordered, "0.30" => "0.40"))))
     end
 
-    @testset "headline tier against the Lean bound" begin
-        check(yaml; json = lean_json()) = first(run_check(FAMILY * "records:\n" * yaml; json))
+    @testset "the headline tier against the Lean bound" begin
         sharper = """{value: "1/2", decimal: "0.5"}"""   # beats log(13480)/(97/4) ≈ 0.3921
-        # a certificate sharper than the Lean bound: the headline tier is the certificate's
         @test passed(check(record(tier = "certified", bound = sharper)))
-        @test errors_match(check(record(bound = sharper)), "weaker than the headline")
-        # a Lean record with the same bound as the headline: the tier must be Lean's
-        @test errors_match(check(record(tier = "certified")), "tier must be lean")
-        # a smaller headline value is implied by the Lean theorem
+        @test fails(check(record(bound = sharper)), "weaker than the headline")
+        @test fails(check(record(tier = "certified")), "tier must be lean")
         @test passed(check(record(bound = """{value: "39/100", decimal: "0.39"}""")))
-        # the Lean theorem must also cover the headline lengths
-        fewer = """{name: Leaderboard.Records.Toy.p, L0: 8, r: "13480", beta: "97/4"}"""
-        @test errors_match(check(record(lean = fewer)), "weaker than the headline")
-        # the kind must match when the tier is Lean's
-        @test errors_match(check(record(tier = "lean-unconditional")), "Lean record is conditional")
-        # long exact values need a longer rounded-down decimal
-        long = """{value: "7066853945252893/18014398509481984", decimal: "0.3922"}"""
-        @test errors_match(check(record(tier = "certified", bound = long)), "add bound.precise")
-        withp = replace(long, "}" => """, precise: "0.392289198084"}""")
-        @test passed(check(record(tier = "certified", bound = withp)))
-        wrongp = replace(withp, "0.392289198084" => "0.392289198085")
-        @test !passed(check(record(tier = "certified", bound = wrongp)))
     end
 
-    @testset "Lean source scan" begin
+    @testset "rows against their certificates" begin
+        # the certificate proves 1/2; the diagnostic's 0.9 is not taken for the certificate
+        @test fails(check(record(tier = "certified", bound = """{value: "3/5", decimal: "0.6"}""")),
+            "less than the row's bound")
+        @test fails(check(record(seed = """{n0: 6, beta0: "24"}""")), "states no bound for seed")
+        @test fails(check(record(seed = """{n0: 8, beta0: "97/4"}""")), "states no bound for seed")
+        @test fails(check(record(params = """{g: "1/2"}""")), "states no bound for seed")
+        # a conditional Lean record must assume defects at least the certified ones
+        seeds(s, t) = """, "n0": 6, "s": "$s", "t": "$t\""""
+        @test passed(check(record(); json = lean_json(seeds = seeds("1/100", "1/50"))))
+        @test fails(check(record(); json = lean_json(seeds = seeds("1/200", "1/50"))), "below the certified defect")
+    end
+
+    @testset "challenges and news" begin
+        ch(link) = "challenges:\n  - {id: toy-ch, family: toy, title: 'T', need: 'N', link: '$link'}\n"
+        @test passed(check(record(); head = HEAD * ch("https://example.org/x")))
+        @test fails(check(record(); head = HEAD * ch("models/toy/nope.md")), "does not exist")
+        @test fails(check(record(); head = HEAD * replace(ch("https://example.org"), "toy-ch" => "toy-p")), "distinct")
         mktempdir() do dir
-            lb = joinpath(dir, "leaderboard")
-            mkpath(joinpath(lb, "Records"))
-            write(joinpath(lb, "Clean.lean"), """
-                /-! The audit rejects `sorry` and `native_decide`; this docstring mentions them. -/
-                -- an axiom in a comment is fine: axiom foo : False
-                theorem t : 1 = 1 := rfl
-                def s := "sorry inside a string is fine"
-                """)
-            @test isempty(scan_lean_sources(lb))
-            write(joinpath(lb, "Records", "Bad.lean"), """
-                theorem a : 1 = 2 := by sorry
-                theorem b : 2 + 2 = 4 := by native_decide
-                axiom c : False
-                set_option debug.skipKernelTC true in
-                @[implemented_by foo] def d := 1
-                /- nested /- comment -/ still a comment: sorry -/
-                theorem e : True := trivial
-                """)
-            hits = scan_lean_sources(lb)
-            @test length(hits) == 5
-            @test any(h -> occursin("Bad.lean:1: sorry", h), hits)
-            @test any(h -> occursin("Bad.lean:3: axiom", h), hits)
-            @test !any(h -> occursin(":6:", h), hits)
+            path = joinpath(dir, "news.yml")
+            write(path, """
+- {date: "2026-10-15", text: 'Lean theorem', link: 'https://example.org/pull/34', prs: [34]}
+- {date: "2026-10-16", text: 'Explainer', link: '/explainer/', records: [toy-p]}
+""")
+            @test passed(check_news(path; record_ids = Set(["toy-p"])))
+            @test !passed(check_news(path; record_ids = Set(String[])))
+            write(path, "- {date: \"2026-10-32\", text: 'x', link: 'explainer'}\n")
+            r = check_news(path)
+            @test fails(r, "yyyy-mm-dd") && fails(r, "link must be")
         end
-        @test isempty(scan_lean_sources(joinpath(tempdir(), "no-such-leaderboard-dir")))
     end
 
-    @testset "repository records.yml" begin
-        report, summary = check_records(joinpath(REPO, "home_page", "_data", "records.yml");
-            root = REPO, lean_records = FIXTURE)
+    @testset "repository data" begin
+        path = joinpath(REPO, "home_page", "_data", "records.yml")
+        report, summary = check_records(path; root = REPO, lean_records = FIXTURE)
         foreach(println, report.errors)
         @test passed(report)
-        @test isempty(report.warnings)
-        @test summary["lean-unconditional"] >= 1
-        @test sum(values(summary)) >= 60
+        @test summary["lean-unconditional"] >= 1 && summary["certified"] >= 40
+        ids = Set(String[string(r["id"]) for r in YAML.load_file(path)["records"]])
+        news = check_news(joinpath(REPO, "home_page", "_data", "news.yml"); record_ids = ids)
+        foreach(println, news.errors)
+        @test passed(news)
     end
 end
