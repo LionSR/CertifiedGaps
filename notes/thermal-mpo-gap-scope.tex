@@ -82,11 +82,11 @@ The spacetime bootstrap establishes a uniform spectral gap from bond reflection 
 \setcounter{section}{3}
 
 \section{Prerequisites of the Spacetime Bootstrap}\label{app:uses}
-The scale-doubling iteration in Ref.~\cite{main} comprises three elementary operations:
+To see which Hamiltonians admit the spacetime-bootstrap proof of Ref.~\cite{main}, we isolate the three operations its scale-doubling iteration uses:
 \begin{itemize}
-\item \emph{Coupling identities.} Equalities between partition-function ratios on the spacetime torus, such as $\Zt42/\Ztsq[4]21$. These hold universally for every translation-invariant lattice Hamiltonian.
+\item \emph{Coupling identities.} Torus partition-function identities such as $\Zt42/\Ztsq[4]21$, which hold universally for every translation-invariant lattice Hamiltonian.
 \item \emph{Temporal squaring.} The relation $\tncolumn{\rho_n,\rho_n}\propto\rho_n(2\beta)$ requires only positivity of the Gibbs operator, $e^{-\beta H}=e^{-\beta H/2}(e^{-\beta H/2})^\dagger\ge0$, which holds generally by Euclidean time reflection.
-\item \emph{Spatial squaring.} The dual relation $\tnchain{\sigma_n,\sigma_n}\propto\sigma_{2n}$ requires positivity of the spatial transfer operator, $\sigma_n=X_\beta^n/Z_n\ge0$. This holds whenever $X_\beta$ is self-adjoint ($X_\beta=X_\beta^\dagger$), which additionally guarantees that $Z_n=\sum_i\lambda_i^n$ with real eigenvalues $\lambda_i$, permitting $\ell^p$ norm interpolation to non-dyadic intermediate lengths.
+\item \emph{Spatial squaring.} The dual relation $\tnchain{\sigma_n,\sigma_n}\propto\sigma_{2n}$ requires positivity of the spatial transfer operator, $\sigma_n=X_\beta^n/Z_n\ge0$. This holds whenever $X_\beta$ is self-adjoint ($X_\beta=X_\beta^\dagger$), which additionally guarantees that $Z_n=\sum_i\lambda_i^n$ with real eigenvalues $\lambda_i$, permitting power-sum interpolation to non-dyadic intermediate lengths.
 \end{itemize}
 Self-adjointness of $X_\beta$ represents the spatial counterpart of Euclidean time reflection, and is not automatic. Once it holds, the remaining doubling argument follows directly.
 The three hypotheses are therefore:
@@ -151,32 +151,30 @@ Under Eq.~\eqref{eq:rpform}, build the continuous-time MPO as in
 Ref.~\cite{main}. The events are $(\tau,k)$, they occur at rate $c_k$, and
 $e^{-\tau D}$ propagates between them. Then the transfer kernel obeys
 \begin{equation}
- \overline{\Xab ab}=\Xab ba,\qquad\text{i.e.}\quad
+ \overline{\Xab ab}=\Xab ba,\qquad\text{i.e.,}\quad
  \overline{X_\beta(a,b)}=X_\beta(b,a).
  \label{eq:mirror}
 \end{equation}
 \end{lemma}
 \begin{proof}
-Open the vertex in imaginary time. Events on the left bond $a$ insert
-$\Theta(C)$, and events on the right bond $b$ insert $C$, along a single traced
-physical loop:
+Open the vertex in imaginary time: events on the left bond $a$ insert
+$\Theta(C)$ and events on the right bond $b$ insert $C$ along a single traced
+physical loop. Write $\Theta=VK$ with unitary $V$. Complex conjugation of a
+trace conjugates every insertion while preserving time order; conjugating the
+loop by $V$ then maps $\overline{\Theta(C)}\mapsto C$,
+$\overline C\mapsto\Theta(C)$, and $\overline D\mapsto D$ because
+$V\overline V=\pm1$ and $\Theta(D)=D$, swapping left and right insertions:
 \begin{equation*}
  \overline{X_\beta(a,b)}=\overline{\eventsite{\Theta C}{C}}
- =\eventsite{C}{\Theta C}=X_\beta(b,a).
+ =\eventsite{C}{\Theta C}=X_\beta(b,a).\qedhere
 \end{equation*}
-Write $\Theta=VK$. Complex conjugation of a trace conjugates every
-insertion and keeps the time order. Conjugating the loop by $V$ then maps
-$\overline{\Theta(C)}\mapsto C$, $\overline C\mapsto\Theta(C)$ and
-$\overline D\mapsto D$, because $V\overline V=\pm1$ and $\Theta(D)=D$. The
-picture that results is the mirror image of the original: the left
-insertions are now $C$ and the right ones are $\Theta(C)$.
 \end{proof}
 
 \begin{theorem}[Space behaves like time]\label{thm:space}
 Assume (H1) and (H2). Then $X_\beta$ is a self-adjoint Hilbert--Schmidt
 operator on $L^2(\mu_\beta)$. For every even $n$, $Z_n(\beta)=\sum_i\lambda_i(\beta)^n$ with
 real $\lambda_i$, and $\sigma_n(\beta)\ge0$. In particular the squaring
-lemma, the coupling identities and the $\ell^p$ interpolation of
+lemma, the coupling identities, and the length interpolation of
 Ref.~\cite{main} hold verbatim.
 \end{theorem}
 \begin{proof}
@@ -188,12 +186,13 @@ those of Ref.~\cite{main} for a self-adjoint $X_\beta$.
 \end{proof}
 
 \emph{Multi-site unit cells and internal reflection.}
-When $c$ sites are blocked into a unit cell on a ring of $L$ cells,
-$H_L=\sum_{j=1}^L h_{j,j+1}+\sum_{j=1}^L o_j$, a mirror cut across an
-inter-cell bond swaps the left and right virtual legs of each cell while
-reversing the site order inside the cell. Let $F$ be a real symmetric
-involution ($F=F^{\mathsf T}$, $F^2=I$) that reverses the internal site order.
-If the inter-cell bond $h$ and on-site cell operator $o$ satisfy
+Blocking $c$ sites into a unit cell on a ring of $L$ cells,
+$H_L=\sum_{j=1}^L h_{j,j+1}+\sum_{j=1}^L o_j$, reduces dimerized and
+finite-range chains to nearest-neighbor form (H1), but a mirror cut across an
+inter-cell bond also reverses the site order inside each cell. Let $F$ be a
+real symmetric involution ($F=F^{\mathsf T}$, $F^2=I$) that reverses the
+internal site order. If the inter-cell bond $h$ and on-site cell operator $o$
+satisfy
 \begin{equation}
  -h=\sum_\alpha C_\alpha\otimes F\overline{C_\alpha}F,\qquad
  FoF=o,\qquad o=\overline{o},
@@ -229,7 +228,7 @@ cell transfer operator into a half-cell product,
  \label{eq:cellpos}
 \end{equation}
 Every transfer eigenvalue $\lambda_i(\beta)$ is then nonnegative, so
-$\sigma_n(\beta)=X_\beta^n/Z_n(\beta)\ge0$, the squaring map, and $\ell^p$
+$\sigma_n(\beta)=X_\beta^n/Z_n(\beta)\ge0$, the squaring map, and power-sum
 interpolation hold at odd as well as even cell counts $n_0$. In the
 dimerized spin-1 chain (\path{models/spin1_dimerized}), Eq.~\eqref{eq:cellpos}
 enables an odd seed of $n_0=3$ dimer cells ($6$ and $12$ spins), bypassing the
@@ -260,7 +259,7 @@ Define the one-step loss
  \label{eq:delta}
 \end{equation}
 It lies below the diagonal, \deltacurve, up to $\varepsilon_*\simeq0.1273$,
-the root of $\delta(\varepsilon)=\varepsilon$. Ref.~\cite{main} uses the
+the root of $\delta(\varepsilon)=\varepsilon$. Reference~\cite{main} uses the
 cruder bound $\delta\le5\varepsilon^2$, valid for $\varepsilon\le1/100$.
 
 \begin{theorem}[Spacetime-bootstrap criterion]\label{thm:criterion}
@@ -285,7 +284,7 @@ Ref.~\cite{main} apply without change. Move~1 gives
 $\Ps(n,2\beta)\ge(1-\varepsilon)^3$. Move~2 squares in space to get
 $\Ps(2n,2\beta)\ge1-\delta(\varepsilon)$. Move~3 gives
 $\Pt(4n,\beta)\ge(1-\varepsilon)^2(1-\delta)\ge(1-\varepsilon)^3$, which
-requires $\delta\le\varepsilon$, i.e.\ $\varepsilon\le\varepsilon_*$.
+requires $\delta\le\varepsilon$, i.e., $\varepsilon\le\varepsilon_*$.
 Move~4 squares in time to get $\Pt(4n,2\beta)\ge1-\delta(\varepsilon)$.
 Induction on $j$ gives
 $\Ps(n_j,\beta_j),\Pt(2n_j,\beta_j)\ge1-\varepsilon_j$, with
@@ -304,17 +303,17 @@ Ref.~\cite{main}, with $c\ge(\log20)/784$.
 \emph{Asymmetric defects and half-length seeds.}
 In Theorem~\ref{thm:criterion}, the initial spatial defect
 $\varepsilon_{\mathrm s}\ge1-\Ps(n_0,\beta_0)$ and thermal defect
-$\varepsilon_\tau\ge1-\Pt(2n_0,\beta_0)$ need not be equal. Tracking
-$(\varepsilon_{\mathrm s,j},\varepsilon_{\tau,j})$ separately through Moves~1--4
-gives the asymmetric recurrence
+$\varepsilon_\tau\ge1-\Pt(2n_0,\beta_0)$ need not be equal. With
+$f(z)=z^2/[2(1-z)^2]$, tracking $(\varepsilon_{\mathrm s,j},\varepsilon_{\tau,j})$
+separately through Moves~1--4 gives the asymmetric recurrence
 \begin{equation}
  \begin{aligned}
  \varepsilon_{\mathrm s,j+1}&=f\bigl(1-(1-\varepsilon_{\mathrm s,j})^2(1-\varepsilon_{\tau,j})\bigr),\\
- \varepsilon_{\tau,j+1}&=f\bigl(1-(1-\varepsilon_{\tau,j})^2(1-\varepsilon_{\mathrm s,j+1})\bigr),
+ \varepsilon_{\tau,j+1}&=f\bigl(1-(1-\varepsilon_{\tau,j})^2(1-\varepsilon_{\mathrm s,j+1})\bigr).
  \end{aligned}
  \label{eq:asym}
 \end{equation}
-where $f(z)=z^2/[2(1-z)^2]$. Because the second line uses the updated spatial
+Because the second line uses the updated spatial
 defect $\varepsilon_{\mathrm s,j+1}$ from Move~2 rather than
 $\varepsilon_{\mathrm s,j}$, the basin of attraction in the
 $(\varepsilon_{\mathrm s},\varepsilon_\tau)$ plane extends well outside the
@@ -408,7 +407,8 @@ $J=\operatorname{diag}(J_x,J_y,J_z)$ with nonzero entries and $\bm h=0$, such
 an $O$ exists if and only if an even number of $J_x,J_y,J_z$ are negative.
 \end{proposition}
 \begin{proof}
-$O=-R$ with $R$ the identity or a $\pi$ rotation. Let $T$ be time reversal,
+Any symmetric orthogonal $O$ on $\mathbb R^3$ with $\det O=-1$ has the form
+$O=-R$ for $R=I$ or a $\pi$ rotation. Let $T$ be time reversal,
 so $TST^{-1}=-S$, and put $\Theta=U_RT$. Then $\Theta\bm S\Theta^{-1}=O\bm S$.
 Since $U_R$ commutes with $T$, $\Theta^2=U_R^2T^2=\pm1$. Factor
 $-JO=\sum_kv_kv_k^{\mathsf T}$ with real $v_k$ and set
@@ -471,14 +471,15 @@ Longitudinal Ising & 1 site, $-gX-hZ$ & 30 pts in $[\tfrac14,2]{\times}[\tfrac1{
 \emph{Spin-1 bilinear--biquadratic chain.}
 Consider $H=\sum_j\cos\vartheta\,\bm S_j\cdot\bm S_{j+1}
 +\sin\vartheta\,(\bm S_j\cdot\bm S_{j+1})^2$. In the Cartesian basis the
-quadrupoles $Q_{\alpha\beta}=S^\alpha S^\beta$ are real. Their antisymmetric
-part is $\frac12\epsilon_{\alpha\beta\gamma}G_\gamma$, so
+quadrupoles $Q_{\alpha\beta}=S^\alpha S^\beta$ are real, with symmetric part
+$Q^+_{\alpha\beta}=\frac12(Q_{\alpha\beta}+Q_{\beta\alpha})$ and antisymmetric
+part $\frac12\epsilon_{\alpha\beta\gamma}G_\gamma$; since their cross terms
+cancel,
 \begin{equation}
  -h=\bigl(\cos\vartheta-\tfrac12\sin\vartheta\bigr)\sum_\alpha G_\alpha\otimes\overline{G_\alpha}
- -\sin\vartheta\sum_{\alpha,\beta}Q^{+}_{\alpha\beta}\otimes\overline{Q^{+}_{\alpha\beta}},
+ -\sin\vartheta\sum_{\alpha,\beta}Q^{+}_{\alpha\beta}\otimes\overline{Q^{+}_{\alpha\beta}}.
  \label{eq:blbq}
 \end{equation}
-where $Q^+_{\alpha\beta}=\frac12(Q_{\alpha\beta}+Q_{\beta\alpha})$; the cross terms cancel between symmetric and antisymmetric parts.
 \begin{proposition}\label{prop:blbq}
 With $\Theta=K$ in the Cartesian basis, the bilinear--biquadratic chain is
 in reflection-positive form if and only if
@@ -561,22 +562,22 @@ Two floating-point tests screen Hamiltonians before algebraic certification:
 sites, $\beta\in[0.3,3]$, reporting the least eigenvalue of
 $A\mapsto\Tr[A\theta(A)e^{-\beta H}]$ relative to the largest, minimized over
 $\Theta=VK$.
-\item \emph{Realignment test} (\path{CertifiedGaps.rp_test}).
-Checks Eq.~\eqref{eq:rpform} via the bond realignment matrix
-$R[-h]_{(ij),(kl)}=-h_{(ik),(jl)}$ with an optimized on-site shift.
+\item \emph{Realignment test.} Checks Eq.~\eqref{eq:rpform} via the bond
+realignment $R[-h]_{(ij),(kl)}=-h_{(ik),(jl)}$ up to an optimized on-site shift
+(\path{CertifiedGaps.rp_test}).
 \end{itemize}
 The screening results match Propositions~\ref{prop:xyz} and~\ref{prop:blbq}:
 \begin{itemize}
 \item \emph{Spin-$\tfrac12$ XYZ chain.} All eight sign patterns of
-$(J_x,J_y,J_z)=(\pm1,\pm.7,\pm.4)$ follow the parity rule: zero or two
-ferromagnetic entries give $\ge-10^{-12}$ after optimizing $V$, while the other
-four give $-0.048$; the uniform-field antiferromagnet gives $-0.095$ and the
+$(J_x,J_y,J_z)=(\pm1,\pm0.7,\pm0.4)$ follow the parity rule: zero or two
+ferromagnetic entries give $\ge-10^{-12}$ after optimizing $V$, the other four
+give $-0.048$, the uniform-field antiferromagnet gives $-0.095$, and the
 transverse-field Ising chain gives $\ge-10^{-12}$.
 \item \emph{Spin-1, Cartesian $\Theta=K$.} The Heisenberg antiferromagnet and
 $-(\bm S\cdot\bm S)^2$ pass; the ferromagnet ($-0.39$) and AKLT ($-0.04$) fail.
-Over $\vartheta$, the test is nonnegative on $\vartheta/\pi\in[-.62,0]$
+Over $\vartheta$, the test is nonnegative on $\vartheta/\pi\in[-0.62,0]$
 (Proposition~\ref{prop:blbq}) and negative on
-$\vartheta/\pi\in\{-1,-.88,-.75\}\cup[.12,1]$.
+$\vartheta/\pi\in\{-1,-0.88,-0.75\}\cup[0.12,1]$.
 \item \emph{Spin-1, every on-site $\Theta=VK$.} Minimizing over $V\in U(3)$
 with twelve restarts leaves AKLT at $-0.040$, ULS at $-0.18$, and
 $\vartheta=-0.75\pi$ and the ferromagnet at $-0.15$.
@@ -641,10 +642,9 @@ $L\ge6$ sites has a unique ground state and
 \Delta_L>\frac{\log13480}{97/4}\approx0.3921.
 \label{eq:isinggap}
 \end{equation}
-The seed is $(n_0,\beta_0)=(6,97/4)$ with
-$1-\Ps(6,97/4)\le9064\cdot10^{-9}$ and $1-\Pt(12,97/4)\le3141\cdot10^{-8}$.
-These two bounds feed the chain certificate above. They are proved from the
-spectra of the rings of $L=6$ and $L=12$ sites by the following four steps.
+The seed $(n_0,\beta_0)=(6,97/4)$ has
+$1-\Ps(6,97/4)\le9064\cdot10^{-9}$ and $1-\Pt(12,97/4)\le3141\cdot10^{-8}$,
+proved from the $L=6$ and $L=12$ spectra in four steps:
 \begin{enumerate}
 \item \emph{Two eigenvalues from residuals.} Two trial vectors per ring, with
 integer entries at scale $2^{52}$, are checked by \texttt{decide +kernel}:
@@ -667,33 +667,28 @@ subspace of codimension $|B|$ in a nonzero vector. So at most $|B|$
 eigenvalues lie below $\rho$. A kernel count gives $|B|=2$ at $\rho=-3.7$
 ($L=6$) and $\rho=-11.5$ ($L=12$), both above $\theta_1+r$. Every eigenvalue
 other than the two from step~1 is therefore at least $\rho$.
-\item \emph{Partition-function bounds.} With
-$\theta_0,\theta_1,\rho$ as above and $\beta>0$,
+\item \emph{Partition-function bounds.} For $\beta>0$,
+$Z_L(\beta)\ge e^{-\beta(\theta_0+r)}$ and
 \[
-\begin{aligned}
-Z_L(\beta)&\ge e^{-\beta(\theta_0+r)},\\
-Z_L(\beta)&\le e^{-\beta(\theta_0-r)}\bigl[1+e^{-\beta(\theta_1-\theta_0)}\\
-&\qquad+2^Le^{-\beta(\rho-\theta_0+r)}\bigr].
-\end{aligned}
+Z_L(\beta)\le e^{-\beta(\theta_0-r)}\bigl[1+e^{-\beta(\theta_1-\theta_0)}
++2^Le^{-\beta(\rho-\theta_0+r)}\bigr].
 \]
-At $\beta=97/4$ each correction term is at most a power of $e^{-14}$.
-Lean bounds these powers using $e>2.7182818283$ (Mathlib's
-\path{Real.exp_one_gt_d9}).
+At $\beta=97/4$ each correction term is at most a power of $e^{-14}$, bounded
+in Lean via $e>2.7182818283$ (\path{Real.exp_one_gt_d9}).
 \item \emph{Purities.} Write the upper bound on the denominator $Z_1$
 ($Z_6(\beta_0)$ or $Z_{12}(\beta_0)$) as $A(1+t)$ with $A=e^{-\beta_0(\theta_0-r)}$, and
 the lower bound on the numerator $Z_2$ ($Z_{12}(\beta_0)$ or $Z_{12}(2\beta_0)$) as
 $A^2e^{-x}$. Then $Z_2/Z_1^2\ge(1-x)/(1+t)^2$, and the right side is checked
 against both seed bounds in exact rational arithmetic.
 \end{enumerate}
-The arithmetic is done on bit-packed integer vectors, with the $L=12$ sums
-split into 64 chunks of 64 configurations. The checker's integer sums are
-identified with the Lean Hamiltonian
-(\path{Ising/Bridge.lean}, \path{Ising/Hamiltonian.lean}). No step uses
+The arithmetic uses bit-packed integer vectors (splitting $L=12$ into $64$
+chunks of $64$ configurations) identified with the Lean Hamiltonian
+(\path{Ising/Bridge.lean}, \path{Ising/Hamiltonian.lean}), without
 \texttt{native\_decide}. This point is the cheapest seed in
 Table~\ref{tab:certified} because only two states lie below $\rho$, whereas the
-seeds in the other seven model families require resolving $195\text{--}2465$
-low-lying states (\path{models/lean_seeds/}). The remaining 29 points of row~9
-keep their seeds as hypotheses in
+other seven model families require resolving $195\text{--}2465$ low-lying
+states (\path{models/lean_seeds/}). The remaining $29$ points of row~9 keep
+their seeds as hypotheses in
 \path{lean/CertifiedGaps/Models/IsingLongitudinal.lean}.
 
 \begin{thebibliography}{14}
