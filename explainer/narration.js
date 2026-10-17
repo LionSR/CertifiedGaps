@@ -128,11 +128,11 @@
 
     owhy: [
       'The ring proof needs a ring. Z, the trace of X to the n, joins the last leg back to the first. But the boundary-field theorem is about a chain with two ends. Cut the ring open, and there is no loop left to close.',
-      'A picture of spin one helps here: the valence-bond solid, or V B S, of Affleck, Kennedy, Lieb and Tasaki. Write each spin one as two spin one-halves, the two dots in one oval, combined symmetrically.',
+      'A picture of spin one helps here: the valence bond solid, or V B S, found by Affleck, Kennedy, Lieb and Tasaki. Write each spin one as two spin one-halves, the two dots in one oval, combined symmetrically.',
       'Neighbors pair one half each into a singlet, with total spin zero, shown in blue. On a ring, every half finds a partner, and nothing is left free.',
       'Now cut the ring open. The two outermost halves lose their partners. A free spin one-half sits at each end, which gives two times two, four, low states: a singlet and a triplet, whose splitting shrinks as the chain grows.'],
     oedge: [
-      'Here are real numbers with no field, from exact diagonalization, for n from four to twelve. The end states sit low. For even n, a triplet sits just above the ground state, at zero point five one, zero point three one, zero point two, zero point one four, and zero point one. For odd n, the ground state itself is a triplet. There is no uniform gap.',
+      'Here are real numbers with no field, from exact diagonalization, for n from four to twelve. The states of the free ends sit low. For even n, a triplet sits just above the ground state, at zero point five one, zero point three one, zero point two, zero point one four, and zero point one. For odd n, the ground state itself is a triplet. There is no uniform gap.',
       'An end field, h equal to three fifths along z, pins the end spins and splits the four states. For odd n the ground state is alone, with gaps zero point seven two, zero point six four, zero point five eight, and zero point five five, leveling off. Even n are worse: the left and right ends prefer opposite directions.',
       'That is the chain of the theorem: H is the sum of S dot S, minus h times the z spins at the two ends, with h equal to three fifths, and n odd.'],
     oising: [
@@ -143,7 +143,7 @@
     ocyl: [
       'Now the quantum chain. For a ring, space and imaginary time are both circles: the torus.',
       'Open the chain. Imaginary time is still a circle, because Z is still a trace over spin states, but space now has two ends. The spacetime is a cylinder.',
-      'Inside, nothing changes: the same box X sits at every site. Only the two ends need closing, as the vectors u did for Eesing. Those caps, v bar and v, are the boundary vectors.'],
+      'Inside, nothing changes: the same box X sits at every site. Only the two ends need closing, as the end vectors did for the Eesing chain. Those caps, v bar and v, are the boundary vectors.'],
     ovec: [
       'What closes an end? The end site has a bond on its inner side only. On its outer side acts the end field, minus h S z. It enters e to the minus beta H just like a bond term, so it fires field events at random imaginary times.',
       'A bond event puts G alpha on both of its sites. A field event is half a bond: it puts G z on the end site alone, with a factor i h, since S z is minus i G z. Here are histories with zero, one, two, and three field events.',
