@@ -17,7 +17,7 @@ cert  = certify_gap(model; n0 = 6, β0 = BETA0[(g, h)], rp = rp_certificate(mode
    each momentum, the block $`\langle s,k|H|r,k\rangle = \sqrt{p_r/p_s}\sum_l c(r \to T^l s)\,e^{ikl}`$
    in interval arithmetic (exact couplings, enclosed phases and norm ratios). Its `Float64` center
    is exactly Hermitian (real for $k = 0, L/2$), and the Frobenius norm of the entrywise radii
-   bounds $`\|A - M\|_2`$. The model is real, so $A_{-k} = \overline{A_k}$ has the same spectrum and
+   bounds $\|A - M\|_2$. The model is real, so $`A_{-k} = \overline{A_k}`$ has the same spectrum and
    only $0 \le k \le L/2$ is built, with multiplicity 2 for $0 < k < L/2$. No charge is conserved
    for $h > 0$, so there is one sector. At $L = 12$: 7 blocks, the largest of dimension 352.
 3. **Enclosure.** `verified_eigen` turns the LAPACK eigenpairs of each center into a guarantee:

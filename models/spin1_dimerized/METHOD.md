@@ -90,8 +90,8 @@ The certificates `results/certificate_d9.json` and `results/certificate_d7.json`
 $U = \prod_{\text{cells}} (1 \otimes V)$, $V = e^{-i\pi S^y}$, described in `README.md`:
 
 - **Exact model.** With $X' = \sqrt2 S^x$, $`A' = \sqrt2\,iS^y`$ and $S^z$ integer matrices,
-  $U (J\,\mathbf{S}_i\cdot\mathbf{S}_j) U^\dagger
-  = -J(\tfrac12 X'\otimes X' + \tfrac12 A'\otimes A' + S^z\otimes S^z)$
+
+  $`U (J\,\mathbf{S}_i\cdot\mathbf{S}_j) U^\dagger = -J(\tfrac12 X'\otimes X' + \tfrac12 A'\otimes A' + S^z\otimes S^z)`$
   for every bond, since $V$ reverses $S^x$ and $S^z$ and keeps $S^y$. The on-site term is this
   bond with $J = 1 - \delta$ on $(a, b)$, the ring bond is it with $J = 1 + \delta$ on
   $(b, a')$. The core checks exactly that the cell charge $z_a - z_b$ is conserved and that the

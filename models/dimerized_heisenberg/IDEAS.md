@@ -12,7 +12,7 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
 1. **Reflected unit-cell RP identity (`-h = Σ C_α ⊗ conj(C_α)` in a complex singlet/triplet basis):**
    An unreflected bond decomposition $\sum_\alpha C_\alpha \otimes C_\alpha$ ($F = I$) must commute
    with swapping two entire unit cells ($F_{\mathrm{outer}}$), which fails for the oriented
-   inter-cell bond $\mathbf{S}_{2j}\cdot\mathbf{S}_{2j+1}$. However, combining the internal
+   inter-cell bond $`\mathbf{S}_{2j}\cdot\mathbf{S}_{2j+1}`$. However, combining the internal
    two-spin swap $F$ inside each cell with single-site rotation $J = 2iS^y$ on the second spin and
    transforming to the complex singlet/triplet basis $M/\sqrt{2}$ diagonalizes $F$, turning the
    antiunitary reflection $F\overline{(\cdot)}F$ into standard entrywise complex conjugation
@@ -26,16 +26,16 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
    rounding analysis (now the core `verified_eigen`) certifies complete spectra at $n_0 = 2$ and
    $n_0 = 4$ cells ($8$ and $16$ spins) in a few minutes.
    **Chosen route for $`\delta \in \{1/2, 3/10, 1/4\}`$.**
-3. **Continuous-$\beta$ interval exclusion covers:** When a grid scan finds no admissible seed at
+3. **Continuous-$`\beta`$ interval exclusion covers:** When a grid scan finds no admissible seed at
    $`n_0 \in \{2, 4\}`$ for weaker dimerizations ($`\delta \in \{1/5, 3/20, 1/10\}`$), we can upgrade
-   that numerical observation to a rigorous all-$\beta$ exclusion theorem by combining thermal
+   that numerical observation to a rigorous all-$`\beta`$ exclusion theorem by combining thermal
    purity monotonicity on $(0, 1]$, a ground-state energy defect bound on $[B, \infty)$, and a
    finite cover of $[1, B]$ by interval boxes propagating lower defect bounds through the monotone
    doubling map until $z \ge 1/2$. **Chosen route for certifying the $n_0 \le 4$ grid boundary.**
 4. **Operator-norm perturbation around decoupled dimers ($\delta = 1$):** At $\delta = 1$ ($w = 0$),
    the partition function factors exactly into independent dimers,
    $Z_n^{\mathrm{dimer}}(\beta) = (e^{3\beta s/4} + 3e^{-\beta s/4})^n$. Writing $H_n = H_n^{\mathrm{dimer}} + V_n$
-   with $`\|V_n\| \le \frac{3}{4} n (1 - \delta)`$ and applying Weyl's inequality bounds
+   with $\|V_n\| \le \frac{3}{4} n (1 - \delta)$ and applying Weyl's inequality bounds
    $|\log Z_n - \log Z_n^{\mathrm{dimer}}| \le \frac{3}{4}\beta n (1 - \delta)$ at arbitrary $n$ in
    $O(\log n)$ operations. However, because unlinked norm bounds lose the extensive bulk free-energy
    cancellation between $\log Z_{2n}$ and $2\log Z_n$, the resulting error grows with $n$ and only
@@ -60,9 +60,9 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
   (`verified_ring_spectrum` by charge, momentum, and charge flip; `certify_gap`), certifies
   $\Delta_L \ge 0.534794$ ($\delta = 1/2, \beta_0 = 6$), $\Delta_L \ge 0.173204$
   ($\delta = 3/10, \beta_0 = 13/2$), and $\Delta_L \ge 0.058232$ ($\delta = 1/4, \beta_0 = 29/4$) for
-  all even $L \ge 4$ cells (interval bound; the exact rational chain gives $0.534267, 0.173082,
-  0.058177$).
-- **Rigorous all-$\beta$ exclusions ($n_0 = 2, 4$ cells):** Continuous-$\beta$ interval covers
+  all even $L \ge 4$ cells (interval bound; the exact rational chain gives
+  $0.534267, 0.173082, 0.058177$).
+- **Rigorous all-$`\beta`$ exclusions ($n_0 = 2, 4$ cells):** Continuous-$`\beta`$ interval covers
   prove that no $\beta_0 > 0$ yields an admissible seed for this recurrence at $n_0 = 2$ (for any of
   the six $\delta$ values) or at $n_0 = 4$ for $`\delta \in \{1/5, 3/20, 1/10\}`$, establishing
   $\delta = 1/4$ as the exact certifiability threshold on rings of at most 16 spins.

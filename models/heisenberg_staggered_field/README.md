@@ -50,8 +50,8 @@ $o = -hZ$ is real and symmetric (`site_rp(h)`). The core verifies it exactly
 
 **Blocking used for the spectra.** In this frame only the $S^z$ parity is a one-site charge.
 In two-site cells $(a, b)$, the rotated bond flips both spins of a pair together or neither, so
-the cell charge $q = S^z_a - S^z_b$ (values $0, 1, -1, 0$ on $\uparrow\uparrow, \uparrow\downarrow,
-\downarrow\uparrow, \downarrow\downarrow$) is conserved. It is minus the physical
+the cell charge $q = S^z_a - S^z_b$ (values $0, 1, -1, 0$ on
+$\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow$) is conserved. It is minus the physical
 magnetization of the cell. The core builds the exact cell model (`RingModels.cell_model`) and
 diagonalizes rings of $n_0/2$ and $n_0$ cells in (cell charge, cell momentum) blocks. The
 certificate stores this blocking, and `check_certificate` rebuilds it from the site model. No

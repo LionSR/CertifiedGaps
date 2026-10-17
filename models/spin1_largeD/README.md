@@ -29,7 +29,7 @@ h = S^z \otimes S^z + S_+ \otimes S_- + S_- \otimes S_+, \qquad o = D\mathrm{dia
 with conserved charge $`m \in \{1, 0, -1\}`$ and the spin flip $F = \mathrm{antidiag}(1, 1, 1)$.
 
 **Frame.** The Lean model (`lean/CertifiedGaps/Models/SpinOneLargeD.lean`) uses the Cartesian
-basis with $(S^\alpha)_{ab} = -i\varepsilon_{\alpha ab}$. The unitary $U = W N^{-1/2}$ with
+basis with $`(S^\alpha)_{ab} = -i\varepsilon_{\alpha ab}`$. The unitary $U = W N^{-1/2}$ with
 ```math
 W = \begin{pmatrix} -i & 0 & i \\ 1 & 0 & 1 \\ 0 & i & 0 \end{pmatrix}, \qquad N = W^\dagger W = \mathrm{diag}(2, 1, 2)
 ```
@@ -200,7 +200,7 @@ by path beyond these sources and the stored spectra.
 
 Until this revision the model had its own pipeline: a local block builder (`model.jl`) with spin
 inversion, a local residual/polar enclosure with a priori $\gamma_{8m+32}$ constants and
-$`\|H\|_2 \le L(|D| + 2)`$, run-length-encoded $L = 12$ spectra (`src/spectra.jl`), a local
+$\|H\|_2 \le L(|D| + 2)$, run-length-encoded $L = 12$ spectra (`src/spectra.jl`), a local
 $\log Z$ with a truncated tail, a per-model environment, and hash-pinned top-level scripts. It was
 replaced by the shared core. The model is now a `RingModel` in the $S^z$ frame (with the Cartesian
 frame checked exactly). Stage 1 is `certify_gap` with `flip`, which gives the same 92 blocks; the
@@ -213,8 +213,8 @@ decreased and every bound increased (old $\to$ new):
 - the $n_0 = 12$ seed: $0.899143399 \to 0.899422073$;
 - the transported intervals: $0.001001626 \to 0.001821437$ on $[3.2059998, 3.206]$ and
   $0.001442884 \to 0.002590164$ on $[3.9979773, 4]$;
-- the lifts $n_0 = 24, 48, 96$: $0.660233530, 0.402885117, 0.063967113 \to 0.660561928,
-  0.403276789, 0.064969180$;
+- the lifts $n_0 = 24, 48, 96$:
+  $0.660233530, 0.402885117, 0.063967113 \to 0.660561928, 0.403276789, 0.064969180$;
 - the survey seed: $0.543812926 \to 0.543857012$.
 
 The largest $L = 12$ radius fell from $4.07 \times 10^{-6}$ to $1.54 \times 10^{-6}$. The

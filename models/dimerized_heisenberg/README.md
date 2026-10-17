@@ -3,8 +3,8 @@
 **Certified at $\delta = 1/2, 3/10,$ and $1/4$:** for every even ring length $L \ge 4$ two-spin
 unit cells ($N = 2L = 8, 12, 16, \dots$ spins, i.e., $N$ divisible by $4$), the ground state is
 unique and the spectral gap satisfies $\Delta_L \ge 0.534794, 0.173204, 0.058232$ (the interval
-bound `certified_gap_bound`; the exact rational chain gives $\Delta_L > 0.534267, 0.173082,
-0.058177$). Each certificate is a core `GapCertificates.certify_gap` certificate of the chain in a
+bound `certified_gap_bound`; the exact rational chain gives
+$\Delta_L > 0.534267, 0.173082, 0.058177$). Each certificate is a core `GapCertificates.certify_gap` certificate of the chain in a
 sublattice-rotated frame (exact RP identity, verified spectra, both bounds). On the grid
 $`\delta \in \{1/2, 3/10, 1/4, 1/5, 3/20, 1/10\}`$, $\delta = 1/4$ is the smallest dimerization
 certifiable from rings of at most $16$ spins: at $`\delta \in \{1/5, 3/20, 1/10\}`$,
@@ -29,16 +29,16 @@ H_L = (1 + \delta) \sum_{j=1}^L \mathbf{S}_{2j-1} \cdot \mathbf{S}_{2j}
 ```
 Lengths $L$ and $n_0$ count two-spin cells.
 
-**Certified frame.** Rotating the second spin of every cell by $J = 2iS^y =
-\begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}$`, i.e. `$U = (I \otimes J)^{\otimes L}$,
+**Certified frame.** Rotating the second spin of every cell by
+$`J = 2iS^y = \begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}`$, i.e. $U = (I \otimes J)^{\otimes L}$,
 gives $U^\top H_L U = \sum_j h_{j,j+1} + \sum_j o_j$ (the same spectrum) with
 ```math
 o = (1 + \delta)(-S^xS^x + S^yS^y - S^zS^z), \qquad
 h = (1 - \delta)\, I \otimes (-S^xS^x + S^yS^y - S^zS^z) \otimes I,
 ```
 both real rational $4 \times 4$ and $16 \times 16$ matrices on the cell basis
-$|{\uparrow\uparrow}\rangle, |{\uparrow\downarrow}\rangle, |{\downarrow\uparrow}\rangle,
-|{\downarrow\downarrow}\rangle$`. In this frame the cell charge `$z_a - z_b = [0, 1, -1, 0]$ is
+
+$|{\uparrow\uparrow}\rangle, |{\uparrow\downarrow}\rangle, |{\downarrow\uparrow}\rangle, |{\downarrow\downarrow}\rangle$. In this frame the cell charge $z_a - z_b = [0, 1, -1, 0]$ is
 conserved and reversed by the cell spin flip $\sigma^x \otimes \sigma^x$. `rotated_model(δ)` in
 `src/DimerizedHeisenberg.jl` is this core `RingModel(4, h, o; charge, flip)`, and
 `frame_identity(δ)` checks exactly that $W = I \otimes J$ is orthogonal and maps the physical
@@ -56,8 +56,8 @@ the reflected form of `notes/thermal-mpo-gap-scope.tex` (Appendix E) and of the 
 `RPRing` (this is the frame of `lean/CertifiedGaps/Models/DimerizedHeisenberg.lean`).
 `rotated_rp(δ)` builds it with the core `rp_certificate(...; reflection = F)`; every certificate
 stores factors, weights, and $F$, and `RingModels.verify_rp` checks the identity exactly. Without
-$F$ the bond is not RP in any common cell basis ($\|h - F_{\mathrm{outer}} h
-F_{\mathrm{outer}}\|_F^2 = \frac{3}{8}(1 - \delta)^2 > 0$ for the swap of two whole cells,
+$F$ the bond is not RP in any common cell basis (
+$\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \frac{3}{8}(1 - \delta)^2 > 0$ for the swap of two whole cells,
 `src/reflection_conventions.jl`). `src/rp.jl` audits an equivalent conjugate form in the
 singlet/triplet basis exactly (`results/rp_audit.json`); see [`METHOD.md`](METHOD.md).
 
@@ -81,8 +81,8 @@ the Lean theorem). Both are rigorous and stored in each certificate.
 $\delta = 1/4$ the spatial defect exceeds the diagonal threshold $\varepsilon_* \approx 0.12731$,
 but the unequal-defect recurrence closes thanks to the smaller thermal defect. The Lean theorems in
 `lean/CertifiedGaps/Models/DimerizedHeisenberg*.lean` take
-$(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) \le (0.01133, 0.01224), (0.09516, 0.0518),
-(0.1658, 0.05123)$ at the same $(4, \beta_0)$ as hypotheses; the certified defects satisfy them
+
+$(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) \le (0.01133, 0.01224), (0.09516, 0.0518), (0.1658, 0.05123)$ at the same $(4, \beta_0)$ as hypotheses; the certified defects satisfy them
 (checked exactly in `test/runtests.jl`).
 
 ### Rigorous all-$\beta$ exclusions at $n_0 = 2, 4$ for smaller $\delta$
@@ -124,7 +124,7 @@ $n_0 = 5$ cells ($10$ and $20$ spins) enters the admissible region numerically n
 (yielding $\approx 0.086$), while the next even seeds $n_0 = 6, 6, 8$ cells would require $24$- and
 $32$-spin doubled rings.
 
-Finally, `dimer_bounds` implements an exact, arbitrary-$n$ operator-norm perturbation sandwich
+Finally, `dimer_bounds` implements an exact, arbitrary-$`n`$ operator-norm perturbation sandwich
 around the decoupled dimer limit $\delta = 1$ (closing a 512-spin ring seed at $\delta = 0.999999$
 in the unit tests in $O(\log n)$ operations); because unlinked norm bounds lose bulk free-energy
 cancellation, their extensive error $O(\beta n (1-\delta))$ is too large to certify
@@ -222,9 +222,9 @@ $z_a - z_b$ and charge flip, and `certify_gap` replaces the local block builder,
 enclosure (component-maximum $\gamma_{4d+16}$ witnesses), the local $\log Z$, and the local
 record format; the six `seed_delta_*.json.gz` files and `certificate.json` were replaced by four
 core certificates and `summary.json`. Old → new, at the same seeds: $\varepsilon_{\mathrm{s}}$ and
-$\varepsilon_\tau$ decreased at every seed (e.g. $\delta = 1/2$: $0.011267, 0.012008 \to
-0.0112652, 0.0120046$`) and the interval bound rose (`$0.534756, 0.173197, 0.058225 \to 0.534794,
-0.173204, 0.058232$`; survey `$0.533681 \to 0.533722$); the exact rational chain now stored as
+$\varepsilon_\tau$ decreased at every seed (e.g. $\delta = 1/2$:
+$0.011267, 0.012008 \to 0.0112652, 0.0120046$) and the interval bound rose (
+$0.534756, 0.173197, 0.058225 \to 0.534794, 0.173204, 0.058232$; survey $0.533681 \to 0.533722$); the exact rational chain now stored as
 well gives $0.534267, 0.173082, 0.058177$ (survey $0.533215$). The exclusion covers have the
 same box counts. The 20-spin diagnostic now takes its 8/16-spin ground energies from the
 `Float64` solver instead of the old seed files.

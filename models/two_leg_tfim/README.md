@@ -26,9 +26,9 @@ spin, i.e. the exact rational orthogonal involution $W = (H \otimes H)/2$ with
 $`H = \begin{pmatrix}1&1\\1&-1\end{pmatrix}`$ on every rung (`Ladder.rung_hadamard`). It maps
 $X \leftrightarrow Z$, so the rotated ladder (`Ladder.ladder(g)`) has bond
 $h = -(X_a X_{a'} + X_b X_{b'})$ and on-site term $o = -X_a X_b - g(Z_a + Z_b)$. There the
-$\mathbb{Z}_2$ charge (number of down spins mod 2, `charge = [0, 1, 1, 0]`) is conserved and
-the leg exchange $a \leftrightarrow b$ is an exact on-site $\mathbb{Z}_2$ symmetry
-(`symmetries = [LEG_SWAP]`). The tests check $W o_{\text{phys}} W = o_{\text{rot}}$ and
+$`\mathbb{Z}_2`$ charge (number of down spins mod 2, `charge = [0, 1, 1, 0]`) is conserved and
+the leg exchange $`a \leftrightarrow b`$ is an exact on-site $`\mathbb{Z}_2`$ symmetry
+(`symmetries = [LEG_SWAP]`). The tests check $`W o_{\text{phys}} W = o_{\text{rot}}`$ and
 $(W \otimes W) h_{\text{phys}} (W \otimes W) = h_{\text{rot}}$ exactly. $W^{\otimes L}$ is
 orthogonal, so both frames have the same spectrum and purities.
 
@@ -95,10 +95,10 @@ with other jobs):
 
 - **Rigorous:** the exact RP identity and frame change (`Rational{BigInt}`); the complete
   spectra of the rings of 4 and 8 rungs, split exactly by the core `VerifiedSpectra.ring_blocks`
-  into $\mathbb{Z}_2$ charge, lattice momentum (±k merged with multiplicity 2) and leg-exchange
+  into $`\mathbb{Z}_2`$ charge, lattice momentum (±k merged with multiplicity 2) and leg-exchange
   parity, with block entries enclosed in interval arithmetic; each block enclosed by
   `CertifiedGaps.VerifiedSpectra.verified_eigen` (residual and Gram matrices in `Float64` with
-  a priori $\gamma_{N+8}$ (real blocks) or $\gamma_{2N+8}$ (complex blocks) rounding bounds and
+  a priori $`\gamma_{N+8}`$ (real blocks) or $\gamma_{2N+8}$ (complex blocks) rounding bounds and
   Frobenius norms, then Ostrowski/polar-factor and Weyl bounds, plus the exact construction
   error); $\log Z$ by `log_partition_enclosure` in interval arithmetic; seed defects rounded up
   to a $10^{-15}$ grid; the exact rational doubling chain and the interval

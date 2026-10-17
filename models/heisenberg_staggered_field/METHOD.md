@@ -194,7 +194,7 @@ $(n_0, \beta_0) \approx (14, 17.0)$ (requiring a 28-site doubled ring).
 The five certificates were first produced by a model-local pipeline in the physical frame. It
 built $(S^z, k)$ blocks under translation by two sites, using spin flip composed with a one-site
 translation to identify $p \leftrightarrow L - p$. Its own residual and polar-factor enclosure used
-conservative $\gamma_{32d+32}$ constants and $`\|A\|_2 \le L(3/4 + h/2)`$. It had its own $\log Z$
+conservative $\gamma_{32d+32}$ constants and $\|A\|_2 \le L(3/4 + h/2)$. It had its own $\log Z$
 and a fresh spectral replay and direct interval audit of small blocks. An independent
 shared-core certificate at $h = 1$ in the one-site frame used only the $S^z$ parity
 (about 12 min, $\Delta_L > 1.147699$). The local pipeline was retired in favor of the core.

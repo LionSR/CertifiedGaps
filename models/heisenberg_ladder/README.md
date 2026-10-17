@@ -38,7 +38,7 @@ and the physical $S^z_{\text{tot}}$ becomes the cell charge $z_1 - z_2$. With th
 -h = \sum_\alpha C_\alpha \otimes F \overline{C_\alpha} F, \qquad C_\alpha \in \{X \otimes 1, A \otimes 1, Z \otimes 1, 1 \otimes X, 1 \otimes A, 1 \otimes Z\},
 ```
 
-since $\sigma^y X \sigma^y = -X$, $\sigma^y A \sigma^y = A$, $\sigma^y Z \sigma^y = -Z$ on each leg. The core `RingModel` (`ladder_model` in [`src/model.jl`](src/model.jl)) carries the charge $z_1 - z_2$, the charge flip $F$, and the on-site $\mathbb{Z}_2$ symmetry leg exchange $`U\,\mathrm{SWAP}\,U^\mathsf{T}`$; the core checks all of them exactly. `ladder_rp` stores the factors and $F$ for `CertifiedGaps.verify_rp`, and `check_frame` verifies over `Rational{BigInt}` that $U$ maps the physical bond, rung term, and $S^z_{\text{tot}}$ to the rotated ones (both checker modes and `test/runtests.jl`, which also compares the spectra of both frames with an independent dense Hamiltonian).
+since $\sigma^y X \sigma^y = -X$, $\sigma^y A \sigma^y = A$, $\sigma^y Z \sigma^y = -Z$ on each leg. The core `RingModel` (`ladder_model` in [`src/model.jl`](src/model.jl)) carries the charge $z_1 - z_2$, the charge flip $F$, and the on-site $`\mathbb{Z}_2`$ symmetry leg exchange $`U\,\mathrm{SWAP}\,U^\mathsf{T}`$; the core checks all of them exactly. `ladder_rp` stores the factors and $F$ for `CertifiedGaps.verify_rp`, and `check_frame` verifies over `Rational{BigInt}` that $`U`$ maps the physical bond, rung term, and $S^z_{\text{tot}}$ to the rotated ones (both checker modes and `test/runtests.jl`, which also compares the spectra of both frames with an independent dense Hamiltonian).
 
 ## Seeds and certified bounds
 
@@ -169,7 +169,7 @@ later, the source-hash policy change and the move of duplicated helpers into the
 the results with every certified number identical.
 
 The certificate pipeline then moved entirely into the core: the local block builder, eigenvalue
-enclosure ($\gamma_{8n+32}$ with $`\|H\|_F`$), $\log Z$ sums, and the single-file
+enclosure ($\gamma_{8n+32}$ with $\|H\|_F$), $\log Z$ sums, and the single-file
 `results/certificate.json` were replaced by `verified_ring_spectrum`, `seed_bounds`, and
 `certify_gap` in the uniform leg-rotated frame (cell reflection $\sigma^y \otimes \sigma^y$,
 conserved $S^z$, flip and leg-exchange parities), with one core certificate per coupling and the

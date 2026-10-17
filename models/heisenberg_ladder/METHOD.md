@@ -44,7 +44,7 @@ are valid defect upper bounds across the entire interval $|J_\perp - J_*| \le \d
 
 This section records a rigorous negative result for the naive independent-rung operator-norm perturbation bound: for every even seed length $n \ge 2$, every $\beta > 0$, and every $0 < J_\perp \le 4$, bounding $\log Z_L(\beta)$ around the independent-rung limit via Weyl's inequality cannot produce an admissible seed. Increasing $n$ cannot rescue the bound because the extensive norm error destroys the bulk cancellation between purities.
 
-Let $H_0$ contain only the rung interactions, let $V$ contain the $2L$ leg bonds, and let $z(\beta) = e^{3\beta J_\perp/4} + 3e^{-\beta J_\perp/4}$ be the single-rung partition function. Each spin-1/2 Heisenberg leg bond $h$ has eigenvalues $-3/4$ and $1/4$. Centering $h$ by $+I/4$ gives $`\|h + I/4\|_2 = 1/2`$, so the sum of $2L$ leg bonds satisfies
+Let $H_0$ contain only the rung interactions, let $V$ contain the $2L$ leg bonds, and let $z(\beta) = e^{3\beta J_\perp/4} + 3e^{-\beta J_\perp/4}$ be the single-rung partition function. Each spin-1/2 Heisenberg leg bond $h$ has eigenvalues $-3/4$ and $1/4$. Centering $h$ by $+I/4$ gives $\|h + I/4\|_2 = 1/2$, so the sum of $2L$ leg bonds satisfies
 
 ```math
 \|V + \tfrac{L}{2} I\|_2 \le L, \qquad \bigl|\log Z_L(\beta) - \bigl(L \log z(\beta) + \tfrac{1}{2}\beta L\bigr)\bigr| \le \beta L.
@@ -65,7 +65,7 @@ In both cases, $A = (1 - \varepsilon_{\mathrm{s}})^2(1 - \varepsilon_\tau) < 1/2
 
 ## Local coupling continuation around a certified seed
 
-At a certified coupling $J_*$, write $H_L(J_\perp) - H_L(J_*) = (J_\perp - J_*) W_L$, where $W_L$ is the sum of $L$ rung operators. Centering each rung operator by $+I/4$ gives $`\|W_L + \tfrac{L}{4} I\|_2 \le L/2`$. For $|J_\perp - J_*| \le \delta$, the scalar shift cancels in both purities and Weyl's inequality bounds the variation of each centered log-partition function by $\frac{1}{2}\beta \delta L$. Thus, given certified defects $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ at $(n_0, \beta_0, J_*)$, valid upper defect bounds across the entire interval $|J_\perp - J_*| \le \delta$ are
+At a certified coupling $`J_*`$, write $`H_L(J_\perp) - H_L(J_*) = (J_\perp - J_*) W_L`$, where $`W_L`$ is the sum of $L$ rung operators. Centering each rung operator by $+I/4$ gives $\|W_L + \tfrac{L}{4} I\|_2 \le L/2$. For $|J_\perp - J_*| \le \delta$, the scalar shift cancels in both purities and Weyl's inequality bounds the variation of each centered log-partition function by $`\frac{1}{2}\beta \delta L`$. Thus, given certified defects $`(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)`$ at $`(n_0, \beta_0, J_*)`$, valid upper defect bounds across the entire interval $|J_\perp - J_*| \le \delta$ are
 
 ```math
 \varepsilon_{\mathrm{s}}(\delta) = 1 - (1 - \varepsilon_{\mathrm{s}}) e^{-2\beta_0 n_0 \delta}, \qquad \varepsilon_\tau(\delta) = 1 - (1 - \varepsilon_\tau) e^{-4\beta_0 n_0 \delta}.
