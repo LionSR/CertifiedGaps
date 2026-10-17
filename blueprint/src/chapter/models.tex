@@ -1,0 +1,530 @@
+\chapter{Further models}
+\label{chap:models}
+
+Each model below (Lean files \texttt{CertifiedGaps/Models/*.lean}) is instantiated as a
+reflection-positive ring, lists its certified parameter points with a seed inverse temperature
+\(\beta_0\) and a rational chain certificate, and proves a uniform gap \(\log r / \beta_0\) at
+every point from Theorem~\ref{thm:rp-gap}. The only open hypothesis of each model is a single
+lemma stating its two seed inequalities at every point; the seeds are certified numerically
+(complete spectra of the seed rings with rigorous eigenvalue enclosures) in the model directory
+named in each statement. Ring lengths count unit cells.
+
+\section{Local building blocks}
+
+\begin{definition}[Real Pauli and spin-\(\tfrac12\) factors]
+  \label{def:local-spin-half}
+  \lean{CertifiedGaps.pauliZ, CertifiedGaps.pauliX, CertifiedGaps.pauliZ_transpose,
+    CertifiedGaps.pauliX_transpose, CertifiedGaps.SpinHalf.P, CertifiedGaps.SpinHalf.P_symm}
+  \leanok
+  The real Pauli matrices \(Z = \operatorname{diag}(1, -1)\) and \(X\), both symmetric, and the
+  real spin-\(\tfrac12\) factors \(P_\alpha = (S^x, iS^y, S^z)\), each symmetric or antisymmetric.
+\end{definition}
+
+\begin{lemma}[Sublattice rotation]
+  \label{lem:spin-half-rotation}
+  \lean{CertifiedGaps.SpinHalf.spinHalf, CertifiedGaps.SpinHalf.rot,
+    CertifiedGaps.SpinHalf.rot_mul_conjTranspose, CertifiedGaps.SpinHalf.rot_conj_spinHalf,
+    CertifiedGaps.SpinHalf.Pc_eq}
+  \leanok
+  \uses{def:local-spin-half}
+  The rotation \(R = e^{i\pi S^y} = \bigl(\begin{smallmatrix} 0 & 1 \\ -1 & 0 \end{smallmatrix}\bigr)\)
+  is unitary and \(R S^\alpha R^\dagger = s_\alpha S^\alpha\) with \(s = (-1, 1, -1)\). The real
+  factors are \(P_\alpha = c_\alpha S^\alpha\) with \(c = (1, i, 1)\), so
+  \(\mathbf S \cdot \mathbf S\) rotated on one site is \(-\sum_\alpha P_\alpha \otimes P_\alpha\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Direct computation with \(2 \times 2\) matrices.
+\end{proof}
+
+\begin{definition}[Cell swap]
+  \label{def:cell-swap}
+  \lean{CertifiedGaps.cellSwap, CertifiedGaps.cellSwap_mul_kronecker_mul_cellSwap,
+    CertifiedGaps.cellSwap_mul_cellSwap, CertifiedGaps.cellSwap_transpose,
+    CertifiedGaps.cellSwap_conj_smul_sum_kronecker_self}
+  \leanok
+  The swap \(F\) of the two sites of a cell is a real symmetric involution with
+  \(F (A \otimes B) F = B \otimes A\); it commutes with every intra-cell exchange
+  \(c \sum_k A_k \otimes A_k\). It is the internal reflection of the dimerized models.
+\end{definition}
+
+\section{Spin-1 chain with single-ion anisotropy}
+
+\begin{definition}
+  \label{def:large-d-points}
+  \lean{CertifiedGaps.SpinOneLargeD.Point, CertifiedGaps.SpinOneLargeD.points}
+  \leanok
+  \uses{def:spin-one-large-d, def:chain-certificate}
+  The model \(\sum_j \mathbf S_j \cdot \mathbf S_{j+1} + D \sum_j (S^z_j)^2\) of
+  Definition~\ref{def:spin-one-large-d} at the two points \(D = 4\) (\(\beta_0 = 9/4\),
+  \(r = 4.755\)) and \(D = 1603/500\) (\(\beta_0 = 381/125\), \(r = 1.0065429\)), seed length
+  \(n_0 = 6\) sites (\texttt{models/spin1\_largeD}).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:large-d-valid}
+  \lean{CertifiedGaps.SpinOneLargeD.points_valid, CertifiedGaps.SpinOneLargeD.points_β₀_pos}
+  \leanok
+  \uses{def:large-d-points}
+  Both certificates are valid and both \(\beta_0 > 0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[Seeds]
+  \label{lem:large-d-seeds}
+  \lean{CertifiedGaps.SpinOneLargeD.seeds}
+  \leanok
+  \uses{def:large-d-points, def:rp-purities}
+  At each point, \(\Ps(6, \beta_0) \ge 1 - s_0\) and \(\Pt(12, \beta_0) \ge 1 - t_0\).
+\end{lemma}
+\begin{proof}
+  Certified in \texttt{models/spin1\_largeD}. Not yet proved in Lean.
+\end{proof}
+
+\begin{theorem}
+  \label{thm:large-d-gap}
+  \lean{CertifiedGaps.SpinOneLargeD.gap}
+  \leanok
+  \uses{lem:large-d-valid, lem:large-d-seeds, thm:rp-gap}
+  At each point, every even ring of \(L \ge 6\) sites has a unique ground state and
+  \(\GapGT(E_L, \log r / \beta_0)\): \(\Delta_L > 0.693\) at \(D = 4\) and \(\Delta_L > 0.00214\) at
+  \(D = 1603/500\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:rp-gap}.
+\end{proof}
+
+\section{Dimerized spin-1 chain}
+
+\begin{definition}
+  \label{def:spin-one-dimerized}
+  \lean{CertifiedGaps.SpinOneDimerized.model, CertifiedGaps.SpinOneDimerized.Point,
+    CertifiedGaps.SpinOneDimerized.points}
+  \leanok
+  \uses{def:rpring, def:spin-one-generators, def:cell-swap, def:chain-certificate}
+  \(H = \sum_j (1-\delta)\, \mathbf S_{2j} \cdot \mathbf S_{2j+1} + (1+\delta)\,
+  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) as a ring of weak pairs: bond factors
+  \(C_\alpha = \sqrt{1+\delta}\,(1 \otimes G_\alpha)\), internal reflection \(F\) the cell swap,
+  and on-site term \(o = -(1-\delta) \sum_\alpha G_\alpha \otimes G_\alpha\). One point,
+  \(\delta = 9/10\), with \(n_0 = 2\) cells, \(\beta_0 = 7/2\), \(r = 6.339\)
+  (\texttt{models/spin1\_dimerized}).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:spin-one-dimerized-valid}
+  \lean{CertifiedGaps.SpinOneDimerized.points_valid, CertifiedGaps.SpinOneDimerized.points_β₀_pos}
+  \leanok
+  \uses{def:spin-one-dimerized}
+  The certificate is valid and \(\beta_0 > 0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[Seeds]
+  \label{lem:spin-one-dimerized-seeds}
+  \lean{CertifiedGaps.SpinOneDimerized.seeds}
+  \leanok
+  \uses{def:spin-one-dimerized, def:rp-purities}
+  \(\Ps(2, 7/2) \ge 1 - 0.04972\) and \(\Pt(4, 7/2) \ge 1 - 0.03206\).
+\end{lemma}
+\begin{proof}
+  Certified in \texttt{models/spin1\_dimerized}. Not yet proved in Lean.
+\end{proof}
+
+\begin{theorem}
+  \label{thm:spin-one-dimerized-gap}
+  \lean{CertifiedGaps.SpinOneDimerized.gap}
+  \leanok
+  \uses{lem:spin-one-dimerized-valid, lem:spin-one-dimerized-seeds, thm:rp-gap}
+  Every even ring of \(L \ge 2\) cells has a unique ground state and
+  \(\Delta_L > \log 6.339 / (7/2) \approx 0.528\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:rp-gap}.
+\end{proof}
+
+\section{Two-leg transverse-field Ising ladder}
+
+\begin{definition}
+  \label{def:two-leg-ising}
+  \lean{CertifiedGaps.TwoLegIsing.model, CertifiedGaps.TwoLegIsing.Point,
+    CertifiedGaps.TwoLegIsing.points}
+  \leanok
+  \uses{def:rpring, def:local-spin-half, def:chain-certificate}
+  \(H = -\sum_{\text{legs}} Z_i Z_j - \sum_{\text{rungs}} Z_i Z_j - g \sum_i X_i\) as a ring of
+  rungs with bond factors \(Z \otimes 1\), \(1 \otimes Z\) and on-site term
+  \(o = -Z \otimes Z - g (X \otimes 1 + 1 \otimes X)\). One point, \(g = 3\), with \(n_0 = 4\)
+  rungs, \(\beta_0 = 3/2\), \(r = 2.585\) (\texttt{models/two\_leg\_tfim}).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:two-leg-ising-valid}
+  \lean{CertifiedGaps.TwoLegIsing.points_valid, CertifiedGaps.TwoLegIsing.points_β₀_pos}
+  \leanok
+  \uses{def:two-leg-ising}
+  The certificate is valid and \(\beta_0 > 0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[Seeds]
+  \label{lem:two-leg-ising-seeds}
+  \lean{CertifiedGaps.TwoLegIsing.seeds}
+  \leanok
+  \uses{def:two-leg-ising, def:rp-purities}
+  \(\Ps(4, 3/2) \ge 1 - 0.1125\) and \(\Pt(8, 3/2) \ge 1 - 0.05162\).
+\end{lemma}
+\begin{proof}
+  Certified in \texttt{models/two\_leg\_tfim}. Not yet proved in Lean.
+\end{proof}
+
+\begin{theorem}
+  \label{thm:two-leg-ising-gap}
+  \lean{CertifiedGaps.TwoLegIsing.gap}
+  \leanok
+  \uses{lem:two-leg-ising-valid, lem:two-leg-ising-seeds, thm:rp-gap}
+  Every even ring of \(L \ge 4\) rungs has a unique ground state and
+  \(\Delta_L > \log 2.585 / (3/2) \approx 0.633\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:rp-gap}.
+\end{proof}
+
+\section{Ising chain in transverse and longitudinal fields}
+
+\begin{definition}
+  \label{def:ising-longitudinal}
+  \lean{CertifiedGaps.IsingLongitudinal.model, CertifiedGaps.IsingLongitudinal.Point,
+    CertifiedGaps.IsingLongitudinal.points}
+  \leanok
+  \uses{def:rpring, def:local-spin-half, def:chain-certificate}
+  \(H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j\) as a ring with the single bond
+  factor \(Z\) and on-site term \(-gX - hZ\); non-integrable for \(h \ne 0\). Thirty grid points
+  \(g \in [1/4, 2]\), \(h \in [1/20, 1]\), including the critical value \(g = 1\) and the ordered
+  phase \(g < 1\) (the longitudinal field lifts the degeneracy), each with seed length \(n_0 = 6\)
+  (\texttt{models/tfim\_longitudinal}).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:ising-longitudinal-valid}
+  \lean{CertifiedGaps.IsingLongitudinal.points_valid,
+    CertifiedGaps.IsingLongitudinal.points_β₀_pos}
+  \leanok
+  \uses{def:ising-longitudinal}
+  All thirty certificates are valid and every \(\beta_0 > 0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[Seeds]
+  \label{lem:ising-longitudinal-seeds}
+  \lean{CertifiedGaps.IsingLongitudinal.seeds}
+  \leanok
+  \uses{def:ising-longitudinal, def:rp-purities}
+  At each point, \(\Ps(6, \beta_0) \ge 1 - s_0\) and \(\Pt(12, \beta_0) \ge 1 - t_0\).
+\end{lemma}
+\begin{proof}
+  Certified in \texttt{models/tfim\_longitudinal}. Not yet proved in Lean as a whole; the first
+  point is proved in the kernel (Theorem~\ref{thm:ising-seeds}).
+\end{proof}
+
+\begin{theorem}
+  \label{thm:ising-longitudinal-gap}
+  \lean{CertifiedGaps.IsingLongitudinal.gap}
+  \leanok
+  \uses{lem:ising-longitudinal-valid, lem:ising-longitudinal-seeds, thm:rp-gap}
+  At each point, every even ring of \(L \ge 6\) sites has a unique ground state and
+  \(\GapGT(E_L, \log r / \beta_0)\); the bounds range from \(0.075\) at \(g = 1\), \(h = 1/20\)
+  to \(3.70\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:rp-gap}.
+\end{proof}
+
+\section{Spin-\(\tfrac12\) Heisenberg chain in a staggered field}
+
+\begin{definition}
+  \label{def:staggered}
+  \lean{CertifiedGaps.StaggeredHeisenberg.model, CertifiedGaps.StaggeredHeisenberg.Point,
+    CertifiedGaps.StaggeredHeisenberg.points}
+  \leanok
+  \uses{def:rpring, def:local-spin-half, def:chain-certificate}
+  The rotated chain: bond factors \(P_\alpha\) and on-site term \(-h S^z\). Five points
+  \(h = 1, 3/4, 1/2, 7/20, 1/4\) with \(n_0 = 8\) and \(\beta_0 = 21/4, 21/4, 11/2, 23/4, 25/4\)
+  (\texttt{models/heisenberg\_staggered\_field}).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:staggered-valid}
+  \lean{CertifiedGaps.StaggeredHeisenberg.points_valid,
+    CertifiedGaps.StaggeredHeisenberg.points_β₀_pos}
+  \leanok
+  \uses{def:staggered}
+  All five certificates are valid and every \(\beta_0 > 0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[Seeds]
+  \label{lem:staggered-seeds}
+  \lean{CertifiedGaps.StaggeredHeisenberg.seeds}
+  \leanok
+  \uses{def:staggered, def:rp-purities}
+  At each point, \(\Ps(8, \beta_0) \ge 1 - s_0\) and \(\Pt(16, \beta_0) \ge 1 - t_0\).
+\end{lemma}
+\begin{proof}
+  Certified in \texttt{models/heisenberg\_staggered\_field}. Not yet proved in Lean.
+\end{proof}
+
+\begin{theorem}
+  \label{thm:staggered-gap}
+  \lean{CertifiedGaps.StaggeredHeisenberg.gap}
+  \leanok
+  \uses{lem:staggered-valid, lem:staggered-seeds, thm:rp-gap}
+  At each point, every even ring of \(L \ge 8\) sites of the rotated chain has a unique ground
+  state and \(\GapGT(E_L, \log r / \beta_0)\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:rp-gap}.
+\end{proof}
+
+\begin{definition}[Physical chain]
+  \label{def:staggered-physical}
+  \lean{CertifiedGaps.StaggeredHeisenberg.physicalHamiltonian,
+    CertifiedGaps.StaggeredHeisenberg.physicalSpectrum, CertifiedGaps.StaggeredHeisenberg.rotation}
+  \leanok
+  \uses{def:ring-operators, lem:spin-half-rotation}
+  \(H_L = \sum_j \mathbf S_j \cdot \mathbf S_{j+1} - h \sum_j (-1)^j S^z_j\), and the rotation
+  \(e^{i\pi S^y}\) on the odd sites.
+\end{definition}
+
+\begin{lemma}
+  \label{lem:staggered-physical-eq}
+  \lean{CertifiedGaps.StaggeredHeisenberg.physicalHamiltonian_eq,
+    CertifiedGaps.StaggeredHeisenberg.physicalSpectrum_eq}
+  \leanok
+  \uses{def:staggered-physical, def:staggered, thm:conj-hamiltonian, thm:conj-spectrum}
+  On an even ring the physical chain is the rotation of the rotated chain, so their spectra
+  agree.
+\end{lemma}
+\begin{proof}
+  \leanok
+  On an even ring every bond joins an odd and an even site; the rotation maps
+  \(\mathbf S \cdot \mathbf S\) to \(-\sum_\alpha P_\alpha \otimes P_\alpha\) and the staggered
+  field to the uniform field (Lemma~\ref{lem:spin-half-rotation}).
+  Theorems~\ref{thm:conj-hamiltonian} and~\ref{thm:conj-spectrum} conclude.
+\end{proof}
+
+\begin{theorem}
+  \label{thm:staggered-physical-gap}
+  \lean{CertifiedGaps.StaggeredHeisenberg.physical_gap}
+  \leanok
+  \uses{lem:staggered-physical-eq, thm:staggered-gap}
+  At each point, every even ring of \(L \ge 8\) sites of the physical chain has a unique ground
+  state and gap \(> 1.1475, 0.8899, 0.5940, 0.3828, 0.2139\) at
+  \(h = 1, 3/4, 1/2, 7/20, 1/4\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Lemma~\ref{lem:staggered-physical-eq} and Theorem~\ref{thm:staggered-gap}.
+\end{proof}
+
+\section{Dimerized spin-\(\tfrac12\) Heisenberg chain}
+
+\begin{definition}
+  \label{def:dimerized}
+  \lean{CertifiedGaps.DimerizedHeisenberg.model, CertifiedGaps.DimerizedHeisenberg.Point,
+    CertifiedGaps.DimerizedHeisenberg.points}
+  \leanok
+  \uses{def:rpring, def:local-spin-half, def:cell-swap, def:chain-certificate}
+  The rotated chain as a ring of strong pairs: bond factors
+  \(C_\alpha = \sqrt{1-\delta}\,(1 \otimes P_\alpha)\), internal reflection the cell swap, and
+  on-site term \(o = -(1+\delta) \sum_\alpha P_\alpha \otimes P_\alpha\). Three points
+  \(\delta = 1/2, 3/10, 1/4\) with \(n_0 = 4\) cells and \(\beta_0 = 6, 13/2, 29/4\)
+  (\texttt{models/dimerized\_heisenberg}).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:dimerized-valid}
+  \lean{CertifiedGaps.DimerizedHeisenberg.points_valid,
+    CertifiedGaps.DimerizedHeisenberg.points_β₀_pos,
+    CertifiedGaps.DimerizedHeisenberg.points_δ_le_one}
+  \leanok
+  \uses{def:dimerized}
+  All three certificates are valid, every \(\beta_0 > 0\) and every \(\delta \le 1\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[Seeds]
+  \label{lem:dimerized-seeds}
+  \lean{CertifiedGaps.DimerizedHeisenberg.seeds}
+  \leanok
+  \uses{def:dimerized, def:rp-purities}
+  At each point, \(\Ps(4, \beta_0) \ge 1 - s_0\) and \(\Pt(8, \beta_0) \ge 1 - t_0\).
+\end{lemma}
+\begin{proof}
+  Certified in \texttt{models/dimerized\_heisenberg}. Not yet proved in Lean.
+\end{proof}
+
+\begin{theorem}
+  \label{thm:dimerized-gap}
+  \lean{CertifiedGaps.DimerizedHeisenberg.gap}
+  \leanok
+  \uses{lem:dimerized-valid, lem:dimerized-seeds, thm:rp-gap}
+  At each point, every even ring of \(L \ge 4\) cells of the rotated chain has a unique ground
+  state and \(\GapGT(E_L, \log r / \beta_0)\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:rp-gap}.
+\end{proof}
+
+\begin{definition}[Physical chain]
+  \label{def:dimerized-physical}
+  \lean{CertifiedGaps.DimerizedHeisenberg.physicalHamiltonian,
+    CertifiedGaps.DimerizedHeisenberg.physicalSpectrum, CertifiedGaps.DimerizedHeisenberg.cellRot}
+  \leanok
+  \uses{def:ring-operators, lem:spin-half-rotation}
+  \(H = \sum_j (1+\delta)\, \mathbf S_{2j} \cdot \mathbf S_{2j+1} + (1-\delta)\,
+  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) as a ring of strong pairs, and the rotation
+  \(1 \otimes e^{i\pi S^y}\) of every cell.
+\end{definition}
+
+\begin{lemma}
+  \label{lem:dimerized-physical-eq}
+  \lean{CertifiedGaps.DimerizedHeisenberg.physicalHamiltonian_eq,
+    CertifiedGaps.DimerizedHeisenberg.physicalSpectrum_eq}
+  \leanok
+  \uses{def:dimerized-physical, def:dimerized, thm:conj-hamiltonian, thm:conj-spectrum}
+  For \(\delta \le 1\) and \(L \ge 2\), the physical chain is the rotation of the rotated chain,
+  so their spectra agree.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Rotating the second spin of every cell turns every exchange into
+  \(-\sum_\alpha P_\alpha \otimes P_\alpha\) (Lemma~\ref{lem:spin-half-rotation}); the weak bond
+  becomes \((1-\delta) \sum_\alpha (1 \otimes P_\alpha) \otimes (P_\alpha \otimes 1)\) with sign
+  absorbed by \(\sqrt{1-\delta}^2 = 1 - \delta\), which needs \(\delta \le 1\).
+\end{proof}
+
+\begin{theorem}
+  \label{thm:dimerized-physical-gap}
+  \lean{CertifiedGaps.DimerizedHeisenberg.physical_gap}
+  \leanok
+  \uses{lem:dimerized-physical-eq, thm:dimerized-gap, lem:dimerized-valid}
+  At each point, every even ring of \(L \ge 4\) cells of the physical chain has a unique ground
+  state and gap \(> 0.532, 0.172, 0.057\) at \(\delta = 1/2, 3/10, 1/4\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Lemma~\ref{lem:dimerized-physical-eq} and Theorem~\ref{thm:dimerized-gap}.
+\end{proof}
+
+\section{Spin-\(\tfrac12\) two-leg Heisenberg ladder}
+
+\begin{definition}
+  \label{def:ladder}
+  \lean{CertifiedGaps.HeisenbergLadder.rungExchange, CertifiedGaps.HeisenbergLadder.model,
+    CertifiedGaps.HeisenbergLadder.Point, CertifiedGaps.HeisenbergLadder.points}
+  \leanok
+  \uses{def:rpring, def:local-spin-half, def:chain-certificate}
+  The rotated ladder as a ring of rungs: bond factors \(P_\alpha \otimes 1\) and
+  \(1 \otimes P_\alpha\), and the rung as on-site term
+  \(o = -J_\perp \sum_\alpha P_\alpha \otimes P_\alpha\). One point, \(J_\perp = 4\), with
+  \(n_0 = 4\) rungs, \(\beta_0 = 2\), \(r = 9.033\) (\texttt{models/heisenberg\_ladder}).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:ladder-valid}
+  \lean{CertifiedGaps.HeisenbergLadder.points_valid, CertifiedGaps.HeisenbergLadder.points_β₀_pos}
+  \leanok
+  \uses{def:ladder}
+  The certificate is valid and \(\beta_0 > 0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[Seeds]
+  \label{lem:ladder-seeds}
+  \lean{CertifiedGaps.HeisenbergLadder.seeds}
+  \leanok
+  \uses{def:ladder, def:rp-purities}
+  \(\Ps(4, 2) \ge 1 - 0.03509\) and \(\Pt(8, 2) \ge 1 - 0.02463\).
+\end{lemma}
+\begin{proof}
+  Certified in \texttt{models/heisenberg\_ladder}. Not yet proved in Lean.
+\end{proof}
+
+\begin{theorem}
+  \label{thm:ladder-gap}
+  \lean{CertifiedGaps.HeisenbergLadder.gap}
+  \leanok
+  \uses{lem:ladder-valid, lem:ladder-seeds, thm:rp-gap}
+  Every even ring of \(L \ge 4\) rungs of the rotated ladder has a unique ground state and
+  \(\Delta_L > \log 9.033 / 2 \approx 1.100\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:rp-gap}.
+\end{proof}
+
+\begin{definition}[Physical ladder]
+  \label{def:ladder-physical}
+  \lean{CertifiedGaps.HeisenbergLadder.legS, CertifiedGaps.HeisenbergLadder.physicalHamiltonian,
+    CertifiedGaps.HeisenbergLadder.physicalSpectrum, CertifiedGaps.HeisenbergLadder.rungRot}
+  \leanok
+  \uses{def:ring-operators, lem:spin-half-rotation}
+  \(H = \sum_{\text{legs}} \mathbf S_i \cdot \mathbf S_j + J_\perp \sum_{\text{rungs}}
+  \mathbf S_i \cdot \mathbf S_j\), and the checkerboard rotation \(e^{i\pi S^y}\) on the sites
+  \((1, j)\), \(j\) odd, and \((2, j)\), \(j\) even.
+\end{definition}
+
+\begin{lemma}
+  \label{lem:ladder-physical-eq}
+  \lean{CertifiedGaps.HeisenbergLadder.physicalHamiltonian_eq,
+    CertifiedGaps.HeisenbergLadder.physicalSpectrum_eq}
+  \leanok
+  \uses{def:ladder-physical, def:ladder, thm:conj-hamiltonian, thm:conj-spectrum}
+  On a ring of an even number of rungs, the physical ladder is the rotation of the rotated
+  ladder, so their spectra agree.
+\end{lemma}
+\begin{proof}
+  \leanok
+  On an even ring the checkerboard rotates exactly one end of every leg and rung bond, which turns
+  every exchange into \(-\sum_\alpha P_\alpha \otimes P_\alpha\)
+  (Lemma~\ref{lem:spin-half-rotation}).
+\end{proof}
+
+\begin{theorem}
+  \label{thm:ladder-physical-gap}
+  \lean{CertifiedGaps.HeisenbergLadder.physical_gap}
+  \leanok
+  \uses{lem:ladder-physical-eq, thm:ladder-gap}
+  Every even ring of \(L \ge 4\) rungs of the physical ladder at \(J_\perp = 4\) has a unique
+  ground state and \(\Delta_L > 1.100\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Lemma~\ref{lem:ladder-physical-eq} and Theorem~\ref{thm:ladder-gap}.
+\end{proof}

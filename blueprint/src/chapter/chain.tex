@@ -1,0 +1,194 @@
+\chapter{Unequal seed defects and rational chain certificates}
+\label{chap:chain}
+
+Theorem~\ref{thm:gap-of-seeds} needs both seed defects below \(1/100\). Certified seeds are
+usually larger and unequal, for example \((\es, \et) \approx (0.064, 0.041)\), and reach that
+range only after a few doubling steps. This chapter (Lean files \texttt{CertifiedGaps/Chain.lean}
+and \texttt{CertifiedGaps/ChainCheck.lean}) runs the exact asymmetric doubling recurrence for
+finitely many steps and then hands over to Theorem~\ref{thm:gap-of-seeds}. All remaining
+conditions are rational inequalities, checked in the kernel.
+
+\section{One step of the exact recurrence}
+
+\begin{definition}[Coupling defect]
+  \label{def:coupling-defect}
+  \lean{CertifiedGaps.couplingDefect}
+  \leanok
+  \(z(a, b) = 1 - (1 - b)(1 - a)^2\). If \(\Ps \ge 1 - a\) and \(\Pt \ge 1 - b\), the coupled
+  purity of Lemma~\ref{lem:coupling} is at least \(1 - z(a, b)\).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:gapgt-mono}
+  \lean{CertifiedGaps.GapGT.mono}
+  \leanok
+  \uses{def:gapgt}
+  If \(\GapGT(e, c)\) and \(c' \le c\), then \(\GapGT(e, c')\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The same minimizer works.
+\end{proof}
+
+\begin{lemma}[Defect form of squaring]
+  \label{lem:defect-squaring}
+  \lean{CertifiedGaps.one_sub_thermalPurity_two_mul_le,
+    CertifiedGaps.one_sub_spatialPurity_two_mul_le, CertifiedGaps.squaringDefect_le_of_le}
+  \leanok
+  \uses{lem:power-sums, lem:squaring-homogeneous, lem:f-mono, def:moment-bounds}
+  \(1 - \Pt(L, 2\beta) \le f\bigl(1 - \Pt(L, \beta)\bigr)\), and under the spatial moment
+  inequalities above \(n_0\), \(1 - \Ps(2n, \beta) \le f\bigl(1 - \Ps(n, \beta)\bigr)\) for even
+  \(n \ge n_0\) and \(\beta > 0\). If \(P \le 1\) and \(1 - z \le P\) with \(z < 1\), then
+  \(f(1 - P) \le f(z)\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Lemma~\ref{lem:squaring-homogeneous} applied to the Boltzmann weights, respectively to inequality
+  (2) of Definition~\ref{def:moment-bounds}; the last claim is Lemma~\ref{lem:f-mono}.
+\end{proof}
+
+\begin{lemma}[Doubling step]
+  \label{lem:doubling-step}
+  \lean{CertifiedGaps.doubling_step}
+  \leanok
+  \uses{def:coupling-defect, lem:coupling, lem:defect-squaring, lem:purity-basic,
+    lem:purity-squaring}
+  Assume the spatial moment inequalities above \(n_0\), let \(n \ge n_0\) be even and
+  \(\beta > 0\). Let \(s, t, s' \le 1\) with \(z(s, t) < 1\), \(f(z(s, t)) \le s'\),
+  \(z(t, s') < 1\) and \(f(z(t, s')) \le t'\). If \(\Ps(n, \beta) \ge 1 - s\) and
+  \(\Pt(2n, \beta) \ge 1 - t\), then \(\Ps(2n, 2\beta) \ge 1 - s'\) and
+  \(\Pt(4n, 2\beta) \ge 1 - t'\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  As in Lemma~\ref{lem:doubling}, the first coupling identity and \(\Pt(n,\beta) \le 1\) give
+  \(\Ps(n, 2\beta) \ge 1 - z(s, t)\), and squaring the spatial spectrum gives the bound on
+  \(\Ps(2n, 2\beta)\). The second coupling identity and \(\Ps(2n, \beta) \le 1\) give
+  \(\Pt(4n, \beta) \ge 1 - z(t, s')\), and squaring the Gibbs spectrum gives the bound on
+  \(\Pt(4n, 2\beta)\).
+\end{proof}
+
+\begin{lemma}[Interpolation]
+  \label{lem:window}
+  \lean{CertifiedGaps.thermalPurity_ge_of_window}
+  \leanok
+  \uses{def:coupling-defect, def:moment-bounds, lem:purity-basic}
+  Under the spatial moment inequalities above \(n_0\), let \(n \ge n_0\) be even and positive,
+  \(\beta > 0\), \(s \le 1\), \(\Ps(n, \beta) \ge 1 - s\) and \(\Pt(2n, \beta) \ge 1 - t\). Then
+  every even \(L\) with \(n \le L \le 2n\) has \(\Pt(L, \beta) \ge 1 - z(s, t)\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The interpolation step of the proof of Theorem~\ref{thm:gap-of-seeds}:
+  \(\Pt(L, \beta) \ge x^{L/(2n)} \ge x = \Pt(2n, \beta)\, \Ps(n, \beta)^2 \ge 1 - z(s, t)\).
+\end{proof}
+
+\begin{lemma}[From a thermal purity to a gap]
+  \label{lem:thermal-gap}
+  \lean{CertifiedGaps.gapGT_of_thermalPurity}
+  \leanok
+  \uses{lem:purity-to-gap}
+  If \(\beta > 0\), \(z < 1\), \(\Pt(L, \beta) \ge 1 - z\) and \(e^{\beta c} z < 1 - z\), then
+  \(\GapGT(E_L, c)\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  By Lemma~\ref{lem:purity-to-gap},
+  \(e^{-\beta (E_L(m) - E_L(m_0))} \le (1 - \Pt)/\Pt \le z/(1-z) < e^{-\beta c}\).
+\end{proof}
+
+\section{The chain criterion}
+
+\begin{lemma}[Purities along a chain]
+  \label{lem:chain-purities}
+  \lean{CertifiedGaps.purities_ge_chain}
+  \leanok
+  \uses{lem:doubling-step}
+  Assume the spatial moment inequalities above an even \(n_0\) and \(\beta_0 > 0\). Let
+  \((s_j, t_j)_{j \le J}\) satisfy \(s_j, t_j \le 1\) and, for \(j < J\), the step conditions of
+  Lemma~\ref{lem:doubling-step} with \((s, t, s', t') = (s_j, t_j, s_{j+1}, t_{j+1})\). If
+  \(\Ps(n_0, \beta_0) \ge 1 - s_0\) and \(\Pt(2n_0, \beta_0) \ge 1 - t_0\), then for all
+  \(j \le J\), \(\Ps(n_0 2^j, \beta_0 2^j) \ge 1 - s_j\) and
+  \(\Pt(2 n_0 2^j, \beta_0 2^j) \ge 1 - t_j\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Induction on \(j\) with Lemma~\ref{lem:doubling-step}.
+\end{proof}
+
+\begin{theorem}[Two-purity criterion with a chain]
+  \label{thm:gap-of-chain}
+  \lean{CertifiedGaps.gapGT_of_chain}
+  \leanok
+  \uses{lem:chain-purities, lem:dyadic-window, lem:window, lem:thermal-gap, thm:gap-of-seeds,
+    lem:gapgt-mono, lem:moment-bounds-limit}
+  Assume the spatial moment inequalities above an even \(n_0 > 0\), \(\beta_0 > 0\), seeds
+  \(\Ps(n_0, \beta_0) \ge 1 - s_0\), \(\Pt(2n_0, \beta_0) \ge 1 - t_0\), and a chain
+  \((s_j, t_j)_{j \le J}\) as in Lemma~\ref{lem:chain-purities}. Let \(r > 0\) and
+  \(0 < \varepsilon \le 1/100\) with
+  \[
+    r^{2^j} z(s_j, t_j) < 1 - z(s_j, t_j) \quad (j < J), \qquad
+    s_J, t_J \le \varepsilon, \qquad r^{2^J} \cdot 5\varepsilon \le 1.
+  \]
+  Then \(\GapGT(E_L, \log r / \beta_0)\) for every even \(L \ge n_0\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Take the dyadic window \(n_0 2^j \le L \le 2 n_0 2^j\). If \(j < J\), Lemma~\ref{lem:window}
+  gives \(\Pt(L, \beta_0 2^j) \ge 1 - z(s_j, t_j)\), and Lemma~\ref{lem:thermal-gap} with
+  \(e^{\beta_0 2^j \log r / \beta_0} = r^{2^j}\) gives the gap. If \(j \ge J\), apply
+  Theorem~\ref{thm:gap-of-seeds} with seed scale \((n_0 2^J, \beta_0 2^J)\) and defect
+  \(\varepsilon\); its bound \(\log(1/(5\varepsilon)) / (\beta_0 2^J)\) is at least
+  \(\log r / \beta_0\) because \(r^{2^J} \le 1/(5\varepsilon)\), so Lemma~\ref{lem:gapgt-mono}
+  finishes.
+\end{proof}
+
+\section{Rational certificates}
+
+\begin{definition}[Chain certificate]
+  \label{def:chain-certificate}
+  \lean{CertifiedGaps.ChainCertificate, CertifiedGaps.ChainCertificate.Valid}
+  \leanok
+  \uses{def:coupling-defect, def:squaring-defect}
+  A chain certificate consists of rational lists \(s = (s_0, \dots, s_J)\) and
+  \(t = (t_0, \dots, t_J)\), a rate \(r \in \Q\) and a hand-over defect \(\varepsilon \in \Q\). It
+  is \emph{valid} if \(r > 0\), \(0 < \varepsilon \le 1/100\), \(s_J, t_J \le \varepsilon\),
+  \(r^{2^J} \cdot 5 \varepsilon \le 1\), \(s_j, t_j \le 1\) for \(j \le J\), and, for \(j < J\),
+  the step conditions \(z(s_j, t_j) < 1\), \(f(z(s_j, t_j)) \le s_{j+1}\),
+  \(z(t_j, s_{j+1}) < 1\), \(f(z(t_j, s_{j+1})) \le t_{j+1}\) and
+  \(r^{2^j} z(s_j, t_j) < 1 - z(s_j, t_j)\), with \(z\) and \(f\) evaluated in \(\Q\). Validity is
+  decidable, so a concrete certificate is checked by \texttt{decide +kernel}.
+\end{definition}
+
+\begin{lemma}
+  \label{lem:chain-cast}
+  \lean{CertifiedGaps.ChainCertificate.cast_zQ, CertifiedGaps.ChainCertificate.cast_fQ}
+  \leanok
+  \uses{def:chain-certificate}
+  The rational coupling defect and squaring bound agree with their real counterparts.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Both are the same rational expressions; push the casts.
+\end{proof}
+
+\begin{theorem}[Two-purity criterion from a rational certificate]
+  \label{thm:gap-of-chain-certificate}
+  \lean{CertifiedGaps.gapGT_of_chainCertificate}
+  \leanok
+  \uses{thm:gap-of-chain, def:chain-certificate, lem:chain-cast}
+  Assume the spatial moment inequalities above an even \(n_0 > 0\), \(\beta_0 > 0\), a valid chain
+  certificate \(c\), and seeds \(\Ps(n_0, \beta_0) \ge 1 - s_0\),
+  \(\Pt(2n_0, \beta_0) \ge 1 - t_0\). Then \(\GapGT(E_L, \log r / \beta_0)\) for every even
+  \(L \ge n_0\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Cast the rational conditions to \(\R\) (Lemma~\ref{lem:chain-cast}) and apply
+  Theorem~\ref{thm:gap-of-chain}.
+\end{proof}
+
+\begin{remark}
+  The certificates are generated by \texttt{lean/scripts/chain\_certificate.jl} from the certified
+  seed defects. The script only searches; Lean re-checks every inequality.
+\end{remark}

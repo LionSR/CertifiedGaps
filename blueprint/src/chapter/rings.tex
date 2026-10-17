@@ -1,0 +1,417 @@
+\chapter{Reflection-positive rings}
+\label{chap:rings}
+
+On paper the spatial moment form comes from an exact continuous-time thermal matrix product
+operator whose spatial transfer operator \(X_\beta\) is a compact self-adjoint operator on a path
+space. Formalizing that construction would need measure theory on Poisson configuration spaces and
+the spectral theorem for compact operators. The formalization instead Trotterizes: each Trotter
+approximant is the trace of a power of a finite positive semidefinite matrix, hence has the moment
+form, and the moment inequalities pass to the limit (Lemma~\ref{lem:moment-bounds-limit}).
+
+\section{Rings, bonds and the Hamiltonian}
+
+\begin{definition}[Operators on a ring]
+  \label{def:ring-operators}
+  \lean{CertifiedGaps.piTensor, CertifiedGaps.bondOp, CertifiedGaps.siteOp}
+  \leanok
+  For a finite local space \(d\) and \(L\) cells, operators act on functions
+  \((\mathrm{Fin}\,L \to d) \to \C\). The tensor product \(\bigotimes_i A_i\) has entries
+  \(\prod_i (A_i)_{\sigma_i \tau_i}\). The operator \(B\) on the two sites \(j, k\) acts as \(B\) on
+  \((\sigma_j, \sigma_k)\) and as the identity elsewhere; the one-site operator \(A\) at \(j\) is
+  \(\bigotimes_i A_i\) with \(A_j = A\) and \(A_i = 1\) otherwise.
+\end{definition}
+
+\begin{definition}[Reflection-positive ring]
+  \label{def:rpring}
+  \lean{CertifiedGaps.RPRing, CertifiedGaps.RPRing.bondMatrix, CertifiedGaps.RPRing.bond,
+    CertifiedGaps.RPRing.site, CertifiedGaps.RPRing.hamiltonian}
+  \leanok
+  \uses{def:ring-operators}
+  A reflection-positive ring with local space \(d\) consists of real matrices
+  \(C_\alpha \in \R^{d \times d}\), \(\alpha \in \iota\), each symmetric or antisymmetric, a real
+  symmetric on-site term \(o\), and an internal cell reflection \(F\) (real, symmetric,
+  \(F^2 = 1\), \(F o F = o\); by default \(F = 1\)). The bond is
+  \[
+    h = -\sum_\alpha C_\alpha \otimes F C_\alpha F,
+  \]
+  and the ring Hamiltonian on \(L\) cells is
+  \(H_L = \sum_{j} h_{j, j+1} + \sum_j o_j\) with \(j + 1\) taken cyclically. A model with a
+  multi-site unit cell is a ring of cells: \(d\) is the cell space and intra-cell terms belong to
+  \(o\).
+\end{definition}
+
+\begin{lemma}[Hermiticity]
+  \label{lem:rpring-hermitian}
+  \lean{CertifiedGaps.RPRing.bondMatrix_isHermitian, CertifiedGaps.RPRing.oc_isHermitian,
+    CertifiedGaps.RPRing.hamiltonian_isHermitian, CertifiedGaps.bondOp_isHermitian,
+    CertifiedGaps.siteOp_isHermitian}
+  \leanok
+  \uses{def:rpring}
+  The bond, the on-site term and \(H_L\) are Hermitian.
+\end{lemma}
+\begin{proof}
+  \leanok
+  \((C_\alpha \otimes F C_\alpha F)^\dagger = C_\alpha^{\mathsf T} \otimes F C_\alpha^{\mathsf T} F\),
+  and the two signs from an antisymmetric \(C_\alpha\) cancel. Hermitian one- and two-site
+  operators embed as Hermitian operators on the ring.
+\end{proof}
+
+\begin{definition}[Spectrum and partition function of a ring]
+  \label{def:ring-spectrum}
+  \lean{CertifiedGaps.RPRing.spectrum, CertifiedGaps.RPRing.partitionFunction}
+  \leanok
+  \uses{lem:rpring-hermitian}
+  \(E_L\) is the family of eigenvalues of \(H_L\) with multiplicity, indexed by configurations, and
+  \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\).
+\end{definition}
+
+\begin{lemma}
+  \label{lem:ring-trace-exp}
+  \lean{CertifiedGaps.trace_exp_smul_eq_sum_of_isHermitian,
+    CertifiedGaps.RPRing.partitionFunction_eq_sum}
+  \leanok
+  \uses{def:ring-spectrum, def:partition-function}
+  For Hermitian \(A\) and real \(c\), \(\Tr e^{cA} = \sum_i e^{c \lambda_i}\). In particular
+  \(\operatorname{Re}\Tr e^{-\beta H_L} = \sum_m e^{-\beta E_L(m)}\), the partition function of
+  Definition~\ref{def:partition-function}.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Diagonalize \(A = U D U^\dagger\) by the spectral theorem; \(e^{cA} = U e^{cD} U^{-1}\) and the
+  trace is invariant under conjugation.
+\end{proof}
+
+\section{Trotter slices and the transfer matrix}
+
+\begin{definition}[Trotter slice]
+  \label{def:trotter}
+  \lean{CertifiedGaps.RPRing.trotterSlice, CertifiedGaps.RPRing.trotterTrace,
+    CertifiedGaps.evenBonds, CertifiedGaps.oddBonds}
+  \leanok
+  \uses{def:rpring}
+  A first-order Trotter slice of width \(\tau\) is the ordered product
+  \[
+    S_L(\tau) = \prod_{j \text{ even}} (1 - \tau h_{j,j+1}) \cdot \prod_i (1 - \tau o_i) \cdot
+      \prod_{j \text{ odd}} (1 - \tau h_{j,j+1}),
+  \]
+  and the \(M\)-slice approximant of \(Z_L(\beta)\) is
+  \(Z^{(M)}_L(\beta) = \operatorname{Re}\Tr S_L(\beta/M)^M\).
+\end{definition}
+
+\begin{lemma}[Bond factors as sums of tensor products]
+  \label{lem:bond-expansion}
+  \lean{CertifiedGaps.RPRing.one_sub_smul_bond, CertifiedGaps.RPRing.one_sub_smul_site}
+  \leanok
+  \uses{def:trotter}
+  Let \(\tau \ge 0\), \(L \ge 2\), \(C_{\varnothing} = 1\) and \(C_\alpha^\tau = \sqrt\tau\,
+  C_\alpha\). Then
+  \(1 - \tau h_{j,j+1} = \sum_{\gamma \in \iota \sqcup \{\varnothing\}} (C^\tau_\gamma)_j \otimes
+  (F C^\tau_\gamma F)_{j+1}\), and \(1 - \tau o_i\) is the one-site operator \(O = 1 - \tau o\) at
+  \(i\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Expand \(-h\) by Definition~\ref{def:rpring}; the term \(\gamma = \varnothing\) is the identity
+  because \(F^2 = 1\), and \(\sqrt\tau \cdot \sqrt\tau = \tau\).
+\end{proof}
+
+\begin{lemma}[Closed paths and tensor products]
+  \label{lem:closed-path}
+  \lean{CertifiedGaps.trace_pow_eq_sum_closedPath, CertifiedGaps.piTensor_mul,
+    CertifiedGaps.trace_piTensor, CertifiedGaps.list_prod_ofFn_sum}
+  \leanok
+  \uses{def:ring-operators}
+  \(\Tr T^N = \sum_{q} \prod_{k} T_{q_k, q_{k+1}}\) over closed paths
+  \(q \colon \mathrm{Fin}\,N \to D\) (indices cyclic). Tensor products multiply sitewise, and
+  \(\Tr \bigotimes_i A_i = \prod_i \Tr A_i\). An ordered product of sums is the sum of the ordered
+  products.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Expand matrix powers as sums over paths by induction; the other identities are entrywise.
+\end{proof}
+
+\begin{lemma}[A slice as a sum of tensor products]
+  \label{lem:slice-sum}
+  \lean{CertifiedGaps.RPRing.trotterSlice_eq_sum, CertifiedGaps.RPRing.sliceSite_evenSite,
+    CertifiedGaps.RPRing.sliceSite_oddSite}
+  \leanok
+  \uses{lem:bond-expansion, lem:closed-path}
+  On a ring of \(2N\) cells, \(N \ge 1\), one slice is a sum over one label per bond of tensor
+  products. Cell \(2k\) carries the word \(C_{b_k} O\, F C_{c_{k-1}} F\) and cell \(2k+1\) carries
+  \(F C_{b_k} F\, O\, C_{c_k}\), where \(b_k\) labels the even bond \((2k, 2k+1)\) and \(c_k\) the
+  odd bond \((2k+1, 2k+2)\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Expand each bond factor by Lemma~\ref{lem:bond-expansion} and multiply the tensor products
+  sitewise (Lemma~\ref{lem:closed-path}); a site meets exactly one even and one odd bond.
+\end{proof}
+
+\begin{definition}[One-cell transfer matrix]
+  \label{def:cell-transfer}
+  \lean{CertifiedGaps.RPRing.timeWord, CertifiedGaps.RPRing.cellTransfer}
+  \leanok
+  \uses{lem:bond-expansion}
+  For time-label sequences \(p, q \colon \mathrm{Fin}\,M \to \iota \sqcup \{\varnothing\}\), let
+  \(\mathcal F_{pq} = \Tr \prod_{t} C^\tau_{p_t}\, O\, F C^\tau_{q_t} F\), the trace of the
+  time-ordered word on one cell over \(M\) slices.
+\end{definition}
+
+\begin{lemma}[Odd cells]
+  \label{lem:odd-word}
+  \lean{CertifiedGaps.RPRing.trace_oddWord}
+  \leanok
+  \uses{def:cell-transfer}
+  \(\Tr \prod_t F C^\tau_{p_t} F\, O\, C^\tau_{q_t} = \mathcal F_{pq}\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Since \(F\) commutes with \(O\) and \(F^2 = 1\), each factor is the \(F\)-conjugate of the even
+  word's factor, and the trace is invariant under conjugation.
+\end{proof}
+
+\begin{theorem}[Transfer factorization]
+  \label{thm:transfer-factorization}
+  \lean{CertifiedGaps.RPRing.trace_trotterSlice_pow_eq_sum,
+    CertifiedGaps.RPRing.trace_trotterSlice_pow_eq_trace_transfer}
+  \leanok
+  \uses{lem:slice-sum, def:cell-transfer, lem:odd-word, lem:closed-path}
+  For \(\tau \ge 0\), \(N \ge 1\) and every number of slices \(M\),
+  \[
+    \Tr S_{2N}(\tau)^M = \Tr \bigl(\mathcal F^{\mathsf T} \mathcal F\bigr)^N .
+  \]
+\end{theorem}
+\begin{proof}
+  \leanok
+  Over \(M\) slices the trace is a sum over space-time bond labels of a product over cells of the
+  traces of their time words (Lemma~\ref{lem:closed-path}). By Lemma~\ref{lem:odd-word} each even
+  and each odd cell contributes an entry of \(\mathcal F\), indexed by the time labels of its two
+  bonds. Summing over the labels of the even bonds pairs consecutive cells into
+  \((\mathcal F^{\mathsf T} \mathcal F)\), and the remaining sum over odd-bond labels is a closed
+  path of length \(N\), that is \(\Tr (\mathcal F^{\mathsf T}\mathcal F)^N\).
+\end{proof}
+
+\begin{lemma}[The transfer matrix is real]
+  \label{lem:real-transfer}
+  \lean{CertifiedGaps.RPRing.star_cellTransfer_apply,
+    CertifiedGaps.RPRing.conjTranspose_cellTransfer}
+  \leanok
+  \uses{def:cell-transfer}
+  \(\mathcal F\) has real entries, so \(\mathcal F^\dagger = \mathcal F^{\mathsf T}\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  \(\mathcal F_{pq}\) is the image under \(\R \to \C\) of the trace of a product of real
+  matrices. This is where reflection positivity enters: the bond is a sum of squares
+  \(C_\alpha \otimes F C_\alpha F\) of \emph{real} matrices.
+\end{proof}
+
+\begin{theorem}[Positive semidefinite transfer matrix]
+  \label{thm:psd-transfer}
+  \lean{CertifiedGaps.RPRing.exists_posSemidef_transfer}
+  \leanok
+  \uses{thm:transfer-factorization, lem:real-transfer}
+  For every \(M\) and \(\tau \ge 0\) there is a positive semidefinite matrix \(T\), independent of
+  the ring size, with \(\Tr S_{2N}(\tau)^M = \Tr T^N\) for every \(N \ge 1\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  \(T = \mathcal F^\dagger \mathcal F = \mathcal F^{\mathsf T} \mathcal F \succeq 0\).
+\end{proof}
+
+\begin{lemma}
+  \label{lem:trace-pow-eig}
+  \lean{CertifiedGaps.trace_pow_eq_sum_eigenvalues}
+  \leanok
+  For Hermitian \(T\), \(\Tr T^N = \sum_i \lambda_i^N\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Spectral theorem.
+\end{proof}
+
+\begin{proposition}[Moment form from a positive semidefinite transfer matrix]
+  \label{prop:moment-psd}
+  \lean{CertifiedGaps.hasMomentForm_of_trace_pow}
+  \leanok
+  \uses{lem:trace-pow-eig, def:moment-form}
+  If \(T \succeq 0\) and \(Z(2N) = \operatorname{Re}\Tr T^N\) for all \(N \ge 1\), then \(Z\) has
+  the moment form above \(2\), with \(\mu_i = \sqrt{\lambda_i(T)}\) (padded by zeros).
+\end{proposition}
+\begin{proof}
+  \leanok
+  \(\operatorname{Re}\Tr T^N = \sum_i \lambda_i^N = \sum_i \mu_i^{2N}\) with \(\lambda_i \ge 0\).
+\end{proof}
+
+\begin{lemma}
+  \label{lem:trotter-moment}
+  \lean{CertifiedGaps.RPRing.hasMomentForm_trotterTrace}
+  \leanok
+  \uses{thm:psd-transfer, prop:moment-psd}
+  For every \(M\) and \(\beta > 0\), \(L \mapsto Z^{(M)}_L(\beta)\) has the moment form above
+  \(2\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:psd-transfer} with \(\tau = \beta/M\) and Proposition~\ref{prop:moment-psd}.
+\end{proof}
+
+\section{The Lie--Trotter product formula}
+
+\begin{lemma}[Telescoping]
+  \label{lem:telescoping}
+  \lean{CertifiedGaps.norm_pow_sub_pow_le}
+  \leanok
+  In a normed ring with \(\|1\| = 1\), if \(\|X\|, \|Y\| \le K\) and \(K \ge 1\), then
+  \(\|X^k - Y^k\| \le k K^k \|X - Y\|\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Induction on \(k\), from \(X^{k+1} - Y^{k+1} = X (X^k - Y^k) + (X - Y) Y^k\).
+\end{proof}
+
+\begin{lemma}[Chernoff]
+  \label{lem:chernoff}
+  \lean{CertifiedGaps.tendsto_natCast_smul_sub_one, CertifiedGaps.tendsto_pow_of_tendsto_natCast_smul,
+    CertifiedGaps.tendsto_pow_of_hasDerivAt}
+  \leanok
+  \uses{lem:telescoping}
+  In a complete normed \(\C\)-algebra, if \(M (X_M - 1) \to A\) then \(X_M^M \to e^A\). In
+  particular, if \(g(0) = 1\) and \(g'(0) = A\) then \(g(1/M)^M \to e^A\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Compare \(X_M\) with \(Y_M = e^{A/M}\), whose \(M\)-th power is \(e^A\) and which also satisfies
+  \(M(Y_M - 1) \to A\). With \(C = \|A\| + 1\), eventually \(\|X_M\|, \|Y_M\| \le 1 + C/M\), and
+  \((1 + C/M)^M \le e^C\). Lemma~\ref{lem:telescoping} then bounds \(\|X_M^M - e^A\|\) by
+  \(e^C \|M (X_M - Y_M)\|\), which tends to \(0\).
+\end{proof}
+
+\begin{theorem}[Lie--Trotter product formula]
+  \label{thm:lie-trotter}
+  \lean{CertifiedGaps.tendsto_list_prod_one_add_smul_pow,
+    CertifiedGaps.hasDerivAt_list_prod_one_add_smul}
+  \leanok
+  \uses{lem:chernoff}
+  For complex matrices \(h_1, \dots, h_k\) and \(c \in \R\),
+  \(\bigl(\prod_i (1 + \tfrac{c}{M} h_i)\bigr)^M \to \exp\bigl(c \sum_i h_i\bigr)\) as
+  \(M \to \infty\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  The polynomial \(\tau \mapsto \prod_i (1 + \tau h_i)\) has derivative \(\sum_i h_i\) at \(0\);
+  apply Lemma~\ref{lem:chernoff} in the matrix algebra with the operator norm.
+\end{proof}
+
+\begin{lemma}[Trotter approximants converge]
+  \label{lem:trotter-limit}
+  \lean{CertifiedGaps.RPRing.tendsto_trotterTrace, CertifiedGaps.RPRing.sum_evenBonds_append_oddBonds}
+  \leanok
+  \uses{thm:lie-trotter, def:trotter, def:ring-spectrum}
+  For every \(\beta\) and \(L\), \(Z^{(M)}_L(\beta) \to Z_L(\beta)\) as \(M \to \infty\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The slice is \(\prod (1 + \tfrac{\beta}{M} h)\) over the list of the negated bond and site terms
+  (even bonds, sites, odd bonds), whose sum is \(-H_L\). Apply Theorem~\ref{thm:lie-trotter} and
+  the continuity of \(A \mapsto \operatorname{Re}\Tr A\).
+\end{proof}
+
+\section{The criterion for reflection-positive rings}
+
+\begin{theorem}[Spatial moment inequalities for every reflection-positive ring]
+  \label{thm:rp-moment-bounds}
+  \lean{CertifiedGaps.RPRing.spatialMomentBounds, CertifiedGaps.RPRing.hasSpatialMomentBounds}
+  \leanok
+  \uses{lem:trotter-moment, lem:trotter-limit, lem:moment-bounds-limit, lem:ring-trace-exp}
+  For every reflection-positive ring and every \(\beta > 0\), \(L \mapsto Z_L(\beta)\) satisfies
+  the spatial moment inequalities above \(2\). Equivalently, the spectra \(E_L\) satisfy them.
+\end{theorem}
+\begin{proof}
+  \leanok
+  The approximants have the moment form (Lemma~\ref{lem:trotter-moment}) and converge
+  (Lemma~\ref{lem:trotter-limit}); apply Lemma~\ref{lem:moment-bounds-limit}. The second form
+  follows from Lemma~\ref{lem:ring-trace-exp}.
+\end{proof}
+
+\begin{remark}
+  No uniform-in-\(L\) Trotter error bound is needed: the limit \(M \to \infty\) is taken at each
+  fixed length, inside the finitely many trace inequalities, before the doubling bootstrap runs.
+  The moment inequalities hold for every reflection-positive ring, including gapless and
+  symmetry-broken ones; the seeds are what distinguish a gapped phase.
+\end{remark}
+
+\begin{definition}[Purities of a ring]
+  \label{def:rp-purities}
+  \lean{CertifiedGaps.RPRing.spatialPurity, CertifiedGaps.RPRing.thermalPurity}
+  \leanok
+  \uses{def:ring-spectrum}
+  \(\Ps(n, \beta)\) and \(\Pt(L, \beta)\) of Definition~\ref{def:purities}, computed from
+  \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\).
+\end{definition}
+
+\begin{theorem}[Two-purity criterion for a reflection-positive ring]
+  \label{thm:rp-gap}
+  \lean{CertifiedGaps.RPRing.gapGT_of_chainCertificate}
+  \leanok
+  \uses{thm:rp-moment-bounds, thm:gap-of-chain-certificate, def:rp-purities, lem:ring-trace-exp}
+  Let \(n_0 \ge 2\) be even, \(\beta_0 > 0\), and \(c\) a valid chain certificate with seed
+  defects \(s_0, t_0\) and rate \(r\). If \(\Ps(n_0, \beta_0) \ge 1 - s_0\) and
+  \(\Pt(2n_0, \beta_0) \ge 1 - t_0\), then every even ring of \(L \ge n_0\) cells has a unique
+  ground state and \(\GapGT(E_L, \log r / \beta_0)\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:gap-of-chain-certificate} with the moment inequalities of
+  Theorem~\ref{thm:rp-moment-bounds}, rewriting the purities by Lemma~\ref{lem:ring-trace-exp}.
+\end{proof}
+
+\section{Sitewise unitary conjugation}
+
+Several models are reflection positive only in a rotated frame, for example after
+\(e^{i\pi S^y}\) on every other site. A gap proved for the rotated Hamiltonian transfers to the
+physical one.
+
+\begin{lemma}[Sitewise conjugation]
+  \label{lem:conj-ops}
+  \lean{CertifiedGaps.piTensor_conj, CertifiedGaps.conj_bondOp_kronecker,
+    CertifiedGaps.conj_siteOp, CertifiedGaps.piTensor_conjTranspose_mul_self}
+  \leanok
+  \uses{def:ring-operators}
+  Let \(U = \bigotimes_i a_i\) with \(a_i a_i^\dagger = 1\). Then \(U\) is unitary,
+  \(U (A \otimes B)_{jk} U^\dagger = (a_j A a_j^\dagger \otimes a_k B a_k^\dagger)_{jk}\) for
+  \(j \ne k\), and \(U A_j U^\dagger = (a_j A a_j^\dagger)_j\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Tensor products multiply sitewise and \(a_i a_i^\dagger = 1\) on the untouched sites.
+\end{proof}
+
+\begin{theorem}[Conjugating the ring Hamiltonian]
+  \label{thm:conj-hamiltonian}
+  \lean{CertifiedGaps.RPRing.conj_hamiltonian}
+  \leanok
+  \uses{lem:conj-ops, def:rpring}
+  For \(L \ne 1\),
+  \(U H_L U^\dagger = -\sum_j \sum_\alpha (a_j C_\alpha a_j^\dagger)_j \otimes
+  (a_{j+1} F C_\alpha F a_{j+1}^\dagger)_{j+1} + \sum_j (a_j o a_j^\dagger)_j\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Lemma~\ref{lem:conj-ops} bond by bond and site by site; \(j \ne j+1\) because \(L \ge 2\).
+\end{proof}
+
+\begin{theorem}[Spectra agree]
+  \label{thm:conj-spectrum}
+  \lean{CertifiedGaps.eigenvalues_eq_of_conj, CertifiedGaps.RPRing.eigenvalues_eq_spectrum}
+  \leanok
+  \uses{thm:conj-hamiltonian, def:ring-spectrum}
+  Unitary conjugation preserves eigenvalues with multiplicity. Hence a Hermitian \(H\) with
+  \(H = U H_L U^\dagger\) has the spectrum \(E_L\) of the ring.
+\end{theorem}
+\begin{proof}
+  \leanok
+  \(\det(t - U A U^\dagger) = \det(t - A U^\dagger U) = \det(t - A)\), and the eigenvalue family
+  of a Hermitian matrix is determined by its characteristic polynomial.
+\end{proof}
