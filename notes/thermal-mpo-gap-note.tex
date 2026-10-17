@@ -79,7 +79,7 @@ For every even $L\ge2304$, the chain~\eqref{eq:model} has a unique ground
 state and $\Delta_L>(\log20)/784\simeq0.003821$.
 \end{theorem}
 
-The spectral gap of the chain~\eqref{eq:model} was established by OpenAI~\cite{source} using machine-assisted proof search over a thirty-page analytical construction. That proof relies on coordinate expansions, degree-12 polynomial spectral filters, and character decompositions across dihedral symmetry sectors. Automated theorem provers naturally explore such symbolic coordinate representations, which can accumulate intermediate algebraic machinery over long deduction horizons.
+The spectral gap of the chain~\eqref{eq:model} was established by OpenAI~\cite{source} using machine-assisted proof search over a thirty-page analytical construction. That proof relies on coordinate expansions, degree-12 polynomial spectral filters, and character decompositions across dihedral symmetry sectors. Automated provers tend to work in such coordinate representations, and over long chains of deductions these accumulate intermediate algebra.
 
 Here, we show that the underlying mechanism is fundamentally geometric. The proof has one goal and three steps. The goal is a single number per length and temperature: the \emph{thermal purity} of the Gibbs state, which is close to one exactly when the ground state carries almost all of the Boltzmann weight. A thermal purity near one forces a gap, so it suffices to show that the purity defect falls exponentially in $\beta$, uniformly in $L$. Squaring the Gibbs state in imaginary time improves the purity for any Hamiltonian, but it never changes the length. The three steps supply the missing direction. First, an exact continuous-time thermal MPO turns the partition function into a power of a symmetric transfer operator in space, so a \emph{spatial purity} can be squared in the same way. Second, spacetime contraction identities couple the spatial and thermal purities, and doubling the length and the inverse temperature together roughly squares both defects; we call this self-improving iteration the \emph{spacetime bootstrap}. Third, monotonicity of $\ell^p$ norms extends the bound from the doubled lengths to all intermediate even lengths, which establishes Eq.~\eqref{eq:target}.
 
@@ -283,8 +283,8 @@ Solving for one factor, and repeating at length $2n$, gives
 \end{align}
 
 \emph{Doubling estimate.---}
-Each application doubles the torus in both directions, \torusseq, and
-roughly squares the purity defect. For even $n$ and $0\le\varepsilon\le1/100$,
+Alternating the two coupling identities with the two squarings doubles the
+torus in both directions, \torusseq, and roughly squares the purity defect. For even $n$ and $0\le\varepsilon\le1/100$,
 \begin{equation}
  \begin{gathered}
  \Ps(n,\beta),\ \Pt(2n,\beta)\ge1-\varepsilon\\
@@ -337,10 +337,10 @@ $\Pt(4n,\beta)\ge(1-\varepsilon)^2(1-\delta)\ge(1-\varepsilon)^3$.
 $\rho_{4n}(2\beta)$, so $\Pt(4n,2\beta)\ge1-\delta\ge1-5\varepsilon^2$.
 This proves Eq.~\eqref{eq:update}.
 
-\emph{Finite input and iteration.---}
+\emph{Starting estimate and iteration.---}
 The doubling estimate needs a starting point: one scale at which both
 defects are already below $1/100$. This is the only numerical input.
-Proposition~5.5 of Ref.~\cite{source} provides the base-scale estimates:
+Proposition~5.5 of Ref.~\cite{source} provides the starting estimates:
 \begin{equation}
  \Ps(2304,784),\ \Pt(4608,784)\ge0.99.
  \label{eq:input}
@@ -417,11 +417,11 @@ The scale-doubling recurrence and the gap deduction are formally verified in Lea
 
 
 \section*{Discussion: Representation in Machine-Assisted Proofs}
-The uniform spectral gap theorems for the periodic and boundary-field spin-1 Heisenberg chains, together with the certified finite-scale numerical inputs, originate from the machine-assisted proofs by OpenAI~\cite{source,boundary}.
+The uniform spectral gap theorems for the periodic and boundary-field spin-1 Heisenberg chains, together with the certified starting estimates, come from the machine-assisted proofs of OpenAI~\cite{source,boundary}.
 
-The original thirty-page proofs isolate eigenvalues and bridge scales through extensive coordinate constructions, including degree-12 polynomial spectral filters and dihedral character projectors, alongside lemmas that remain unused in the final inequality. Automated reasoning systems typically operate via local symbolic rewrite rules in a fixed basis. Without the geometric and topological representations native to many-body physics, long-horizon symbolic search tends to accumulate representational overhead to ensure soundness.
+Those proofs run to thirty pages. They locate eigenvalues and connect different scales with explicit coordinate constructions, such as degree-12 polynomial spectral filters and dihedral character projectors, and they contain lemmas that the final inequality does not use. Automated provers work by local symbolic rewriting in a fixed basis. Without the geometric pictures that physicists use for many-body systems, such a search tends to build up intermediate algebra in order to stay correct.
 
-In this work, the authors proposed to GPT-6 to examine the argument through spacetime tensor networks, and interactively digested the resulting structure. Tensor network diagrams provide the geometric inductive bias that symbolic coordinate expansions lack. By placing imaginary time and spatial extent on equal footing on a Euclidean torus, the self-adjoint spatial transfer operator and contractive scale-doubling iteration become elementary planar identities. This indicates that diagrammatic tensor networks can serve not only as a calculational tool, but as an effective distillation framework for interpreting, simplifying, and extracting the essential physical mechanisms from machine-generated mathematical proofs. All mathematical arguments and formal proofs were verified and adjudicated by the authors.
+In this work, the authors asked GPT-6 to re-examine the argument in terms of spacetime tensor networks, and worked through the resulting structure interactively. The diagrams make visible the geometric structure that coordinate expansions hide. With imaginary time and space treated alike on a torus, the self-adjoint spatial transfer operator and the doubling iteration reduce to short identities between planar diagrams. This suggests that tensor-network diagrams are useful not only for calculation but also for reading, simplifying, and extracting the physical mechanism of a machine-generated proof. The authors checked all mathematical arguments and formal proofs.
 
 \begin{thebibliography}{4}
 \bibitem{source}
@@ -477,7 +477,7 @@ $\Pt^{\same}(n,\beta)=\sum_mw_m^2$ from below, since
 \end{equation}
 
 \emph{Strategy.---}
-The ring proof cannot be applied verbatim, because an open chain has no
+The ring proof cannot be applied directly, because an open chain has no
 ring to close: its partition function is not a trace of $X_\beta^n$, so
 there is no spatial purity to square. Its bulk, however, is the same as
 that of the ring, and the ring estimates already control the spectrum of
@@ -519,7 +519,7 @@ The scales of this appendix replace those of Eq.~\eqref{eq:scales}:
  \label{eq:b-scales}
 \end{equation}
 with the lengths $k_2=142$ and $k_{j+1}=M_j$ at which the boundary defect is
-evaluated. The ring estimates at these scales, with periodic purity defect
+evaluated. The ring estimates at these scales, with ring purity defect
 $\varepsilon_j$, are collected in Appendix~\ref{app:b-periodic}
 [Eq.~\eqref{eq:b-tail}], and the starting values at $j=2$ in
 Appendix~\ref{app:b-iteration}.
@@ -572,7 +572,8 @@ series is absolutely convergent and may be regrouped into the contraction
 of Eq.~\eqref{eq:b-mpo}.
 
 \emph{Transfer operator spectrum.---}
-At successive inverse temperatures $\beta_{j+1}=2\beta_j$, the periodic estimates show that the leading eigenvalue of Eq.~\eqref{eq:moment}, $\lambda_j:=\lambda_0(\beta_j)$, is simple and positive. Normalizing it to one:
+The open-chain argument needs the following facts about $X_\beta$, all supplied by the
+ring. At successive inverse temperatures $\beta_{j+1}=2\beta_j$, the ring estimates of Appendix~\ref{app:b-periodic} show that the leading eigenvalue of Eq.~\eqref{eq:moment}, $\lambda_j:=\lambda_0(\beta_j)$, is simple and positive. Normalizing it to one:
 \begin{equation}
  T_j:=X_{\beta_j}/\lambda_j=\Pi_j+R_j,\qquad
  \Pi_j=|\psi_j\rangle\langle\psi_j|,\quad\|\psi_j\|=1,
@@ -582,7 +583,8 @@ where $\Pi_jR_j=R_j\Pi_j=0$, so $T_j^m=\Pi_j+R_j^m$.
 Furthermore, $\|R_j\|<1$, $U_P\Pi_j=\Pi_j$, and $0<r_j:=\lambda_{j+1}/\lambda_j^2\le1$ (Appendix~\ref{app:b-periodic}).
 
 \emph{Boundary overlap and residual decomposition.---}
-Put $v_j=v_{\beta_j}$. Inserting the leading projector disconnects the network:
+We now split the open-chain contraction into the leading part, which carries the
+boundary overlap, and a remainder. Put $v_j=v_{\beta_j}$. Inserting the leading projector disconnects the network:
 \begin{equation}
  \underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{\Pi_j}}_{c_j}
  =\tnchain[capl=\bar v_j,nostubr]{\psi_j}\;\;\tnchain[nostubl,capr=v_j]{\bar\psi_j}
@@ -598,7 +600,8 @@ the two are orthogonal. For even $m\ge2$,
  +\underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{R_j^m}}_{D_m(j)}.
  \label{eq:b-boundary-split}
 \end{equation}
-Folding establishes nonnegativity of the remainder:
+The remainder is nonnegative: writing $R_j^m=R_j^{m/2}R_j^{m/2}$ folds the
+chain at its middle into a norm,
 \begin{equation}
  D_m(j)=\folded{R_j^{m/2}}=\|R_j^{m/2}v_j\|^2\ge0.
  \label{eq:b-fold}
@@ -609,12 +612,12 @@ The boundary defect is defined by
  e_m(j):=\frac{D_m(j)}{B_m(j)}=1-\frac{c_j}{B_m(j)},
  \label{eq:b-e}
 \end{equation}
-the grey share of the contraction, \stackbar{.14}, drawn at the starting
+the grey fraction of the bar, \stackbar{.14}, drawn at the starting
 value $e_{142}(2)\le.14$ of Eq.~\eqref{eq:b-seeds}. Any $e_m<1$ guarantees a
 nonzero overlap with the leading eigenvector.
 
 \emph{Spatial remainder suppression.---}
-For even $m\ge k$, absorbing $k/2$ residual factors into each boundary gives $w=R_j^{k/2}v_j$ and
+A longer chain shrinks the remainder but leaves the overlap unchanged. For even $m\ge k$, moving $k/2$ factors of $R_j$ onto each boundary vector gives $w=R_j^{k/2}v_j$ and
 \begin{equation}
  D_m(j)=\tnchain[capl={\bar w},capr={w}]{R_j^{m-k}}
  \le\|R_j\|^{m-k}\underbrace{\|w\|^2}_{D_k(j)}.
@@ -644,9 +647,11 @@ Since $Y_m(\beta_{j+1})=\Pt^{\opp}(m,\beta_j)Y_m(\beta_j)^2$ and $B_m(j)=Y_m(\be
 \end{equation}
 
 \emph{Coupled overlap recurrence.---}
+This is Move~1: a small boundary defect at scale $j$ gives a small one at scale $j+1$.
 Assuming $e_k(j)<1$ at scale $j$, let primes denote $j+1$, choose even $m>k\ge2$, and let $\|R_{j+1}\|^{m-k}\le q<1$.
 Spatial suppression at $j+1$ gives $D_m'\le qD_k'$.
-Since $c'$ is length-independent, $D_k'-D_m'=B_k'-B_m'$, implying
+Since $c'$ is length-independent, $D_k'-D_m'=B_k'-B_m'$; substituting
+$D_k'=D_m'+B_k'-B_m'$ into $D_m'\le qD_k'$ gives the first inequality, and dividing by $B_m'$ the second:
 \begin{equation}
  (1-q)D_m'\le q(B_k'-B_m'),\qquad
  e_m'\le\frac{q}{1-q}\left(\frac{B_k'}{B_m'}-1\right).
@@ -664,7 +669,8 @@ Because only the previous overlap appears in the denominator, $e_m'<1$ establish
 When $e_k(j)$ and $1-\Pt^{\opp}(m,\beta_j)$ are $\mathcal O(x)$, choosing $m-k$ with $q\le\mathcal O(x)$ ensures that $e_m'$ contracts quadratically as $\mathcal O(x^2)$.
 
 \emph{Thermal purity propagation.---}
-The boundary bound enables physical length doubling. For even $M$, Eq.~\eqref{eq:b-bridge} yields
+This is Move~2: with the overlap under control, the length can double at
+almost no cost in purity. For even $M$, dividing Eq.~\eqref{eq:b-bridge} at $m=2M$ by the same equation at $m=M$ yields
 \begin{equation}
  \frac{\Pt^{\opp}(2M,\beta_j)}{\Pt^{\opp}(M,\beta_j)}
  =r_j^M\underbrace{\frac{B_{2M}(j+1)}{B_M(j+1)}}_{\displaystyle\ge1-e_M(j+1)}
@@ -681,8 +687,8 @@ Squaring the Gibbs operator advances temperature, as in Eq.~\eqref{eq:squaring}:
 so the squaring bound~\eqref{eq:square} at $m=2M$ drives $1-\Pt^{\opp}$ to $\mathcal O(x^2)$.
 
 \emph{Scale induction.---}
-Coupling the overlap and purity recurrences enables simultaneous induction over physical length and inverse temperature.
-With the scales~\eqref{eq:b-scales}, the lengths $k_j$, and the periodic error $\varepsilon_j$ bounded in Eq.~\eqref{eq:b-tail}, induction establishes
+Together, the overlap and purity bounds give an induction in which the length and the inverse temperature double at each step.
+With the scales~\eqref{eq:b-scales}, the lengths $k_j$, and the ring purity defect $\varepsilon_j$ bounded in Eq.~\eqref{eq:b-tail}, induction establishes
 \begin{equation}
  \begin{gathered}
  \varepsilon_j,\ e_{k_j}(j),\ 1-\Pt^{\opp}(M_j,\beta_j)\le x_j\quad(j\ge5),\\
@@ -741,13 +747,15 @@ Because $\|R_j^{n-M}U_P\|\le1$,
 \end{equation}
 bounding the odd-length remainder by $D_M(j)$ without requiring positivity of $R_j^n$.
 
-For $M_j\le n\le2M_j$ and $M=M_j=k_{j+1}$, this yields
+For $M_j\le n\le2M_j$ and $M=M_j=k_{j+1}$, Eq.~\eqref{eq:b-odd-bound} gives
+$Q\le c+D_M=B_M$ and $Q\ge c-D_M=(1-2e_M)B_M$; with $e_M(j+1)\le x_{j+1}$
+from Eq.~\eqref{eq:b-x}, this yields
 \begin{equation}
  Q_j(n)\le B_M(j),\quad
  Q_{j+1}(n)\ge(1-2x_{j+1})B_M(j+1)>0.
  \label{eq:b-odd-new}
 \end{equation}
-Dividing these contractions via Eq.~\eqref{eq:b-bridge} gives the equal-field purity:
+Since $\Pt^{\same}(n,\beta_j)=Q_{j+1}(n)\lambda_{j+1}^n/[Q_j(n)\lambda_j^n]^2$, inserting these two bounds and Eq.~\eqref{eq:b-bridge} at $m=M$ gives the equal-field purity:
 \begin{align}
  \Pt^{\same}(n,\beta_j)
  &=\frac{Y_n^{\same}(\beta_{j+1})}{Y_n^{\same}(\beta_j)^2}
@@ -801,7 +809,8 @@ moves~3 and 4 give the same bound for $1-\Pt(4n,2\beta)$.
 Induction therefore proves
 $\Ps(n_j,\beta_j),\Pt(M_j,\beta_j)\ge1-\varepsilon_j$.
 
-Consider a probability list with purity at least $1-\varepsilon>1/2$ and
+To turn a purity bound into a bound on the remainder $R_j$, we use an
+elementary fact about probability lists. Consider a probability list with purity at least $1-\varepsilon>1/2$ and
 largest weight $p_0$; put $z=1-p_0$. The purity is at most
 $p_0^2+z^2=1-2z(1-z)$, so $2z(1-z)\le\varepsilon$. It is also at most $p_0$,
 so $p_0>1/2$: the largest weight is unique and $z<1/2$. Then
@@ -818,7 +827,7 @@ Positivity of $Z_N(\beta_j)$ for all large odd $N$ ensures that the leading eige
 The residual sum tends to zero since $X_{\beta_j}$ is Hilbert--Schmidt
 and its residual spectral radius is strictly smaller than $\lambda_j$.
 
-The real kernel admits real orthogonal virtual actions of the three
+It remains to show $U_P\Pi_j=\Pi_j$. The real kernel admits real orthogonal virtual actions of the three
 $\pi$ rotations and the cyclic permutation of the coordinate axes,
 all commuting with $X_{\beta_j}$. On its real one-dimensional leading
 eigenspace these actions are signs. The order-three cyclic rotation
@@ -826,7 +835,7 @@ has sign $+1$ and conjugates the three $\pi$ rotations into one another,
 so their signs agree. The product of two is the third; their common
 sign is therefore $+1$. This proves $U_P\Pi_j=\Pi_j$.
 
-Finally $Z_N(\beta_{j+1})\le Z_N(\beta_j)^2$ by physical purity.
+Finally $Z_N(\beta_{j+1})\le Z_N(\beta_j)^2$ since the thermal purity $\Pt(N,\beta_j)$ is at most one.
 Taking $N$th roots along even $N\to\infty$ gives
 $\lambda_{j+1}\le\lambda_j^2$. For the lower bound at the required
 finite length, the largest eigenvalue of $\sigma_{M_j}(\beta_{j+1})$
@@ -850,7 +859,7 @@ rules from $j=2$ to $j=5$, and finally proves the induction step for
 $j\ge5$.
 
 \emph{Inputs.---}
-The certified initial estimates combine periodic variational estimates with
+The certified starting estimates combine periodic variational estimates with
 small-cluster boundary certificates from Ref.~\cite{boundary}:
 \begin{equation}
  \begin{gathered}
@@ -860,7 +869,7 @@ small-cluster boundary certificates from Ref.~\cite{boundary}:
  \label{eq:b-seeds}
 \end{equation}
 The first row concerns the ring at the scale $(n_2,\beta_2)=(120,49)$ of
-Eq.~\eqref{eq:b-scales}; it gives the periodic defect $\varepsilon_2=.052$
+Eq.~\eqref{eq:b-scales}; it gives the ring purity defect $\varepsilon_2=.052$
 used in Appendix~\ref{app:b-periodic}. The second row concerns the open
 chain: the boundary defect at length $k_2=142$ and the opposite-field
 thermal purity at length $M_2=240$.
