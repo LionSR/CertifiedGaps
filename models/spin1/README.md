@@ -13,7 +13,7 @@ cross-checks (not part of the rigorous certificate).
 | Source 1 (published) | $P_{\mathrm{s}}(2304, 784) \ge 1 - 84513/10^7$, $P_\tau(4608, 784) \ge 1 - 27493/(5\cdot 10^6)$; bootstrap $u_0 = 1/100$, $C = 5$ | $\log(20)/784 \approx 0.00382$ | even $L \ge 2304$ |
 | Source 2 (published) | $P_{\mathrm{s}}(60, 105/4) > 7/8$, $P_\tau(120, 105/4) > 7/8$; bootstrap $u_0 = 1/8$, $C = 79/10$ | $(4/105)\log(80/79) \approx 0.00048$ | even $L \ge 60$ |
 | Scalar optimization (`experiments/`) | Reuses source-1 and source-2 finite inputs with unequal-defect recurrence | $0.016978269$ ($> 1/60$) | even $L \ge 36$ |
-| Temperature lifting (`experiments/`) | Reuses source-1 traces ($L \le 12$) and $L=120$ MPS trial; lifted seed at $n_0 = 36, 60$ | $0.072901771$ ($> 7/100$ simple) | even $L \ge 36$ |
+| Temperature lifting (`experiments/`) | Reuses source-1 traces ($L \le 12$) and $L=120$ MPS trial; lifted seed at $n_0 = 60$; the unlifted seed at $(36, 49/4)$ covers $36 \le L \le 72$ | $0.072901771$ ($> 7/100$ simple) | even $L \ge 36$ |
 
 ## Model
 
@@ -105,11 +105,12 @@ conditional one-trace criterion on which [`models/spin2`](../spin2) builds.
 The scalar optimization tightens the polynomial filter cutoffs, tracks unequal spatial and
 thermal defects $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ through the coupled recurrence
 rather than collapsing to $\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$, and covers intermediate
-chain lengths via the reflection-positivity interpolation inequality before invoking the uniform
+chain lengths via the moment interpolation inequality (monotonicity of $\ell^p$ norms) before invoking the uniform
 bootstrap tail. Temperature lifting combines the 18 source-1 thermal traces with the length-120
 MPS trial, raises the inverse temperature before extracting purity bounds, and retains the
-threefold $\mathrm{SU}(2)$ triplet multiplicity when bounding residual moments; a length-72 seed
-bridges even chain lengths $36 \le L \le 72$. The script `search_temperature_lift.jl` performs the
+threefold multiplicity of the three nontrivial $D_2$ symmetry sectors of the spatial transfer
+operator when bounding residual moments; the unlifted seed at $(n_0, \beta) = (36, 49/4)$ covers even
+chain lengths $36 \le L \le 72$. The script `search_temperature_lift.jl` performs the
 exploratory floating-point parameter scan that selected the moment length and temperature
 multiplier (`temperature-lift-search.json`, labeled non-certifying), and `temperature_lift.jl`
 replays the chosen parameters in exact rational arithmetic.
