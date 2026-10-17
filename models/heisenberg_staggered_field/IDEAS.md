@@ -29,8 +29,10 @@ $2^L$-dimensional Hilbert space into $(S^z, k)$ symmetry blocks.
 ## Outcome
 
 Route 1 certified all five target fields $h \in \{1, 3/4, 1/2, 7/20, 1/4\}$ at seed length
-$n_0 = 8$ from complete verified 8- and 16-site spectra. Exploratory 20-site scans ($n_0 = 10$)
-using partial Krylov spectra for blocks of dimension $> 2{,}500$ identified stronger numerical
-candidate seeds down to $h = 3/20$, while an independent shared-core cross-check
-(`scripts/core_certificate.jl`) reproduced the $h = 1$ certificate using a different symmetry-block
-reduction and the exact rational doubling chain.
+$n_0 = 8$ from complete verified 8- and 16-site spectra. The certificates were first produced by a
+model-local block builder and enclosure (two-site translation momentum and $S^z$ blocks). They are
+now produced by the shared core pipeline (`GapCertificates.certify_gap`) on the one-site
+rotated-frame model. The seed spectra are split by blocking into two-site cells, where the
+rotated frame conserves the U(1) cell charge $S^z_a - S^z_b$; this is the same reduction as
+route 1. Exploratory 20-site scans ($n_0 = 10$), with partial Krylov spectra for large blocks,
+identified stronger numerical candidate seeds down to $h = 3/20$.

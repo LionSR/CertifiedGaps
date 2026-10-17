@@ -1,26 +1,34 @@
-# Certifies one field: verified dense spectra of the rings n0 and 2n0, outward log Z, rational
-# seeds, recurrence; writes results/certificate_<h>.json (about 1 min per field).
-# Usage: certify.jl [h] [maxL]          (seed read from results/scan_<h>_<maxL>.json)
-#        certify.jl h n0 beta           (seed given explicitly, e.g. '1//1' 8 '21//4')
+# Certifies the staggered-field points with the shared core: for each h in `SEEDS`
+# (src/common.jl), `GapCertificates.certify_gap` on the one-site rotated-frame model at
+# (n₀, β₀) = (8, β₀), with the seed spectra split by the two-site U(1) cell charge `BLOCKING`.
+# Writes results/certificate_<h>.json and results/summary.json.
+#     julia --project=julia models/heisenberg_staggered_field/certify.jl [h]   (default: all five)
 include(joinpath(@__DIR__, "src", "common.jl"))
-h=isempty(ARGS) ? 1//1 : parse_rational(ARGS[1])
-if length(ARGS)>=3
-    n=parse(Int,ARGS[2]);beta=parse_rational(ARGS[3])
-else
-    maxL=length(ARGS)>1 ? parse(Int,ARGS[2]) : 16
-    scan=JSON3.read(read(joinpath(ROOT,"results","scan_$(tag(h))_$(maxL).json"),String),Dict{String,Any})
-    best=scan["best"];@assert best!==nothing
-    n=best["n0"];beta=Rational{BigInt}(best["beta"])
+fields = isempty(ARGS) ? FIELDS : [parse_rational(ARGS[1])]
+for h in fields
+    β0 = Dict(SEEDS)[h]
+    seconds = @elapsed cert = certify_gap(site_model(h); n0 = N0, β0, rp = site_rp(h),
+        blocking = BLOCKING)
+    cert["staggered_field"] = string(h)
+    cert["seconds"] = seconds
+    cert["metadata"] = model_metadata(ROOT, Dict("h" => string(h), "n0" => N0,
+        "beta0" => string(β0)); SOURCES..., packages = (CertifiedGaps,), certified = true)
+    write_result(certificate_path(h), cert)
+    println("CERTIFIED h=$h gap > $(cert["gap_lower_bound_decimal"]) ",
+        "($(round(seconds; digits = 1)) s)")
+    flush(stdout)
 end
-exact_rp(h)
-start=time();a=all_spectra(n,h;verified=true);b=all_spectra(2n,h;verified=true)
-seeds=enclosed_seeds(a.records,b.records,beta)
-bound=certified_gap_bound(seeds.s,seeds.t,beta);@assert bound.bound!==nothing
-write_result(joinpath(ROOT,"results","certificate_$(tag(h)).json"),Dict(
-    "metadata"=>provenance(Dict("h"=>string(h),"n0"=>n);certified=true),
-    "h"=>string(h),"n0"=>n,"sites_per_cell"=>1,"beta"=>string(beta),
-    "epsilon_s"=>string(seeds.s),"epsilon_t"=>string(seeds.t),
-    "bound"=>bound.bound,"logs"=>seeds.logs,"seconds"=>time()-start,
-    "small_sectors"=>a.records,"large_sectors"=>b.records,
-    "reference_gap"=>b.spec.E[2]-b.spec.E[1],"ratio"=>bound.bound/(b.spec.E[2]-b.spec.E[1])))
-println("CERTIFIED h=$h n=$n beta=$beta bound=$(bound.bound) seconds=$(time()-start)")
+# Compact summary of every stored certificate (checked against them by test/runtests.jl).
+rows = map(FIELDS) do h
+    c = read_result(certificate_path(h), Dict{String,Any})
+    Dict("h" => string(h), "n0" => c["seed"]["n0"], "beta0" => c["seed"]["beta0"],
+        "eps_s" => c["seed"]["eps_s"], "eps_t" => c["seed"]["eps_t"],
+        "gap_lower_bound" => c["gap_lower_bound"],
+        "gap_lower_bound_decimal" => c["gap_lower_bound_decimal"],
+        "interval_bound_decimal" => c["interval_bound_decimal"],
+        "seconds" => c["seconds"])
+end
+write_result(joinpath(ROOT, "results", "summary.json"), Dict(
+    "description" =>
+        "Seeds and gap bounds of results/certificate_<h>.json; every even L >= 8 sites",
+    "points" => rows))

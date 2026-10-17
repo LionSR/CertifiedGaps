@@ -1,190 +1,55 @@
-using CertifiedGaps, LinearAlgebra, SparseArrays, IntervalArithmetic, JSON3
-using CertifiedGaps.Results, CertifiedGaps.Seeds, CertifiedGaps.ExactDiagonalization
-using KrylovKit, Random
-using CertifiedGaps.ExactArithmetic: parse_rational
+# The staggered-field Heisenberg chain on top of the shared core: the exact sublattice rotation
+# to the reflection-positive frame, the one-site model and its RP data (the certified claim),
+# the two-site blocking with its conserved U(1) cell charge (used only to split the verified seed
+# spectra), the certified parameter points, and the hashed source set.
+using CertifiedGaps, LinearAlgebra
+using CertifiedGaps.RingModels, CertifiedGaps.GapCertificates, CertifiedGaps.Results
+using CertifiedGaps.ExactArithmetic: RationalBig, parse_rational
 using CertifiedGaps.Spins: exact_spin_half
-BLAS.set_num_threads(1)
 # The model directory (this file is in src/); results/ and hashed paths are relative to it.
 const ROOT = dirname(@__DIR__)
-const REPO = normpath(joinpath(ROOT,"../.."))
-const FIELDS = [1//1,3//4,1//2,7//20,1//4]
-tag(h) = replace(string(h),"//"=>"_")
-iv(x) = CertifiedGaps.Recurrence.to_interval(x)
-iv(x::Irrational) = interval(Float64,x)
+
+"Certified points: staggered field h => seed inverse temperature β₀, at the seed length `N0`."
+const SEEDS = [1 // 1 => 21 // 4, 3 // 4 => 21 // 4, 1 // 2 => 11 // 2, 7 // 20 => 23 // 4,
+    1 // 4 => 25 // 4]
+const FIELDS = first.(SEEDS)
+"Seed length n₀ in sites (lengths count sites: the unit cell of the rotated frame is one spin)."
+const N0 = 8
+
+tag(h) = replace(string(h), "//" => "_")
+certificate_path(h) = joinpath(ROOT, "results", "certificate_$(tag(h)).json")
+
+# Spin-½ matrices X = Sˣ, J = iSʸ (real antisymmetric), Z = Sᶻ, and the identity.
+const X, J, Z, I2 = let S = exact_spin_half(Rational{BigInt}); (S.x, S.iy, S.z, S.id) end
+"The π rotation about y, U = 2iSʸ = e^{iπSʸ}, applied to every odd site."
+const U = 2J
+
+"Physical bond S·S = X⊗X − J⊗J + Z⊗Z (real: SʸSʸ = −J⊗J)."
+physical_bond() = kron(X, X) - kron(J, J) + kron(Z, Z)
+"Rotated bond −(X⊗X + J⊗J + Z⊗Z): the physical bond conjugated by U on either endpoint."
+rotated_bond() = -(kron(X, X) + kron(J, J) + kron(Z, Z))
+
 """
-Run metadata with SHA-256 of this model's sources under `source_sha256` and of the shared core
-under `core_sha256` (provenance only), both keyed by repository path (`model_provenance`).
+    site_model(h)
+
+One-site rotated-frame ring: bond −(X⊗X + J⊗J + Z⊗Z) and on-site term −hZ. Unitarily
+equivalent (by U on odd sites) to the physical chain on every even ring. Only the Sᶻ parity is
+a one-site charge here; the U(1) charge needs two-site cells (`BLOCKING`).
 """
-function provenance(config; certified=false)
-    (;source_sha256,core_sha256) = model_provenance(ROOT; dirs=("src","scripts"),
-        files=("certify.jl","check.jl","Project.toml","Manifest.toml"))
-    meta = run_metadata(config;source_sha256,packages=(CertifiedGaps,IntervalArithmetic),
-        status=certified ? "certified" : "numerical, not certified",certified)
-    meta["core_sha256"] = core_sha256
-    meta
-end
-"Exact rational check of the sublattice rotation, the RP identity −h = Σ C⊗C and o = −h Z."
-function exact_rp(h)
-    S = exact_spin_half(Rational{Int}); X, J, Z, Id = S.x, S.iy, S.z, S.id; U=2J
-    original=kron(X,X)-kron(J,J)+kron(Z,Z)
-    rotated=-kron(X,X)-kron(J,J)-kron(Z,Z)
-    @assert kron(U,Id)*original*kron(U',Id)==rotated
-    @assert kron(Id,U)*original*kron(Id,U')==rotated
-    @assert -rotated==sum(kron(C,C) for C in (X,J,Z))
-    @assert U*Z*U' == -Z
-    @assert issymmetric(-h*Z) && isreal(-h*Z)
-    true
-end
-rot(s,L)=((s<<2)&((1<<L)-1)) | (s>>(L-2))
-"Exact orbit partition under translation by two sites in a fixed particle sector."
-function orbits(L,p)
-    reps=Int[]; lens=Int[]; owner=zeros(Int32,1<<L); shift=zeros(Int8,1<<L)
-    for s in 0:(1<<L)-1
-        count_ones(s)==p && owner[s+1]==0 || continue
-        push!(reps,s); t=s; ell=0
-        while true
-            owner[t+1]=length(reps);shift[t+1]=ell;ell+=1;t=rot(t,L)
-            t==s && break
-        end
-        push!(lens,ell)
-    end
-    @assert sum(lens)==binomial(L,p)
-    (;reps,lens,owner,shift)
-end
-"Momentum block, with optional interval enclosure of every exact matrix entry."
-function block(L,h,k,o; verified=false)
-    m=L÷2; ids=findall(l->(k*l)%m==0,o.lens); n=length(ids)
-    loc=zeros(Int,length(o.reps));loc[ids]=1:n
-    V=verified ? Complex{Interval{Float64}} : ComplexF64
-    entries=Dict{Tuple{Int,Int},V}()
-    phases=verified ? [complex(cos(iv(2*k*t)*iv(pi)/iv(m)),sin(iv(2*k*t)*iv(pi)/iv(m))) for t in 0:m-1] :
-        [cispi(2*k*t/m) for t in 0:m-1]
-    for (col,a) in enumerate(ids)
-        s=o.reps[a]; diag=0//1
-        for j in 0:L-1
-            z=1-2*((s>>j)&1); zn=1-2*((s>>mod(j+1,L))&1)
-            diag+=z*zn//4-h*(-1)^(j+1)*z/2
-            if z!=zn
-                t=s ⊻ (1<<j) ⊻ (1<<mod(j+1,L));b=o.owner[t+1];row=loc[b]
-                row==0 && continue
-                f=verified ? sqrt(iv(o.lens[a])/iv(o.lens[b]))/iv(2) : sqrt(o.lens[a]/o.lens[b])/2
-                v=f*phases[Int(o.shift[t+1])+1]
-                entries[(row,col)]=get(entries,(row,col),zero(v))+v
-            end
-        end
-        v=verified ? complex(iv(diag),iv(0)) : complex(Float64(diag))
-        entries[(col,col)]=get(entries,(col,col),zero(v))+v
-    end
-    ii=Int[];jj=Int[];vv=ComplexF64[]; err2=iv(0)
-    for ((i,j),v) in entries
-        i>j && continue
-        z=verified ? complex(mid(real(v)),mid(imag(v))) : v
-        i==j && (z=complex(real(z),0))
-        push!(ii,i);push!(jj,j);push!(vv,z)
-        if i!=j
-            push!(ii,j);push!(jj,i);push!(vv,conj(z))
-        end
-        if verified
-            er=max(abs(inf(real(v)-iv(real(z)))),abs(sup(real(v)-iv(real(z)))))
-            ei=max(abs(inf(imag(v)-iv(imag(z)))),abs(sup(imag(v)-iv(imag(z)))))
-            err2+=iv(i==j ? 1 : 2)*(iv(er)^2+iv(ei)^2)
-        end
-    end
-    sparse(ii,jj,vv,n,n), verified ? sup(sqrt(err2)) : 0.0
-end
-# Outward Frobenius norm; every scalar multiply/add is rounded upward. nextfloat also
-# covers underflow. No Float64 reduction is accepted as an inequality.
-function frob(A)
-    s=0.0
-    for z in A
-        a=nextfloat(real(z)*real(z));b=nextfloat(imag(z)*imag(z))
-        s=nextfloat(s+nextfloat(a+b))
-    end
-    nextfloat(sqrt(s))
-end
-"Residual/polar/Weyl enclosure, with conservative IEEE complex matmul error bounds."
-function enclose(H,F,entry_error,L,h)
-    Q=F.vectors; lam=F.values;n=length(lam)
-    R=H*Q-Q*Diagonal(lam)
-    E=Q'*Q-I
-    q=iv(frob(Q));hf=iv(frob(nonzeros(H)));lf=iv(frob(lam))
-    u=iv(1//big(2)^53); g=iv(32n+32)*u/(iv(1)-iv(32n+32)*u)
-    # Standard dot-product gamma bound, enlarged for complex products and subtraction.
-    # Frobenius product inequality avoids an extra dense abs(A)*abs(B) multiplication.
-    r=iv(frob(R))+g*(hf*q+q*lf)+iv(1//big(10)^280)
-    e=iv(frob(E))+g*(q^2+sqrt(iv(n)))+iv(1//big(10)^280)
-    @assert sup(e)<1
-    d=e/(iv(1)+sqrt(iv(1)-e))
-    hn=iv(L)*(iv(3)/iv(4)+iv(h)/iv(2))+iv(entry_error)
-    eta=iv(entry_error)+r+(hn+iv(maximum(abs,lam)))*d
-    (;radius=sup(eta),residual_upper=sup(r),orthogonality_upper=sup(e),
-        entry_error,dimension=n)
-end
+site_model(h) = RingModel(2, rotated_bond(), -h * Z; charge = [0, 1], modulus = 2,
+    name = "spin-1/2 Heisenberg, staggered field $h, rotated frame")
+
+"Real RP form of the one-site model: −h = Σ C ⊗ C with C ∈ {X, J, Z}, o = −hZ real."
+site_rp(h) = rp_certificate(site_model(h); factors = [X, J, Z])
+
 """
-Spectrum of the L-site ring at field h from one representative per (S^z, momentum) equivalence
-class. With `verified=true` every block is dense and its record carries the eigenvalues and the
-`enclose` radius; otherwise blocks above `dense_max` are partial Krylov spectra (numerical).
+Two-site blocking for the seed spectra. In cells (a, b) with states ↑↑, ↑↓, ↓↑, ↓↓, the rotated
+bond flips both spins of a pair together or neither, so the cell charge q = Sᶻ_a − Sᶻ_b
+(0, 1, −1, 0) is conserved; it is minus the physical Sᶻ of the cell, since U flips site a. No
+on-site cell operator maps q to −q (spin flip reverses the field and the sublattice exchange is
+not on-site), so there is no `flip`.
 """
-function all_spectra(L,h; verified=false,dense_max=2500,nev=80)
-    start=time();levels=Float64[];records=Any[];N=0;cut=Inf
-    for p in 0:L÷2
-        o=orbits(L,p)
-        for k in 0:(L÷2)÷2
-            H,err=block(L,h,k,o;verified);n=size(H,1);n==0 && continue
-            # Global spin flip followed by one-site translation maps p to L-p.
-            # Complex conjugation maps k to m-k. Both are exact unitary/antiunitary maps.
-            mult=(p==L÷2 ? 1 : 2)*(k==0 || 2k==L÷2 ? 1 : 2)
-            t=time();complete=verified || n<=dense_max
-            if complete
-                if verified
-                    F=eigen(Hermitian(Matrix(H))); vals=F.values
-                    check=enclose(H,F,err,L,h)
-                else
-                    vals=eigvals(Hermitian(Matrix(H)))
-                end
-            else
-                Random.seed!(L*10000+p*100+k)
-                es,_,info=eigsolve(H,randn(ComplexF64,n),min(nev,n-2),:SR;
-                    ishermitian=true,krylovdim=min(n,max(2nev+30,180)),tol=1e-11,maxiter=400)
-                @assert info.converged>=min(nev,n-2)
-                vals=sort(real.(es[1:min(nev,n-2)]));cut=min(cut,vals[end])
-            end
-            for _ in 1:mult; append!(levels,vals);end
-            N+=n*mult
-            rec=Dict{String,Any}("p"=>p,"k"=>k,"dimension"=>n,"multiplicity"=>mult,
-                "dense"=>complete,"seconds"=>time()-t)
-            if verified
-                rec["eigenvalues"]=vals
-                for (key,v) in pairs(check);rec[string(key)]=v;end
-            end
-            push!(records,rec)
-            println("L=$L h=$h p=$p k=$k dim=$n mult=$mult dense=$complete seconds=$(round(time()-t;digits=2))");flush(stdout)
-        end
-    end
-    @assert N==2^L
-    isfinite(cut) && filter!(x->x<=cut,levels)
-    spec=PartialSpectrum(sort!(levels),N,isinf(cut))
-    (;spec,records,seconds=time()-start)
-end
-"Outward logZ from ALL enclosed levels; energy shift is an exact stored Float64."
-function enclosed_logz(records,beta)
-    shift=minimum(minimum(r["eigenvalues"]) for r in records)
-    z=iv(0);b=iv(beta)
-    for r in records
-        eta=iv(-r["radius"],r["radius"])
-        for e in r["eigenvalues"]
-            z+=iv(r["multiplicity"])*exp(-b*(iv(e)-iv(shift)+eta))
-        end
-    end
-    log(z)-b*iv(shift)
-end
-iv(a,b)=interval(a,b)
-"Rational upper bounds on 1 − Pₛ(n, β) and 1 − P_τ(2n, β) from the block records of n and 2n."
-function enclosed_seeds(a,b,beta)
-    x=enclosed_logz(a,beta);y=enclosed_logz(b,beta);z=enclosed_logz(b,2beta)
-    # Core step from log Z to exact rational defects (binary upper endpoints, no decimal
-    # rounding); never above the plain 1 - exp evaluation of the stored certificates.
-    (;eps_s,eps_t)=seed_defects(x,y,z); s,t=eps_s,eps_t
-    @assert 0<=s<1 && 0<=t<1
-    (;s,t,logs=[[inf(x),sup(x)],[inf(y),sup(y)],[inf(z),sup(z)]])
-end
+const BLOCKING = (; cell = 2, charge = [0, 1, -1, 0], modulus = 0)
+
+"Model-local sources hashed into every certificate (`model_metadata`, `verify_model_metadata`)."
+const SOURCES = (; dirs = ("src",), files = ("certify.jl", "check.jl"))
