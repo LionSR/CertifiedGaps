@@ -64,7 +64,7 @@ use `decide +kernel`, as `lean/SeedKernel` does. Do not edit `lean/`; put new ge
 ```sh
 lake build
 lake exe leaderboard_audit home_page/_data/lean_records.json
-lake env leanchecker Leaderboard CertifiedGaps SeedKernel
+LEAN_NUM_THREADS=1 lake env leanchecker Leaderboard CertifiedGaps SeedKernel.Ising SeedKernel.Packed
 ```
 
 `lake build` builds every default target, `Leaderboard` included. Run it first, because the
@@ -99,8 +99,12 @@ sorted by name, with one object per record:
 
 `leanchecker` comes with the Lean toolchain; it is the upstreamed `lean4checker`. It replays
 every declaration of the listed modules through the kernel. This catches a file that switched
-the kernel off with `set_option debug.skipKernelTC true`. In CI, lean-action runs it with
-`leanchecker: true`.
+the kernel off with `set_option debug.skipKernelTC true`. The listed prefixes cover the
+Leaderboard library and the repository modules it imports. With one thread, leanchecker checks
+one module at a time, so its memory peak is that of the largest module, about 9 GB for
+`SeedKernel.Ising.Seed`. Parallel checks need much more memory. CI runs this check in
+`.github/workflows/kernel-check.yml`, apart from the deploy. It runs when `leaderboard/` or
+`lean/` changes, and weekly.
 
 ## What a reviewer must still check
 

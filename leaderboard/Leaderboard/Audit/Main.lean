@@ -1,7 +1,7 @@
 /-
-Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
+Copyright (c) 2026 CertifiedGaps contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: thermal-mpo-gap contributors
+Authors: CertifiedGaps contributors
 -/
 import Lean
 
@@ -126,7 +126,8 @@ def spectrumJson (e : Expr) : MetaM Json := do
   let some model := m.getAppFn.constName? |
     throwError "the spectrum must be a constant applied to numerals, not {e}"
   let params ← (← explicitArgs m).mapM fun a ↦ return ratString (← evalNumeral a)
-  let opts := ({} : Options) |>.set `pp.notation false |>.set `pp.fullNames true
+  let opts := ({} : Options) |>.set `pp.notation false |>.set `pp.fieldNotation false
+    |>.set `pp.fullNames true
   let printed := (← withOptions (fun _ ↦ opts) (ppExpr e)).pretty 100000
   return Json.mkObj [("model", toJson model.toString), ("frame", toJson frame),
     ("params", toJson params), ("printed", toJson printed)]
@@ -137,8 +138,8 @@ def recordJson (n mod : Name) (h : Head) (args : Array Expr) : MetaM Json := do
   let axioms ← collectAxioms n
   let bad := axioms.filter (!allowedAxioms.contains ·)
   unless bad.isEmpty do
-    throwError "disallowed axioms {bad} (`sorry` adds sorryAx, `native_decide` adds \
-      Lean.ofReduceBool or `*._native.native_decide.ax_*`; only {allowedAxioms} are allowed)"
+    throwError (s!"disallowed axioms {bad.toList} (`sorry` adds sorryAx, `native_decide` adds \
+      Lean.ofReduceBool or `*._native.native_decide.ax_*`; only {allowedAxioms} are allowed)")
   let seeds ← match h.seeds with
     | some (n₀, s, t) =>
       pure [("n0", toJson (← evalNat args[n₀]!)), ("s", toJson (← evalRat args[s]!)),
