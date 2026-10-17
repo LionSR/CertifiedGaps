@@ -1,59 +1,37 @@
 {
-    "source_hashes": {
-        "Project.toml": "89cda383e17e9cdc166800d29d78817d486665bc598d1de80eb0fb67e4c1e0dd",
-        "model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472",
-        "scripts/transfer_certify.jl": "8ae9ba5e18a4d3defa0c62d199edd954dd1929e2856bb75d4fa49ab186174299",
-        "src/spectra.jl": "46c0726f4f5ce07f55901f2823f9803adbb58b6ca02822b51db331bb35b9ca85",
-        "Manifest.toml": "4c7d9b6f0b359a73d67c541378c4fc326ea419bd1469b1be69b8b3e9ff7a7977",
-        "src/TransferCertificate.jl": "e798b9dc3f24e155bdbc37f9dab3f030c869b30c42ed4563f9484f15d6f2f445",
-        "check.jl": "6f168c03ee01cad823df87a3d84af5cabb0afef3206ce4d661126cac2c7ddb1a"
-    },
     "rings": [
         {
-            "gap_interval": [
-                "568481//250000",
-                "90957//40000"
-            ],
             "blocks": "46",
             "dimension": "6561",
             "D": "4//1",
             "L": "8",
-            "seconds": 1.6425449848175049
+            "gap_lower": "568481//250000",
+            "seconds": 0.04227462300000001
         },
         {
-            "gap_interval": [
-                "454047//200000",
-                "567559//250000"
-            ],
             "blocks": "67",
             "dimension": "59049",
             "D": "4//1",
             "L": "10",
-            "seconds": 103.55789995193481
+            "gap_lower": "454047//200000",
+            "seconds": 4.94934154
         }
     ],
-    "run_metadata": {
-        "config": {
-            "D": "4//1"
-        },
-        "created_utc": "2026-10-15T09:38:09.176",
+    "metadata": {
         "source_sha256": {
-            "Project.toml": "89cda383e17e9cdc166800d29d78817d486665bc598d1de80eb0fb67e4c1e0dd",
-            "model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472",
-            "scripts/transfer_certify.jl": "8ae9ba5e18a4d3defa0c62d199edd954dd1929e2856bb75d4fa49ab186174299",
-            "src/spectra.jl": "46c0726f4f5ce07f55901f2823f9803adbb58b6ca02822b51db331bb35b9ca85",
-            "Manifest.toml": "4c7d9b6f0b359a73d67c541378c4fc326ea419bd1469b1be69b8b3e9ff7a7977",
-            "src/TransferCertificate.jl": "e798b9dc3f24e155bdbc37f9dab3f030c869b30c42ed4563f9484f15d6f2f445",
-            "check.jl": "6f168c03ee01cad823df87a3d84af5cabb0afef3206ce4d661126cac2c7ddb1a"
+            "models/spin1_largeD/check.jl": "46f349ab1949938682f4e9968d6b19d563b912fc97b826ceccf81ba7e9a4594b",
+            "models/spin1_largeD/scripts/transfer_certify.jl": "f5fd1811fd7ce07f26dd37f28cf579b3c9e1beaa1172c9c31b09d9f22006762a",
+            "models/spin1_largeD/src/TransferCertificate.jl": "1eead2b4b01190abed4ebc5910a9cc733e1f81a58335c7dad882f83194dd1e4e",
+            "models/spin1_largeD/src/model.jl": "98fc4878fd7d1e13ac6d5ec913c74e49b87e1bb4d56d4da419f89278cbb90f98"
         },
         "core_sha256": {
-            "julia/src/ExactDiagonalization.jl": "3589e3461ea172adb4234fe52a8aa2ec8f36c939984e28e98559a1e9ec72c1d1",
+            "julia/src/ExactDiagonalization.jl": "d9af3857fcbd6da1ff3ee27d01c3dfe427769d664fd718a6b075e2fa6947e52b",
             "julia/src/ReflectionPositivity.jl": "e8d5d3446f680f377bed27d0d9ba44dda8182b7c3055165b9b61701fe736040c",
             "julia/src/Recurrence.jl": "2dc12e517f9739e2064f5de119510c52caa0a2cfba53d0eb8b5d6c85e02f9729",
-            "julia/src/RingModels.jl": "ee4347971bbce70809354c7232fec6514bb592f4462d6a57b239c393861f5c6c",
-            "julia/src/Seeds.jl": "a8239c9745b2aae6db03c8de535f6a6ecb3aab71ade5a50699ad03a96903abf7",
+            "julia/src/RingModels.jl": "89bb0e9c8a13432c2034fcb1e7538dd3f833ca6730516a50a6e4890a5b25e611",
+            "julia/src/Seeds.jl": "55e81986e9784999a32028a26c1665258d8c3bd46c489f81f5471d9c790e21f0",
             "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
-            "julia/src/VerifiedSpectra.jl": "f970f8186158bf0110e8124d647d1b8a7c3ff23ac194c3d569e372d833850df5",
+            "julia/src/VerifiedSpectra.jl": "472e90f1009511df8d2a0083b6d5a666bf419dc5a04c20cf1d1e5a672f63b641",
             "julia/src/CertifiedMPO/GaugeSearch.jl": "96d9fcdcf031b5b84c502a7582ae5715022752276d3385db724143477b2eb4f5",
             "julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
             "julia/src/CertifiedMPO/SchattenBridge.jl": "2300c4f86790906274adf9d50ac8bd43a7ef1ccbfc49e4a9aaafbbe2addc290f",
@@ -64,11 +42,11 @@
             "julia/src/Models.jl": "299d8bc7b0e377361276b26a99023e5a6130e73058639b0bdb13783b51855b2e",
             "julia/src/Purification.jl": "ea8a4b1a03a8a38b01d0289b06da72a8ea255e79287008ccf58456cfda9fadf3",
             "julia/src/ExactArithmetic.jl": "77feece9b1e56011667bd8241ff159864943433d2121f01f351dccefae769882",
-            "julia/src/GapCertificates.jl": "a8497294951be57ebff526beae7732b6d91446d579eeb4c31cabc7d96174e311",
-            "julia/src/Results.jl": "9aa080ae98e184280c1678ef825a6b85978bbbb47918200d94fec89ba6fc485c",
+            "julia/src/GapCertificates.jl": "c828cbf866fbfa82a8996486a15fae7403d2644e21c0071dafa532a1b0b97b3f",
+            "julia/src/Results.jl": "dda86f08bd426aea0c5f876580f7dda9a1a8bbf208d66268f6926a6f1dc2319f",
             "julia/src/CertifiedMPO/Products.jl": "5207b7d80375c538d531c67c699d048a0014409cf410425ffc633299959a9230",
             "julia/src/CertifiedMPO/Squaring.jl": "9e454f12d3149482d734f33d3a1f47b6c4dab21144329753cdd2826d05c5b03c",
-            "julia/src/Spins.jl": "fb4d5c617531cd5e080eb166a495212d7d48ada62f9802f55e65e6bca0261855",
+            "julia/src/Spins.jl": "b3dcf5d8f8edb50bd6f8308d18e5da123621adf6074a831f276f56ba629e8f18",
             "julia/src/CertifiedGaps.jl": "958e839cff840169bfaeb0463a9f06f2a5276453b1472e478111ca36f48ba75b",
             "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
             "julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
@@ -78,13 +56,17 @@
             "julia/src/CertifiedMPO/PositiveBounds.jl": "8921e7de4f45a27260dfc22e00719b06651674fc3dd792d6580e294b5fd68382",
             "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
         },
+        "status": "certified",
+        "certified": true,
+        "blas_threads": 1,
+        "config": {
+            "D": "4//1"
+        },
+        "created_utc": "2026-10-17T04:05:20.731",
         "julia_threads": 1,
         "julia": "1.12.4",
         "IntervalArithmetic": "1.0.12",
-        "status": "fresh complete spectra; checker repeats these small eigensolves",
-        "certified": true,
-        "CertifiedGaps": "0.2.0",
-        "blas_threads": 1
+        "CertifiedGaps": "0.2.0"
     },
-    "wall_seconds": 107.08640003204346
+    "wall_seconds": 5.789884090423584
 }
