@@ -5,6 +5,7 @@ authors = ["thermal-mpo-gap"]
 
 [deps]
 CertifiedGaps = "5b0c3f0e-7a51-4c55-9b1e-2f7f3d6a8c11"
+CodecZlib = "944b1d66-785c-5afd-91f1-9de20f533193"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
@@ -14,6 +15,7 @@ CertifiedGaps = {path = "../../julia"}
 
 [compat]
 CertifiedGaps = "0.2"
+CodecZlib = "0.7.9"
 Dates = "1"
 JSON3 = "1.14"
 YAML = "0.4"
