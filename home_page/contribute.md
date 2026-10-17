@@ -39,10 +39,10 @@ The Lean library `Leaderboard` in the directory `leaderboard/` holds one theorem
 [README]({{ repo_blob }}leaderboard/README.md) explains how to add one. The theorem either has no
 assumptions, or assumes exactly the two inequalities at the starting scale, which a computer
 proof in `models/` then establishes. It may use only Lean's standard axioms, so no `sorry` and no
-`native_decide`. The automatic checks build the library, list the axioms of every theorem, check
-every proof again in the Lean kernel, and write the file `lean_records.json` that the
-leaderboard reads. A reviewer checks that the Hamiltonian in the theorem is the physical model of
-the leaderboard row. No program can check that.
+`native_decide`. The automatic checks build the library, list the axioms of every theorem and
+write the file `lean_records.json` that the leaderboard reads. A reviewer checks that the
+Hamiltonian in the theorem is the physical model of the leaderboard row. No program can check
+that.
 
 ## A proposed target
 
@@ -68,7 +68,8 @@ julia --project=tools/leaderboard tools/leaderboard/check_records.jl
 
 | check | what it establishes |
 |---|---|
-| Lean build and audit | every Lean theorem compiles, uses only the standard axioms, and passes a second check in the kernel |
+| Lean build and audit | every Lean theorem compiles and uses only the standard axioms |
+| kernel re-check (when Lean code changes, and weekly) | every proof passes a second, independent check in the Lean kernel |
 | `check_records.jl` | every row matches its certificate (starting scale, defects and bound, compared exactly), every decimal is rounded down, and every Lean row matches its theorem |
 | `check.jl` of each changed model | the computer proof recomputes to the stored certificate |
 

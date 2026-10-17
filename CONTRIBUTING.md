@@ -29,8 +29,9 @@ and the open challenges.
 
 ## Checks
 
-Automatic checks run on every pull request. They build the Lean library, list the axioms of every
-theorem and check every proof again in the Lean kernel. They compare every leaderboard row with
+Automatic checks run on every pull request. They build the Lean library and list the axioms of
+every theorem. When Lean code changes, and every week, a separate check replays every proof in
+the Lean kernel. The checks also compare every leaderboard row with
 its certificate and its Lean theorem in exact arithmetic, and they run the checker program of
 each changed model. A reviewer then checks that each row describes the model its certificate and
 its Lean theorem are about, and that its badge is right.
