@@ -119,7 +119,7 @@ th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1p
   <section class="ch" id="gap">
     <h2><span class="n">1</span>What is a gap?</h2>
     <div class="r"><div class="main prose"><p>Consider a periodic ring of \(L\) quantum spins (where site \(L+1\) is identified with site \(1\)), interacting with their nearest neighbors through the antiferromagnetic Heisenberg Hamiltonian \(H_L=\sum_{j=1}^L\mathbf S_j\cdot\mathbf S_{j+1}\). Here \(\mathbf S_j=(S_j^x,S_j^y,S_j^z)\) are the three spin-1 operators on site \(j\). Because the ring is finite, \(H_L\) has discrete energy levels \(E_0(L)\le E_1(L)\le\cdots\). The lowest energy \(E_0(L)\) is the ground-state energy, and the <em>spectral gap</em> \(\Delta_L=E_1(L)-E_0(L)\) is the energy step from the ground level to the first excited level.</p>
-<p>On any single finite ring, \(\Delta_L\) is just a difference of matrix eigenvalues; the hard question is whether \(\Delta_L\) stays open as \(L\to\infty\). Haldane predicted in 1983 that while the spin-\(\tfrac12\) chain is gapless (\(\Delta_L\to0\)), the spin-1 chain keeps a positive gap as the ring grows; numerical calculations give \(\Delta\approx0.41\). For decades there was no proof that a single fixed constant \(c>0\) bounds \(\Delta_L\ge c\) for every large even ring length \(L\).</p></div><aside class="side"><p class="note">Haldane, 1983. The theorem here is from OpenAI’s 2026 preprint; this page follows <code>notes/thermal-mpo-gap-note.tex</code>.</p></aside></div>
+<p>On any single finite ring, \(\Delta_L\) is just a difference of matrix eigenvalues; the hard question is whether \(\Delta_L\) stays open as \(L\to\infty\). Haldane predicted in 1983 that while the spin-\(\tfrac12\) chain is gapless (\(\Delta_L\to0\)), the spin-1 chain keeps a positive gap as the ring grows; numerical calculations give \(\Delta\approx0.41\). For decades there was no proof that a single fixed constant \(c>0\) bounds \(\Delta_L\ge c\) for every large even ring length \(L\).</p></div><aside class="side"><p class="note">Haldane, 1983 <a href="#ref-1">[1]</a>. The theorem here is from OpenAI’s 2026 preprint <a href="#ref-2">[2]</a>; this page follows the main note <a href="#ref-4">[4]</a>.</p></aside></div>
     <div class="player" data-ch="gap"></div>
     <div class="r"><div class="main eqs">\[ H_L=\sum_{j=1}^{L}\mathbf S_j\cdot\mathbf S_{j+1},\qquad \Delta_L=E_1(L)-E_0(L). \]
 <p class="thm">Theorem: \(\Delta_L>\log 20/784\approx0.0038\) for every even \(L\ge2304\), and the ground state is unique.</p></div><aside class="side"></aside></div>
@@ -337,7 +337,7 @@ th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1p
   <section class="part" id="part2">
     <h1 class="parth">Part II · Open chains</h1>
     <div class="r" style="margin-top: 18px"><div class="main prose"><p>In Part I, periodic boundary conditions joined the last spin back to the first, turning the partition function into a trace \(\operatorname{Tr}X_\beta^{\,L}\). Now cut the ring open into a chain with two free ends, and apply a small magnetic field to the two endpoint spins. The bulk of the chain is unchanged, so the ring proof carries over with one new ingredient: the open ends of the network are closed by <em>boundary vectors</em> instead of a trace, and the proof must show that those boundary vectors have a nonzero overlap with the dominant eigenvector of \(X_\beta\). Eleven figures, following Appendices A–C of the note.</p></div>
-      <aside class="side"><p class="note">Theorem from OpenAI’s boundary-field preprint; this part follows <code>notes/thermal-mpo-gap-note.tex</code>, Appendices A–C.</p></aside></div>
+      <aside class="side"><p class="note">Theorem from OpenAI’s boundary-field preprint <a href="#ref-3">[3]</a>; this part follows the main note <a href="#ref-4">[4]</a>, Appendices A–C.</p></aside></div>
     <div class="r" style="margin-top: 14px"><div class="main"><video src="open-chains.mp4" poster="poster-open.jpg" controls preload="metadata" playsinline></video></div>
       <aside class="side"><p class="note">The eleven open-chain figures as one film, with narration, about thirteen minutes.</p></aside></div>
   </section>
@@ -426,6 +426,12 @@ th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1p
     <div class="r"><div class="main eqs">\[ e^{-\beta_j\Delta_n}\le\frac{4x_j}{1-4x_j}<10^{-2^{j-5}},\quad\beta_j=392\cdot2^{j-5}\quad\Longrightarrow\quad\Delta_n>\frac{\log10}{392}. \]</div><aside class="side"></aside></div>
     
   </section>
+  <ol class="foot" id="references">
+    <li id="ref-1">F. D. M. Haldane, Continuum dynamics of the 1-D Heisenberg antiferromagnet: identification with the O(3) nonlinear sigma model, Phys. Lett. A <b>93</b>, 464–468 (1983). <a href="https://doi.org/10.1016/0375-9601(83)90631-X">doi:10.1016/0375-9601(83)90631-X</a></li>
+    <li id="ref-2">OpenAI, The periodic spin-one Haldane gap, preprint (September 24, 2026). <a href="https://github.com/openai/math/blob/main/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/paper.pdf">PDF</a></li>
+    <li id="ref-3">OpenAI, A boundary-field gap for the spin-one Heisenberg chain, preprint (September 24, 2026). <a href="https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf">PDF</a></li>
+    <li id="ref-4">The main note this page explains: <a href="../notes/thermal-mpo-gap-note.pdf">thermal-mpo-gap-note.pdf</a>.</li>
+  </ol>
   <p class="foot">Sources: <code>notes/thermal-mpo-gap-note.tex</code>, <code>notes/thermal-mpo-gap-scope.tex</code>, <code>notes/thermal-mpo-gap-certificate.tex</code>,
     <code>julia/src/recurrence/</code>. Curves in section 1 are schematic.</p>
 </article>
