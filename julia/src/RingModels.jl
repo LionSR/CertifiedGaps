@@ -30,7 +30,7 @@ _exact(x) = throw(ArgumentError("refusing inexact matrix entry $(repr(x)) of typ
 
 """
     RingModel(d, bond, onsite = zeros(d, d); charge = nothing, modulus = 0, flip = nothing,
-        name = "")
+        symmetries = [], name = "")
 
 Ring with local dimension `d`, Hermitian bond `bond` (d²×d², on `kron(x, x+1)`) and Hermitian
 on-site term `onsite`, all with exact entries. `charge[a]` is an optional additive quantum
@@ -40,7 +40,12 @@ number of local state `a`, conserved by H (checked exactly), summed modulo `modu
 `flip` is an optional exact local unitary F that reverses the charge (F[a, b] ≠ 0 only when
 `charge[a] ≡ −charge[b]`) and leaves h and o invariant, such as a spin flip. Then F^{⊗L} commutes
 with H and with translations and maps the sector q onto −q, so the two have the same spectrum
-and only one of them is diagonalised. All conditions are checked exactly.
+and only one of them is diagonalised.
+
+`symmetries` are optional exact on-site Z₂ symmetries G: real signed permutation matrices with
+G² = I that preserve the charge, leave h and o invariant and commute with each other (a leg
+exchange, say). Each charge and momentum block is split by the parities of the G^{⊗L}. All
+conditions are checked exactly.
 """
 struct RingModel
     name::String
@@ -50,8 +55,9 @@ struct RingModel
     charge::Vector{Int}
     modulus::Int
     flip::Union{Nothing,Matrix{ExactEntry}}
+    symmetries::Vector{Matrix{ExactEntry}}
     function RingModel(d::Integer, bond::AbstractMatrix, onsite::AbstractMatrix = zeros(Int, d, d);
-        charge = nothing, modulus::Integer = 0, flip = nothing, name = "")
+        charge = nothing, modulus::Integer = 0, flip = nothing, symmetries = [], name = "")
         B, O = exact_matrix(bond), exact_matrix(onsite)
         size(B) == (d^2, d^2) || throw(DimensionMismatch("bond must be $(d^2)×$(d^2)"))
         size(O) == (d, d) || throw(DimensionMismatch("onsite must be $d×$d"))
@@ -60,10 +66,13 @@ struct RingModel
         q = charge === nothing ? zeros(Int, d) : collect(Int, charge)
         length(q) == d || throw(DimensionMismatch("charge must have length $d"))
         F = flip === nothing ? nothing : exact_matrix(flip)
-        model = new(String(name), Int(d), B, O, q, Int(modulus), F)
+        S = Matrix{ExactEntry}[exact_matrix(G) for G in symmetries]
+        model = new(String(name), Int(d), B, O, q, Int(modulus), F, S)
         conserves_charge(model) || throw(ArgumentError("H does not conserve the given charge"))
         F === nothing || _valid_flip(model) ||
             throw(ArgumentError("flip is not a charge-reversing local symmetry of H"))
+        all(G -> _valid_symmetry(model, G), S) && all(A * B == B * A for A in S, B in S) ||
+            throw(ArgumentError("symmetries are not commuting on-site Z₂ symmetries of H"))
         return model
     end
 end
@@ -102,6 +111,29 @@ function _valid_flip(m::RingModel)
         return false
     FF = kron(F, F)
     return FF * m.bond * FF' == m.bond && F * m.onsite * F' == m.onsite
+end
+
+# A real signed permutation matrix G as (perm, sign) with G e_a = sign[a] e_{perm[a]} (states
+# 0-based in `perm`); `nothing` for any other matrix.
+function _monomial(G::AbstractMatrix)
+    d = size(G, 1)
+    perm, sign = zeros(Int, d), zeros(Int, d)
+    for a in 1:d
+        rows = findall(!iszero, G[:, a])
+        length(rows) == 1 && G[rows[1], a] in (1, -1) || return nothing
+        perm[a], sign[a] = rows[1] - 1, Int(real(G[rows[1], a]))
+    end
+    return allunique(perm) ? (perm, sign) : nothing
+end
+
+# Exact check of the conditions on one of `symmetries` stated in the `RingModel` docstring.
+function _valid_symmetry(m::RingModel, G)
+    d = m.d
+    size(G) == (d, d) && _monomial(G) !== nothing && G * G == I || return false
+    all(iszero(G[a, b]) || _reduce(m, m.charge[a] - m.charge[b]) == 0 for a in 1:d, b in 1:d) ||
+        return false
+    GG = kron(G, G)
+    return GG * m.bond * GG == m.bond && G * m.onsite * G == m.onsite
 end
 
 "Exact check that every nonzero matrix element of h and o preserves the total charge."
@@ -225,11 +257,12 @@ function decode_matrix(record)
     return ExactEntry.(re, im)
 end
 
-"JSON record of a model (exact strings); `charge_flip` only when the model has one."
+"JSON record of a model (exact strings); `charge_flip` and `symmetries` only when present."
 function encode_model(m::RingModel)
     record = Dict{String,Any}("name" => m.name, "d" => m.d, "bond" => encode_matrix(m.bond),
         "onsite" => encode_matrix(m.onsite), "charge" => m.charge, "charge_modulus" => m.modulus)
     m.flip === nothing || (record["charge_flip"] = encode_matrix(m.flip))
+    isempty(m.symmetries) || (record["symmetries"] = encode_matrix.(m.symmetries))
     return record
 end
 
@@ -237,6 +270,7 @@ end
 decode_model(r) = RingModel(_int(r["d"]), decode_matrix(r["bond"]), decode_matrix(r["onsite"]);
     charge = _int.(r["charge"]), modulus = _int(r["charge_modulus"]),
     flip = haskey(r, "charge_flip") ? decode_matrix(r["charge_flip"]) : nothing,
+    symmetries = decode_matrix.(get(r, "symmetries", [])),
     name = String(r["name"]))
 
 # `parse_exact_json` reads every integer as a string.

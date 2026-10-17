@@ -177,3 +177,48 @@ end
     @test isequal_interval(shifted_log_partition(back, 1, s0) - interval(s0),
         log_partition_enclosure(back, 1))
 end
+
+@testset "on-site Z₂ symmetries and flip parity" begin
+    # Two-leg Heisenberg ladder in rung cells, physical frame, charge 2Sᶻ of the rung.
+    heis = kron(SX, SX) - kron(ISY, ISY) + kron(SZ, SZ)
+    one = [1 0; 0 1]
+    leg(A, B) = kron(A, one, B, one) + kron(one, A, one, B)
+    bond = leg(SX, SX) - leg(ISY, ISY) + leg(SZ, SZ)
+    onsite = 3 // 2 * heis
+    swap = [1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1]
+    zz = kron(2SZ, 2SZ)                          # a signed permutation: diag(1, −1, −1, 1)
+    flip = kron(2SX, 2SX)
+    plain = RingModel(4, bond, onsite; charge = [2, 0, 0, -2])
+    for (symmetries, f) in (([swap], nothing), ([zz], nothing), ([swap, zz], flip))
+        m = RingModel(4, bond, onsite; charge = [2, 0, 0, -2], symmetries, flip = f)
+        for L in (3, 4)
+            a, b = verified_ring_spectrum(plain, L), verified_ring_spectrum(m, L)
+            @test maximum(abs, levels(a) - levels(b)) < 1e-12
+            # The rung parity zz is fixed by the charge, (−1)^(rungs of charge 0), so it
+            # exercises the signs without splitting; the leg exchange halves the blocks.
+            largest(s) = maximum(length(x.centers) for x in s)
+            @test swap in symmetries ? largest(b) < largest(a) : largest(b) == largest(a)
+            @test all(length(s.label["parities"]) == length(symmetries) for s in b)
+        end
+    end
+    # With the flip, the self-conjugate sector q = 0 is split by flip parity as well.
+    m = RingModel(4, bond, onsite; charge = [2, 0, 0, -2], symmetries = [swap, zz], flip)
+    spec = verified_ring_spectrum(m, 4)
+    @test Set(s.label["flip_parity"] for s in spec if s.label["charge"] == 0) == Set([1, -1])
+    @test !any(haskey(s.label, "flip_parity") for s in spec if s.label["charge"] != 0)
+    # Dense ED of the 8-spin ladder: spins 2r − 1, 2r on rung r, legs joining rungs r, r + 1.
+    h = Float64.(heis)
+    ladder(N) = [[(j, mod1(j + 2, N), h) for j in 1:N]; [(j, j + 1, 1.5h) for j in 1:2:N]]
+    E = sort(spectrum(Chain(2, ladder), 8; dense_max = 10^6).E)
+    @test maximum(abs, levels(spec) - E) < 1e-12
+    # Refused: a symmetry of the bond but not of the on-site term, a non-monomial matrix,
+    # a charge-changing permutation, and non-commuting symmetries.
+    @test_throws ArgumentError RingModel(4, bond, kron(SZ, one); charge = [2, 0, 0, -2],
+        symmetries = [swap])
+    @test_throws ArgumentError RingModel(4, bond, onsite; symmetries = [kron(one, one) // 2])
+    @test_throws ArgumentError RingModel(4, bond, onsite; charge = [2, 0, 0, -2],
+        symmetries = [flip])
+    @test_throws ArgumentError RingModel(2, -kron(SX, SX); symmetries = [2SX, 2SZ])
+    # Symmetries survive the exact model record.
+    @test decode_model(parse_exact_json(JSON3.write(encode_model(m)))).symmetries == m.symmetries
+end

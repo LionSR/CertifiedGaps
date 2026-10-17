@@ -159,7 +159,8 @@ function _stored_blocking(cert, model)
     haskey(cert, "blocking") || return nothing
     c = _int(cert["blocking"]["cell"])
     stored = decode_model(cert["blocking"]["model"])
-    blocking = (; cell = c, charge = stored.charge, modulus = stored.modulus, flip = stored.flip)
+    blocking = (; cell = c, charge = stored.charge, modulus = stored.modulus, flip = stored.flip,
+        symmetries = stored.symmetries)
     rebuilt, _ = _spectral(model, blocking)
     rebuilt.bond == stored.bond && rebuilt.onsite == stored.onsite ||
         error("the stored cell model is not the blocked site model")
@@ -174,7 +175,10 @@ _int(x::Integer) = Int(x)
 Re-derive a certificate from its stored model, RP data and seed: the exact RP identity, the
 seed defects from freshly verified spectra (skipped with `spectra = false`), which must not
 exceed the stored εₛ, εₜ, and the exact chain, whose bound must equal the stored one. Throws
-on any mismatch; returns the recomputed defect enclosures.
+on any mismatch; returns the recomputed defect enclosures. A checker that has itself just
+computed the verified spectra of the certificate's (cell) model, from the decoded model, may
+pass them as `spectra = Dict(n0 => small, 2n0 => large)` (keyed by length in sites) instead of
+having them recomputed; spectra read from storage are not a check.
 """
 function check_certificate(cert; spectra = true, progress = false)
     cert["format"] == FORMAT || error("unknown certificate format $(cert["format"])")
@@ -188,8 +192,9 @@ function check_certificate(cert; spectra = true, progress = false)
     iseven(n0) || !isempty(positive_transfer) || error("odd n0 without positive_transfer")
     blocking = _stored_blocking(cert, model)
     recomputed = Dict{String,Any}()
-    if spectra
-        fresh = seed_bounds(model, n0, β; blocking, positive_transfer, progress)
+    if spectra !== false
+        fresh = seed_bounds(model, n0, β; blocking, positive_transfer, progress,
+            spectra = spectra === true ? nothing : spectra)
         sup(fresh.defect_s) <= εs || error("spatial defect exceeds the stored εₛ")
         sup(fresh.defect_t) <= εt || error("thermal defect exceeds the stored εₜ")
         recomputed["defect_s_upper"] = sup(fresh.defect_s)
