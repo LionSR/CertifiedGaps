@@ -26,6 +26,8 @@ const NEEDS_CERTIFICATE = ("lean-conditional", "certified", "unreviewed")
 const STANDARD_AXIOMS = Set(["propext", "Classical.choice", "Quot.sound"])
 const PARITIES = ("even", "odd", "all")
 const BOUNDARIES = ("periodic", "open")
+# Exact values longer than this are replaced on the page by `bound.precise`.
+const MAX_SHOWN_VALUE = 24
 const ID_PATTERN = r"^[a-z0-9]+(-[a-zA-Z0-9]+)*$"
 const LEAN_NAME_PATTERN = r"^Leaderboard\.Records(\.[A-Za-z_][A-Za-z0-9_']*)+$"
 
@@ -154,6 +156,33 @@ function check_exact_field!(report, where, x; positive = true)
         err!(report, "$where: $(sprint(showerror, e))")
     end
     return report
+end
+
+"""
+    lean_covers(lean, leanbound, bound, headline, lengths) -> Bool
+
+Whether the Lean theorem `Δ_L > log(r)/β` for every even `L ≥ lean.L0` implies the headline
+claim: the Lean value is at least the headline value (exactly: identical `{r, beta}`, or
+disjoint outward enclosures) and the Lean lengths include the headline lengths (even periodic
+rings with `lean.L0 ≤ lengths.L0`). Throws when the enclosures overlap and cannot decide.
+"""
+function lean_covers(lean, leanbound, bound, headline, lengths)
+    longer = getk(lengths, "parity") == "even" &&
+        something(getk(lengths, "boundary"), "periodic") == "periodic" &&
+        getk(lean, "L0") isa Integer && getk(lengths, "L0") isa Integer &&
+        getk(lean, "L0") <= getk(lengths, "L0")
+    same = haskey(bound, "r") && parse_exact(bound["r"]) == parse_exact(getk(lean, "r")) &&
+        parse_exact(bound["beta"]) == parse_exact(getk(lean, "beta"))
+    stronger = if same
+        true
+    elseif leanbound[1] >= headline[2]
+        true
+    elseif leanbound[2] < headline[1]
+        false
+    else
+        throw(ArgumentError("cannot decide whether the Lean bound is at least the headline bound"))
+    end
+    return longer && stronger
 end
 
 "Lean records keyed by name, from the JSON array written by `lake exe leaderboard_audit`."
@@ -303,14 +332,23 @@ function check_records(records_path; root, lean_records = nothing)
             err!(report, "$where: missing lengths")
         end
         bound = getk(rec, "bound")
+        headline = nothing
         if bound isa AbstractDict
             for k in keys(bound)
-                k in ("r", "beta", "value", "strict", "decimal", "display") ||
+                k in ("r", "beta", "value", "strict", "decimal", "precise", "display") ||
                     err!(report, "$where: unknown bound field $k")
             end
             try
-                lo, hi = bound_enclosure(bound)
-                check_decimal!(report, "$where: bound", getk(bound, "decimal"), lo, hi)
+                headline = bound_enclosure(bound)
+                check_decimal!(report, "$where: bound", getk(bound, "decimal"), headline...)
+                precise = getk(bound, "precise")
+                precise === nothing ||
+                    check_decimal!(report, "$where: bound.precise", precise, headline...)
+                # A long exact value (a dyadic rational from Float64 arithmetic) is not shown
+                # on the page; its longer rounded-down decimal is.
+                v = getk(bound, "value")
+                v isa AbstractString && length(v) > MAX_SHOWN_VALUE && precise === nothing &&
+                    err!(report, "$where: bound.value is longer than $MAX_SHOWN_VALUE characters; add bound.precise")
             catch e
                 err!(report, "$where: bound: $(sprint(showerror, e))")
             end
@@ -342,7 +380,6 @@ function check_records(records_path; root, lean_records = nothing)
         if haskey(LEAN_TIERS, tier) && !(lean isa AbstractDict)
             err!(report, "$where: tier $tier needs a lean record")
         elseif lean isa AbstractDict
-            haskey(LEAN_TIERS, tier) || err!(report, "$where: a Lean record needs tier lean-unconditional or lean-conditional")
             name = getk(lean, "name")
             if !(name isa AbstractString) || match(LEAN_NAME_PATTERN, name) === nothing
                 err!(report, "$where: lean.name must be Leaderboard.Records.<Model>.<point>")
@@ -352,28 +389,52 @@ function check_records(records_path; root, lean_records = nothing)
             end
             L0 = getk(lean, "L0")
             (L0 isa Integer && L0 > 0) || err!(report, "$where: lean.L0 must be a positive integer")
+            leanbound = nothing
             try
-                lo, hi = bound_enclosure(Dict("r" => getk(lean, "r"), "beta" => getk(lean, "beta")))
+                leanbound = bound_enclosure(Dict("r" => getk(lean, "r"), "beta" => getk(lean, "beta")))
                 dec = getk(lean, "decimal")
-                dec === nothing || check_decimal!(report, "$where: lean", dec, lo, hi)
+                dec === nothing || check_decimal!(report, "$where: lean", dec, leanbound...)
             catch e
                 err!(report, "$where: lean: $(sprint(showerror, e))")
             end
+            # The headline badge is the Lean tier exactly when the Lean theorem implies the
+            # headline claim; otherwise it is the certificate's tier.
+            if leanbound !== nothing && headline !== nothing && lengths isa AbstractDict
+                covers = try
+                    lean_covers(lean, leanbound, bound, headline, lengths)
+                catch e
+                    err!(report, "$where: $(sprint(showerror, e))")
+                    nothing
+                end
+                if covers === true && !haskey(LEAN_TIERS, tier)
+                    err!(report, "$where: the Lean bound covers the headline bound, so the tier must be lean-unconditional or lean-conditional, not $tier")
+                elseif covers === false && haskey(LEAN_TIERS, tier)
+                    err!(report, "$where: tier $tier but the Lean bound is weaker than the headline bound (or covers fewer lengths); use the certificate's tier")
+                end
+            end
             if json !== nothing && name isa AbstractString
                 kind = check_lean_record!(report, where, lean, json)
-                kind === nothing || kind == get(LEAN_TIERS, tier, nothing) ||
+                haskey(LEAN_TIERS, tier) && kind !== nothing && kind != LEAN_TIERS[tier] &&
                     err!(report, "$where: tier $tier but the Lean record is $kind")
             end
         end
 
+        previous = nothing
         for (j, h) in enumerate(something(getk(rec, "history"), Any[]))
             hw = "$where: history[$j]"
             check_date!(report, hw, getk(h, "date"))
-            try
-                parse_decimal(getk(h, "decimal"))
+            key = try
+                (string(getk(h, "date")), first(parse_decimal(getk(h, "decimal"))))
             catch e
                 err!(report, "$hw: $(sprint(showerror, e))")
+                nothing
             end
+            # Rendered in file order: newest first, and the larger bound first on a shared date.
+            if key !== nothing && previous !== nothing && (key[1] > previous[1] ||
+                    (key[1] == previous[1] && key[2] > previous[2]))
+                err!(report, "$hw: history must be newest first, larger bound first on the same date")
+            end
+            key === nothing || (previous = key)
             getk(h, "method") isa AbstractString || err!(report, "$hw: missing method")
             getk(h, "tier") in TIERS || err!(report, "$hw: tier must be one of $(join(TIERS, ", "))")
         end

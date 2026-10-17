@@ -126,7 +126,7 @@ errors_match(report, re) = any(e -> occursin(re, e), report.errors)
             "does not exist")
         @test errors_match(bad(record(certificate = "../outside.json")), "relative")
         @test errors_match(bad(record(lean = nothing)), "needs a lean record")
-        @test errors_match(bad(record(tier = "certified")), "needs tier lean")
+        @test errors_match(bad(record(tier = "certified")), "tier must be lean")
         @test errors_match(bad(record(); json = lean_json(kind = "unconditional", hyp = "null")),
             "Lean record is unconditional")
         @test errors_match(bad(record(); json = lean_json(L0 = 8)), "L0")
@@ -155,6 +155,40 @@ errors_match(report, re) = any(e -> occursin(re, e), report.errors)
       - {date: "2026-13-01", decimal: "0.39", method: "m", tier: certified}
 """
         @test errors_match(bad(record(extra = history)), "yyyy-mm-dd")
+        unordered = """
+    history:
+      - {date: "2026-10-01", decimal: "0.30", method: "m", tier: certified}
+      - {date: "2026-10-01", decimal: "0.35", method: "m", tier: certified}
+"""
+        @test errors_match(bad(record(extra = unordered)), "newest first")
+        older_later = replace(unordered, "\"2026-10-01\", decimal: \"0.35" => "\"2026-10-02\", decimal: \"0.35")
+        @test errors_match(bad(record(extra = older_later)), "newest first")
+        ordered = replace(unordered, "0.30" => "0.40")
+        @test passed(first(run_check(FAMILY * "records:\n" * record(extra = ordered))))
+    end
+
+    @testset "headline tier against the Lean bound" begin
+        check(yaml; json = lean_json()) = first(run_check(FAMILY * "records:\n" * yaml; json))
+        sharper = """{value: "1/2", decimal: "0.5"}"""   # beats log(13480)/(97/4) ≈ 0.3921
+        # a certificate sharper than the Lean bound: the headline tier is the certificate's
+        @test passed(check(record(tier = "certified", bound = sharper)))
+        @test errors_match(check(record(bound = sharper)), "weaker than the headline")
+        # a Lean record with the same bound as the headline: the tier must be Lean's
+        @test errors_match(check(record(tier = "certified")), "tier must be lean")
+        # a smaller headline value is implied by the Lean theorem
+        @test passed(check(record(bound = """{value: "39/100", decimal: "0.39"}""")))
+        # the Lean theorem must also cover the headline lengths
+        fewer = """{name: Leaderboard.Records.Toy.p, L0: 8, r: "13480", beta: "97/4"}"""
+        @test errors_match(check(record(lean = fewer)), "weaker than the headline")
+        # the kind must match when the tier is Lean's
+        @test errors_match(check(record(tier = "lean-unconditional")), "Lean record is conditional")
+        # long exact values need a longer rounded-down decimal
+        long = """{value: "7066853945252893/18014398509481984", decimal: "0.3922"}"""
+        @test errors_match(check(record(tier = "certified", bound = long)), "add bound.precise")
+        withp = replace(long, "}" => """, precise: "0.392289198084"}""")
+        @test passed(check(record(tier = "certified", bound = withp)))
+        wrongp = replace(withp, "0.392289198084" => "0.392289198085")
+        @test !passed(check(record(tier = "certified", bound = wrongp)))
     end
 
     @testset "Lean source scan" begin
