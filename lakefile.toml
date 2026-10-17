@@ -1,7 +1,5 @@
-# Root Lake package for the blueprint tooling (leanblueprint, checkdecls, docgen-action).
-# It builds the libraries of the Lean project in lean/ from their sources, so that these tools,
-# which expect a lakefile at the repository root, work unchanged. The Lean project itself, its
-# options and its Mathlib pin live in lean/; keep the two in sync when bumping Mathlib.
+# The Lean package of the repository. Its sources live in lean/ (srcDir); the lakefile sits at
+# the repository root so that leanblueprint, checkdecls and docgen-action work as designed.
 name = "CertifiedGaps"
 defaultTargets = ["CertifiedGaps", "SeedKernel"]
 
@@ -20,11 +18,22 @@ rev = "v4.35.0-rc3"
 [[require]]
 name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
+
 [[lean_lib]]
 name = "CertifiedGaps"
 srcDir = "lean"
 
+# Kernel-checked seed arithmetic (spin-1 and Ising). The root `SeedKernel.Audit` prints the
+# axioms of every main declaration.
 [[lean_lib]]
 name = "SeedKernel"
 srcDir = "lean"
 roots = ["SeedKernel", "SeedKernel.Audit"]
+
+# Kernel benchmarks (several minutes, up to ~4 GB per file), opt-in: `lake build SeedKernelBench`.
+# No roots, so that checkdecls (which imports the roots of every library) does not load them.
+[[lean_lib]]
+name = "SeedKernelBench"
+srcDir = "lean"
+roots = []
+globs = ["SeedKernel.Bench.+"]
