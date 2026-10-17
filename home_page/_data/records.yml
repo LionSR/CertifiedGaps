@@ -46,10 +46,10 @@
 tiers:
   - {key: lean-unconditional, glyph: '◆', label: 'Proved in Lean, no assumptions',
      meaning: 'A theorem checked by the Lean proof assistant with no hypotheses; the finite computation is checked inside Lean too.'}
-  - {key: lean-conditional, glyph: '◇', label: 'Proved in Lean from two computer-checked inequalities',
-     meaning: 'A Lean theorem whose only hypotheses are the two purity inequalities at the starting scale; a computer certificate in the repository proves those.'}
+  - {key: lean-conditional, glyph: '◇', label: 'Proved in Lean from computer-checked inequalities',
+     meaning: 'A Lean theorem whose only hypotheses are the purity inequalities at its starting scale (two, or four for a proof with two starting rings); a computer certificate in the repository proves those.'}
   - {key: certified, glyph: '✓', label: 'Computer-checked proof',
-     meaning: 'A rigorous computer proof in exact or interval arithmetic, rerun by a standalone checker. Any Lean theorem for the same point proves a smaller bound.'}
+     meaning: 'A rigorous computer proof in exact or interval arithmetic, rerun by a standalone checker. A Lean theorem for the same point proves a bound smaller by about one part in 10⁵: Lean follows the doubling for 14 steps, the computer for 48.'}
   - {key: target, glyph: '◌', label: 'Open target (estimate only)',
      meaning: 'Only floating-point estimates exist; there is no proof yet.'}
 
@@ -171,6 +171,15 @@ challenges:
       This would make $\Delta_L > 0.039$ for every even $L \ge 60$ a computer-checked record
       and give a starting scale small enough to check inside Lean (design C).
     link: models/lean_seeds/README.md
+  - id: lean-odd-seed
+    family: spin1-dimerized
+    title: 'Lean for an odd starting ring'
+    need: >-
+      The proof at $\delta = 7/10$ starts from a ring of 3 cells. An odd start needs one more
+      fact: the transfer operator has no negative eigenvalues, because it factors as $K K^*$.
+      The Lean criterion covers even starts only. Proving the factorization in Lean would give
+      this point a Lean theorem like the others.
+    link: models/spin1_dimerized/README.md
 
 
 records:
@@ -179,21 +188,27 @@ records:
     family: spin1-heisenberg
     parameter: 'periodic ring'
     lengths: {L0: 36}
-    bound: {value: "72901771/1000000000", strict: true, decimal: "0.072901771"}
+    bound: {r: "16689019/2500000", beta: "833/32", decimal: "0.072930044", display: '\log(6.6756076)/(833/32)'}
     seed: {n0: 60, beta0: "833/32", text: 'a ring of 60 sites; a ring of 36 sites at $\beta_0 = 49/4$ covers the lengths from 36 to 72'}
     numerical_gap: "0.41048"
-    tier: certified
+    tier: lean-conditional
+    lean: {name: Leaderboard.Records.SpinOneHeisenberg.temperature_lifting, r: "16689019/2500000", beta: "833/32", decimal: "0.072930044"}
     certificate: models/spin1/experiments/temperature-lift.json
     check: models/spin1/experiments/test_temperature_lift.jl
-    date: "2026-10-10"
+    date: "2026-10-17"
     pr: null
-    contributors: ['CertifiedGaps contributors']
+    contributors: ['LionSR']
     notes: >-
-      Computed in exact rational arithmetic from the finite inputs of the OpenAI preprint,
-      reproduced here (18 thermal traces of rings up to 12 sites and one matrix-product trial
-      state of 120 sites). Independently reviewed in #49, by re-deriving every inequality and by
-      a separate computation in Arb ball arithmetic that shares no code with the original.
+      The starting inequalities are computed in exact rational arithmetic from the finite inputs
+      of the OpenAI preprint, reproduced here (18 thermal traces of rings up to 12 sites and one
+      matrix-product trial state of 120 sites). Independently reviewed in #49, by re-deriving
+      every inequality and by a separate computation in Arb ball arithmetic that shares no code
+      with the original. The Lean theorem assumes the two inequalities at each starting ring: 60
+      sites at $\beta_0 = 833/32$ and 36 sites at $\beta_0 = 49/4$. Lean follows the doubling for
+      14 steps where the computer proof follows it for 10, so its bound is slightly larger.
     history:
+      - {date: "2026-10-10", decimal: "0.072901771", lengths: 'even L ≥ 36', tier: certified, pr: null,
+         method: 'the computer proof from the same two starting rings'}
       - {date: "2026-10-10", decimal: "0.070450002", lengths: 'even L ≥ 36', tier: certified, pr: null,
          method: 'the same computation with simpler parameters'}
       - {date: "2026-10-10", decimal: "0.016978269", lengths: 'even L ≥ 36', tier: certified, pr: null,
@@ -202,20 +217,23 @@ records:
     family: spin1-heisenberg
     parameter: 'periodic ring'
     lengths: {L0: 2304}
-    bound: {r: "20", beta: "784", decimal: "0.00382", display: '\log(20)/784'}
+    bound: {r: "41196029/1000000", beta: "784", decimal: "0.004742", display: '\log(41.196029)/784'}
     seed: {n0: 2304, beta0: "784"}
     numerical_gap: "0.41048"
     tier: lean-conditional
-    lean: {name: Leaderboard.Records.SpinOneHeisenberg.heisenberg, r: "20", beta: "784", decimal: "0.00382"}
+    lean: {name: Leaderboard.Records.SpinOneHeisenberg.heisenberg, r: "41196029/1000000", beta: "784", decimal: "0.004742"}
     certificate: models/spin1/results/scalars.json
-    date: "2026-09-24"
+    date: "2026-10-17"
     pr: null
-    contributors: ['OpenAI (preprint)', 'CertifiedGaps contributors']
+    contributors: ['LionSR']
     notes: >-
-      The two inequalities are $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge
-      0.99$. The OpenAI preprint proves them by computer, and this repository reproduces that
-      computation in exact integer arithmetic.
+      The two inequalities are $P_{\mathrm{s}}(2304, 784) \ge 1 - 0.0084513$ and
+      $P_\tau(4608, 784) \ge 1 - 0.0054986$. The OpenAI preprint proves them by computer, and
+      this repository reproduces that computation in exact integer arithmetic. The preprint
+      rounds both to $\ge 0.99$, which gives the smaller $\log(20)/784$.
     history:
+      - {date: "2026-09-24", decimal: "0.00382", display: '\log(20)/784', lengths: 'even L ≥ 2304', tier: lean-conditional, pr: null,
+         method: 'the first computation of the OpenAI preprint, with both inequalities rounded to 0.99'}
       - {date: "2026-09-24", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: 'even L ≥ 60', tier: certified, pr: null,
          method: 'the second computation of the OpenAI preprint, starting from 60 sites at 105/4'}
   # ---------------------------------------------------------------- heisenberg-staggered-field
@@ -228,7 +246,7 @@ records:
     seed: {n0: 8, beta0: "21/4"}
     numerical_gap: "1.87351193"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1, r: "2067/5", beta: "21/4", decimal: "1.1475"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1, r: "41501591/100000", beta: "21/4", decimal: "1.148250"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_1.json
     date: "2026-10-12"
     pr: 2
@@ -244,7 +262,7 @@ records:
     seed: {n0: 8, beta0: "21/4"}
     numerical_gap: "1.57089206"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_3_4, r: "1069/10", beta: "21/4", decimal: "0.8898"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_3_4, r: "10739897/100000", beta: "21/4", decimal: "0.890771"}
     certificate: models/heisenberg_staggered_field/results/certificate_3_4.json
     date: "2026-10-12"
     pr: 2
@@ -258,7 +276,7 @@ records:
     seed: {n0: 8, beta0: "11/2"}
     numerical_gap: "1.23131976"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_2, r: "2623/100", beta: "11/2", decimal: "0.5939"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_2, r: "26344587/1000000", beta: "11/2", decimal: "0.594775"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_2.json
     date: "2026-10-12"
     pr: 2
@@ -272,7 +290,7 @@ records:
     seed: {n0: 8, beta0: "23/4"}
     numerical_gap: "0.994380622"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_7_20, r: "1807/200", beta: "23/4", decimal: "0.3828"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_7_20, r: "90713109/10000000", beta: "23/4", decimal: "0.383498"}
     certificate: models/heisenberg_staggered_field/results/certificate_7_20.json
     date: "2026-10-12"
     pr: 2
@@ -286,7 +304,7 @@ records:
     seed: {n0: 8, beta0: "25/4"}
     numerical_gap: "0.812031433"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_4, r: "1903/500", beta: "25/4", decimal: "0.2138"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_4, r: "19104427/5000000", beta: "25/4", decimal: "0.214477"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_4.json
     date: "2026-10-12"
     pr: 2
@@ -301,14 +319,13 @@ records:
     seed: {n0: 4, beta0: "6"}
     numerical_gap: "1.188631"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "2433/100", beta: "6", decimal: "0.5319"}
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "12370753/500000", beta: "6", decimal: "0.534747"}
     certificate: models/dimerized_heisenberg/results/certificate_delta_1_2_beta_6.json
     date: "2026-10-15"
     pr: 23
     contributors: ['LionSR']
     notes: >-
-      The Lean theorem uses the slightly weaker inequalities of an earlier computation. The
-      starting temperature 25/4 of an earlier survey also works and gives 0.533681.
+      The starting temperature 25/4 of an earlier survey also works and gives 0.533681.
     history:
       - {date: "2026-10-12", decimal: "0.532658", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
          method: 'an earlier, less precise computation at the same starting scale'}
@@ -321,7 +338,7 @@ records:
     seed: {n0: 4, beta0: "13/2"}
     numerical_gap: "0.810214"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "613/200", beta: "13/2", decimal: "0.1723"}
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "6164911/2000000", beta: "13/2", decimal: "0.173188"}
     certificate: models/dimerized_heisenberg/results/certificate_delta_3_10_beta_13_2.json
     date: "2026-10-15"
     pr: 23
@@ -338,7 +355,7 @@ records:
     seed: {n0: 4, beta0: "29/4"}
     numerical_gap: "0.707193"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "757/500", beta: "29/4", decimal: "0.0572"}
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "15251257/10000000", beta: "29/4", decimal: "0.058217"}
     certificate: models/dimerized_heisenberg/results/certificate_delta_1_4_beta_29_4.json
     date: "2026-10-15"
     pr: 23
@@ -359,7 +376,7 @@ records:
     seed: {n0: 2, beta0: "7/2"}
     numerical_gap: "1.7627"
     tier: certified
-    lean: {name: Leaderboard.Records.SpinOneDimerized.delta_9_10, r: "6339/1000", beta: "7/2", decimal: "0.5276"}
+    lean: {name: Leaderboard.Records.SpinOneDimerized.delta_9_10, r: "12729193/2000000", beta: "7/2", decimal: "0.528785953268"}
     certificate: models/spin1_dimerized/results/certificate_d9.json
     date: "2026-10-12"
     pr: 3
@@ -391,8 +408,7 @@ records:
     seed: {n0: 12, beta0: "29/10", text: 'a ring of 12 sites; separate verified spectra cover the rings of 6, 8 and 10 sites'}
     numerical_gap: "2.26946"
     tier: certified
-    lean: {name: Leaderboard.Records.SpinOneLargeD.D_4, r: "951/200", beta: "9/4", decimal: "0.6929",
-           certificate: models/spin1_largeD/results/certificate_D4_1.json}
+    lean: {name: Leaderboard.Records.SpinOneLargeD.D_4, r: "47731477/10000000", beta: "9/4", decimal: "0.694669325", certificate: models/spin1_largeD/results/certificate_D4_1.json}
     certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-15"
     pr: 12
@@ -414,7 +430,7 @@ records:
     seed: {n0: 6, beta0: "381/125"}
     numerical_gap: "1.54533"
     tier: certified
-    lean: {name: Leaderboard.Records.SpinOneLargeD.D_1603_500, r: "10065429/10000000", beta: "381/125", decimal: "0.002139"}
+    lean: {name: Leaderboard.Records.SpinOneLargeD.D_1603_500, r: "5033559/5000000", beta: "381/125", decimal: "0.002194677"}
     certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-12"
     pr: 7
@@ -428,6 +444,7 @@ records:
     seed: {n0: 6, beta0: "381/125", text: 'the proof at $D = 3.206$ extends to the interval by a perturbation bound; the numerical gap is the one at $D = 3.206$'}
     numerical_gap: "1.54533"
     tier: certified
+    lean: {name: Leaderboard.Records.SpinOneLargeD.D_interval_3206, r: "5014989/5000000", beta: "381/125", decimal: "0.000982058"}
     certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-15"
     pr: 12
@@ -441,6 +458,7 @@ records:
     seed: {n0: 6, beta0: "23/10", text: 'the proof at $D = 4$ extends to the interval by a perturbation bound; the numerical gap is the one at $D = 4$'}
     numerical_gap: "2.26946"
     tier: certified
+    lean: {name: Leaderboard.Records.SpinOneLargeD.D_interval_4, r: "5016317/5000000", beta: "23/10", decimal: "0.001416559"}
     certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-15"
     pr: 12
@@ -455,7 +473,7 @@ records:
     seed: {n0: 4, beta0: "2"}
     numerical_gap: "3.1375"
     tier: certified
-    lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_4, r: "9033/1000", beta: "2", decimal: "1.1004"}
+    lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_4, r: "11334983/1250000", beta: "2", decimal: "1.102375116"}
     certificate: models/heisenberg_ladder/results/certificate_J4.json
     date: "2026-10-12"
     pr: 6
@@ -472,6 +490,7 @@ records:
     seed: {n0: 4, beta0: "9/4"}
     numerical_gap: "2.6584"
     tier: certified
+    lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_7_2, r: "5765561/1000000", beta: "9/4", decimal: "0.778623315"}
     certificate: models/heisenberg_ladder/results/certificate_J7_2.json
     date: "2026-10-15"
     pr: 13
@@ -488,6 +507,7 @@ records:
     seed: {n0: 4, beta0: "5/2"}
     numerical_gap: "2.1864"
     tier: certified
+    lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_3, r: "31124723/10000000", beta: "5/2", decimal: "0.454166944"}
     certificate: models/heisenberg_ladder/results/certificate_J3.json
     date: "2026-10-15"
     pr: 13
@@ -504,6 +524,7 @@ records:
     seed: {n0: 4, beta0: "3"}
     numerical_gap: "1.7252"
     tier: certified
+    lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_5_2, r: "11356953/10000000", beta: "3", decimal: "0.042415020"}
     certificate: models/heisenberg_ladder/results/certificate_J5_2.json
     date: "2026-10-15"
     pr: 13
@@ -516,6 +537,7 @@ records:
     bound: {value: "306233/200000000", decimal: "0.001531165"}
     seed: {n0: 4, beta0: "3"}
     tier: certified
+    lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_163069_65536, r: "1004547/1000000", beta: "3", decimal: "0.001512231"}
     certificate: models/heisenberg_ladder/results/certificate_J163069_65536.json
     date: "2026-10-15"
     pr: 13
@@ -533,7 +555,7 @@ records:
     seed: {n0: 4, beta0: "3/2"}
     numerical_gap: "2.6618"
     tier: certified
-    lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "517/200", beta: "3/2", decimal: "0.6331"}
+    lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "25974347/10000000", beta: "3/2", decimal: "0.636349536"}
     certificate: models/two_leg_tfim/results/certificate_g3_1.json
     date: "2026-10-12"
     pr: 1
@@ -544,19 +566,21 @@ records:
     parameter: '$g = 1/4,\ h = 1/20$'
     params: {g: "1/4", h: "1/20"}
     lengths: {L0: 6}
-    bound: {r: "13480", beta: "97/4", decimal: "0.3921", display: '\log(13480)/(97/4)'}
+    bound: {r: "2706387/200", beta: "97/4", decimal: "0.392280", display: '\log(13531.935)/(97/4)'}
     seed: {n0: 6, beta0: "97/4"}
     numerical_gap: "1.1904"
     tier: lean-unconditional
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_20, r: "13480", beta: "97/4", decimal: "0.3921"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_20, r: "2706387/200", beta: "97/4", decimal: "0.392280"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_20.json.gz
-    date: "2026-10-15"
-    pr: 34
+    date: "2026-10-17"
+    pr: null
     contributors: ['LionSR']
     notes: >-
       Lean also checks the finite computation, so the theorem has no assumptions. The computer
-      proof alone gives the slightly larger 0.3922.
+      proof alone gives the slightly larger 0.392289.
     history:
+      - {date: "2026-10-15", decimal: "0.3921", lengths: 'even L ≥ 6', tier: lean-unconditional, pr: 34,
+         method: 'the same Lean theorem with a shorter chain'}
       - {date: "2026-10-12", decimal: "0.3922", lengths: 'even L ≥ 6', tier: certified, pr: 5,
          method: 'computer proof from verified spectra of the 6- and 12-site rings'}
       - {date: "2026-10-12", decimal: "0.3921", lengths: 'even L ≥ 6', tier: lean-conditional, pr: 9,
@@ -566,11 +590,11 @@ records:
     parameter: '$g = 1/4,\ h = 1/10$'
     params: {g: "1/4", h: "1/10"}
     lengths: {L0: 6}
-    bound: {value: "3302233499695993/4503599627370496", decimal: "0.7332"}
+    bound: {value: "3302233499695993/4503599627370496", decimal: "0.733243"}
     seed: {n0: 6, beta0: "55/4"}
     numerical_gap: "2.3807"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_10, r: "23810", beta: "55/4", decimal: "0.7329"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_10, r: "11954821/500", beta: "55/4", decimal: "0.733239"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_10.json.gz
     date: "2026-10-12"
     pr: 5
@@ -580,11 +604,11 @@ records:
     parameter: '$g = 1/4,\ h = 1/4$'
     params: {g: "1/4", h: "1/4"}
     lengths: {L0: 6}
-    bound: {value: "7478691344159091/4503599627370496", decimal: "1.6606"}
+    bound: {value: "7478691344159091/4503599627370496", decimal: "1.660603"}
     seed: {n0: 6, beta0: "13/2"}
     numerical_gap: "4.1902"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_4, r: "48540", beta: "13/2", decimal: "1.6600"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_4, r: "6090116/125", beta: "13/2", decimal: "1.660594"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_4.json.gz
     date: "2026-10-12"
     pr: 5
@@ -594,11 +618,11 @@ records:
     parameter: '$g = 1/4,\ h = 1/2$'
     params: {g: "1/4", h: "1/2"}
     lengths: {L0: 6}
-    bound: {value: "4448837818148203/2251799813685248", decimal: "1.9756"}
+    bound: {value: "4448837818148203/2251799813685248", decimal: "1.975680"}
     seed: {n0: 6, beta0: "11/2"}
     numerical_gap: "4.8428"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_2, r: "52170", beta: "11/2", decimal: "1.9749"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_2, r: "26187609/500", beta: "11/2", decimal: "1.975670"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_2.json.gz
     date: "2026-10-12"
     pr: 5
@@ -608,11 +632,11 @@ records:
     parameter: '$g = 1/4,\ h = 1$'
     params: {g: "1/4", h: "1"}
     lengths: {L0: 6}
-    bound: {value: "4579304145823509/2251799813685248", decimal: "2.0336"}
+    bound: {value: "4579304145823509/2251799813685248", decimal: "2.033619"}
     seed: {n0: 6, beta0: "21/4"}
     numerical_gap: "5.9397"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1, r: "43160", beta: "21/4", decimal: "2.0328"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1, r: "43323337/1000", beta: "21/4", decimal: "2.033608"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_1.json.gz
     date: "2026-10-12"
     pr: 5
@@ -622,11 +646,11 @@ records:
     parameter: '$g = 1/2,\ h = 1/20$'
     params: {g: "1/2", h: "1/20"}
     lengths: {L0: 6}
-    bound: {value: "8221106264140229/18014398509481984", decimal: "0.4563"}
+    bound: {value: "8221106264140229/18014398509481984", decimal: "0.456363"}
     seed: {n0: 6, beta0: "13"}
     numerical_gap: "1.1575"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_20, r: "1878/5", beta: "13", decimal: "0.4560"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_20, r: "3771579/10000", beta: "13", decimal: "0.456358"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_20.json.gz
     date: "2026-10-12"
     pr: 5
@@ -636,11 +660,11 @@ records:
     parameter: '$g = 1/2,\ h = 1/10$'
     params: {g: "1/2", h: "1/10"}
     lengths: {L0: 6}
-    bound: {value: "8639350894680277/9007199254740992", decimal: "0.9591"}
+    bound: {value: "8639350894680277/9007199254740992", decimal: "0.959160"}
     seed: {n0: 6, beta0: "8"}
     numerical_gap: "2.3145"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_10, r: "2141", beta: "8", decimal: "0.9586"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_10, r: "21500127/10000", beta: "8", decimal: "0.959153"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_10.json.gz
     date: "2026-10-12"
     pr: 5
@@ -650,11 +674,11 @@ records:
     parameter: '$g = 1/2,\ h = 1/4$'
     params: {g: "1/2", h: "1/4"}
     lengths: {L0: 6}
-    bound: {value: "5317854477896093/2251799813685248", decimal: "2.3616"}
+    bound: {value: "5317854477896093/2251799813685248", decimal: "2.361601"}
     seed: {n0: 6, beta0: "9/2"}
     numerical_gap: "3.6417"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_4, r: "41080", beta: "9/2", decimal: "2.3607"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_4, r: "5154939/125", beta: "9/2", decimal: "2.361589"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_4.json.gz
     date: "2026-10-12"
     pr: 5
@@ -664,11 +688,11 @@ records:
     parameter: '$g = 1/2,\ h = 1/2$'
     params: {g: "1/2", h: "1/2"}
     lengths: {L0: 6}
-    bound: {value: "6249587996536423/2251799813685248", decimal: "2.7753"}
+    bound: {value: "6249587996536423/2251799813685248", decimal: "2.775374"}
     seed: {n0: 6, beta0: "4"}
     numerical_gap: "4.4918"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_2, r: "66010", beta: "4", decimal: "2.7743"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_2, r: "16566669/250", beta: "4", decimal: "2.775360"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_2.json.gz
     date: "2026-10-12"
     pr: 5
@@ -678,11 +702,11 @@ records:
     parameter: '$g = 1/2,\ h = 1$'
     params: {g: "1/2", h: "1"}
     lengths: {L0: 6}
-    bound: {value: "3071038202321127/1125899906842624", decimal: "2.7276"}
+    bound: {value: "3071038202321127/1125899906842624", decimal: "2.727629"}
     seed: {n0: 6, beta0: "4"}
     numerical_gap: "5.7804"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1, r: "54530", beta: "4", decimal: "2.7266"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1, r: "13686553/250", beta: "4", decimal: "2.727615"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_1.json.gz
     date: "2026-10-12"
     pr: 5
@@ -692,11 +716,11 @@ records:
     parameter: '$g = 3/4,\ h = 1/20$'
     params: {g: "3/4", h: "1/20"}
     lengths: {L0: 6}
-    bound: {value: "2855541750003467/9007199254740992", decimal: "0.3170"}
+    bound: {value: "2855541750003467/9007199254740992", decimal: "0.317028"}
     seed: {n0: 6, beta0: "8"}
     numerical_gap: "1.0807"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_20, r: "629/50", beta: "8", decimal: "0.3165"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_20, r: "6315629/500000", beta: "8", decimal: "0.317021"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_20.json.gz
     date: "2026-10-12"
     pr: 5
@@ -706,11 +730,11 @@ records:
     parameter: '$g = 3/4,\ h = 1/10$'
     params: {g: "3/4", h: "1/10"}
     lengths: {L0: 6}
-    bound: {value: "6946503521803545/9007199254740992", decimal: "0.7712"}
+    bound: {value: "6946503521803545/9007199254740992", decimal: "0.771216"}
     seed: {n0: 6, beta0: "21/4"}
     numerical_gap: "2.1209"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_10, r: "5711/100", beta: "21/4", decimal: "0.7704"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_10, r: "28665237/500000", beta: "21/4", decimal: "0.771206"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_10.json.gz
     date: "2026-10-12"
     pr: 5
@@ -720,11 +744,11 @@ records:
     parameter: '$g = 3/4,\ h = 1/4$'
     params: {g: "3/4", h: "1/4"}
     lengths: {L0: 6}
-    bound: {value: "4732863760365999/2251799813685248", decimal: "2.1018"}
+    bound: {value: "4732863760365999/2251799813685248", decimal: "2.101813"}
     seed: {n0: 6, beta0: "7/2"}
     numerical_gap: "3.0756"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_4, r: "1559", beta: "7/2", decimal: "2.1005"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_4, r: "1566019/1000", beta: "7/2", decimal: "2.101797"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_4.json.gz
     date: "2026-10-12"
     pr: 5
@@ -734,11 +758,11 @@ records:
     parameter: '$g = 3/4,\ h = 1/2$'
     params: {g: "3/4", h: "1/2"}
     lengths: {L0: 6}
-    bound: {value: "6781813507788343/2251799813685248", decimal: "3.0117"}
+    bound: {value: "6781813507788343/2251799813685248", decimal: "3.011730"}
     seed: {n0: 6, beta0: "7/2"}
     numerical_gap: "4.0891"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_2, r: "37670", beta: "7/2", decimal: "3.0104"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_2, r: "9458843/250", beta: "7/2", decimal: "3.011714"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_2.json.gz
     date: "2026-10-12"
     pr: 5
@@ -748,11 +772,11 @@ records:
     parameter: '$g = 3/4,\ h = 1$'
     params: {g: "3/4", h: "1"}
     lengths: {L0: 6}
-    bound: {value: "7064853518310969/2251799813685248", decimal: "3.1374"}
+    bound: {value: "7064853518310969/2251799813685248", decimal: "3.137425"}
     seed: {n0: 6, beta0: "7/2"}
     numerical_gap: "5.5673"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1, r: "58500", beta: "7/2", decimal: "3.1362"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1, r: "29371647/500", beta: "7/2", decimal: "3.137409"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_1.json.gz
     date: "2026-10-12"
     pr: 5
@@ -762,11 +786,11 @@ records:
     parameter: '$g = 1,\ h = 1/20$'
     params: {g: "1", h: "1/20"}
     lengths: {L0: 6}
-    bound: {value: "2749898627347949/36028797018963968", decimal: "0.0763"}
+    bound: {value: "2749898627347949/36028797018963968", decimal: "0.076325"}
     seed: {n0: 6, beta0: "13/2"}
     numerical_gap: "0.8676"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_20, r: "1633/1000", beta: "13/2", decimal: "0.0754"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_20, r: "656893/400000", beta: "13/2", decimal: "0.076316"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_20.json.gz
     date: "2026-10-12"
     pr: 5
@@ -776,11 +800,11 @@ records:
     parameter: '$g = 1,\ h = 1/10$'
     params: {g: "1", h: "1/10"}
     lengths: {L0: 6}
-    bound: {value: "2271030470095253/4503599627370496", decimal: "0.5042"}
+    bound: {value: "2271030470095253/4503599627370496", decimal: "0.504270"}
     seed: {n0: 6, beta0: "17/4"}
     numerical_gap: "1.5324"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_10, r: "4247/500", beta: "17/4", decimal: "0.5033"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_10, r: "85257569/10000000", beta: "17/4", decimal: "0.504256"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_10.json.gz
     date: "2026-10-12"
     pr: 5
@@ -790,11 +814,11 @@ records:
     parameter: '$g = 1,\ h = 1/4$'
     params: {g: "1", h: "1/4"}
     lengths: {L0: 6}
-    bound: {value: "7247298563012943/4503599627370496", decimal: "1.6092"}
+    bound: {value: "7247298563012943/4503599627370496", decimal: "1.609223"}
     seed: {n0: 6, beta0: "3"}
     numerical_gap: "2.573"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_4, r: "622/5", beta: "3", decimal: "1.6078"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_4, r: "390352/3125", beta: "3", decimal: "1.609204"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_4.json.gz
     date: "2026-10-12"
     pr: 5
@@ -804,11 +828,11 @@ records:
     parameter: '$g = 1,\ h = 1/2$'
     params: {g: "1", h: "1/2"}
     lengths: {L0: 6}
-    bound: {value: "6197625565257127/2251799813685248", decimal: "2.7522"}
+    bound: {value: "6197625565257127/2251799813685248", decimal: "2.752298"}
     seed: {n0: 6, beta0: "3"}
     numerical_gap: "3.7089"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_2, r: "3839", beta: "3", decimal: "2.7509"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_2, r: "38538963/10000", beta: "3", decimal: "2.752279"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_2.json.gz
     date: "2026-10-12"
     pr: 5
@@ -818,11 +842,11 @@ records:
     parameter: '$g = 1,\ h = 1$'
     params: {g: "1", h: "1"}
     lengths: {L0: 6}
-    bound: {value: "8197240385155753/2251799813685248", decimal: "3.6403"}
+    bound: {value: "8197240385155753/2251799813685248", decimal: "3.640306"}
     seed: {n0: 6, beta0: "3"}
     numerical_gap: "5.3425"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1, r: "55100", beta: "3", decimal: "3.6389"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1, r: "27659233/500", beta: "3", decimal: "3.640287"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_1.json.gz
     date: "2026-10-12"
     pr: 5
@@ -832,11 +856,11 @@ records:
     parameter: '$g = 3/2,\ h = 1/20$'
     params: {g: "3/2", h: "1/20"}
     lengths: {L0: 6}
-    bound: {value: "6094718352940729/36028797018963968", decimal: "0.1691"}
+    bound: {value: "6094718352940729/36028797018963968", decimal: "0.169162"}
     seed: {n0: 6, beta0: "7/2"}
     numerical_gap: "1.0853"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_20, r: "899/500", beta: "7/2", decimal: "0.1676"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_20, r: "723049/400000", beta: "7/2", decimal: "0.169146"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_20.json.gz
     date: "2026-10-12"
     pr: 5
@@ -846,11 +870,11 @@ records:
     parameter: '$g = 3/2,\ h = 1/10$'
     params: {g: "3/2", h: "1/10"}
     lengths: {L0: 6}
-    bound: {value: "3243440810004471/9007199254740992", decimal: "0.3600"}
+    bound: {value: "3243440810004471/9007199254740992", decimal: "0.360094"}
     seed: {n0: 6, beta0: "13/4"}
     numerical_gap: "1.2881"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_10, r: "321/100", beta: "13/4", decimal: "0.3588"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_10, r: "6445599/2000000", beta: "13/4", decimal: "0.360077"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_10.json.gz
     date: "2026-10-12"
     pr: 5
@@ -860,11 +884,11 @@ records:
     parameter: '$g = 3/2,\ h = 1/4$'
     params: {g: "3/2", h: "1/4"}
     lengths: {L0: 6}
-    bound: {value: "4754104748432683/4503599627370496", decimal: "1.0556"}
+    bound: {value: "4754104748432683/4503599627370496", decimal: "1.055623"}
     seed: {n0: 6, beta0: "11/4"}
     numerical_gap: "2.0626"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_4, r: "363/20", beta: "11/4", decimal: "1.0540"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_4, r: "729083/40000", beta: "11/4", decimal: "1.055602"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_4.json.gz
     date: "2026-10-12"
     pr: 5
@@ -874,11 +898,11 @@ records:
     parameter: '$g = 3/2,\ h = 1/2$'
     params: {g: "3/2", h: "1/2"}
     lengths: {L0: 6}
-    bound: {value: "1198674532026897/562949953421312", decimal: "2.1292"}
+    bound: {value: "1198674532026897/562949953421312", decimal: "2.129273"}
     seed: {n0: 6, beta0: "5/2"}
     numerical_gap: "3.204"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_2, r: "1021/5", beta: "5/2", decimal: "2.1276"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_2, r: "820097/4000", beta: "5/2", decimal: "2.129251"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_2.json.gz
     date: "2026-10-12"
     pr: 5
@@ -888,11 +912,11 @@ records:
     parameter: '$g = 3/2,\ h = 1$'
     params: {g: "3/2", h: "1"}
     lengths: {L0: 6}
-    bound: {value: "1042857023309191/281474976710656", decimal: "3.7049"}
+    bound: {value: "1042857023309191/281474976710656", decimal: "3.704972"}
     seed: {n0: 6, beta0: "5/2"}
     numerical_gap: "4.9782"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1, r: "10490", beta: "5/2", decimal: "3.7032"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1, r: "10534123/1000", beta: "5/2", decimal: "3.704950"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_1.json.gz
     date: "2026-10-12"
     pr: 5
@@ -902,11 +926,11 @@ records:
     parameter: '$g = 2,\ h = 1/20$'
     params: {g: "2", h: "1/20"}
     lengths: {L0: 6}
-    bound: {value: "2053827705081559/2251799813685248", decimal: "0.9120"}
+    bound: {value: "2053827705081559/2251799813685248", decimal: "0.912082"}
     seed: {n0: 6, beta0: "9/4"}
     numerical_gap: "2.0196"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_20, r: "1551/200", beta: "9/4", decimal: "0.9103"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_20, r: "4865291/625000", beta: "9/4", decimal: "0.912057"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_20.json.gz
     date: "2026-10-12"
     pr: 5
@@ -916,11 +940,11 @@ records:
     parameter: '$g = 2,\ h = 1/10$'
     params: {g: "2", h: "1/10"}
     lengths: {L0: 6}
-    bound: {value: "8685218056921241/9007199254740992", decimal: "0.9642"}
+    bound: {value: "8685218056921241/9007199254740992", decimal: "0.964252"}
     seed: {n0: 6, beta0: "9/4"}
     numerical_gap: "2.0763"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_10, r: "218/25", beta: "9/4", decimal: "0.9624"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_10, r: "17508041/2000000", beta: "9/4", decimal: "0.964228"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_10.json.gz
     date: "2026-10-12"
     pr: 5
@@ -930,11 +954,11 @@ records:
     parameter: '$g = 2,\ h = 1/4$'
     params: {g: "2", h: "1/4"}
     lengths: {L0: 6}
-    bound: {value: "2866053400128415/2251799813685248", decimal: "1.2727"}
+    bound: {value: "2866053400128415/2251799813685248", decimal: "1.272783"}
     seed: {n0: 6, beta0: "9/4"}
     numerical_gap: "2.415"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_4, r: "349/20", beta: "9/4", decimal: "1.2708"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_4, r: "17526371/1000000", beta: "9/4", decimal: "1.272758"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_4.json.gz
     date: "2026-10-12"
     pr: 5
@@ -944,11 +968,11 @@ records:
     parameter: '$g = 2,\ h = 1/2$'
     params: {g: "2", h: "1/2"}
     lengths: {L0: 6}
-    bound: {value: "140773048703973/70368744177664", decimal: "2.0005"}
+    bound: {value: "140773048703973/70368744177664", decimal: "2.000505"}
     seed: {n0: 6, beta0: "9/4"}
     numerical_gap: "3.222"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_2, r: "2244/25", beta: "9/4", decimal: "1.9987"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_2, r: "45057249/500000", beta: "9/4", decimal: "2.000480"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_2.json.gz
     date: "2026-10-12"
     pr: 5
@@ -958,11 +982,11 @@ records:
     parameter: '$g = 2,\ h = 1$'
     params: {g: "2", h: "1"}
     lengths: {L0: 6}
-    bound: {value: "7861415094695713/2251799813685248", decimal: "3.4911"}
+    bound: {value: "7861415094695713/2251799813685248", decimal: "3.491169"}
     seed: {n0: 6, beta0: "2"}
     numerical_gap: "4.8539"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1, r: "1073", beta: "2", decimal: "3.4891"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1, r: "2154751/2000", beta: "2", decimal: "3.491141"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_1.json.gz
     date: "2026-10-12"
     pr: 5

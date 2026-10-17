@@ -74,7 +74,7 @@
         h('ol', {}, newest.map(r => h('li', {}, rowLink(r), ' ', h('span', {class: 'muted'}, r.date, ' ', prLink(r.pr)))))),
       h('section', {class: 'panel'}, h('h3', {}, 'Proved in Lean'),
         h('p', {}, badge('lean-unconditional', true), ' ', count('lean-unconditional'), ' with no assumptions'),
-        h('p', {}, badge('lean-conditional', true), ' ', count('lean-conditional'), ' from two computer-checked inequalities'),
+        h('p', {}, badge('lean-conditional', true), ' ', count('lean-conditional'), ' from computer-checked inequalities'),
         top ? h('p', {class: 'muted'}, 'Most: ', family[top[0]].name, ' (', top[1], ')') : null));
     typeset(box);
   }
@@ -211,8 +211,8 @@
 
   // ---------------------------------------------------------------- challenges
   // Cards for the next records: the hand-written list, the open targets, and challenges derived
-  // from the rows (the weakest bound of each family, points without a Lean theorem, and Lean
-  // theorems that still assume their two inequalities).
+  // from the rows (in each family, the point whose bound is the smallest share of its numerical
+  // gap; points without a Lean theorem; Lean theorems that still assume their starting inequalities).
   function challenges() {
     const groups = [];
     const group = (title, cards) => { if (cards.length) groups.push({title, cards}); };
@@ -226,20 +226,20 @@
       return card(r.id, 'Prove a gap: ' + r.fam.name + ', ' + plain(r.parameter), (e.text ? e.text + '. ' : '') +
         (e.float_bound ? 'A floating-point survey suggests a provable gap near ' + e.float_bound + from + '.' : 'No estimate yet.'));
     }));
-    group('Raise the weakest bound', perFamily(r => r.share != null, (f, rows) => {
+    group('Get closer to the true gap', perFamily(r => r.share != null, (f, rows) => {
       if (rows.length < 2) return null;
       const w = rows.reduce((a, b) => (b.share < a.share ? b : a));
-      return card(w.id + '-raise', 'Raise the weakest bound: ' + f.name + ', ' + plain(w.parameter),
-        `The proof gives ${w.bound.decimal}, ${pct(w.share)} of the numerical gap ${w.numerical_gap}. ` +
+      return card(w.id + '-raise', 'Get closer to the true gap: ' + f.name + ', ' + plain(w.parameter),
+        `The proof gives ${w.bound.decimal}, ${pct(w.share)} of the numerical gap ${w.numerical_gap}, the smallest share in this family. ` +
         'A larger starting ring or a sharper computation would raise it.');
     }));
     group('Prove it in Lean', perFamily(r => !r.lean, (f, rows) => card(f.key + '-lean', 'Prove it in Lean: ' + f.name,
       `No Lean theorem yet for ${some(rows.length, 'the point', 'the ' + rows.length + ' points')} ` +
-      rows.map(r => plain(r.parameter)).join('; ') + '. A Lean statement from the two starting-scale inequalities would ' +
+      rows.map(r => plain(r.parameter)).join('; ') + '. A Lean statement from the starting-scale inequalities would ' +
       some(rows.length, 'make it a Lean result.', 'make them Lean results.'))));
     group('Remove the assumptions', perFamily(r => r.leanEff === 'lean-conditional', (f, rows) =>
       card(f.key + '-unconditional', 'Remove the assumptions: ' + f.name,
-        `${rows.length} ${some(rows.length, 'Lean theorem here assumes', 'Lean theorems here assume')} two inequalities ` +
+        `${rows.length} ${some(rows.length, 'Lean theorem here assumes', 'Lean theorems here assume')} the inequalities at the starting scale ` +
         'that a computer certificate proves. Checking them inside Lean, as done for the Ising point g = 1/4, h = 1/20, ' +
         'would remove the assumptions.')));
     const box = document.getElementById('challenge-cards');

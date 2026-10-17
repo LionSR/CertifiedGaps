@@ -173,8 +173,10 @@ end
 
 A conditional Lean record assumes `P_s(n0, β) ≥ 1 - s` and `P_τ(2n0, β) ≥ 1 - t`. The certificate
 must prove them: the same `n0` and `β`, and defects `εₛ ≤ s` and `ε_τ ≤ t`. The certificate is
-the row's, or `lean.certificate` when the Lean theorem uses another seed. Skipped while the Lean
-record does not state `n0`, `s` and `t`.
+the row's, or `lean.certificate` when the Lean theorem uses another seed. A certificate entry
+without defects falls back to the one-step entry of the seed (`window_defects`). A two-seed
+record (`seed2`) must find its second seed among the one-step entries of the same certificate.
+Skipped while the Lean record does not state `n0`, `s` and `t`.
 """
 function check_lean_seeds!(report, where, rec, lean, leanjson, rowcert, root)
     all(k -> haskey(leanjson, k), (:n0, :s, :t)) || return report
@@ -187,11 +189,53 @@ function check_lean_seeds!(report, where, rec, lean, leanjson, rowcert, root)
     c === nothing && return err!(report, "$where: no certificate entry for the Lean seed")
     (cert_exact(c.n0) == parse_exact(leanjson[:n0]) && cert_exact(c.beta) == parse_exact(lean["beta"])) ||
         return err!(report, "$where: the Lean seed ($(leanjson[:n0]), $(lean["beta"])) is not the certificate's; give lean.certificate")
-    for (k, eps) in ((:s, c.s), (:t, c.t))
-        eps === nothing && (err!(report, "$where: the certificate states no defect $k"); continue)
-        cert_exact(eps) <= parse_exact(string(leanjson[k])) ||
-            err!(report, "$where: Lean assumes $k = $(leanjson[k]), below the certified defect")
+    path = joinpath(root, get(lean, "certificate", rec["certificate"]))
+    params = something(getk(rec, "params"), Dict())
+    s, t = c.s, c.t
+    if s === nothing || t === nothing
+        w = window_defects(path, cert_exact(c.n0), cert_exact(c.beta), params)
+        w === nothing || ((s, t) = w)
     end
+    compare_defects!(report, where, (s, t), (leanjson[:s], leanjson[:t]))
+    seed2 = get(leanjson, :seed2, nothing)
+    if seed2 !== nothing
+        w = window_defects(path, parse_exact(string(seed2[:n0])), parse_exact(string(seed2[:beta])), params)
+        w === nothing && return err!(report, "$where: the certificate states no one-step entry for the second Lean seed ($(seed2[:n0]), $(seed2[:beta]))")
+        compare_defects!(report, "$where: second seed", w, (seed2[:s], seed2[:t]))
+    end
+    return report
+end
+
+"Each certified defect must be at most the defect the Lean record assumes."
+function compare_defects!(report, where, certified, assumed)
+    for (k, eps, lean) in zip((:s, :t), certified, assumed)
+        eps === nothing && (err!(report, "$where: the certificate states no defect $k"); continue)
+        cert_exact(eps) <= parse_exact(string(lean)) ||
+            err!(report, "$where: Lean assumes $k = $lean, below the certified defect")
+    end
+    return report
+end
+
+"""
+    check_lean_interval!(report, where, rec, leanjson)
+
+A row on a parameter interval (params `<p>_min`, `<p>_max`) needs a Lean record on the same
+interval (`Record.SeededOn`, whose `interval` is `[a, b]`), and a Lean record on an interval
+needs such a row.
+"""
+function check_lean_interval!(report, where, rec, leanjson)
+    params = something(getk(rec, "params"), Dict())
+    lo = [k for k in keys(params) if endswith(k, "_min")]
+    interval = get(leanjson, :interval, nothing)
+    if isempty(lo)
+        interval === nothing || err!(report, "$where: the Lean record is on an interval but the row is a point")
+        return report
+    end
+    length(lo) == 1 || return err!(report, "$where: more than one parameter interval")
+    hi = replace(lo[1], r"_min$" => "_max")
+    interval === nothing && return err!(report, "$where: the row is an interval but the Lean record is a point")
+    [parse_exact(params[lo[1]]), parse_exact(get(params, hi, "0"))] == parse_exact.(string.(interval)) ||
+        err!(report, "$where: the Lean interval $(collect(interval)) is not [$(lo[1]), $hi] of the row")
     return report
 end
 
@@ -321,6 +365,7 @@ function check_record!(report, rec, ctx)
             haskey(LEAN_KIND, tier) && kind isa AbstractString && kind != LEAN_KIND[tier] &&
                 err!(report, "$where: tier $tier but the Lean record is $kind")
             kind == "conditional" && check_lean_seeds!(report, where, rec, lean, json[name], rowcert, root)
+            haskey(json, name) && check_lean_interval!(report, where, rec, json[name])
         end
     end
 

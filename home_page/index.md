@@ -22,16 +22,17 @@ it to all lengths in the Lean proof assistant [[7](#ref-7)].
 
 ## Headline results
 
-* **The spin-1 Heisenberg chain.** The gap is at least $$\log(20)/784 \approx 0.00382$$ for every
-  even ring of at least 2304 sites. Lean proves this from two inequalities that the OpenAI
-  preprint [[3](#ref-3)] checks by computer and that this repository reproduces in exact
-  arithmetic. A sharper computer-checked bound, independently reviewed, gives 0.0729 for every
-  even ring of at least 36 sites. The numerical value of the gap is about 0.41 [[5](#ref-5)].
-  A companion preprint treats the open chain with fields at its ends [[4](#ref-4)].
+* **The spin-1 Heisenberg chain.** The gap is at least 0.0729 for every even ring of at least 36
+  sites. The starting inequalities come from the finite computations of the OpenAI preprint
+  [[3](#ref-3)], reproduced here in exact arithmetic and independently reviewed; Lean proves the
+  rest. The preprint itself gives $$\log(20)/784 \approx 0.00382$$ for rings of at least 2304
+  sites. The numerical value of the gap is about 0.41 [[5](#ref-5)]. A companion preprint treats
+  the open chain with fields at its ends [[4](#ref-4)].
 * **A gap proved in Lean with no assumptions.** For the Ising ring
   $$-\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j$$ the gap is at least
-  $$\log(13480)/(97/4) \approx 0.392$$ for every even length of at least 6. Lean also checks the
-  finite computation.
+  0.3922 for every even length of at least 6. Lean also checks the finite computation.
+* **Lean checks almost every result.** For every proven gap except one, Lean proves the step
+  from the computed starting inequalities to all ring lengths.
 * **{{ data.records | where_exp: "r", "r.tier != 'target'" | size }} proven gaps** for eight model
   families, from spin ladders to chains in staggered fields. See the
   [leaderboard]({{ '/leaderboard.html' | relative_url }}).

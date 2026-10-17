@@ -17,6 +17,11 @@ cells.
 * `Record.Seeded spectrum L₀ r β n₀ s t`: the gap holds if the two seed inequalities
   `P_s(n₀, β) ≥ 1 - s` and `P_τ(2n₀, β) ≥ 1 - t` hold for the same spectrum. The definition fixes
   the hypothesis, so the rationals `n₀`, `s`, `t` determine it.
+* `Record.SeededOn family a b L₀ r β n₀ s t`: `Record.Seeded (family x) L₀ r β n₀ s t` for every
+  real parameter `x` in `[a, b]`. A computer certificate that bounds the two defects on the whole
+  interval, for example by a perturbation bound, proves the seeds at every `x`.
+* `Record.TwoSeeded spectrum L₀ r β n₀ s t n₁ β₁ s₁ t₁`: the gap holds if the seed inequalities
+  hold at `(n₀, β)` and at a second seed `(n₁, β₁)`, which covers the rings shorter than `n₀`.
 
 Only even rings are covered. Odd rings or open chains would need new record forms.
 -/
@@ -50,6 +55,21 @@ then `Δ_L > log r / β` for every even `L ≥ L₀`. -/
 def Seeded {d : Type*} [Fintype d] [DecidableEq d] (spectrum : (L : ℕ) → (Fin L → d) → ℝ)
     (L₀ : ℕ) (r β : ℚ) (n₀ : ℕ) (s t : ℚ) : Prop :=
   PositiveBound r β ∧ (SeedBounds spectrum n₀ β s t → UniformGap spectrum L₀ r β)
+
+/-- **A seeded record on a parameter interval.** For every real `x` with `a ≤ x ≤ b`, the seeded
+record `Seeded (family x) L₀ r β n₀ s t`, whose seeds are those of `family x`. -/
+def SeededOn {d : Type*} [Fintype d] [DecidableEq d]
+    (family : ℝ → (L : ℕ) → (Fin L → d) → ℝ) (a b : ℚ) (L₀ : ℕ) (r β : ℚ) (n₀ : ℕ) (s t : ℚ) :
+    Prop :=
+  ∀ x : ℝ, (a : ℝ) ≤ x → x ≤ b → Seeded (family x) L₀ r β n₀ s t
+
+/-- **A record from two seeds.** `log r / β > 0`, and if the seeds `(n₀, β, s, t)` and
+`(n₁, β₁, s₁, t₁)` of `spectrum` hold, then `Δ_L > log r / β` for every even `L ≥ L₀`. The
+second seed covers the short rings: its one-step bound covers the lengths between `n₁` and `2n₁`. -/
+def TwoSeeded {d : Type*} [Fintype d] [DecidableEq d] (spectrum : (L : ℕ) → (Fin L → d) → ℝ)
+    (L₀ : ℕ) (r β : ℚ) (n₀ : ℕ) (s t : ℚ) (n₁ : ℕ) (β₁ s₁ t₁ : ℚ) : Prop :=
+  PositiveBound r β ∧ (SeedBounds spectrum n₀ β s t → SeedBounds spectrum n₁ β₁ s₁ t₁ →
+    UniformGap spectrum L₀ r β)
 
 variable {d : Type*} [Fintype d] [DecidableEq d] {spectrum spectrum' : (L : ℕ) → (Fin L → d) → ℝ}
   {L₀ n₀ : ℕ} {r β s t : ℚ}
