@@ -6,7 +6,9 @@ certified seed defects are typically larger and unequal, such as \((\es, \et) \a
 0.041)\), and enter the \(\le 1/100\) regime only after several doubling steps. To cover these
 seeds, the Lean files \texttt{CertifiedGaps/Chain.lean} and \texttt{CertifiedGaps/ChainCheck.lean}
 iterate the exact asymmetric doubling recurrence for finitely many steps until both defects are
-small enough for Theorem~\ref{thm:gap-of-seeds} to apply at all larger scales. Because the
+small enough for Theorem~\ref{thm:gap-of-seeds} to apply at all larger scales. The single-step
+lemmas of the first section live in \texttt{CertifiedGaps/PurityCriterion.lean}, where the
+equal-defect criterion also uses them. Because the
 recurrence maps are rational functions, every step condition reduces to a rational inequality
 verified inside the Lean kernel.
 
