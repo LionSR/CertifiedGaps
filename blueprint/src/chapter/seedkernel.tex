@@ -1,0 +1,212 @@
+\chapter{Kernel-checked seeds}
+\label{chap:seedkernel}
+
+The two-purity doubling criterion reduces an infinite-volume spectral gap to two seed purity
+inequalities on finite rings. The opt-in library \texttt{SeedKernel}
+(\texttt{lake build SeedKernel}) proves these finite-ring inequalities inside the Lean kernel from
+approximate integer eigenvectors scaled by \(2^{52}\); an external Julia script generates the
+integer vectors, and the Lean kernel verifies the resulting residual inequalities by GMP integer
+arithmetic via \texttt{decide +kernel} without using \texttt{native\_decide}. Carrying out this
+verification for the longitudinal-field Ising chain at \(g = 1/4\) and \(h = 1/20\) proves its
+seed inequalities in the kernel and yields the first unconditional gap theorem.
+
+\section{Two eigenvalue bounds}
+
+Bounding the two seed purities \(\Ps(6, \beta)\) and \(\Pt(12, \beta)\) inside the Lean kernel
+requires upper and lower bounds on the partition functions \(Z_6(\beta)\) and \(Z_{12}(\beta)\)
+without diagonalizing the
+full \(64 \times 64\) and \(4096 \times 4096\) Hamiltonians. At large inverse temperature, the
+partition function is dominated by the lowest energy levels, so a Ritz residual bound from two
+approximate integer eigenvectors encloses the two lowest eigenvalues while a subspace comparison
+lemma bounds all remaining \(2^L - 2\) eigenvalues from below.
+
+\begin{lemma}[Residual bound]
+  \label{lem:residual}
+  \lean{SeedKernel.Ising.exists_eigenvalue_near}
+  \leanok
+  For a Hermitian matrix \(A\), a vector \(x\), and \(\theta \in \R\), some eigenvalue satisfies
+  \((\lambda_i - \theta)^2 \|x\|^2 \le \|Ax - \theta x\|^2\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Expanding in the unitary eigenbasis via \(y = U^\dagger x\) gives \(\|Ax - \theta x\|^2 = \sum_i
+  (\lambda_i - \theta)^2
+  |y_i|^2 \ge \min_i (\lambda_i - \theta)^2 \|y\|^2\), where \(\|y\| = \|x\|\).
+\end{proof}
+
+\begin{lemma}[Counting by comparison]
+  \label{lem:counting}
+  \lean{SeedKernel.Ising.card_eigenvalues_lt_le}
+  \leanok
+  Let \(A\) be Hermitian, \(B\) a set of basis vectors, and \(\rho \in \R\). If
+  \(\operatorname{Re}\langle x, Ax \rangle \ge \rho \|x\|^2\) for every \(x\) vanishing on \(B\),
+  then at most \(|B|\) eigenvalues of \(A\) lie below \(\rho\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  If more than \(|B|\) eigenvalues were strictly below \(\rho\), their eigenvectors would span a
+  subspace of dimension larger than \(|B|\), which must intersect the codimension-\(|B|\) subspace
+  of vectors vanishing on \(B\) in a nonzero vector \(x\) satisfying
+  \(\operatorname{Re}\langle x, Ax \rangle < \rho \|x\|^2\).
+\end{proof}
+
+\section{The Ising Hamiltonian in the computational basis}
+
+In the \(Z\)-basis, the longitudinal-field Ising Hamiltonian is diagonal up to single-spin flips of
+strength \(g\), so its quadratic form is bounded below by the classical Ising energy minus \(gL\)
+and its action on bit-encoded configurations reduces to exact integer arithmetic.
+
+\begin{lemma}[Action of the Hamiltonian]
+  \label{lem:ising-action}
+  \lean{SeedKernel.Ising.diagE, SeedKernel.Ising.flipAt, SeedKernel.Ising.hamiltonian_mulVec_apply}
+  \leanok
+  \uses{def:ising-longitudinal}
+  For the ring of Definition~\ref{def:ising-longitudinal}, with classical energy
+  \(E(\sigma) = -\sum_j z_j z_{j+1} - h \sum_j z_j\) (\(z_j = \pm 1\)),
+  \((H x)(\sigma) = E(\sigma)\, x(\sigma) - g \sum_j x(\mathrm{flip}_j \sigma)\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Evaluating the bond and site operators on basis configurations shows that \(Z \otimes Z\) and
+  \(Z\) act diagonally with the classical Ising energy while each \(X\) flips a single spin.
+\end{proof}
+
+\begin{lemma}[Comparison with the classical energies]
+  \label{lem:ising-classical}
+  \lean{SeedKernel.Ising.re_quadratic_ge}
+  \leanok
+  \uses{lem:ising-action}
+  For \(g \ge 0\), \(\operatorname{Re}\langle x, Hx \rangle \ge \sum_\sigma (E(\sigma) - gL)
+  |x(\sigma)|^2\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Bounding each off-diagonal spin-flip product by \(\operatorname{Re}(\bar a b) \le (|a|^2 +
+  |b|^2)/2\)
+  and summing over the \(L\) single-spin flip neighbors of each configuration gives the lower
+  bound.
+\end{proof}
+
+\begin{lemma}[Bridge to the integer checker]
+  \label{lem:ising-bridge}
+  \lean{SeedKernel.Ising.encode, SeedKernel.Ising.applyH_encode, SeedKernel.Ising.dot_self_eq,
+    SeedKernel.Ising.residualSq_eq}
+  \leanok
+  \uses{lem:ising-action}
+  When spin configurations are encoded as the bits of a natural number so that a single-spin flip
+  is \(\mathrm{xor}\,2^j\), the integer action of \(20 H\) and the bit-indexed sums evaluated by
+  the checker equal the matrix action of \(H\), the squared norm, and the squared residual of the
+  decoded vector.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Rewrite the sums over \(\{0, \dots, 2^L - 1\}\) as sums over configurations through the
+  bit-encoding bijection.
+\end{proof}
+
+\section{The seed and the unconditional gap}
+
+Combining the two Ritz enclosures with the classical-energy lower bound brackets \(Z_6(97/4)\),
+\(Z_{12}(97/4)\), and \(Z_{12}(97/2)\) tightly enough to discharge the seed hypothesis at
+\((g, h) = (1/4, 1/20)\), giving a gap theorem with no hypothesis and no \texttt{sorry} that
+depends only on the standard axioms.
+
+\begin{definition}[Low spectrum]
+  \label{def:low-spectrum}
+  \lean{SeedKernel.Ising.LowSpectrum}
+  \leanok
+  An eigenvalue family \(e\) has low spectrum \((a_0, b_0, a_1, \rho)\) if one eigenvalue lies in
+  \([a_0, b_0]\), a second eigenvalue is at least \(a_1\), and all remaining eigenvalues are at
+  least \(\rho\).
+\end{definition}
+
+\begin{lemma}[Partition functions from a low spectrum]
+  \label{lem:low-spectrum-z}
+  \lean{SeedKernel.Ising.sum_exp_ge, SeedKernel.Ising.sum_exp_le}
+  \leanok
+  \uses{def:low-spectrum}
+  For \(\beta \ge 0\) and \(N\) eigenvalues in total,
+  \(e^{-\beta b_0} \le \sum_i e^{-\beta e_i} \le e^{-\beta a_0} + e^{-\beta a_1} +
+  N e^{-\beta \rho}\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Dropping all terms except the one for the eigenvalue in \([a_0, b_0]\) gives the lower bound, and
+  bounding each Boltzmann
+  weight by the corresponding spectral lower bound gives the upper bound.
+\end{proof}
+
+\begin{lemma}[Low spectra of the seed rings]
+  \label{lem:ising-low-spectra}
+  \lean{SeedKernel.Ising.lowSpectrum_of_checks, SeedKernel.Ising.lowSpectrum6,
+    SeedKernel.Ising.lowSpectrum12, SeedKernel.Ising.allChunks12_eq_range}
+  \leanok
+  \uses{lem:residual, lem:counting, lem:ising-classical, lem:ising-bridge, def:low-spectrum}
+  At \(g = 1/4\) and \(h = 1/20\), the rings of \(6\) and \(12\) sites have low spectra with
+  eigenvalue radius \(10^{-10}\) around the two Ritz values of the generated trial vectors and
+  excited-state threshold \(\rho = c/20 - L/4\), where exactly two classical configurations satisfy
+  \(20 E < c\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The kernel checks the norms and residuals of two integer trial vectors on each ring (evaluated
+  for \(12\) sites in \(64\) chunks whose union is proved to cover \(\{0, \dots, 4095\}\)) together
+  with the count of classical configurations below the cutoff. Lemma~\ref{lem:residual} converts
+  the residual bounds into eigenvalue enclosures, and Lemmas~\ref{lem:counting}
+  and~\ref{lem:ising-classical} convert the classical count into the lower bound on all remaining
+  eigenvalues.
+\end{proof}
+
+\begin{theorem}[The Ising seed]
+  \label{thm:ising-seeds}
+  \lean{SeedKernel.Ising.seed_spatial, SeedKernel.Ising.seed_thermal,
+    SeedKernel.Ising.first_point_seed}
+  \leanok
+  \uses{lem:ising-low-spectra, lem:low-spectrum-z, def:rp-purities, def:ising-longitudinal}
+  For \(H_L = -\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j\),
+  \[
+    \Ps(6, 97/4) \ge 1 - 9064 \cdot 10^{-9}, \qquad \Pt(12, 97/4) \ge 1 - 3141 \cdot 10^{-8}.
+  \]
+  These are the seed inequalities of the first grid point of
+  Definition~\ref{def:ising-longitudinal}.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Applying Lemma~\ref{lem:low-spectrum-z} to the low spectra of Lemma~\ref{lem:ising-low-spectra}
+  gives \(Z \ge e^{-\beta(\theta_0 + r)}\) and \(Z \le e^{-\beta(\theta_0 - r)}(1 + T)\) with an
+  exponentially small excited-state sum \(T\); the purity ratios \(Z_{12}(\beta)/Z_6(\beta)^2\) and
+  \(Z_{12}(2\beta)/Z_{12}(\beta)^2\) are then bounded from below by \((1 - x)/(1 + t)^2\) using
+  \(e^{-14} \le 2.7182818283^{-14}\).
+\end{proof}
+
+\begin{theorem}[An unconditional spectral gap]
+  \label{thm:ising-gap}
+  \lean{SeedKernel.Ising.firstPoint_mem, SeedKernel.Ising.gap_first_point,
+    SeedKernel.Ising.ising_gap}
+  \leanok
+  \uses{thm:ising-seeds, lem:ising-longitudinal-valid, thm:rp-gap}
+  For every even \(L \ge 6\), the Ising ring
+  \(-\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j\) has a unique ground state
+  and
+  \[
+    \Delta_L > \frac{\log 13480}{97/4} \approx 0.3921 .
+  \]
+\end{theorem}
+\begin{proof}
+  \leanok
+  Apply Theorem~\ref{thm:rp-gap} at the first grid point, using the certificate validity from
+  Lemma~\ref{lem:ising-longitudinal-valid} and the seed bounds from Theorem~\ref{thm:ising-seeds}.
+  The resulting theorem has no open hypotheses and no \texttt{sorry}, depending only on
+  \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+\end{proof}
+
+\section{Spin-1 seed arithmetic}
+
+\begin{remark}
+  The module \texttt{SeedKernel/Spin1} implements the spin-1 Hamiltonian action and a shifted
+  polynomial filter on integer vectors of dimension \(3^n\), checks that they agree with the
+  entrywise matrix action on small rings, and verifies the integer Rayleigh quotients and residuals
+  of a filtered N\'eel trial state on rings of \(6\), \(8\), and \(10\) sites. Connecting these
+  integer residual checks to spectral enclosures of the spin-1 partition functions remains open and
+  is documented in \texttt{models/lean\_seeds/}.
+\end{remark}

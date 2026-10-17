@@ -73,13 +73,15 @@ IEEE binary64 model (including BLAS matrix products).
 | [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core package: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalization, verified ring spectra, certified MPO arithmetic (Nemo/Arb), and thermal purification (ITensors) |
 | [`models/`](models/) | one directory per model in a standardized layout ([`AGENTS.md`](AGENTS.md), "Directory format"): `README.md`, `IDEAS.md`, certificate JSON, `certify.jl`, `check.jl`, and tests; documented layout exceptions are listed in each README's `## Layout`. `spin1/` reproduces the exact-arithmetic spin-1 certificate; `lean_seeds/` develops kernel-checked seed witnesses |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalization of the two-purity criterion and each certified model's gap theorem (with the seeds as hypotheses), plus the opt-in library `SeedKernel` for kernel-checked seed arithmetic |
+| [`blueprint/`](blueprint/), [`home_page/`](home_page/) | the `leanblueprint` blueprint of the Lean formalization (web, PDF, dependency graph) and the project home page, built from the root `lakefile.toml` (which builds `lean/`) and deployed to GitHub Pages by `docgen-action` |
 | [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes |
 
 See [`AGENTS.md`](AGENTS.md) for the exact specification of a gap certificate and instructions on adding new models.
 
 ## Reproduce
 
-Requirements: Julia 1.12, `elan` (Lean 4), and a LaTeX installation with REVTeX 4.2 and `latexmk`.
+Requirements: Julia 1.12, `elan` (Lean 4), a LaTeX installation with REVTeX 4.2 and `latexmk`, and
+`leanblueprint` for the blueprint.
 
 ```sh
 # Julia core and its tests
@@ -97,12 +99,18 @@ OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenber
 OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenberg_ladder/test/runtests.jl
 
 # Lean formalization
-cd lean && lake exe cache get && lake build
+(cd lean && lake exe cache get && lake build)
+
+# blueprint of the Lean formalization, from the repository root
+lake exe cache get && lake build
+leanblueprint pdf && leanblueprint web
+lake exe checkdecls blueprint/lean_decls
 
 # LaTeX notes
 latexmk -pdf -outdir=work/latex-build notes/thermal-mpo-gap-note.tex
 ```
 
+The root build uses its own `.lake` directory, with a Mathlib copy separate from `lean/.lake`.
 Each model directory's `README.md` provides its exact reproduction commands, measured run times, and
 trusted arithmetic base.
 

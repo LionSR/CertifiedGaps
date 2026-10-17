@@ -1,0 +1,57 @@
+name: Compile blueprint
+
+on:
+  push:
+    branches:
+      - main # Trigger on pushes to the default branch
+  pull_request:
+    branches:
+      - main # Build and check pull requests into the default branch (no deploy)
+  workflow_dispatch:        # Allow manual triggering of the workflow from the GitHub Actions interface
+
+# Cancel previous runs if a new commit is pushed to the same PR or branch
+concurrency:
+  group: ${{ github.ref }}  # Group runs by the ref (branch or PR)
+  cancel-in-progress: true  # Cancel any ongoing runs in the same group
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages. Only the push-gated
+# upload and deploy steps use them; pull-request runs, including read-only fork runs, need none.
+permissions:
+  contents: read          # Read access to repository contents
+  pages: write            # Write access to GitHub Pages
+  id-token: write         # Write access to ID tokens
+
+jobs:
+  build_project:
+    runs-on: ubuntu-latest
+    name: Build project
+    steps:
+      - name: Cleanup to free disk space
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: false
+          android: true
+          dotnet: false
+          haskell: false
+          large-packages: false
+          docker-images: false
+          swap-storage: false
+
+      - name: Checkout project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0 # Fetch all history for all branches and tags
+
+      - name: Build and lint project
+        uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1.6.2
+        with:
+          build: true
+          lint: false # no lint driver is configured
+          mk_all-check: false # mk_all does not follow srcDir = "lean"
+
+      - name: Compile blueprint and documentation
+        uses: leanprover-community/docgen-action@dacc1acc2a3f532cc577266979ba9c36c7593f7c # 2026-10-05
+        with:
+          blueprint: true
+          homepage: home_page
+          ruby-version: "3.1" # the Ruby of home_page/Gemfile.lock (github-pages 226)
