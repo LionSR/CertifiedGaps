@@ -14,10 +14,17 @@ into a guarantee:
   (|fl(Σ aᵢbᵢ) − Σ aᵢbᵢ| ≤ γ_K Σ|aᵢbᵢ|, valid for any summation order and with FMA);
 * Weyl: B = X†MX = Λ + GΛ + X†R, so |λᵢ(B) − Λᵢ| ≤ ‖G‖‖Λ‖ + ‖X‖‖R‖ (sorted eigenvalues);
 * Ostrowski: λᵢ(B) = θᵢ λᵢ(M) with θᵢ ∈ [1 − ‖G‖, 1 + ‖G‖];
+* or the polar factor U of X = UP: ‖X − U‖ ≤ ‖G‖/(1 + √(1 − ‖G‖)), and Weyl for
+  U†MU = Λ + U†(MU − UΛ); the smaller of the two radii is kept;
 * Weyl again for the distance between M and the true block.
 
 Hence every true eigenvalue lies within one radius r of the sorted computed values. No
 inequality rests on an unverified floating-point result. Scalar bounds are exact rationals.
+
+`verified_eigen` (and its short form `enclose_hermitian`) is the enclosure step shared by every
+model. A model with its own exact symmetry reduction (spin flip, reflection, leg exchange, …)
+builds the Float64 center of each block and an exact bound on its distance to the true block
+and passes both here; `ring_blocks` is the generic charge-and-momentum reduction.
 """
 module VerifiedSpectra
 
@@ -26,7 +33,7 @@ using ..ExactArithmetic: RationalBig
 using ..RingModels: RingModel, isreal_model, _reduce
 using ..Recurrence: to_interval
 
-export BlockSpectrum, enclose_hermitian, ring_blocks, verified_ring_spectrum,
+export BlockSpectrum, verified_eigen, enclose_hermitian, ring_blocks, verified_ring_spectrum,
     log_partition_enclosure, spectrum_summary
 
 const UNIT = big(1) // big(2)^53                 # unit roundoff of binary64
@@ -55,19 +62,23 @@ function _fnorm(A::AbstractArray{Float64})
     return _sqrt_up(RationalBig(s) / (1 - _gamma(n + 1)) + n * TINY)
 end
 _sqrt_up(q::RationalBig) = RationalBig(sup(sqrt(interval(BigFloat, q))))
+_sqrt_down(q::RationalBig) = RationalBig(inf(sqrt(interval(BigFloat, q))))
 
 """
-    enclose_hermitian(M; matrix_error = 0) -> (centers, radius)
+    verified_eigen(M; matrix_error = 0) -> (; values, radius, residual, orthogonality, matrix_error)
 
-Sorted eigenvalue approximations of the Hermitian Float64 matrix `M` (real or complex) and an
-exact rational `radius` such that the sorted eigenvalues of every Hermitian A with
-‖A − M‖₂ ≤ `matrix_error` lie within `radius` of `centers`, index by index.
+Sorted eigenvalue approximations `values` of the exactly Hermitian Float64 matrix `M` (real or
+complex) and an exact rational `radius` such that the sorted eigenvalues of every Hermitian A
+with ‖A − M‖₂ ≤ `matrix_error` lie within `radius` of `values`, index by index. `residual` and
+`orthogonality` are the exact upper bounds on ‖MX − XΛ‖₂ and ‖X†X − I‖₂ for the computed
+eigenvectors X; `matrix_error` is returned as an exact rational.
 """
-function enclose_hermitian(M::Matrix{T}; matrix_error = 0) where {T<:Union{Float64,ComplexF64}}
+function verified_eigen(M::Matrix{T}; matrix_error = 0) where {T<:Union{Float64,ComplexF64}}
+    ishermitian(M) || throw(ArgumentError("the block center is not exactly Hermitian"))
     N = size(M, 1)
     F = eigen(Hermitian(M))
     Λ, X = F.values, F.vectors
-    @assert all(isfinite, Λ) && all(isfinite, X)
+    @assert all(isfinite, Λ) && all(isfinite, X) && issorted(Λ)
     K = N + 8                                     # roundings along any dependency path
     if T === Float64
         R = M * X - X .* transpose(Λ)
@@ -92,9 +103,25 @@ function enclose_hermitian(M::Matrix{T}; matrix_error = 0) where {T<:Union{Float
         η = _fnorm(Gr) + _fnorm(Gi) + γ * (2 * (nXr^2 + nXi^2) + N) + 2N * (2N + 8) * TINY
     end
     η < 1 // 4 || error("eigenvectors far from orthonormal (‖X†X − I‖ ≤ $(Float64(η)))")
-    # |λᵢ(M) − Λᵢ| ≤ (‖G‖ max|Λ| + ‖X‖ ‖R‖ + ‖G‖ |Λᵢ|)/(1 − ‖G‖), with ‖X‖ ≤ 1 + ‖G‖.
-    radius = (2η * λmax + (1 + η) * r) / (1 - η) + RationalBig(matrix_error)
-    return sort(Λ), radius
+    # Ostrowski: |λᵢ(M) − Λᵢ| ≤ (‖G‖ max|Λ| + ‖X‖ ‖R‖ + ‖G‖ |Λᵢ|)/(1 − ‖G‖), ‖X‖ ≤ 1 + ‖G‖.
+    ostrowski = (2η * λmax + (1 + η) * r) / (1 - η)
+    # Polar factor: the singular values of X lie in [√(1 − η), √(1 + η)], so ‖X − U‖ ≤ p. Then
+    # U†MU − Λ = U†(MU − UΛ) is Hermitian with norm ≤ r + (‖M‖ + max|Λ|) p, and the first
+    # bound gives ‖M‖ ≤ max|Λ| + `ostrowski`. This roughly halves the orthogonality term.
+    p = η / (1 + _sqrt_down(1 - η))
+    polar = r + (2λmax + ostrowski) * p
+    return (; values = Λ, radius = min(ostrowski, polar) + RationalBig(matrix_error),
+        residual = r, orthogonality = η, matrix_error = RationalBig(matrix_error))
+end
+
+"""
+    enclose_hermitian(M; matrix_error = 0) -> (centers, radius)
+
+The sorted `values` and the `radius` of `verified_eigen(M; matrix_error)`.
+"""
+function enclose_hermitian(M::Matrix{<:Union{Float64,ComplexF64}}; matrix_error = 0)
+    e = verified_eigen(M; matrix_error)
+    return e.values, e.radius
 end
 
 # State codes: digit of site x (0-based) is (code ÷ d^x) % d. The translation T moves the

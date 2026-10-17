@@ -80,6 +80,19 @@ end
     M = [2.0 1.0; 1.0 2.0]
     centers, r = enclose_hermitian(M; matrix_error = 1 // 1000)
     @test centers ≈ [1.0, 3.0] && 1 // 1000 < r < 1 // 1000 + 1 // 10^12
+    # Tridiagonal Toeplitz blocks with exact spectrum cos(kπ/(n+1)); the complex block is
+    # diagonally unitarily equivalent (off-diagonal i/2). The radius must cover the truth.
+    n = 300
+    exact = sort([cospi(big(k) / (n + 1)) for k in 1:n])
+    for off in (0.5, 0.5im)
+        T = diagm(1 => fill(off, n - 1), -1 => fill(conj(off), n - 1))
+        e = verified_eigen(off isa Complex ? T : real(T))
+        @test maximum(abs.(exact .- e.values)) <= e.radius < 1 // 10^10
+        # The polar-factor radius is kept: it halves the orthogonality term of Ostrowski's.
+        η, r, λ = e.orthogonality, e.residual, maximum(abs, e.values)
+        @test e.radius < (2η * λ + (1 + η) * r) / (1 - η)
+    end
+    @test_throws ArgumentError verified_eigen([1.0 2.0; nextfloat(2.0) 1.0])
 end
 
 @testset "end-to-end gap certificate" begin
