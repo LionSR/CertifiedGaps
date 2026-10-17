@@ -92,9 +92,10 @@ julia --project=models/spin1 models/spin1/test/runtests.jl
 julia --project=models/spin1 models/spin1/check.jl                      # stored-output audit
 julia --project=models/spin1 --threads=4 models/spin1/check.jl --full   # fresh run, ≈20–45 min
 
-# any other model: fast checker (add --full for the full spectral replay), and its tests
-OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenberg_ladder/check.jl
-OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenberg_ladder/test/runtests.jl
+# any other model runs in the core environment: fast checker (add --full for the full
+# spectral replay), and its tests
+OPENBLAS_NUM_THREADS=1 julia --project=julia models/heisenberg_ladder/check.jl
+OPENBLAS_NUM_THREADS=1 julia --project=julia models/heisenberg_ladder/test/runtests.jl
 
 # Lean formalization
 cd lean && lake exe cache get && lake build
