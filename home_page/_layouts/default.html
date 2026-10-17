@@ -11,38 +11,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#157878">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  {% if jekyll.environment == "production" %}
-  <link rel="stylesheet"
-    href="{{ site.github.repository_name | append: '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-  {% else %}
-  <link rel="stylesheet" href="{{ 'assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-  {% endif %}
+  <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
   {% include head-custom.html %}
 </head>
 
 <body>
   <a id="skip-to-content" href="#content">Skip to the content.</a>
 
-  <header class="page-header" role="banner">
+  {% assign repo_url = 'https://github.com/' | append: site.repository %}
+  <header class="page-header{% unless page.url == "/" or page.url == "/index.html" %} compact{% endunless %}" role="banner">
     <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
     <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline
       }}</h2>
-    <a href="blueprint" class="btn">Blueprint (web)</a>
-    <a href="blueprint.pdf" class="btn">Blueprint (pdf)</a>
-    <a href="docs" class="btn">Documentation</a>
-    {% if site.github.is_project_page %}
-    <a href="{{ site.github.repository_url }}" class="btn">GitHub</a>
-    {% endif %}
+    <a href="{{ '/' | relative_url }}" class="btn">Home</a>
+    <a href="{{ '/leaderboard.html' | relative_url }}" class="btn">Leaderboard</a>
+    <a href="{{ '/explainer/' | relative_url }}" class="btn">Explainer</a>
+    <a href="{{ '/blueprint/' | relative_url }}" class="btn">Blueprint (web)</a>
+    <a href="{{ '/docs/' | relative_url }}" class="btn">Lean API docs</a>
+    <a href="{{ '/contribute.html' | relative_url }}" class="btn">Contribute</a>
+    <a href="{{ repo_url }}" class="btn">GitHub</a>
   </header>
 
-  <main id="content" class="main-content" role="main">
+  <main id="content" class="main-content{% if page.wide %} wide{% endif %}" role="main">
     {{ content }}
 
     <footer class="site-footer">
-      {% if site.github.is_project_page %}
-      <span class="site-footer-owner"><a href="{{ site.github.repository_url }}">{{ site.github.repository_name }}</a>
-	is maintained by The thermal-mpo-gap contributors. Visit the GitHub repository for more information.</span>
-      {% endif %}
+      <span class="site-footer-owner"><a href="{{ repo_url }}">{{ site.repository }}</a>
+        is maintained by the thermal-mpo-gap contributors. Visit the GitHub repository for more information.</span>
     </footer>
   </main>
 </body>

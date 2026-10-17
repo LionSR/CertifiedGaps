@@ -1,0 +1,51 @@
+{%- comment -%}
+  One leaderboard row: Parameter | Gap ≥ (with the headline tier) | Lengths | Seed | Known gap |
+  Details. The Details disclosure holds the exact bound, the Lean record with its own badge, the
+  evidence links, the date and pull request, and the notes. Parameter: rec (a records.yml entry).
+{%- endcomment -%}
+{%- assign rec = include.rec -%}
+{%- assign repo_url = 'https://github.com/' | append: site.repository -%}
+{%- assign repo_blob = repo_url | append: '/blob/' | append: site.branch | append: '/' -%}
+{%- include effective-tier.html rec=rec -%}
+<tr id="{{ rec.id }}">
+  <td class="param">{{ rec.parameter }}</td>
+  <td class="num"><strong>{{ rec.bound.decimal }}</strong> {% include tier-badge.html tier=eff %}</td>
+  <td>{% if rec.lengths.text %}{{ rec.lengths.text }}{% else %}{% if rec.lengths.parity != 'all' %}{{ rec.lengths.parity }} {% endif %}$L \ge {{ rec.lengths.L0 }}${% endif %}{% if rec.lengths.boundary == 'open' %}, open chain{% endif %}</td>
+  <td class="num">{% if rec.seed %}({{ rec.seed.n0 }}, {{ rec.seed.beta0 }}){% else %}—{% endif %}</td>
+  <td class="num">
+    {%- if rec.numerical_gap -%}
+      {%- assign ratio = rec.bound.decimal | times: 100.0 | divided_by: rec.numerical_gap.value | round: 1 -%}
+      {{ rec.numerical_gap.value }} <span class="ratio">({{ ratio }}%)</span>
+    {%- else -%}—{%- endif -%}
+  </td>
+  <td class="details">
+    <details><summary>details</summary>
+      <div class="detail-body">
+        <p><strong>Bound.</strong>
+          {%- if rec.bound.r %} $\Delta_L > {% if rec.bound.display %}{{ rec.bound.display }}{% else %}\log({{ rec.bound.r }})/({{ rec.bound.beta }}){% endif %}$.
+          {%- elsif rec.bound.precise %} $\Delta_L {% if rec.bound.strict %}>{% else %}\ge{% endif %}$ {{ rec.bound.precise }}…
+          {%- else %} $\Delta_L {% if rec.bound.strict %}>{% else %}\ge{% endif %} {{ rec.bound.value }}$.
+          {%- endif %}
+          {% if rec.seed.text %}Seed: {{ rec.seed.text }}.{% endif %}</p>
+        {%- if rec.lean %}
+        {%- assign short = rec.lean.name | remove_first: 'Leaderboard.Records.' %}
+        <p><strong>Lean.</strong> {% include tier-badge.html tier=lean_eff %}
+          <a href="{{ '/docs/find/' | relative_url }}?pattern={{ rec.lean.name | url_encode }}#doc"><code>{{ short }}</code></a>:
+          $\Delta_L > \log({{ rec.lean.r }})/({{ rec.lean.beta }})${% if rec.lean.decimal %} ≈ {{ rec.lean.decimal }}{% endif %}
+          for every even $L \ge {{ rec.lean.L0 }}$.
+          {%- if lr %}
+            {% if lr.hypothesis %}Hypothesis: <code>{{ lr.hypothesis }}</code>.{% else %}No hypotheses.{% endif %}
+          {%- endif %}</p>
+        {%- endif %}
+        <p><strong>Evidence.</strong>
+          {% if rec.certificate %}<a href="{{ repo_blob }}{{ rec.certificate }}">certificate</a>{% endif %}
+          {% if rec.check %} · <a href="{{ repo_blob }}{{ rec.check }}">checker</a>{% endif %}
+          {% if rec.source %}{% if rec.certificate or rec.check %} · {% endif %}{% if rec.source.url %}<a href="{{ rec.source.url }}">source</a>{% else %}{{ rec.source.text }}{% endif %}{% endif %}
+          · {{ rec.date }}{% if rec.pr %}, <a href="{{ repo_url }}/pull/{{ rec.pr }}">#{{ rec.pr }}</a>{% endif %}</p>
+        {%- if rec.notes %}
+        <p>{{ rec.notes }}</p>
+        {%- endif %}
+      </div>
+    </details>
+  </td>
+</tr>

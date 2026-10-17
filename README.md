@@ -23,6 +23,11 @@ The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), ha
    preprint [*The periodic spin-one Haldane gap*](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026);
    and for the other models using verified eigenvalue enclosures of complete seed-ring spectra.
 
+**Website:** the [project home page](https://LionSR.github.io/haldane-gap-diagrams/) gathers the
+notes, the explainer, the blueprint and the Lean API docs, and its
+[leaderboard](https://LionSR.github.io/haldane-gap-diagrams/leaderboard.html) lists every certified gap
+with its verification tier and history. To submit a result, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## Spin-1 Heisenberg chain
 
 | statement | status | where |
@@ -74,9 +79,10 @@ IEEE binary64 model (including BLAS matrix products).
 | [`models/`](models/) | one directory per model in a standardized layout ([`AGENTS.md`](AGENTS.md), "Directory format"): `README.md`, `IDEAS.md`, certificate JSON, `certify.jl`, `check.jl`, and tests; documented layout exceptions are listed in each README's `## Layout`. `spin1/` reproduces the exact-arithmetic spin-1 certificate; `lean_seeds/` develops kernel-checked seed witnesses |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalization of the two-purity criterion and each certified model's gap theorem (with the seeds as hypotheses), plus the opt-in library `SeedKernel` for kernel-checked seed arithmetic |
 | [`blueprint/`](blueprint/), [`home_page/`](home_page/) | the `leanblueprint` blueprint of the Lean formalization (web, PDF, dependency graph) and the project home page, built from the root `lakefile.toml` (which builds `lean/`) and deployed to GitHub Pages by `docgen-action` |
-| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes |
+| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes; `leaderboard/`: the validator of the leaderboard data `home_page/_data/records.yml` |
 
-See [`AGENTS.md`](AGENTS.md) for the exact specification of a gap certificate and instructions on adding new models.
+See [`AGENTS.md`](AGENTS.md) for the exact specification of a gap certificate and instructions on adding new models,
+and [`CONTRIBUTING.md`](CONTRIBUTING.md) for submitting a record to the leaderboard.
 
 ## Reproduce
 

@@ -1,0 +1,200 @@
+---
+layout: default
+title: Leaderboard of certified spectral gaps
+description: Uniform lower bounds on spectral gaps of quantum spin chains, and how each is verified
+usemathjax: true
+wide: true # the layout widens the main column for the tables
+---
+{%- comment -%}
+  Rendered from _data/records.yml (hand-edited) and _data/lean_records.json (generated in CI by
+  `lake exe leaderboard_audit`; absent in local builds unless copied there).
+{%- endcomment -%}
+{%- assign data = site.data.records -%}
+{%- assign repo_url = 'https://github.com/' | append: site.repository -%}
+{%- assign repo_blob = repo_url | append: '/blob/' | append: site.branch | append: '/' -%}
+
+<p>
+  Each row is a theorem: <em>for every ring length $L$ in the stated range, the Hamiltonian has a
+  unique ground state and a spectral gap $\Delta_L = E_1(L) - E_0(L)$ at least the stated
+  bound</em>, proved by the spacetime bootstrap from one seed $(n_0, \beta_0)$. Bounds are rounded
+  down; “details” gives the exact form, the Lean record and the evidence. Known gaps are
+  floating-point or exact reference values for comparison, not certified. Data:
+  <a href="{{ repo_blob }}home_page/_data/records.yml"><code>records.yml</code></a> ·
+  <a href="{{ '/contribute.html' | relative_url }}">contribute</a>.
+</p>
+<p class="key">
+  <a href="#tiers">Tiers</a>:
+  {% include tier-glyph.html tier="lean-unconditional" %} Lean, unconditional ·
+  {% include tier-glyph.html tier="lean-conditional" %} Lean, conditional ·
+  {% include tier-glyph.html tier="certified" %} certified ·
+  {% include tier-glyph.html tier="unreviewed" %} unreviewed ·
+  {% include tier-glyph.html tier="assumed" %} assumed ·
+  {% include tier-glyph.html tier="target" %} target.
+  A badge describes the bound next to it.
+</p>
+{% unless site.data.lean_records %}
+<p class="callout"><strong>Lean status unavailable in this build.</strong> Lean tiers are read from
+  <code>lean_records.json</code>, which continuous integration generates from the Lean library
+  <code>Leaderboard</code>.</p>
+{% endunless %}
+
+<h2 id="summary">Best bounds by model family</h2>
+<div class="table-wrap"><table class="summary">
+  <thead><tr><th>Model family</th><th>Best gap ≥</th><th>At</th><th>Points</th><th>With Lean record</th></tr></thead>
+  <tbody>
+  {%- for fam in data.families %}
+    {%- assign recs = data.records | where: "family", fam.key | where_exp: "r", "r.tier != 'assumed'" | where_exp: "r", "r.tier != 'target'" -%}
+    {%- if recs.size == 0 %}{% continue %}{% endif -%}
+    {%- assign best = nil -%}{%- assign bestv = -1.0 -%}
+    {%- for r in recs -%}
+      {%- assign v = r.bound.decimal | times: 1.0 -%}
+      {%- if v > bestv %}{% assign bestv = v %}{% assign best = r %}{% endif -%}
+    {%- endfor -%}
+    {%- assign nlean = recs | where_exp: "r", "r.lean" | size -%}
+    {%- include effective-tier.html rec=best %}
+    <tr>
+      <td><a href="#family-{{ fam.key }}">{{ fam.name }}</a></td>
+      <td class="num"><a href="#{{ best.id }}"><strong>{{ best.bound.decimal }}</strong></a> {% include tier-glyph.html tier=eff %}</td>
+      <td>{{ best.parameter }}{% if best.lengths.L0 %}, $L \ge {{ best.lengths.L0 }}${% endif %}</td>
+      <td class="num">{{ recs.size }}</td>
+      <td class="num">{{ nlean }}</td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+</table></div>
+
+{% for fam in data.families %}
+  {%- assign recs = data.records | where: "family", fam.key | where_exp: "r", "r.tier != 'assumed'" | where_exp: "r", "r.tier != 'target'" -%}
+  {%- if recs.size == 0 %}{% continue %}{% endif %}
+<section class="family" id="family-{{ fam.key }}">
+  <h2>{{ fam.name }}</h2>
+  {% include family-table.html fam=fam recs=recs %}
+</section>
+{% endfor %}
+
+<section id="assumed">
+  <h2>Assumed results</h2>
+  <p>Results that use the criterion but rest on inputs not reproduced here: estimates imported from
+    another paper, or finite tables whose certification is still open.</p>
+  {%- assign recs = data.records | where: "tier", "assumed" %}
+  <div class="table-wrap"><table class="records">
+    <thead><tr><th>Parameter</th><th>Gap ≥</th><th>Lengths</th><th>Seed $(n_0, \beta_0)$</th><th>Known gap</th><th></th></tr></thead>
+    <tbody>
+    {%- for rec in recs %}
+      {%- assign fam = data.families | where: "key", rec.family | first %}
+      <tr class="group"><th colspan="6">{{ fam.name }}</th></tr>
+      {% include record-row.html rec=rec %}
+    {%- endfor %}
+    </tbody>
+  </table></div>
+</section>
+
+<section id="targets">
+  <h2>Open targets</h2>
+  <p>Models where the method should apply but no certificate exists yet; seeds and bounds are
+    floating-point survey estimates. The model directories also record rigorous negative results
+    (seeds excluded at every $\beta_0$) for nearby parameters.</p>
+  {%- assign recs = data.records | where: "tier", "target" %}
+  <div class="table-wrap"><table class="records">
+    <thead><tr><th>Model</th><th>Seed estimate</th><th>Float bound</th><th>Known gap</th><th>Notes</th></tr></thead>
+    <tbody>
+    {%- for rec in recs %}
+      {%- assign fam = data.families | where: "key", rec.family | first %}
+      <tr id="{{ rec.id }}">
+        <td>{{ fam.name }}, {{ rec.parameter }}</td>
+        <td class="num">{% if rec.estimate.n0 %}({{ rec.estimate.n0 }}{% if rec.estimate.beta0 %}, {{ rec.estimate.beta0 }}{% endif %}){% else %}—{% endif %}</td>
+        <td class="num">{{ rec.estimate.float_bound | default: '—' }}</td>
+        <td class="num">{% if rec.numerical_gap %}<span title="{{ rec.numerical_gap.source }}">{{ rec.numerical_gap.value }}</span>{% else %}—{% endif %}</td>
+        <td class="cellnote">{{ rec.estimate.text }}{% if rec.numerical_gap %}. Gap: {{ rec.numerical_gap.source }}{% endif %}. Source: {{ rec.source.text }}</td>
+      </tr>
+    {%- endfor %}
+    </tbody>
+  </table></div>
+</section>
+
+<section id="history">
+  <h2>Record history</h2>
+  {%- assign with_history = data.records | where_exp: "r", "r.history" %}
+  <details>
+    <summary>Earlier records for {{ with_history.size }} entries, newest first</summary>
+    <div class="table-wrap"><table class="history">
+      <thead><tr><th>Entry</th><th>Date</th><th>Gap ≥</th><th>Lengths</th><th>Method</th><th>PR</th></tr></thead>
+      <tbody>
+      {%- for rec in with_history %}
+        {%- assign fam = data.families | where: "key", rec.family | first %}
+        {%- assign n = rec.history | size | plus: 1 %}
+        {%- include effective-tier.html rec=rec %}
+        <tr class="current">
+          <td rowspan="{{ n }}"><a href="#{{ rec.id }}">{{ fam.name }}, {{ rec.parameter }}</a></td>
+          <td>{{ rec.date }}</td>
+          <td class="num"><strong>{{ rec.bound.decimal }}</strong> {% include tier-glyph.html tier=eff %}</td>
+          <td>{% if rec.lengths.text %}{{ rec.lengths.text }}{% else %}{{ rec.lengths.parity }} $L \ge {{ rec.lengths.L0 }}${% endif %}</td>
+          <td>current record</td>
+          <td>{% if rec.pr %}<a href="{{ repo_url }}/pull/{{ rec.pr }}">#{{ rec.pr }}</a>{% endif %}</td>
+        </tr>
+        {%- for h in rec.history %}
+        <tr>
+          <td>{{ h.date }}</td>
+          <td class="num">{{ h.decimal }} {% include tier-glyph.html tier=h.tier %}</td>
+          <td>{{ h.lengths }}</td>
+          <td>{{ h.method }}</td>
+          <td>{% if h.pr %}<a href="{{ repo_url }}/pull/{{ h.pr }}">#{{ h.pr }}</a>{% endif %}</td>
+        </tr>
+        {%- endfor %}
+      {%- endfor %}
+      </tbody>
+    </table></div>
+    <p><small>Earlier entries carry the tier they had when set.</small></p>
+  </details>
+</section>
+
+<section id="tiers">
+  <h2>Tiers</h2>
+  <p>A badge describes the bound printed next to it. The headline gap of a row is its best
+    rigorous bound. When the row's Lean theorem proves at least that bound (compared in exact
+    arithmetic by the validator), the headline badge is the Lean one; otherwise it is the tier of
+    the computer certificate, and the Lean theorem, with its own badge, is listed under
+    “details”. Lean kinds are read from <code>lean_records.json</code>, which continuous
+    integration regenerates on every build by auditing and re-checking the Lean library
+    <code>Leaderboard</code>; they are never read from <code>records.yml</code>.</p>
+  <dl class="tiers">
+    <dt>{% include tier-badge.html tier="lean-unconditional" %}</dt>
+    <dd>A Lean theorem, checked by the Lean kernel, with no hypotheses: for every even $L \ge L_0$
+      the stated Hamiltonian has a unique ground state and $\Delta_L > \log(r)/\beta$. Its axioms
+      are among <code>propext</code>, <code>Classical.choice</code> and <code>Quot.sound</code>
+      (no <code>sorry</code>, no <code>native_decide</code>); the seed is verified inside the
+      kernel.</dd>
+    <dt>{% include tier-badge.html tier="lean-conditional" %}</dt>
+    <dd>The same Lean statement, proved from exactly two hypotheses, the seed inequalities
+      $P_{\mathrm{s}}(n_0, \beta_0) \ge 1 - \varepsilon_{\mathrm{s}}$ and
+      $P_\tau(2n_0, \beta_0) \ge 1 - \varepsilon_\tau$. Reflection positivity, the doubling
+      recurrence and the arithmetic of the bound are proved in Lean; the two seed inequalities are
+      certified by computer in <code>models/&lt;slug&gt;/</code>, so the result is as reliable as
+      that certificate's trusted base.</dd>
+    <dt>{% include tier-badge.html tier="certified" %}</dt>
+    <dd>A rigorous computer certificate per <a href="{{ repo_blob }}AGENTS.md"><code>AGENTS.md</code></a>:
+      an exact reflection-positivity identity, seed enclosures in exact, interval or verified
+      floating-point arithmetic with an explicit rounding analysis, and the certified recurrence,
+      all recomputed by the model's <code>check.jl</code>. A Lean record of the row, if any, proves
+      a weaker bound.</dd>
+    <dt>{% include tier-badge.html tier="unreviewed" %}</dt>
+    <dd>A certificate and checker exist, but the computation has not yet been independently
+      reviewed.</dd>
+    <dt>{% include tier-badge.html tier="assumed" %}</dt>
+    <dd>The proof relies on estimates imported from elsewhere (for example the four finite
+      estimates of the boundary-field paper) or on finite tables not yet certified here.</dd>
+    <dt>{% include tier-badge.html tier="target" %}</dt>
+    <dd>Floating-point survey estimates only; no rigorous bound.</dd>
+  </dl>
+</section>
+
+<script>
+  // Open the disclosures around a linked row (grid cells link into the collapsed full table).
+  function openTarget() {
+    var el = location.hash && document.getElementById(decodeURIComponent(location.hash.slice(1)));
+    for (var p = el; p; p = p.parentElement) { if (p.tagName === 'DETAILS') p.open = true; }
+    if (el) el.scrollIntoView();
+  }
+  window.addEventListener('hashchange', openTarget);
+  window.addEventListener('DOMContentLoaded', openTarget);
+</script>
