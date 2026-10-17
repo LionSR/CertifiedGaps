@@ -15,9 +15,10 @@ verified inside the Lean kernel.
 Rather than bounding both defects by a single common value \(\varepsilon\), the exact recurrence
 tracks separate upper bounds \(s\) and \(t\) on the spatial defect \(1 - \Ps(n, \beta)\) and the
 thermal defect \(1 - \Pt(2n, \beta)\) through the coupling map \(z(a, b) = 1 - (1 - b)(1 - a)^2\)
-and the squaring map \(f(z)\). Because the second coupling step uses the reduced spatial defect
-\(s' \ge f(z(s, t))\) obtained from spatial squaring rather than the initial defect \(s\), this
-asymmetric recurrence tolerates substantially larger initial defects.
+and the squaring map \(f(z)\). Because the thermal half of the step (Lemma~\ref{lem:doubling-step})
+uses the reduced spatial defect \(s' \ge f(z(s, t))\) obtained from spatial squaring rather than
+the initial defect \(s\), this asymmetric recurrence tolerates substantially larger initial
+defects.
 
 \begin{definition}[Coupling defect]
   \label{def:coupling-defect}

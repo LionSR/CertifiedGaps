@@ -30,7 +30,6 @@ The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), ha
 | $\Delta_L > (\log 20)/784 \approx 0.00382$ for every even $L \ge 2304$ | proved in the main note, given the seed purity bounds at $(n_0, \beta_0) = (2304, 784)$ | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
 | seed purity bounds $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge 0.99$ | reproduced in exact arithmetic (status `passed`) | [`models/spin1/`](models/spin1/) |
 | the two-purity criterion and the spin-1 theorem above, given the two seed bounds | formalized in Lean 4 | [`lean/`](lean/) |
-| blueprint of the Lean formalization (web, PDF, dependency graph) and project home page | `leanblueprint` (run from the root, which has a `lakefile.toml` building `lean/`); deployed by `docgen-action` | [`blueprint/`](blueprint/), [`home_page/`](home_page/) |
 | [`explainer/`](explainer/) | an illustrated, undergraduate-level exposition of the proof (HTML page and two animated films); floating-point illustrations only, not part of any certificate |
 | $\Delta_L > 0.0729$ for every even $L \ge 36$ | exact-arithmetic computation combining temperature-lifting with a tighter seed chain; not yet independently reviewed | [`models/spin1/`](models/spin1/) (`experiments/`) |
 | open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ | proved in Appendices A–C, given four finite estimates from the boundary-field paper | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
@@ -74,13 +73,15 @@ IEEE binary64 model (including BLAS matrix products).
 | [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core package: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalization, verified ring spectra, certified MPO arithmetic (Nemo/Arb), and thermal purification (ITensors) |
 | [`models/`](models/) | one directory per model in a standardized layout ([`AGENTS.md`](AGENTS.md), "Directory format"): `README.md`, `IDEAS.md`, certificate JSON, `certify.jl`, `check.jl`, and tests; documented layout exceptions are listed in each README's `## Layout`. `spin1/` reproduces the exact-arithmetic spin-1 certificate; `lean_seeds/` develops kernel-checked seed witnesses |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalization of the two-purity criterion and each certified model's gap theorem (with the seeds as hypotheses), plus the opt-in library `SeedKernel` for kernel-checked seed arithmetic |
+| [`blueprint/`](blueprint/), [`home_page/`](home_page/) | the `leanblueprint` blueprint of the Lean formalization (web, PDF, dependency graph) and the project home page, built from the root `lakefile.toml` (which builds `lean/`) and deployed to GitHub Pages by `docgen-action` |
 | [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes |
 
 See [`AGENTS.md`](AGENTS.md) for the exact specification of a gap certificate and instructions on adding new models.
 
 ## Reproduce
 
-Requirements: Julia 1.12, `elan` (Lean 4), and a LaTeX installation with REVTeX 4.2 and `latexmk`.
+Requirements: Julia 1.12, `elan` (Lean 4), a LaTeX installation with REVTeX 4.2 and `latexmk`, and
+`leanblueprint` for the blueprint.
 
 ```sh
 # Julia core and its tests
@@ -98,12 +99,18 @@ OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenber
 OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder models/heisenberg_ladder/test/runtests.jl
 
 # Lean formalization
-cd lean && lake exe cache get && lake build
+(cd lean && lake exe cache get && lake build)
+
+# blueprint of the Lean formalization, from the repository root
+lake exe cache get && lake build
+leanblueprint pdf && leanblueprint web
+lake exe checkdecls blueprint/lean_decls
 
 # LaTeX notes
 latexmk -pdf -outdir=work/latex-build notes/thermal-mpo-gap-note.tex
 ```
 
+The root build uses its own `.lake` directory, with a Mathlib copy separate from `lean/.lake`.
 Each model directory's `README.md` provides its exact reproduction commands, measured run times, and
 trusted arithmetic base.
 
