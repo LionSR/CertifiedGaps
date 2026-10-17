@@ -17,8 +17,8 @@ const CERT_FIELDS = (
 )
 # Record parameter name => the certificate fields that may hold it. A Weyl-transported interval
 # [D_min, D_max] is the certificate field D_interval.
-const PARAM_FIELDS = Dict("g" => ("g",), "h" => ("h",), "delta" => ("delta",), "Jperp" => ("J",),
-    "D" => ("reference_D", "D"))
+const PARAM_FIELDS = Dict("g" => ("g",), "h" => ("h", "staggered_field"), "delta" => ("delta",),
+    "Jperp" => ("J",), "D" => ("reference_D", "D"))
 const SCOPE_FIELDS = union(Set(["D_interval"]), (Set(v) for v in values(PARAM_FIELDS))...)
 
 "A JSON value as an exact rational: integers, exact strings, and floats converted exactly."
@@ -33,6 +33,24 @@ function load_certificate(path)
 end
 
 """
+    core_candidate(data) -> NamedTuple or nothing
+
+The single entry of a certificate made by the shared pipeline (`GapCertificates.certify_gap`,
+format "CertifiedGaps ring gap certificate v…"): the seed and exact defects from `seed`, and as
+bound the outward-rounded interval bound `interval_bound_decimal` (`certified_gap_bound`), which
+the model READMEs quote; the exact chain bound `gap_lower_bound` is at most slightly smaller.
+"""
+function core_candidate(data)
+    format = get(data, "format", nothing)
+    format isa AbstractString && startswith(format, "CertifiedGaps ring gap certificate") ||
+        return nothing
+    s = data["seed"]
+    scope = Dict(k => v for (k, v) in data if k in SCOPE_FIELDS)
+    return (; n0 = s["n0"], beta = s["beta0"], bound = data["interval_bound_decimal"],
+        s = s["eps_s"], t = s["eps_t"], scope)
+end
+
+"""
     certificate_candidates(data) -> Vector{NamedTuple}
 
 Every object in a certificate that states `n0`, `beta`, and a `bound` or exact defects, with
@@ -40,6 +58,8 @@ its defects `s`, `t` (or `nothing`) and the parameter fields in scope (its own a
 ancestors').
 """
 function certificate_candidates(data)
+    core = core_candidate(data)
+    core === nothing || return [core]
     out = NamedTuple[]
     function walk(x, scope)
         if x isa AbstractVector

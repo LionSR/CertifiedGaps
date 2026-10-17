@@ -167,7 +167,7 @@ function run_metadata(config; source_sha256, packages = (), status, certified = 
 end
 
 """
-    model_metadata(model_dir, config; dirs = ("src",), files = ("Project.toml", "Manifest.toml"),
+    model_metadata(model_dir, config; dirs = ("src",), files = ("certify.jl", "check.jl"),
         packages = (), certified = false) -> Dict
 
 `run_metadata` of a model result with the hashes of `model_provenance(model_dir; dirs, files)`:
@@ -175,7 +175,7 @@ the model-local `source_sha256` and the core `core_sha256` (provenance only).
 `verify_model_metadata` with the same `dirs` and `files` checks it.
 """
 function model_metadata(model_dir, config; dirs = ("src",),
-    files = ("Project.toml", "Manifest.toml"), packages = (), certified = false)
+    files = ("certify.jl", "check.jl"), packages = (), certified = false)
     (; source_sha256, core_sha256) = model_provenance(model_dir; dirs, files)
     record = run_metadata(config; source_sha256, packages, certified,
         status = certified ? "certified" : "numerical, not certified")
@@ -185,7 +185,7 @@ end
 
 """
     verify_model_metadata(metadata, model_dir; dirs = ("src",),
-        files = ("Project.toml", "Manifest.toml")) -> Int
+        files = ("certify.jl", "check.jl")) -> Int
 
 Check a `model_metadata` record against the checkout: the recorded model-local source paths
 must be exactly the current ones for `dirs` and `files`, and each must have its recorded
@@ -193,7 +193,7 @@ SHA-256. The core hashes are provenance and are not compared. Returns the number
 checked; throws on any mismatch.
 """
 function verify_model_metadata(metadata, model_dir; dirs = ("src",),
-    files = ("Project.toml", "Manifest.toml"))
+    files = ("certify.jl", "check.jl"))
     repo = normpath(joinpath(model_dir, "..", ".."))
     current = model_provenance(model_dir; dirs, files).source_sha256
     recorded = metadata["source_sha256"]

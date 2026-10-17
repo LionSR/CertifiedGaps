@@ -64,8 +64,8 @@ heuristic safety padding for the TFIM open targets of `AGENTS.md`. The recurrenc
 former `scripts/constants.jl` printed (the diagonal threshold ε⋆, the note's seeds, odd lengths, and
 the Theorem 2.22 closed forms) are now asserted in `test/runtests.jl`.
 
-To use `CertifiedGaps` from a model project under `models/`, link it with
-`Pkg.develop(path = "../../julia")`:
+Models run in this package's environment (`julia --project=julia models/<slug>/...` from the
+repository root), so `using CertifiedGaps` needs no extra setup:
 
 ```julia
 using CertifiedGaps                                  # doubling recurrence and gap bounds
