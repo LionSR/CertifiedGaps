@@ -3,8 +3,8 @@
 # rejected by the recurrence, checks the hashes of the stored references and recomputes the
 # small-ring rows (n₀ = 2, 3) of results/scaling.json.
 #
-#     julia --project=models/blbq_haldane models/blbq_haldane/check.jl          # fast
-#     julia --project=models/blbq_haldane models/blbq_haldane/check.jl --full   # + n₀ = 4
+#     julia --project=julia models/blbq_haldane/check.jl          # fast
+#     julia --project=julia models/blbq_haldane/check.jl --full   # + n₀ = 4
 #
 # `--full` also recomputes the n₀ = 4 rows from complete dense spectra of the 4- and 8-site
 # rings. Larger rows need the regeneration pipeline in scripts/ (hours; see README).

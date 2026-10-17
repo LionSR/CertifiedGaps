@@ -23,7 +23,7 @@ resource_files = Dict(name => strip(read(joinpath("/sys/fs/cgroup", name), Strin
 write_result(joinpath(ROOT, "results/environment.json"), (;
     metadata=run_metadata((; memory_limit_bytes=17179869184, cpu_quota=4);
         source_sha256=source_hashes(ROOT; dirs=("src", "scripts", "test"),
-            files=("Project.toml",)),
+            files=()),
         status="environment ready; Julia version asserted and dependencies loaded"),
     packages=versions,
     core_environment_hashes=file_hashes(joinpath(ROOT, "../../julia"),
