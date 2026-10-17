@@ -43,6 +43,6 @@
   link: '/leaderboard.html'
   prs: [53]
 - date: "2026-10-17"
-  text: 'Lean now checks the rest of the proof, after the two computed inequalities, for 50 of the 52 computer-checked gaps. The spin-1 bound for rings of 2304 sites or more rises from 0.00382 to 0.00474.'
+  text: 'Lean now checks the rest of the proof, after the computed starting inequalities, for 51 of the 52 proven gaps, the spin-1 bound 0.0729 among them. The spin-1 bound for rings of 2304 sites or more rises from 0.00382 to 0.00474.'
   link: '/leaderboard.html#spin1-source1'
   records: [spin1-source1, ising-g-1-4-h-1-20]
