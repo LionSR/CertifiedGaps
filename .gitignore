@@ -32,3 +32,4 @@ lean/.lake
 *.jls
 
 # Model-specific ignores (regenerable results) live in models/<slug>/.gitignore.
+/.lake/

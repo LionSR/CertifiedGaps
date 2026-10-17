@@ -1,0 +1,26 @@
+# Root Lake package for the blueprint tooling (leanblueprint, checkdecls, docgen-action).
+# It builds the libraries of the Lean project in lean/ from their sources, so that these tools,
+# which expect a lakefile at the repository root, work unchanged. The Lean project itself, its
+# options and its Mathlib pin live in lean/; keep the two in sync when bumping Mathlib.
+name = "CertifiedGaps"
+defaultTargets = ["CertifiedGaps", "SeedKernel"]
+
+[leanOptions]
+pp.unicode.fun = true
+relaxedAutoImplicit = false
+autoImplicit = false
+weak.linter.mathlibStandardSet = true
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.35.0-rc3"
+
+[[lean_lib]]
+name = "CertifiedGaps"
+srcDir = "lean"
+
+[[lean_lib]]
+name = "SeedKernel"
+srcDir = "lean"
+roots = ["SeedKernel", "SeedKernel.Audit"]
