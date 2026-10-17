@@ -1,6 +1,6 @@
 # Two-leg transverse-field Ising ladder: verification method and results
 
-**Headline result:** $g = 3$ is the smallest certified transverse field on the tested grid $g \in \{2, 5/2, 3, 4\}$. The seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636386863$ and a unique ground state for every even $L \ge 4$ rungs ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ passes the numerical scan but was not run through full verification since $g = 3$ already succeeds.
+**Headline result:** $g = 3$ is the smallest certified transverse field on the tested grid $g \in \{2, 5/2, 3, 4\}$. The seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636870831$ (interval bound; exact chain bound $\Delta_L > 0.636342881$) and a unique ground state for every even $L \ge 4$ rungs ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ passes the numerical scan but was not run through full verification since $g = 3$ already succeeds.
 
 ## Model and scope
 
@@ -12,43 +12,25 @@ The $L = 2$ ring includes both periodic leg bonds, following the core package co
 
 In this Pauli normalization, DMRG finite-size scaling by Xavier, Pereira, Nunes, and Plascak ([arXiv:2111.11404](https://arxiv.org/abs/2111.11404), Eq. (1) and Table I with $J_\perp^x = 0$, $J_\perp^z = 1$, $J_4 = 0$) locates the quantum critical point at $g_c = 1.83214(5)$, placing all four tested fields $g \in \{2, 5/2, 3, 4\}$ in the gapped paramagnetic phase. This literature value is used only for physical context and never enters the certificate.
 
-## Exact reflection positivity and symmetry decomposition
+## Exact frame, reflection positivity and symmetry decomposition
 
-In the real $\sigma^z$ cell basis $(\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow)$ with $Z = \operatorname{diag}(1, -1)$ and $X = \bigl(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\bigr)$, setting $C_1 = Z \otimes I$ and $C_2 = I \otimes Z$ gives
+In the real $\sigma^z$ cell basis $(\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow)$ with $Z = \operatorname{diag}(1, -1)$ and $X = \bigl(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\bigr)$, the physical bond satisfies $-h = (Z \otimes I) \otimes (Z \otimes I) + (I \otimes Z) \otimes (I \otimes Z)$ with a real symmetric on-site rung operator $o = -Z \otimes Z - g(X \otimes I + I \otimes X)$; this is the form of the Lean model. The transverse field is not diagonal in this basis, so the certificate uses the rotated frame of a Hadamard gate on every spin: $W = (H \otimes H)/2$ with $H = \bigl(\begin{smallmatrix}1&1\\1&-1\end{smallmatrix}\bigr)$ is an exact rational orthogonal involution on a rung with $W X W = Z$ spin by spin. The rotated ladder `Ladder.ladder(g)` has
 
-$$-h_{\text{bond}} = C_1 \otimes C_1 + C_2 \otimes C_2,$$
+$$h = -(X_a X_{a'} + X_b X_{b'}), \qquad o = -X_a X_b - g (Z_a + Z_b), \qquad -h = C_1 \otimes C_1 + C_2 \otimes C_2,\quad C_1 = X \otimes I,\ C_2 = I \otimes X,$$
 
-with real symmetric on-site rung operator $o = -Z \otimes Z - g(X \otimes I + I \otimes X)$. The function `rp_identity` in [`src/Ladder.jl`](src/Ladder.jl) checks this four-spin matrix identity over `Rational{BigInt}`, constructing the inter-rung bond independently from four $2 \times 2$ Kronecker factors. Because a single rung cell is invariant under spatial reflection along the leg direction, $F = I$.
+so it is reflection positive with real factors and $F = I$. The tests check both frame identities and both RP identities over `Rational{BigInt}`; the core `verify_rp` checks the rotated one again inside `certify_gap` and `check_certificate`.
 
-To block-diagonalize $H_L$ for exact diagonalization, a real Hadamard rotation on every spin diagonalizes the transverse field so that $\mathbb{Z}_2$ spin-flip parity (the parity of the number of down spins in the rotated basis) is conserved, while the $ZZ$ couplings act as pair flips. Leg exchange $S$, rung reflection $R: j \mapsto -j$, and (for even $L$) half-ring translation $T: j \mapsto j + L/2$ are commuting involutions that commute with $H_L$. For each spin-flip parity and real character $\chi$ of the involution group, each permutation orbit $O$ with a $\chi$-trivial stabilizer contributes one normalized basis state $|O, \chi\rangle = |O|^{-1/2} \sum_{s \in O} \chi(s) |s\rangle$, and orbits with non-trivial stabilizer characters vanish. Because distinct orbits have disjoint support and characters are orthogonal, this produces an exact orthonormal decomposition into real symmetric blocks whose dimensions sum to $4^L$.
+In the rotated frame the number of down spins mod 2 is a conserved additive charge (`charge = [0, 1, 1, 0]`, `modulus = 2`): every $X$ flips one spin and every term flips two. The leg exchange $S$ ($\uparrow\downarrow \leftrightarrow \downarrow\uparrow$, `LEG_SWAP`) is a real permutation involution on a rung that commutes with $h$, $o$ and the charge. The core `VerifiedSpectra.ring_blocks` splits the ring exactly into charge sectors, lattice momenta $k = 2\pi m/L$ ($0 \le m \le L/2$; the model is real, so $\pm k$ are merged with multiplicity 2) and the parity of $S^{\otimes L}$, using symmetrized orbit states of the group generated by translations and $S^{\otimes L}$. Block entries are enclosed in interval arithmetic (exact couplings times enclosed phases and orbit-size ratios); the Float64 center is exactly Hermitian, and the Frobenius norm of the entry radii bounds its distance to the exact block. The 4-rung ring gives 12 blocks (largest 24), the 8-rung ring 20 blocks (largest 2102), with multiplicities summing to $4^4$ and $4^8$. The test suite compares the core blocks for $L = 2, 3, 4$ with an independently constructed $4^L \times 4^L$ Hamiltonian. (Rung reflection, which the former local code also used, is not available in the core; it would halve the blocks once more.)
 
-Exact block entries have the algebraic form $A_{ij} / (2\sqrt{m_i / m_j})$, where $A$ is an integer matrix and $m_i = |O_i|$ are orbit sizes; exact symmetry is verified via the integer identity $A_{ij} m_j = A_{ji} m_i$. Small-ring tests check the block spectra against the full $4^L \times 4^L$ Hamiltonian.
+## Enclosure and seed arithmetic
 
-## Implemented enclosure theorem
+Every block goes through `CertifiedGaps.VerifiedSpectra.verified_eigen`: with LAPACK eigenpairs $(\Lambda, X)$ of the center $M$, the residual $R = MX - X\Lambda$ and Gram defect $G = X^\dagger X - I$ are computed in `Float64` (BLAS) and bounded in Frobenius norm with the a priori rounding bound $\gamma_{N+8}$ for real blocks and $\gamma_{2N+8}$ for complex blocks (four real products), valid for any summation order and FMA under the IEEE binary64 model with gradual underflow. The smaller of the Ostrowski bound and the polar-factor bound gives a radius $r$ such that the sorted eigenvalues of $M$ lie within $r$ of $\Lambda$, and Weyl adds the construction error. The largest radii are $6.1 \times 10^{-12}$ (4 rungs) and $1.5 \times 10^{-7}$ (8 rungs), against $1.5 \times 10^{-10}$ and $3.9 \times 10^{-5}$ for the former local enclosure. `log_partition_enclosure` sums the enclosed spectra in interval arithmetic; `seed_bounds` forms $1 - \exp(\log Z_{2n_0}(\beta_0) - 2 \log Z_{n_0}(\beta_0))$ and $1 - \exp(\log Z_{2n_0}(2\beta_0) - 2\log Z_{2n_0}(\beta_0))$ and rounds their upper ends up to the grid $10^{-15}$; `certify_gap` then screens the seed with the interval `certified_gap_bound` and builds the exact rational doubling chain.
 
-Let $B$ be an exact real symmetric block of dimension $m$, $H$ its `Float64` approximation, $Q$ the computed eigenvector matrix, and $\Lambda = \operatorname{diag}(\Lambda_1, \dots, \Lambda_m)$ the computed eigenvalues. Suppose we have certified upper bounds
+## Validation
 
-$$\|B - H\|_2 \le d, \qquad \|HQ - Q\Lambda\|_2 \le r, \qquad \|Q^\top Q - I\|_2 \le e < 1.$$
-
-Then the orthogonal polar factor $U = Q(Q^\top Q)^{-1/2}$ satisfies $\|U - Q\|_2 \le a = e / (1 + \sqrt{1 - e})$, which implies
-
-$$\|U^\top H U - \Lambda\|_2 \le r + (\|H\|_2 + \|\Lambda\|_2)\, a.$$
-
-By Weyl's inequality and the triangle inequality, every ordered eigenvalue of $B$ (counted with multiplicity) satisfies
-
-$$|\lambda_i(B) - \Lambda_i| \le \eta = d + r + (\|H\|_F + \|\Lambda\|_2)\, a.$$
-
-In the implementation:
-- Each algebraic entry of $B$ is enclosed using 256-bit directed-rounding MPFR arithmetic, and $d \ge \|B - H\|_2$ is bounded by the maximum absolute row sum of $B - H$.
-- Under the IEEE binary64 floating-point model (unit roundoff $u = 2^{-53}$, $\gamma_k = ku / (1 - ku)$ with $k = 2m + 8$, plus an additive $16m^3 \cdot 2^{-1074}$ allowance for gradual underflow), the rounding error of the floating-point matrix products $HQ - Q\Lambda$ and $Q^\top Q - I$ is bounded by $\gamma_k(\|H\|_F \|Q\|_F + \|Q\|_F \|\Lambda\|_2)$ and $\gamma_k(\|Q\|_F^2 + \sqrt{m})$, respectively. All Frobenius norms and combined upper bounds are accumulated in `BigFloat` with upward rounding.
-- Directed-rounding MPFR exponentials, sums, and logarithms enclose $\log Z_n(\beta_0)$, $\log Z_{2n}(\beta_0)$, and $\log Z_{2n}(2\beta_0)$ from the eigenvalue intervals $[\Lambda_i - \eta, \Lambda_i + \eta]$. From the lower bounds on the log-purities $l_{\mathrm{s}} = \operatorname{lo}(\log Z_{2n}(\beta_0)) - 2\operatorname{hi}(\log Z_n(\beta_0))$ and $l_\tau = \operatorname{lo}(\log Z_{2n}(2\beta_0)) - 2\operatorname{hi}(\log Z_{2n}(\beta_0))$, upward-rounded values of $-\operatorname{expm1}(l_{\mathrm{s}})$ and $-\operatorname{expm1}(l_\tau)$ are converted exactly to `Rational{BigInt}` and passed to `CertifiedGaps.certified_gap_bound`.
-
-## Validation and independent audit
-
-The certificate [`results/certificate_g3_1.json.gz`](results/certificate_g3_1.json.gz) (uncompressed SHA-256 `aba98d9865f1b496a96e7a7e17dec0239ec07b34e012b73714d373c1e8a74928`) was generated on Julia 1.12.4 in 645.83 s, with maximum eigenvalue enclosure radii of $1.50 \times 10^{-10}$ ($L = 4$ rungs) and $3.94 \times 10^{-5}$ ($L = 8$ rungs), yielding $\varepsilon_{\mathrm{s}} \approx 0.11240836635$, $\varepsilon_\tau \approx 0.05161523886$, and $\Delta_L \ge 0.6363868632722607$.
-
-- **Fast checker (`check.jl` / `test/runtests.jl`):** runs 70 tests in ~35 s (10 exact RP and symmetry checks, 58 stored-seed, recurrence, and provenance checks, and 2 enclosure checks on an analytic test matrix), recomputing $\log Z$ and the rational seed defects from the stored eigenvalues and radii.
-- **Full spectral replay (`check.jl --full` and `scripts/replay_audit.jl`):** rebuilds all 32 dense symmetry blocks at $4$ and $8$ rungs ($256$ and $65{,}536$ states) from the Hamiltonian, recomputing the residual and orthogonality enclosures, partition intervals, rational seed defects, and recurrence bound from scratch (~445 s). On the original Linux OpenBLAS environment, the replay matched every stored floating-point and rational number bit for bit (`scripts/check_replay.jl`, 262 tests in 5.4 s). On an Apple M5 (Julia 1.12.4), platform differences in LAPACK eigenvector tie-breaking yield slightly tighter enclosure radii and a valid gap bound of $0.6364738604216351$, while all seed, bound, and source-hash checks pass.
+- **Fast checker (`check.jl` / `test/runtests.jl`):** exact frame and RP identities at $g \in \{2, 5/2, 3, 4\}$; core blocks against independent dense ED for $L = 2, 3, 4$ (verified radii $< 10^{-9}$); for each stored certificate, the decoded model equals `Ladder.ladder(g)` (including charge and symmetry), the seed is the listed one, `check_certificate(cert; spectra = false)` re-verifies the RP identity and reproduces the exact chain bound, `certified_gap_bound` reproduces `interval_bound_decimal`, the defects satisfy the Lean seed hypotheses, and `verify_model_metadata` checks the model-local source hashes.
+- **Full check (`check.jl --full`):** `check_certificate(cert; spectra = true)` recomputes every block spectrum of the 4- and 8-rung rings from the stored model and requires the fresh defect upper ends to be at most the stored seeds.
+- **Cross-check without the leg-exchange symmetry:** a run of `certify_gap` with charge and momentum blocks only (10 blocks of dimension about 4100 at 8 rungs, 971 s) gave $\varepsilon_{\mathrm{s}} \le 0.112389884123893$, $\varepsilon_\tau \le 0.051537141979371$ and interval bound $0.6368651924843131$, consistent with the certified values.
 
 ## Results
 
@@ -61,7 +43,7 @@ All scan values below are **numerical, not certified**. The grid is $\beta = 1/8
 | 3//1 | 4 | 1.500 | 0.636872819 | 2.661781588 | 90.40 |
 | 4//1 | 4 | 1.125 | 2.142199085 | 4.763362747 | 136.61 |
 
-Spectral runtimes sum the measured dense-spectrum calls after orbit construction; they exclude Julia startup, the $\beta$-grid scan, and JSON I/O. Verification runtime includes spectra, residual validation, and seed construction, excluding startup and final JSON I/O.
+Spectral runtimes were measured with the former local symmetry blocks (the scan now uses the core blocks); they exclude Julia startup, the $\beta$-grid scan, and JSON I/O.
 
 ### Purity and ground-energy finite-size diagnostics
 
@@ -85,17 +67,8 @@ For the fields without an $n_0 \le 4$ seed, a two-point fit $\delta(n) = \delta(
 - `g = 2//1`: $\xi_\delta = 2.465543$ rungs; estimated $(n_0, \beta_0) = (10, 8.250)$, requiring a 20-rung doubled ring.
 - `g = 5//2`: $\xi_\delta = 1.394273$ rungs; estimated $(n_0, \beta_0) = (6, 2.500)$, requiring a 12-rung doubled ring.
 
-### Dense sector dimensions
-
-- `L = 2`: 5, 1, 1, 1, 2, 2, 2, 2; sum = $16 = 4^2$. Zero-dimensional sectors are omitted.
-- `L = 3`: 14, 6, 6, 6, 10, 10, 6, 6; sum = $64 = 4^3$. Zero-dimensional sectors are omitted.
-- `L = 4`: 34, 18, 14, 14, 10, 10, 14, 14, 24, 24, 16, 16, 8, 8, 16, 16; sum = $256 = 4^4$. Zero-dimensional sectors are omitted.
-- `L = 6`: 320, 256, 256, 256, 240, 240, 240, 240, 272, 272, 272, 272, 240, 240, 240, 240; sum = $4096 = 4^6$. Zero-dimensional sectors are omitted.
-- `L = 8`: 4384, 4128, 4064, 4064, 4000, 4000, 4064, 4064, 4224, 4224, 4096, 4096, 3968, 3968, 4096, 4096; sum = $65536 = 4^8$. Zero-dimensional sectors are omitted.
-
 ### Certified results
 
-- **`g = 3//1`: $\Delta_L \ge 0.636386863$** for all even $L \ge 4$ rungs ($2L$ spin sites, multiples of 4, $\ge 8$ sites). Seed $(n_0, \beta_0) = (4, 3/2)$; verification time $645.83\text{ s}$; ratio of certified bound to 8-rung ED gap $= 0.239083$.
-  The returned `.bound` is `0.6363868632722607` (exact binary rational `179126977518527//281474976710656`), rounded downward in the headline decimal.
-  Exact rational seed defects and per-sector eigenvalue enclosure radii are stored in `results/certificate_g3_1.json.gz`.
+- **g=3//1: Δ_L ≥ 0.636870831** (interval bound `0.6368708319575064`; exact chain bound `636342881//1000000000`) for every even L ≥ 4 rungs. Seed (n0,β)=(4,3//2), εₛ ≤ 0.11238966699069, εₜ ≤ 0.051536220063797; bound / 8-rung ED gap = 0.239265. Certificate: `results/certificate_g3_1.json`.
 
+Certified: the exact RP identity, whole-spectrum eigenvalue enclosures for the selected parameter/seed, outward log-partition and rational defect bounds, and the resulting uniform gap under the repository's two-purity theorem. Numerical: seed optimization, all nonverified scan spectra and finite-size gaps, the literature critical point, and comparisons to finite-ring reference gaps. The ED reference gap is not claimed to be an infinite-volume limit.

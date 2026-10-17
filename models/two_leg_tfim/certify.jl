@@ -1,38 +1,28 @@
-# Certifies the best stored numerical seed at field g (default 3//1): verified dense spectra of
-# the rings n0 and 2n0, outward log Z, rational seeds, recurrence (~11 min). Writes OUTPUT
-# (default results/certificate_g<g>_certifiedgaps.json, which test/runtests.jl also checks;
-# check.jl --full passes a temporary file instead).
-#     julia --project=models/two_leg_tfim models/two_leg_tfim/certify.jl [g] [OUTPUT]
+# Core gap certificate of the two-leg TFIM ladder at every point of `Ladder.POINTS` (or at the
+# field given as the first argument, with that point's seed): CertifiedGaps.certify_gap on the
+# rotated-frame RingModel (exact RP identity, verified spectra of the rings of n₀ and 2n₀ rungs,
+# log Z enclosures, seed defects, exact rational chain). Writes results/certificate_g<g>.json
+# with `Results.model_metadata` (model-local and core source hashes) under "metadata".
+#     julia --project=julia models/two_leg_tfim/certify.jl [g]     (about 9 min)
 include(joinpath(@__DIR__, "src", "Ladder.jl"))
-using .Ladder, CertifiedGaps, CertifiedGaps.Results, LinearAlgebra
+using .Ladder, CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.GapCertificates
+using LinearAlgebra
 BLAS.set_num_threads(1)
-root=@__DIR__
-g=parse(Rational{Int},get(ARGS,1,"3//1"))
-tag=replace(string(g),"//"=>"_")
-output=get(ARGS,2,joinpath(root,"results","certificate_g$(tag)_certifiedgaps.json"))
-scan=read_exact_json(joinpath(root,"results","scan_g$tag.json"))
-@assert scan["best"] !== nothing "No eligible numerical seed"
-best=scan["best"]; n=parse(Int,best["n₀"])
-beta=Rational{BigInt}(best["β₀"]); @assert iseven(n)
-t=time(); specs=[]
-for L in (n,2n)
-    push!(specs,full_spectrum(L,g;verified=true))
+const ROOT = @__DIR__
+
+points = isempty(ARGS) ? POINTS : filter(p -> p.g == parse(Rational{Int}, ARGS[1]), POINTS)
+isempty(points) && error("no certified point at g = $(ARGS[1]); see Ladder.POINTS")
+for p in points
+    model = ladder(p.g)
+    seconds = @elapsed cert = certify_gap(model; n0 = p.n0, β0 = p.β0, rp = ladder_rp(model),
+        progress = true)
+    cert["point"] = Dict("g" => string(p.g), "lengths" => "even L >= $(p.n0) rungs")
+    cert["metadata"] = model_metadata(ROOT, (; g = string(p.g), n0 = p.n0,
+            beta0 = string(p.β0), blas = string(BLAS.get_config()), seconds);
+        PROVENANCE..., packages = (CertifiedGaps,), certified = true)
+    tag = replace(string(p.g), "//" => "_")
+    path = write_result(joinpath(ROOT, "results", "certificate_g$tag.json"), cert)
+    println(path, ": g = $(p.g), εₛ ≤ $(Float64(parse(Rational{BigInt}, cert["seed"]["eps_s"]))),",
+        " εₜ ≤ $(Float64(parse(Rational{BigInt}, cert["seed"]["eps_t"]))),",
+        " gap > $(cert["gap_lower_bound_decimal"]), $(round(seconds; digits = 1)) s")
 end
-(;es,et,logZ)=seed_defects(specs[1],specs[2],beta)
-@assert 0<=es<1 && 0<=et<1
-bound=certified_gap_bound(es,et,beta)
-@assert bound.bound !== nothing
-payload=(;g=string(g),n0=n,beta=string(beta),epsilon_s=string(es),epsilon_t=string(et),
-    bound=bound.bound,recurrence=bound,seconds=time()-t,
-    validity="even L >= $n rungs (2L spin sites, multiples of four, >= $(2n) sites)",
-    logZ=[map(x->string(Rational{BigInt}(x)),v) for v in logZ],
-    spectra=specs,
-    # Model-local sources are enforced by the checker; the core is provenance only.
-    metadata=merge(run_metadata((;g=string(g),n0=n,beta=string(beta));
-        source_sha256=source_hashes(root;dirs=("src",),
-            files=["certify.jl","Project.toml","Manifest.toml"]),
-        packages=(CertifiedGaps,),status="certified",certified=true),
-        Dict("core_sha256"=>source_hashes(normpath(joinpath(root,"../.."));
-            dirs=("julia/src",),files=("julia/Project.toml","julia/Manifest.toml")))))
-write_result(output,payload)
-println("CERTIFIED g=$g n0=$n beta=$beta bound=$(bound.bound), seconds=$(time()-t), output=$output")

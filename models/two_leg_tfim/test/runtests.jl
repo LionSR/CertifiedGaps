@@ -1,90 +1,84 @@
-using SparseArrays, Test, LinearAlgebra, SHA, CertifiedGaps, CertifiedGaps.Results
-include(joinpath(@__DIR__, "../src/Ladder.jl"))
+# Fast tests and certificate checks for the two-leg TFIM ladder (run by check.jl).
+using Test, LinearAlgebra, CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.RingModels
+using CertifiedGaps.GapCertificates: check_certificate
+using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum
+const ROOT = dirname(@__DIR__)
+include(joinpath(ROOT, "src", "Ladder.jl"))
 using .Ladder
-include(joinpath(@__DIR__, "../src/Provenance.jl"))
-using .Provenance
 BLAS.set_num_threads(1)
-@testset "Exact ladder RP and full sector resolution" begin
-    for g in (2//1,5//2,3//1,4//1)
-        @test rp_identity(g)
+
+certificate_paths() = filter(p -> occursin(r"^certificate_g.*\.json$", basename(p)),
+    readdir(joinpath(ROOT, "results"); join = true))
+
+# The seed defects hardcoded as the first entries of `s` and `t` in
+# lean/CertifiedGaps/Models/TwoLegIsing.lean, per field.
+const LEAN_SEEDS = Dict(3 // 1 => (s = 1125 // 10^4, t = 5162 // 10^5))
+
+@testset "Exact frame change and reflection positivity" begin
+    W = rung_hadamard()
+    @test W * W == I && W == transpose(W)
+    for g in (2 // 1, 5 // 2, 3 // 1, 4 // 1)
+        p, r = physical_terms(g), rotated_terms(g)
+        @test W * p.onsite * W == r.onsite
+        @test kron(W, W) * p.bond * kron(W, W) == r.bond
+        m = ladder(g)
+        @test verify_rp(m, ladder_rp(m))
+        # Physical frame: −h = Σ (Z⊗1) ⊗ (Z⊗1) + (1⊗Z) ⊗ (1⊗Z), as in the Lean model.
+        Z, I2 = [1 0; 0 -1], [1 0; 0 1]
+        @test -p.bond == kron(Z, I2, Z, I2) + kron(I2, Z, I2, Z)
     end
+end
+
+@testset "Core blocks against an independent full Hamiltonian" begin
+    # Rotated frame, rung state index 2a + b + 1 with a, b ∈ {0 = up, 1 = down}; spin (j, leg) is
+    # bit 2j + leg of the ring state s, leg a the more significant bit of each rung.
+    g = 3
     for L in 2:4
-        bs=blocks(L)
-        @test sum(length(b.reps) for b in bs)==4^L
-        # Independent full Hamiltonian in the X basis, including the L=2 doubled bonds.
-        N=4^L; H=zeros(N,N)
-        for s in 0:N-1
-            H[s+1,s+1]=-3*(2L-2count_ones(s))
-            for j in 0:L-1
-                H[(s ⊻ (1<<(2j)) ⊻ (1<<(2j+1)))+1,s+1]-=1
-                for a in 0:1
-                    H[(s ⊻ (1<<(2j+a)) ⊻ (1<<(2mod(j+1,L)+a)))+1,s+1]-=1
+        N = 4^L; H = zeros(N, N)
+        bit(j, leg) = 2j + (1 - leg)
+        for s in 0:(N-1)
+            H[s+1, s+1] = -g * (2L - 2count_ones(s))
+            for j in 0:(L-1)
+                H[(s ⊻ (1 << bit(j, 0)) ⊻ (1 << bit(j, 1)))+1, s+1] -= 1
+                for leg in 0:1
+                    H[(s ⊻ (1 << bit(j, leg)) ⊻ (1 << bit(mod(j + 1, L), leg)))+1, s+1] -= 1
                 end
             end
         end
-        ev=Float64[]
-        for b in bs
-            M,A=block_matrix(b,3//1)
-            append!(ev,eigvals(Symmetric(M)))
-        end
-        @test sort(ev) ≈ eigvals(Symmetric(H)) atol=1e-11
+        E = eigvals(Symmetric(H))
+        @test ladder_energies(g, L) ≈ E atol = 1e-11
+        spec = verified_ring_spectrum(ladder(g), L)
+        @test maximum(s.radius for s in spec) < 1e-9
+        @test sum(length(s.centers) * s.multiplicity for s in spec) == N
     end
 end
-# Certificate files passed as arguments (check.jl --full passes a fresh one) are checked too.
-@testset "Stored rational seed and outward recurrence" begin
-    paths=filter(p->startswith(basename(p),"certificate_g") &&
-        (endswith(p,".json") || endswith(p,".json.gz")),
-        readdir(joinpath(@__DIR__,"../results");join=true))
-    @test !isempty(paths)
-    append!(paths,abspath.(ARGS))
-    for p in paths
-        c=read_result(p)
-        @test rp_identity(parse(Rational{BigInt},c["g"]))
-        es=parse(Rational{BigInt},c["epsilon_s"])
-        et=parse(Rational{BigInt},c["epsilon_t"])
-        beta=parse(Rational{BigInt},c["beta"])
-        n=parse(Int,c["n0"]); @test iseven(n)
-        @test certified_gap_bound(es,et,beta).bound == c["bound"]
-        loaded=stored_spectra(c)
-        # Recomputed defects are valid upper bounds; the stored seeds may only be larger.
-        seeds=seed_defects(loaded[1],loaded[2],beta)
-        @test seeds.es <= es
-        @test seeds.et <= et
-        # The original certificate's source hashes describe the audited historical snapshot
-        # (when this directory was certificates/two_leg_tfim and the core was ThermalMPOGap).
-        # They are provenance, not part of the mathematical check: verify them when that
-        # commit is in the local object store, and say loudly when it is not.
-        historical=basename(p)=="certificate_g3_1.json.gz"
-        if historical
-            @test read_result_bytes(p) |> sha256 |> bytes2hex == ORIGINAL_CERTIFICATE_SHA256
-        end
-        if historical && !snapshot_available(joinpath(@__DIR__,".."))
-            @warn "Historical snapshot $(HISTORICAL_SNAPSHOT) not in the Git object store; " *
-                "skipping $(length(c["metadata"]["source_sha256"])) provenance hashes"
-            @test_skip false
-        else
-            for (rel,hash) in c["metadata"]["source_sha256"]
-                # A current certificate enforces only model-local sources; a path outside
-                # this directory (the shared core) is provenance and is not compared.
-                !historical && startswith(normpath(rel),"..") && continue
-                snapshot=historical ? HISTORICAL_SNAPSHOT : nothing
-                @test source_sha256(joinpath(@__DIR__,".."),rel;snapshot)==hash
-            end
-        end
 
-        for spec in c["spectra"]
-            L=parse(Int,spec["L"])
-            @test sum(parse(Int,s["dimension"]) for s in spec["sectors"])==4^L
-            @test all(length(s["eigenvalues"])==parse(Int,s["dimension"]) for s in spec["sectors"])
+@testset "Stored certificates" begin
+    paths = certificate_paths()
+    @test !isempty(paths)
+    for path in paths
+        c = read_exact_json(path)
+        g = parse(Rational{BigInt}, c["point"]["g"])
+        point = only(filter(p -> p.g == g, POINTS))
+        # The stored model and RP data are those of `ladder(g)`, with the listed seed.
+        stored, model = decode_model(c["model"]), ladder(g)
+        @test (stored.d, stored.bond, stored.onsite, stored.charge, stored.modulus,
+            stored.symmetries) ==
+              (model.d, model.bond, model.onsite, model.charge, model.modulus,
+            model.symmetries)
+        @test parse(Int, c["seed"]["n0"]) == point.n0
+        @test parse(Rational{BigInt}, c["seed"]["beta0"]) == point.β0
+        # Exact RP identity and the exact chain from the stored seeds (throws on mismatch).
+        @test check_certificate(c; spectra = false)["gap_lower_bound"] == c["gap_lower_bound"]
+        εs = parse(Rational{BigInt}, c["seed"]["eps_s"])
+        εt = parse(Rational{BigInt}, c["seed"]["eps_t"])
+        @test 0 <= εs < 1 && 0 <= εt < 1
+        @test certified_gap_bound(εs, εt, point.β0).bound == c["interval_bound_decimal"]
+        # The Lean theorem's seed hypotheses are implied by the certified defects.
+        @test εs <= LEAN_SEEDS[g].s && εt <= LEAN_SEEDS[g].t
+        for (L, s) in c["spectra"]
+            @test parse(Int, s["dimension"]) == 4^parse(Int, L)
         end
+        @test verify_model_metadata(c["metadata"], ROOT; PROVENANCE...) == 3
     end
-end
-@testset "Enclosure arithmetic on an exactly soluble block" begin
-    # Known spectrum {−sqrt(5),sqrt(5)} for an exact rational symmetric matrix.
-    H=[1.0 2.0;2.0 -1.0]
-    A=2Int.(H); b=(sizes=[1,1],)
-    F=eigen(Symmetric(H)); v=verify_eigen(H,sparse(A),b,F)
-    eta=BigFloat(parse(Rational{BigInt},v.radius))
-    @test abs(BigFloat(F.values[1])+sqrt(big(5.0)))<=eta
-    @test abs(BigFloat(F.values[2])-sqrt(big(5.0)))<=eta
 end

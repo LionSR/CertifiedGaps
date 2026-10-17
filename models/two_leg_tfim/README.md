@@ -1,111 +1,138 @@
 # Two-leg transverse-field Ising ladder
 
-This module certifies a uniform spectral gap for the two-leg transverse-field Ising ladder at transverse field $g = 3$: **$\Delta_L \ge 0.636386863$ and a unique ground state for every even $L \ge 4$ rungs** ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). The verification method, eigenvalue enclosure theorem, numerical scan tables, and independent replay audit are documented in [`METHOD.md`](METHOD.md); the route analysis is in [`IDEAS.md`](IDEAS.md).
+This module certifies a uniform spectral gap for the two-leg transverse-field Ising ladder at
+transverse field $g = 3$: **$\Delta_L \ge 0.636870831$ and a unique ground state for every even
+$L \ge 4$ rungs** ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). The certificate is produced
+end to end by the shared core (`CertifiedGaps.GapCertificates.certify_gap`) from the ladder
+written as a reflection-positive `RingModel` of rungs. The method, scan tables and finite-size
+diagnostics are in [`METHOD.md`](METHOD.md); the route analysis is in [`IDEAS.md`](IDEAS.md).
 
 | $g$ | seed $(n_0 \text{ rungs}, \beta_0)$ | certified gap $\ge$ | lengths covered |
 |---|---|---:|---|
-| 3 | $(4, 3/2)$ | 0.636386863 | every even $L \ge 4$ rungs |
+| 3 | $(4, 3/2)$ | 0.636870831 | every even $L \ge 4$ rungs |
 
 ## Model
 
-Each unit cell is a two-spin rung ($d = 4$). In Pauli normalization on a periodic ring of $L$ rungs,
+Each unit cell is a two-spin rung ($d = 4$). In Pauli normalization on a periodic ring of $L$
+rungs,
 
 $$H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).$$
 
-Lengths count rungs, and the $L = 2$ ring retains both periodic leg bonds, following the core package convention.
+Lengths count rungs, and the $L = 2$ ring retains both periodic leg bonds, following the core
+convention. The certificate works in the **rotated frame** obtained by a Hadamard gate on every
+spin, i.e. the exact rational orthogonal involution $W = (H \otimes H)/2$ with
+$H = \begin{pmatrix}1&1\\1&-1\end{pmatrix}$ on every rung (`Ladder.rung_hadamard`). It maps
+$X \leftrightarrow Z$, so the rotated ladder (`Ladder.ladder(g)`) has bond
+$h = -(X_a X_{a'} + X_b X_{b'})$ and on-site term $o = -X_a X_b - g(Z_a + Z_b)$. There the
+$\mathbb{Z}_2$ charge (number of down spins mod 2, `charge = [0, 1, 1, 0]`) is conserved and
+the leg exchange $a \leftrightarrow b$ is an exact on-site $\mathbb{Z}_2$ symmetry
+(`symmetries = [LEG_SWAP]`). The tests check $W o_{\text{phys}} W = o_{\text{rot}}$ and
+$(W \otimes W) h_{\text{phys}} (W \otimes W) = h_{\text{rot}}$ exactly. $W^{\otimes L}$ is
+orthogonal, so both frames have the same spectrum and purities.
 
 ## Reflection positivity
 
-In the real $\sigma^z$ rung basis $(\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow)$, setting the diagonal real bond factors $C_1 = Z \otimes I$ and $C_2 = I \otimes Z$ gives
+In the rotated frame, the real bond factors $C_1 = X \otimes I$ and $C_2 = I \otimes X$ give
 
-$$-h_{\text{bond}} = C_1 \otimes C_1 + C_2 \otimes C_2,$$
+$$-h = C_1 \otimes C_1 + C_2 \otimes C_2,$$
 
-and the on-site rung operator $o = -Z \otimes Z - g(X \otimes I + I \otimes X)$ is real symmetric. The function `rp_identity` in [`src/Ladder.jl`](src/Ladder.jl) checks this identity over `Rational{BigInt}`, constructing the inter-rung bond independently from four $2 \times 2$ Kronecker factors. Because a single rung is invariant under spatial reflection along the leg direction, no internal cell reflection $F$ is required ($F = I$).
+and the on-site term $o$ is real symmetric; a single rung needs no internal reflection ($F = I$).
+`Ladder.ladder_rp` passes these factors to the core `rp_certificate`, whose `verify_rp` checks
+the identity over `Rational{BigInt}`; the certificate stores them and `check.jl` re-verifies
+them. In the physical frame the same identity holds with $C_1 = Z \otimes I$, $C_2 = I \otimes Z$
+(the form used in `lean/CertifiedGaps/Models/TwoLegIsing.lean`), which the tests also check.
 
 ## Seeds and certified bounds
 
-| $g$ | seed $(n_0 \text{ rungs}, \beta_0)$ | $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(4, 3/2)$ | $\varepsilon_\tau \ge 1 - P_\tau(8, 3/2)$ | certified bound | 8-rung ED gap |
-|---|---|---:|---:|---:|---:|
-| 3 | $(4, 3/2)$ | $\approx 0.11240836635$ | $\approx 0.05161523886$ | 0.636386863 | 2.6618 (numerical) |
+| $g$ | seed $(n_0, \beta_0)$ | $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(4, 3/2)$ | $\varepsilon_\tau \ge 1 - P_\tau(8, 3/2)$ | certified gap $\ge$ (interval) | exact chain bound | 8-rung ED gap |
+|---|---|---:|---:|---:|---:|---:|
+| 3 | $(4, 3/2)$ | $0.11238966699069$ | $0.051536220063797$ | 0.636870831 | $> 0.636342881$ | 2.6618 (numerical) |
 
-The exact rational defect upper bounds are stored as `epsilon_s` and `epsilon_t` in [`results/certificate_g3_1.json.gz`](results/certificate_g3_1.json.gz). Passing them to `CertifiedGaps.certified_gap_bound(εₛ, εₜ, 3//2).bound` yields the exact rational `179126977518527//281474976710656` ($\approx 0.6363868632722607$, rounded down in the table above), which is about $24\%$ of the 8-rung numerical gap. On the scanned field grid $g \in \{2, 5/2, 3, 4\}$, the weaker fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ (numerical bound $2.142$) was not run through full certification because $g = 3$ is already certified.
+The seeds are the exact rationals `seed.eps_s = 11238966699069//100000000000000` and
+`seed.eps_t = 51536220063797//1000000000000000` of
+[`results/certificate_g3_1.json`](results/certificate_g3_1.json). The headline is the
+outward-rounded interval bound `certified_gap_bound(εₛ, εₜ, 3//2).bound` $= 0.6368708319575064$
+(`interval_bound_decimal`, rounded down above), about $24\%$ of the 8-rung numerical gap; the
+certificate's claim `gap_lower_bound` is the exact rational doubling chain,
+$\Delta_L > 636342881/10^9$. Both are rigorous. The defects satisfy the Lean theorem's seed
+hypotheses ($\varepsilon_{\mathrm{s}} \le 0.1125$, $\varepsilon_\tau \le 0.05162$, checked
+exactly in the tests). On the scanned grid $g \in \{2, 5/2, 3, 4\}$, the fields $g = 2$ and
+$5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ (numerical bound $2.142$) was
+not certified because $g = 3$ already is.
 
 ## Reproduce
 
-From the repository root, with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1`:
+From the repository root, with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1`, in the core
+environment:
 
 ```sh
-julia --project=models/two_leg_tfim -e 'using Pkg; Pkg.instantiate()'
-julia --project=models/two_leg_tfim models/two_leg_tfim/check.jl           # fast checker
-julia --project=models/two_leg_tfim models/two_leg_tfim/check.jl --full    # + fresh recertification
-# Fixed-seed replay from model inputs and its checker (output paths must be new):
-julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/replay_audit.jl results/replay.json
-julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/check_replay.jl \
-    results/replay.json results/replay_check.json
+julia --project=julia -e 'using Pkg; Pkg.instantiate()'
+julia --project=julia models/two_leg_tfim/certify.jl          # results/certificate_g3_1.json
+julia --project=julia models/two_leg_tfim/check.jl            # fast checker
+julia --project=julia models/two_leg_tfim/check.jl --full     # + freshly verified spectra
+julia --project=julia models/two_leg_tfim/test/runtests.jl    # same as the fast checker
 # Numerical seed scan for one field, then the extrapolation and the METHOD.md tables:
-julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/scan.jl 3//1
-julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/extrapolate.jl
-julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/summarize.jl
+julia --project=julia models/two_leg_tfim/scripts/scan.jl 3//1
+julia --project=julia models/two_leg_tfim/scripts/extrapolate.jl
+julia --project=julia models/two_leg_tfim/scripts/summarize.jl
 ```
 
-Running `certify.jl [g] [OUTPUT]` (default `3//1`) reads the best seed from `results/scan_g<g>.json`
-and writes `OUTPUT` (default `results/certificate_g<g>_certifiedgaps.json`, which the fast checker
-also verifies). `check.jl --full` runs it at $g = 3$ into a temporary file, never into `results/`,
-checks that fresh certificate like the stored ones, and requires the same seed $(g, n_0, \beta_0)$
-and a bound at least that of `results/certificate_g3_1.json.gz`. The enclosure radii depend on the
-LAPACK run, so a fresh run need not be bit-identical: on a heavily loaded machine (7040 s) it gave
-the valid bound 0.636473… against the stored 0.636386…. The scan script writes full spectra to
-`results/spectra_g<g>.json` (2.5 MB each, gitignored) for use by `extrapolate.jl` and
-`summarize.jl`. `--project=julia` (the core environment) also works for every command.
-
-Measured run times (Julia 1.12.4, one BLAS thread):
-- `check.jl` (equivalent to `test/runtests.jl`): 70 tests, 20–35 s including compilation;
-- `certify.jl 3//1`: 646 s for the verified spectra of $4$ and $8$ rungs;
-- `scripts/replay_audit.jl`: ~450 s; `scripts/check_replay.jl`: ~5 s;
-- `scripts/scan.jl`: 90–140 s of dense diagonalization per field.
+`certify.jl [g]` certifies every point of `Ladder.POINTS` (or the one at field `g`). The scan
+writes full spectra to `results/spectra_g<g>.json` (gitignored) for `extrapolate.jl` and
+`summarize.jl`. Measured run times (Julia 1.12.4, one BLAS thread, Apple M-series laptop shared
+with other jobs):
+- `certify.jl`: 532 s and 980 s in two identical runs at load averages of about 50–80 (32
+  blocks; the 8-rung blocks have dimension at most 2102, most of them complex);
+- `check.jl` / `test/runtests.jl`: 37 tests, 38–45 s including compilation;
+- `check.jl --full`: 319 s (284 s to recompute both verified spectra);
+- `scripts/scan.jl`: about 5 min per field (unverified spectra of the core blocks).
 
 ## What is rigorous
 
-- **Verified enclosures and recurrence:** the exact RP identity; complete dense spectra of all 32 symmetry sectors at $4$ and $8$ rungs (dimension sums $256$ and $65{,}536$), each enclosed by a polar/Weyl whole-spectrum bound that accounts for algebraic matrix-construction error and explicit binary64 BLAS rounding error bounds; outward-rounded MPFR log-partition intervals; exact rational seed defects; and the two-purity doubling recurrence. The enclosures rely on IEEE binary64 round-to-nearest arithmetic with gradual underflow and standard BLAS dot-product error bounds (see [`METHOD.md`](METHOD.md)).
-- **Fast vs. full verification:** `check.jl` (fast) uses the stored per-sector eigenvalue radii to recompute $\log Z$, the rational seed defects (each at most the stored one; they coincide), and the recurrence bound. `check.jl --full` and `scripts/replay_audit.jl` rebuild every eigenpair and enclosure radius from the Hamiltonian. On the original Linux OpenBLAS machine, `replay_audit.jl` reproduced the stored certificate bit for bit; on an Apple M5, LAPACK tie-breaking produces slightly tighter radii and a valid bound of $0.6364738604216351$ (so `check_replay.jl` flags the bit-identity comparisons while passing all seed, bound, and source-hash checks).
-- **Numerical only (not used in the proof):** the seed search ($g \in \{2, 5/2, 3, 4\}$, $n_0 \in \{2, 3, 4\}$, $\beta = 1/8 : 1/8 : 32$), the uncertified $g = 4$ candidate, the negative scan results at $g = 2$ and $5/2$, the extrapolated seed sizes, finite-ring ED reference gaps, and the literature critical field $g_c \approx 1.83214(5)$.
+- **Rigorous:** the exact RP identity and frame change (`Rational{BigInt}`); the complete
+  spectra of the rings of 4 and 8 rungs, split exactly by the core `VerifiedSpectra.ring_blocks`
+  into $\mathbb{Z}_2$ charge, lattice momentum (±k merged with multiplicity 2) and leg-exchange
+  parity, with block entries enclosed in interval arithmetic; each block enclosed by
+  `CertifiedGaps.VerifiedSpectra.verified_eigen` (residual and Gram matrices in `Float64` with
+  a priori $\gamma_{N+8}$ (real blocks) or $\gamma_{2N+8}$ (complex blocks) rounding bounds and
+  Frobenius norms, then Ostrowski/polar-factor and Weyl bounds, plus the exact construction
+  error); $\log Z$ by `log_partition_enclosure` in interval arithmetic; seed defects rounded up
+  to a $10^{-15}$ grid; the exact rational doubling chain and the interval
+  `certified_gap_bound`. Trusted base: IEEE binary64 round-to-nearest with gradual underflow,
+  standard (non-fast-math) BLAS and LAPACK producing finite output, `IntervalArithmetic`, and
+  the repository's two-purity theorem.
+- **Fast vs. full verification:** `check.jl` re-verifies the RP identity, the stored model
+  against `Ladder.ladder(g)`, the exact chain from the stored seeds, the interval bound, the
+  Lean seed hypotheses and the model-local source hashes; `--full` also recomputes and
+  re-verifies every block spectrum and requires the fresh defects to be at most the stored ones.
+- **Numerical only (not used in the proof):** the seed search ($g \in \{2, 5/2, 3, 4\}$,
+  $n_0 \in \{2, 3, 4\}$, $\beta = 1/8 : 1/8 : 32$), the negative scan results at $g = 2$ and
+  $5/2$, the extrapolated seed sizes, finite-ring ED reference gaps, and the literature critical
+  field $g_c \approx 1.83214(5)$.
 
 ## Layout
 
-- `certify.jl`, `check.jl`: certificate generator and verifier.
-- `src/Ladder.jl`: exact RP identity, symmetry sector orbits, block matrices, verified eigenvalue
-  enclosures, $\log Z$ intervals, and `seed_defects` (the single implementation of the step from two
-  spectra to the rational seeds, shared by `certify.jl`, the tests, and the replay scripts).
-- `src/Provenance.jl`: the historical snapshot constants and source-hash verification (the gzip
-  certificate is read with the core `Results.read_result` / `read_result_bytes`).
-- `scripts/`: `scan.jl` (numerical seed scan), `extrapolate.jl`, `summarize.jl` (updates the
-  `## Results` section of `METHOD.md`), `replay_audit.jl`, and `check_replay.jl` (full fixed-seed
-  replay and its checker).
-- `test/runtests.jl`: fast test suite and certificate checker.
-- `results/certificate_g3_1.json.gz`: compressed certificate (gzip of the original 5.3 MB JSON),
-  alongside `results/scan_g*.json` (numerical scans), `extrapolation.json`, and `environment.json`
-  (Julia, BLAS, and package versions of the certifying run).
-- `METHOD.md`: verification method, enclosure theorem, numerical scan tables, and the independent
-  audit.
+- `certify.jl`, `check.jl`: certificate generator (core `certify_gap`) and checker (core
+  `check_certificate`).
+- `src/Ladder.jl`: the model only: physical and rotated terms, the frame change, the core
+  `RingModel` with its charge and leg-exchange symmetry, the RP factors, the certified points,
+  the hashed source set, and unverified energies for scans.
+- `scripts/`: `scan.jl` (numerical seed scan), `extrapolate.jl`, `summarize.jl` (rewrites the
+  `## Results` section of `METHOD.md`).
+- `test/runtests.jl`: exact frame and RP tests, core blocks against an independent full
+  Hamiltonian, and the stored-certificate checks.
+- `results/certificate_g3_1.json`: the core-format certificate (model, RP data, seed, log Z
+  enclosures, spectrum summaries, exact chain, and `metadata` with the model-local
+  `source_sha256` of `src/`, `certify.jl`, `check.jl` and the core `core_sha256`);
+  `scan_g*.json` (numerical scans) and `extrapolation.json`.
 
 ## History
 
-This certificate was generated when the directory was `certificates/two_leg_tfim` and the core
-package was named `ThermalMPOGap`. Its `source_sha256` entries reference the audited snapshot
-`8a1aad63e1a285392c97bf5cf17e8da03f0b8314`, which the fast checker verifies against the Git object
-database when that commit is available (and reports when it is not), along with the SHA-256 hash
-(`aba98d98…a74928`) of the uncompressed certificate bytes. The rename changed only the namespace,
-and a replay on `CertifiedGaps` 0.2.0 reproduced every number exactly. `METHOD.md` was named
-`REPORT.md` until the directory-format standardization. Later the seed step that `certify.jl`,
-`test/runtests.jl`, `scripts/replay_audit.jl`, and `scripts/check_replay.jl` each carried moved
-into `Ladder.seed_defects` (same operations, same rounding), `certify.jl` gained the optional output
-path, and `check.jl --full` stopped writing into `results/`. The stored certificate's provenance
-hashes refer to the historical snapshot and are unaffected. Fresh certificates (`certify.jl`,
-`replay_audit.jl`) now record only model-local sources under `source_sha256` (compared by the
-tests) and the core under `core_sha256` (provenance only). Later, duplicated helpers moved into the shared core `CertifiedGaps`: the gzip
-loaders `certificate_bytes`/`read_certificate` became `Results.read_result_bytes`/`read_result`,
-and the exact Pauli matrices come from `Spins.exact_pauli`. The fast checks of the seed defects are monotone: the defects recomputed from the stored
-enclosures (through the core `Seeds.seed_defects`) must be at most the stored εₛ, εₜ in exact
-rationals, rather than equal to them; the stored seeds and bounds are unchanged. For this certificate the
-recomputed defects equal the stored ones (`Ladder.seed_defects` now calls the core step, which
-reproduces the directed-rounding `−expm1`).
+The original certificate (`results/certificate_g3_1.json.gz`, generated when the directory was
+`certificates/two_leg_tfim`) used local symmetry blocks (parity, leg exchange, reflection, half
+translation), a local polar/Weyl enclosure and MPFR log Z. It was retired together with its
+replay scripts, `environment.json` and the model's own Julia environment. The model now runs
+entirely on the shared core (`certify_gap` with the leg-exchange symmetry) and was regenerated
+with the same seed: $\varepsilon_{\mathrm{s}}$ $0.1124084 \to 0.1123897$,
+$\varepsilon_\tau$ $0.0516152 \to 0.0515362$, interval bound $0.636387 \to 0.636871$ (exact
+chain bound $0.636343$).
