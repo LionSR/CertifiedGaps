@@ -1,27 +1,38 @@
-# Produces the dimerised Heisenberg certificate files in results/:
+# Produces the dimerized Heisenberg certificates in results/ with the shared core:
 #
-#   julia certify.jl rp           exact RP audit at the six deltas        -> rp_audit.json
-#   julia certify.jl seeds        seed certificate or all-beta exclusion at every delta
-#                                 (about 1 min each)                       -> seed_delta_*.json.gz
-#   julia certify.jl seeds 3 10   one delta only
-#   julia certify.jl summary      plain index of the six certificates     -> certificate.json
-#   julia certify.jl              all of the above, in this order
+#   julia certify.jl rp          exact RP audit at the six deltas             -> rp_audit.json
+#   julia certify.jl delta p q   one dimerization δ = p/q: verified spectra of the rings of 2, 4
+#                                and 8 cells, a core gap certificate per seed of SEEDS
+#                                (certificate_delta_*.json), the all-β exclusions at the other
+#                                n₀ ∈ {2, 4}, the 16-spin gap, and its row of summary.json
+#   julia certify.jl             all of the above, every δ
 #
-# check.jl verifies everything written here. A rerun records hashes of the current sources;
-# the eigenvector solves need not be bitwise reproducible, so a rerun may store slightly
-# different (equally valid) enclosures. Seed upper bounds are rounded up to a 1e-6 grid plus one
-# spare unit, so that the stored seeds survive a fresh replay on another BLAS (check.jl --full).
+# The certificates are `GapCertificates.certify_gap` outputs for `rotated_model(δ)`;
+# check.jl verifies everything written here.
 using CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic, LinearAlgebra
-isdefined(@__MODULE__, :check_source_hashes) || include(joinpath(@__DIR__, "src", "provenance.jl"))
+using CertifiedGaps.RingModels, CertifiedGaps.VerifiedSpectra, CertifiedGaps.GapCertificates
+using CertifiedGaps.ExactArithmetic: round_up, round_down, parse_rational
+isdefined(@__MODULE__, :DimerizedHeisenberg) ||
+    include(joinpath(@__DIR__, "src", "DimerizedHeisenberg.jl"))
+isdefined(@__MODULE__, :DimerizedRP) || include(joinpath(@__DIR__, "src", "rp.jl"))
 isdefined(@__MODULE__, :ReflectionConventions) ||
     include(joinpath(@__DIR__, "src", "reflection_conventions.jl"))
-isdefined(@__MODULE__, :Certification) ||
-    include(joinpath(@__DIR__, "src", "Certification.jl"))
-using .Certification, .Certification.DimerizedRP
+using .DimerizedHeisenberg, .DimerizedRP
 BLAS.set_num_threads(1)
 
 const RESULTS_DIR = joinpath(@__DIR__, "results")
-const MODEL = "models/dimerized_heisenberg"
+const SUMMARY = joinpath(RESULTS_DIR, "summary.json")
+const GRID = big(10)^6                  # outward decimal grid of the reported gap intervals
+
+# Run metadata with the model-local and core SHA-256 of every result (`SOURCES`).
+metadata(config; certified) = model_metadata(MODEL_DIR, config; SOURCES...,
+    packages = (CertifiedGaps, IntervalArithmetic), certified)
+
+_slug(x) = denominator(x) == 1 ? "$(numerator(x))" : "$(numerator(x))_$(denominator(x))"
+
+"Path of the core certificate of the seed (δ, β₀)."
+certificate_path(δ, β0) =
+    joinpath(RESULTS_DIR, "certificate_delta_$(_slug(δ))_beta_$(_slug(β0)).json")
 
 "Exact RP audit of all six deltas; writes results/rp_audit.json (no gap claim)."
 function certify_rp()
@@ -36,22 +47,14 @@ function certify_rp()
             "conjugate_identity_exact" => a.conjugate_identity,
             "reflected_real_identity_exact" => a.reflected_real_identity,
             "theta_invariant_onsite_exact" => a.theta_invariant_onsite,
-            "repository_general_RP_eligible" => true,
             "real_identical_factor_identity" => a.real_identical_identity,
             "onsite_real_symmetric" => true,
             "certified_gap_bound" => nothing, "rational_seeds" => nothing,
-            "seed_scan" => "see results/seed_delta_*.json.gz",
         ))
     end
-    # Model-local sources are enforced by check.jl; the core is recorded as provenance only.
-    hashes = source_hashes(repository_root(); dirs=(), files=(
-        "$MODEL/src/rp.jl", "$MODEL/src/reflection_conventions.jl", "$MODEL/certify.jl",
-        "$MODEL/check.jl", "$MODEL/Project.toml", "$MODEL/Manifest.toml"))
     data = Dict(
-        "metadata" => merge(run_metadata(Dict("model" => "dimerized_heisenberg",
-                "sites_per_cell" => 2); source_sha256=hashes, packages=(CertifiedGaps,),
-            status="exact_obstruction_to_requested_real_RP_form", certified=false),
-            Dict("core_sha256" => core_provenance())),
+        "metadata" => metadata(Dict("model" => "dimerized_heisenberg", "sites_per_cell" => 2);
+            certified = false),
         "exact_algebraic_audit" => true, "gap_certificate" => false,
         "arithmetic" => "Complex{Rational{BigInt}}; normalized basis evaluated with exact " *
             "denominators",
@@ -63,71 +66,104 @@ function certify_rp()
             "uniform_identical_form" => r.uniform_identical_form)
             for r in ReflectionConventions.audit_conventions()],
         "scope" => "No common cell basis admits sum c*C tensor C for the stated inter-cell " *
-            "bond. The broader conjugate form is verified exactly and is not excluded.",
-        "largest_exact_audit_matrix_dimension" => 256,
-        "validity_range" => nothing, "reference_gap" => nothing,
-        "bound_to_gap_ratio" => nothing)
+            "bond. The reflected form with the cell swap holds exactly (the certificates).",
+        "largest_exact_audit_matrix_dimension" => 256)
     path = write_result(joinpath(RESULTS_DIR, "rp_audit.json"), data)
     println("Wrote $path; exact audit seconds = $elapsed")
 end
 
 """
-    certify_summary()
+    certify_delta(δ) -> Dict
 
-Write results/certificate.json: for every delta the SHA-256 of its seed certificate, the seeds
-(or the all-beta exclusions), the enclosed 16-spin gap and the bound-to-gap16 ratio interval,
-and the smallest certified grid delta. check.jl compares every entry with the certificates.
+Everything for one dimerization from one verified spectrum per ring: the core certificate of
+every seed in `SEEDS`, the all-β exclusions at the even n₀ ∈ {2, 4} without a seed, the
+enclosed 16-spin gap, and the dimer perturbation bound. Writes the certificates and returns the
+summary row.
 """
-function certify_summary()
+function certify_delta(δ)
+    start = time()
+    model, rp = rotated_model(δ), rotated_rp(δ)
+    spectra = Dict(L => verified_ring_spectrum(model, L) for L in (2, 4, 8))
     rows = Any[]
-    for delta in DELTAS
-        path = seed_path(delta)
-        record = read_result(path)
-        lo, hi = parse_rational.(record["reference_gap_16_interval"])
-        gap = interval(inf(CertifiedGaps.to_interval(lo)), sup(CertifiedGaps.to_interval(hi)))
-        best = isempty(record["seeds"]) ? nothing :
-            maximum(parse_rational(s["gap_lower"]) for s in record["seeds"])
-        ratio = best === nothing ? nothing :
-            endpoints(CertifiedGaps.to_interval(best) / gap)
-        push!(rows, Dict("delta" => string(delta), "source_file" => "results/" * basename(path),
-            "sha256" => sha256_file(path), "seeds" => record["seeds"],
-            "survey_seed" => record["survey_seed"], "seconds_total" => record["seconds_total"],
-            "reference_gap_16_interval" => record["reference_gap_16_interval"],
-            "bound_to_gap16_interval" => ratio,
-            "negative_results" => [Dict("n0_cells" => r["n0_cells"], "status" => r["status"],
-                "beta_boxes" => string(length(r["cover"]))) for r in record["negative_results"]]))
-        println("delta=$delta bound=$(best === nothing ? "none" : Float64(best)) ratio=$ratio")
+    for (n0, β0) in get(SEEDS, δ, Tuple{Int,Rational{BigInt}}[])
+        seed = seed_bounds(model, n0, β0; spectra = Dict(n0 => spectra[n0], 2n0 => spectra[2n0]))
+        cert = certify_gap(model; n0, β0, rp, seed)
+        cert["metadata"] = metadata(Dict("delta" => string(δ), "n0" => n0,
+            "beta0" => string(β0)); certified = true)
+        path = write_result(certificate_path(δ, β0), cert)
+        push!(rows, Dict("file" => "results/" * basename(path), "sha256" => sha256_file(path),
+            "n0" => string(n0), "beta0" => string(β0), "eps_s" => cert["seed"]["eps_s"],
+            "eps_t" => cert["seed"]["eps_t"], "gap_lower_bound" => cert["gap_lower_bound"],
+            "gap_lower_bound_decimal" => cert["gap_lower_bound_decimal"],
+            "interval_bound_decimal" => cert["interval_bound_decimal"]))
+        println("delta=$δ n0=$n0 beta0=$β0 eps_s=$(Float64(seed.eps_s)) ",
+            "eps_t=$(Float64(seed.eps_t)) gap>$(cert["gap_lower_bound_decimal"])")
     end
-    certified = [parse_rational(r["delta"]) for r in rows if !isempty(r["seeds"])]
-    write_result(joinpath(RESULTS_DIR, "certificate.json"), Dict(
-        "format" => "dimerized-heisenberg-summary-v2", "parameters" => rows,
-        "model" => "H = sum over a ring of 2n spins of (1+delta) S.S inside each two-spin " *
-            "cell plus (1-delta) S.S between neighbouring cells",
+    exclusions = Any[]
+    for n in (2, 4)
+        any(r -> r["n0"] == string(n), rows) && continue
+        cover = negative_cover(spectra[n], spectra[2n], n)
+        cover["status"] == "all_beta_rejected" || error("delta=$δ n0=$n: $(cover["status"])")
+        push!(exclusions, cover)
+    end
+    lo, hi = spectral_gap_enclosure(spectra[8])
+    lo > 0 || error("the 16-spin ground state is not separated")
+    gap = [round_down(lo, GRID), round_up(hi, GRID)]
+    # The headline bound is the interval bound (`certified_gap_bound`), as in the root README.
+    best = isempty(rows) ? nothing :
+        maximum(Rational{BigInt}(r["interval_bound_decimal"]) for r in rows)
+    ratio = best === nothing ? nothing :
+        string.([round_down(best / gap[2], GRID), round_up(best / gap[1], GRID)])
+    dimer = dimer_bounds(δ, 4, DIMER_BETA(δ))
+    endpoints(x) = string.([Rational{BigInt}(inf(x)), Rational{BigInt}(sup(x))])
+    return Dict("delta" => string(δ), "certificates" => rows, "negative_results" => exclusions,
+        "reference_gap_16_interval" => string.(gap), "bound_to_gap16_interval" => ratio,
+        "dimer_perturbation" => Dict("n0" => "4", "beta0" => string(DIMER_BETA(δ)),
+            "norm_small" => string(dimer.norm_small), "eps_s_enclosure" => endpoints(dimer.s),
+            "eps_t_enclosure" => endpoints(dimer.t)),
+        "spectra" => Dict(string(L) => spectrum_summary(s) for (L, s) in spectra),
+        "seconds" => time() - start)
+end
+
+"""
+    certify_summary(deltas)
+
+Regenerate `deltas` with `certify_delta` and write results/summary.json, keeping the stored rows
+of the other dimerizations.
+"""
+function certify_summary(deltas)
+    old = isfile(SUMMARY) ? read_result(SUMMARY)["parameters"] : Any[]
+    rows = Dict(parse_rational(r["delta"]) => r for r in old)
+    for δ in deltas
+        rows[δ] = certify_delta(δ)
+    end
+    Set(keys(rows)) == Set(DELTAS) || error("summary rows missing; run certify.jl")
+    certified = [δ for δ in DELTAS if !isempty(rows[δ]["certificates"])]
+    write_result(SUMMARY, Dict(
+        "format" => "dimerized-heisenberg-summary-v3", "parameters" => [rows[δ] for δ in DELTAS],
+        "model" => "H = sum over a ring of 2L spins of (1+delta) S.S inside each two-spin " *
+            "cell plus (1-delta) S.S between neighboring cells",
+        "frame" => "Certificates are for the rotated frame U'HU, U = (1 x J)^{x L}, " *
+            "J = [0 1; -1 0] on the second spin of every cell (rotated_model, frame_identity)",
         "smallest_certified_grid_delta" => string(minimum(certified)),
-        "maximum_certification_sites" => "16",
-        "validity_sites" => "N divisible by 4, N >= 8",
-        "negative_scope" => "For delta=1/5,3/20,1/10 and n0=2,4 cells, every beta>0 fails the " *
-            "doubling recurrence of certified_gap_bound. This does not imply gaplessness or " *
-            "exclude other methods, other seed theorems or larger rings.",
+        "validity" => "every even L >= n0 = 4 cells (N = 2L spins divisible by 4, N >= 8)",
+        "negative_scope" => "For delta=1/5,3/20,1/10 and n0=2,4 cells (n0=2 at every delta), " *
+            "every beta>0 fails the doubling recurrence of certified_gap_bound. This does not " *
+            "imply gaplessness or exclude other methods, other seed theorems or larger rings.",
         "ratio_scope" => "Certified lower bound divided by the enclosed 16-spin gap; not an " *
             "infinite-chain ratio",
-        "metadata" => merge(run_metadata(Dict("model" => "dimerized_heisenberg");
-            source_sha256=source_hashes(repository_root(); dirs=(),
-                files=("$MODEL/certify.jl", "$MODEL/src/Certification.jl")),
-            packages=(CertifiedGaps, IntervalArithmetic),
-            status="summary_of_seed_certificates", certified=true),
-            Dict("core_sha256" => core_provenance()))))
-    println("Wrote results/certificate.json")
+        "metadata" => metadata(Dict("model" => "dimerized_heisenberg"); certified = true)))
+    println("Wrote $SUMMARY")
 end
 
 if abspath(PROGRAM_FILE) == @__FILE__
     step = isempty(ARGS) ? "all" : ARGS[1]
-    step in ("all", "rp", "seeds", "summary") || error("unknown step $step")
+    step in ("all", "rp", "delta") || error("usage: certify.jl [rp | delta p q]")
     step in ("all", "rp") && certify_rp()
-    if step == "seeds" && length(ARGS) == 3
-        generate(parse(BigInt, ARGS[2]) // parse(BigInt, ARGS[3]))
-    elseif step in ("all", "seeds")
-        foreach(generate, DELTAS)
+    if step == "delta"
+        length(ARGS) == 3 || error("usage: certify.jl delta p q")
+        certify_summary([parse(BigInt, ARGS[2]) // parse(BigInt, ARGS[3])])
+    elseif step == "all"
+        certify_summary(DELTAS)
     end
-    step in ("all", "summary") && certify_summary()
 end

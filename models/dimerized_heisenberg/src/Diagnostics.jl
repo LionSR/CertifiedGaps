@@ -5,7 +5,6 @@
 # condenses the six files into the tracked results/diagnostic20_summary.json.
 module Diagnostics
 using CertifiedGaps, CertifiedGaps.Results, KrylovKit, LinearAlgebra, Random, SparseArrays
-using CertifiedGaps.ExactArithmetic: parse_rational
 include("sectors.jl")
 
 export sparse_block, low_spectrum, run_diagnostic, summarize_diagnostics
@@ -122,13 +121,9 @@ function run_diagnostic(delta::Rational{BigInt})
     twelve,_ = dense_spectrum(Float64(delta),12)
     defect3 = twelve.E[1]-2six.E[1]
     defect5 = large.E[1]-2small.E[1]
-    current_path = joinpath(@__DIR__,"../results",
-        "seed_delta_$(numerator(delta))_$(denominator(delta)).json.gz")
-    current = read_result(current_path)
-    qfloat(s) = Float64(parse_rational(s))
-    ground(L) = minimum(qfloat(e) for ring in current["rings"]
-        if parse(Int,string(ring["spins"])) == L for b in ring["blocks"] for e in b["eigenvalues"])
-    defect4 = ground(16)-2ground(8)
+    eight,_ = dense_spectrum(Float64(delta),8)
+    sixteen,_ = dense_spectrum(Float64(delta),16)
+    defect4 = sixteen.E[1]-2eight.E[1]
     xi34 = 1/log(defect3/defect4)
     xi45 = 1/log(defect4/defect5)
     rows = Any[]
@@ -154,7 +149,6 @@ function run_diagnostic(delta::Rational{BigInt})
         "decay_times_delta_two_thirds_float"=>xi45*Float64(delta)^(2/3),
         "scaling_estimate_n0_float"=>4*(0.25/Float64(delta))^(2/3),
         "scaling_caveat"=>"Energy-defect decay fit, not a certified correlation length or seed",
-        "verified_spectrum_input_sha256"=>sha256_file(current_path),
         "retained_levels"=>string(length(large.E)),"scan_float"=>rows,
         "best_odd_seed_float"=>isempty(good) ? nothing : argmax(r -> r["bound_float"],good),
         "seconds_total"=>time()-start,
@@ -174,14 +168,12 @@ const SUMMARY_KEYS = ("delta", "spins", "n0_cells", "theorem_eligible", "certifi
     "gap_20_float", "ground_energy_defects_float", "decay_length_cells_3_4_float",
     "decay_length_cells_4_5_float", "decay_times_delta_two_thirds_float",
     "scaling_estimate_n0_float", "scaling_caveat", "retained_levels", "best_odd_seed_float",
-    "verified_spectrum_input_sha256", "seconds_total")
+    "seconds_total")
 
 """
     summarize_diagnostics(deltas)
 
 Condense results/diagnostic20_<p>_<q>.json for every delta into results/diagnostic20_summary.json.
-Each run must have been made from the current seed certificate (same SHA-256), so its 8/16-spin
-ground-energy defect is the certified one.
 """
 function summarize_diagnostics(deltas)
     rows = Any[]
@@ -189,9 +181,6 @@ function summarize_diagnostics(deltas)
         name = "$(numerator(delta))_$(denominator(delta))"
         full = parse_exact_json(read(joinpath(@__DIR__, "..", "results",
             "diagnostic20_$name.json"), String))
-        seed = joinpath(@__DIR__, "..", "results", "seed_delta_$name.json.gz")
-        full["verified_spectrum_input_sha256"] == sha256_file(seed) ||
-            error("diagnostic $name predates its seed certificate; rerun scripts/scan20.jl")
         row = Dict(k => full[k] for k in SUMMARY_KEYS)
         row["sectors"] = length(full["sectors"])
         row["complete_sectors"] = count(b -> b["complete"], full["sectors"])

@@ -4,7 +4,7 @@
 #                                    -> results/diagnostic20_p_q.json (gitignored)
 #   julia scripts/scan20.jl summary  condense the six runs -> results/diagnostic20_summary.json
 #
-# Run after certify.jl: each run reads the 8/16-spin ground energies of its seed certificate.
+# The 8- and 16-spin ground energies come from the Float64 sector solver (src/sectors.jl).
 include(joinpath(@__DIR__, "..", "src", "Diagnostics.jl"))
 using LinearAlgebra
 BLAS.set_num_threads(1)
