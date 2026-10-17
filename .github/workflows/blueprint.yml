@@ -94,5 +94,9 @@ jobs:
         uses: leanprover-community/docgen-action@dacc1acc2a3f532cc577266979ba9c36c7593f7c # 2026-10-05
         with:
           blueprint: true
+          # Off until the site is live: the first Mathlib API-docs build takes about 3.5 h and
+          # has never finished. Until this is true again, the blueprint's \lean{} links and the
+          # home page's "Lean documentation" button (both under /docs/) are dead.
+          api-docs: false
           homepage: home_page
           ruby-version: "3.1" # the Ruby of home_page/Gemfile.lock (github-pages 226)
