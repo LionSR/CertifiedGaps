@@ -2,9 +2,9 @@
 
 Contributions are welcome: a gap certificate for a new model, a sharper bound for an existing
 one, a Lean record that upgrades a computer-certified bound, or a proposed target. The full guide
-is the [contribute page](https://LionSR.github.io/haldane-gap-diagrams/contribute.html) of the
+is the [contribute page](https://sirui-lu.com/CertifiedGaps/contribute.html) of the
 website (source: [`home_page/contribute.md`](home_page/contribute.md)); the results are on the
-[leaderboard](https://LionSR.github.io/haldane-gap-diagrams/leaderboard.html).
+[leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html).
 
 ## In short
 

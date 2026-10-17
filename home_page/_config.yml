@@ -11,11 +11,11 @@
 
 title: Certified spectral gaps by the spacetime bootstrap
 description: Uniform spectral gaps of quantum spin chains, certified by computer and formalized in Lean 4
-baseurl: "/haldane-gap-diagrams" # the subpath of the site
-url: "https://LionSR.github.io" # the base hostname and protocol of the site
+baseurl: "/CertifiedGaps" # the subpath of the site
+url: "https://sirui-lu.com" # the custom domain GitHub Pages serves this project under
 twitter_username:
 github_username: LionSR
-repository: LionSR/haldane-gap-diagrams
+repository: LionSR/CertifiedGaps
 branch: main # the branch that certificate and checker links point to
 
 # Build settings
