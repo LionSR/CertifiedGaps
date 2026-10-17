@@ -13,6 +13,7 @@ an exposition only: nothing here is part of any certificate.
 | `film.js` | the shared film player: TeX preloading, captions, and the frame-deterministic `window.draw(t)` |
 | `core.js` | the exact two-purity recurrence in log space (mirrors `julia/src/recurrence/map.jl`), transverse-field Ising free-fermion purities, and the spacetime-sheet → torus renderer |
 | `chapters.js`, `open_chapters.js` | the film chapters (shared by the page figures and the films); `chapters.js` also holds the drawing kit and the helpers both files use |
+| `film.mp4`, `open-chains.mp4` | the two rendered films (1920×1080, 30 fps, H.264) |
 | `render.mjs` | renders a film page to MP4 |
 | `poster.jpg`, `poster-open.jpg` | video posters |
 
@@ -24,12 +25,13 @@ Serve the directory and open `index.html` (MathJax and EB Garamond load from pub
 cd explainer && python3 -m http.server 8000   # then open http://localhost:8000
 ```
 
-The page expects `film.mp4` and `open-chains.mp4` next to it. They are not committed (about
-20 MB); render them with Playwright and ffmpeg:
+The rendered films `film.mp4` (main proof, ~7 min) and `open-chains.mp4` (open chains, ~4 min)
+are committed next to the page. After changing a chapter, re-render them with Playwright and
+ffmpeg:
 
 ```sh
 cd explainer && npm install playwright
-node render.mjs film.html film.mp4             # ~7 min of video (open film ~4 min)
+node render.mjs film.html film.mp4
 node render.mjs film_open.html open-chains.mp4
 ```
 

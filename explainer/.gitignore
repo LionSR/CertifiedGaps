@@ -1,2 +1,2 @@
-# Rendered films are regenerated with render.mjs (about 20 MB in total).
-*.mp4
+# Playwright for render.mjs (symlink or npm install).
+node_modules
