@@ -52,7 +52,7 @@ already formalized in [`lean/`](../../lean):
   the $S^z$-basis integer matrices used in `SeedKernel` remains an open formalization task.
 - For the longitudinal-field Ising chain, reflection positivity holds in the standard Pauli-$Z$
   basis with single bond factor $C_1 = Z$ ($-h_{\mathrm{bond}} = Z \otimes Z$) and real diagonal
-  on-site term $o = -g X - h Z$, checked directly in `lean/CertifiedGaps/IsingLongitudinal.lean`.
+  on-site term $o = -g X - h Z$, checked directly in `lean/CertifiedGaps/Models/IsingLongitudinal.lean`.
 
 ## Result
 
