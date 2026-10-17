@@ -25,9 +25,10 @@
             "delta": "9//10",
             "certificate": {
                 "beta0": "7//2",
-                "ratio_to_12_spin_gap_numerical": 0.3000004318850121,
-                "seconds": 1.014692142,
-                "bound": 0.5288019493276747,
+                "ratio_to_12_spin_gap_numerical": 0.2997438948322098,
+                "seconds": 21.459408208,
+                "bound": 0.528349759,
+                "interval_bound": 0.528802288307423,
                 "n0": 2
             }
         },
@@ -81,9 +82,10 @@
             "delta": "7//10",
             "certificate": {
                 "beta0": "17//4",
-                "ratio_to_12_spin_gap_numerical": 0.17283289027691878,
-                "seconds": 1017.267724815,
-                "bound": 0.2187941698399417,
+                "ratio_to_12_spin_gap_numerical": 0.17268490738188433,
+                "seconds": 6520.240395334,
+                "bound": 0.218606834,
+                "interval_bound": 0.21879317091553224,
                 "n0": 3
             }
         },

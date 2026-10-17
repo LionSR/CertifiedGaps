@@ -47,3 +47,12 @@ integer dihedral projectors across all 79 blocks of the 12-spin ring (`METHOD.md
 6-cell ($12$-spin) ring cap, $\delta = 3/5$ and $\delta = 1/2$ do not yet reach the admissible
 region; finite-size energy-defect extrapolations place their first admissible seeds near $n_0 \approx 5$
 and $n_0 \approx 7$ cells ($20\text{--}28$ spins).
+
+**Update (core consolidation).** Route 2 is now the shared core pipeline for both points: the
+cell ring in the $S^z$ basis with spin $b$ rotated by $\pi$ about $y$ is reflection positive with
+the cell swap and conserves the cell charge $z_a - z_b$, so `certify_gap` splits it into charge,
+momentum and flip-parity blocks and certifies $\Delta_L \ge 0.528802288$ ($\delta = 9/10$) and,
+with the odd seed passed as `positive_transfer`, $\Delta_L \ge 0.218793170$ ($\delta = 7/10$). The
+local dihedral projectors and enclosure were removed. Without a lattice-reflection reduction the
+core's 6-cell blocks include complex ones of dimension $11{,}596$, so the run takes 109 min and
+a 22 GB peak footprint (17 min before), and the $\delta = 7/10$ bound is about $10^{-6}$ looser.
