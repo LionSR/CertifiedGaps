@@ -1,19 +1,25 @@
 \chapter{Further models}
 \label{chap:models}
 
-Each model below (Lean files \texttt{CertifiedGaps/Models/*.lean}) is instantiated as a
-reflection-positive ring, lists its certified parameter points with a seed inverse temperature
-\(\beta_0\) and a rational chain certificate, and proves a uniform gap \(\log r / \beta_0\) at
-every point from Theorem~\ref{thm:rp-gap}. The only open hypothesis of each model is a single
-lemma stating its two seed inequalities at every point; the seeds are certified numerically
-(complete spectra of the seed rings with rigorous eigenvalue enclosures) in the model directory
-named in each statement. Ring lengths count unit cells.
+The reflection-positive ring criterion applies across spin-1 and spin-half chains and ladders, both
+for Hamiltonians that are reflection positive in a natural real basis (the computational basis for
+the Ising models, the Cartesian basis for spin 1) and for antiferromagnetic models that become
+reflection positive after a sublattice rotation. Each model in
+\texttt{CertifiedGaps/Models/*.lean} is defined as a reflection-positive ring together with its
+certified parameter points, seed inverse temperature \(\beta_0\), and rational chain certificate,
+giving a uniform gap bound \(\log r / \beta_0\) at every point by Theorem~\ref{thm:rp-gap}. The
+only open hypothesis for each model is a single lemma stating its two seed inequalities at every
+certified point, which are verified numerically from complete eigenvalue enclosures of the seed
+rings in the corresponding directory under \texttt{models/}. Ring lengths count unit cells.
 
 \section{Local building blocks}
 
-We first record the local spin-\(\tfrac12\) operators, the bipartite sublattice rotation
-\(e^{i\pi S^y}\), and the two-site cell swap \(F\) shared by the spin-\(\tfrac12\) and dimerized
-models.
+The spin-\(\tfrac12\) and dimerized models share three local operators: the real spin-\(\tfrac12\)
+bond factors, the bipartite sublattice rotation \(e^{i\pi S^y}\), which on one site of a bond turns
+the
+antiferromagnetic exchange into minus a sum of squares of real factors, and the two-site cell swap
+\(F\) used as the internal reflection on
+dimerized rings.
 
 \begin{definition}[Real Pauli and spin-\(\tfrac12\) factors]
   \label{def:local-spin-half}
@@ -21,8 +27,8 @@ models.
     CertifiedGaps.pauliX_transpose, CertifiedGaps.SpinHalf.P, CertifiedGaps.SpinHalf.P_symm}
   \leanok
   Let \(Z = \operatorname{diag}(1, -1)\) and \(X\) be the real symmetric Pauli matrices, and let
-  \(P_\alpha = (S^x, iS^y, S^z)\) be the real spin-\(\tfrac12\) factors, each symmetric or
-  antisymmetric.
+  \(P_\alpha = (S^x, iS^y, S^z)\) be the real spin-\(\tfrac12\) factors, each of which is
+  symmetric or antisymmetric.
 \end{definition}
 
 \begin{lemma}[Sublattice rotation]
@@ -32,14 +38,16 @@ models.
     CertifiedGaps.SpinHalf.Pc_eq}
   \leanok
   \uses{def:local-spin-half}
-  The rotation \(R = e^{i\pi S^y} = \bigl(\begin{smallmatrix} 0 & 1 \\ -1 & 0 \end{smallmatrix}\bigr)\)
-  is unitary and \(R S^\alpha R^\dagger = s_\alpha S^\alpha\) with \(s = (-1, 1, -1)\). The real
-  factors are \(P_\alpha = c_\alpha S^\alpha\) with \(c = (1, i, 1)\), so
-  \(\mathbf S \cdot \mathbf S\) rotated on one site is \(-\sum_\alpha P_\alpha \otimes P_\alpha\).
+  The rotation \(R = e^{i\pi S^y} = \bigl(\begin{smallmatrix} 0 & 1 \\ -1 & 0
+  \end{smallmatrix}\bigr)\)
+  is unitary and satisfies \(R S^\alpha R^\dagger = s_\alpha S^\alpha\) with \(s = (-1, 1, -1)\).
+  Since the real factors satisfy \(P_\alpha = c_\alpha S^\alpha\) with \(c = (1, i, 1)\), rotating
+  one site of the exchange interaction \(\mathbf S \cdot \mathbf S\) turns it into
+  \(-\sum_\alpha P_\alpha \otimes P_\alpha\).
 \end{lemma}
 \begin{proof}
   \leanok
-  This follows by direct computation with \(2 \times 2\) matrices.
+  Evaluate both sides entrywise on \(2 \times 2\) matrices.
 \end{proof}
 
 \begin{definition}[Cell swap]
@@ -48,22 +56,28 @@ models.
     CertifiedGaps.cellSwap_mul_cellSwap, CertifiedGaps.cellSwap_transpose,
     CertifiedGaps.cellSwap_conj_smul_sum_kronecker_self}
   \leanok
-  The swap \(F\) of the two sites of a cell is a real symmetric involution with
-  \(F (A \otimes B) F = B \otimes A\); it commutes with every intra-cell exchange
-  \(c \sum_k A_k \otimes A_k\). It serves as the internal reflection of the dimerized models.
+  The swap \(F\) of the two sites of a cell is a real symmetric involution satisfying
+  \(F (A \otimes B) F = B \otimes A\) and commuting with every intra-cell exchange
+  \(c \sum_k A_k \otimes A_k\). It serves as the internal cell reflection of the dimerized models.
 \end{definition}
 
 \section{Spin-1 chain with single-ion anisotropy}
+
+Adding a positive single-ion anisotropy to the spin-1 Heisenberg chain favors the zero-projection
+state on each site. Beyond a transition near \(D \approx 1\) the chain leaves the gapped Haldane
+phase of \(D = 0\) for a different gapped phase, the large-\(D\) phase that contains both
+certified points below. The anisotropy is a real symmetric on-site term, so reflection positivity
+in the Cartesian basis is preserved.
 
 \begin{definition}
   \label{def:large-d-points}
   \lean{CertifiedGaps.SpinOneLargeD.Point, CertifiedGaps.SpinOneLargeD.points}
   \leanok
   \uses{def:spin-one-large-d, def:chain-certificate}
-  We instantiate the model \(\sum_j \mathbf S_j \cdot \mathbf S_{j+1} + D \sum_j (S^z_j)^2\) of
-  Definition~\ref{def:spin-one-large-d} at the two points \(D = 4\) (\(\beta_0 = 9/4\),
-  \(r = 4.755\)) and \(D = 1603/500\) (\(\beta_0 = 381/125\), \(r = 1.0065429\)), with seed length
-  \(n_0 = 6\) sites (\texttt{models/spin1\_largeD}).
+  The anisotropic spin-1 model \(\sum_j \mathbf S_j \cdot \mathbf S_{j+1} + D \sum_j (S^z_j)^2\) of
+  Definition~\ref{def:spin-one-large-d} is certified at the two parameter points \(D = 4\)
+  (\(\beta_0 = 9/4\), \(r = 4.755\)) and \(D = 1603/500\) (\(\beta_0 = 381/125\),
+  \(r = 1.0065429\)), each with seed length \(n_0 = 6\) sites (\texttt{models/spin1\_largeD}).
 \end{definition}
 
 \begin{lemma}
@@ -86,7 +100,8 @@ models.
   At each point, \(\Ps(6, \beta_0) \ge 1 - s_0\) and \(\Pt(12, \beta_0) \ge 1 - t_0\).
 \end{lemma}
 \begin{proof}
-  These bounds are certified in \texttt{models/spin1\_largeD} and are not yet proved in Lean.
+  These bounds are certified in \texttt{models/spin1\_largeD} and are left as an open numerical
+  hypothesis in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -94,9 +109,9 @@ models.
   \lean{CertifiedGaps.SpinOneLargeD.gap}
   \leanok
   \uses{lem:large-d-valid, lem:large-d-seeds, thm:rp-gap}
-  At each point, every even ring of \(L \ge 6\) sites has a unique ground state and
-  \(\GapGT(E_L, \log r / \beta_0)\): \(\Delta_L > 0.693\) at \(D = 4\) and \(\Delta_L > 0.00214\) at
-  \(D = 1603/500\).
+  At each point, every even ring of \(L \ge 6\) sites has a unique ground state and satisfies
+  \(\GapGT(E_L, \log r / \beta_0)\), giving \(\Delta_L > 0.693\) at \(D = 4\) and
+  \(\Delta_L > 0.00214\) at \(D = 1603/500\).
 \end{theorem}
 \begin{proof}
   \leanok
@@ -105,18 +120,24 @@ models.
 
 \section{Dimerized spin-1 chain}
 
+Alternating the exchange coupling between weak and strong bonds along the spin-1 chain breaks
+single-site translation invariance to a two-site unit cell. Grouping each weak bond into a
+two-site cell with the cell swap as its internal reflection makes the strong inter-cell bonds
+reflection positive in the Cartesian basis.
+
 \begin{definition}
   \label{def:spin-one-dimerized}
   \lean{CertifiedGaps.SpinOneDimerized.model, CertifiedGaps.SpinOneDimerized.Point,
     CertifiedGaps.SpinOneDimerized.points}
   \leanok
   \uses{def:rpring, def:spin-one-generators, def:cell-swap, def:chain-certificate}
-  We write \(H = \sum_j (1-\delta)\, \mathbf S_{2j} \cdot \mathbf S_{2j+1} + (1+\delta)\,
-  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) as a ring of weak pairs with bond factors
-  \(C_\alpha = \sqrt{1+\delta}\,(1 \otimes G_\alpha)\), internal reflection \(F\) given by the cell
-  swap, and on-site term \(o = -(1-\delta) \sum_\alpha G_\alpha \otimes G_\alpha\). We record one
-  certified point, \(\delta = 9/10\), with \(n_0 = 2\) cells, \(\beta_0 = 7/2\), and \(r = 6.339\)
-  (\texttt{models/spin1\_dimerized}).
+  The dimerized spin-1 chain with Hamiltonian \(H = \sum_j (1-\delta)\, \mathbf S_{2j} \cdot \mathbf
+  S_{2j+1} + (1+\delta)\,
+  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) is formulated as a ring of weak-bond pairs with bond
+  factors \(C_\alpha = \sqrt{1+\delta}\,(1 \otimes G_\alpha)\), internal reflection \(F\) given by
+  the cell swap, and on-site term \(o = -(1-\delta) \sum_\alpha G_\alpha \otimes G_\alpha\). It is
+  certified at \(\delta = 9/10\) with seed length \(n_0 = 2\) cells, \(\beta_0 = 7/2\), and
+  \(r = 6.339\) (\texttt{models/spin1\_dimerized}).
 \end{definition}
 
 \begin{lemma}
@@ -139,7 +160,8 @@ models.
   The seed purities satisfy \(\Ps(2, 7/2) \ge 1 - 0.04972\) and \(\Pt(4, 7/2) \ge 1 - 0.03206\).
 \end{lemma}
 \begin{proof}
-  These bounds are certified in \texttt{models/spin1\_dimerized} and are not yet proved in Lean.
+  These bounds are certified in \texttt{models/spin1\_dimerized} and are left as an open numerical
+  hypothesis in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -157,16 +179,20 @@ models.
 
 \section{Two-leg transverse-field Ising ladder}
 
+Coupling two ferromagnetic transverse-field Ising chains by ferromagnetic rungs produces a two-leg
+ladder whose two-site rung cells are directly reflection positive in the computational basis.
+
 \begin{definition}
   \label{def:two-leg-ising}
   \lean{CertifiedGaps.TwoLegIsing.model, CertifiedGaps.TwoLegIsing.Point,
     CertifiedGaps.TwoLegIsing.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:chain-certificate}
-  We write \(H = -\sum_{\text{legs}} Z_i Z_j - \sum_{\text{rungs}} Z_i Z_j - g \sum_i X_i\) as a
-  ring of rungs with bond factors \(Z \otimes 1\), \(1 \otimes Z\) and on-site term
-  \(o = -Z \otimes Z - g (X \otimes 1 + 1 \otimes X)\). We record one certified point, \(g = 3\),
-  with \(n_0 = 4\) rungs, \(\beta_0 = 3/2\), and \(r = 2.585\) (\texttt{models/two\_leg\_tfim}).
+  The two-leg Ising ladder with Hamiltonian
+  \(H = -\sum_{\text{legs}} Z_i Z_j - \sum_{\text{rungs}} Z_i Z_j - g \sum_i X_i\) is a ring of
+  two-site rungs with bond factors \(Z \otimes 1\) and \(1 \otimes Z\) and on-site term
+  \(o = -Z \otimes Z - g (X \otimes 1 + 1 \otimes X)\). It is certified at \(g = 3\) with seed
+  length \(n_0 = 4\) rungs, \(\beta_0 = 3/2\), and \(r = 2.585\) (\texttt{models/two\_leg\_tfim}).
 \end{definition}
 
 \begin{lemma}
@@ -189,7 +215,8 @@ models.
   The seed purities satisfy \(\Ps(4, 3/2) \ge 1 - 0.1125\) and \(\Pt(8, 3/2) \ge 1 - 0.05162\).
 \end{lemma}
 \begin{proof}
-  These bounds are certified in \texttt{models/two\_leg\_tfim} and are not yet proved in Lean.
+  These bounds are certified in \texttt{models/two\_leg\_tfim} and are left as an open numerical
+  hypothesis in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -207,17 +234,23 @@ models.
 
 \section{Ising chain in transverse and longitudinal fields}
 
+Adding a longitudinal field to the ferromagnetic transverse-field Ising chain breaks the global
+spin-flip symmetry, lifting the ground-state degeneracy of the ordered phase and making the chain
+non-integrable while keeping the bond interaction reflection positive in the computational basis.
+
 \begin{definition}
   \label{def:ising-longitudinal}
   \lean{CertifiedGaps.IsingLongitudinal.model, CertifiedGaps.IsingLongitudinal.Point,
     CertifiedGaps.IsingLongitudinal.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:chain-certificate}
-  We write \(H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j\) as a ring with the single
-  bond factor \(Z\) and on-site term \(-gX - hZ\), which is non-integrable for \(h \ne 0\). We
-  record thirty certified grid points \(g \in [1/4, 2]\), \(h \in [1/20, 1]\), including the
-  critical value \(g = 1\) and the ordered phase \(g < 1\) (where the longitudinal field lifts the
-  degeneracy), each with seed length \(n_0 = 6\) (\texttt{models/tfim\_longitudinal}).
+  The longitudinal-field Ising chain has Hamiltonian
+  \(H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j\), represented as a reflection-positive
+  ring with bond factor \(Z\) and on-site term \(-gX - hZ\), which is non-integrable for
+  \(h \ne 0\). The formalization includes thirty certified grid points spanning
+  \(g \in [1/4, 2]\) and \(h \in [1/20, 1]\), covering both the critical coupling \(g = 1\) and
+  the ordered regime \(g < 1\), each with seed length \(n_0 = 6\)
+  (\texttt{models/tfim\_longitudinal}).
 \end{definition}
 
 \begin{lemma}
@@ -241,8 +274,9 @@ models.
   At each point, \(\Ps(6, \beta_0) \ge 1 - s_0\) and \(\Pt(12, \beta_0) \ge 1 - t_0\).
 \end{lemma}
 \begin{proof}
-  These bounds are certified in \texttt{models/tfim\_longitudinal}. They are not yet proved in Lean
-  as a whole, although the first point is proved in the kernel (Theorem~\ref{thm:ising-seeds}).
+  These bounds are certified in \texttt{models/tfim\_longitudinal}. The full thirty-point lemma
+  remains an open numerical hypothesis in Lean, while the seed at the first grid point is proved in
+  the Lean kernel in Theorem~\ref{thm:ising-seeds}.
 \end{proof}
 
 \begin{theorem}
@@ -250,9 +284,9 @@ models.
   \lean{CertifiedGaps.IsingLongitudinal.gap}
   \leanok
   \uses{lem:ising-longitudinal-valid, lem:ising-longitudinal-seeds, thm:rp-gap}
-  At each point, every even ring of \(L \ge 6\) sites has a unique ground state and
-  \(\GapGT(E_L, \log r / \beta_0)\); the bounds range from \(0.075\) at \(g = 1\), \(h = 1/20\)
-  to \(3.70\).
+  At each point, every even ring of \(L \ge 6\) sites has a unique ground state and satisfies
+  \(\GapGT(E_L, \log r / \beta_0)\), with certified gap lower bounds ranging from \(0.075\) at
+  \(g = 1\), \(h = 1/20\) to \(3.70\).
 \end{theorem}
 \begin{proof}
   \leanok
@@ -261,14 +295,22 @@ models.
 
 \section{Spin-\(\tfrac12\) Heisenberg chain in a staggered field}
 
+An antiferromagnetic spin-half Heisenberg chain in a staggered magnetic field is not reflection
+positive in the standard basis because its exchange coupling has the opposite sign. Rotating every
+odd site turns each exchange \(\mathbf S \cdot \mathbf S\) into
+\(-S^xS^x + S^yS^y - S^zS^z = -\sum_\alpha P_\alpha \otimes P_\alpha\) and the staggered field into
+a
+uniform field, producing a reflection-positive ring with the same spectrum.
+
 \begin{definition}
   \label{def:staggered}
   \lean{CertifiedGaps.StaggeredHeisenberg.model, CertifiedGaps.StaggeredHeisenberg.Point,
     CertifiedGaps.StaggeredHeisenberg.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:chain-certificate}
-  We define the rotated chain as the reflection-positive ring with bond factors \(P_\alpha\) and
-  on-site term \(-h S^z\), at the five points \(h = 1, 3/4, 1/2, 7/20, 1/4\) with \(n_0 = 8\) and
+  The rotated staggered-field chain is the reflection-positive ring with bond factors \(P_\alpha\)
+  and on-site term \(-h S^z\), certified at the five field strengths
+  \(h = 1, 3/4, 1/2, 7/20, 1/4\) with seed length \(n_0 = 8\) and inverse temperatures
   \(\beta_0 = 21/4, 21/4, 11/2, 23/4, 25/4\) (\texttt{models/heisenberg\_staggered\_field}).
 \end{definition}
 
@@ -293,8 +335,8 @@ models.
   At each point, \(\Ps(8, \beta_0) \ge 1 - s_0\) and \(\Pt(16, \beta_0) \ge 1 - t_0\).
 \end{lemma}
 \begin{proof}
-  These bounds are certified in \texttt{models/heisenberg\_staggered\_field} and are not yet proved
-  in Lean.
+  These bounds are certified in \texttt{models/heisenberg\_staggered\_field} and are left as an
+  open numerical hypothesis in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -317,8 +359,8 @@ models.
   \leanok
   \uses{def:ring-operators, lem:spin-half-rotation}
   The physical chain has Hamiltonian
-  \(H_L = \sum_j \mathbf S_j \cdot \mathbf S_{j+1} - h \sum_j (-1)^j S^z_j\), related to the
-  rotated chain by the sublattice rotation \(e^{i\pi S^y}\) on the odd sites.
+  \(H_L = \sum_j \mathbf S_j \cdot \mathbf S_{j+1} - h \sum_j (-1)^j S^z_j\) and is related to the
+  rotated chain by applying the sublattice rotation \(e^{i\pi S^y}\) on the odd sites.
 \end{definition}
 
 \begin{lemma}
@@ -327,15 +369,16 @@ models.
     CertifiedGaps.StaggeredHeisenberg.physicalSpectrum_eq}
   \leanok
   \uses{def:staggered-physical, def:staggered, thm:conj-hamiltonian, thm:conj-spectrum}
-  On an even ring the physical chain is the rotation of the rotated chain, so their spectra
-  agree.
+  On an even ring, the physical chain is unitarily conjugate to the rotated chain under the
+  sublattice rotation, so their spectra agree.
 \end{lemma}
 \begin{proof}
   \leanok
-  On an even ring every bond joins an odd and an even site; the rotation maps
-  \(\mathbf S \cdot \mathbf S\) to \(-\sum_\alpha P_\alpha \otimes P_\alpha\) and the staggered
-  field to the uniform field (Lemma~\ref{lem:spin-half-rotation}).
-  Theorems~\ref{thm:conj-hamiltonian} and~\ref{thm:conj-spectrum} conclude.
+  On an even ring every bond connects an odd site and an even site, so the sublattice rotation maps
+  \(\mathbf S \cdot \mathbf S\) to \(-\sum_\alpha P_\alpha \otimes P_\alpha\) and turns the
+  staggered field into the uniform field by Lemma~\ref{lem:spin-half-rotation}.
+  Theorems~\ref{thm:conj-hamiltonian} and~\ref{thm:conj-spectrum} then show that the two
+  Hamiltonians are unitarily conjugate and share the same eigenvalue family.
 \end{proof}
 
 \begin{theorem}
@@ -344,7 +387,7 @@ models.
   \leanok
   \uses{lem:staggered-physical-eq, thm:staggered-gap}
   At each point, every even ring of \(L \ge 8\) sites of the physical chain has a unique ground
-  state and gap \(> 1.1475, 0.8899, 0.5940, 0.3828, 0.2139\) at
+  state and spectral gap \(> 1.1475, 0.8899, 0.5940, 0.3828, 0.2139\) at
   \(h = 1, 3/4, 1/2, 7/20, 1/4\).
 \end{theorem}
 \begin{proof}
@@ -354,17 +397,22 @@ models.
 
 \section{Dimerized spin-\(\tfrac12\) Heisenberg chain}
 
+Grouping a dimerized spin-half Heisenberg chain into two-site cells across the strong bonds and
+rotating the second spin of each cell makes the inter-cell bonds reflection positive, with the cell
+swap as the internal reflection, and turns the intra-cell exchange into a real symmetric on-site
+term that commutes with the swap.
+
 \begin{definition}
   \label{def:dimerized}
   \lean{CertifiedGaps.DimerizedHeisenberg.model, CertifiedGaps.DimerizedHeisenberg.Point,
     CertifiedGaps.DimerizedHeisenberg.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:cell-swap, def:chain-certificate}
-  We define the rotated chain as a ring of strong pairs with bond factors
+  The rotated dimerized chain is a ring of strong-bond pairs with bond factors
   \(C_\alpha = \sqrt{1-\delta}\,(1 \otimes P_\alpha)\), internal reflection given by the cell swap,
-  and on-site term \(o = -(1+\delta) \sum_\alpha P_\alpha \otimes P_\alpha\), at the three points
-  \(\delta = 1/2, 3/10, 1/4\) with \(n_0 = 4\) cells and \(\beta_0 = 6, 13/2, 29/4\)
-  (\texttt{models/dimerized\_heisenberg}).
+  and on-site term \(o = -(1+\delta) \sum_\alpha P_\alpha \otimes P_\alpha\), certified at the
+  three dimerizations \(\delta = 1/2, 3/10, 1/4\) with seed length \(n_0 = 4\) cells and inverse
+  temperatures \(\beta_0 = 6, 13/2, 29/4\) (\texttt{models/dimerized\_heisenberg}).
 \end{definition}
 
 \begin{lemma}
@@ -374,7 +422,7 @@ models.
     CertifiedGaps.DimerizedHeisenberg.points_δ_le_one}
   \leanok
   \uses{def:dimerized}
-  All three certificates are valid, every \(\beta_0 > 0\) and every \(\delta \le 1\).
+  All three certificates are valid, every \(\beta_0 > 0\), and every \(\delta \le 1\).
 \end{lemma}
 \begin{proof}
   \leanok
@@ -389,8 +437,8 @@ models.
   At each point, \(\Ps(4, \beta_0) \ge 1 - s_0\) and \(\Pt(8, \beta_0) \ge 1 - t_0\).
 \end{lemma}
 \begin{proof}
-  These bounds are certified in \texttt{models/dimerized\_heisenberg} and are not yet proved in
-  Lean.
+  These bounds are certified in \texttt{models/dimerized\_heisenberg} and are left as an open
+  numerical hypothesis in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -414,8 +462,8 @@ models.
   \uses{def:ring-operators, lem:spin-half-rotation}
   The physical chain has Hamiltonian
   \(H = \sum_j (1+\delta)\, \mathbf S_{2j} \cdot \mathbf S_{2j+1} + (1-\delta)\,
-  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) written as a ring of strong pairs, related to the
-  rotated chain by the rotation \(1 \otimes e^{i\pi S^y}\) on every cell.
+  \mathbf S_{2j+1} \cdot \mathbf S_{2j+2}\) written on a ring of strong-bond pairs, and is related
+  to the rotated chain by applying the local rotation \(1 \otimes e^{i\pi S^y}\) on every cell.
 \end{definition}
 
 \begin{lemma}
@@ -424,15 +472,16 @@ models.
     CertifiedGaps.DimerizedHeisenberg.physicalSpectrum_eq}
   \leanok
   \uses{def:dimerized-physical, def:dimerized, thm:conj-hamiltonian, thm:conj-spectrum}
-  For \(\delta \le 1\) and \(L \ge 2\), the physical chain is the rotation of the rotated chain,
-  so their spectra agree.
+  For \(\delta \le 1\) and \(L \ge 2\), the physical chain is unitarily conjugate to the rotated
+  chain, so their spectra agree.
 \end{lemma}
 \begin{proof}
   \leanok
-  Rotating the second spin of every cell turns every exchange into
-  \(-\sum_\alpha P_\alpha \otimes P_\alpha\) (Lemma~\ref{lem:spin-half-rotation}); the weak bond
-  becomes \((1-\delta) \sum_\alpha (1 \otimes P_\alpha) \otimes (P_\alpha \otimes 1)\) with sign
-  absorbed by \(\sqrt{1-\delta}^2 = 1 - \delta\), which needs \(\delta \le 1\).
+  Rotating the second spin of every cell maps each two-spin exchange to
+  \(-\sum_\alpha P_\alpha \otimes P_\alpha\) by Lemma~\ref{lem:spin-half-rotation}; the inter-cell
+  weak bond becomes \((1-\delta) \sum_\alpha (1 \otimes P_\alpha) \otimes (P_\alpha \otimes 1)\),
+  whose nonnegative coupling constant equals \(\sqrt{1-\delta}^2 = 1 - \delta\) because
+  \(\delta \le 1\).
 \end{proof}
 
 \begin{theorem}
@@ -441,7 +490,7 @@ models.
   \leanok
   \uses{lem:dimerized-physical-eq, thm:dimerized-gap, lem:dimerized-valid}
   At each point, every even ring of \(L \ge 4\) cells of the physical chain has a unique ground
-  state and gap \(> 0.532, 0.172, 0.057\) at \(\delta = 1/2, 3/10, 1/4\).
+  state and spectral gap \(> 0.532, 0.172, 0.057\) at \(\delta = 1/2, 3/10, 1/4\).
 \end{theorem}
 \begin{proof}
   \leanok
@@ -450,16 +499,20 @@ models.
 
 \section{Spin-\(\tfrac12\) two-leg Heisenberg ladder}
 
+On a two-leg antiferromagnetic spin-half Heisenberg ladder, a checkerboard sublattice rotation acts
+on one spin of every leg bond and one spin of every rung bond, making the rotated ladder a
+reflection-positive ring of two-site rungs.
+
 \begin{definition}
   \label{def:ladder}
   \lean{CertifiedGaps.HeisenbergLadder.rungExchange, CertifiedGaps.HeisenbergLadder.model,
     CertifiedGaps.HeisenbergLadder.Point, CertifiedGaps.HeisenbergLadder.points}
   \leanok
   \uses{def:rpring, def:local-spin-half, def:chain-certificate}
-  We define the rotated ladder as a ring of rungs with bond factors \(P_\alpha \otimes 1\) and
-  \(1 \otimes P_\alpha\) and the rung exchange as the on-site term
-  \(o = -J_\perp \sum_\alpha P_\alpha \otimes P_\alpha\). We record one certified point,
-  \(J_\perp = 4\), with \(n_0 = 4\) rungs, \(\beta_0 = 2\), and \(r = 9.033\)
+  The rotated Heisenberg ladder is a ring of two-site rungs with bond factors
+  \(P_\alpha \otimes 1\) and \(1 \otimes P_\alpha\) and rung exchange as the on-site term
+  \(o = -J_\perp \sum_\alpha P_\alpha \otimes P_\alpha\). It is certified at rung coupling
+  \(J_\perp = 4\) with seed length \(n_0 = 4\) rungs, \(\beta_0 = 2\), and \(r = 9.033\)
   (\texttt{models/heisenberg\_ladder}).
 \end{definition}
 
@@ -483,7 +536,8 @@ models.
   The seed purities satisfy \(\Ps(4, 2) \ge 1 - 0.03509\) and \(\Pt(8, 2) \ge 1 - 0.02463\).
 \end{lemma}
 \begin{proof}
-  These bounds are certified in \texttt{models/heisenberg\_ladder} and are not yet proved in Lean.
+  These bounds are certified in \texttt{models/heisenberg\_ladder} and are left as an open
+  numerical hypothesis in Lean.
 \end{proof}
 
 \begin{theorem}
@@ -507,8 +561,8 @@ models.
   \uses{def:ring-operators, lem:spin-half-rotation}
   The physical ladder has Hamiltonian
   \(H = \sum_{\text{legs}} \mathbf S_i \cdot \mathbf S_j + J_\perp \sum_{\text{rungs}}
-  \mathbf S_i \cdot \mathbf S_j\), related to the rotated ladder by the checkerboard rotation
-  \(e^{i\pi S^y}\) on the sites \((1, j)\) for odd \(j\) and \((2, j)\) for even \(j\).
+  \mathbf S_i \cdot \mathbf S_j\) and is related to the rotated ladder by the checkerboard rotation
+  \(e^{i\pi S^y}\) applied to site \((1, j)\) for odd \(j\) and site \((2, j)\) for even \(j\).
 \end{definition}
 
 \begin{lemma}
@@ -517,14 +571,14 @@ models.
     CertifiedGaps.HeisenbergLadder.physicalSpectrum_eq}
   \leanok
   \uses{def:ladder-physical, def:ladder, thm:conj-hamiltonian, thm:conj-spectrum}
-  On a ring of an even number of rungs, the physical ladder is the rotation of the rotated
+  On a ring with an even number of rungs, the physical ladder is unitarily conjugate to the rotated
   ladder, so their spectra agree.
 \end{lemma}
 \begin{proof}
   \leanok
-  On an even ring the checkerboard rotates exactly one end of every leg and rung bond, which turns
-  every exchange into \(-\sum_\alpha P_\alpha \otimes P_\alpha\)
-  (Lemma~\ref{lem:spin-half-rotation}).
+  On an even ring, the checkerboard rotation acts on one endpoint of every leg bond and one
+  endpoint of every rung bond, mapping each exchange interaction to
+  \(-\sum_\alpha P_\alpha \otimes P_\alpha\) by Lemma~\ref{lem:spin-half-rotation}.
 \end{proof}
 
 \begin{theorem}
