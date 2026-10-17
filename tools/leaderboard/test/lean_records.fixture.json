@@ -1,0 +1,662 @@
+[
+    {
+        "name": "Leaderboard.Records.SpinOneHeisenberg.periodic_2304",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.SpinOneHeisenberg.spectrum L",
+        "L0": 2304,
+        "r": "20",
+        "beta": "784",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 2304 (784) ∧ 1 - εₜ ≤ thermalPurity 4608 (784)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.SpinOneHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.StaggeredHeisenberg.h_1",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.StaggeredHeisenberg.physicalSpectrum (1) L",
+        "L0": 8,
+        "r": "2067/5",
+        "beta": "21/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 8 (21/4) ∧ 1 - εₜ ≤ thermalPurity 16 (21/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.StaggeredHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.StaggeredHeisenberg.h_3_4",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.StaggeredHeisenberg.physicalSpectrum (3/4) L",
+        "L0": 8,
+        "r": "1069/10",
+        "beta": "21/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 8 (21/4) ∧ 1 - εₜ ≤ thermalPurity 16 (21/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.StaggeredHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.StaggeredHeisenberg.h_1_2",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.StaggeredHeisenberg.physicalSpectrum (1/2) L",
+        "L0": 8,
+        "r": "2623/100",
+        "beta": "11/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 8 (11/2) ∧ 1 - εₜ ≤ thermalPurity 16 (11/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.StaggeredHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.StaggeredHeisenberg.h_7_20",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.StaggeredHeisenberg.physicalSpectrum (7/20) L",
+        "L0": 8,
+        "r": "1807/200",
+        "beta": "23/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 8 (23/4) ∧ 1 - εₜ ≤ thermalPurity 16 (23/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.StaggeredHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.StaggeredHeisenberg.h_1_4",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.StaggeredHeisenberg.physicalSpectrum (1/4) L",
+        "L0": 8,
+        "r": "1903/500",
+        "beta": "25/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 8 (25/4) ∧ 1 - εₜ ≤ thermalPurity 16 (25/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.StaggeredHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.DimerizedHeisenberg.delta_1_2",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.DimerizedHeisenberg.physicalSpectrum (1/2) L",
+        "L0": 4,
+        "r": "2433/100",
+        "beta": "6",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 4 (6) ∧ 1 - εₜ ≤ thermalPurity 8 (6)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.DimerizedHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.DimerizedHeisenberg.delta_3_10",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.DimerizedHeisenberg.physicalSpectrum (3/10) L",
+        "L0": 4,
+        "r": "613/200",
+        "beta": "13/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 4 (13/2) ∧ 1 - εₜ ≤ thermalPurity 8 (13/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.DimerizedHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.DimerizedHeisenberg.delta_1_4",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.DimerizedHeisenberg.physicalSpectrum (1/4) L",
+        "L0": 4,
+        "r": "757/500",
+        "beta": "29/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 4 (29/4) ∧ 1 - εₜ ≤ thermalPurity 8 (29/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.DimerizedHeisenberg"
+    },
+    {
+        "name": "Leaderboard.Records.SpinOneDimerized.delta_9_10",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.SpinOneDimerized.model (9/10)).spectrum L",
+        "L0": 2,
+        "r": "6339/1000",
+        "beta": "7/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 2 (7/2) ∧ 1 - εₜ ≤ thermalPurity 4 (7/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.SpinOneDimerized"
+    },
+    {
+        "name": "Leaderboard.Records.SpinOneLargeD.D_4",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.SpinOneLargeD.model (4)).spectrum L",
+        "L0": 6,
+        "r": "951/200",
+        "beta": "9/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (9/4) ∧ 1 - εₜ ≤ thermalPurity 12 (9/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.SpinOneLargeD"
+    },
+    {
+        "name": "Leaderboard.Records.SpinOneLargeD.D_1603_500",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.SpinOneLargeD.model (1603/500)).spectrum L",
+        "L0": 6,
+        "r": "10065429/10000000",
+        "beta": "381/125",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (381/125) ∧ 1 - εₜ ≤ thermalPurity 12 (381/125)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.SpinOneLargeD"
+    },
+    {
+        "name": "Leaderboard.Records.HeisenbergLadder.Jperp_4",
+        "kind": "conditional",
+        "spectrum": "CertifiedGaps.HeisenbergLadder.physicalSpectrum (4) L",
+        "L0": 4,
+        "r": "9033/1000",
+        "beta": "2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 4 (2) ∧ 1 - εₜ ≤ thermalPurity 8 (2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.HeisenbergLadder"
+    },
+    {
+        "name": "Leaderboard.Records.TwoLegIsing.g_3",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.TwoLegIsing.model (3)).spectrum L",
+        "L0": 4,
+        "r": "517/200",
+        "beta": "3/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 4 (3/2) ∧ 1 - εₜ ≤ thermalPurity 8 (3/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.TwoLegIsing"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_4_h_1_20",
+        "kind": "unconditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/4) (1/20)).spectrum L",
+        "L0": 6,
+        "r": "13480",
+        "beta": "97/4",
+        "hypothesis": null,
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_4_h_1_10",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/4) (1/10)).spectrum L",
+        "L0": 6,
+        "r": "23810",
+        "beta": "55/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (55/4) ∧ 1 - εₜ ≤ thermalPurity 12 (55/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_4_h_1_4",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/4) (1/4)).spectrum L",
+        "L0": 6,
+        "r": "48540",
+        "beta": "13/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (13/2) ∧ 1 - εₜ ≤ thermalPurity 12 (13/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_4_h_1_2",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/4) (1/2)).spectrum L",
+        "L0": 6,
+        "r": "52170",
+        "beta": "11/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (11/2) ∧ 1 - εₜ ≤ thermalPurity 12 (11/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_4_h_1",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/4) (1)).spectrum L",
+        "L0": 6,
+        "r": "43160",
+        "beta": "21/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (21/4) ∧ 1 - εₜ ≤ thermalPurity 12 (21/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_2_h_1_20",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/2) (1/20)).spectrum L",
+        "L0": 6,
+        "r": "1878/5",
+        "beta": "13",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (13) ∧ 1 - εₜ ≤ thermalPurity 12 (13)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_2_h_1_10",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/2) (1/10)).spectrum L",
+        "L0": 6,
+        "r": "2141",
+        "beta": "8",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (8) ∧ 1 - εₜ ≤ thermalPurity 12 (8)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_2_h_1_4",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/2) (1/4)).spectrum L",
+        "L0": 6,
+        "r": "41080",
+        "beta": "9/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (9/2) ∧ 1 - εₜ ≤ thermalPurity 12 (9/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_2_h_1_2",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/2) (1/2)).spectrum L",
+        "L0": 6,
+        "r": "66010",
+        "beta": "4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (4) ∧ 1 - εₜ ≤ thermalPurity 12 (4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_2_h_1",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1/2) (1)).spectrum L",
+        "L0": 6,
+        "r": "54530",
+        "beta": "4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (4) ∧ 1 - εₜ ≤ thermalPurity 12 (4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_4_h_1_20",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/4) (1/20)).spectrum L",
+        "L0": 6,
+        "r": "629/50",
+        "beta": "8",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (8) ∧ 1 - εₜ ≤ thermalPurity 12 (8)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_4_h_1_10",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/4) (1/10)).spectrum L",
+        "L0": 6,
+        "r": "5711/100",
+        "beta": "21/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (21/4) ∧ 1 - εₜ ≤ thermalPurity 12 (21/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_4_h_1_4",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/4) (1/4)).spectrum L",
+        "L0": 6,
+        "r": "1559",
+        "beta": "7/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (7/2) ∧ 1 - εₜ ≤ thermalPurity 12 (7/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_4_h_1_2",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/4) (1/2)).spectrum L",
+        "L0": 6,
+        "r": "37670",
+        "beta": "7/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (7/2) ∧ 1 - εₜ ≤ thermalPurity 12 (7/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_4_h_1",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/4) (1)).spectrum L",
+        "L0": 6,
+        "r": "58500",
+        "beta": "7/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (7/2) ∧ 1 - εₜ ≤ thermalPurity 12 (7/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_h_1_20",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1) (1/20)).spectrum L",
+        "L0": 6,
+        "r": "1633/1000",
+        "beta": "13/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (13/2) ∧ 1 - εₜ ≤ thermalPurity 12 (13/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_h_1_10",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1) (1/10)).spectrum L",
+        "L0": 6,
+        "r": "4247/500",
+        "beta": "17/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (17/4) ∧ 1 - εₜ ≤ thermalPurity 12 (17/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_h_1_4",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1) (1/4)).spectrum L",
+        "L0": 6,
+        "r": "622/5",
+        "beta": "3",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (3) ∧ 1 - εₜ ≤ thermalPurity 12 (3)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_h_1_2",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1) (1/2)).spectrum L",
+        "L0": 6,
+        "r": "3839",
+        "beta": "3",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (3) ∧ 1 - εₜ ≤ thermalPurity 12 (3)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_1_h_1",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (1) (1)).spectrum L",
+        "L0": 6,
+        "r": "55100",
+        "beta": "3",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (3) ∧ 1 - εₜ ≤ thermalPurity 12 (3)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_2_h_1_20",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/2) (1/20)).spectrum L",
+        "L0": 6,
+        "r": "899/500",
+        "beta": "7/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (7/2) ∧ 1 - εₜ ≤ thermalPurity 12 (7/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_2_h_1_10",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/2) (1/10)).spectrum L",
+        "L0": 6,
+        "r": "321/100",
+        "beta": "13/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (13/4) ∧ 1 - εₜ ≤ thermalPurity 12 (13/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_2_h_1_4",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/2) (1/4)).spectrum L",
+        "L0": 6,
+        "r": "363/20",
+        "beta": "11/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (11/4) ∧ 1 - εₜ ≤ thermalPurity 12 (11/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_2_h_1_2",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/2) (1/2)).spectrum L",
+        "L0": 6,
+        "r": "1021/5",
+        "beta": "5/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (5/2) ∧ 1 - εₜ ≤ thermalPurity 12 (5/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_3_2_h_1",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (3/2) (1)).spectrum L",
+        "L0": 6,
+        "r": "10490",
+        "beta": "5/2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (5/2) ∧ 1 - εₜ ≤ thermalPurity 12 (5/2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_2_h_1_20",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (2) (1/20)).spectrum L",
+        "L0": 6,
+        "r": "1551/200",
+        "beta": "9/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (9/4) ∧ 1 - εₜ ≤ thermalPurity 12 (9/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_2_h_1_10",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (2) (1/10)).spectrum L",
+        "L0": 6,
+        "r": "218/25",
+        "beta": "9/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (9/4) ∧ 1 - εₜ ≤ thermalPurity 12 (9/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_2_h_1_4",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (2) (1/4)).spectrum L",
+        "L0": 6,
+        "r": "349/20",
+        "beta": "9/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (9/4) ∧ 1 - εₜ ≤ thermalPurity 12 (9/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_2_h_1_2",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (2) (1/2)).spectrum L",
+        "L0": 6,
+        "r": "2244/25",
+        "beta": "9/4",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (9/4) ∧ 1 - εₜ ≤ thermalPurity 12 (9/4)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    },
+    {
+        "name": "Leaderboard.Records.Ising.g_2_h_1",
+        "kind": "conditional",
+        "spectrum": "(CertifiedGaps.IsingLongitudinal.model (2) (1)).spectrum L",
+        "L0": 6,
+        "r": "1073",
+        "beta": "2",
+        "hypothesis": "1 - εₛ ≤ spatialPurity 6 (2) ∧ 1 - εₜ ≤ thermalPurity 12 (2)",
+        "axioms": [
+            "propext",
+            "Classical.choice",
+            "Quot.sound"
+        ],
+        "module": "Leaderboard.Records.Ising"
+    }
+]
