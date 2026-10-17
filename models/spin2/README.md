@@ -17,7 +17,9 @@ route here has reached. [`METHOD.md`](METHOD.md) is the dated lab notebook of ev
 The Hamiltonian on a periodic ring of $L$ spin-2 sites (local Hilbert-space dimension $d = 5$ per
 site; one site per cell, so lengths $L$ count sites; no on-site term) is
 
-$$H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 6I, \qquad J = 1, \qquad \mathbf{S}_{L+1} = \mathbf{S}_1.$$
+```math
+H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 6I, \qquad J = 1, \qquad \mathbf{S}_{L+1} = \mathbf{S}_1.
+```
 
 The thermal and variational codes shift energies by a rational per-bond constant (e.g.
 $a = 238061/50000$); the shift cancels in both purities. Numerical references: gap
@@ -28,9 +30,11 @@ rings of order $10^3$ sites.
 
 Real symmetric traceless $3 \times 3$ matrices form a 5-dimensional real inner-product space
 carrying the spin-2 representation, with $S^\alpha = -i G_\alpha$ for real antisymmetric $G_\alpha$
-($\alpha \in \{x, y, z\}$). This gives the reflection-positive bond decomposition
+($`\alpha \in \{x, y, z\}`$). This gives the reflection-positive bond decomposition
 
-$$-\mathbf{S}_j \cdot \mathbf{S}_{j+1} = \sum_\alpha G_\alpha \otimes G_\alpha = \sum_\alpha G_\alpha \otimes \overline{G_\alpha}, \qquad \|G_\alpha\| = 2,$$
+```math
+-\mathbf{S}_j \cdot \mathbf{S}_{j+1} = \sum_\alpha G_\alpha \otimes G_\alpha = \sum_\alpha G_\alpha \otimes \overline{G_\alpha}, \qquad \|G_\alpha\| = 2,
+```
 
 with on-site term $o = 0$. `real_generators()` (= `CertifiedGaps.Spins.cartesian_generators(2)`)
 builds the $G_\alpha$ independently of the magnetic basis; `test/runtests.jl` checks the identity

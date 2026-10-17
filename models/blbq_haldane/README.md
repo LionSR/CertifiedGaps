@@ -15,19 +15,25 @@
 
 On a periodic ring of $L$ spin-1 sites (one site per unit cell, $o = 0$, $\kappa = 0$),
 
-$$H_L = \sum_{j=1}^L \bigl(\cos\theta\, X_{j,j+1} + \sin\theta\, X_{j,j+1}^2\bigr), \qquad X_{j,j+1} = \mathbf{S}_j \cdot \mathbf{S}_{j+1},$$
+```math
+H_L = \sum_{j=1}^L \bigl(\cos\theta\, X_{j,j+1} + \sin\theta\, X_{j,j+1}^2\bigr), \qquad X_{j,j+1} = \mathbf{S}_j \cdot \mathbf{S}_{j+1},
+```
 
-evaluated at $\theta \in \{0, -1/10, -3/10, -1/2, -3/5, -7/10\}$ radians ($\theta = 0$ is the spin-1 Heisenberg chain, certified at $n_0 = 20$ in [`models/spin1/`](../spin1/README.md), and $\theta = -\pi/4$ is the gapless Takhtajan–Babujian critical point bounding the negative-$\theta$ Haldane window). At $L = 2$, both periodic bonds are included.
+evaluated at $`\theta \in \{0, -1/10, -3/10, -1/2, -3/5, -7/10\}`$ radians ($\theta = 0$ is the spin-1 Heisenberg chain, certified at $n_0 = 20$ in [`models/spin1/`](../spin1/README.md), and $\theta = -\pi/4$ is the gapless Takhtajan–Babujian critical point bounding the negative-$`\theta`$ Haldane window). At $L = 2$, both periodic bonds are included.
 
 ## Reflection positivity
 
-In the Cartesian spin-1 basis with real skew-symmetric generators $(G_\alpha)_{bc} = \varepsilon_{\alpha bc}$ ($S^\alpha = -i G_\alpha$) and real symmetric quadrupole operators $Q_{\alpha\beta} = -\frac{1}{2}(G_\alpha G_\beta + G_\beta G_\alpha)$, define
+In the Cartesian spin-1 basis with real skew-symmetric generators $`(G_\alpha)_{bc} = \varepsilon_{\alpha bc}`$ ($S^\alpha = -i G_\alpha$) and real symmetric quadrupole operators $Q_{\alpha\beta} = -\frac{1}{2}(G_\alpha G_\beta + G_\beta G_\alpha)$, define
 
-$$A = \sum_{\alpha=1}^3 G_\alpha \otimes G_\alpha, \qquad B = \sum_{\alpha,\beta=1}^3 Q_{\alpha\beta} \otimes Q_{\alpha\beta}.$$
+```math
+A = \sum_{\alpha=1}^3 G_\alpha \otimes G_\alpha, \qquad B = \sum_{\alpha,\beta=1}^3 Q_{\alpha\beta} \otimes Q_{\alpha\beta}.
+```
 
 Then $X = -A$ and $X^2 = \frac{1}{2}A + B$, so the unshifted bond operator decomposes as
 
-$$-h = \bigl(\cos\theta - \tfrac{1}{2}\sin\theta\bigr) A - \sin\theta\, B, \qquad o = 0.$$
+```math
+-h = \bigl(\cos\theta - \tfrac{1}{2}\sin\theta\bigr) A - \sin\theta\, B, \qquad o = 0.
+```
 
 The function `exact_rp` in [`src/model.jl`](src/model.jl) proves these algebraic identities over `Rational{BigInt}`, establishing that the identity holds symbolically for all $\cos\theta$ and $\sin\theta$, and verifies that the realignment $R[-h]$ has eigenvalues $2\cos\theta - \sin\theta$ ($\times 3$), $-\sin\theta$ ($\times 5$), and $-4\sin\theta$ ($\times 1$). Because the three $G_\alpha$ and six independent $Q_{\alpha\beta}$ form a linearly independent basis of $3 \times 3$ matrices, the unshifted bond is reflection positive if and only if both weights are non-negative, i.e., $-\pi + \arctan(2) \le \theta \le 0$ (which intersects the Haldane phase on $-\pi/4 < \theta \le 0$). The exact rational basis matrices are recorded in `results/rp.json`.
 
@@ -37,7 +43,7 @@ The function `exact_rp` in [`src/model.jl`](src/model.jl) proves these algebraic
 
 - **Complete dense spectra ($L = 2\text{–}8, 10, 12, 14$):** computed at all six angles using magnetization, translation momentum, spin flip (in $M = 0$), and reflection (at $k = 0, \pi$) up to $L = 12$, and using $\mathrm{SU}(2)$ highest-weight $\times$ momentum blocks at $L = 14$ (all 120 $(S, k)$ sectors with multiplet weights $2S + 1$ summing to $3^{14} = 4{,}782{,}969$, each sector dimension verified against an exact character formula; 3.98 hours total dense solver time).
 - **Low-energy reference levels ($L = 14, 16$):** computed in the $M = 0$ sector using `KrylovKit` (6 levels per block) to extract ground-state energies $E_0(L)$ and finite-size gaps $\Delta_L$ (never used in partition functions).
-- **Seed purity grid:** scanned over $\beta_0 \in \{1/8, 2/8, \dots, 64\}$ and $n_0 = 2, \dots, 7$ via `CertifiedGaps.Seeds.scan_seeds`, testing every even grid point against the full asymmetric doubling recurrence.
+- **Seed purity grid:** scanned over $`\beta_0 \in \{1/8, 2/8, \dots, 64\}`$ and $n_0 = 2, \dots, 7$ via `CertifiedGaps.Seeds.scan_seeds`, testing every even grid point against the full asymmetric doubling recurrence.
 
 ### Best even seed per angle ($n_0 \le 6$)
 
@@ -56,7 +62,7 @@ The rational defects stored for these points in `results/scaling.json` (`best_ev
 
 With zero energy shift ($\kappa = 0$), the spatial purity is bounded above by the ground-energy doubling mismatch $\delta(n) = E_0(2n) - 2E_0(n) > 0$, which forces $P_{\mathrm{s}}(n, \beta) \lesssim e^{-\beta \delta(n)}$, while the thermal purity $P_\tau(2n, \beta)$ requires $\beta$ to be several inverse gaps. On even rings $n = 4, 6, 8$:
 
-| $\theta$ | $\delta(4)$ | $\delta(6)$ | $\delta(8)$ | gap at $L = 16$ | fitted $\xi$ (exp) |
+| $`\theta`$ | $\delta(4)$ | $\delta(6)$ | $\delta(8)$ | gap at $L = 16$ | fitted $\xi$ (exp) |
 |---:|---:|---:|---:|---:|---:|
 | 0 | 0.663 | 0.365 | 0.227 | 0.443 | 3.7 |
 | $-0.1$ | 0.833 | 0.482 | 0.321 | 0.410 | 4.2 |
@@ -119,7 +125,7 @@ julia models/blbq_haldane/scripts/finalize_su2.jl  # collect, gzip, analyze, aud
 | path | role |
 |---|---|
 | `check.jl` | runs the verification and unit test suite (no certificate to check); `--full` adds the $n_0 = 4$ rows |
-| `src/model.jl` | exact RP identities (`exact_rp`) and integer $\mathbf{S}_j \cdot \mathbf{S}_{j+1}$ bond matrices |
+| `src/model.jl` | exact RP identities (`exact_rp`) and integer $`\mathbf{S}_j \cdot \mathbf{S}_{j+1}`$ bond matrices |
 | `src/sectors.jl` | translation orbits and momentum / spin-flip / reflection blocks |
 | `src/su2.jl` | numerical $\mathrm{SU}(2)$ highest-weight blocks (Casimir projector + CholeskyQR2) |
 | `src/dimensions.jl` | exact character dimensions of magnetization and momentum sectors |

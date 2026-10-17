@@ -14,10 +14,10 @@ cert  = certify_gap(model; n0 = 6, β0 = BETA0[(g, h)], rp = rp_certificate(mode
 1. **RP.** `verify_rp` checks $-h_{\text{bond}} = Z \otimes Z$ and the reality of $o = -gX - hZ$
    exactly.
 2. **Sectors.** `ring_blocks` builds the translation orbits of the $2^L$ configurations and, for
-   each momentum, the block $\langle s,k|H|r,k\rangle = \sqrt{p_r/p_s}\sum_l c(r \to T^l s)\,e^{ikl}$
+   each momentum, the block $`\langle s,k|H|r,k\rangle = \sqrt{p_r/p_s}\sum_l c(r \to T^l s)\,e^{ikl}`$
    in interval arithmetic (exact couplings, enclosed phases and norm ratios). Its `Float64` center
    is exactly Hermitian (real for $k = 0, L/2$), and the Frobenius norm of the entrywise radii
-   bounds $\|A - M\|_2$. The model is real, so $A_{-k} = \overline{A_k}$ has the same spectrum and
+   bounds $`\|A - M\|_2`$. The model is real, so $A_{-k} = \overline{A_k}$ has the same spectrum and
    only $0 \le k \le L/2$ is built, with multiplicity 2 for $0 < k < L/2$. No charge is conserved
    for $h > 0$, so there is one sector. At $L = 12$: 7 blocks, the largest of dimension 352.
 3. **Enclosure.** `verified_eigen` turns the LAPACK eigenpairs of each center into a guarantee:
@@ -52,8 +52,8 @@ doubled radius $2\eta$; the core certificate stores no eigenvalues.)
 
 ## Seed selection
 
-`BETA0` was selected by the earlier floating-point scan over $n_0 \in \{2, 4, 6\}$ and
-$\beta_0 \in \{1/4, \dots, 64\}$ (best `certified_gap_bound`), kept unchanged so that the seeds of
+`BETA0` was selected by the earlier floating-point scan over $`n_0 \in \{2, 4, 6\}`$ and
+$`\beta_0 \in \{1/4, \dots, 64\}`$ (best `certified_gap_bound`), kept unchanged so that the seeds of
 the Lean statement stay valid. `scripts/scan.jl` repeats the scan from the core momentum blocks
 and matches 29 of 30 points; at $g = 1/4, h = 1$ its `Float64` defects are at rounding level and
 its preferred $\beta_0 = 23/4$ carries a meaningless float bound. With the tighter enclosures some
@@ -100,6 +100,6 @@ defects assumed in `IsingLongitudinal.lean`; every new $\varepsilon \le$ Lean va
 | 2//1 | 1//1 | 0.0001302 | 0.0001286 | 0.0001302 | 0.0003861 | 0.0003799 | 0.0003862 | 3.4912 | 3.4957 | 3.4989 |
 
 All 60 defects decreased strictly and all 30 interval bounds increased. The exact chain bound is
-below the old interval bound at 13 points, by at most $0.13\%$ (relative); it is a separate,
+below the old interval bound at 13 points, by at most $`0.13\%`$ (relative); it is a separate,
 slightly more conservative exact rational evaluation of the recurrence, and it is the bound the
 certificate claims.

@@ -16,12 +16,14 @@ diagnostics are in [`METHOD.md`](METHOD.md); the route analysis is in [`IDEAS.md
 Each unit cell is a two-spin rung ($d = 4$). In Pauli normalization on a periodic ring of $L$
 rungs,
 
-$$H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).$$
+```math
+H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).
+```
 
 Lengths count rungs, and the $L = 2$ ring retains both periodic leg bonds, following the core
 convention. The certificate works in the **rotated frame** obtained by a Hadamard gate on every
 spin, i.e. the exact rational orthogonal involution $W = (H \otimes H)/2$ with
-$H = \begin{pmatrix}1&1\\1&-1\end{pmatrix}$ on every rung (`Ladder.rung_hadamard`). It maps
+$`H = \begin{pmatrix}1&1\\1&-1\end{pmatrix}`$ on every rung (`Ladder.rung_hadamard`). It maps
 $X \leftrightarrow Z$, so the rotated ladder (`Ladder.ladder(g)`) has bond
 $h = -(X_a X_{a'} + X_b X_{b'})$ and on-site term $o = -X_a X_b - g(Z_a + Z_b)$. There the
 $\mathbb{Z}_2$ charge (number of down spins mod 2, `charge = [0, 1, 1, 0]`) is conserved and
@@ -34,7 +36,9 @@ orthogonal, so both frames have the same spectrum and purities.
 
 In the rotated frame, the real bond factors $C_1 = X \otimes I$ and $C_2 = I \otimes X$ give
 
-$$-h = C_1 \otimes C_1 + C_2 \otimes C_2,$$
+```math
+-h = C_1 \otimes C_1 + C_2 \otimes C_2,
+```
 
 and the on-site term $o$ is real symmetric; a single rung needs no internal reflection ($F = I$).
 `Ladder.ladder_rp` passes these factors to the core `rp_certificate`, whose `verify_rp` checks
@@ -52,11 +56,11 @@ The seeds are the exact rationals `seed.eps_s = 11238966699069//100000000000000`
 `seed.eps_t = 51536220063797//1000000000000000` of
 [`results/certificate_g3_1.json`](results/certificate_g3_1.json). The headline is the
 outward-rounded interval bound `certified_gap_bound(εₛ, εₜ, 3//2).bound` $= 0.6368708319575064$
-(`interval_bound_decimal`, rounded down above), about $24\%$ of the 8-rung numerical gap; the
+(`interval_bound_decimal`, rounded down above), about $`24\%`$ of the 8-rung numerical gap; the
 certificate's claim `gap_lower_bound` is the exact rational doubling chain,
 $\Delta_L > 636342881/10^9$. Both are rigorous. The defects satisfy the Lean theorem's seed
 hypotheses ($\varepsilon_{\mathrm{s}} \le 0.1125$, $\varepsilon_\tau \le 0.05162$, checked
-exactly in the tests). On the scanned grid $g \in \{2, 5/2, 3, 4\}$, the fields $g = 2$ and
+exactly in the tests). On the scanned grid $`g \in \{2, 5/2, 3, 4\}`$, the fields $g = 2$ and
 $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ (numerical bound $2.142$) was
 not certified because $g = 3$ already is.
 
@@ -105,8 +109,8 @@ with other jobs):
   against `Ladder.ladder(g)`, the exact chain from the stored seeds, the interval bound, the
   Lean seed hypotheses and the model-local source hashes; `--full` also recomputes and
   re-verifies every block spectrum and requires the fresh defects to be at most the stored ones.
-- **Numerical only (not used in the proof):** the seed search ($g \in \{2, 5/2, 3, 4\}$,
-  $n_0 \in \{2, 3, 4\}$, $\beta = 1/8 : 1/8 : 32$), the negative scan results at $g = 2$ and
+- **Numerical only (not used in the proof):** the seed search ($`g \in \{2, 5/2, 3, 4\}`$,
+  $`n_0 \in \{2, 3, 4\}`$, $\beta = 1/8 : 1/8 : 32$), the negative scan results at $g = 2$ and
   $5/2$, the extrapolated seed sizes, finite-ring ED reference gaps, and the literature critical
   field $g_c \approx 1.83214(5)$.
 

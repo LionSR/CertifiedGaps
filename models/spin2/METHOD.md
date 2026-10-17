@@ -37,7 +37,7 @@ its incident histories, and bounded by 5. Consequently its integral operator
 expansion yields
 
 \[
-Z_L(\beta)=\operatorname{Tr}X_\beta^L.
+Z_L(\beta)=\mathrm{Tr}\,X_\beta^L.
 \]
 
 For even \(L\), \(X_\beta^L/Z_L(\beta)\) is positive with unit trace. The
@@ -330,7 +330,7 @@ Araki--Lieb--Thirring inequality and the product-formula limit give
 
 \[
 Z_N(\beta)\le
-\operatorname{Tr}\left(e^{-\beta A/m}e^{-\beta B/m}\right)^m
+\mathrm{Tr}\,\left(e^{-\beta A/m}e^{-\beta B/m}\right)^m
 \quad(m\in\mathbb N).
 \]
 

@@ -10,15 +10,19 @@ model-specific code is `src/DimerizedHeisenberg.jl`; everything else is the core
 Group each strong bond into a two-spin unit cell $(a, b)$, and set $s = 1 + \delta$,
 $w = 1 - \delta$. The physical cell term and inter-cell bond (second spin of a cell, first spin
 of the next, on $\mathrm{cell} \otimes \mathrm{cell}$) are
-$$o_{\mathrm{phys}} = s\, \mathbf{S}_a \cdot \mathbf{S}_b, \qquad
-h_{\mathrm{phys}} = w\, (I \otimes \mathbf{S}) \cdot (\mathbf{S} \otimes I).$$
+```math
+o_{\mathrm{phys}} = s\, \mathbf{S}_a \cdot \mathbf{S}_b, \qquad
+h_{\mathrm{phys}} = w\, (I \otimes \mathbf{S}) \cdot (\mathbf{S} \otimes I).
+```
 Rotate the second spin of every cell by $J = 2iS^y = \begin{psmallmatrix} 0 & 1 \\ -1 & 0
-\end{psmallmatrix}$, a real orthogonal matrix with $J^\top S^x J = -S^x$, $J^\top S^z J = -S^z$,
+\end{psmallmatrix}$`, a real orthogonal matrix with `$J^\top S^x J = -S^x$`, `$J^\top S^z J = -S^z$,
 and $J^\top (iS^y) J = iS^y$. With $W = I \otimes J$ and $U = W^{\otimes L}$, every bond of the
 ring joins a rotated and an unrotated spin, so
-$$U^\top H_L U = \sum_j h_{j,j+1} + \sum_j o_j, \qquad
+```math
+U^\top H_L U = \sum_j h_{j,j+1} + \sum_j o_j, \qquad
 o = s\,(-S^xS^x + S^yS^y - S^zS^z), \qquad
-h = w\, I \otimes (-S^xS^x + S^yS^y - S^zS^z) \otimes I.$$
+h = w\, I \otimes (-S^xS^x + S^yS^y - S^zS^z) \otimes I.
+```
 Because $U$ is a product of cell unitaries, the two local identities
 $W^\top o_{\mathrm{phys}} W = o$ and $(W \otimes W)^\top h_{\mathrm{phys}} (W \otimes W) = h$
 imply unitary equivalence for every $L$; `frame_identity` checks both exactly in
@@ -37,25 +41,29 @@ once.
 ## Reflected reflection positivity
 
 Let $F$ be the swap of the two spins of a cell (real, symmetric, $F^2 = I$, $FoF = o$). With
-$P_\alpha \in \{S^x, iS^y, S^z\}$ (real),
-$$-h = w \sum_{\alpha} C_\alpha \otimes F\, \overline{C_\alpha}\, F, \qquad
-C_\alpha = I \otimes P_\alpha, \qquad F (I \otimes P_\alpha) F = P_\alpha \otimes I,$$
+$`P_\alpha \in \{S^x, iS^y, S^z\}`$ (real),
+```math
+-h = w \sum_{\alpha} C_\alpha \otimes F\, \overline{C_\alpha}\, F, \qquad
+C_\alpha = I \otimes P_\alpha, \qquad F (I \otimes P_\alpha) F = P_\alpha \otimes I,
+```
 which is the reflected form of `notes/thermal-mpo-gap-scope.tex` (Appendix E) and of the Lean
 structure `RPRing` (`lean/CertifiedGaps/Models/DimerizedHeisenberg.lean` uses exactly this
 frame). `RingModels.verify_rp` checks it exactly, and every certificate stores the factors, the
 weights $w$, and the reflection $F$. Without $F$ there is no such factorization: the core's exact
-LDL$^\dagger$ factorization of the realigned bond fails in this basis, and
+LDL$`^\dagger`$ factorization of the realigned bond fails in this basis, and
 `src/reflection_conventions.jl` shows that no common single-cell basis change helps, since
-$\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \tfrac38 (1 - \delta)^2 > 0$ for the swap
+$`\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \tfrac38 (1 - \delta)^2 > 0`$ for the swap
 $F_{\mathrm{outer}}$ of two whole cells is basis independent.
 
 `src/rp.jl` (`results/rp_audit.json`) records an equivalent second frame: the singlet/triplet
 basis $M/\sqrt{2}$ with
-$$M = \begin{pmatrix} 1 & 1 & 0 & 0 \\ 0 & 0 & 1 & i \\ 0 & 0 & 1 & -i \\ 1 & -1 & 0 & 0
-\end{pmatrix}, \qquad M^\dagger M = 2I, \qquad \tfrac12 M M^\top = F,$$
+```math
+M = \begin{pmatrix} 1 & 1 & 0 & 0 \\ 0 & 0 & 1 & i \\ 0 & 0 & 1 & -i \\ 1 & -1 & 0 & 0
+\end{pmatrix}, \qquad M^\dagger M = 2I, \qquad \tfrac12 M M^\top = F,
+```
 diagonalizes $F$ and turns the reflected form into the conjugate form
 $-h = \sum_\alpha C'_\alpha \otimes \overline{C'_\alpha}$ with complex $C'_\alpha$ and
-$o = \tfrac{s}{4}\operatorname{diag}(-3, 1, 1, 1)$. Both forms are verified exactly; the
+$o = \tfrac{s}{4}\mathrm{diag}(-3, 1, 1, 1)$. Both forms are verified exactly; the
 certificates use the real rotated frame because it carries the conserved charge.
 
 ## Core certificates
@@ -89,11 +97,11 @@ To prove that no $\beta_0 > 0$ satisfies the doubling recurrence at a given $(n_
 `negative_cover` partitions $(0, \infty)$ into three regimes, using only core enclosures of the
 verified spectra of the rings $n_0$ and $2n_0$:
 1. **High temperature $(0, 1]$:** $\frac{d}{d\beta}\log P_\tau(2n_0, \beta) =
-   2(\langle H \rangle_\beta - \langle H \rangle_{2\beta}) \ge 0$, so $P_\tau(2n_0, \beta)$ is
+   2(\langle H \rangle_\beta - \langle H \rangle_{2\beta}) \ge 0$`, so `$P_\tau(2n_0, \beta)$ is
    nondecreasing; $P_\tau(2n_0, 1) \le 1/2$ (`log_partition_enclosure` at $\beta = 1$) gives
    $\varepsilon_\tau \ge 1/2$, hence $z \ge 1/2$, for all $\beta_0 \le 1$.
 2. **Low temperature $[B, \infty)$:** with
-   $d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0$ from `ground_energy_enclosure`,
+   $`d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0`$ from `ground_energy_enclosure`,
    $P_{\mathrm{s}}(n_0, \beta) \le 2^{4n_0} e^{-\beta d_E} \le 1/2$ for all $\beta \ge B$, with $B$
    the smallest power of two $\ge 32$ that works.
 3. **Intermediate $[1, B]$:** $[1, B]$ is bisected into closed boxes. On each box, interval
@@ -112,10 +120,12 @@ spectra.
 At $\delta = 1$ ($w = 0$), the $n$-cell ring consists of $n$ decoupled strong dimers with exact
 partition function $Z_n^{\mathrm{dimer}}(\beta) = (e^{3\beta s/4} + 3e^{-\beta s/4})^n$. For
 $w = 1 - \delta > 0$, writing $H_n = H_n^{\mathrm{dimer}} + V_n$ gives
-$\|V_n\|_2 \le v_n := \frac{3}{4} n w$, so Weyl's inequality implies
+$`\|V_n\|_2 \le v_n := \frac{3}{4} n w`$, so Weyl's inequality implies
 $|\log Z_n(\beta) - \log Z_n^{\mathrm{dimer}}(\beta)| \le \beta v_n$ and hence
-$$P_{\mathrm{s}}(n, \beta) \ge e^{-4\beta v_n}, \qquad
-P_\tau(2n, \beta) \ge \left(\frac{1 + 3x^2}{(1 + 3x)^2}\right)^{2n} e^{-8\beta v_n}, \qquad x = e^{-\beta s}.$$
+```math
+P_{\mathrm{s}}(n, \beta) \ge e^{-4\beta v_n}, \qquad
+P_\tau(2n, \beta) \ge \left(\frac{1 + 3x^2}{(1 + 3x)^2}\right)^{2n} e^{-8\beta v_n}, \qquad x = e^{-\beta s}.
+```
 Evaluating these bounds requires only $O(\log n)$ interval operations independently of the
 $2^{2n}$ Hilbert-space dimension (certifying $n_0 = 128$ cells / $512$ spins at
 $\delta = 0.999999, \beta_0 = 8$ in `test/runtests.jl`), but because the extensive error

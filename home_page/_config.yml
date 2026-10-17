@@ -1,0 +1,33 @@
+# Jekyll configuration of the project home page (leanblueprint template, cayman remote theme),
+# built by docgen-action in .github/workflows/blueprint.yml.
+#
+# Every page builds links with `relative_url` / `absolute_url`, and GitHub links from
+# `repository`, so moving the site or renaming the repository only changes `url`, `baseurl`
+# and `repository` below. For a local preview at the server root, override them:
+#     bundle exec jekyll build --baseurl "" --config _config.yml,<file with url: "">
+#
+# The leaderboard rows live in _data/records.yml (hand-edited; schema in its header).
+# _data/lean_records.json is generated in CI by `lake exe leaderboard_audit` (not committed).
+
+title: Proven energy gaps of quantum spin chains
+description: Lower bounds on the energy gap that hold for every ring length, checked by computer and in the Lean proof assistant
+baseurl: "/CertifiedGaps" # the subpath of the site
+url: "https://sirui-lu.com" # the base hostname and protocol of the site
+twitter_username:
+github_username: LionSR
+repository: LionSR/CertifiedGaps
+branch: main # the branch that certificate and checker links point to
+
+# Build settings
+remote_theme: pages-themes/cayman@v0.2.0
+plugins:
+  - jekyll-remote-theme
+  - jekyll-github-metadata
+
+# Every page uses the site layout unless its front matter says otherwise. GitHub's own Pages
+# build adds this through jekyll-default-layout; docgen-action runs plain `jekyll build`.
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

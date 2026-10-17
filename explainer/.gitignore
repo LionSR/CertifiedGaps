@@ -1,2 +1,8 @@
-# Rendered films are regenerated with render.mjs (about 20 MB in total).
+# Rendered films are regenerated with render.mjs (about 20 MB in total), the narration clips are a
+# local cache, and the npm packages are installed by hand (see README.md).
 *.mp4
+.voice/
+*.narration.wav
+node_modules/
+package.json
+package-lock.json

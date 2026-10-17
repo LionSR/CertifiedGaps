@@ -1,6 +1,6 @@
 # A diagrammatic proof of the Haldane gap
 
-The spin-1 antiferromagnetic Heisenberg chain $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ has a
+The spin-1 antiferromagnetic Heisenberg chain $`H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}`$ has a
 spectral gap $\Delta_L = E_1(L) - E_0(L)$ that stays open as the ring grows (Haldane's conjecture;
 numerically $\Delta \approx 0.4105$). This repository proves a uniform lower bound on that gap using
 spacetime tensor networks drawn as diagrams, certifies the finite numerical inputs by computer, and
@@ -8,8 +8,8 @@ applies the same method to a family of one-dimensional quantum spin chains and l
 
 The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), has two parts:
 
-1. **An analytic criterion.** Write the partition function $Z_L(\beta) = \operatorname{Tr} e^{-\beta H_L}$
-   of a periodic ring as $\operatorname{Tr} X_\beta^L$, where $X_\beta$ is the spatial transfer operator of an
+1. **An analytic criterion.** Write the partition function $`Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}`$
+   of a periodic ring as $`\mathrm{Tr}\, X_\beta^L`$, where $X_\beta$ is the spatial transfer operator of an
    exact continuous-time thermal matrix product operator (MPO). When the bond interaction is reflection
    positive, $X_\beta$ is self-adjoint, so $Z_L(\beta)$ is a sum of $L$-th powers of real transfer
    eigenvalues just as it is a sum of exponentials of energy eigenvalues. Consequently, both the
@@ -23,6 +23,11 @@ The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), ha
    preprint [*The periodic spin-one Haldane gap*](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026);
    and for the other models using verified eigenvalue enclosures of complete seed-ring spectra.
 
+**Website:** the [project home page](https://sirui-lu.com/CertifiedGaps/) gathers the
+notes, the explainer, the blueprint and the Lean documentation. Its
+[leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) lists every proven gap,
+how it is proved, and the open challenges. To submit a result, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+
 ## Spin-1 Heisenberg chain
 
 | statement | status | where |
@@ -30,8 +35,8 @@ The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), ha
 | $\Delta_L > (\log 20)/784 \approx 0.00382$ for every even $L \ge 2304$ | proved in the main note, given the seed purity bounds at $(n_0, \beta_0) = (2304, 784)$ | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
 | seed purity bounds $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge 0.99$ | reproduced in exact arithmetic (status `passed`) | [`models/spin1/`](models/spin1/) |
 | the two-purity criterion and the spin-1 theorem above, given the two seed bounds | formalized in Lean 4 | [`lean/`](lean/) |
-| [`explainer/`](explainer/) | an illustrated, undergraduate-level exposition of the proof (HTML page and two animated films); floating-point illustrations only, not part of any certificate |
-| $\Delta_L > 0.0729$ for every even $L \ge 36$ | exact-arithmetic computation combining temperature-lifting with a tighter seed chain; not yet independently reviewed | [`models/spin1/`](models/spin1/) (`experiments/`) |
+| [`explainer/`](explainer/) | an illustrated, undergraduate-level exposition of the proof (two HTML pages, ring and open chains, and two animated films); floating-point illustrations only, not part of any certificate |
+| $\Delta_L > 0.0729$ for every even $L \ge 36$ | exact-arithmetic computation combining temperature-lifting with a tighter seed chain; independently reviewed in #49 | [`models/spin1/`](models/spin1/) (`experiments/`) |
 | open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ | proved in Appendices A–C, given four finite estimates from the boundary-field paper | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
 | general scope of the method (bond reflection positivity and multi-site unit cells) | proved in Appendices D–H | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf) |
 | diagrammatic exposition of the spin-1 seed certificate at $(2304, 784)$ | Appendices I–M | [`notes/thermal-mpo-gap-certificate.pdf`](notes/thermal-mpo-gap-certificate.pdf) |
@@ -58,7 +63,7 @@ only open hypotheses.
 | Ising chain $-ZZ - gX - hZ$, 30 points $g \in [1/4, 2]$, $h \in [1/20, 1]$ | $(6, \text{per point})$ | $\ge 0.0763$ at every point (smallest at $g = 1, h = 1/20$) | [`tfim_longitudinal`](models/tfim_longitudinal/) |
 | spin-1 bilinear–biquadratic, $\theta \in [-7/10, 0]$ | no admissible even seed with $n_0 \le 6$ | negative result; required seed scale estimated | [`blbq_haldane`](models/blbq_haldane/) |
 | spin-2 Heisenberg chain | — | numerical and certified-MPO investigation; no certificate | [`spin2`](models/spin2/) |
-| hexagonal spin-3/2 AKLT ($2+1$ dimensions) | — | numerical pilot of the $2+1$D thermal-purity recursion | [`aklt`](models/aklt/) |
+| hexagonal spin-3/2 AKLT ($2+1$ dimensions) | — | numerical pilot of the $`2+1`$D thermal-purity recursion | [`aklt`](models/aklt/) |
 
 All certified models outside `spin1/` share one pipeline in the core (`CertifiedGaps.GapCertificates`):
 each model is an exact `RingModel` with exact reflection-positivity data, and `certify_gap` computes
@@ -77,13 +82,16 @@ interval bounds; each certificate also states the exact rational chain bound.
 | [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core package: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalization, verified ring spectra, certified MPO arithmetic (Nemo/Arb), and thermal purification (ITensors) |
 | [`models/`](models/) | one directory per model in a standardized layout ([`AGENTS.md`](AGENTS.md), "Directory format"): `README.md`, `IDEAS.md`, certificate JSON, `certify.jl`, `check.jl`, and tests; documented layout exceptions are listed in each README's `## Layout`. `spin1/` reproduces the exact-arithmetic spin-1 certificate; `lean_seeds/` develops kernel-checked seed witnesses |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalization of the two-purity criterion and each certified model's gap theorem (with the seeds as hypotheses), plus the opt-in library `SeedKernel` for kernel-checked seed arithmetic |
-| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes |
+| [`blueprint/`](blueprint/), [`home_page/`](home_page/) | the `leanblueprint` blueprint of the Lean formalization (web, PDF, dependency graph) and the project home page, built from the root `lakefile.toml` (which builds `lean/`) and deployed to GitHub Pages by `docgen-action` |
+| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes; `leaderboard/`: the validator of the leaderboard data `home_page/_data/records.yml` |
 
-See [`AGENTS.md`](AGENTS.md) for the exact specification of a gap certificate and instructions on adding new models.
+See [`AGENTS.md`](AGENTS.md) for the exact specification of a gap certificate and instructions on adding new models,
+and [`CONTRIBUTING.md`](CONTRIBUTING.md) for submitting a record to the leaderboard.
 
 ## Reproduce
 
-Requirements: Julia 1.12, `elan` (Lean 4), and a LaTeX installation with REVTeX 4.2 and `latexmk`.
+Requirements: Julia 1.12, `elan` (Lean 4), a LaTeX installation with REVTeX 4.2 and `latexmk`, and
+`leanblueprint` for the blueprint.
 
 ```sh
 # Julia core and its tests
@@ -102,12 +110,18 @@ OPENBLAS_NUM_THREADS=1 julia --project=julia models/heisenberg_ladder/check.jl
 OPENBLAS_NUM_THREADS=1 julia --project=julia models/heisenberg_ladder/test/runtests.jl
 
 # Lean formalization
-cd lean && lake exe cache get && lake build
+(cd lean && lake exe cache get && lake build)
+
+# blueprint of the Lean formalization, from the repository root
+lake exe cache get && lake build
+leanblueprint pdf && leanblueprint web
+lake exe checkdecls blueprint/lean_decls
 
 # LaTeX notes
 latexmk -pdf -outdir=work/latex-build notes/thermal-mpo-gap-note.tex
 ```
 
+The root build uses its own `.lake` directory, with a Mathlib copy separate from `lean/.lake`.
 Each model directory's `README.md` provides its exact reproduction commands, measured run times, and
 trusted arithmetic base.
 

@@ -121,7 +121,7 @@ continuation (Route 6) across all active sectors at $n = 8, 10, 12$.
    viable without a custom routing network.
 3. **Marshall-transformed positive power filter:** On even untwisted rings, the Marshall sign
    transformation makes all off-diagonal entries of $nI - H_{\mathrm{M}}$ nonnegative, allowing
-   unsigned power-filter trial generation $v = (nI - H_{\mathrm{M}})^q e_{\text{N\'eel}}$. For
+   unsigned power-filter trial generation $`v = (nI - H_{\mathrm{M}})^q e_{\text{N\'eel}}`$. For
    general signed and twisted applications, represent signed vectors by separate positive and
    negative `Nat` limbs with explicit carry and floor-division bounds.
 4. **Exact integer Rayleigh–Ritz and residual witnesses:** Kernel-check the exact integer moment
@@ -172,7 +172,7 @@ strategy scales.
 Route 2 (the three-twist $I/O/N$ split using the $C$ twist at $n = 6, 8, 10$) and Route 1 at
 $n \le 12$ (even lengths $4, 6, 8, 10, 12$ with real twists $I, P$ only) both succeeded and were
 verified in exact rational arithmetic (`results/seed_design/certificate.json`). Design A uses just
-9 traces at $n \in \{6, 8, 10\}$ with absolute tolerance $3 \times 10^{-4}$ to certify
+9 traces at $`n \in \{6, 8, 10\}`$ with absolute tolerance $3 \times 10^{-4}$ to certify
 $\Delta_L > 0.005966152$ for even $L \ge 60$ (an $8\times$ reduction in total Hilbert-space
 dimension relative to source 1), while Design C uses 10 real-twist traces at even $n \le 12$ with
 tolerance $10^{-3}$ to certify $\Delta_L > 0.039036761$ for even $L \ge 60$. Conversely, dropping

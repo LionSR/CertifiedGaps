@@ -2,7 +2,7 @@
 
 This package (`AKLTPilot`) is a numerical pilot of the $2+1$-dimensional thermal-purity recursion
 developed in [`notes/thermal-mpo-gap-2plus1d.tex`](../../notes/thermal-mpo-gap-2plus1d.tex) for the
-periodic spin-$3/2$ Affleck–Kennedy–Lieb–Tasaki (AKLT) model on the honeycomb lattice. It is a
+periodic spin-$`3/2`$ Affleck–Kennedy–Lieb–Tasaki (AKLT) model on the honeycomb lattice. It is a
 floating-point implementation check, not a certificate: standard MPS thermal purification on
 snake-ordered two-dimensional torus quotients suffers from severe bond-compression bias and does not
 reproduce the smallest exact reference, so no seed or gluing diagnostic is resolved.
@@ -18,12 +18,14 @@ reproduce the smallest exact reference, so no seed or gluing diagnostic is resol
 
 ## Model
 
-Each primitive unit cell at $(x, y) \in \mathbb{Z}_{L_x} \times \mathbb{Z}_{L_y}$ contains two spin-$3/2$
+Each primitive unit cell at $`(x, y) \in \mathbb{Z}_{L_x} \times \mathbb{Z}_{L_y}`$ contains two spin-$`3/2`$
 sites, $A(x, y)$ and $B(x, y)$ (local Hilbert-space dimension $d = 4$ per spin, $16$ per cell). Each site
 $A(x, y)$ is coupled to its three nearest neighbors $B(x, y)$, $B(x-1, y)$, and $B(x, y-1)$ with periodic
-boundary conditions in both directions. The Hamiltonian is a sum of spin-$3$ bond projectors:
+boundary conditions in both directions. The Hamiltonian is a sum of spin-$`3`$ bond projectors:
 
-$$H = \sum_{\langle i, j \rangle} P_{ij}^{(S=3)}$$
+```math
+H = \sum_{\langle i, j \rangle} P_{ij}^{(S=3)}
+```
 
 where $P_{ij}^{(S=3)}$ is the orthogonal projector onto total spin $S = 3$ on bond $\langle i, j \rangle$,
 normalized with eigenvalues $0$ and $1$ so that the frustration-free AKLT ground state has exact energy
@@ -50,9 +52,9 @@ although direct characteristic-polynomial bounds at width $2$ yield $d_{2L} \le 
 
 Not available. The 2+1D note proves that the standard time-reversal construction fails for one
 AKLT bond: with \(\theta(A)=U\bar AU^\dagger\), \(U=e^{-i\pi S^y}\), and the quadrupole
-\(Q=(S^z)^2-\tfrac54\), \(\operatorname{Tr}[e^{-tP^{(3)}}(Q\otimes\theta Q)]=\tfrac75(e^{-t}-1)<0\)
+\(Q=(S^z)^2-\tfrac54\), \(\mathrm{Tr}[e^{-tP^{(3)}}(Q\otimes\theta Q)]=\tfrac75(e^{-t}-1)<0\)
 for every \(t>0\). `test/runtests.jl` checks the ingredients in floating point
-(\(\operatorname{Tr}[P^{(3)}(Q\otimes Q)]=7/5\) and the projector polynomial). This excludes only
+(\(\mathrm{Tr}[P^{(3)}(Q\otimes Q)]=7/5\) and the projector polynomial). This excludes only
 that local construction; the scalar gluing inequalities the 2+1D recursion needs remain open.
 
 ## Result
@@ -62,7 +64,7 @@ that local construction; the scalar gluing inequalities the 2+1D recursion needs
 - **Negative result for 2D snake-ordered thermal MPO purification:** On the 8-spin ($2\times 2$-cell)
   torus at $\beta = 2$, dense diagonalization gives $\log Z = 5.31205522615$. Evolving the purified
   amplitude $e^{-\beta H/2}$ with step $\delta\beta = 1/8$ at maximum bond dimensions
-  $\chi \in \{16, 32, 64, 128\}$ underestimates $\log Z$ by $-1.773$, $-1.424$, $-0.587$, and $-0.333$,
+  $`\chi \in \{16, 32, 64, 128\}`$ underestimates $\log Z$ by $-1.773$, $-1.424$, $-0.587$, and $-0.333$,
   respectively. Halving the Trotter step to $\delta\beta = 1/16$ does not remove the error, confirming
   that the discrepancy comes from SVD bond-compression truncation across long-range snake bonds rather
   than Trotter splitting error. Avoiding site swap restoration between nonlocal gates (`thermal-swap-refinement`)
@@ -71,7 +73,7 @@ that local construction; the scalar gluing inequalities the 2+1D recursion needs
   values are not converged even on 8 spins at $\beta = 2$, observed negative values of $G$ or small values
   of $C$ at fixed bond dimension cannot be interpreted as physical gluing bounds.
 - **Eight-spin floating-point reference:** Full dense diagonalization of the 8-spin Hilbert space ($65{,}536$
-  states split across conserved total-$S^z$ sectors) finds a unique ground state with numerical energy
+  states split across conserved total-$`S^z`$ sectors) finds a unique ground state with numerical energy
   $1.35 \times 10^{-14}$, a finite-size gap $\Delta \approx 0.0920298633241$, and thermal excess
   $R(64) = 0.00831113960$ ($R(\beta) = 0.01$ is crossed near $\beta \approx 61.9932$).
 
@@ -90,9 +92,9 @@ julia --startup-file=no --project=models/aklt models/aklt/scripts/run.jl \
 There is no `certify.jl` (nothing is certified) and no `check.jl` (there are no tracked results to
 check); the test suite is the verification. Additional configuration files in `scripts/configs/`
 are:
-- `thermal-pilot.toml`: $2\times 2$ base geometry, $\chi \in \{16, 32\}$,
-  $\delta\beta \in \{1/8, 1/16\}$;
-- `thermal-reference-refinement.toml`: 8-spin torus, $\chi \in \{64, 128\}$;
+- `thermal-pilot.toml`: $2\times 2$ base geometry, $`\chi \in \{16, 32\}`$,
+  $`\delta\beta \in \{1/8, 1/16\}`$;
+- `thermal-reference-refinement.toml`: 8-spin torus, $`\chi \in \{64, 128\}`$;
 - `thermal-swap-refinement.toml`: 8-spin torus without swapping moved sites back between gates.
 
 Each run records source and environment hashes, parameter settings, package versions, thread counts,
@@ -103,11 +105,11 @@ an earlier run.
 ## What is rigorous
 
 Nothing in this directory is a rigorous certificate. The exact identities checked by the tests
-(projector polynomial, $\operatorname{Tr}[P^{(3)}(Q\otimes Q)]=7/5$, and the single-bond partition
+(projector polynomial, $\mathrm{Tr}[P^{(3)}(Q\otimes Q)]=7/5$, and the single-bond partition
 function) hold in exact arithmetic, but the tests evaluate them in `Float64`.
 - **Reference diagonalization (`src/exact.jl`):** Builds $P_{ij}^{(S=3)}$ from its exact degree-3
   polynomial in $\mathbf{S}_i \cdot \mathbf{S}_j$ (independently of the Clebsch–Gordan gate
-  decomposition) and diagonalizes every total-$S^z$ sector in `Float64` using spin-flip symmetry for
+  decomposition) and diagonalizes every total-$`S^z`$ sector in `Float64` using spin-flip symmetry for
   $S^z < 0$. There is no Hilbert-space truncation on 8 spins, but the eigenvalues are unverified
   dense `Float64` eigensolves.
 - **Thermal MPO purification (`src/thermal.jl`):** Wraps

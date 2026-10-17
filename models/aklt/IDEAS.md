@@ -13,7 +13,7 @@ uniform gap then needs one certified finite seed and a proof of the gluing inequ
 * **Reflection positivity of the bond (the 1D criterion's route to gluing).** Fails for the
   standard construction. With time reversal \(\theta(A)=U\bar AU^\dagger\),
   \(U=e^{-i\pi S^y}\), and the quadrupole \(Q=(S^z)^2-\tfrac54\), the note shows
-  \(\operatorname{Tr}[e^{-tP^{(3)}}(Q\otimes\theta Q)]=\tfrac75(e^{-t}-1)<0\). This rules out that
+  \(\mathrm{Tr}[e^{-tP^{(3)}}(Q\otimes\theta Q)]=\tfrac75(e^{-t}-1)<0\). This rules out that
   local RP construction, not the scalar gluing inequalities themselves.
 * **Self-adjoint spatial transfer for a projection filter.** Checked at width two (a transfer of
   dimension 256) with local Python helpers. No positive metric makes \(T\) or \(T^2\)
@@ -26,7 +26,7 @@ uniform gap then needs one certified finite seed and a proof of the gluing inequ
   finite-size checks, not bulk evidence.
 * **Thermal MPO purification.** The cost is polynomial in the bond dimension χ and linear in
   β/δβ, so it could reach the 16- and 32-spin tori if compression is accurate. Each bond gate is
-  exact (\(e^{-tP}=I+\operatorname{expm1}(-t)P\)), so only Trotter and truncation errors remain,
+  exact (\(e^{-tP}=I+\mathrm{expm1}(-t)P\)), so only Trotter and truncation errors remain,
   but this pipeline has no rigorous truncation bound.
 * **PEPS boundary methods.** Relative factorization of boundary operators controls ground-space
   projectors, but those estimates are not thermal-purity certificates.

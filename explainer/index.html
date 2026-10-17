@@ -10,117 +10,25 @@
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" defer></script>
 <script src="core.js"></script>
 <script src="chapters.js"></script>
-<script src="open_chapters.js"></script>
-<style>
-/* Layout: a Tufte page. One text column (about 60%), a right margin for notes and figure captions; figures without frames. */
-:root {
-  --bg: #fffff8; --ink: #111111; --mute: #6b6b66; --line: #d9d6c6; --space: #a2322e; --time: #34628f; --proved: #8f6412; --ok: #2f6b3d; --fail: #a2322e;
-  --space-f: rgba(162,50,46,.08); --time-f: rgba(52,98,143,.08); --proved-f: rgba(143,100,18,.10); --torus-fill: #efede2; --surface: #fffff8;
-  --heat-lo: #f3f1e4; --heat-none: #dedbcb; --stage: var(--bg);
-  --serif: "EB Garamond", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #151515; --ink: #dddddd; --mute: #9a9a94; --line: #3a3a37; --space: #e0786c; --time: #84aad4; --proved: #d4a64a; --ok: #7fbf8f; --fail: #e0786c;
-  --space-f: rgba(224,120,108,.10); --time-f: rgba(132,170,212,.10); --proved-f: rgba(212,166,74,.12); --torus-fill: #26262a; --surface: #151515;
-  --heat-lo: #222220; --heat-none: #33332f; color-scheme: dark; } }
-:root[data-theme="dark"] {
-  --bg: #151515; --ink: #dddddd; --mute: #9a9a94; --line: #3a3a37; --space: #e0786c; --time: #84aad4; --proved: #d4a64a; --ok: #7fbf8f; --fail: #e0786c;
-  --space-f: rgba(224,120,108,.10); --time-f: rgba(132,170,212,.10); --proved-f: rgba(212,166,74,.12); --torus-fill: #26262a; --surface: #151515;
-  --heat-lo: #222220; --heat-none: #33332f; color-scheme: dark; }
-body { background: var(--bg); color: var(--ink); font: 19px/1.55 var(--serif); font-variant-numeric: oldstyle-nums; }
-article { max-width: 1240px; margin: 0 auto; padding-block: 48px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-h1 { font-weight: 400; font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: 1.1; margin: 0; }
-.subtitle { font-style: italic; font-size: 1.45rem; margin: 6px 0 0; color: var(--ink); }
-h2 { font-weight: 400; font-style: italic; font-size: 1.8rem; line-height: 1.2; margin: 0 0 14px; }
-h2 .n { font-style: normal; font-size: .95rem; color: var(--mute); margin-right: 14px; font-variant-numeric: lining-nums; }
-a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-code { font: .78em ui-monospace, "SFMono-Regular", Menlo, monospace; }
-.r { display: grid; grid-template-columns: minmax(0, 62%) minmax(0, 1fr); gap: 0 4%; align-items: start; }
-.r > * { min-width: 0; }
-.prose p, .intro p { margin: 0 0 .9em; max-width: 36em; }
-.prose ol { margin: 0 0 .9em; padding-left: 1.3em; max-width: 36em; }
-.side { font-size: .9rem; line-height: 1.4; color: var(--ink); }
-.side .note { margin: .25em 0 0; }
-.ch { padding-block: 44px 8px; }
-.player canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
-.player { margin: 18px 0 6px; }
-.pmeta { margin-top: 10px; }
-.pcap { margin: 0; font-size: 1.02rem; line-height: 1.45; min-height: 4.4em; font-style: italic; max-width: 36em; }
-.pctl { margin: 0; font-size: .85rem; color: var(--mute); }
-.pctl button { font: inherit; font-variant: small-caps; letter-spacing: .04em; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.pctl .bt { display: block; margin-top: 4px; font-style: italic; }
-.pmeta input[type=range] { width: 100%; margin-top: 8px; }
-input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; height: 18px; }
-input[type=range]::-webkit-slider-runnable-track { height: 1px; background: var(--mute); }
-input[type=range]::-moz-range-track { height: 1px; background: var(--mute); }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--ink); margin-top: -5px; border: 0; }
-input[type=range]::-moz-range-thumb { width: 11px; height: 11px; border-radius: 50%; background: var(--ink); border: 0; }
-.eqs { margin-top: 6px; }
-.eqs p { margin: 0 0 .6em; }
-mjx-container[display="true"] { margin: .6em 0 !important; overflow-x: auto; overflow-y: hidden; }
-.toc { font-size: .95rem; line-height: 1.8; max-width: 44em; }
-.toc a { white-space: nowrap; }
-video { width: 100%; aspect-ratio: 16 / 9; display: block; background: var(--bg); }
-details.try { margin-top: 12px; }
-details.try > summary { cursor: pointer; font-style: italic; color: var(--ink); }
-details.try > summary::marker { color: var(--mute); }
-.tryin { padding: 6px 0 4px; }
-.two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
-.two-col > * { min-width: 0; }
-.two-col canvas { width: 100%; height: auto; display: block; }
-.fig { width: 100%; max-width: 560px; height: auto; display: block; }
-.small { font-size: .82rem; color: var(--mute); margin: 4px 0; font-style: italic; }
-.ctrl { display: grid; grid-template-columns: minmax(7em, auto) 1fr minmax(6ch, auto); gap: 4px 12px; align-items: center; font-size: .9rem; color: var(--mute); margin-top: 8px; }
-.ctrl output { color: var(--ink); text-align: right; font-variant-numeric: lining-nums tabular-nums; }
-button { font: .85rem var(--serif); color: var(--ink); background: none; border: 0; border-bottom: 1px solid var(--line); padding: 2px 2px; cursor: pointer; }
-button:hover { border-bottom-color: var(--ink); }
-button:focus-visible, input:focus-visible, a:focus-visible, summary:focus-visible, canvas:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
-.presets button.on { border-bottom: 2px solid var(--ink); }
-.row { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; align-items: center; }
-.verdict { font-size: .92rem; margin-top: 8px; }
-.big { font-size: 1.6rem; color: var(--ink); font-variant-numeric: lining-nums; }
-table { border-collapse: collapse; font-size: .82rem; width: 100%; font-variant-numeric: lining-nums tabular-nums; }
-th, td { text-align: right; padding: 2px 6px; white-space: nowrap; }
-th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1px solid var(--line); }
-.tbl { overflow: auto; max-height: 200px; margin-top: 8px; }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 18px; margin: 14px 0; max-width: 62%; }
-.stat .k { font-size: .8rem; color: var(--mute); font-style: italic; }
-.stat .v { font-size: 1.15rem; overflow-wrap: anywhere; font-variant-numeric: lining-nums; }
-.g { color: var(--ink); }
-.chip { display: inline-block; font-size: .85rem; padding: 0 6px; margin: 2px; border-bottom: 1px solid; }
-.chip.cl { color: var(--proved); } .chip.cr { color: var(--time); }
-.part { padding-top: 72px; border-top: 1px solid var(--line); margin-top: 56px; }
-.parth { font-size: clamp(2rem, 4vw, 2.8rem); }
-.foot { color: var(--mute); font-size: .85rem; margin-top: 40px; max-width: 62%; }
-@media (max-width: 760px) {
-  .r { grid-template-columns: minmax(0, 1fr); }
-  .side { margin: 4px 0 12px; padding-left: 12px; border-left: 1px solid var(--line); }
-  .side:empty { display: none; }
-  .pcap { min-height: 0; }
-  .two-col { grid-template-columns: minmax(0, 1fr); }
-  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
-  .foot { max-width: none; }
-}
-</style>
+<link rel="stylesheet" href="page.css">
 </head>
 <body>
 <article>
   <header>
     <h1>The spacetime bootstrap</h1>
-    <p class="subtitle">A proof that the spin-1 Heisenberg ring has a spectral gap, in sixteen figures, with an open-chain sequel</p>
+    <p class="subtitle">A proof that the spin-1 Heisenberg ring has a spectral gap, in nineteen figures, with an <a href="open.html">open-chain sequel</a></p>
   </header>
   <div class="r" style="margin-top: 28px"><div class="main intro">
-    <p>A gap is a decay rate: at low temperature, excited states fade like \(e^{-\beta\Delta}\). The proof measures how pure the thermal state is on one finite
-      ring, then shows that doubling the ring and the inverse temperature together makes the purity better by itself, all the way to infinity.
-      Each section states one idea in words, shows it in a figure that runs step by step, and ends with the formula.</p>
-    <p class="toc"><a href="#gap">What is a gap?</a> · <a href="#rate">A gap is a decay rate</a> · <a href="#imag">Imaginary time</a> · <a href="#paths">A sum over histories</a> · <a href="#torus">The partition function is a torus</a> · <a href="#chain">Histories of a chain</a> · <a href="#slice">Two ways to slice the torus</a> · <a href="#purity">Purity, seen as squares</a> · <a href="#two">Two purities from one torus</a> · <a href="#square">Squaring sharpens</a> · <a href="#couple">Space and time are tied</a> · <a href="#rpwhy">Why the proof needs a symmetric transfer matrix</a> · <a href="#rpwhere">Where the symmetry comes from</a> · <a href="#rptest">Testing a bond for reflection positivity</a> · <a href="#double">One doubling step</a> · <a href="#iterate">Repeat, and read off the gap</a> · <a href="#seedtoy">The starting numbers, worked on a toy</a> · <a href="#seed">The real certificate</a> · <a href="#lab">the whole machine on a solvable chain</a> · <a href="#part2"><i>Part II: open chains</i></a></p></div>
+    <p>A quantum spin chain has discrete energy levels, and its <em>spectral gap</em> \(\Delta\) is the energy step from the lowest level (the ground state) to the first excited level. We want to prove that as a ring of spin-1 sites grows to any even length \(L\), this gap \(\Delta_L\) never shrinks below a fixed positive constant.</p>
+    <p>At low temperature (large inverse temperature \(\beta\)), higher-energy states are suppressed by Boltzmann factors \(e^{-\beta E}\), so excited states fade relative to the ground state like \(e^{-\beta\Delta}\). A gap is therefore a decay rate in \(\beta\). The proof measures how close the thermal state is to a single pure state—its <em>purity</em>—on one finite ring, then shows that doubling the ring length and the inverse temperature together improves the purity automatically, step after step, all the way to infinity. Each section below states the question it solves, walks through the step in an animated figure, and ends with the formula.</p>
+    <p class="toc"><a href="#gap">What is a gap?</a> · <a href="#rate">A gap is a decay rate</a> · <a href="#imag">Imaginary time</a> · <a href="#paths">A sum over histories</a> · <a href="#torus">The partition function is a torus</a> · <a href="#chain">Histories of a chain</a> · <a href="#slice">Two ways to slice the torus</a> · <a href="#purity">Purity, seen as squares</a> · <a href="#two">Two purities from one torus</a> · <a href="#square">Squaring sharpens</a> · <a href="#couple">Space and time are tied</a> · <a href="#rpwhy">Why the proof needs a symmetric transfer matrix</a> · <a href="#rpwhere">Where the symmetry comes from</a> · <a href="#rptest">Testing a bond for reflection positivity</a> · <a href="#double">One doubling step</a> · <a href="#iterate">Repeat, and read off the gap</a> · <a href="#seedtoy">The starting numbers, worked on a toy</a> · <a href="#seed">The real certificate</a> · <a href="#lab">The whole machine on a solvable chain</a> · <a href="open.html"><i>Part II: open chains</i></a></p></div>
     <aside class="side"><p class="note">Figures play when they come into view. Use <i>back</i> and <i>next</i> to step, or drag the slider. Red marks space, blue imaginary time.</p></aside></div>
   <div class="r" style="margin-top: 18px"><div class="main"><video src="film.mp4" poster="poster.jpg" controls preload="metadata" playsinline></video></div>
-    <aside class="side"><p class="note">The same figures as one film, with the step captions, about five and a half minutes.</p></aside></div>
+    <aside class="side"><p class="note">The same figures as one film, with the step captions and narration, about twenty-nine minutes.</p></aside></div>
   <section class="ch" id="gap">
     <h2><span class="n">1</span>What is a gap?</h2>
-    <div class="r"><div class="main prose"><p>A spin chain has discrete energy levels. The gap \(\Delta_L\) is the distance from the lowest level to the next one. Haldane predicted in 1983 that the
-spin-1 chain keeps a gap as the ring grows; numerics give \(\Delta\approx0.41\). For decades there was no proof that some fixed \(c>0\) bounds \(\Delta_L\) for every \(L\).</p></div><aside class="side"><p class="note">Haldane, 1983. The theorem here is from OpenAI’s 2026 preprint; this page follows <code>notes/thermal-mpo-gap-note.tex</code>.</p></aside></div>
+    <div class="r"><div class="main prose"><p>Consider a periodic ring of \(L\) quantum spins (where site \(L+1\) is identified with site \(1\)), interacting with their nearest neighbors through the antiferromagnetic Heisenberg Hamiltonian \(H_L=\sum_{j=1}^L\mathbf S_j\cdot\mathbf S_{j+1}\). Here \(\mathbf S_j=(S_j^x,S_j^y,S_j^z)\) are the three spin-1 operators on site \(j\). Because the ring is finite, \(H_L\) has discrete energy levels \(E_0(L)\le E_1(L)\le\cdots\). The lowest energy \(E_0(L)\) is the ground-state energy, and the <em>spectral gap</em> \(\Delta_L=E_1(L)-E_0(L)\) is the energy step from the ground level to the first excited level.</p>
+<p>On any single finite ring, \(\Delta_L\) is just a difference of matrix eigenvalues; the hard question is whether \(\Delta_L\) stays open as \(L\to\infty\). Haldane predicted in 1983 that while the spin-\(\tfrac12\) chain is gapless (\(\Delta_L\to0\)), the spin-1 chain keeps a positive gap as the ring grows; numerical calculations give \(\Delta\approx0.41\). For decades there was no proof that a single fixed constant \(c>0\) bounds \(\Delta_L\ge c\) for every large even ring length \(L\).</p></div><aside class="side"><p class="note">Haldane, 1983 <a href="#ref-1">[1]</a>. The theorem here is from OpenAI’s 2026 preprint <a href="#ref-2">[2]</a>; this page follows the main note <a href="#ref-4">[4]</a>.</p></aside></div>
     <div class="player" data-ch="gap"></div>
     <div class="r"><div class="main eqs">\[ H_L=\sum_{j=1}^{L}\mathbf S_j\cdot\mathbf S_{j+1},\qquad \Delta_L=E_1(L)-E_0(L). \]
 <p class="thm">Theorem: \(\Delta_L>\log 20/784\approx0.0038\) for every even \(L\ge2304\), and the ground state is unique.</p></div><aside class="side"></aside></div>
@@ -128,29 +36,27 @@ spin-1 chain keeps a gap as the ring grows; numerics give \(\Delta\approx0.41\).
   </section>
   <section class="ch" id="rate">
     <h2><span class="n">2</span>A gap is a decay rate</h2>
-    <div class="r"><div class="main prose"><p>At inverse temperature \(\beta\), level \(m\) has probability \(w_m=e^{-\beta E_m}/Z\). The first two weights have ratio \(e^{-\beta\Delta}\).
-So it is enough to show that the excited weight decays at least like \(e^{-c\beta}\), with the same \(c\) for every ring. Everything that follows controls excited weight
-at low temperature on arbitrarily long rings.</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>Finding \(E_0(L)\) and \(E_1(L)\) directly by diagonalizing \(H_L\) is impossible on long rings, because \(H_L\) is a \(3^L\times 3^L\) matrix. Thermal equilibrium turns the energy gap into a rate of probability decay that we can bound without solving for individual energy levels.</p>
+<p>At inverse temperature \(\beta\) (where large \(\beta\) means low temperature), energy level \(m\) carries the Boltzmann weight \(e^{-\beta E_m}\) and has probability \(w_m=e^{-\beta E_m}/Z_L(\beta)\), where \(Z_L(\beta)=\sum_m e^{-\beta E_m}=\operatorname{Tr}e^{-\beta H_L}\) is the <em>partition function</em> of the \(L\)-site ring. In the ratio of the first two probabilities, the normalizing denominator \(Z_L(\beta)\) cancels, leaving \(w_1/w_0=e^{-\beta(E_1-E_0)}=e^{-\beta\Delta_L}\).</p>
+<p>On a logarithmic plot against \(\beta\), \(\log(w_1/w_0)=-\beta\Delta_L\) is a straight line of slope \(-\Delta_L\). To prove \(\Delta_L\ge c\), it is therefore enough to show that the excited weight ratio \(w_1/w_0\) decays at least as fast as \(e^{-c\beta}\), with the same constant \(c>0\) for every ring length \(L\). Everything that follows is built to control excited thermal weight at low temperature on arbitrarily long rings.</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="rate"></div>
     <div class="r"><div class="main eqs">\[ \frac{w_1}{w_0}=e^{-\beta\Delta_L}\le e^{-c\beta}\ \text{ for all }\beta\quad\Longrightarrow\quad\Delta_L\ge c. \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="imag">
     <h2><span class="n">3</span>Imaginary time</h2>
-    <div class="r"><div class="main prose"><p>Expand a state in energy eigenstates, \(\psi=\sum_mc_m|m\rangle\). Real-time evolution multiplies \(c_m\) by the phase \(e^{-iE_mt}\): every probability \(|c_m|^2\) stays the same forever.
-Put \(t=-i\tau\) and the phase becomes a real factor \(e^{-\tau E_m}\). Nothing rotates any more; each component shrinks, higher energies faster.
-After rescaling, the ground state wins, and the first excited level loses at rate \(\Delta\). At \(\tau=\beta\) the factors are the Boltzmann weights: "long imaginary time" and "low temperature" are the same statement.</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>Why does the thermal operator \(e^{-\beta H_L}\) isolate the ground state, and why is \(\beta\) called imaginary time? Expand any quantum state in the energy eigenstates \(|m\rangle\) of \(H_L\) as \(\psi=\sum_m c_m|m\rangle\), where each complex coefficient \(c_m\) has magnitude \(|c_m|\) and probability \(|c_m|^2\).</p>
+<p>In ordinary real time \(t\), quantum evolution \(e^{-iHt}\psi\) multiplies each coefficient \(c_m\) by the phase factor \(e^{-iE_mt}\). Viewed as an arrow in the complex plane, each amplitude \(c_m\) simply rotates at speed \(E_m\); its length never changes, so every probability \(|c_m|^2\) stays the same forever and nothing settles.</p>
+<p>Now replace real time \(t\) by <em>imaginary time</em> \(t=-i\tau\) with \(\tau>0\). The oscillating phase \(e^{-iE_mt}\) becomes a real damping factor \(e^{-\tau E_m}\). Nothing rotates anymore; instead, each component shrinks without turning, and higher energies shrink fastest. After rescaling the state so that the probabilities again sum to \(1\), the ground state wins and the first excited amplitude ratio \(|c_1(\tau)|/|c_0(\tau)|\) decays at rate \(e^{-\tau\Delta}\). At \(\tau=\beta\), these damping factors \(e^{-\beta E_m}\) are the exact Boltzmann weights of Section 2: "long imaginary time" and "low temperature" are the same mathematical statement.</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="imag"></div>
     <div class="r"><div class="main eqs">\[ e^{-iHt}\psi=\sum_m c_me^{-iE_mt}|m\rangle\ \xrightarrow{\ t=-i\tau\ }\ e^{-\tau H}\psi=\sum_m c_me^{-\tau E_m}|m\rangle,\qquad \frac{|c_1(\tau)|}{|c_0(\tau)|}\propto e^{-\tau\Delta}. \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="paths">
     <h2><span class="n">4</span>A sum over histories</h2>
-    <div class="r"><div class="main prose"><p>One fact does all the work: an entry of a matrix power \(A^M\) is a sum over paths through \(M\) steps, each path weighted by the product of the entries it uses
-(the same fact that counts walks on a graph). Write \(e^{-\beta H}=A^M\) with \(A=e^{-d\tau H}\) and \(M=\beta/d\tau\). For one spin with \(H=-\sigma^x\),
-\(A\approx\begin{pmatrix}1&d\tau\\d\tau&1\end{pmatrix}\): staying costs 1, flipping costs \(d\tau\). As \(d\tau\to0\) a path is a world line with a few flips; \(k\) flips can sit
-anywhere, which gives weight \(\beta^k/k!\). The trace keeps only paths that return to their start, so time is periodic. Summing gives \(2\cosh\beta\), the exact answer.
-That sum over histories is the Euclidean, or imaginary-time, path integral.</p></div><aside class="side"><p class="note">The same identity counts walks on a graph: (Aᴹ)ᵢⱼ with A the adjacency matrix.</p></aside></div>
+    <div class="r"><div class="main prose"><p>To compute the partition function \(\operatorname{Tr}e^{-\beta H}\) without diagonalizing \(H\), we factor the imaginary-time interval \(\beta\) into \(M\) tiny steps of size \(d\tau=\beta/M\), writing \(e^{-\beta H}=A^M\) with single-step matrix \(A=e^{-d\tau H}\approx I-d\tau H\). One algebraic fact then does all the work: the definition of matrix multiplication turns a matrix power \(A^M\) into a sum over step-by-step histories.</p>
+<p>For two matrices \(A\) and \(B\), the entry in row \(i\) and column \(k\) of their product is \((AB)_{ik}=\sum_j A_{ij}B_{jk}\): to go from state \(i\) to state \(k\) in two steps, pass through an intermediate state \(j\), multiply the two step entries \(A_{ij}\) and \(B_{jk}\) used along that route, and add over every possible \(j\). For example, with \(A=\begin{pmatrix}2&1\\1&3\end{pmatrix}\), the top-left entry of \(A^2\) sums two routes, \(1\to1\to1\) (weight \(2\times2=4\)) and \(1\to2\to1\) (weight \(1\times1=1\)), giving \((A^2)_{11}=4+1=5\). Repeating this rule across \(M\) factors, an entry \((A^M)_{ij}\) is a sum over all \(M\)-step paths \(i=s_0\to s_1\to\cdots\to s_M=j\), where each path is weighted by the product of the matrix entries it uses.</p>
+<p>Apply this to a single spin with states \(|\!\uparrow\rangle,|\!\downarrow\rangle\) and Hamiltonian \(H=-\sigma^x=-\begin{pmatrix}0&1\\1&0\end{pmatrix}\). For a tiny step \(d\tau\), the step matrix is \(A=e^{-d\tau H}\approx\begin{pmatrix}1&d\tau\\d\tau&1\end{pmatrix}\): staying in the same spin state has weight \(1\) (diagonal entries), while flipping to the opposite state has weight \(d\tau\) (off-diagonal entries). As \(d\tau\to0\), a path becomes a continuous-time <em>world line</em> on \([0,\beta]\) that stays put except at \(k\) flip times. Each flip carries weight \(d\tau\), and choosing \(k\) ordered flip times in \([0,\beta]\) gives volume \(\beta^k/k!\). The trace \(\operatorname{Tr}(A^M)=\sum_i(A^M)_{ii}\) keeps only periodic paths that end in the state where they started, so \(k\) must be even and there are \(2\) starting states (\(\uparrow\) or \(\downarrow\)). Summing \(2\beta^k/k!\) over even \(k\) gives \(2\cosh\beta\), the exact value of \(\operatorname{Tr}e^{\beta\sigma^x}\). This sum over continuous-time trajectories is the Euclidean, or imaginary-time, path integral.</p></div><aside class="side"><p class="note">The same identity counts walks on a graph: (Aᴹ)ᵢⱼ with A the adjacency matrix.</p></aside></div>
     <div class="player" data-ch="paths"></div>
     <div class="r"><div class="main eqs">\[ (A^M)_{ij}=\sum_{\text{paths }i\to j}\ \prod_{\text{steps}}A_{s_ts_{t+1}},\qquad \operatorname{Tr}e^{\beta\sigma^x}=\sum_{k\ \mathrm{even}}\frac{2\beta^k}{k!}=2\cosh\beta . \]</div><aside class="side"></aside></div>
     <div class="r"><div class="main"><details class="try"><summary>Try it: add up the histories yourself</summary>
@@ -161,21 +67,22 @@ That sum over histories is the Euclidean, or imaginary-time, path integral.</p><
   </section>
   <section class="ch" id="torus">
     <h2><span class="n">5</span>The partition function is a torus</h2>
-    <div class="r"><div class="main prose"><p>Split \(e^{-\beta H}\) into many short steps in imaginary time. The trace glues the last step to the first, so imaginary time is a circle of length \(\beta\).
-The ring is a circle in space. The partition function is a sum over histories on an \(L\times\beta\) torus. The proof uses an exact continuous-time version of this picture,
-with no discretization error.</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>Now pass from one spin to a ring of \(L\) spins. Lay the \(L\) sites horizontally along space and plot imaginary time \(\tau\in[0,\beta]\) vertically, forming an \(L\times\beta\) spacetime sheet.</p>
+<p>Both pairs of opposite edges of this sheet are glued together into circles. Vertically, splitting \(e^{-\beta H_L}=(e^{-\beta H_L/M})^M\) into \(M\) imaginary-time steps and taking the trace glues the final time slice \(\tau=\beta\) back to the initial slice \(\tau=0\), turning imaginary time into a circle of circumference \(\beta\). Horizontally, the periodic ring boundary condition glues site \(L\) back to site \(1\), turning space into a circle of circumference \(L\).</p>
+<p>With both space and imaginary time periodic, the partition function \(Z_L(\beta)=\operatorname{Tr}e^{-\beta H_L}\) is a sum over histories on an \(L\times\beta\) <em>spacetime torus</em>. The proof uses the exact continuous-time limit (\(M\to\infty\)) of this torus, so there is no time-discretization error.</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="torus"></div>
     <div class="r"><div class="main eqs">\[ Z_L(\beta)=\operatorname{Tr}e^{-\beta H_L}=\operatorname{Tr}\big(e^{-\beta H_L/M}\big)^M . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="chain">
     <h2><span class="n">6</span>Histories of a chain</h2>
-    <div class="r"><div class="main prose"><p>The classical Ising ring has \(Z=\operatorname{Tr}T^L\): a 2×2 matrix passes one spin from site to site. The quantum chain works the same way after one change of what is passed along.
-Each bond term \(\mathbf S_j\cdot\mathbf S_{j+1}=-\sum_\alpha G_{\alpha,j}G_{\alpha,j+1}\) fires events at random imaginary times, and an event of type \(\alpha\) puts the real 3×3 matrix
-\(G_\alpha=iS^\alpha\) on both of its sites. The thing passed along the ring is the list of events on a bond. A site with events \(a\) on its left bond and \(b\) on its right
-contributes \(X(a,b)\): the trace of its \(G\)'s multiplied in time order. Examples: no events gives 3; one \(z\)-event on each side gives \(\operatorname{Tr}G_zG_z=-2\).</p></div><aside class="side"><p class="note">G<sub>α</sub> = iS<sup>α</sup> in the Cartesian basis |x⟩, |y⟩, |z⟩ are real antisymmetric 3 × 3 matrices.</p></aside></div>
+    <div class="r"><div class="main prose"><p>To see how \(Z_L(\beta)\) depends on the ring length \(L\), we want to contract the spacetime torus one site at a time around the ring. A classical warm-up shows the blueprint: on a classical Ising ring of \(L\) spins \(s_j=\pm1\), each neighboring pair \((s_j,s_{j+1})\) contributes a bond weight \(T(s_j,s_{j+1})=e^{Ks_js_{j+1}}\) (\(e^K\) when neighbors agree, \(e^{-K}\) when they disagree). Draw the \(2\times2\) <em>transfer matrix</em> \(T\) as a box with two horizontal legs for its row and column spin indices. Joining the leg \(s_2\) shared by the first two boxes means summing over \(s_2=\pm1\), which is matrix multiplication \(\sum_{s_2}T(s_1,s_2)T(s_2,s_3)=(T^2)(s_1,s_3)\). Joining all \(L\) boxes around the ring and closing the last leg back to the first traces the matrix product: \(Z=\operatorname{Tr}T^L\).</p>
+<p>The quantum spin-1 chain works the exact same way once we replace the classical spin on each leg by a bond history. In the Cartesian spin-1 basis \(|x\rangle,|y\rangle,|z\rangle\), define the three operators \(G_\alpha=iS^\alpha\) for \(\alpha\in\{x,y,z\}\). These are real antisymmetric \(3\times3\) matrices: for example, \(G_z=\begin{pmatrix}0&1&0\\-1&0&0\\0&0&0\end{pmatrix}\) rotates \(|x\rangle\to-|y\rangle\) and \(|y\rangle\to|x\rangle\) while killing \(|z\rangle\), so \(G_zG_z=\operatorname{diag}(-1,-1,0)\) has trace \(-2\). Because \((S^\alpha)^2=-G_\alpha^2\), each bond term in \(-H_L\) decomposes as \(-\mathbf S_j\cdot\mathbf S_{j+1}=\sum_{\alpha=x,y,z}G_{\alpha,j}\otimes G_{\alpha,j+1}\).</p>
+<p>When we expand \(e^{-\beta H_L}\approx(I-d\tau H_L)^M\) in tiny steps \(d\tau\), each step either does nothing (weight \(1\)) or fires one bond term \(G_{\alpha,j}\otimes G_{\alpha,j+1}\) (weight \(d\tau\)). Each such action is a <em>bond event</em>: a rung across bond \((j,j+1)\) at an imaginary time \(\tau\in(0,\beta)\), labeled by \(\alpha\in\{x,y,z\}\), which places the real \(3\times3\) matrix \(G_\alpha\) on both site \(j\) and site \(j+1\) at time \(\tau\). The list of all events on a single bond during \(0<\tau<\beta\) is called a <em>bond history</em>, and this bond history is the object passed from site to site along the ring.</p>
+<p>Once the bond histories are fixed, different sites commute, so the trace over the chain factors into one trace per site. Follow a single site's world line from spin state \(|s'\rangle\) at \(\tau=0\) to \(\langle s|\) at \(\tau=\beta\): events from its left bond history \(a\) and its right bond history \(b\) multiply in chronological order (the time-ordering symbol \(\mathcal T_\tau\) places later imaginary times to the left) to form the local four-leg tensor \(W_\beta^{ss'}(a,b)\). Gluing \(\tau=\beta\) back to \(\tau=0\) sets \(s=s'\) and sums over \(s\in\{x,y,z\}\), tracing that matrix product into the <em>transfer kernel</em> \(X_\beta(a,b)\): for example, no events gives \(\operatorname{Tr}I=3\); one \(z\)-event on each side gives \(\operatorname{Tr}G_zG_z=-2\); and \(a=\{z\text{ at }0.2,\,x\text{ at }0.6\}\) with \(b=\{y\text{ at }0.4\}\) gives \(\operatorname{Tr}(G_xG_yG_z)=1\). Joining the shared bond-history legs around all \(L\) sites sums and integrates over every bond history, giving \(Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}\).</p></div><aside class="side"><p class="note">G<sub>α</sub> = iS<sup>α</sup> in the Cartesian basis |x⟩, |y⟩, |z⟩ are real antisymmetric 3 × 3 matrices.</p></aside></div>
+    <div class="player" data-ch="ising"></div>
     <div class="player" data-ch="chain"></div>
-    <div class="r"><div class="main eqs">\[ X_\beta(a,b)=\operatorname{Tr}\Big[\mathcal T\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\Big],\qquad Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}\quad\big(\text{cf. }Z=\operatorname{Tr}T^L\big). \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main eqs">\[ W_\beta^{ss'}(a,b)=\Big\langle s\,\Big|\,\mathcal T_\tau\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\,\Big|\,s'\Big\rangle,\qquad X_\beta(a,b)=\sum_s W_\beta^{ss}(a,b)=\operatorname{Tr}\Big[\mathcal T_\tau\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\Big],\qquad Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}. \]</div><aside class="side"></aside></div>
     <div class="r"><div class="main"><details class="try"><summary>Try it: compute X(a, b) yourself</summary>
   <div class="tryin"><p class="small">Add events in time order. Each event puts \(G_x\), \(G_y\) or \(G_z\) on the site, from the left bond (a) or the right bond (b).
   X is the trace of the product, later events on the left.</p>
@@ -185,71 +92,71 @@ contributes \(X(a,b)\): the trace of its \(G\)'s multiplied in time order. Examp
   </section>
   <section class="ch" id="slice">
     <h2><span class="n">7</span>Two ways to slice the torus</h2>
-    <div class="r"><div class="main prose"><p>Horizontal slices give the familiar sum over energies. Vertical slices give a transfer matrix \(X_\beta\) that carries one site's whole time history along the ring.
-A ring of \(L\) sites is \(X_\beta^{\,L}\), traced. The eigenvalues \(\lambda_i\) depend on \(\beta\) but not on \(L\). This is the classical Ising transfer matrix,
-except that each "spin" is now a history in imaginary time.</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>We now have two ways to slice the exact same \(L\times\beta\) spacetime torus, and equating them connects the energy spectrum of the \(L\)-site chain to a single operator that does not depend on \(L\).</p>
+<p>Slicing the torus horizontally across space at fixed moments of imaginary time propagates the \(L\)-spin state upward by \(e^{-\beta H_L}\), giving the familiar sum over energy eigenvalues \(Z_L(\beta)=\sum_m e^{-\beta E_m(L)}\). Slicing vertically along imaginary time instead isolates one site's full time history on \([0,\beta]\) and carries it from site to site around the ring by the transfer operator \(X_\beta\). Closing the ring of \(L\) sites traces \(X_\beta^{\,L}\), giving \(Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}=\sum_i\lambda_i(\beta)^L\).</p>
+<p>In the first sum, the energies \(E_m(L)\) change with \(L\); in the second, the eigenvalues \(\lambda_i(\beta)\) of \(X_\beta\) depend on \(\beta\) alone, and the ring length \(L\) enters only as an exponent. Just as low temperature (large \(\beta\)) makes the lowest energy \(E_0\) dominate the horizontal sum, a long ring (large \(L\)) makes the largest eigenvalue \(\lambda_0(\beta)\) dominate the vertical sum.</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="slice"></div>
     <div class="r"><div class="main eqs">\[ Z_L(\beta)=\sum_m e^{-\beta E_m}=\operatorname{Tr}X_\beta^{\,L}=\sum_i\lambda_i(\beta)^L . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="purity">
     <h2><span class="n">8</span>Purity, seen as squares</h2>
-    <div class="r"><div class="main prose"><p>Purity measures how close a distribution, or a density matrix, is to a single state. Lay the probabilities along a unit segment and draw a square on each:
-all squares fit under the tallest one, so the purity is at most the largest probability. A purity of 0.99 means one state holds at least 99%.</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>In Section 2 we saw that to bound the gap, we need the ground state to carry almost all of the Boltzmann probability \(w_0\), leaving very little for \(w_1\). How can we prove that a single probability \(p_0\) dominates a distribution without computing the individual probabilities \(p_i\)?</p>
+<p>For any probability list \(p_0\ge p_1\ge\cdots\ge0\) adding to \(1\) (or any positive density matrix with unit trace and eigenvalues \(p_i\)), the <em>purity</em> is the sum of squared probabilities \(P=\sum_i p_i^2\), and \(1-P\) is the <em>purity defect</em>. Lay the probabilities end to end along a segment of length \(\sum_i p_i=1\) and draw a square of side \(p_i\) on each piece: the total area of the squares is the purity \(P=\sum_i p_i^2\).</p>
+<p>Because every square is no taller than the largest one \(p_0\), all the squares fit inside a rectangle of width \(1\) and height \(p_0\). Thus \(P\le p_0\): the purity is a direct lower bound on the largest probability. A purity of \(0.99\) (defect \(0.01\)) guarantees that a single dominant state holds at least \(99\%\) of the probability, and all other states together hold at most \(1\%\).</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="purity"></div>
     <div class="r"><div class="main eqs">\[ P=\sum_ip_i^2\ \le\ p_0\sum_ip_i=p_0 . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="two">
     <h2><span class="n">9</span>Two purities from one torus</h2>
-    <div class="r"><div class="main prose"><p>Normalize the torus two ways: cut it in space, \(\sigma_n=X^n/Z_n\), or take the Gibbs state \(\rho_n=e^{-\beta H}/Z_n\). The purity of \(\sigma\) glues two tori side by side;
-the purity of \(\rho\) stacks two. Both are ratios of partition functions, and adding a constant to \(H\) changes neither.</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>Why is purity so useful on the spacetime torus? Because cutting the closed torus network open in either direction produces a normalized state, and computing the purity of that state simply glues two tori together into a single torus twice as large.</p>
+<p>Write \(Z_n(\beta)=\operatorname{Tr}X_\beta^{\,n}\) for the partition function of an \(n\)-site ring at inverse temperature \(\beta\), drawn as a closed loop of \(n\) transfer boxes \(X_\beta\). First, cut the torus vertically along imaginary time between two sites, severing one bond-history leg of the ring. What remains is the chain of \(n\) boxes \(X_\beta^{\,n}\) with two open legs. Dividing by \(Z_n(\beta)\) so that its trace is \(1\) gives the <em>spatial state</em> \(\sigma_n=X_\beta^{\,n}/Z_n(\beta)\), with eigenvalues \(p_i=\lambda_i(\beta)^n/Z_n(\beta)\). Its purity \(\operatorname{Tr}(\sigma_n^2)\) joins two copies of \(\sigma_n\) leg to leg into a closed ring of \(2n\) boxes: the <em>spatial purity</em> \(P_{\mathrm s}(n,\beta)=\operatorname{Tr}(X_\beta^{\,2n})/Z_n(\beta)^2=Z_{2n}(\beta)/Z_n(\beta)^2\), which glues two tori side by side.</p>
+<p>Second, cut the torus horizontally across all \(n\) sites at one moment of imaginary time \(\tau\). Opening the time circle leaves the operator \(e^{-\beta H_n}\) with open spin legs at \(\tau=0\) and \(\tau=\beta\). Dividing by \(Z_n(\beta)\) gives the thermal <em>Gibbs state</em> \(\rho_n=e^{-\beta H_n}/Z_n(\beta)\), with eigenvalues \(w_m=e^{-\beta E_m(n)}/Z_n(\beta)\). Its purity \(\operatorname{Tr}(\rho_n^2)=\operatorname{Tr}(e^{-2\beta H_n})/Z_n(\beta)^2\) stacks two copies vertically in imaginary time to form a torus of height \(2\beta\): the <em>thermal purity</em> \(P_\tau(n,\beta)=Z_n(2\beta)/Z_n(\beta)^2\). Both purities are ratios of partition functions of equal total spacetime area \(2n\beta\), so adding any constant shift to \(H_n\) multiplies numerator and denominator by the same factor and changes neither purity.</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="two"></div>
     <div class="r"><div class="main eqs">\[ P_{\mathrm s}(n,\beta)=\frac{Z_{2n}(\beta)}{Z_n(\beta)^2},\qquad P_\tau(n,\beta)=\frac{Z_n(2\beta)}{Z_n(\beta)^2}. \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="square">
     <h2><span class="n">10</span>Squaring sharpens</h2>
-    <div class="r"><div class="main prose"><p>Squaring a normalized state doubles the torus in one direction: \(\sigma_n^2=P_{\mathrm s}\,\sigma_{2n}\) and \(\rho_n^2=P_\tau\,\rho_n(2\beta)\).
-On the probabilities this is \(p_i\to p_i^2/P\). The new defect is at most \(f\) of the old one, about half its square, whenever the old defect is below \(\tfrac12\).</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>Once a state has purity \(P=1-\varepsilon\) close to \(1\), how do we make it much purer? By gluing two copies of the torus together, which squares the state and renormalizes its probabilities.</p>
+<p>In space, gluing two copies of \(\sigma_n=X_\beta^{\,n}/Z_n(\beta)\) gives \(\sigma_n^2=X_\beta^{\,2n}/Z_n(\beta)^2=P_{\mathrm s}(n,\beta)\,\sigma_{2n}\), so \(\sigma_n^2/\operatorname{Tr}(\sigma_n^2)=\sigma_{2n}\) is the spatial state of the ring twice as long. In imaginary time, stacking two copies of \(\rho_n(\beta)\) gives \(\rho_n(\beta)^2=P_\tau(n,\beta)\,\rho_n(2\beta)\), the Gibbs state at twice the inverse temperature. In both cases, each probability \(p_i\) is replaced by \(p_i'=p_i^2/P\), which suppresses small probabilities relative to the leader \(p_0\).</p>
+<p>A short algebraic lemma bounds how fast the defect \(1-P=2\sum_{i<k}p_ip_k\) shrinks under squaring. The new defect is \(1-P'=2\sum_{i<k}p_i^2p_k^2/P^2\); since every \(p_ip_k\ge0\), dropping cross terms from \((\sum_{i<k}p_ip_k)^2=(1-P)^2/4\) gives \(1-P'\le(1-P)^2/(2P^2)=f(1-P)\), where \(f(z)=z^2/[2(1-z)^2]\). For small \(z\), \(f(z)\approx z^2/2\) is about half the square of the old defect, and whenever the old defect \(1-P\) is below \(\tfrac12\), repeated squaring drives the defect quadratically to zero.</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="square"></div>
     <div class="r"><div class="main eqs">\[ 1-P'\le f(1-P),\qquad f(z)=\frac{z^2}{2(1-z)^2}. \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="couple">
     <h2><span class="n">11</span>Space and time are tied</h2>
-    <div class="r"><div class="main prose"><p>At fixed \(\beta\), a longer ring loses purity, so length and \(\beta\) must double together. Gluing four tori into one twice as wide and twice as tall,
-rows first or columns first, gives one identity. Since every purity is at most 1, it turns a spatial bound at \(\beta\) and a thermal bound at \(2n\) into a spatial bound at \(2\beta\).</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>Squaring \(\rho_n(\beta)\) improves the thermal purity by doubling \(\beta\), but it never increases the ring length \(n\). Conversely, at fixed \(\beta\), making the ring longer gives thermal excitations more room and lowers the purity. To keep the purity high on arbitrarily long rings, \(n\) and \(\beta\) must double together, which requires an identity that trades spatial purity for thermal purity.</p>
+<p>First notice what a single gluing does to the partition function. Rearranging the two definitions from Section 9 gives \(Z_{2n}(\beta)=P_{\mathrm s}(n,\beta)\,Z_n(\beta)^2\) for a side-by-side spatial gluing, and \(Z_n(2\beta)=P_\tau(n,\beta)\,Z_n(\beta)^2\) for a vertical thermal stacking: each gluing of two identical tori multiplies the squared partition function by the corresponding purity.</p>
+<p>Now start with four identical \(n\times\beta\) tori, with product \(Z_n(\beta)^4\), and glue them into a single \(2n\times2\beta\) torus \(Z_{2n}(2\beta)\) in two different orders. Gluing rows first (side by side in space) multiplies by \(P_{\mathrm s}(n,\beta)^2\) to make two \(2n\times\beta\) tori \(Z_{2n}(\beta)^2\), and stacking those two vertically multiplies by \(P_\tau(2n,\beta)\). Gluing columns first (stacking in imaginary time) multiplies by \(P_\tau(n,\beta)^2\) to make two \(n\times2\beta\) tori \(Z_n(2\beta)^2\), and gluing those two side by side multiplies by \(P_{\mathrm s}(n,2\beta)\). Both routes produce the exact same torus \(Z_{2n}(2\beta)\), so their purity products are equal. Because every purity is at most \(1\), dividing by \(P_\tau(n,\beta)^2\le1\) turns a spatial bound at \(\beta\) and a thermal bound at \(2n\) into a spatial bound at \(2\beta\).</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="couple"></div>
     <div class="r"><div class="main eqs">\[ P_{\mathrm s}(n,2\beta)\,P_\tau(n,\beta)^2=\frac{Z_{2n}(2\beta)}{Z_n(\beta)^4}=P_{\mathrm s}(n,\beta)^2\,P_\tau(2n,\beta). \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="rpwhy">
     <h2><span class="n">12</span>Why the proof needs a symmetric transfer matrix</h2>
-    <div class="r"><div class="main prose"><p>The squaring step treats \(p_i=\lambda_i^n/Z_n\) as probabilities, so it needs the eigenvalues of the transfer matrix to be real. A two-by-two example makes the
-danger concrete. For the symmetric matrix \(\begin{pmatrix}0.9&0.3\\0.3&0.5\end{pmatrix}\) the "spatial purity" \(Z_{2n}/Z_n^2\) runs 0.63, 0.83, 0.94, 0.98, … up to 1.
-For the slightly rotated matrix \(\begin{pmatrix}0.9&-0.4\\0.4&0.9\end{pmatrix}\), whose eigenvalues are complex, the same ratio is 0.40, −0.11, −4.2, −47: no
-probability can do that, and the argument would collapse.</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>Before combining squaring and coupling, we must check a hidden assumption. In Sections 8–11 we treated the eigenvalues \(p_i=\lambda_i^n/Z_n\) of the spatial state \(\sigma_n=X_\beta^{\,n}/Z_n\) as nonnegative probabilities summing to \(1\). Why are the eigenvalues \(\lambda_i\) of \(X_\beta\) real, so that \(\lambda_i^n\ge0\) for every even ring length \(n\)?</p>
+<p>A \(2\times2\) numerical test makes the danger concrete. For the symmetric matrix \(X=\begin{pmatrix}0.9&0.3\\0.3&0.5\end{pmatrix}\), the eigenvalues \(1.06\) and \(0.34\) are real, so for \(n=1,2,3,4,\dots\) the spatial purity \(Z_{2n}/Z_n^2=\operatorname{Tr}(X^{2n})/(\operatorname{Tr}X^n)^2\) runs \(0.63, 0.83, 0.94, 0.98, \dots\), staying in \((0,1]\) and climbing smoothly to \(1\). For the slightly rotated non-symmetric matrix \(X=\begin{pmatrix}0.9&-0.4\\0.4&0.9\end{pmatrix}\), whose eigenvalues \(0.9\pm0.4i\) are complex, \(\operatorname{Tr}X^n\) changes sign and the same ratio \(Z_{2n}/Z_n^2\) takes the values \(0.40, -0.11, -4.2, -47\): no probability distribution can do that, and both the squaring inequality and \(P_{\mathrm s}\le1\) would collapse. The proof therefore requires \(X_\beta\) to be a real symmetric operator.</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="rpwhy"></div>
     <div class="r"><div class="main eqs">\[ P_{\mathrm s}(n)=\frac{Z_{2n}}{Z_n^2}=\sum_ip_i^2\in(0,1]\quad\text{only if}\quad p_i=\frac{\lambda_i^n}{Z_n}\ \text{are real and}\ \ge0 . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="rpwhere">
     <h2><span class="n">13</span>Where the symmetry comes from</h2>
-    <div class="r"><div class="main prose"><p>Symmetry of \(X\) comes from the bond. In \(X(a,b)\) a site multiplies the matrices of all events in time order, those arriving from its left bond (\(a\)) and
-from its right bond (\(b\)). For the Heisenberg chain every event inserts the same real matrix \(G_\alpha\) from either side, so the site cannot tell the sides apart:
-with \(a=\{G_z\ \text{at}\ 0.2,\ G_x\ \text{at}\ 0.6\}\) and \(b=\{G_y\ \text{at}\ 0.4\}\), both \(X(a,b)\) and \(X(b,a)\) equal \(\operatorname{Tr}G_xG_yG_z=1\).
-A bond that inserts different matrices on its two sides breaks this: with \(G_z\) on the left site and \(P=\mathrm{diag}(1,0,0)\) on the right, two events give 1 from one
-side and −2 from the other. Reflection positivity is the general condition that the bond looks the same from both sides, \(-h=\sum_kC_k\otimes\Theta(C_k)\), with positive weights.</p></div><aside class="side"><p class="note">Formal statement and classification of reflection-positive chains: <code>notes/thermal-mpo-gap-scope.tex</code>, appendices D–F.</p></aside></div>
+    <div class="r"><div class="main prose"><p>What makes the transfer matrix \(X_\beta\) symmetric? View \(X_\beta(a,b)\) as a matrix whose row index is the left bond history \(a\) and whose column index is the right bond history \(b\). Symmetry \(X_\beta(a,b)=X_\beta(b,a)\) means that mirroring a site's transfer box horizontally—swapping the histories arriving from its left and right bonds—leaves the trace unchanged.</p>
+<p>This left–right symmetry comes directly from the bond Hamiltonian. In \(X_\beta(a,b)\), a site collects all events arriving from its left bond (\(a\)) and from its right bond (\(b\)) and multiplies their \(3\times3\) matrices in time order. For the Heisenberg antiferromagnet, \(-\mathbf S_j\cdot\mathbf S_{j+1}=\sum_\alpha G_\alpha\otimes G_\alpha\), so every event of type \(\alpha\) places the exact same real matrix \(G_\alpha\) on both sites of its bond. A site therefore receives the same matrix \(G_\alpha\) whether the event arrives from its left bond or its right bond, and cannot tell the two sides apart: with \(a=\{G_z\ \text{at}\ 0.2,\ G_x\ \text{at}\ 0.6\}\) and \(b=\{G_y\ \text{at}\ 0.4\}\), both \(X(a,b)\) and \(X(b,a)\) multiply the same three matrices at the same times and equal \(\operatorname{Tr}G_xG_yG_z=1\).</p>
+<p>A bond that inserts different matrices on its two ends breaks this mirror symmetry, because a site is the right end of its left bond and the left end of its right bond: with \(G_z\) on the left site of a bond and \(P=\mathrm{diag}(1,0,0)\) on the right site, two events give \(\operatorname{Tr}(P^2)=1\) from the left bond and \(\operatorname{Tr}(G_z^2)=-2\) from the right bond (or, in the figure's positive-diagonal variant with \(Q=-G_z^2=\mathrm{diag}(1,1,0)\) on the left site and \(P\) on the right, \(\operatorname{Tr}(P^2)=1\) from the left and \(\operatorname{Tr}(Q^2)=2\) from the right). <em>Reflection positivity</em> is the general condition that the bond looks the same from both sides, \(-h=\sum_kC_k\otimes\Theta(C_k)\), with positive weights.</p></div><aside class="side"><p class="note">Formal statement and classification of reflection-positive chains: <code>notes/thermal-mpo-gap-scope.tex</code>, appendices D–F.</p></aside></div>
     <div class="player" data-ch="rpwhere"></div>
     <div class="r"><div class="main eqs">\[ -\mathbf S_j\cdot\mathbf S_{j+1}=+\sum_\alpha G_\alpha\otimes G_\alpha\quad\Longrightarrow\quad X(a,b)=X(b,a)\in\mathbb R . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="rptest">
     <h2><span class="n">14</span>Testing a bond for reflection positivity</h2>
-    <div class="r"><div class="main prose"><p>To test any bond, regroup the 81 entries of \(-h\) so that rows carry both indices of the left site and columns both indices of the right site. This realignment
-turns a product \(A\otimes B\) into an outer product \(\mathrm{vec}(A)\,\mathrm{vec}(B)^{\mathsf T}\). A reflection-positive bond becomes a sum of squares \(\sum vv^\dagger\),
-whose eigenvalues are all \(\ge0\). The spin-1 antiferromagnet gives 2, 2, 2 and zeros; the ferromagnet gives −2, −2, −2 and fails, and no on-site constant can repair it.</p></div><aside class="side"><p class="note">Rule for bilinear chains: reflection positive exactly when an even number of couplings J<sub>x</sub>, J<sub>y</sub>, J<sub>z</sub> are ferromagnetic.</p></aside></div>
+    <div class="r"><div class="main prose"><p>Given any two-site bond term \(h\), how can we check whether \(-h\) has a reflection-positive decomposition without guessing the matrices \(C_k\) by hand? On two spin-1 sites, \(-h\) is a four-leg tensor with \(3^4=81\) entries \(\langle ij|{-h}|kl\rangle\), where \(i,k\in\{x,y,z\}\) are the output and input indices on the left site and \(j,l\in\{x,y,z\}\) are the output and input indices on the right site. In the usual \(9\times9\) matrix of \(-h\), rows are the two outputs \((i,j)\) and columns are the two inputs \((k,l)\).</p>
+<p>To test the bond, regroup those same \(81\) entries into a new \(9\times9\) matrix \(R[-h]\) whose rows carry both indices \((i,k)\) of the left site and whose columns carry both indices \((j,l)\) of the right site: \(R[-h]_{(ik),(jl)}=\langle ij|{-h}|kl\rangle\). This regrouping of indices is called <em>bond realignment</em>. Writing \(\mathrm{vec}(A)\) for the \(9\)-component column vector of entries \(A_{ik}\) of a \(3\times3\) matrix \(A\), realignment turns a tensor product \(A\otimes B\) (with entries \(A_{ik}B_{jl}\)) into the rank-one outer product \(\mathrm{vec}(A)\,\mathrm{vec}(B)^{\mathsf T}\).</p>
+<p>Under realignment, a reflection-positive bond \(-h=\sum_\alpha C_\alpha\otimes\overline{C_\alpha}\) becomes a sum of squares \(\sum_\alpha v_\alpha v_\alpha^\dagger\) with \(v_\alpha=\mathrm{vec}(C_\alpha)\)—a positive semidefinite matrix (\(\succeq0\)) whose eigenvalues are all \(\ge0\). For the spin-1 Heisenberg antiferromagnet (\(h=\mathbf S_j\cdot\mathbf S_{j+1}\)), \(R[-h]=\sum_{\alpha=x,y,z}\mathrm{vec}(G_\alpha)\,\mathrm{vec}(G_\alpha)^{\mathsf T}\) has eigenvalues \(2, 2, 2\) and six zeros, so it passes; the ferromagnet (\(h=-\mathbf S_j\cdot\mathbf S_{j+1}\)) gives \(-2, -2, -2\) and fails, and no on-site constant shift can repair all three negative eigenvalues.</p></div><aside class="side"><p class="note">Rule for bilinear chains: reflection positive exactly when an even number of couplings J<sub>x</sub>, J<sub>y</sub>, J<sub>z</sub> are ferromagnetic.</p></aside></div>
     <div class="player" data-ch="rptest"></div>
     <div class="r"><div class="main eqs">\[ R\big[A\otimes B\big]=\mathrm{vec}(A)\,\mathrm{vec}(B)^{\mathsf T},\qquad R\big[-\mathbf S_j\cdot\mathbf S_{j+1}\big]=\sum_\alpha\mathrm{vec}(G_\alpha)\,\mathrm{vec}(G_\alpha)^{\mathsf T}\succeq0 . \]</div><aside class="side"></aside></div>
     <div class="r"><div class="main"><details class="try"><summary>Try it: XXZ anisotropy, coupling signs, and the spin-1 phase diagram</summary>
@@ -265,18 +172,21 @@ whose eigenvalues are all \(\ge0\). The spin-1 antiferromagnet gives 2, 2, 2 and
   </section>
   <section class="ch" id="double">
     <h2><span class="n">15</span>One doubling step</h2>
-    <div class="r"><div class="main prose"><p>Four moves turn bounds at \((n,\beta)\) into bounds at \((2n,2\beta)\). Moves 1 and 3 use the coupling identity and cost a factor of about 3 in \(\varepsilon\).
-Moves 2 and 4 square and turn \(3\varepsilon\) into about \(\tfrac92\varepsilon^2\). Net: \(\varepsilon\to5\varepsilon^2\) for \(\varepsilon\le1/100\).
-The exact map keeps improving as long as \(\varepsilon<\varepsilon_*\approx0.127\).</p></div><aside class="side"></aside></div>
+    <div class="r"><div class="main prose"><p>We can now assemble the self-improving loop at the heart of the spacetime bootstrap. Suppose at an even ring length \(n\) and inverse temperature \(\beta\) we know that both the spatial purity \(P_{\mathrm s}(n,\beta)\) and the doubled-length thermal purity \(P_\tau(2n,\beta)\) are at least \(1-\varepsilon\), with defect \(\varepsilon\le1/100\). Four alternating moves—coupling, squaring in space, coupling, and squaring in time—carry these two bounds to the doubled scale \((2n,2\beta)\):</p>
+<ol><li><em>Couple to double \(\beta\) in space:</em> The coupling identity of Section 11 gives \(P_{\mathrm s}(n,2\beta)=P_{\mathrm s}(n,\beta)^2P_\tau(2n,\beta)/P_\tau(n,\beta)^2\). Since \(P_\tau(n,\beta)\le1\), dropping the denominator leaves \(P_{\mathrm s}(n,2\beta)\ge(1-\varepsilon)^3\ge1-3\varepsilon\), costing a factor of at most \(3\) in the defect.</li>
+<li><em>Square in space to double \(n\):</em> Because \(X_{2\beta}\) is symmetric and \(n\) is even, squaring \(\sigma_n(2\beta)\) to \(\sigma_{2n}(2\beta)\) applies the squaring function \(f\) of Section 10, turning the defect \(1-(1-\varepsilon)^3\le3\varepsilon\) into \(\delta=f(1-(1-\varepsilon)^3)\approx\tfrac92\varepsilon^2\le5\varepsilon^2\) (for \(\varepsilon\le1/100\)). Thus \(P_{\mathrm s}(2n,2\beta)\ge1-5\varepsilon^2\).</li>
+<li><em>Couple at length \(2n\):</em> Applying the coupling identity at size \(2n\) gives \(P_\tau(4n,\beta)=P_\tau(2n,\beta)^2P_{\mathrm s}(2n,2\beta)/P_{\mathrm s}(2n,\beta)^2\ge(1-\varepsilon)^2(1-\delta)\ge(1-\varepsilon)^3\), a defect of about \(2\varepsilon\) (and at most \(3\varepsilon\)).</li>
+<li><em>Square in time to double \(\beta\) at length \(4n\):</em> Squaring the Gibbs state \(\rho_{4n}(\beta)\) to \(\rho_{4n}(2\beta)\) applies \(f\) once more, giving \(P_\tau(4n,2\beta)\ge1-\delta\ge1-5\varepsilon^2\).</li></ol>
+<p>The output pair at \((2n,2\beta)\) has the exact same form as the input pair at \((n,\beta)\), with the defect \(\varepsilon\) replaced by \(5\varepsilon^2\) (and the exact map \(\varepsilon\mapsto\delta\) keeps improving whenever \(\varepsilon<\varepsilon_*\approx0.127\)).</p></div><aside class="side"></aside></div>
     <div class="player" data-ch="double"></div>
     <div class="r"><div class="main eqs">\[ P_{\mathrm s}(n,\beta),\,P_\tau(2n,\beta)\ge1-\varepsilon\ \Longrightarrow\ P_{\mathrm s}(2n,2\beta),\,P_\tau(4n,2\beta)\ge1-5\varepsilon^2 . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="iterate">
     <h2><span class="n">16</span>Repeat, and read off the gap</h2>
-    <div class="r"><div class="main prose"><p>Start from \(\varepsilon_0=1/100\) at \((2304,784)\). After \(j\) steps, \(\varepsilon_j=20^{-2^j}/5\) at \(\beta_j=784\cdot2^j\), which is \(\tfrac15e^{-\beta_j\log20/784}\):
-exponential decay in \(\beta\). Lengths between doublings follow from the real eigenvalues (\(\ell^p\)-norm monotonicity). The thermal purity then exceeds \(\tfrac12\),
-the ground state is unique, and the weight ratio gives the gap.</p></div><aside class="side"><p class="note">The recurrence and the gap deduction are formalized in Lean 4: <code>lean/CertifiedGaps/PurityCriterion.lean</code>.</p></aside></div>
+    <div class="r"><div class="main prose"><p>Once the starting defect is small enough that \(5\varepsilon_0<1\), repeating the doubling step drives the defect down doubly exponentially in the step number \(j\)—which is ordinary exponential decay in the inverse temperature \(\beta_j\). Starting from \(\varepsilon_0=1/100\) at \((n_0,\beta_0)=(2304,784)\), \(j\) steps of \(\varepsilon_{j+1}=5\varepsilon_j^2\) give \(\varepsilon_j=20^{-2^j}/5\) at \((n_j,\beta_j)=(2304\cdot2^j,\,784\cdot2^j)\). Because \(2^j=\beta_j/784\), this is \(\varepsilon_j=\tfrac15e^{-\beta_j\log20/784}\): on a log plot against \(\beta\), the points fall on a straight line of slope \(-\log20/784\).</p>
+<p>To cover every even ring length \(L\ge2304\)—not just the powers of two \(n_j\)—pick the scale \(j\) with \(n_j\le L\le2n_j\). For even lengths the weights \(p_i=|\lambda_i|^n/Z_n\) lie in \([0,1]\) and sum to one, so raising them to any power \(r\ge1\) can only lower their sum: \(Z_{rn}/Z_n^{\,r}=\sum_ip_i^r\le1\). With \(r=L/n_j\) at \(\beta_j\) this gives \(Z_L(\beta_j)\le Z_{n_j}(\beta_j)^{L/n_j}\), and with base length \(L\) and \(r=2n_j/L\) at \(2\beta_j\) it gives \(Z_L(2\beta_j)\ge Z_{2n_j}(2\beta_j)^{L/(2n_j)}\). Taking their ratio bounds the thermal purity at length \(L\) by \(P_\tau(L,\beta_j)\ge[P_\tau(2n_j,\beta_j)P_{\mathrm s}(n_j,\beta_j)^2]^{L/(2n_j)}\ge(1-\varepsilon_j)^3\ge1-3\varepsilon_j\).</p>
+<p>Since \(1-3\varepsilon_j\ge0.97>\tfrac12\), the squares bound \(w_0\ge P_\tau(L,\beta_j)>\tfrac12\) of Section 8 forces a single ground state to hold more than half the total Boltzmann probability, so the ground state is unique. The first excited weight is at most the remaining probability \(1-w_0\le3\varepsilon_j\), so \(e^{-\beta_j\Delta_L}=w_1/w_0\le3\varepsilon_j/(1-3\varepsilon_j)<20^{-2^j}\), and dividing by \(\beta_j=784\cdot2^j\) proves \(\Delta_L>\log20/784\).</p></div><aside class="side"><p class="note">The recurrence and the gap deduction are formalized in Lean 4: <code>lean/CertifiedGaps/PurityCriterion.lean</code>.</p></aside></div>
     <div class="player" data-ch="iterate"></div>
     <div class="r"><div class="main eqs">\[ e^{-\beta_j\Delta_L}=\frac{w_1}{w_0}\le\frac{3\varepsilon_j}{1-3\varepsilon_j}<20^{-2^j}\quad\Longrightarrow\quad\Delta_L>\frac{\log20}{784}. \]</div><aside class="side"></aside></div>
     <div class="r"><div class="main"><details class="try"><summary>Try it: the gap certified by any seed</summary>
@@ -293,33 +203,31 @@ the ground state is unique, and the weight ratio gives the gap.</p></div><aside 
   </section>
   <section class="ch" id="seedtoy">
     <h2><span class="n">17</span>The starting numbers, worked on a toy</h2>
-    <div class="r"><div class="main prose"><p>The certificate never sees the eigenvalues of \(X\); it sees exact traces \(Z_n\) of small rings. Here is the whole logic on a toy with hidden eigenvalues
-1, 0.6, −0.5, 0.4. The sixth moment \(Z_6=1.0664\) caps every \(|\lambda|\) at 1.011. A trial state gives \(Z_{24}\ge1\); if all \(|\lambda|\le0.97\), the sixth-moment
-mass could produce at most 0.484, so one eigenvalue must exceed 0.97. The rest then carry at most 0.233 of the mass, which bounds their contribution and gives
-\(P_{\mathrm s}(24)\ge0.988\). The real certificate runs the same three steps with 12-site rings, exact integers, symmetry sectors and a 72-site trial state.</p></div><aside class="side"><p class="note">Toy numbers are exact to the digits shown; the real certificate uses capped masses with degree-12 filters, as in <code>notes/thermal-mpo-gap-certificate.tex</code>.</p></aside></div>
+    <div class="r"><div class="main prose"><p>Where does the starting purity bound come from? The transfer operator \(X_\beta\) acts on the infinite-dimensional space of bond histories, so a computer can never diagonalize \(X_\beta\) to read off its eigenvalues \(\lambda_i\). What a computer can evaluate exactly are the traces \(Z_k=\operatorname{Tr}X_\beta^{\,k}=\sum_i\lambda_i^k\)—the partition functions of very small rings. Can a small-ring moment \(Z_6\) together with a lower bound at a larger length \(n=24\) certify the purity \(P_{\mathrm s}(24)=Z_{48}/Z_{24}^2\) without ever seeing the eigenvalues?</p>
+<p>Here is the entire logic on a toy example whose true eigenvalues are \(1, 0.6, -0.5, 0.4\), kept hidden from the certificate. First, on a \(6\)-site ring, the computer evaluates the sixth moment \(Z_6=\sum_i\lambda_i^6=1.0664\); since \(\lambda_i^6\ge0\), no single eigenvalue can exceed \(|\lambda_i|\le1.0664^{1/6}=1.011\). Second, to rule out the possibility that \(Z_6\) is spread thinly across many small eigenvalues, we need a lower bound on \(Z_{24}\) at length \(24\). Because \(Z_{24}=\sum_me^{-\beta E_m}\ge e^{-\beta E_0}\) and any <em>trial state</em> \(\psi\) gives a variational upper bound \(E_0\le\langle\psi|H|\psi\rangle/\langle\psi|\psi\rangle\), finding a trial state with negative energy (after shifting \(H\) by a constant per site, which cancels in all purities) proves \(Z_{24}\ge1\).</p>
+<p>Now combine the upper bound \(Z_6=1.0664\) with the lower bound \(Z_{24}\ge1\). If every eigenvalue obeyed \(|\lambda_i|\le0.97\), each sixth power would obey \(\lambda_i^6\le0.97^6=0.833\). Because \(\lambda_i^{24}=(\lambda_i^6)^4\) and fourth powers are convex, a total sixth-moment mass of \(1.0664\) subject to \(\lambda_i^6\le0.833\) maximizes \(\sum_i\lambda_i^{24}\) when packed into one full bar of \(0.833\) and one remainder bar of \(1.0664-0.833=0.233\), giving at most \(0.833^4+0.233^4=0.484<1\le Z_{24}\)—a contradiction. Thus one dominant eigenvalue \(\lambda_0\) must exceed \(0.97\) (\(\lambda_0^6>0.833\)). The remaining eigenvalues share at most \(0.233\) of the sixth-moment mass, so their twenty-fourth powers sum to at most \(0.233^4=0.0030\). Keeping only \(\lambda_0^{48}\) in the numerator of \(P_{\mathrm s}(24)=\sum\lambda_i^{48}/(\sum\lambda_i^{24})^2\) and bounding the rest of the denominator by \(0.233^4\) gives \(P_{\mathrm s}(24)\ge(1+0.233^4/0.97^{24})^{-2}=0.98765\ldots>0.987\). The real certificate runs these exact three steps with \(12\)-site rings, exact integers, symmetry sectors, and a \(72\)-site trial state.</p></div><aside class="side"><p class="note">Toy numbers are exact to the digits shown; the real certificate uses capped masses with degree-12 filters, as in <code>notes/thermal-mpo-gap-certificate.tex</code>.</p></aside></div>
     <div class="player" data-ch="seedtoy"></div>
-    <div class="r"><div class="main eqs">\[ \sum_i\lambda_i^{24}\le\underbrace{0.833^4+(1.0664-0.833)^4}_{0.484}<1\le Z_{24}\ \Rightarrow\ \lambda_0>0.97,\qquad P_{\mathrm s}(24)\ge\Big(1+\frac{0.233^4}{0.97^{24}}\Big)^{-2}=0.988 . \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main eqs">\[ \sum_i\lambda_i^{24}\le\underbrace{0.833^4+(1.0664-0.833)^4}_{0.484}<1\le Z_{24}\ \Rightarrow\ \lambda_0>0.97,\qquad P_{\mathrm s}(24)\ge\Big(1+\frac{0.233^4}{0.97^{24}}\Big)^{-2}=0.98765\ldots>0.987 . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="seed">
     <h2><span class="n">18</span>The real certificate</h2>
-    <div class="r"><div class="main prose"><p>The input is both purities \(\ge0.99\) at \((2304,784)\). A ring of 2304 spin-1 sites has \(3^{2304}\) states, so it is never computed. Instead:</p>
-<ol><li>exact integer computation of \(Z_n\) for rings of up to 12 sites;</li>
-<li>symmetry and polynomial filters turn these into caps on every transfer eigenvalue;</li>
-<li>a 72-site trial state and the variational principle force one dominant eigenvalue;</li>
-<li>this gives purities at length 36, and six doublings carry them to 2304.</li></ol>
-<p>Every number is an integer or an exact fraction. The other models in this repository diagonalize 16-spin rings completely and bound every floating-point rounding error.</p></div><aside class="side"><p class="note">Every number in the spin-1 seed is an integer or an exact fraction: <code>models/spin1/results/scalars.json</code>.</p></aside></div>
+    <div class="r"><div class="main prose"><p>Section 16 took as its starting input that both purities \(P_{\mathrm s}(2304,784)\) and \(P_\tau(4608,784)\) are at least \(0.99\). A ring of \(2304\) spin-1 sites has \(3^{2304}\) states, so its partition function is never computed directly. Instead, OpenAI's certificate runs the three-step toy strategy at a much smaller scale, \((n_0,\beta_0)=(36,12.25)\), and then applies six doubling steps:</p>
+<ol><li><em>Small-ring moments in exact integers:</em> For even ring lengths \(k\le12\) at \(\beta_0=49/4=12.25\), the certificate evaluates the exact partition functions \(Z_k=\operatorname{Tr}X_{\beta_0}^{\,k}\)—along with twisted traces \(Z_k(g)=\operatorname{Tr}(U_gX_{\beta_0}^{\,k})\) that insert a lattice or spin-rotation symmetry \(g\) before closing the ring—in exact integer arithmetic.</li>
+<li><em>Symmetry sectors and spectral filters:</em> The symmetry twists separate the eigenvalues of \(X_{\beta_0}\) by symmetry sector, and degree-\(12\) polynomial filters turn the small-ring traces into upper caps (such as \(|\lambda|\le Z_k^{1/k}\)) on the eigenvalues and moment masses in each sector.</li>
+<li><em>A \(72\)-site matrix-product trial state:</em> To prove \(Z_{72}>1\) without diagonalizing a \(3^{72}\times3^{72}\) matrix, the certificate uses a real matrix-product trial state \(\psi\) on \(72\) sites (one tensor \(A\) per site, with a \(3\)-dimensional spin leg and two \(26\)-dimensional virtual legs joined around the ring). Gluing \(\psi\) to its bra turns the norm \(\langle\psi|\psi\rangle=\operatorname{Tr}T^{72}\) and expected energy \(\langle\psi|H_{72}|\psi\rangle\) into traces of \(72\) small matrices, which are contracted exactly. With a per-site energy shift \(\kappa\) (which cancels in all purities), the variational bound \(E_0\le\langle\psi|H_{72}|\psi\rangle/\langle\psi|\psi\rangle<-72\kappa\) proves \(Z_{72}\ge e^{-\beta_0(E_0+72\kappa)}>1\) and forces one dominant eigenvalue \(\lambda_0>0.999\).</li>
+<li><em>Six doublings from length \(36\) to \(2304\):</em> Exactly as in Section 17, \(\lambda_0>0.999\) and the moment caps certify the spatial and thermal defects \((\varepsilon_{\mathrm s},\varepsilon_\tau)=(0.0479,0.1815)\) at length \(36\) and \(\beta_0=12.25\). Six applications of the exact doubling map carry \((36,12.25)\) to \((2304,784)\) and shrink the defects to \((0.0084513,0.0054986)\), both below \(0.01\).</li></ol>
+<p>Every number in the spin-1 seed is an integer or an exact fraction. The other models in this repository have shorter correlation lengths, so they diagonalize \(16\)-spin rings completely and bound every floating-point rounding error.</p></div><aside class="side"><p class="note">Every number in the spin-1 seed is an integer or an exact fraction: <code>models/spin1/results/scalars.json</code>.</p></aside></div>
     <div class="player" data-ch="seed"></div>
     <div class="r"><div class="main eqs">\[ |\lambda|\le Z_k^{1/k}\ (k\ \text{even}),\qquad Z_{72}>1\ \Rightarrow\ \lambda_0>0.999, \]
 \[ (0.0479,\ 0.1815)\ \xrightarrow{\ \times6\ }\ (0.0084513,\ 0.0054986). \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="lab">
-    <h2><span class="n">17</span>The whole machine on a solvable chain</h2>
+    <h2><span class="n">19</span>The whole machine on a solvable chain</h2>
     <div class="r"><div class="main prose">
-      <p>Transverse-field Ising ring \(H=-\sum Z_jZ_{j+1}-g\sum X_j\): free fermions give \(Z_n(\beta)\) exactly at any size. Pick a seed size \(n_0\) and temperature \(\beta_0\);
-      the page computes both defects, runs the recurrence, and compares the certified gap with the true gap \(2|1-g|\). For \(g&lt;1\) there are two ground states and every seed fails, as it must.
-      Floating point here, so this is a diagnostic, not a certificate. At \(g=2\), \((128,32)\) it reproduces the survey value 1.885 in <code>AGENTS.md</code>.</p></div><aside class="side"><p class="note">Floating point, not a certificate. Free-fermion formulas with the ground-energy mismatch summed by Poisson summation, so tiny defects are not lost to cancellation.</p></aside></div>
+      <p>Before turning to open chains, we can test the entire bootstrap machine on an exactly solvable spin-\(\tfrac12\) chain where \(Z_n(\beta)\) and the true gap are known in closed form at every size: the transverse-field Ising ring \(H=-\sum Z_jZ_{j+1}-g\sum X_j\), where \(Z_j,X_j\) are the Pauli matrices \(\sigma_j^z,\sigma_j^x\) and \(g\) is the transverse field.</p>
+      <p>Mapping the spins to free fermions gives \(Z_n(\beta)\) exactly for any even ring length \(n\). Pick a field \(g\), a seed size \(n_0\), and an inverse temperature \(\beta_0\); the page computes both starting defects \((\varepsilon_{\mathrm s},\varepsilon_\tau)\), runs the exact doubling recurrence, and compares the certified gap bound with the true thermodynamic gap \(2|1-g|\). For \(g&lt;1\) the ordered phase has two nearly degenerate ground states, so the thermal purity never approaches \(1\) and every seed fails, as it must. The browser uses standard floating-point arithmetic here, so this interactive laboratory is a diagnostic, not a certificate. At \(g=2\), \((128,32)\) it reproduces the survey value \(1.885\) in <code>AGENTS.md</code>.</p></div><aside class="side"><p class="note">Floating point, not a certificate. Free-fermion formulas with the ground-energy mismatch summed by Poisson summation, so tiny defects are not lost to cancellation.</p></aside></div>
     <div class="r"><div class="main"><div class="ctrl"><label for="gSl">field g</label><input id="gSl" type="range" min="0.6" max="3" step="0.01" value="1.25"><output id="gOut"></output></div>
       <div class="ctrl"><label for="n0Sl">seed length n₀</label><input id="n0Sl" type="range" min="1" max="9" step="any" value="5"><output id="n0Out"></output></div>
       <div class="ctrl"><label for="bdSl">β₀ · Δ (log)</label><input id="bdSl" type="range" min="-1" max="6" step="any" value="3"><output id="bdOut"></output></div>
@@ -337,193 +245,20 @@ mass could produce at most 0.484, so one eigenvalue must exceed 0.97. The rest t
   </section>
   <section class="part" id="part2">
     <h1 class="parth">Part II · Open chains</h1>
-    <div class="r" style="margin-top: 18px"><div class="main prose"><p>A chain with two ends and a small field on the end spins. The ring proof carries over with one new ingredient:
-      the ends are closed by boundary vectors instead of a trace, and the proof must show that they overlap the dominant state. Eight figures, following Appendices A–C of the note.</p></div>
-      <aside class="side"><p class="note">Theorem from OpenAI’s boundary-field preprint; this part follows <code>notes/thermal-mpo-gap-note.tex</code>, Appendices A–C.</p></aside></div>
-    <div class="r" style="margin-top: 14px"><div class="main"><video src="open-chains.mp4" poster="poster-open.jpg" controls preload="metadata" playsinline></video></div>
-      <aside class="side"><p class="note">The eight open-chain figures as one film, about two and a half minutes.</p></aside></div>
+    <div class="r" style="margin-top: 18px"><div class="main prose"><p>Cut the ring open into a chain with two free ends, and pin the two end spins with a small magnetic field. The same bootstrap, with the open ends of the network closed by <em>boundary vectors</em> instead of a trace, proves that the odd open chains have a unique ground state and a uniform gap <a href="#ref-3">[3]</a>. That argument, from Appendices A–C of the note, has its own page: <a href="open.html">Open chains</a>, in eleven figures and a thirteen-minute film.</p></div><aside class="side"></aside></div>
   </section>
-  <section class="ch" id="oedge">
-    <h2><span class="n">II.1</span>Ends carry free spins</h2>
-    <div class="r"><div class="main prose"><p>Opening the ring changes the physics before it changes the proof. In the valence-bond picture each spin 1 is a pair of spin-½, and neighbouring
-halves bind into singlets; at each end one spin-½ is left over. Exact diagonalization of small chains shows the consequence. Without a field, even chains have three
-states just above the ground state, at 0.51, 0.31, 0.20, 0.14, 0.10 for n = 4, …, 12, and odd chains have a three-fold degenerate ground state. With a field
-\(h=3/5\) on the two end spins, odd chains have a single ground state and a gap of 0.72, 0.64, 0.58, 0.55 for n = 5, …, 11.</p></div><aside class="side"><p class="note">Levels from floating-point exact diagonalization with conserved S<sup>z</sup> (n ≤ 12), a diagnostic and not part of the proof. With an odd number of sites both ends lie on the same sublattice, so equal fields suit both.</p></aside></div>
-    <div class="player" data-ch="oedge"></div>
-    <div class="r"><div class="main eqs">\[ H_n=\sum_{i=1}^{n-1}\mathbf S_i\cdot\mathbf S_{i+1}-h\,(S_1^z+S_n^z),\qquad h=\tfrac35 . \]
-<p>Theorem: for every odd \(n\ge1921\) the ground state is unique and \(\Delta_n>\log10/392\approx0.0059\).</p></div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="ocyl">
-    <h2><span class="n">II.2</span>A cylinder, not a torus</h2>
-    <div class="r"><div class="main prose"><p>The partition function of the open chain is still a trace, so imaginary time is still periodic. Space is not: the chain has two ends.
-The spacetime is a cylinder, and the network that computes \(Z\) is a row of transfer matrices closed by a vector at each end instead of a trace.</p></div><aside class="side"></aside></div>
-    <div class="player" data-ch="ocyl"></div>
-    <div class="r"><div class="main eqs">\[ \text{ring: }\ \operatorname{Tr}X^n\qquad\text{open chain: }\ \langle\bar v|\,X^n\,|v\rangle . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="ovec">
-    <h2><span class="n">II.3</span>What a boundary vector is</h2>
-    <div class="r"><div class="main prose"><p>The end field acts on one site, so expanding \(e^{-\beta H}\) puts field events on that site's world line, each inserting \(G_z=iS^z\).
-The list of field events is a history, just like the list of events on a bond, and its weight defines a vector on histories:
-\(v(a)=(ih)^d\) when all \(d\) events are of type \(z\). With field \(-h\) on one end and \(+h\) on the other, the two caps are the same vector, one conjugated,
-so every even power is a squared norm by the mirror argument of section 12. The equal-field chain of the theorem is reached by a \(\pi\) rotation \(U_P\) on one cap.</p></div><aside class="side"><p class="note">The left cap is conjugated: its events carry (−ih)G<sub>z</sub> = +hS<sup>z</sup>, adding −hS<sub>1</sub><sup>z</sup>; the right cap adds +hS<sub>n</sub><sup>z</sup>.</p></aside></div>
-    <div class="player" data-ch="ovec"></div>
-    <div class="r"><div class="main eqs">\[ v_\beta(a)=(ih)^d\ \ (\text{all labels }z),\qquad \|v_\beta\|^2=e^{\beta h^2},\qquad Y^{\mathrm{same}}_n=\langle\bar v|X^nU_P|v\rangle . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="over">
-    <h2><span class="n">II.4</span>The overlap</h2>
-    <div class="r"><div class="main prose"><p>A trace always contains the top eigenvector of the transfer matrix; a boundary vector might not. Split the normalized transfer matrix into its top
-eigenvector and the rest, \(T=|\psi\rangle\langle\psi|+R\) with \(\|R\|<1\). Repeated application keeps the component of \(v\) along \(\psi\) and shrinks the rest,
-so the open-chain network splits into a fixed overlap \(c\) and a remainder that dies with length. The boundary defect \(e\) measures the remainder's share;
-any \(e<1\) proves \(c>0\).</p></div><aside class="side"></aside></div>
-    <div class="player" data-ch="over"></div>
-    <div class="r"><div class="main eqs">\[ B_m=\langle v|T^m|v\rangle=\underbrace{|\langle\psi,v\rangle|^2}_{c}+\underbrace{\langle v|R^m|v\rangle}_{D_m},\qquad e_m=\frac{D_m}{B_m}=1-\frac{c}{B_m}. \]</div><aside class="side"></aside></div>
-    <div class="r"><div class="main"><details class="try"><summary>Try it: overlap versus chain length</summary>
-  <div class="tryin"><svg class="fig" id="ovSvg" viewBox="0 0 520 210" role="img" aria-label="Overlap and remainder versus chain length"></svg>
-  <div class="ctrl"><label for="ovC">overlap c</label><input id="ovC" type="range" min="0" max="1" step="0.01" value="0.3"><output id="ovCOut"></output></div>
-  <div class="ctrl"><label for="ovM">length m</label><input id="ovM" type="range" min="2" max="40" step="2" value="8"><output id="ovMOut"></output></div></div></details></div><aside class="side"></aside></div>
-  </section>
-  <section class="ch" id="ofold">
-    <h2><span class="n">II.5</span>Why the remainder is a square</h2>
-    <div class="r"><div class="main prose"><p>For even \(m\) the remainder folds in half: the two halves of the strip are mirror images, so \(D_m\) is a squared norm. Absorbing \(k/2\) factors
-into each end leaves a middle of norm at most \(\|R\|^{m-k}\), which shrinks the remainder geometrically while the overlap \(c\) is unchanged.
-This is how a longer chain improves the boundary defect.</p></div><aside class="side"></aside></div>
-    <div class="player" data-ch="ofold"></div>
-    <div class="r"><div class="main eqs">\[ D_m=\big\|R^{m/2}v\big\|^2\ge0,\qquad D_m\le\|R\|^{m-k}D_k . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="omoves">
-    <h2><span class="n">II.6</span>Three moves per scale</h2>
-    <div class="r"><div class="main prose"><p>The open-chain bootstrap tracks two numbers per scale: the boundary defect and the thermal purity of the open chain at length \(M_j\).
-Move 1 uses the geometric suppression at the next temperature to squeeze the boundary defect. Move 2 doubles the length, which costs little once the overlap is
-controlled. Move 3 squares the Gibbs state. One step sends a defect \(x\) to \(10x^2\).</p></div><aside class="side"><p class="note">Composition in imaginary time links the scales: B<sub>m</sub>(j+1) = P<sub>τ</sub><sup>opp</sup>(m, β<sub>j</sub>) r<sub>j</sub><sup>−m</sup> B<sub>m</sub>(j)<sup>2</sup>.</p></aside></div>
-    <div class="player" data-ch="omoves"></div>
-    <div class="r"><div class="main eqs">\[ e_{M_j/2}(j)\le x,\ \ P_\tau^{\mathrm{opp}}(M_j,\beta_j)\ge1-x\ \Longrightarrow\ e_{M_j}(j{+}1)\le10x^2,\ \ P_\tau^{\mathrm{opp}}(2M_j,\beta_{j+1})\ge1-10x^2 . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="onum">
-    <h2><span class="n">II.7</span>One open-chain step, in numbers</h2>
-    <div class="r"><div class="main prose"><p>The first open-chain step with every number shown. Starting from boundary defect 0.14 and thermal defect 0.21 at \(\beta=49\), the overlap recurrence
-gives \(0.1655\times0.7115=0.118\), and doubling then squaring gives \(f(0.352)=0.147\). Both shrink; two more steps reach 0.001, after which the rule \(x\to10x^2\) takes over.</p></div><aside class="side"><p class="note">Recomputed from the formulas of Appendix C; each result lies at or below the rational table entry of the note.</p></aside></div>
-    <div class="player" data-ch="onum"></div>
-    <div class="r"><div class="main eqs">\[ E'\le\frac{q}{1-q}\Big[\frac{1}{(1-E)^2(1-\eta)}-1\Big],\qquad \eta'\le f\big(1-(1-\eta)(1-\varepsilon_j)(1-\varepsilon_{j+1})(1-E')\big). \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="ostart">
-    <h2><span class="n">II.8</span>Starting numbers</h2>
-    <div class="r"><div class="main prose"><p>The iteration starts at \(\beta=49\) from four certified numbers: periodic purities at length 120 and 240, and two open-chain bounds
-from the boundary-field paper. Three rounds bring both defects to 0.001 at \(\beta=392\), length 1920. From there \(x\to10x^2\) gives
-\(x_j=10^{-1-2^{j-5}}\).</p></div><aside class="side"><p class="note">Rows j = 2…5 are the rational table of the note; recomputing the recurrence gives values at or below each entry.</p></aside></div>
-    <div class="player" data-ch="ostart"></div>
-    <div class="r"><div class="main eqs">\[ P_{\mathrm s}(120,49),\,P_\tau(240,49)\ge0.948,\quad e_{142}\le0.14,\quad P_\tau^{\mathrm{opp}}(240,49)\ge0.79 . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="ogap">
-    <h2><span class="n">II.9</span>Odd lengths, and the gap</h2>
-    <div class="r"><div class="main prose"><p>For odd \(n\) the remainder \(R^n\) need not be positive. Putting \(M/2\) factors on each end leaves a middle \(R^{n-M}U_P\) of norm at most 1,
-so the remainder is bounded by \(D_M\) whatever its sign, and the rotation \(U_P\) acts trivially next to the top eigenvector. The windows \([M_j,2M_j]\)
-cover every \(n\ge1920\); in window \(j\) the thermal purity is at least \(1-4x_j>\tfrac12\), the ground state is unique, and the weight ratio gives the gap.</p></div><aside class="side"></aside></div>
-    <div class="player" data-ch="ogap"></div>
-    <div class="r"><div class="main eqs">\[ e^{-\beta_j\Delta_n}\le\frac{4x_j}{1-4x_j}<10^{-2^{j-5}},\quad\beta_j=392\cdot2^{j-5}\quad\Longrightarrow\quad\Delta_n>\frac{\log10}{392}. \]</div><aside class="side"></aside></div>
-    
-  </section>
+  <ol class="foot" id="references">
+    <li id="ref-1">F. D. M. Haldane, Continuum dynamics of the 1-D Heisenberg antiferromagnet: identification with the O(3) nonlinear sigma model, Phys. Lett. A <b>93</b>, 464–468 (1983). <a href="https://doi.org/10.1016/0375-9601(83)90631-X">doi:10.1016/0375-9601(83)90631-X</a></li>
+    <li id="ref-2">OpenAI, The periodic spin-one Haldane gap, preprint (September 24, 2026). <a href="https://github.com/openai/math/blob/main/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/paper.pdf">PDF</a></li>
+    <li id="ref-3">OpenAI, A boundary-field gap for the spin-one Heisenberg chain, preprint (September 24, 2026). <a href="https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf">PDF</a></li>
+    <li id="ref-4">The main note this page explains: <a href="../notes/thermal-mpo-gap-note.pdf">thermal-mpo-gap-note.pdf</a>.</li>
+  </ol>
   <p class="foot">Sources: <code>notes/thermal-mpo-gap-note.tex</code>, <code>notes/thermal-mpo-gap-scope.tex</code>, <code>notes/thermal-mpo-gap-certificate.tex</code>,
     <code>julia/src/recurrence/</code>. Curves in section 1 are schematic.</p>
 </article>
 
+<script src="page.js"></script>
 <script>
-const NS = 'http://www.w3.org/2000/svg';
-const $ = id => document.getElementById(id);
-const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-function el(tag, attrs = {}, parent) {
-  const e = document.createElementNS(NS, tag);
-  for (const k in attrs) e.setAttribute(k, attrs[k]);
-  if (parent) parent.appendChild(e); return e;
-}
-function txt(parent, x, y, s, attrs = {}) {
-  const t = el('text', Object.assign({x, y, 'font-family': 'IBM Plex Mono, monospace', 'font-size': 12, fill: 'var(--mute)'}, attrs), parent);
-  t.textContent = s; return t;
-}
-function barsSvg(svg, x, y, w, h, vals, color) {
-  const gap = 6, bw = (w - gap*(vals.length - 1)) / vals.length;
-  el('line', {x1: x, y1: y+h, x2: x+w, y2: y+h, stroke: 'var(--line)'}, svg);
-  vals.forEach((v, i) => {
-    el('rect', {x: x + i*(bw+gap), y: y + h - v*h, width: bw, height: Math.max(0, v*h), fill: color, opacity: i ? .5 : 1, rx: 2}, svg);
-    if (v > .04) txt(svg, x + i*(bw+gap) + bw/2, y + h - v*h - 5, v.toFixed(2), {'text-anchor': 'middle', fill: 'var(--ink)', 'font-size': 11});
-  });
-}
-const sup = n => String(n).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹⁻'['0123456789-'.indexOf(c)] || c).join('');
-function sci(x, d = 2) {
-  if (!isFinite(x)) return '–'; if (x === 0) return '0';
-  const e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
-  return Math.abs(e) < 3 ? x.toPrecision(d + 1) : `${m.toFixed(d)}×10${sup(e)}`;
-}
-const fmtLog = l => { if (!isFinite(l)) return '0'; const e = l / Math.LN10, ei = Math.floor(e); return e > -300 ? sci(Math.exp(l)) : `${Math.pow(10, e - ei).toFixed(2)}×10${sup(ei)}`; };
-
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// ---------- theme ----------
-let TH = null;
-function readTheme() {
-  const g = v => css(v);
-  TH = {bg: g('--stage'), surface: g('--surface'), ink: g('--ink'), mute: g('--mute'), line: g('--line'), space: g('--space'), time: g('--time'),
-    proved: g('--proved'), ok: g('--ok'), fail: g('--fail'), spaceF: g('--space-f'), timeF: g('--time-f'), provedF: g('--proved-f'), torusFill: g('--torus-fill')};
-}
-readTheme();
-
-// ---------- TeX on canvas ----------
-const TEXC = new Map(); let texReady = false;
-function texImg(src, color, px) {
-  const key = src + '|' + color + '|' + px; const hit = TEXC.get(key);
-  if (hit) return hit === 'pending' ? null : hit;
-  if (!texReady) return null;
-  TEXC.set(key, 'pending');
-  STBV.texImage(src, color, px).then(im => { TEXC.set(key, im); redrawAll(); }, () => TEXC.delete(key));
-  return null;
-}
-
-// ---------- players ----------
-const PLAYERS = [];
-function makePlayer(host) {
-  const ch = [...STBV.CH, ...STBV.OPEN].find(c => c.id === host.dataset.ch); if (!ch) return;
-  host.innerHTML = `<canvas width="960" height="540" aria-label="${ch.title} animation"></canvas>
-    <div class="r pmeta"><p class="main pcap" aria-live="polite"></p><div class="side"><p class="pctl"><button type="button" class="pp">play</button> · <button type="button" class="pv">back</button> · <button type="button" class="nx">next</button>
-    <span class="bt"></span></p><input type="range" min="0" max="${ch.dur}" step="0.01" aria-label="Scrub"></div></div>`;
-  const cv = host.querySelector('canvas'), cap = host.querySelector('.pcap'), pp = host.querySelector('.pp'), sl = host.querySelector('input'), bt = host.querySelector('.bt');
-  const P = {ch, t: ch.dur, playing: false, seen: false};
-  function size() { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = 960 * dpr; cv.height = 540 * dpr; P.dpr = dpr; }
-  size();
-  const beatIdx = () => STBV.beatAt(ch, P.t);
-  P.draw = () => {
-    const ctx = cv.getContext('2d'); ctx.setTransform(P.dpr, 0, 0, P.dpr, 0, 0);
-    ctx.fillStyle = TH.bg; ctx.fillRect(0, 0, 960, 540);
-    ch.draw(STBV.kit(ctx, TH, texImg), P.t);
-    const bi = beatIdx();
-    if (cap.dataset.bi !== String(bi)) { cap.textContent = ch.beats[bi][1]; cap.dataset.bi = bi; }
-    sl.value = P.t; bt.textContent = `step ${bi + 1} of ${ch.beats.length}`;
-    pp.textContent = P.playing ? 'pause' : (P.t >= ch.dur - .01 ? 'replay' : 'play'); pp.setAttribute('aria-label', P.playing ? 'Pause' : 'Play');
-  };
-  pp.addEventListener('click', () => { if (P.playing) P.playing = false; else { if (P.t >= ch.dur - .01) P.t = 0; P.playing = true; } P.draw(); });
-  host.querySelector('.nx').addEventListener('click', () => { const bi = beatIdx(); P.playing = false; P.t = bi + 1 < ch.beats.length ? ch.beats[bi + 1][0] + 2.5 : ch.dur; P.t = Math.min(P.t, bi + 2 < ch.beats.length ? ch.beats[bi + 2][0] - .01 : ch.dur); P.draw(); });
-  host.querySelector('.pv').addEventListener('click', () => { const bi = beatIdx(); P.playing = false; P.t = bi > 0 ? Math.min(ch.beats[bi - 1][0] + 2.5, ch.beats[bi][0] - .01) : 0; P.draw(); });
-  sl.addEventListener('input', () => { P.playing = false; P.t = +sl.value; P.draw(); });
-  PLAYERS.push(P);
-  new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting && !P.seen && !reduce) { P.seen = true; P.t = 0; P.playing = true; } }), {threshold: .55}).observe(host);
-}
-document.querySelectorAll('.player').forEach(makePlayer);
-function redrawAll() { PLAYERS.forEach(P => P.draw()); }
-let last = performance.now();
-function tick(now) {
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
-  for (const P of PLAYERS) if (P.playing) { P.t = Math.min(P.ch.dur, P.t + dt); if (P.t >= P.ch.dur) P.playing = false; P.draw(); }
-  requestAnimationFrame(tick);
-}
-redrawAll(); requestAnimationFrame(tick);
-(function waitMJ() { if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => { texReady = true; redrawAll(); }); else setTimeout(waitMJ, 100); })();
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(redrawAll);
-
 // ---------- widgets ----------
 // ---------- step 6 ----------
 const PRESETS = [
@@ -780,36 +515,9 @@ function drawXab() {
   $('xabOut').textContent = `X(a, b) = Tr(${XAB.length ? XAB.map(([, a]) => 'G_' + a).reverse().join(' ') : '1'}) = ${tr}`;
 }
 
-// open-chain overlap
-function drawOverlap() {
-  const c = +$('ovC').value, m = +$('ovM').value, svg = $('ovSvg'); svg.innerHTML = '';
-  $('ovCOut').textContent = c.toFixed(2); $('ovMOut').textContent = m;
-  const rs = [.85, .7, -.6, .4], wts = rs.map((_, i) => (1 - c) * [.4, .3, .2, .1][i]);
-  const gx = 50, gy = 16, gw = 440, gh = 140, Mx = 40, Y = v => gy + gh - Math.min(1.2, v) / 1.2 * gh;
-  el('rect', {x: gx, y: gy, width: gw, height: gh, fill: 'none', stroke: 'var(--line)'}, svg);
-  for (let k = 2; k <= Mx; k += 2) {
-    const D = wts.reduce((s, w, i) => s + w * Math.pow(rs[i], k), 0), x = gx + (k - 2) / (Mx - 2) * (gw - 10);
-    const hc = Y(0) - Y(c), hd = Y(c) - Y(c + D);
-    el('rect', {x, y: Y(c), width: 8, height: hc, fill: 'var(--space)', opacity: k === m ? 1 : .55}, svg);
-    el('rect', {x, y: Y(c + D), width: 8, height: hd, fill: 'var(--mute)', opacity: k === m ? 1 : .45}, svg);
-  }
-  [0, .5, 1].forEach(v => txt(svg, gx - 6, Y(v) + 4, String(v), {'text-anchor': 'end'}));
-  txt(svg, gx, gy + gh + 18, 'chain length m →'); txt(svg, gx + gw, gy + gh + 18, 'red: overlap c   grey: remainder Dₘ', {'text-anchor': 'end'});
-  const D = wts.reduce((s, w, i) => s + w * Math.pow(rs[i], m), 0), B = c + D, e = D / B;
-  txt(svg, gx, gy + gh + 42, c === 0 ? 'c = 0: e = 1 at every m; the top eigenvector is never seen' :
-    `m = ${m}: B = ${B.toFixed(3)}, defect e = D/B = ${e.toFixed(3)}, shrinking with m`, {fill: c === 0 ? 'var(--fail)' : 'var(--ink)'});
-}
-['ovC', 'ovM'].forEach(id => $(id).addEventListener('input', drawOverlap));
 
-drawPaths(); drawXXZ(); drawXab(); drawXYZ(); drawDial(); buildMap(); updateExplorer(); drawOverlap(); labChanged();
-
-// ---------- nav ----------
-const links = [...document.querySelectorAll('#toc a')];
-const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id)); }), {rootMargin: '-40% 0px -55% 0px'});
-document.querySelectorAll('section.ch').forEach(s => io.observe(s));
-function themeRedraw() { readTheme(); TEXC.clear(); redrawAll(); buildMap(); updateExplorer(); buildHeat(); labChanged(); drawDial(); drawOverlap(); drawPaths(); drawXXZ(); }
-try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeRedraw); } catch (e) {}
-new MutationObserver(themeRedraw).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+drawPaths(); drawXXZ(); drawXab(); drawXYZ(); drawDial(); buildMap(); updateExplorer(); labChanged();
+THEMED.push(buildMap, updateExplorer, buildHeat, labChanged, drawDial, drawPaths, drawXXZ);
 </script>
 
 </body>

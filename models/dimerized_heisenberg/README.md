@@ -6,8 +6,8 @@ unique and the spectral gap satisfies $\Delta_L \ge 0.534794, 0.173204, 0.058232
 bound `certified_gap_bound`; the exact rational chain gives $\Delta_L > 0.534267, 0.173082,
 0.058177$). Each certificate is a core `GapCertificates.certify_gap` certificate of the chain in a
 sublattice-rotated frame (exact RP identity, verified spectra, both bounds). On the grid
-$\delta \in \{1/2, 3/10, 1/4, 1/5, 3/20, 1/10\}$, $\delta = 1/4$ is the smallest dimerization
-certifiable from rings of at most $16$ spins: at $\delta \in \{1/5, 3/20, 1/10\}$,
+$`\delta \in \{1/2, 3/10, 1/4, 1/5, 3/20, 1/10\}`$, $\delta = 1/4$ is the smallest dimerization
+certifiable from rings of at most $16$ spins: at $`\delta \in \{1/5, 3/20, 1/10\}`$,
 continuous-$\beta$ interval covers prove that **every** $\beta_0 > 0$ fails the doubling
 recurrence at both even seed lengths $n_0 = 2$ and $n_0 = 4$ cells.
 
@@ -22,19 +22,23 @@ recurrence at both even seed lengths $n_0 = 2$ and $n_0 = 4$ cells.
 
 A periodic ring of $N = 2L$ spin-1/2 sites grouped into $L$ two-spin unit cells (strong dimers),
 with bond strength $1 + \delta$ inside each cell and $1 - \delta$ between adjacent cells:
-$$H_L = (1 + \delta) \sum_{j=1}^L \mathbf{S}_{2j-1} \cdot \mathbf{S}_{2j}
+```math
+H_L = (1 + \delta) \sum_{j=1}^L \mathbf{S}_{2j-1} \cdot \mathbf{S}_{2j}
       + (1 - \delta) \sum_{j=1}^L \mathbf{S}_{2j} \cdot \mathbf{S}_{2j+1}, \qquad
-\mathbf{S}_m = \frac{1}{2}\boldsymbol{\sigma}_m.$$
+\mathbf{S}_m = \frac{1}{2}\boldsymbol{\sigma}_m.
+```
 Lengths $L$ and $n_0$ count two-spin cells.
 
 **Certified frame.** Rotating the second spin of every cell by $J = 2iS^y =
-\begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}$, i.e. $U = (I \otimes J)^{\otimes L}$,
+\begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}$`, i.e. `$U = (I \otimes J)^{\otimes L}$,
 gives $U^\top H_L U = \sum_j h_{j,j+1} + \sum_j o_j$ (the same spectrum) with
-$$o = (1 + \delta)(-S^xS^x + S^yS^y - S^zS^z), \qquad
-h = (1 - \delta)\, I \otimes (-S^xS^x + S^yS^y - S^zS^z) \otimes I,$$
+```math
+o = (1 + \delta)(-S^xS^x + S^yS^y - S^zS^z), \qquad
+h = (1 - \delta)\, I \otimes (-S^xS^x + S^yS^y - S^zS^z) \otimes I,
+```
 both real rational $4 \times 4$ and $16 \times 16$ matrices on the cell basis
 $|{\uparrow\uparrow}\rangle, |{\uparrow\downarrow}\rangle, |{\downarrow\uparrow}\rangle,
-|{\downarrow\downarrow}\rangle$. In this frame the cell charge $z_a - z_b = [0, 1, -1, 0]$ is
+|{\downarrow\downarrow}\rangle$`. In this frame the cell charge `$z_a - z_b = [0, 1, -1, 0]$ is
 conserved and reversed by the cell spin flip $\sigma^x \otimes \sigma^x$. `rotated_model(δ)` in
 `src/DimerizedHeisenberg.jl` is this core `RingModel(4, h, o; charge, flip)`, and
 `frame_identity(δ)` checks exactly that $W = I \otimes J$ is orthogonal and maps the physical
@@ -43,9 +47,11 @@ cross-checked against a `Float64` solver of the physical chain in the tests).
 
 ## Reflection positivity
 
-With $F$ the swap of the two spins of a cell and $P_\alpha \in \{S^x, iS^y, S^z\}$ (real),
-$$-h = (1 - \delta) \sum_\alpha C_\alpha \otimes F\, \overline{C_\alpha}\, F, \qquad
-C_\alpha = I \otimes P_\alpha, \qquad F o F = o,$$
+With $F$ the swap of the two spins of a cell and $`P_\alpha \in \{S^x, iS^y, S^z\}`$ (real),
+```math
+-h = (1 - \delta) \sum_\alpha C_\alpha \otimes F\, \overline{C_\alpha}\, F, \qquad
+C_\alpha = I \otimes P_\alpha, \qquad F o F = o,
+```
 the reflected form of `notes/thermal-mpo-gap-scope.tex` (Appendix E) and of the Lean structure
 `RPRing` (this is the frame of `lean/CertifiedGaps/Models/DimerizedHeisenberg.lean`).
 `rotated_rp(δ)` builds it with the core `rp_certificate(...; reflection = F)`; every certificate
@@ -83,11 +89,11 @@ $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) \le (0.01133, 0.01224), (0.09516, 
 
 With the largest ring capped at $16$ spins, the only even seed lengths are $n_0 = 2$ and
 $n_0 = 4$ cells. For $n_0 = 2$ at all six $\delta$ values and for $n_0 = 4$ at
-$\delta \in \{1/5, 3/20, 1/10\}$, `negative_cover` proves from the core's verified spectra that
+$`\delta \in \{1/5, 3/20, 1/10\}`$, `negative_cover` proves from the core's verified spectra that
 the doubling recurrence fails for **every** $\beta_0 > 0$:
 1. monotonicity of $P_\tau(2n_0, \beta)$ excludes $0 < \beta_0 \le 1$ once
    $P_\tau(2n_0, 1) \le 1/2$;
-2. a positive ground-energy defect $d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0$
+2. a positive ground-energy defect $`d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0`$
    implies $P_{\mathrm{s}}(n_0, \beta) \le 2^{4n_0} e^{-\beta d_E} \le 1/2$ for all $\beta_0 \ge B$;
 3. the interval $[1, B]$ is covered by $6\text{--}12$ rigorous boxes (core
    `shifted_log_partition` with an interval $\beta$), on each of which lower bounds on both
@@ -103,7 +109,7 @@ The scripts `scripts/numerical_scan.jl` (complete `Float64` spectra up to 16 spi
 sectors using 40 Krylov Ritz values in large blocks, `results/diagnostic20_summary.json`) provide
 numerical diagnostics across all six $\delta$ values:
 
-| $\delta$ | $\Delta_{20}$ (numerical) | $\xi_{\mathrm{eff}}$ (cells) | $\xi_{\mathrm{eff}}\,\delta^{2/3}$ | Estimated even $n_0$ by $\delta^{-2/3}$ scaling |
+| $\delta$ | $\Delta_{20}$ (numerical) | $\xi_{\mathrm{eff}}$ (cells) | $`\xi_{\mathrm{eff}}\,\delta^{2/3}`$ | Estimated even $n_0$ by $\delta^{-2/3}$ scaling |
 |---|---:|---:|---:|---:|
 | $1/2$ | $1.188631$ | $0.5624$ | $0.3543$ | $4$ |
 | $3/10$ | $0.810214$ | $0.8448$ | $0.3786$ | $4$ |
@@ -217,8 +223,8 @@ enclosure (component-maximum $\gamma_{4d+16}$ witnesses), the local $\log Z$, an
 record format; the six `seed_delta_*.json.gz` files and `certificate.json` were replaced by four
 core certificates and `summary.json`. Old → new, at the same seeds: $\varepsilon_{\mathrm{s}}$ and
 $\varepsilon_\tau$ decreased at every seed (e.g. $\delta = 1/2$: $0.011267, 0.012008 \to
-0.0112652, 0.0120046$) and the interval bound rose ($0.534756, 0.173197, 0.058225 \to 0.534794,
-0.173204, 0.058232$; survey $0.533681 \to 0.533722$); the exact rational chain now stored as
+0.0112652, 0.0120046$`) and the interval bound rose (`$0.534756, 0.173197, 0.058225 \to 0.534794,
+0.173204, 0.058232$`; survey `$0.533681 \to 0.533722$); the exact rational chain now stored as
 well gives $0.534267, 0.173082, 0.058177$ (survey $0.533215$). The exclusion covers have the
 same box counts. The 20-spin diagnostic now takes its 8/16-spin ground energies from the
 `Float64` solver instead of the old seed files.

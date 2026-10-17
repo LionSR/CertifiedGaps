@@ -1,0 +1,17 @@
+<!-- MathJax 3 for pages with `usemathjax: true` (the leanblueprint template's MathJax 2 CDN,
+     cdn.mathjax.org, was retired). Kramdown turns $$...$$ in Markdown into \(...\) and \[...\];
+     HTML pages such as the leaderboard write $...$ directly. -->
+{% if page.usemathjax %}
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true,
+      tags: 'ams'
+    },
+    options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+  };
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-chtml.js"></script>
+{% endif %}

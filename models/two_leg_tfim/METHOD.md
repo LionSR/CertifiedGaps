@@ -1,22 +1,26 @@
 # Two-leg transverse-field Ising ladder: verification method and results
 
-**Headline result:** $g = 3$ is the smallest certified transverse field on the tested grid $g \in \{2, 5/2, 3, 4\}$. The seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636870831$ (interval bound; exact chain bound $\Delta_L > 0.636342881$) and a unique ground state for every even $L \ge 4$ rungs ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ passes the numerical scan but was not run through full verification since $g = 3$ already succeeds.
+**Headline result:** $g = 3$ is the smallest certified transverse field on the tested grid $`g \in \{2, 5/2, 3, 4\}`$. The seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636870831$ (interval bound; exact chain bound $\Delta_L > 0.636342881$) and a unique ground state for every even $L \ge 4$ rungs ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ passes the numerical scan but was not run through full verification since $g = 3$ already succeeds.
 
 ## Model and scope
 
 Each unit cell is a two-spin rung ($d = 4$). In Pauli normalization on a periodic ring of $L$ rungs,
 
-$$H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).$$
+```math
+H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).
+```
 
 The $L = 2$ ring includes both periodic leg bonds, following the core package convention. For every $g > 0$, the off-diagonal terms in the $\sigma^z$ basis form a connected hypercube graph with negative edge weights $-g$, so Perron–Frobenius applied to $cI - H_L$ guarantees a unique ground state on every finite ring (while the two-purity doubling criterion establishes the uniform infinite-volume gap and ground-state uniqueness).
 
-In this Pauli normalization, DMRG finite-size scaling by Xavier, Pereira, Nunes, and Plascak ([arXiv:2111.11404](https://arxiv.org/abs/2111.11404), Eq. (1) and Table I with $J_\perp^x = 0$, $J_\perp^z = 1$, $J_4 = 0$) locates the quantum critical point at $g_c = 1.83214(5)$, placing all four tested fields $g \in \{2, 5/2, 3, 4\}$ in the gapped paramagnetic phase. This literature value is used only for physical context and never enters the certificate.
+In this Pauli normalization, DMRG finite-size scaling by Xavier, Pereira, Nunes, and Plascak ([arXiv:2111.11404](https://arxiv.org/abs/2111.11404), Eq. (1) and Table I with $J_\perp^x = 0$, $J_\perp^z = 1$, $J_4 = 0$) locates the quantum critical point at $g_c = 1.83214(5)$, placing all four tested fields $`g \in \{2, 5/2, 3, 4\}`$ in the gapped paramagnetic phase. This literature value is used only for physical context and never enters the certificate.
 
 ## Exact frame, reflection positivity and symmetry decomposition
 
-In the real $\sigma^z$ cell basis $(\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow)$ with $Z = \operatorname{diag}(1, -1)$ and $X = \bigl(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\bigr)$, the physical bond satisfies $-h = (Z \otimes I) \otimes (Z \otimes I) + (I \otimes Z) \otimes (I \otimes Z)$ with a real symmetric on-site rung operator $o = -Z \otimes Z - g(X \otimes I + I \otimes X)$; this is the form of the Lean model. The transverse field is not diagonal in this basis, so the certificate uses the rotated frame of a Hadamard gate on every spin: $W = (H \otimes H)/2$ with $H = \bigl(\begin{smallmatrix}1&1\\1&-1\end{smallmatrix}\bigr)$ is an exact rational orthogonal involution on a rung with $W X W = Z$ spin by spin. The rotated ladder `Ladder.ladder(g)` has
+In the real $\sigma^z$ cell basis $(\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow)$ with $Z = \mathrm{diag}(1, -1)$ and $`X = \bigl(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\bigr)`$, the physical bond satisfies $-h = (Z \otimes I) \otimes (Z \otimes I) + (I \otimes Z) \otimes (I \otimes Z)$ with a real symmetric on-site rung operator $o = -Z \otimes Z - g(X \otimes I + I \otimes X)$; this is the form of the Lean model. The transverse field is not diagonal in this basis, so the certificate uses the rotated frame of a Hadamard gate on every spin: $W = (H \otimes H)/2$ with $`H = \bigl(\begin{smallmatrix}1&1\\1&-1\end{smallmatrix}\bigr)`$ is an exact rational orthogonal involution on a rung with $W X W = Z$ spin by spin. The rotated ladder `Ladder.ladder(g)` has
 
-$$h = -(X_a X_{a'} + X_b X_{b'}), \qquad o = -X_a X_b - g (Z_a + Z_b), \qquad -h = C_1 \otimes C_1 + C_2 \otimes C_2,\quad C_1 = X \otimes I,\ C_2 = I \otimes X,$$
+```math
+h = -(X_a X_{a'} + X_b X_{b'}), \qquad o = -X_a X_b - g (Z_a + Z_b), \qquad -h = C_1 \otimes C_1 + C_2 \otimes C_2,\quad C_1 = X \otimes I,\ C_2 = I \otimes X,
+```
 
 so it is reflection positive with real factors and $F = I$. The tests check both frame identities and both RP identities over `Rational{BigInt}`; the core `verify_rp` checks the rotated one again inside `certify_gap` and `check_certificate`.
 
@@ -28,7 +32,7 @@ Every block goes through `CertifiedGaps.VerifiedSpectra.verified_eigen`: with LA
 
 ## Validation
 
-- **Fast checker (`check.jl` / `test/runtests.jl`):** exact frame and RP identities at $g \in \{2, 5/2, 3, 4\}$; core blocks against independent dense ED for $L = 2, 3, 4$ (verified radii $< 10^{-9}$); for each stored certificate, the decoded model equals `Ladder.ladder(g)` (including charge and symmetry), the seed is the listed one, `check_certificate(cert; spectra = false)` re-verifies the RP identity and reproduces the exact chain bound, `certified_gap_bound` reproduces `interval_bound_decimal`, the defects satisfy the Lean seed hypotheses, and `verify_model_metadata` checks the model-local source hashes.
+- **Fast checker (`check.jl` / `test/runtests.jl`):** exact frame and RP identities at $`g \in \{2, 5/2, 3, 4\}`$; core blocks against independent dense ED for $L = 2, 3, 4$ (verified radii $< 10^{-9}$); for each stored certificate, the decoded model equals `Ladder.ladder(g)` (including charge and symmetry), the seed is the listed one, `check_certificate(cert; spectra = false)` re-verifies the RP identity and reproduces the exact chain bound, `certified_gap_bound` reproduces `interval_bound_decimal`, the defects satisfy the Lean seed hypotheses, and `verify_model_metadata` checks the model-local source hashes.
 - **Full check (`check.jl --full`):** `check_certificate(cert; spectra = true)` recomputes every block spectrum of the 4- and 8-rung rings from the stored model and requires the fresh defect upper ends to be at most the stored seeds.
 - **Cross-check without the leg-exchange symmetry:** a run of `certify_gap` with charge and momentum blocks only (10 blocks of dimension about 4100 at 8 rungs, 971 s) gave $\varepsilon_{\mathrm{s}} \le 0.112389884123893$, $\varepsilon_\tau \le 0.051537141979371$ and interval bound $0.6368651924843131$, consistent with the certified values.
 

@@ -20,7 +20,9 @@ the route memo is in [`IDEAS.md`](IDEAS.md).
 
 We consider the periodic spin-1/2 antiferromagnetic Heisenberg chain in a staggered longitudinal
 magnetic field $h$:
-$$H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z, \qquad \mathbf{S}_{L+1} \equiv \mathbf{S}_1,$$
+```math
+H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z, \qquad \mathbf{S}_{L+1} \equiv \mathbf{S}_1,
+```
 with unit exchange coupling and $\mathbf{S}_j = \frac{1}{2}\boldsymbol{\sigma}_j$. The two-site
 ring ($L = 2$) includes both bonds $(1, 2)$ and $(2, 1)$, as in the core convention. The field
 has a two-site period. After the sublattice rotation below, the Hamiltonian is translation
@@ -33,14 +35,16 @@ count sites.
 $Z = S^z$ be the exact rational matrices, and let $U = 2G_y = e^{i\pi S^y}$. The exact unitary
 $V_L = \bigotimes_{j\ \mathrm{odd}} U_j$ (a $\pi$ rotation about $y$ on every odd site) maps
 $H_L$ to the one-site ring
-$$V_L H_L V_L^\dagger = \sum_j h_{j,j+1} + \sum_j o_j, \qquad h = -(X \otimes X + G_y \otimes G_y + Z \otimes Z), \qquad o = -hZ,$$
+```math
+V_L H_L V_L^\dagger = \sum_j h_{j,j+1} + \sum_j o_j, \qquad h = -(X \otimes X + G_y \otimes G_y + Z \otimes Z), \qquad o = -hZ,
+```
 because $U$ negates $S^x$ and $S^z$ and fixes $G_y$, and because
 $S^y \otimes S^y = -G_y \otimes G_y$.
 This is `site_model(h)`, the model stored in every certificate.
 `test/runtests.jl` checks $V_L H_L V_L^\dagger$ exactly against the stored model's ring
 Hamiltonian for $L = 2, 4, 6$ and every field.
 
-**RP identity.** $-h = \sum_{C \in \{X, G_y, Z\}} C \otimes \overline{C}$ with real $C$, and
+**RP identity.** $`-h = \sum_{C \in \{X, G_y, Z\}} C \otimes \overline{C}`$ with real $C$, and
 $o = -hZ$ is real and symmetric (`site_rp(h)`). The core verifies it exactly
 (`RingModels.verify_rp`) when certifying and again in `check_certificate`.
 

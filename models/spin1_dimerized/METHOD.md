@@ -1,7 +1,7 @@
 # Spin-1 dimerized ring: uniform-gap certificate
 
 The smallest certified dimerization on the five-point grid
-$\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}$ within a 6-cell ($12$-spin) ring ceiling is
+$`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$ within a 6-cell ($12$-spin) ring ceiling is
 **$\delta = 7/10$**. At the odd seed $(n_0, \beta_0) = (3\text{ cells}, 17/4)$ the core pipeline
 gives the interval bound **$\Delta_L \ge 0.218793170$** (exact rational chain bound
 $\Delta_L > 0.218606834$) and a unique ground state for every even $L \ge 3$ cells, from
@@ -10,7 +10,7 @@ $\varepsilon_{\mathrm{s}} = 117195722398365/10^{15}$ and $\varepsilon_\tau = 483
 **$\Delta_L \ge 0.528802288$** (chain $0.528349759$) for every even $L \ge 2$ cells
 (`results/certificate_d9.json`).
 
-At $\delta = 7/10$ the bound is $17.28\%$ of the 12-spin numerical reference gap
+At $\delta = 7/10$ the bound is $`17.28\%`$ of the 12-spin numerical reference gap
 ($1.2659290109040136$); the core enclosure of the 6-cell ring took $6512$ s ($109$ min).
 Across all five grid points, numerical scans were completed through $L = 6$ cells ($12$
 spins); at $\delta = 3/5$ and $1/2$, admissible seeds require larger rings than $6$ cells.
@@ -18,14 +18,16 @@ spins); at $\delta = 3/5$ and $1/2$, admissible seeds require larger rings than 
 ## Model, lengths, and scope
 
 We consider the periodic spin-1 chain
-$$H_L = \sum_{j=1}^{2L} \left[1 + (-1)^j \delta\right] \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 2I,$$
+```math
+H_L = \sum_{j=1}^{2L} \left[1 + (-1)^j \delta\right] \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 2I,
+```
 with two spins per unit cell (local cell dimension $3^2 = 9$) and
-$\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}$. A ring of $L$ cells contains $N = 2L$ spins. Computing
-ring spectra at $L \in \{2, 3, 4, 6\}$ cells supports seed sizes $n_0 = 2$ (using $L = 2, 4$) and
+$`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$. A ring of $L$ cells contains $N = 2L$ spins. Computing
+ring spectra at $`L \in \{2, 3, 4, 6\}`$ cells supports seed sizes $n_0 = 2$ (using $L = 2, 4$) and
 $n_0 = 3$ (using $L = 3, 6$), since certifying $P_\tau(2n_0, \beta_0)$ requires the doubled ring
 $2n_0$.
 
-Candidate inverse temperatures $\beta_0 \in \{1/4, 1/2, \dots, 32\}$ are screened numerically using
+Candidate inverse temperatures $`\beta_0 \in \{1/4, 1/2, \dots, 32\}`$ are screened numerically using
 `Seeds.scan_seeds` and `Seeds.best_seed`, and the selected $(n_0, \beta_0)$ seeds at $\delta = 9/10$
 and $\delta = 7/10$ are then certified with verified full-spectrum eigenvalue enclosures and exact
 rational defect bounds in `results/certificate_d9.json` and `results/certificate_d7.json`.
@@ -34,19 +36,25 @@ rational defect bounds in `results/certificate_d9.json` and `results/certificate
 
 In the Cartesian spin-1 basis, define the real, integer antisymmetric matrices $G_\alpha = i S^\alpha$
 ($S^\alpha = -i G_\alpha$):
-$$G_x = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{pmatrix}, \qquad
+```math
+G_x = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{pmatrix}, \qquad
 G_y = \begin{pmatrix} 0 & 0 & -1 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \qquad
-G_z = \begin{pmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.$$
+G_z = \begin{pmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.
+```
 The module `src/rp.jl` verifies in exact integer arithmetic that $[S^x, S^y] = i S^z$,
-$\sum_\alpha (S^\alpha)^2 = 2I$, and that for any coupling $c \in \{1 - \delta, 1 + \delta\} > 0$,
-$$-c\,\mathbf{S}_i \cdot \mathbf{S}_j = c \sum_{\alpha \in \{x,y,z\}} G_\alpha \otimes G_\alpha.$$
+$\sum_\alpha (S^\alpha)^2 = 2I$, and that for any coupling $`c \in \{1 - \delta, 1 + \delta\} > 0`$,
+```math
+-c\,\mathbf{S}_i \cdot \mathbf{S}_j = c \sum_{\alpha \in \{x,y,z\}} G_\alpha \otimes G_\alpha.
+```
 Inside a two-spin cell $(a, b)$ joined by the weak bond $1 - \delta$, the on-site cell operator
 $o = -(1 - \delta)\sum_\alpha G_\alpha \otimes G_\alpha$ is real symmetric. Let $F = P$ be the
 two-site swap operator inside the cell and $\Theta(\cdot) = F \overline{(\cdot)} F$. Setting
 $A_\alpha = I \otimes G_\alpha$ and $B_\alpha = G_\alpha \otimes I$, the strong inter-cell bond
 satisfies the exact $81 \times 81$ identity
-$$-h_{\mathrm{inter}} = (1 + \delta) \sum_{\alpha \in \{x,y,z\}} A_\alpha \otimes \Theta(A_\alpha), \qquad
-\Theta(A_\alpha) = F \overline{A_\alpha} F = B_\alpha, \qquad \Theta(o) = o.$$
+```math
+-h_{\mathrm{inter}} = (1 + \delta) \sum_{\alpha \in \{x,y,z\}} A_\alpha \otimes \Theta(A_\alpha), \qquad
+\Theta(A_\alpha) = F \overline{A_\alpha} F = B_\alpha, \qquad \Theta(o) = o.
+```
 
 ### Why the odd seed $n_0 = 3$ cells is valid ($X_\beta = K K^* \ge 0$)
 
@@ -62,10 +70,12 @@ spin-1 chain in the Cartesian basis, $X_\beta$ is in fact **positive semidefinit
   ($1 - \delta > 0$) and strong ($1 + \delta > 0$) bonds, respectively. Cutting the ring at the
   strong bonds and integrating out the internal weak-bond history $u$ inside each two-spin cell
   yields the cell transfer kernel on $L^2(\mu_+)$:
-  $$X_\beta(a, b) = \int F_{\mathrm{site}}(a, u)\,F_{\mathrm{site}}(u, b)\,d\mu_-(u) = (K K^*)(a, b),$$
+  ```math
+  X_\beta(a, b) = \int F_{\mathrm{site}}(a, u)\,F_{\mathrm{site}}(u, b)\,d\mu_-(u) = (K K^*)(a, b),
+  ```
   where $K : L^2(\mu_-) \to L^2(\mu_+)$ is the Hilbert–Schmidt integral operator with kernel
   $F_{\mathrm{site}}$.
-- Consequently, $X_\beta = K K^*$ is positive trace-class and $Z_L(\beta) = \operatorname{Tr}(X_\beta^L)$
+- Consequently, $X_\beta = K K^*$ is positive trace-class and $Z_L(\beta) = \mathrm{Tr}(X_\beta^L)$
   for every integer $L \ge 1$, with nonnegative transfer eigenvalues $\lambda_i(\beta) \ge 0$.
   Because the only steps in the two-purity doubling proof that use even $n_0$ are the positivity of
   $X_\beta^{n_0}$ (so that $X_\beta^{n_0} / Z_{n_0}(\beta)$ is a density operator) and the
@@ -79,7 +89,7 @@ The certificates `results/certificate_d9.json` and `results/certificate_d7.json`
 `RingModel` of `src/DimerizedCertificate.jl` (`dimerized(δ)`), in the rotated $S^z$ frame
 $U = \prod_{\text{cells}} (1 \otimes V)$, $V = e^{-i\pi S^y}$, described in `README.md`:
 
-- **Exact model.** With $X' = \sqrt2 S^x$, $A' = \sqrt2\,iS^y$ and $S^z$ integer matrices,
+- **Exact model.** With $X' = \sqrt2 S^x$, $`A' = \sqrt2\,iS^y`$ and $S^z$ integer matrices,
   $U (J\,\mathbf{S}_i\cdot\mathbf{S}_j) U^\dagger
   = -J(\tfrac12 X'\otimes X' + \tfrac12 A'\otimes A' + S^z\otimes S^z)$
   for every bond, since $V$ reverses $S^x$ and $S^z$ and keeps $S^y$. The on-site term is this
@@ -105,7 +115,7 @@ $U = \prod_{\text{cells}} (1 \otimes V)$, $V = e^{-i\pi S^y}$, described in `REA
 ## Former local pipeline
 
 Until 2026-10 both certificates came from a local pipeline (removed; in the git history of this
-directory). It used the physical $S^z$ basis, where $\mathrm{den}(\delta)\,H_L$ is an integer
+directory). It used the physical $S^z$ basis, where $`\mathrm{den}(\delta)\,H_L`$ is an integer
 matrix, and split the 6-cell ring by $S^z$, spin-flip parity, cell momentum and site reversal
 into 79 real blocks (maximum dimension $11{,}596$) with exact integer dihedral character
 projectors on every orbit. Each block was enclosed by a local polar-factor/Weyl bound with

@@ -1,0 +1,106 @@
+---
+---
+
+/* In this file you can add css rules overriding rules defined by your Jekyll theme.  */
+
+/* Import the CSS from the specified theme */
+@import "{{ site.theme }}";
+
+/* Put your rules below this line */
+
+$muted: #4d5560;
+$link: #1e6bb8;
+$lean: #155a3a;
+$cert: #1f4f8b;
+
+/* Header: small navigation buttons on one line on desktop, wrapping on phones; inner pages get
+   a short header (class `compact`, set by the layout). */
+.page-header .btn {
+  display: inline-block;
+  width: auto;
+  margin: 0.15rem 0.1rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+.page-header.compact { padding: 1.25rem 1rem 1rem; }
+.page-header.compact .project-name { font-size: 1.6rem; margin-bottom: 0.2rem; }
+.page-header.compact .project-tagline { font-size: 0.95rem; margin-bottom: 0.6rem; opacity: 0.85; }
+.main-content.wide { max-width: 80rem; }
+
+.muted { color: $muted; }
+html:not(.js) .jsonly { display: none; }
+
+/* Tables scroll inside their own container, so the page never scrolls sideways on a phone. */
+.table-wrap { overflow-x: auto; margin-bottom: 1rem; }
+.main-content .table-wrap table { display: table; width: max-content; min-width: 100%; margin-bottom: 0; }
+.main-content .table-wrap th, .main-content .table-wrap td { padding: 0.35rem 0.6rem; vertical-align: top; }
+.main-content td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Tiers: the glyph and the label carry the meaning; color only reinforces it. */
+.tier {
+  display: inline-block; padding: 0 0.4em; border: 1.5px solid; border-radius: 0.3em;
+  font-size: 0.8em; white-space: nowrap; line-height: 1.5;
+}
+.tier-lean-unconditional { background: $lean; border-color: $lean; color: #fff; }
+.tier-lean-conditional { background: #e6f2ec; border-color: $lean; color: #0f4229; }
+.tier-certified { background: #e8eef7; border-color: $cert; color: #173c69; }
+.tier-lean-unavailable { background: #f3f3f3; border-style: dashed; border-color: #777; color: #333; }
+.glyph-lean-unconditional, .glyph-lean-conditional { color: $lean; fill: $lean; }
+.glyph-certified { color: $cert; fill: $cert; }
+.key .tier { margin: 0.1rem 0.2rem 0.1rem 0; }
+dl.tiers dt { margin-top: 0.8rem; }
+dl.tiers dd { margin-left: 1.5rem; }
+
+nav.tabs { position: sticky; top: 0; z-index: 2; background: #fff; padding: 0.4rem 0; border-bottom: 1px solid #e1e4e8; }
+nav.tabs a { display: inline-block; margin-right: 1rem; font-size: 0.9rem; }
+section[id] { scroll-margin-top: 3rem; }
+
+/* Highlights: three small panels side by side, stacked on phones. */
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.panel { border: 1px solid #e1e4e8; border-radius: 0.4rem; padding: 0.6rem 0.9rem; font-size: 0.9rem; }
+.panel h3 { font-size: 1rem; margin: 0.2rem 0 0.5rem; }
+.panel ol { padding-left: 1.3rem; margin: 0; }
+.panel p { margin: 0.3rem 0; }
+
+/* Leaderboard controls and table. */
+#board-controls input { box-sizing: border-box; width: 100%; max-width: 24rem; padding: 0.35rem 0.5rem; margin-bottom: 0.5rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.5rem; }
+.chip { border: 1px solid #c8ccd1; background: #fff; border-radius: 1rem; padding: 0.15rem 0.7rem; font-size: 0.85rem; cursor: pointer; }
+.chip.on { background: $cert; border-color: $cert; color: #fff; }
+table.board button.sort { background: none; border: 0; font: inherit; font-weight: bold; color: inherit; cursor: pointer; padding: 0; text-align: left; }
+table.board button.more { background: none; border: 0; color: $link; cursor: pointer; font-size: 0.85rem; }
+table.board tr.open td { background: #f6f8fa; }
+table.board tr.detail-row td { background: #f6f8fa; white-space: normal; }
+.detail { max-width: 46rem; font-size: 0.9rem; }
+.detail p { margin: 0.3rem 0; }
+.detail code { word-break: break-all; }
+.bar { position: relative; display: inline-flex; align-items: center; width: 8rem; height: 1.2rem; background: #eef1f4; border-radius: 0.2rem; vertical-align: middle; }
+.bar .fill { position: absolute; left: 0; top: 0; bottom: 0; background: #9db6d8; border-radius: 0.2rem; }
+.bar .label { position: relative; padding-left: 0.3rem; font-size: 0.8rem; line-height: 1.2rem; font-variant-numeric: tabular-nums; }
+table.board th { max-width: 9rem; white-space: normal; vertical-align: bottom; }
+.family-head { font-size: 0.9rem; color: $muted; }
+table.grid td.num a { text-decoration: none; }
+a.button { display: inline-block; border: 1px solid $link; border-radius: 0.3rem; padding: 0.15rem 0.6rem; font-size: 0.85rem; }
+
+/* Open challenges. */
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 0.8rem; margin-bottom: 1rem; }
+.card { border: 1px solid #e1e4e8; border-radius: 0.4rem; padding: 0.5rem 0.8rem; font-size: 0.88rem; }
+.card h4 { font-size: 0.95rem; margin: 0.2rem 0 0.4rem; }
+.card p { margin: 0.3rem 0; }
+#challenges h3 { font-size: 1.05rem; }
+
+/* Timeline chart: faint grid, labeled axes, one step line in the text color. */
+svg.timeline { width: 100%; max-width: 44rem; height: auto; }
+svg.timeline .grid { stroke: #e1e4e8; }
+svg.timeline .tick, svg.timeline .axis, svg.timeline .endlabel { font-size: 11px; fill: $muted; }
+svg.timeline .axis { font-size: 12px; }
+svg.timeline .endlabel { fill: #24292e; font-weight: bold; }
+svg.timeline .step { fill: none; stroke: #24292e; stroke-width: 2; }
+svg.timeline .pt { stroke: #fff; stroke-width: 2; }
+
+/* Home page news. */
+ul.news { list-style: none; padding-left: 0; }
+ul.news li { margin: 0.25rem 0; }
+ul.news .date { color: $muted; font-variant-numeric: tabular-nums; margin-right: 0.5rem; }
+ul.news .new { font-size: 0.75rem; border: 1px solid $lean; color: $lean; border-radius: 0.3rem; padding: 0 0.3rem; margin-left: 0.3rem; }
+ol.references { font-size: 0.9rem; }

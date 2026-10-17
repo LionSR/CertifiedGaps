@@ -6,7 +6,7 @@ certificates for the spin-1/2 Heisenberg chain in a staggered longitudinal field
 
 ## Outcome and scope
 
-All five target staggered fields $h \in \{1, 3/4, 1/2, 7/20, 1/4\}$ are certified from complete
+All five target staggered fields $`h \in \{1, 3/4, 1/2, 7/20, 1/4\}`$ are certified from complete
 verified 8- and 16-site ring spectra at seed length $n_0 = 8$. The alternating sublattice rotation
 gives a homogeneous reflection-positive ring with a one-spin unit cell on every even ring length.
 The gap bounds therefore apply to **every even chain length $L \ge 8$ sites**, establishing both
@@ -20,17 +20,23 @@ reported below as non-certified benchmarks.
 ## Model, frame, and exact RP identity
 
 We consider the periodic spin-1/2 chain
-$$H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z,$$
+```math
+H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z,
+```
 where the $L = 2$ ring includes both periodic bonds. Define the exact rational spin-1/2 matrices
-$$X = S^x = \begin{pmatrix} 0 & 1/2 \\ 1/2 & 0 \end{pmatrix}, \qquad
+```math
+X = S^x = \begin{pmatrix} 0 & 1/2 \\ 1/2 & 0 \end{pmatrix}, \qquad
 G_y = i S^y = \begin{pmatrix} 0 & 1/2 \\ -1/2 & 0 \end{pmatrix}, \qquad
-Z = S^z = \begin{pmatrix} 1/2 & 0 \\ 0 & -1/2 \end{pmatrix}, \qquad U = 2G_y.$$
+Z = S^z = \begin{pmatrix} 1/2 & 0 \\ 0 & -1/2 \end{pmatrix}, \qquad U = 2G_y.
+```
 (In `src/common.jl`, $G_y$ is denoted `J`.) The physical bond is
 $\mathbf{S} \cdot \mathbf{S} = X \otimes X - G_y \otimes G_y + Z \otimes Z$. Rotating every odd site
 by the real orthogonal $U$ (a $\pi$ rotation about $y$, $UXU^\top = -X$, $UG_yU^\top = G_y$,
 $UZU^\top = -Z$) turns both bond orientations into
-$$h_{\mathrm{rot}} = -(X \otimes X + G_y \otimes G_y + Z \otimes Z), \qquad
--h_{\mathrm{rot}} = \sum_{C \in \{X, G_y, Z\}} C \otimes \overline{C},$$
+```math
+h_{\mathrm{rot}} = -(X \otimes X + G_y \otimes G_y + Z \otimes Z), \qquad
+-h_{\mathrm{rot}} = \sum_{C \in \{X, G_y, Z\}} C \otimes \overline{C},
+```
 and the staggered field into the uniform real on-site term $o = -hZ$. The bond factors are real,
 which is all that reflection positivity with $F = I$ requires; the antisymmetry of $G_y$ is
 allowed. `test/runtests.jl` checks
@@ -43,7 +49,7 @@ The core verifies the RP identity exactly (`RingModels.verify_rp`).
 The one-site rotated ring conserves only the $S^z$ parity, since its bond contains
 $X \otimes X + G_y \otimes G_y = (S^+S^+ + S^-S^-)/2$. In two-site cells $(a, b)$, this term flips
 both spins of a pair together: $(a, b)$ inside a cell, or $(b, a')$ across neighboring cells. The
-cell charge $q = S^z_a - S^z_b \in \{0, 1, -1, 0\}$ is therefore an exactly conserved U(1)
+cell charge $`q = S^z_a - S^z_b \in \{0, 1, -1, 0\}`$ is therefore an exactly conserved U(1)
 charge. It equals minus the physical magnetization of the cell. The core option
 `blocking = (; cell = 2, charge = [0, 1, -1, 0])` builds the exact cell model
 (`RingModels.cell_model`: on-site term $h_{ab} + o_a + o_b$, bond between $b$ and the next $a$),
@@ -115,7 +121,7 @@ are exploratory numerical estimates:
 At $n_0 \le 10$, the sampled $\beta_0$ grid finds an admissible seed at $h = 3/20 = 0.15$ and none
 at $h = 1/10 = 0.10$. The table below records $\max_\beta \min(P_{\mathrm{s}}(n_0, \beta), P_\tau(2n_0, \beta))$
 and the ground-state spatial energy defect $\delta(n_0) = E_0(2n_0) - 2E_0(n_0)$ across all scanned
-fields and seed lengths $n_0 \in \{2, 4, 6, 8, 10\}$:
+fields and seed lengths $`n_0 \in \{2, 4, 6, 8, 10\}`$:
 
 | $h$ | $n_0$ | $\max_\beta \min(P_{\mathrm{s}}, P_\tau)$ | $\delta(n_0) = E_0(2n_0) - 2E_0(n_0)$ |
 |---|---:|---:|---:|
@@ -178,7 +184,7 @@ scaling locus $n_0(h) \approx 8 h^{-2/3}$ and $\beta_0(h) \approx 5.25 h^{-2/3}$
 Because the admissible region allows seed defects up to $\approx 0.12731$ (whereas the $h = 1$ seed
 has defects $\sim 7 \times 10^{-4}$), $n_0 = 8$ remains sufficient all the way down to $h = 1/4$,
 with the certified bound-to-ED-gap ratio decreasing from $0.613$ at $h = 1$ to $0.264$ at $h = 1/4$.
-At $h = 1/10$, fitting $\log \delta(n_0) \approx 0.19944 - 0.36810 n_0$ over $n_0 \in \{6, 8, 10\}$
+At $h = 1/10$, fitting $\log \delta(n_0) \approx 0.19944 - 0.36810 n_0$ over $`n_0 \in \{6, 8, 10\}`$
 gives a decay scale of $2.72$ sites and predicts a first admissible seed near
 $(n_0, \beta_0) \approx (14, 17.0)$ (requiring a 28-site doubled ring).
 
@@ -188,7 +194,7 @@ $(n_0, \beta_0) \approx (14, 17.0)$ (requiring a 28-site doubled ring).
 The five certificates were first produced by a model-local pipeline in the physical frame. It
 built $(S^z, k)$ blocks under translation by two sites, using spin flip composed with a one-site
 translation to identify $p \leftrightarrow L - p$. Its own residual and polar-factor enclosure used
-conservative $\gamma_{32d+32}$ constants and $\|A\|_2 \le L(3/4 + h/2)$. It had its own $\log Z$
+conservative $\gamma_{32d+32}$ constants and $`\|A\|_2 \le L(3/4 + h/2)`$. It had its own $\log Z$
 and a fresh spectral replay and direct interval audit of small blocks. An independent
 shared-core certificate at $h = 1$ in the one-site frame used only the $S^z$ parity
 (about 12 min, $\Delta_L > 1.147699$). The local pipeline was retired in favor of the core.

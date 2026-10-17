@@ -4,7 +4,9 @@ The periodic matrix product state (MPS) trial state used in the spin-1 certifica
 dimension $D = 26$, parameterized by 23 integers: eight diagonal amplitudes and fifteen couplings
 between virtual $\mathrm{SU}(2)$ multiplets. Its virtual Hilbert space decomposes under
 $\mathrm{SU}(2)$ as
-$$V_{\mathrm{virt}} = 4V_{1/2} \oplus 3V_{3/2} \oplus V_{5/2}.$$
+```math
+V_{\mathrm{virt}} = 4V_{1/2} \oplus 3V_{3/2} \oplus V_{5/2}.
+```
 To evaluate the norm $\langle\psi|\psi\rangle$ and energy $\langle\psi|H_N|\psi\rangle$ on rings
 of length $N = 72$ and $N = 120$, one must raise the $D^2 \times D^2 = 676 \times 676$ double-layer
 transfer matrix $T$ to high powers. While the upstream reference verifier block-diagonalizes $T$
@@ -47,8 +49,10 @@ and $J_-$ directly from the virtual multiplet structure $4V_{1/2} \oplus 3V_{3/2
 and verify all six tensor commutator relations with the physical spin-1 operators by exact
 arithmetic. On the $676$-dimensional double layer $V_{\mathrm{virt}} \otimes V_{\mathrm{virt}}^*$,
 we form the combined ladder operators
-$$\mathcal{R} = 2J_+ \otimes I - I \otimes J_-, \qquad \mathcal{L} = J_- \otimes I - 2I \otimes J_+.$$
-The kernels of $\mathcal{R}$ at each total spin $J \in \{0, 1, 2, 3, 4, 5\}$ isolate the
+```math
+\mathcal{R} = 2J_+ \otimes I - I \otimes J_-, \qquad \mathcal{L} = J_- \otimes I - 2I \otimes J_+.
+```
+The kernels of $\mathcal{R}$ at each total spin $`J \in \{0, 1, 2, 3, 4, 5\}`$ isolate the
 highest-weight multiplicity spaces, which have dimensions
 ```
 26, 56, 48, 24, 7, 1
@@ -62,7 +66,9 @@ change-of-basis matrix $W$. The verifier checks in exact arithmetic that $W$ has
 intertwines both the double-layer transfer matrix $T$ and the two-site energy insertion $O$ with
 the reduced multiplicity blocks $(T_J, O_J)_{J=0}^5$. These exact intertwining identities
 guarantee that for every ring length $N$, the norm and energy contractions equal
-$$V_N = \sum_{J=0}^5 (2J+1)\operatorname{Tr}(T_J^N), \qquad U_N = \sum_{J=0}^5 (2J+1)\operatorname{Tr}(T_J^{N-2}O_J).$$
+```math
+V_N = \sum_{J=0}^5 (2J+1)\mathrm{Tr}(T_J^N), \qquad U_N = \sum_{J=0}^5 (2J+1)\mathrm{Tr}(T_J^{N-2}O_J).
+```
 
 In addition to computing $V_N$ and $U_N$, the verifier reconstructs the individual trace
 contributions of all eleven original $S^z$ charge blocks and checks them against the upstream
@@ -70,7 +76,7 @@ length-120 evidence file. Both the length-72 and length-120 numerator and norm i
 upstream certificate bit-for-bit.
 
 By working in the $\mathrm{SU}(2)$ multiplicity spaces, the largest matrix dimension raised to the
-$120$th power shrinks from $162$ to $56$, reducing the $\sum d_i^3$ matrix-multiplication work
+$`120`$th power shrinks from $162$ to $56$, reducing the $\sum d_i^3$ matrix-multiplication work
 proxy from $10{,}373{,}002$ to $317{,}952$ (a factor of $32.6\times$). The remaining exact
 integer matrix powers are evaluated using
 [Nemo's FLINT-backed integer matrices](https://nemocas.github.io/Nemo.jl/stable/matrix/) (`ZZMatrix`):
@@ -84,11 +90,11 @@ The original `BigInt` charge-block implementation remains available via
 ## Thermal kernel and scheduling optimizations
 
 In the fixed-point thermal trace recursion (`src/thermal.jl`), the off-diagonal bond matrix
-elements in the computational basis take only the small integer values $\{-2, -1, 1, 2\}$. The
+elements in the computational basis take only the small integer values $`\{-2, -1, 1, 2\}`$. The
 optimized inner-loop kernels expand multiplications by these fixed coefficients into bit shifts,
 additions, and subtractions, enabling integer SIMD vectorization without general 64-bit integer
 multiplications on every bond hop. Similarly, the source-2 kernel in the Eisenstein basis
-$\{1, \omega\}$ expands its three fixed coefficient pairs into additions and subtractions, and
+$`\{1, \omega\}`$ expands its three fixed coefficient pairs into additions and subtractions, and
 applies the arithmetic right-shift floor division to output rows while they remain resident in L1
 cache. The fixed-point recurrence formula and a priori rounding-error bounds are completely
 unchanged.

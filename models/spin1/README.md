@@ -13,17 +13,21 @@ cross-checks (not part of the rigorous certificate).
 | Source 1 (published) | $P_{\mathrm{s}}(2304, 784) \ge 1 - 84513/10^7$, $P_\tau(4608, 784) \ge 1 - 27493/(5\cdot 10^6)$; bootstrap $u_0 = 1/100$, $C = 5$ | $\log(20)/784 \approx 0.00382$ | even $L \ge 2304$ |
 | Source 2 (published) | $P_{\mathrm{s}}(60, 105/4) > 7/8$, $P_\tau(120, 105/4) > 7/8$; bootstrap $u_0 = 1/8$, $C = 79/10$ | $(4/105)\log(80/79) \approx 0.00048$ | even $L \ge 60$ |
 | Scalar optimization (`experiments/`) | Reuses source-1 and source-2 finite inputs with unequal-defect recurrence | $0.016978269$ ($> 1/60$) | even $L \ge 36$ |
-| Temperature lifting (`experiments/`) | Reuses source-1 traces ($L \le 12$) and $L=120$ MPS trial; lifted seed at $n_0 = 36, 60$ | $0.072901771$ ($> 7/100$ simple) | even $L \ge 36$ |
+| Temperature lifting (`experiments/`) | Reuses source-1 traces ($L \le 12$) and $L=120$ MPS trial; lifted seed at $n_0 = 60$; the unlifted seed at $(36, 49/4)$ covers $36 \le L \le 72$ | $0.072901771$ ($> 7/100$ simple) | even $L \ge 36$ |
 
 ## Model
 
 We consider the periodic spin-1 antiferromagnetic Heisenberg ring of length $L$ with unit
 coupling:
-$$H_L = \sum_{j=1}^{L} \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 2I, \qquad \mathbf{S}_{L+1} \equiv \mathbf{S}_1.$$
+```math
+H_L = \sum_{j=1}^{L} \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 2I, \qquad \mathbf{S}_{L+1} \equiv \mathbf{S}_1.
+```
 Lengths $L$ count sites. In the thermal trace recursion, each bond is shifted by a rational
 per-site constant $\kappa = 700741/500000$ (denoted $a$ in the upstream source code), so that
 the twisted partition function is evaluated as
-$$Z_n(\beta, g) = \operatorname{Tr}\!\left(g\,\exp[-\beta(H_n + n\kappa I)]\right)$$
+```math
+Z_n(\beta, g) = \mathrm{Tr}\,\!\left(g\,\exp[-\beta(H_n + n\kappa I)]\right)
+```
 for a global spin rotation $g \in \mathrm{SO}(3)$ acting on the closing bond. Because the shift
 $n\kappa I$ is extensive, it cancels identically in both the spatial purity
 $P_{\mathrm{s}}(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2$ and the thermal purity
@@ -32,11 +36,13 @@ the upstream paper and JSON records).
 
 ## Reflection positivity
 
-In the Cartesian spin-1 basis $\{|x\rangle, |y\rangle, |z\rangle\}$, the spin operators
-$(S^\alpha)_{\beta\gamma} = -i\epsilon_{\alpha\beta\gamma}$ are purely imaginary and
+In the Cartesian spin-1 basis $`\{|x\rangle, |y\rangle, |z\rangle\}`$, the spin operators
+$`(S^\alpha)_{\beta\gamma} = -i\epsilon_{\alpha\beta\gamma}`$ are purely imaginary and
 antisymmetric. Setting $C_\alpha = G_\alpha = i S^\alpha$ (which are real matrices) gives the
 exact reflection-positive decomposition on every bond:
-$$-h = -\mathbf{S}_i \cdot \mathbf{S}_j = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}.$$
+```math
+-h = -\mathbf{S}_i \cdot \mathbf{S}_j = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}.
+```
 For this package, the reflection-positivity identity is cited from the upstream paper and is
 checked algebraically in the shared core test suite (`julia/test/runtests.jl`) and in the Lean 4
 formalization (`lean/CertifiedGaps/Spin1.lean`).
@@ -74,7 +80,7 @@ $\varepsilon_\tau$ at $n_0 = 60$ and $n_0 = 2304$.
 The integer thermal recurrence uses arithmetic right shifts, which implement exact floor division
 for both positive and negative entries. Explicit bounds rule out overflow in `Int64` partial sums
 and `Int128` norm chunks; final totals and trial contractions use `BigInt`. Source 2 is an
-independent unpacked implementation in the Eisenstein basis $\{1, \omega\}$
+independent unpacked implementation in the Eisenstein basis $`\{1, \omega\}`$
 ($\omega^2 + \omega + 1 = 0$), rather than a translation of the upstream packed-lane arithmetic.
 JSON integers are parsed directly from their string tokens so large certificate integers never
 pass through `Float64`. Sectors across all lengths and twists run on the available threads in a
@@ -105,11 +111,12 @@ conditional one-trace criterion on which [`models/spin2`](../spin2) builds.
 The scalar optimization tightens the polynomial filter cutoffs, tracks unequal spatial and
 thermal defects $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ through the coupled recurrence
 rather than collapsing to $\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$, and covers intermediate
-chain lengths via the reflection-positivity interpolation inequality before invoking the uniform
+chain lengths via the moment interpolation inequality (monotonicity of $\ell^p$ norms) before invoking the uniform
 bootstrap tail. Temperature lifting combines the 18 source-1 thermal traces with the length-120
 MPS trial, raises the inverse temperature before extracting purity bounds, and retains the
-threefold $\mathrm{SU}(2)$ triplet multiplicity when bounding residual moments; a length-72 seed
-bridges even chain lengths $36 \le L \le 72$. The script `search_temperature_lift.jl` performs the
+threefold multiplicity of the three nontrivial $D_2$ symmetry sectors of the spatial transfer
+operator when bounding residual moments; the unlifted seed at $(n_0, \beta) = (36, 49/4)$ covers even
+chain lengths $36 \le L \le 72$. The script `search_temperature_lift.jl` performs the
 exploratory floating-point parameter scan that selected the moment length and temperature
 multiplier (`temperature-lift-search.json`, labeled non-certifying), and `temperature_lift.jl`
 replays the chosen parameters in exact rational arithmetic.

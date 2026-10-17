@@ -10,7 +10,7 @@ $2^L$-dimensional Hilbert space into $(S^z, k)$ symmetry blocks.
 1. **Verified dense diagonalization in $(S^z, k)$ symmetry blocks:** The largest symmetry block
    at $S^z = 0$ has dimension $\approx \binom{L}{L/2}/(L/2)$ ($20$ at $L = 8$ and $1{,}620$ at
    $L = 16$), with $O(d^3)$ eigensolve cost and $O(d^2)$ storage per block. This easily covers
-   $n_0 = 8$ ($2n_0 = 16$ sites) across all five staggered fields $h \in \{1, 3/4, 1/2, 7/20, 1/4\}$,
+   $n_0 = 8$ ($2n_0 = 16$ sites) across all five staggered fields $`h \in \{1, 3/4, 1/2, 7/20, 1/4\}`$,
    using interval enclosures for the momentum-block matrix entries and a priori IEEE binary64
    rounding bounds on the eigenvector residual and orthogonality defects. At $n_0 = 10$ ($2n_0 = 20$
    sites), the largest block reaches dimension $18{,}504$, making full dense verification
@@ -23,12 +23,12 @@ $2^L$-dimensional Hilbert space into $(S^z, k)$ symmetry blocks.
    rigorous convergence thresholds down to $h = 1/4$ is unnecessary when $n_0 = 8$ already lies
    well inside the admissible region.
 4. **Partial Krylov spectra (`KrylovKit`):** Useful for numerical seed exploration at $L = 20$
-   ($n_0 = 10$) and weaker fields ($h \in \{1/5, 3/20, 1/10\}$), but cannot certify partition
+   ($n_0 = 10$) and weaker fields ($`h \in \{1/5, 3/20, 1/10\}`$), but cannot certify partition
    functions without a rigorous lower bound on all omitted eigenvalues.
 
 ## Outcome
 
-Route 1 certified all five target fields $h \in \{1, 3/4, 1/2, 7/20, 1/4\}$ at seed length
+Route 1 certified all five target fields $`h \in \{1, 3/4, 1/2, 7/20, 1/4\}`$ at seed length
 $n_0 = 8$ from complete verified 8- and 16-site spectra. The certificates were first produced by a
 model-local block builder and enclosure (two-site translation momentum and $S^z$ blocks). They are
 now produced by the shared core pipeline (`GapCertificates.certify_gap`) on the one-site

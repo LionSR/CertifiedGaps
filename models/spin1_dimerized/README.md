@@ -15,22 +15,26 @@ cell transfer operator factors as $X_\beta = K K^* \ge 0$. Derivations and the a
 
 ## Model
 
-$$H_L = \sum_{j=1}^{2L} \left[1 + (-1)^j \delta\right] \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad
-\mathbf{S}_j^2 = 2I,$$
+```math
+H_L = \sum_{j=1}^{2L} \left[1 + (-1)^j \delta\right] \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad
+\mathbf{S}_j^2 = 2I,
+```
 on a periodic ring of $N = 2L$ spin-1 sites. A unit cell is a pair $(a, b) = (2x - 1, 2x)$ joined
 by the weak bond $1 - \delta$ (on-site term $o$, cell dimension $9$); neighboring cells are joined
 by the strong bond $1 + \delta$ from $b$ to the next $a$ (bond term $h$). Lengths $L$ and $n_0$
-count cells. The scan grid is $\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}$ on rings of up to 6
+count cells. The scan grid is $`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$ on rings of up to 6
 cells.
 
 **Certificate frame.** The core works in the $S^z$ basis ($m = 1, 0, -1$) with the spin $b$ of
 every cell rotated by $\pi$ about $y$:
 $U = \prod_{\text{cells}} (1 \otimes V)$ with
-$V = e^{-i\pi S^y} = \begin{pmatrix} 0&0&1\\0&-1&0\\1&0&0 \end{pmatrix}$.
-With the integer matrices $X' = \sqrt2 S^x$, $A' = \sqrt2\, i S^y$ (real antisymmetric) and
-$S^z = \operatorname{diag}(1, 0, -1)$, every bond becomes
-$$U (J\,\mathbf{S}_i \cdot \mathbf{S}_j) U^\dagger
-= -J\,(\tfrac12 X' \otimes X' + \tfrac12 A' \otimes A' + S^z \otimes S^z).$$
+$`V = e^{-i\pi S^y} = \begin{pmatrix} 0&0&1\\0&-1&0\\1&0&0 \end{pmatrix}`$.
+With the integer matrices $X' = \sqrt2 S^x$, $`A' = \sqrt2\, i S^y`$ (real antisymmetric) and
+$S^z = \mathrm{diag}(1, 0, -1)$, every bond becomes
+```math
+U (J\,\mathbf{S}_i \cdot \mathbf{S}_j) U^\dagger
+= -J\,(\tfrac12 X' \otimes X' + \tfrac12 A' \otimes A' + S^z \otimes S^z).
+```
 In this frame the cell charge $z_a - z_b$ is conserved (an additive U(1) charge), and the spin
 flip $P \otimes P$ ($P$: $m \mapsto -m$) maps charge $q$ onto $-q$, so the core builds the two
 sectors once and splits $q = 0$ by flip parity. `test/runtests.jl` checks
@@ -43,8 +47,10 @@ frames are unitarily equivalent, so purities and gaps agree.
 ## Reflection positivity
 
 In the certificate frame, with $R$ the swap of the two spins of a cell,
-$$-h = \tfrac{1+\delta}{2}\, C_x \otimes R C_x R + \tfrac{1+\delta}{2}\, C_A \otimes R C_A R
-+ (1 + \delta)\, C_z \otimes R C_z R, \qquad C_\alpha = 1 \otimes (X', A', S^z),$$
+```math
+-h = \tfrac{1+\delta}{2}\, C_x \otimes R C_x R + \tfrac{1+\delta}{2}\, C_A \otimes R C_A R
++ (1 + \delta)\, C_z \otimes R C_z R, \qquad C_\alpha = 1 \otimes (X', A', S^z),
+```
 with real integer $C_\alpha$ and real symmetric, swap-invariant $o$. The core `verify_rp` checks
 this $81 \times 81$ identity, $R^2 = 1$ and $R o = o R$ exactly (`DimerizedCertificate.rp`); the
 certificate stores it in the `"reflected"` form. Without $R$ the bond is not RP in this basis
@@ -112,7 +118,7 @@ and the tests replay only the rings of 2 and 4 cells. The scan caches spectra in
   `METHOD.md`, recorded as the certificate's `positive_transfer` reference, not on a computer
   check.
 - **Floating point only:** the $\beta_0$ scans, the 12-spin reference gaps, and the seed-size
-  extrapolations for $\delta \in \{3/5, 1/2\}$.
+  extrapolations for $`\delta \in \{3/5, 1/2\}`$.
 
 ## Layout
 

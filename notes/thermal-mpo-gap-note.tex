@@ -46,11 +46,9 @@ boundary conditions $\bm S_{L+1}=\bm S_1$ and $J=k_B=1$:
  Z_L(\beta)=\Tr e^{-\beta H_L}.
  \label{eq:model}
 \end{equation}
-All system sizes are even and at least four. Let
-$E_0(L)\le E_1(L)\le\cdots$ include multiplicities and define the gap
-$\Delta_L=E_1(L)-E_0(L)$, the step from the ground level to the first
-excited level, \levels. For the Gibbs weights
-$w_m=e^{-\beta E_m(L)}/Z_L(\beta)$,
+We take even $L\ge4$ so the transfer trace is an even power. Let $E_0(L)\le E_1(L)\le\cdots$ include multiplicities, with gap
+$\Delta_L=E_1(L)-E_0(L)$ (\levels) and Gibbs weights
+$w_m=e^{-\beta E_m(L)}/Z_L(\beta)$:
 \begin{equation}
  \frac{w_1}{w_0}=e^{-\beta\Delta_L}\le e^{-c\beta}
  \quad\Longrightarrow\quad \Delta_L\ge c.
@@ -63,142 +61,246 @@ For every even $L\ge2304$, the chain~\eqref{eq:model} has a unique ground
 state and $\Delta_L>(\log20)/784\simeq0.003821$.
 \end{theorem}
 
-The spectral gap of the chain~\eqref{eq:model} was established by OpenAI~\cite{source} using machine-assisted proof search over a thirty-page analytical construction. That proof relies on coordinate expansions, degree-12 polynomial spectral filters, and character decompositions across dihedral symmetry sectors. Automated theorem provers naturally explore such symbolic coordinate representations, which can accumulate intermediate algebraic machinery over long deduction horizons.
+Theorem~\ref{thm:gap} was established by OpenAI~\cite{source} via a thirty-page coordinate construction using degree-12 spectral filters and dihedral character decompositions. After showing how a thermal purity near one forces a gap, our proof has three stages: (i) an exact continuous-time thermal MPO yields a self-adjoint spatial transfer operator; (ii) spacetime contraction identities couple spatial and thermal purities so joint scale doubling quadratically suppresses both defects (the \emph{spacetime bootstrap}); and (iii) interpolating between successive doubled lengths covers all even $L\ge2304$.
 
-Here, we show that the underlying mechanism is fundamentally geometric. Representing the partition function as a continuous-time spacetime tensor network makes the dual spatial transfer operator, reflection Hermiticity, and scale-doubling contraction immediately manifest. The derivation proceeds in three stages. First, an exact continuous-time thermal MPO yields a self-adjoint spatial transfer operator. Second, spacetime contraction identities couple spatial and thermal purities, while scale doubling quadratically suppresses purity defects under joint iteration; we call this self-improving iteration the \emph{spacetime bootstrap}. Third, $\ell^p$ moment monotonicity extends the bound from dyadic scales to all intermediate even lengths to establish Eq.~\eqref{eq:target}.
+Why tensor-network diagrams? In Eq.~\eqref{eq:model}, $L$ counts sites in a sum whereas $\beta$ sits in an exponential. Drawing $Z_L(\beta)$ as a two-dimensional tensor network~\cite{tang,pirvu} puts space and imaginary time on equal footing on a torus: vertical double legs \physleg{} carry the physical spin space through imaginary time (trace $\Tr$; blue, thermal \tikz[tn]{\node[gibbs]{$\rho$};}), horizontal legs \virtleg{} couple neighboring sites in the virtual bond space (trace $\trv$; red, spatial \tikz[tn]{\node[xop]{$\sigma$};}), joined legs \tnchain[node=xvertex]{,} are contracted, and closed loops \tnchain[node=xvertex,ring]{{}} are traces. Reading the same network along either axis turns the proof into planar diagram identities; Appendix~\ref{app:open} caps the horizontal ends with boundary vectors for an open chain.
 
-Every step below is a contraction of one tensor network: horizontal
-legs \virtleg{} are virtual (space), vertical double legs \physleg{} are
-physical (imaginary time), joined legs \tnchain[node=xvertex]{,} are
-contracted, closed loops \tnchain[node=xvertex,ring]{{}} are
-traces~\cite{tang,pirvu}, and a labeled box \tnchain{A} is a product of
-tensors. Blue marks thermal objects \tikz[tn]{\node[gibbs]{$\rho$};} and red marks
-spatial ones \tikz[tn]{\node[xop]{$\sigma$};}.
-Appendix~\ref{app:open} applies the same networks to an open chain with
-boundary fields, where the spacetime is a cylinder rather than a torus; it reuses every identity below and adds only boundary vectors.
+\emph{From purity to gap.---}
+For a positive trace-one operator with eigenvalues $p_0\ge p_1\ge\cdots$, the
+purity obeys
+\begin{equation}
+ P=\sum_i p_i^2\le p_0\sum_i p_i=p_0.
+ \label{eq:weight}
+\end{equation}
+Thus the \emph{purity defect} $1-P$ bounds $1-p_0\le1-P$: a purity near one
+forces a spectrum like \specbars{.86,.08,.04,.02} with a single dominant bar.
+For the Gibbs state, $P>1/2$ implies a unique ground state, with
+$1-w_0\le1-P$ and $e^{-\beta\Delta_L}=w_1/w_0\le(1-P)/P$. To reach
+Eq.~\eqref{eq:target} it suffices to show that $1-P$ falls like $e^{-c\beta}$
+uniformly in $L$. Squaring in imaginary time improves purity at fixed $L$
+[Eq.~\eqref{eq:squaring}], but growing $L$ adds thermal excitations; advancing
+$L$ and $\beta$ together requires a spatial transfer operator.
 
 \emph{Thermal MPO.---}
-To obtain a real symmetric transfer operator, use the Cartesian spin
-basis $s,s'\in\{x,y,z\}$. The matrices
-$(S^\alpha)_{ss'}=-i\epsilon_{\alpha ss'}$ give real operators $G_\alpha=iS^\alpha$,
-$\|G_\alpha\|=1$, and $-H_L=\sum_{j,\alpha}G_{\alpha,j}G_{\alpha,j+1}$.
-Each bond event $(\tau,\alpha)$ in the exponential expansion inserts
-$G_\alpha$ at both endpoints. Let $a,b$ record these events on the two bonds
-adjacent to a site, with $0<\tau<\beta$. The local MPO tensor is
+As a warm-up, consider the classical Ising ring with spins $t_j=\pm1$. Its
+Boltzmann weight $\prod_je^{\beta t_jt_{j+1}}$ is a product of entries of the
+$2\times2$ matrix $K_{tt'}=e^{\beta tt'}$, and each spin appears in exactly two
+neighboring factors. Summing a spin shared by two factors is a matrix product,
+$\sum_{t_2}K_{t_1t_2}K_{t_2t_3}=(K^2)_{t_1t_3}$, which is what a joined leg
+\tnchain[node=xvertex]{,} means; summing every spin multiplies $K$ around the
+ring, and the closure $t_{n+1}=t_1$ turns the last sum into a trace,
+$Z_n=\Tr K^n$. Here we construct a real symmetric operator $X_\beta$ on the
+virtual bond space that plays the role of $K$, with $Z_n(\beta)=\trv X_\beta^n$. In the Cartesian basis
+$s,s'\in\{x,y,z\}$, $(S^\alpha)_{ss'}=-i\epsilon_{\alpha ss'}$ gives real
+operators $G_\alpha=iS^\alpha$ with entries $(G_\alpha)_{ss'}=\epsilon_{\alpha ss'}$:
+$G_\alpha v=v\times e_\alpha$ turns the plane perpendicular to $e_\alpha$ by a
+quarter turn and annihilates $e_\alpha$ (for example $G_z e_x=-e_y$ and
+$G_z^2=\operatorname{diag}(-1,-1,0)$), so $\|G_\alpha\|=1$. Because
+$G_\alpha\otimes G_\alpha=i^2S^\alpha\otimes S^\alpha$,
+$-H_L=\sum_{j,\alpha}G_{\alpha,j}G_{\alpha,j+1}$. Since the simplex
+$0<\tau_1<\cdots<\tau_k<\beta$ in imaginary time $\tau$ has volume
+$\beta^k/k!$, $e^{\beta A}=\sum_{k\ge0}\int_{0<\tau_1<\cdots<\tau_k<\beta}d\tau_1\cdots d\tau_k\,A^k$.
+For $A=-H_L$, each factor selects a bond and a label $\alpha$, inserting
+$G_\alpha$ on both sites of that bond at time $\tau$. We call such a factor an
+\emph{event} $(\tau,\alpha)$ on its bond, and the finite set of events on one
+bond its \emph{bond history}; each term of the expansion is a choice of
+history on every bond. For the histories $a$ and $b$ of the left and right
+bonds of a site, the local MPO
+tensor multiplies the matrices hitting its worldline in time order ($\mathcal T_\tau$ placing later times to the left):
 \begin{equation}
  \Wlegs=W_\beta^{ss'}(a,b)=
  \left\langle s\left|\mathcal T_\tau
- \prod_{(\tau,\alpha)\in a\cup b}G_\alpha\right|s'\right\rangle,
+ \prod_{(\tau,\alpha)\in a\cup b}G_\alpha\right|s'\right\rangle.
  \label{eq:local}
 \end{equation}
-where $\mathcal T_\tau$ places later times to the left. Summing event
-labels and integrating ordered times defines a measure $\mu_\beta$ of
-mass $e^{3\beta}$, with unit mass on the empty history. Contracting $n$
-tensors around the ring recovers the absolutely convergent exponential
-series as an exact MPO on the virtual space $L^2(\mu_\beta)$, without bond
-truncation~\cite{tang,pirvu}:
+For $a=\{(\tau_1,x),(\tau_3,y)\}$ and $b=\{(\tau_2,z)\}$ with
+$\tau_1<\tau_2<\tau_3$, the site worldline and its physical trace
+\Wtrace${}={}$\Xvertex{} are
+\begin{proofdiagram}
+\begin{tikzpicture}[x=1cm,y=.62cm,font=\scriptsize,line width=.45pt]
+ % Imaginary-time axis on the far left
+ \draw[-{Latex[length=1.2mm]},mpoblue] (-.35,.2)--(-.35,1.75)
+   node[above] {$\tau$};
+ \draw[mpoblue] (-.41,.2)--(-.29,.2) node[left=2pt,text=black!65] {$0$};
+ \draw[mpoblue] (-.41,1.75)--(-.29,1.75) node[left=2pt,text=black!65] {$\beta$};
+ % Open worldline inside W_beta^{ss'}(a,b)
+ \fill[mpoblue!12,rounded corners=2pt] (.7,.25) rectangle (1.9,1.7);
+ \draw[mpoblue!70,densely dashed,rounded corners=2pt] (.7,.25) rectangle (1.9,1.7);
+ \node[mpoblue!80!black,anchor=south west,inner sep=1pt] at (.7,1.73) {$W$};
+ \draw[line width=.7pt] (1.3,.05)--(1.3,1.9);
+ \node[anchor=south] at (1.3,1.9) {$\langle s|$};
+ \node[anchor=north] at (1.3,.05) {$|s'\rangle$};
+ % Rungs from left bond a (tau_1, tau_3) and right bond b (tau_2)
+ \draw[mpored,line width=.65pt] (.15,.55)--(1.3,.55);
+ \fill[mpored] (1.3,.55) circle[radius=1.3pt];
+ \node[anchor=east,text=black!75] at (.13,.55) {$\tau_1$};
+ \node[anchor=south west,inner sep=1pt] at (1.34,.55) {$G_x$};
+ \draw[mpoblue!85!black,line width=.65pt] (1.3,.98)--(2.45,.98);
+ \fill[mpoblue!85!black] (1.3,.98) circle[radius=1.3pt];
+ \node[anchor=west,text=black!75] at (2.47,.98) {$\tau_2$};
+ \node[anchor=south east,inner sep=1pt] at (1.26,.98) {$G_z$};
+ \draw[mpored,line width=.65pt] (.15,1.4)--(1.3,1.4);
+ \fill[mpored] (1.3,1.4) circle[radius=1.3pt];
+ \node[anchor=east,text=black!75] at (.13,1.4) {$\tau_3$};
+ \node[anchor=south west,inner sep=1pt] at (1.34,1.4) {$G_y$};
+ \node[mpored!85!black,anchor=south] at (.42,1.45) {$a$};
+ \node[mpoblue!85!black,anchor=south] at (2.18,1.03) {$b$};
+ \node[anchor=north,font=\footnotesize] at (1.3,-.62)
+   {$W_\beta^{ss'}(a,b)=\langle s|G_yG_zG_x|s'\rangle$};
+ % Traced worldline X_beta(a,b) on the right
+ \fill[mpored!10,rounded corners=2pt] (4.55,.25) rectangle (5.75,1.7);
+ \draw[mpored!70,densely dashed,rounded corners=2pt] (4.55,.25) rectangle (5.75,1.7);
+ \node[mpored!80!black,anchor=south west,inner sep=1pt] at (4.55,1.73) {$X_\beta$};
+ \draw[line width=.7pt] (5.15,.25)--(5.15,1.7);
+ % Trace loop closing top to bottom
+ \draw[line width=.55pt,black!65] (5.15,1.7)--(5.15,1.82)
+   arc[start angle=180,end angle=0,radius=.38]
+   --(5.91,.13) arc[start angle=0,end angle=-180,radius=.38]--(5.15,.25);
+ \draw[mpored,line width=.65pt] (4.0,.55)--(5.15,.55);
+ \fill[mpored] (5.15,.55) circle[radius=1.3pt];
+ \node[anchor=south west,inner sep=1pt] at (5.19,.55) {$G_x$};
+ \draw[mpoblue!85!black,line width=.65pt] (5.15,.98)--(6.3,.98);
+ \fill[mpoblue!85!black] (5.15,.98) circle[radius=1.3pt];
+ \node[anchor=south east,inner sep=1pt] at (5.11,.98) {$G_z$};
+ \draw[mpored,line width=.65pt] (4.0,1.4)--(5.15,1.4);
+ \fill[mpored] (5.15,1.4) circle[radius=1.3pt];
+ \node[anchor=south west,inner sep=1pt] at (5.19,1.4) {$G_y$};
+ \node[mpored!85!black,anchor=south] at (4.27,1.45) {$a$};
+ \node[mpoblue!85!black,anchor=south] at (6.15,1.03) {$b$};
+ \node[anchor=north,font=\footnotesize] at (5.2,-.62)
+   {$X_\beta(a,b)=\Tr(G_yG_zG_x)$};
+ % Arrow between them
+ \draw[flow,black!60] (2.95,.98)--(3.65,.98)
+   node[midway,above,text=black!70] {$\sum_s$};
+\end{tikzpicture}
+\end{proofdiagram}
+Operators on different sites commute, so once the events on every bond are
+fixed, the time-ordered product over the ring splits into one worldline per
+site, whose physical trace is $X_\beta(a,b)=\sum_sW_\beta^{ss}(a,b)$. The bond
+history plays the role of the Ising spin, and $X_\beta$ the role of $K$.
+Summing the three labels $\alpha\in\{x,y,z\}$ and integrating ordered
+times defines a measure $\mu_\beta$ of mass $\sum_{k\ge0}(3\beta)^k/k!=e^{3\beta}$
+(unit mass on the empty history). With $a_j$ the history of bond $(j,j+1)$ and
+$a_0=a_n$,
+\begin{equation}
+ Z_n(\beta)=\int\prod_{j=1}^nd\mu_\beta(a_j)\;\prod_{j=1}^nX_\beta(a_{j-1},a_j),
+ \label{eq:factor}
+\end{equation}
+and integrating each shared history $a_j$ is the matrix product of the Ising
+ring, now on $L^2(\mu_\beta)$.
+Contracting $n$ tensors around the ring recovers the convergent exponential
+series as an exact MPO on $L^2(\mu_\beta)$ without bond truncation~\cite{tang,pirvu}:
 \begin{equation}
  e^{-\beta H_n}=\tnchain[node=mpo,legs,ring]{W,W,\cdots,W,W}.
  \label{eq:mpo}
 \end{equation}
-Tracing the physical index, \Wtrace${}={}$\Xvertex, gives the spatial
-transfer kernel $X_\beta(a,b)=\sum_s W_\beta^{ss}(a,b)$.
-It is real, symmetric, and bounded in absolute value by three, hence
-self-adjoint and Hilbert--Schmidt on $L^2(\mu_\beta)$.
+The left leg $a$ is the row index of $X_\beta$ and the right leg $b$ its
+column index, so symmetry means that a site cannot tell its left bond from its
+right one. Because $a$ and $b$ enter Eq.~\eqref{eq:local} through $a\cup b$ and each event
+inserts the same real matrix $G_\alpha$ at both ends of its bond (\emph{bond
+reflection positivity}, $-\bm S_j\cdot\bm S_{j+1}=\sum_\alpha G_{\alpha,j}G_{\alpha,j+1}$),
+the spatial transfer kernel $X_\beta$ is real and
+symmetric ($X_\beta(a,b)=X_\beta(b,a)$). The condition is not automatic: for a
+bond term $-h=Q\otimes P$ with $Q=\operatorname{diag}(1,1,0)$ and
+$P=\operatorname{diag}(1,0,0)$, a site receives $P$ through its left bond and
+$Q$ through its right one, so a history $a$ of two events, with the empty history
+$\emptyset$ on the other bond, gives $X_\beta(a,\emptyset)=\Tr P^2=1$ from the left but
+$X_\beta(\emptyset,a)=\Tr Q^2=2$ from the right. In general,
+regrouping the four legs of $-h$ by site (rows $s_js_j'$, columns
+$s_{j+1}s_{j+1}'$) turns $-h=\sum_\alpha G_\alpha\otimes G_\alpha$ into the
+$9\times9$ matrix $\sum_\alpha\operatorname{vec}G_\alpha\operatorname{vec}G_\alpha^{\mathsf T}$,
+a sum of squares; a positive semidefinite regrouped bond is the reflection
+positivity that the general criterion requires~\cite{scope}. Since $\|G_\alpha\|=1$ on $\mathbb C^3$,
+$|X_\beta(a,b)|\le\Tr I=3$; with the finite mass $e^{6\beta}$ of
+$\mu_\beta\times\mu_\beta$, $X_\beta$ is self-adjoint and Hilbert--Schmidt on
+$L^2(\mu_\beta)$, giving a discrete real spectrum
+$|\lambda_0(\beta)|\ge|\lambda_1(\beta)|\ge\cdots$ ($\sum_i\lambda_i(\beta)^2<\infty$).
 Closing the ring of transfer vertices gives, for even $n$,
 \begin{equation}
  Z_n(\beta)=\tnchain[node=xvertex,ring]{,,\cdots,,}=\trv X_\beta^n=\sum_i|\lambda_i(\beta)|^n,
  \label{eq:moment}
 \end{equation}
-where $\lambda_i(\beta)$ are the real eigenvalues of $X_\beta$, ordered by
-modulus, $|\lambda_0|\ge|\lambda_1|\ge\cdots$. Raising them
-to the $n$th power concentrates the weight on the largest:
-\specbars[mpored]{.5,.3,.2}${}\mapsto{}$\specbars[mpored]{.87,.11,.02} for $n=4$.
+so raising the eigenvalues to the $n$th power concentrates the weight on
+$\lambda_0$:
+\specbars[mpored]{.5,.3,.2}${}\mapsto{}$\specbars[mpored]{.87,.11,.02} ($n=4$).
 
-\emph{Purity and excited-state weight.---}
-For a positive trace-one operator with eigenvalues $p_0\ge p_1\ge\cdots$, the purity obeys
-\begin{equation}
- P=\sum_i p_i^2\le p_0\sum_i p_i=p_0.
- \label{eq:weight}
-\end{equation}
-Thus $1-p_0\le1-P$: a purity near one forces a spectrum like
-\specbars{.86,.08,.04,.02} with a single dominant bar.
-For the Gibbs state, $P>1/2$ implies a unique ground state, with
-excited-state population $1-w_0\le1-P$.
-
-To propagate this bound, cut the ring of Eq.~\eqref{eq:moment} at one bond,
-\tnchain[node=xvertex,ring]{,\cdots,}${}\mapsto{}$\tnchain[node=xvertex]{,\cdots,},
-and normalize both the transfer and Gibbs operators:
+\emph{Spatial and thermal purities.---}
+The transfer operator gives space its own density operator. Cut the ring of
+Eq.~\eqref{eq:moment} at one bond,
+\tnchain[node=xvertex,ring]{,\cdots,}${}\mapsto{}$\tnchain[node=xvertex]{,\cdots,}:
+what is left is $X_\beta^n$ with two open virtual legs. Cutting the torus
+instead along one time slice leaves $e^{-\beta H_n}$ with open physical legs,
+Eq.~\eqref{eq:mpo}. Normalizing both to unit trace gives
 \begin{equation}
  \sigma_n(\beta)=\frac{\tnchain[node=xvertex]{,,\cdots,,}}{Z_n(\beta)}=\frac{X_\beta^n}{Z_n(\beta)},\qquad
  \rho_n(\beta)=\frac{e^{-\beta H_n}}{Z_n(\beta)}.
  \label{eq:states}
 \end{equation}
-Both operators are positive with unit trace; denote their eigenvalues by
-$p_i$ and $w_m$, respectively. Their purities join two copies, along
+For even $n$, both operators are positive with unit trace; denote their
+eigenvalues by $p_i=|\lambda_i(\beta)|^n/Z_n(\beta)$ and $w_m$, respectively.
+Their purities join two copies, along
 space for $\sigma_n$ and along imaginary time for $\rho_n$. Drawing
 $Z_n(\beta)$ as a spacetime torus \Zbox[.7]21{} of width $n$ and height $\beta$
 (dashed edges identified), both are one ratio of tori:
 \begin{equation}
  \begin{aligned}
  \Ps(n,\beta)&=\trv\sigma_n^2=\tnchain[ring]{\sigma_n,\sigma_n}
-   =\frac{Z_{2n}(\beta)}{Z_n(\beta)^2}=\frac{\Zt41}{\Ztsq21},\\[2pt]
+   =\frac{\trv X_\beta^{2n}}{Z_n(\beta)^2}\\
+ &=\frac{Z_{2n}(\beta)}{Z_n(\beta)^2}=\frac{\Zt41}{\Ztsq21},\\[2pt]
  \Pt(n,\beta)&=\Tr\rho_n^2\;=\tncolumn[ring]{\rho_n,\rho_n}
-   =\frac{Z_n(2\beta)}{Z_n(\beta)^2}=\frac{\Zt22}{\Ztsq21}.
+   =\frac{\Tr e^{-2\beta H_n}}{Z_n(\beta)^2}\\
+ &=\frac{Z_n(2\beta)}{Z_n(\beta)^2}=\frac{\Zt22}{\Ztsq21}.
  \end{aligned}
  \label{eq:purities}
 \end{equation}
 
 \emph{Squaring.---}
-Squaring $\sigma_n$ doubles the length; squaring $\rho_n$ doubles the
-inverse temperature:
+Squaring improves a purity: squaring $\sigma_n$ doubles the length; squaring
+$\rho_n$ doubles the inverse temperature. Indeed
+$\sigma_n^2=X_\beta^{2n}/Z_n^2=(Z_{2n}/Z_n^2)\,\sigma_{2n}$, and likewise for
+$\rho_n^2$:
 \begin{equation}
- \begin{gathered}
- \tnchain{\sigma_n,\sigma_n}=\Ps(n,\beta)\,\tnchain{\sigma_{2n}},\\[2pt]
+ \tnchain{\sigma_n,\sigma_n}=\Ps(n,\beta)\,\tnchain{\sigma_{2n}},\quad
  \tncolumn{\rho_n,\rho_n}=\Pt(n,\beta)\,\tncolumn[item={minimum height=1.6em}]{\rho_n(2\beta)}.
- \end{gathered}
  \label{eq:squaring}
 \end{equation}
-Both replace the normalized eigenvalues $p_i$ by $p_i^2/P$, which
-concentrates the spectrum: \specbars{.5,.3,.2}${}\mapsto{}$\specbars{.66,.24,.1}.
-To bound the new purity $P'$, use $1-P=2\sum_{i<k}p_ip_k$:
+Both replace the normalized eigenvalues $p_i$ by $p_i^2/P$,
+concentrating the spectrum: \specbars{.5,.3,.2}${}\mapsto{}$\specbars{.66,.24,.1}.
+Since $1-P=2\sum_{i<k}p_ip_k$, dropping cross terms from
+$(\sum_{i<k}p_ip_k)^2$ bounds the new defect $1-P'$ via
+$f(z):=z^2/[2(1-z)^2]$:
 \begin{equation}
- \begin{gathered}
  1-P'=\frac{2\sum_{i<k}p_i^2p_k^2}{P^2}
- \le\frac{(1-P)^2}{2P^2}=f(1-P),\\
- f(z)=\frac{z^2}{2(1-z)^2}.
- \end{gathered}
+ \le\frac{(1-P)^2}{2P^2}=f(1-P).
  \label{eq:square}
 \end{equation}
-Dropping cross terms from $(\sum_{i<k}p_ip_k)^2$ gives the inequality.
-The function $f$ increases on $[0,1)$, with $f(z)\sim z^2/2$: squaring
+Because $f$ increases on $[0,1)$ with $f(z)\sim z^2/2$, squaring
 roughly squares the purity defect $1-P$, keeping it far below the
 diagonal, \fcurve{} for $0\le z\le.3$.
 
 \emph{Spacetime coupling identities.---}
-While squaring independently doubles space ($n\to 2n$), \Zt21${}\mapsto{}$\Zt41, or imaginary time ($\beta\to 2\beta$), \Zt21${}\mapsto{}$\Zt22, establishing a uniform gap requires doubling both variables simultaneously.
-Contracting four copies of the partition function $Z_n(\beta)$ in either spatial or temporal order yields the composite torus $Z_{2n}(2\beta)$.
-The networks are drawn to scale; red arrows join copies in space, blue arrows in time, and each arrow carries the purity factor it multiplies by:
+Each squaring doubles one side of the torus: space ($n\to 2n$), \Zt21${}\mapsto{}$\Zt41, or imaginary time ($\beta\to 2\beta$), \Zt21${}\mapsto{}$\Zt22. Because a uniform gap needs both sides to grow together, we need identities trading purity in one direction for purity in the other.
+Each gluing multiplies by exactly one purity, because each purity is a ratio of tori [Eq.~\eqref{eq:purities}]: $Z_{2n}(\beta)=\Ps(n,\beta)\,Z_n(\beta)^2$ and $Z_n(2\beta)=\Pt(n,\beta)\,Z_n(\beta)^2$. Starting from four tori $Z_n(\beta)^4$, gluing pairs first in space and then in time, or first in time and then in space, reaches the same doubled torus $Z_{2n}(2\beta)$ (red arrows glue in space, blue in time, labeled by the purity factor they multiply by):
 \begin{proofdiagram}
 \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
  % One n x beta torus = 2 x 1 cells; gaps close as copies are joined.
  \def\c{.3}\def\g{.14}
  \foreach \a in {0,1}{\foreach \b in {0,1}{                       % Z_n(beta)^4
-   \tnpatch{{.6+\a*(2*\c+\g)}}{{2.6+\b*(\c+\g)}}{2}{1}{\c}}}
- \foreach \b in {0,1}{\tnpatch{5.4}{{2.6+\b*(\c+\g)}}{4}{1}{\c}}  % Z_2n(beta)^2
+   \tnpatch{{.6+\a*(2*\c+\g)}}{{2.28+\b*(\c+\g)}}{2}{1}{\c}}}
+ \foreach \b in {0,1}{\tnpatch{5.4}{{2.28+\b*(\c+\g)}}{4}{1}{\c}}  % Z_2n(beta)^2
  \foreach \a in {0,1}{\tnpatch{{.6+\a*(2*\c+\g)}}{.5}{2}{2}{\c}}  % Z_n(2beta)^2
  \tnpatch{5.4}{.5}{4}{2}{\c}                                     % Z_2n(2beta)
- \node[anchor=north] at (1.27,2.55) {$Z_n(\beta)^4$};
- \node[anchor=north] at (6.0,2.55) {$Z_{2n}(\beta)^2$};
+ \node[anchor=north] at (1.27,2.23) {$Z_n(\beta)^4$};
+ \node[anchor=north] at (6.0,2.23) {$Z_{2n}(\beta)^2$};
  \node[anchor=north] at (1.27,.45) {$Z_n(2\beta)^2$};
  \node[anchor=north] at (6.0,.45) {$Z_{2n}(2\beta)$};
- \draw[flow,mpored] (2.15,2.97)--(5.2,2.97)
+ \draw[flow,mpored] (2.15,2.65)--(5.2,2.65)
    node[midway,above,text=black] {$\times\Ps(n,\beta)^2$};
  \draw[flow,mpored] (2.15,.80)--(5.2,.80)
    node[midway,above,text=black] {$\times\Ps(n,2\beta)$};
- \draw[flow,mpoblue] (1.27,2.12)--(1.27,1.3)
+ \draw[flow,mpoblue] (1.27,1.82)--(1.27,1.26)
    node[midway,right,text=black] {$\times\Pt(n,\beta)^2$};
- \draw[flow,mpoblue] (6.0,2.12)--(6.0,1.3)
+ \draw[flow,mpoblue] (6.0,1.82)--(6.0,1.26)
    node[midway,left,text=black] {$\times\Pt(2n,\beta)$};
  \draw[flow,mpored] (-.45,.5)--(.05,.5) node[right,text=black] {$L$};
  \draw[flow,mpoblue] (-.45,.5)--(-.45,1.0) node[above,text=black] {$\beta$};
@@ -223,8 +325,9 @@ Solving for one factor, and repeating at length $2n$, gives
 \end{align}
 
 \emph{Doubling estimate.---}
-Each application doubles the torus in both directions, \torusseq, and
-roughly squares the purity defect. For even $n$ and $0\le\varepsilon\le1/100$,
+Alternating the two coupling identities with the two squarings doubles the
+torus in both directions (\torusseq) and roughly squares the purity defect. For
+even $n$ and $0\le\varepsilon\le1/100$,
 \begin{equation}
  \begin{gathered}
  \Ps(n,\beta),\ \Pt(2n,\beta)\ge1-\varepsilon\\
@@ -233,11 +336,10 @@ roughly squares the purity defect. For even $n$ and $0\le\varepsilon\le1/100$,
  \end{gathered}
  \label{eq:update}
 \end{equation}
-The scale-doubling update~\eqref{eq:update} is established by four moves, alternating
-between spacetime coupling and operator squaring. Read the diagram below from top to
-bottom: each box is one bound, red for $\Ps$ and blue for $\Pt$; solid boxes are given
-or proved, dashed boxes intermediate. Each move is a numbered circle labeled by the
-identity it uses; the grey arrow entering a circle is the second bound that move needs:
+Four moves prove Eq.~\eqref{eq:update}. Read the diagram below from top to
+bottom (red boxes bound $\Ps$, blue $\Pt$; solid given or proved, dashed
+intermediate; circles label the identity and grey arrows supply the second
+input):
 \begin{proofdiagram}
 \begin{prooflanes}
  \lanebound{s}{s0}{0}{0}{$\Ps(n,\beta)\ge1-\varepsilon$}
@@ -254,36 +356,50 @@ identity it uses; the grey arrow entering a circle is the second bound that move
  \lanetag[below]{s2}{proved} \lanetag{t2}{proved}
 \end{prooflanes}
 \end{proofdiagram}
-The proved pair is the given pair with $(n,\beta)\to(2n,2\beta)$, so it is
-the given pair of the next scale, which is why the estimate can be iterated.
+The proved pair is the given pair at $(2n,2\beta)$, so Eq.~\eqref{eq:update} iterates.
 
 \emph{Move 1} (coupling). Since $\Pt(n,\beta)\le1$,
 Eq.~\eqref{eq:couple1} gives $\Ps(n,2\beta)\ge(1-\varepsilon)^3\ge1-3\varepsilon$.
 \emph{Move 2} (squaring in space). For even $n$, $\sigma_n(2\beta)$ has
-nonnegative spectrum and squares to $\sigma_{2n}(2\beta)$, so
-Eq.~\eqref{eq:square} and monotonicity of $f$ give $\Ps(2n,2\beta)\ge1-\delta$, where
+nonnegative spectrum and squares to $\sigma_{2n}(2\beta)$. Since
+$1-(1-\varepsilon)^3\le3\varepsilon$ and $9/[2(1-3\varepsilon)^2]\le5$ for
+$\varepsilon\le1/100$, Eq.~\eqref{eq:square} and monotonicity of $f$ give
+$\Ps(2n,2\beta)\ge1-\delta$, with
 \begin{equation}
  \delta=f\bigl(1-(1-\varepsilon)^3\bigr)
  =\tfrac12\bigl[(1-\varepsilon)^{-3}-1\bigr]^2
  \le5\varepsilon^2\le\varepsilon.
  \label{eq:delta}
 \end{equation}
-Here $1-(1-\varepsilon)^3\le3\varepsilon$ and
-$9/[2(1-3\varepsilon)^2]\le5$ for $\varepsilon\le1/100$.
-\emph{Move 3} (coupling). Eq.~\eqref{eq:couple2} with
+\emph{Move 3} (coupling). Equation~\eqref{eq:couple2} with
 $\Ps(2n,\beta)\le1$ and $\delta\le\varepsilon$ gives
 $\Pt(4n,\beta)\ge(1-\varepsilon)^2(1-\delta)\ge(1-\varepsilon)^3$.
-\emph{Move 4} (squaring in time). $\rho_{4n}(\beta)$ squares to
-$\rho_{4n}(2\beta)$, so $\Pt(4n,2\beta)\ge1-\delta\ge1-5\varepsilon^2$.
-This proves Eq.~\eqref{eq:update}.
+\emph{Move 4} (squaring in time). Squaring $\rho_{4n}(\beta)$ to
+$\rho_{4n}(2\beta)$ gives $\Pt(4n,2\beta)\ge1-\delta\ge1-5\varepsilon^2$,
+proving Eq.~\eqref{eq:update}.
 
-\emph{Finite input and iteration.---}
-Proposition~5.5 of Ref.~\cite{source} provides the base-scale estimates:
+\emph{Starting estimate and iteration.---}
+The doubling estimate needs one starting scale where both defects are below
+$1/100$. Proposition~5.5 of Ref.~\cite{source} gives the $j=0$ starting estimates:
 \begin{equation}
  \Ps(2304,784),\ \Pt(4608,784)\ge0.99.
  \label{eq:input}
 \end{equation}
-The energy shift used there cancels from the purity ratios.
+Equation~\eqref{eq:input} cannot come from diagonalizing $X_\beta$, which acts
+on whole bond histories; Ref.~\cite{source} uses only traces of small rings and
+one variational bound. It shifts $H_L\to H_L+\kappa L I$, with
+$\kappa=700741/500000$ chosen so that $-\kappa$ lies just above the energy per
+site of a matrix-product trial state $\psi$ on $N=72$ sites; the factor
+$e^{-\kappa\beta L}$ in $Z_L(\beta)$ cancels from both purity
+ratios~\eqref{eq:purities}. Since $Z_N(\beta)$ is a sum of positive Boltzmann
+factors and the variational principle gives
+$E_0(N)\le\langle\psi|H_N|\psi\rangle/\langle\psi|\psi\rangle<-\kappa N$, the
+ground-state factor alone gives $Z_N(\beta)>1$. Combined with eigenvalue bounds
+from the twisted traces $\trv(X_\beta^nU_g)$ of rings of at most twelve
+sites, with a spin rotation $U_g$ of the histories on one virtual bond, this
+forces a dominant $\lambda_0$; Appendices~I--M of the companion
+certificate note draw these networks and six doublings from $(36,49/4)$ to
+Eq.~\eqref{eq:input}.
 After $j\ge0$ doublings, set
 \begin{equation}
  n_j=2304\,2^j,\qquad \beta_j=784\,2^j,\qquad
@@ -293,37 +409,40 @@ After $j\ge0$ doublings, set
 Since $\varepsilon_0=1/100$ and $\varepsilon_{j+1}=5\varepsilon_j^2$,
 Eq.~\eqref{eq:update} gives
 $\Ps(n_j,\beta_j),\Pt(2n_j,\beta_j)\ge1-\varepsilon_j$ by induction on $j$:
-each application runs the four moves above once.
+each inductive step runs Moves~1--4 once.
 The defect falls doubly exponentially in $j$,
 $\varepsilon_0=10^{-2}$\,\sparkline{-22}{-2}{-2,-3.30,-5.90,-11.11,-21.52}\,$\varepsilon_4\approx3\times10^{-22}$ (log scale),
-and so exponentially in inverse temperature,
+and so exponentially in $\beta_j$,
 $\varepsilon_j=\frac15\exp[-\beta_j(\log20)/784]$, as needed in Eq.~\eqref{eq:target}.
 
-These estimates hold at the doubled lengths. To cover every even
-$L\ge2304$, choose $j$ with $n_j\le L\le2n_j$.
-Monotonicity of the $\ell^p$ norms in Eq.~\eqref{eq:moment} gives
-\begin{align}
- Z_L(\beta_j)&\le Z_{n_j}(\beta_j)^{L/n_j},\notag\\
- Z_L(2\beta_j)&\ge Z_{2n_j}(2\beta_j)^{L/(2n_j)}.
+\emph{All even lengths.---}
+These estimates hold at the doubled lengths $n_j$ and $2n_j$. To cover every
+even $L\ge2304$, choose $j$ with $n_j\le L\le2n_j$. Since the weights
+$p_i=|\lambda_i(\beta)|^n/Z_n(\beta)\in[0,1]$ sum to one, any power $r\ge1$
+gives $Z_{rn}(\beta)/Z_n(\beta)^r=\sum_ip_i^r\le\sum_ip_i=1$; taking
+$r=L/n_j\ge1$ at $\beta_j$ and $r=2n_j/L\ge1$ at $2\beta_j$ yields
+\begin{equation}
+ Z_L(\beta_j)\le Z_{n_j}(\beta_j)^{L/n_j},\qquad
+ Z_L(2\beta_j)\ge Z_{2n_j}(2\beta_j)^{L/(2n_j)}.
  \label{eq:moments}
-\end{align}
-Substitution into the thermal-purity ratio gives
-\begin{align}
+\end{equation}
+Dividing $Z_L(2\beta_j)$ by $Z_L(\beta_j)^2$, substituting the torus identity
+$Z_{2n_j}(2\beta_j)/Z_{n_j}(\beta_j)^4 = \Pt(2n_j,\beta_j)\Ps(n_j,\beta_j)^2$
+[Eq.~\eqref{eq:cancel}], and using $L/(2n_j)\le1$ with
+$(1-\varepsilon_j)^3\ge1-3\varepsilon_j>\tfrac12$ gives
+\begin{equation}
  \Pt(L,\beta_j)
- &\ge\bigl[\Pt(2n_j,\beta_j)\Ps(n_j,\beta_j)^2\bigr]^{L/(2n_j)}\notag\\
- &\ge(1-\varepsilon_j)^3\ge1-3\varepsilon_j>\tfrac12.
+ \ge\bigl[\Pt(2n_j,\beta_j)\Ps(n_j,\beta_j)^2\bigr]^{L/(2n_j)}
+ \ge1-3\varepsilon_j.
  \label{eq:interpolate}
-\end{align}
-Here $L/(2n_j)\le1$, and both purities in brackets are at least
-$1-\varepsilon_j$.
+\end{equation}
 
 \emph{Recovering the gap.---}
-Order the eigenvalues of $\rho_L(\beta_j)$ as $w_0\ge w_1\ge\cdots$.
-By Eqs.~\eqref{eq:weight} and \eqref{eq:interpolate},
-$w_0\ge1-3\varepsilon_j>1/2$: the Gibbs spectrum looks like
-\specbars{.97,.02,.01}, with the ground state alone above one half.
-Two ground states would show two equal top bars, \specbars{.49,.49,.02},
-neither above one half; so the ground state is unique. The remaining weight bounds $w_1$, and hence
+With $w_0\ge w_1\ge\cdots$ for $\rho_L(\beta_j)$, Eqs.~\eqref{eq:weight} and
+\eqref{eq:interpolate} give $w_0\ge1-3\varepsilon_j>1/2$: the Gibbs spectrum
+looks like \specbars{.97,.02,.01} rather than \specbars{.49,.49,.02}, so the
+ground state is unique and $w_1\le 1-w_0\le 3\varepsilon_j$. Since
+$3\varepsilon_j/(1-3\varepsilon_j)\le(60/97)20^{-2^j}<20^{-2^j}$,
 \begin{equation}
  e^{-\beta_j\Delta_L}=\frac{w_1}{w_0}
  \le\frac{1-w_0}{w_0}
@@ -331,8 +450,6 @@ neither above one half; so the ground state is unique. The remaining weight boun
  <20^{-2^j}.
  \label{eq:gapratio}
 \end{equation}
-The last inequality uses
-$3\varepsilon_j/(1-3\varepsilon_j)\le(60/97)20^{-2^j}$.
 Taking logarithms and dividing by $\beta_j=784\,2^j$ gives, for every
 even $L\ge2304$,
 \begin{equation}
@@ -345,11 +462,9 @@ The scale-doubling recurrence and the gap deduction are formally verified in Lea
 
 
 \section*{Discussion: Representation in Machine-Assisted Proofs}
-The uniform spectral gap theorems for the periodic and boundary-field spin-1 Heisenberg chains, together with the certified finite-scale numerical inputs, originate from the machine-assisted proofs by OpenAI~\cite{source,boundary}.
+The uniform spectral gap theorems for the periodic and boundary-field spin-1 Heisenberg chains, together with the certified starting estimates, come from the machine-assisted proofs of OpenAI~\cite{source,boundary}. Those thirty-page proofs locate eigenvalues and connect scales through explicit coordinate constructions, such as degree-12 polynomial spectral filters and dihedral character projectors, alongside lemmas unused in the final inequality. Automated provers work by local symbolic rewriting in a fixed basis; without the geometric pictures of many-body physics, their long chains of deductions naturally build up intermediate algebra to stay sound.
 
-The original thirty-page proofs isolate eigenvalues and bridge scales through extensive coordinate constructions, including degree-12 polynomial spectral filters and dihedral character projectors, alongside lemmas that remain unused in the final inequality. Automated reasoning systems typically operate via local symbolic rewrite rules in a fixed basis. Without the geometric and topological representations native to many-body physics, long-horizon symbolic search tends to accumulate representational overhead to ensure soundness.
-
-In this work, the authors proposed to GPT-6 to examine the argument through spacetime tensor networks, and interactively digested the resulting structure. Tensor network diagrams provide the geometric inductive bias that symbolic coordinate expansions lack. By placing imaginary time and spatial extent on equal footing on a Euclidean torus, the self-adjoint spatial transfer operator and contractive scale-doubling iteration become elementary planar identities. This indicates that diagrammatic tensor networks can serve not only as a calculational tool, but as an effective distillation framework for interpreting, simplifying, and extracting the essential physical mechanisms from machine-generated mathematical proofs. All mathematical arguments and formal proofs were verified and adjudicated by the authors.
+Here, the authors asked GPT-6 to re-examine the argument in terms of spacetime tensor networks and worked through the resulting structure interactively. Treating imaginary time and space alike on a torus reduces the self-adjoint spatial transfer operator and the contractive scale-doubling iteration to short identities between planar diagrams. Tensor-network diagrams are thus useful not only for calculation, but also for reading, simplifying, and extracting the physical mechanism of a machine-generated proof. The authors checked all mathematical and formal proofs.
 
 \begin{thebibliography}{4}
 \bibitem{source}
@@ -369,6 +484,12 @@ B. Pirvu, V. Murg, J. I. Cirac, and F. Verstraete,
 \href{https://doi.org/10.1088/1367-2630/12/2/025012}
 {Matrix product operator representations},
 New J. Phys. \textbf{12}, 025012 (2010).
+\bibitem{scope}
+Companion note, \emph{Scope of the spacetime bootstrap}
+(\texttt{thermal-mpo-gap-scope.tex}, 2026), Appendix~E.
+\bibitem{kennedy}
+T. Kennedy, Exact diagonalisations of open spin-1 chains,
+J. Phys.: Condens. Matter \textbf{2}, 5737 (1990).
 \end{thebibliography}
 
 \clearpage
@@ -376,7 +497,8 @@ New J. Phys. \textbf{12}, 025012 (2010).
 \setcounter{secnumdepth}{2}
 \section{Open chain with boundary fields}\label{app:open}
 The networks above also bound the gap of the open chain with equal
-endpoint fields. On $n$ spin-1 sites, with $\sum_\alpha(S^\alpha)^2=2I$, let
+endpoint fields. On $n$ spin-1 sites, with
+$\sum_\alpha(S^\alpha)^2=2I$, let
 \begin{equation}
  H_n^{\same}=\sum_{i=1}^{n-1}\bm S_i\cdot\bm S_{i+1}
        -h(S_1^z+S_n^z),\qquad h=\frac35.
@@ -386,180 +508,37 @@ endpoint fields. On $n$ spin-1 sites, with $\sum_\alpha(S^\alpha)^2=2I$, let
 For every odd $n\ge1921$, the Hamiltonian~\eqref{eq:b-model} has a unique
 ground state and $\Delta_n>(\log10)/392\simeq0.005874$.
 \end{theorem}
-Only one ingredient is new. A periodic network is closed by a trace,
-\tnchain[node=xvertex,ring]{,\cdots,}, which always contains the leading transfer
-eigenvector; an open chain is closed by two boundary vectors,
-\tnchain[node=xvertex,caps]{,\cdots,}, which could be orthogonal to it. The proof therefore
-tracks this \emph{boundary overlap} alongside the thermal purity. As in
-Eqs.~\eqref{eq:target} and \eqref{eq:weight}, it suffices to bound the
-equal-field thermal purity $\Pt^{\same}(n,\beta)=\sum_mw_m^2$ from below, since
+The theorem, the field $h=3/5$, and all finite inputs used below
+[Eq.~\eqref{eq:b-seeds}] are due to Ref.~\cite{boundary}. Appendices~\ref{app:open}--\ref{app:b-iteration} give
+a proof in the language of the main text that uses only those inputs.
+
+\emph{Why are boundary fields needed?} Without them, each end of the open
+spin-1 chain carries an effective spin-$1/2$ boundary mode, and the four lowest
+states are split only by an amount exponentially small in
+$n$~\cite{kennedy}. Equal fields lift this boundary degeneracy on odd
+chains~\cite{boundary}.
+
+\emph{What must be shown?} As on the ring, a thermal purity close to one forces
+a gap. With $w_m$ the Gibbs weights of $H_n^{\same}$, Eqs.~\eqref{eq:target}
+and \eqref{eq:weight} reduce Theorem~\ref{thm:b-gap} to a lower bound on the
+equal-field thermal purity $\Pt^{\same}(n,\beta)=\sum_mw_m^2$:
 \begin{equation}
  e^{-\beta\Delta_n}=\frac{w_1}{w_0}
  \le\frac{1-\Pt^{\same}(n,\beta)}{\Pt^{\same}(n,\beta)}.
  \label{eq:b-target}
 \end{equation}
-The scales of this appendix replace those of Eq.~\eqref{eq:scales}; they are
-fixed in Eq.~\eqref{eq:b-scales}, and $\varepsilon_j$ denotes the periodic
-purity defect of Eq.~\eqref{eq:b-tail}.
-
-\emph{Boundary vectors.---}
-The open chain uses the tensor $W_\beta$ of Eq.~\eqref{eq:local}, with the
-energy shift $\kappa=700741/500000$ of Ref.~\cite{boundary} (called $a$ there)
-absorbed as a factor $e^{-\kappa\beta}$, i.e.\ $H_n^\nu\to H_n^\nu+\kappa nI$;
-it cancels from every Gibbs state. Opening the ring of Eq.~\eqref{eq:mpo}
-and capping it with boundary vectors gives
-\begin{equation}
- e^{-\beta H_n^{\same}}=\tnchain[node=mpo,legs,capl=\bar v_\beta,capr=U_Pv_\beta]{W,W,\cdots,W,W}.
- \label{eq:b-mpo}
-\end{equation}
-For a history $a$ of $d$ bond events, the boundary vector is
-\begin{equation}
- v_\beta(a)=
- \begin{cases}(ih)^d,&\text{all labels are }z,\\0,&\text{otherwise},
- \end{cases}
- \qquad \|v_\beta\|^2=e^{\beta h^2},
- \label{eq:b-vector}
-\end{equation}
-with value one on the empty history. Each event on a cap inserts a field
-on the end site: the left cap is conjugated, so its factor
-$(-ih)G_z=+hS^z$ adds $-hS_1^z$ to $H$, while the same vector on the right,
-$(ih)G_z=-hS^z$, adds $+hS_n^z$. The $\pi$ rotation $P=\operatorname{diag}(1,-1,-1)$
-about $x$ flips every $z$ label, so its virtual action $U_P$ reverses the right
-field. The right cap alone therefore sets the field pattern of the trace:
-\begin{align}
- Y_n(\beta)&=\Tr e^{-\beta H_n^{\opp}}
- =\tnchain[capl={\bar v_\beta},capr={v_\beta}]{X_\beta^n},\quad\fieldopp,\label{eq:b-y}\\
- Y_n^{\same}(\beta)&=\Tr e^{-\beta H_n^{\same}}
- =\tnchain[capl={\bar v_\beta},capr={U_Pv_\beta}]{X_\beta^n},\quad\fieldsame,
- \label{eq:b-ys}
-\end{align}
-so $H_n^{\opp}=H_n^{\same}+2hS_n^z$; here $X_\beta^n$ is the chain of
-Eq.~\eqref{eq:states}, and $Z_n$ of Eq.~\eqref{eq:moment} is the periodic
-counterpart. The opposite-field chain has identical bra and ket caps, so
-its even moments are nonnegative. Simultaneous spin rotations of the
-histories act on $L^2(\mu_\beta)$ as real orthogonal operators commuting with
-$X_\beta$; in particular $[U_P,X_\beta]=0$. Before the shift, the absolute
-traced terms sum to at most $3^n e^{\beta[3(n-1)+2h]}$, which justifies the
-regrouping.
-
-\emph{Transfer operator spectrum.---}
-At successive inverse temperatures $\beta_{j+1}=2\beta_j$, the periodic estimates show that the leading eigenvalue of Eq.~\eqref{eq:moment}, $\lambda_j:=\lambda_0(\beta_j)$, is simple and positive. Normalizing it to one:
-\begin{equation}
- T_j:=X_{\beta_j}/\lambda_j=\Pi_j+R_j,\qquad
- \Pi_j=|\psi_j\rangle\langle\psi_j|,\quad\|\psi_j\|=1,
- \label{eq:b-split}
-\end{equation}
-where $\Pi_jR_j=R_j\Pi_j=0$, so $T_j^m=\Pi_j+R_j^m$.
-Furthermore, $\|R_j\|<1$, $U_P\Pi_j=\Pi_j$, and $0<r_j:=\lambda_{j+1}/\lambda_j^2\le1$ (Appendix~\ref{app:b-periodic}).
-
-\emph{Boundary overlap and residual decomposition.---}
-Put $v_j=v_{\beta_j}$. Inserting the leading projector disconnects the network:
-\begin{equation}
- \underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{\Pi_j}}_{c_j}
- =\tnchain[capl=\bar v_j,nostubr]{\psi_j}\;\;\tnchain[nostubl,capr=v_j]{\bar\psi_j}
- =|\langle\psi_j,v_j\rangle|^2.
- \label{eq:b-overlap}
-\end{equation}
-The overlap $c_j$ is the squared projection of $v_j$ onto $\psi_j$,
-\overlapglyph; unlike a periodic trace, where $\trv\Pi_j=1$, it vanishes when
-the two are orthogonal. For even $m\ge2$,
-\begin{equation}
- \underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{T_j^m}}_{B_m(j)}
- =\underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{\Pi_j}}_{c_j}
- +\underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{R_j^m}}_{D_m(j)}.
- \label{eq:b-boundary-split}
-\end{equation}
-Folding establishes nonnegativity of the remainder:
-\begin{equation}
- D_m(j)=\folded{R_j^{m/2}}=\|R_j^{m/2}v_j\|^2\ge0.
- \label{eq:b-fold}
-\end{equation}
-Self-adjointness of $R_j$ makes the lower row the mirror of the upper one, while $B_m=Y_m/\lambda_j^m>0$.
-The boundary defect is defined by
-\begin{equation}
- e_m(j):=\frac{D_m(j)}{B_m(j)}=1-\frac{c_j}{B_m(j)},
- \label{eq:b-e}
-\end{equation}
-the grey share of the contraction, \stackbar{.14}, drawn at the starting
-value $e_{142}(2)\le.14$ of Eq.~\eqref{eq:b-seeds}. Any $e_m<1$ guarantees a
-nonzero overlap with the leading eigenvector.
-
-\emph{Spatial remainder suppression.---}
-For even $m\ge k$, absorbing $k/2$ residual factors into each boundary gives $w=R_j^{k/2}v_j$ and
-\begin{equation}
- D_m(j)=\tnchain[capl={\bar w},capr={w}]{R_j^{m-k}}
- \le\|R_j\|^{m-k}\underbrace{\|w\|^2}_{D_k(j)}.
- \label{eq:b-residual}
-\end{equation}
-Spatial growth suppresses the remainder geometrically, by $\|R_j\|^{m-k}$
-\decayglyph[black!50], while leaving $c_j$ invariant, ensuring $c_j\le B_m(j)\le B_k(j)$.
-
-\emph{Thermal operator composition.---}
-Composition in imaginary time, $e^{-\beta H_m^{\opp}}e^{-\beta H_m^{\opp}}=e^{-2\beta H_m^{\opp}}$, couples temperatures:
-\begin{equation}
- \underbrace{\stackedmpo}_{e^{-\beta H_m^{\opp}}\,e^{-\beta H_m^{\opp}}}
- =\underbrace{\tnchain[node=mpo,legs=1.9em,caps,item={minimum height=1.3em}]{W_{2\beta},W_{2\beta},\cdots,W_{2\beta}}}_{e^{-2\beta H_m^{\opp}}}.
- \label{eq:b-stack-mpo}
-\end{equation}
-This holds as an operator identity on the physical Hilbert space without requiring sitewise virtual fusion.
-Normalizing the trace defines the opposite-field thermal purity:
-\begin{equation}
- \Pt^{\opp}(m,\beta_j):=\frac{Y_m(\beta_{j+1})}{Y_m(\beta_j)^2}=\Tr\rho_m^{\opp}(\beta_j)^2\in(0,1],
- \label{eq:b-a}
-\end{equation}
-with $\rho_m^{\opp}(\beta)=e^{-\beta H_m^{\opp}}/Y_m(\beta)$.
-Factoring out leading eigenvalues links adjacent temperatures:
-\begin{equation}
- B_m(j+1)=\Pt^{\opp}(m,\beta_j)r_j^{-m}B_m(j)^2.
- \label{eq:b-bridge}
-\end{equation}
-
-\emph{Coupled overlap recurrence.---}
-Assuming $e_k(j)<1$ at scale $j$, let primes denote $j+1$, choose even $m>k\ge2$, and let $\|R_{j+1}\|^{m-k}\le q<1$.
-Spatial suppression at $j+1$ gives $D_m'\le qD_k'$.
-Since $c'$ is length-independent, $D_k'-D_m'=B_k'-B_m'$, implying
-\begin{equation}
- (1-q)D_m'\le q(B_k'-B_m'),\qquad
- e_m'\le\frac{q}{1-q}\left(\frac{B_k'}{B_m'}-1\right).
- \label{eq:b-new-e}
-\end{equation}
-Composition relates the ratio to the previous temperature:
-\begin{align}
- \frac{B_k'}{B_m'}
- &=\frac{\Pt^{\opp}(k,\beta_j)}{\Pt^{\opp}(m,\beta_j)}\left[\frac{B_k(j)}{B_m(j)}\right]^2r_j^{m-k}\notag\\
- &\le\frac{1}{\Pt^{\opp}(m,\beta_j)[1-e_k(j)]^2},
- \label{eq:b-new-ratio}
-\end{align}
-using $\Pt^{\opp}(k,\beta_j),r_j\le1$ and $B_m(j)\ge c_j=[1-e_k(j)]B_k(j)>0$.
-Because only the previous overlap appears in the denominator, $e_m'<1$ establishes that the updated overlap remains positive.
-When $e_k(j)$ and $1-\Pt^{\opp}(m,\beta_j)$ are $\mathcal O(x)$, choosing $m-k$ with $q\le\mathcal O(x)$ ensures that $e_m'$ contracts quadratically as $\mathcal O(x^2)$.
-
-\emph{Thermal purity propagation.---}
-The boundary bound enables physical length doubling. For even $M$, Eq.~\eqref{eq:b-bridge} yields
-\begin{equation}
- \frac{\Pt^{\opp}(2M,\beta_j)}{\Pt^{\opp}(M,\beta_j)}
- =r_j^M\underbrace{\frac{B_{2M}(j+1)}{B_M(j+1)}}_{\displaystyle\ge1-e_M(j+1)}
-       \underbrace{\left[\frac{B_M(j)}{B_{2M}(j)}\right]^2}_{\displaystyle\ge1}.
- \label{eq:b-coupling}
-\end{equation}
-The first bound retains $c_{j+1}$, while the second uses Eq.~\eqref{eq:b-residual}.
-Because $r_j^M\approx1$ [Eq.~\eqref{eq:b-ratios}], purity remains controlled upon doubling length.
-Squaring the Gibbs operator advances temperature, as in Eq.~\eqref{eq:squaring}:
-\begin{equation}
- \tncolumn{\rho_m^{\opp},\rho_m^{\opp}}\;=\;\Pt^{\opp}(m,\beta_j)\,\tncolumn[item={minimum height=1.6em}]{\rho_m^{\opp}(\beta_{j+1})},
- \label{eq:stack}
-\end{equation}
-so the squaring bound~\eqref{eq:square} at $m=2M$ drives $1-\Pt^{\opp}$ to $\mathcal O(x^2)$.
-
-\emph{Scale induction.---}
-Coupling the overlap and purity recurrences enables simultaneous induction over physical length and inverse temperature.
-Using the scales of this appendix,
+The proof bounds this purity along a ladder of scales on which length and
+inverse temperature double together,
 \begin{equation}
  \beta_j=49\,2^{j-2},\quad n_j=120\,2^{j-2},\quad
  M_j=2n_j\quad(j\ge2),
  \label{eq:b-scales}
 \end{equation}
-with $k_2=142$, $k_{j+1}=M_j$, and with periodic error $\varepsilon_j$ bounded in Eq.~\eqref{eq:b-tail}, induction establishes
+starting from the scale $(n_2,\beta_2)=(120,49)$ of the inputs of
+Ref.~\cite{boundary}. Here $n_j$ is a ring length and $M_j$ an open-chain
+length; a chain of length $n$ with $M_j\le n\le2M_j$ is handled at scale $j$.
+At every scale $j\ge5$ the proof establishes three bounds, with one
+small number $x_j$ that squares (times ten) from scale to scale:
 \begin{equation}
  \begin{gathered}
  \varepsilon_j,\ e_{k_j}(j),\ 1-\Pt^{\opp}(M_j,\beta_j)\le x_j\quad(j\ge5),\\
@@ -568,13 +547,261 @@ with $k_2=142$, $k_{j+1}=M_j$, and with periodic error $\varepsilon_j$ bounded i
  \end{gathered}
  \label{eq:b-x}
 \end{equation}
-For $j\ge3$, $k_j=M_j/2$, leaving $M_j/2$ sites to suppress remainders.
-One step $j\to j+1$ is three moves. In the diagram below, read from top to
-bottom, each box is one bound: grey for the boundary defect $e_k(j)$, blue
-for the opposite-field thermal purity $\Pt^{\opp}$. Solid boxes are given at
-scale $j$ or proved at scale $j+1$, the dashed box is intermediate, and the
-grey arrow entering a move is the second bound it uses; the bounds shown hold
-for $j\ge5$ (Appendix~\ref{app:b-iteration}):
+In words, the three claims are:
+\begin{itemize}
+\item[(R)] \emph{The ring is close to one eigenvalue:} the ring purity defect
+$\varepsilon_j$ is at most $x_j$, so the transfer operator $X_{\beta_j}$ has
+one dominant eigenvalue (Appendix~\ref{app:b-periodic}).
+\item[(E)] \emph{The ends see that eigenvector:} the boundary defect
+$e_{k_j}(j)$ of Eq.~\eqref{eq:b-e}, the fraction of the open-chain partition
+function not carried by the leading eigenvector, is at most $x_j$.
+\item[(T)] \emph{The open chain is close to its ground state:} the thermal
+defect $1-\Pt^{\opp}(M_j,\beta_j)$ of an auxiliary open chain with opposite end
+fields [Eq.~\eqref{eq:b-a}] is at most $x_j$.
+\end{itemize}
+Together they give $\Pt^{\same}(n,\beta_j)\ge1-4x_j$ for every
+$M_j\le n\le2M_j$ [Eq.~\eqref{eq:b-final-purity}]. Since $x_j\le.01$, the
+right side of Eq.~\eqref{eq:b-target} is then at most $4x_j/(1-4x_j)$, below
+$10^{-2^{j-5}}$, and $\beta_j=392\,2^{j-5}$ turns this into
+$\Delta_n>(\log10)/392$. The three claims depend on each other as follows.
+Claim (R) concerns the ring alone; Appendix~\ref{app:b-periodic} proves it
+from the ring inputs by the doubling estimate of the main text. Claims (E) and
+(T) at scale $j+1$ follow from (E) and (T) at scale $j$ together with (R); this
+is the induction step below. Appendix~\ref{app:b-iteration} supplies the base
+case $j=5$ from the inputs at $j=2$. The intervals $[M_j,2M_j]$ with $j\ge5$
+cover every $n\ge M_5=1920$, which is where the bound $n\ge1921$ (odd) comes
+from.
+
+\emph{Why can the ring proof not be applied directly?} An open chain
+\tnchain[node=xvertex,caps]{,\cdots,} has no ring to close: its partition
+function is not a trace of $X_\beta^n$, so there is no spatial purity to
+square. Its bulk, however, is built from the same transfer operator $X_\beta$,
+and only its two ends differ: the outer virtual legs of the first and last
+sites are closed by boundary vectors. A classical example is the open Ising
+chain, whose partition function is $u^{\mathsf T}K^{n-1}u$ with transfer matrix
+$K$ and $u=(e^{\beta h},e^{-\beta h})$ for a field $h$ on each end spin.
+A periodic trace \tnchain[node=xvertex,ring]{,\cdots,} weights every
+eigenvector of $X_\beta$ by one. An open chain instead weights the leading
+eigenvalue $\lambda(\beta)$ by the squared boundary overlap $c(\beta)$
+[Eq.~\eqref{eq:b-overlap}], which vanishes if the boundary vector is
+orthogonal to the leading eigenvector. For long chains the open partition
+function is therefore approximately $c(\beta)\lambda(\beta)^n$, and its thermal
+purity approximately $[\lambda(2\beta)/\lambda(\beta)^2]^n c(2\beta)/c(\beta)^2$.
+The first factor is a bulk factor controlled by the ring [claim (R)]. The
+second is a boundary factor independent of $n$, so it cancels when lengths $M$
+and $2M$ are compared. Doubling the length therefore costs only the bulk
+factor, and doubling the inverse temperature by squaring~\eqref{eq:squaring}
+needs no ring at all. All of this requires the leading term
+$c(\beta)\lambda(\beta)^n$ to dominate the rest; claim (E) states exactly that,
+through the boundary defect $e$, which shrinks as the chain grows.
+
+\emph{What closes the ends of the chain?} The open chain uses the tensor
+$W_\beta$ of Eq.~\eqref{eq:local}, with the per-site energy shift
+$\kappa=700741/500000$ of Ref.~\cite{boundary} (called $a$ there) absorbed into
+each tensor as a factor $e^{-\kappa\beta}$, that is,
+$H_n^\nu\to H_n^\nu+\kappa nI$. The shift makes the leading periodic eigenvalue
+$\lambda_0(\beta_j)$ close to one at the scales~\eqref{eq:b-scales} and cancels
+from every Gibbs state and every purity. On an end site, the field
+$\pm hS^z=\mp(ih)G_z$ enters the imaginary-time expansion like half a bond: it
+inserts $G_z$ events on the outer virtual leg, each with weight $ih$. So for a
+history $a$ with $|a|$ events, the boundary vector on $L^2(\mu_\beta)$ is
+\begin{equation}
+ v_\beta(a)=
+ \begin{cases}(ih)^{|a|},&\text{all labels are }z,\\0,&\text{otherwise},
+ \end{cases}
+ \qquad \|v_\beta\|^2=e^{\beta h^2},
+ \label{eq:b-vector}
+\end{equation}
+with value one on the empty history ($|a|=0$). The norm follows from the time
+integrals of the $z$ events: $\|v_\beta\|^2$ is the sum of
+$(\beta h^2)^{|a|}/|a|!$ over $|a|\ge0$.
+
+\emph{Which fields do the two caps produce?} The conjugated left cap
+$\bar v_\beta$ weights each $z$ event by $(-ih)G_z=+hS^z$ and so adds $-hS_1^z$
+to the Hamiltonian. The unbarred right cap $v_\beta$ weights each $z$ event by
+$(ih)G_z=-hS^z$ and adds $+hS_n^z$. The two plain caps therefore give the
+opposite-field chain $H_n^{\opp}:=H_n^{\same}+2hS_n^z$, \fieldopp. To restore
+equal fields, the right field must be reversed. The $\pi$ rotation
+$P=\operatorname{diag}(1,-1,-1)$ about $x$ flips $S^z\to-S^z$ and every $z$
+label, so its virtual action $U_P$ on the right cap does this, \fieldsame.
+Opening the ring of Eq.~\eqref{eq:mpo} and capping its ends therefore gives
+\begin{equation}
+ e^{-\beta H_n^{\same}}=\tnchain[node=mpo,legs,capl=\bar v_\beta,capr=U_Pv_\beta]{W,W,\cdots,W,W},
+ \label{eq:b-mpo}
+\end{equation}
+and tracing the physical legs onto the transfer chain $X_\beta^n$ of
+Eq.~\eqref{eq:states} gives the open-chain partition functions, the open
+counterparts of $Z_n$ in Eq.~\eqref{eq:moment}:
+\begin{align}
+ Y_n(\beta)&=\Tr e^{-\beta H_n^{\opp}}
+ =\tnchain[capl={\bar v_\beta},capr={v_\beta}]{X_\beta^n},\quad\fieldopp,\label{eq:b-y}\\
+ Y_n^{\same}(\beta)&=\Tr e^{-\beta H_n^{\same}}
+ =\tnchain[capl={\bar v_\beta},capr={U_Pv_\beta}]{X_\beta^n},\quad\fieldsame.
+ \label{eq:b-ys}
+\end{align}
+The proof works with the opposite-field chain first because its two caps are
+the same vector, so its even moments are nonnegative; the last step transfers
+the bounds to $H_n^{\same}$. Simultaneous spin rotations of the histories act on
+$L^2(\mu_\beta)$ as real orthogonal operators commuting with $X_\beta$; in
+particular $[U_P,X_\beta]=0$. Before the $\kappa$ shift, the series of absolute
+values for the traced expansion sums to at most
+$3^n e^{\beta[3(n-1)+2h]}<\infty$, so Fubini's theorem justifies regrouping the
+time-ordered series into the site-by-site
+contractions~\eqref{eq:b-y}--\eqref{eq:b-ys}.
+
+\emph{What does claim (R) say about $X_\beta$?} At successive inverse
+temperatures $\beta_{j+1}=2\beta_j$, the ring estimates of
+Appendix~\ref{app:b-periodic} show that the leading eigenvalue
+$\lambda_j:=\lambda_0(\beta_j)$ of Eq.~\eqref{eq:moment} is simple and positive,
+\specbars{.9,.06,.04}. Normalizing $\lambda_j$ to one splits
+$X_{\beta_j}/\lambda_j$ into its leading projector $\Pi_j$ and an orthogonal
+remainder $R_j$ ($\Pi_jR_j=R_j\Pi_j=0$):
+\begin{equation}
+ T_j:=X_{\beta_j}/\lambda_j=\Pi_j+R_j,\qquad
+ \Pi_j=|\psi_j\rangle\langle\psi_j|,\quad\|\psi_j\|=1,
+ \label{eq:b-split}
+\end{equation}
+so $T_j^m=\Pi_j+R_j^m$. Appendix~\ref{app:b-periodic} supplies the needed facts
+about these objects: $\|R_j\|<1$, $U_P\Pi_j=\Pi_j$, and
+$0<r_j:=\lambda_{j+1}/\lambda_j^2\le1$, with quantitative versions in
+Eqs.~\eqref{eq:b-tail}--\eqref{eq:b-ratios}.
+
+\emph{How much of the boundary vector lies along the leading eigenvector?}
+Inserting the leading projector between the two caps cuts the network into
+two pieces:
+\begin{equation}
+ \underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{\Pi_j}}_{c_j}
+ =\tnchain[capl=\bar v_j,nostubr]{\psi_j}\;\;\tnchain[nostubl,capr=v_j]{\bar\psi_j}
+ =|\langle\psi_j,v_j\rangle|^2,
+ \label{eq:b-overlap}
+\end{equation}
+where $v_j=v_{\beta_j}$. The overlap $c_j$ is the squared projection of $v_j$
+onto $\psi_j$, \overlapglyph. On a ring the same insertion gives $\trv\Pi_j=1$;
+here it gives $c_j$, which vanishes when the two vectors are orthogonal. For
+even $m\ge2$, $T_j^m=\Pi_j+R_j^m$ splits the normalized partition function
+$B_m(j):=Y_m(\beta_j)/\lambda_j^m>0$ into $c_j$ and a remainder $D_m(j)$:
+\begin{equation}
+ \underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{T_j^m}}_{B_m(j)}
+ =\underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{\Pi_j}}_{c_j}
+ +\underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{R_j^m}}_{D_m(j)}.
+ \label{eq:b-boundary-split}
+\end{equation}
+The remainder is nonnegative. Since $R_j$ is self-adjoint, write
+$R_j^m=R_j^{m/2}R_j^{m/2}$ and let each half act on one boundary vector; the
+network becomes a squared norm:
+\begin{equation}
+ D_m(j)=\folded{R_j^{m/2}}=\|R_j^{m/2}v_j\|^2\ge0.
+ \label{eq:b-fold}
+\end{equation}
+The \emph{boundary defect} of claim (E) is the remainder's share,
+\begin{equation}
+ e_m(j):=\frac{D_m(j)}{B_m(j)}=1-\frac{c_j}{B_m(j)},
+ \label{eq:b-e}
+\end{equation}
+the grey fraction of the bar \stackbar{.14}, drawn at the starting value
+$e_{142}(2)\le.14$ of Eq.~\eqref{eq:b-seeds}. Any $e_m<1$ guarantees a nonzero
+overlap with the leading eigenvector.
+
+\emph{Why does a longer chain help?} A longer chain shrinks the remainder and
+leaves $c_j$ unchanged. For even $m\ge k$, move $k/2$ factors of $R_j$ onto
+each boundary vector and put $y=R_j^{k/2}v_j$:
+\begin{equation}
+ D_m(j)=\tnchain[capl={\bar y},capr={y}]{R_j^{m-k}}
+ \le\|R_j\|^{m-k}\underbrace{\|y\|^2}_{D_k(j)}.
+ \label{eq:b-residual}
+\end{equation}
+So the remainder decays geometrically with the extra length $m-k$,
+\decayglyph[black!50], and $c_j\le B_m(j)\le B_k(j)$.
+
+\emph{How are two temperatures connected?} Eq.~\eqref{eq:b-mpo} is an exact
+operator identity on the physical Hilbert space, so composing
+$e^{-\beta H_m^{\opp}}e^{-\beta H_m^{\opp}}=e^{-2\beta H_m^{\opp}}$ in imaginary
+time links $\beta$ to $2\beta$:
+\begin{equation}
+ \underbrace{\stackedmpo}_{e^{-\beta H_m^{\opp}}\,e^{-\beta H_m^{\opp}}}
+ =\underbrace{\tnchain[node=mpo,legs=1.9em,caps,item={minimum height=1.3em}]{W_{2\beta},W_{2\beta},\cdots,W_{2\beta}}}_{e^{-2\beta H_m^{\opp}}}.
+ \label{eq:b-stack-mpo}
+\end{equation}
+This identity holds between the operators; it does not say that two $W_\beta$
+tensors combine into one $W_{2\beta}$ site by site. Normalizing the trace
+defines the opposite-field Gibbs state
+$\rho_m^{\opp}(\beta)=e^{-\beta H_m^{\opp}}/Y_m(\beta)$, whose thermal purity is
+the quantity of claim (T):
+\begin{equation}
+ \Pt^{\opp}(m,\beta_j):=\frac{Y_m(\beta_{j+1})}{Y_m(\beta_j)^2}=\Tr\rho_m^{\opp}(\beta_j)^2\in(0,1].
+ \label{eq:b-a}
+\end{equation}
+Substituting $Y_m(\beta_j)=\lambda_j^m B_m(j)$ and $\lambda_{j+1}=r_j\lambda_j^2$
+into Eq.~\eqref{eq:b-a} links the normalized partition functions at adjacent
+temperatures:
+\begin{equation}
+ B_m(j+1)=\Pt^{\opp}(m,\beta_j)r_j^{-m}B_m(j)^2.
+ \label{eq:b-bridge}
+\end{equation}
+
+\emph{(E) Why does the boundary defect shrink from one scale to the next?}
+This is Move~1. Assume $e_k(j)<1$ at scale $j$, let primes denote scale $j+1$,
+choose even $m>k\ge2$, and let $\|R_{j+1}\|^{m-k}\le q<1$. The suppression
+bound~\eqref{eq:b-residual} at scale $j+1$ gives $D_m'\le qD_k'$. Since $c'$ does
+not depend on the length, $D_k'-D_m'=B_k'-B_m'$. Substituting
+$D_k'=D_m'+B_k'-B_m'$ into $D_m'\le qD_k'$ gives the first inequality below, and
+dividing by $B_m'$ gives the second:
+\begin{equation}
+ (1-q)D_m'\le q(B_k'-B_m'),\qquad
+ e_m'\le\frac{q}{1-q}\left(\frac{B_k'}{B_m'}-1\right).
+ \label{eq:b-new-e}
+\end{equation}
+The ratio $B_k'/B_m'$ at the new temperature is not known directly, so we
+express it through the old temperature. Using $\Pt^{\opp}(k,\beta_j),r_j\le1$
+and $B_m(j)\ge c_j=[1-e_k(j)]B_k(j)>0$, Eq.~\eqref{eq:b-bridge} gives
+\begin{align}
+ \frac{B_k'}{B_m'}
+ &=\frac{\Pt^{\opp}(k,\beta_j)}{\Pt^{\opp}(m,\beta_j)}\left[\frac{B_k(j)}{B_m(j)}\right]^2r_j^{m-k}\notag\\
+ &\le\frac{1}{\Pt^{\opp}(m,\beta_j)[1-e_k(j)]^2}.
+ \label{eq:b-new-ratio}
+\end{align}
+Only the old overlap appears in the denominator, so $e_m'<1$ shows that the new
+overlap is again positive. If $e_k(j)$ and $1-\Pt^{\opp}(m,\beta_j)$ are
+$\mathcal O(x)$, the right side of Eq.~\eqref{eq:b-new-ratio} is $1+\mathcal
+O(x)$; choosing $m-k$ so large that $q\le\mathcal O(x)$ then makes $e_m'$ of
+order $x^2$.
+
+\emph{(T) Why does doubling the length keep the purity?} This is Move~2: once
+the overlap is controlled, the length can double at almost no cost in purity.
+Solve Eq.~\eqref{eq:b-bridge} for $\Pt^{\opp}(m,\beta_j)$ and divide the
+$m=2M$ identity by the $m=M$ identity, for even $M$. The two bracketed factors
+are bounded by $B_{2M}(j+1)\ge c_{j+1}=[1-e_M(j+1)]B_M(j+1)$ and
+$B_M(j)\ge B_{2M}(j)$ [Eq.~\eqref{eq:b-residual}]:
+\begin{equation}
+ \frac{\Pt^{\opp}(2M,\beta_j)}{\Pt^{\opp}(M,\beta_j)}
+ =r_j^M\underbrace{\frac{B_{2M}(j+1)}{B_M(j+1)}}_{\displaystyle\ge1-e_M(j+1)}
+       \underbrace{\left[\frac{B_M(j)}{B_{2M}(j)}\right]^2}_{\displaystyle\ge1}.
+ \label{eq:b-coupling}
+\end{equation}
+The bulk factor $r_j^M$ is close to one by Eq.~\eqref{eq:b-ratios}, so the
+purity drops only slightly when the length doubles. Move~3 then doubles the
+inverse temperature by squaring the Gibbs operator, as in
+Eq.~\eqref{eq:squaring}:
+\begin{equation}
+ \tncolumn{\rho_m^{\opp},\rho_m^{\opp}}\;=\;\Pt^{\opp}(m,\beta_j)\,\tncolumn[item={minimum height=1.6em}]{\rho_m^{\opp}(\beta_{j+1})},
+ \label{eq:stack}
+\end{equation}
+and the squaring bound~\eqref{eq:square} at $m=2M$ brings $1-\Pt^{\opp}$ down to
+order $x^2$.
+
+\emph{How do the three moves make an induction?} Each step $j\to j+1$ doubles
+length and inverse temperature, with boundary-defect lengths $k_2=142$ (the
+length of the input $e_{142}(2)$) and $k_{j+1}=M_j$. The ring defect
+$\varepsilon_j$ ($\varepsilon_2=.052$, $\varepsilon_{j+1}=6\varepsilon_j^2$) is
+bounded in Appendix~\ref{app:b-periodic} [Eq.~\eqref{eq:b-tail}]. From the
+inputs at $j=2$, three explicit steps in Appendix~\ref{app:b-iteration} reach
+$j=5$, and induction on $j\ge5$ then proves Eq.~\eqref{eq:b-x}. For $j\ge3$,
+$k_j=M_j/2$, which leaves $M_j/2$ sites to suppress the remainder in Move~1.
+In the diagram below, read from top to bottom, each box is one bound: grey for
+the boundary defect $e_k(j)$ [claim (E)], blue for the opposite-field thermal
+purity $\Pt^{\opp}$ [claim (T)]. Solid boxes are given at scale $j$ or proved
+at scale $j+1$, the dashed box is intermediate, and the grey arrow entering a
+move is the second bound it uses:
 \begin{proofdiagram}
 \begin{prooflanes}
  \lanebound{b}{e0}{0}{0}{$e_{M_j/2}(j)\le x$}
@@ -590,54 +817,67 @@ for $j\ge5$ (Appendix~\ref{app:b-iteration}):
 \end{prooflanes}
 \end{proofdiagram}
 Move~1 is the overlap recurrence~\eqref{eq:b-new-e}--\eqref{eq:b-new-ratio},
-move~2 the length doubling~\eqref{eq:b-coupling},
-and move~3 the squaring~\eqref{eq:stack}. Since $M_{j+1}=2M_j$, the proved
-pair is the given pair of scale $j+1$, so the step repeats. The defect falls doubly exponentially,
-$x_5=10^{-2}$\,\sparkline{-17}{-2}{-2,-3,-5,-9,-17}\,$x_9=10^{-17}$ (log scale); since
-$\beta_j=392\,2^{j-5}$, it decays exponentially in inverse temperature.
+Move~2 the length doubling~\eqref{eq:b-coupling}, and Move~3 the
+squaring~\eqref{eq:stack}. Since $M_{j+1}=2M_j$, the proved pair is the given
+pair of scale $j+1$, so the step repeats. The numbers $10x^2$ and
+$1-2x-16x^2$ in the boxes are checked at the end of
+Appendix~\ref{app:b-iteration}. The defect falls
+doubly exponentially,
+$x_5=10^{-2}$\,\sparkline{-17}{-2}{-2,-3,-5,-9,-17}\,$x_9=10^{-17}$ (log
+scale); since $\beta_j=392\,2^{j-5}$, it decays exponentially in inverse
+temperature.
 
-\emph{Equal boundary fields and odd lengths.---}
-The opposite-field estimates extend to the equal-field Hamiltonian~\eqref{eq:b-model} via the spin-rotation symmetry $U_P$.
-Next to the leading projector, the rotation operator acts trivially:
+\emph{How do the bounds pass to equal fields and odd lengths?} Claims (E) and
+(T) concern the opposite-field chain at even lengths $M_j$. The theorem needs
+the equal-field chain at odd $n$. The rotation $U_P$ connects the two chains
+[Eq.~\eqref{eq:b-ys}], and it acts trivially next to the leading projector:
 \begin{equation}
  \tnchain[last=sym]{\Pi_j,U_P}\;=\;\tnchain{\Pi_j}.
  \label{eq:b-twist}
 \end{equation}
-Thus $Q_j(n):=Y_n^{\same}(\beta_j)/\lambda_j^n$ shares the leading value $c_j$.
-For any even $M\le n$, commuting $U_P$ through the right-hand tensors ($[U_P,R_j]=0$) isolates the remainder:
+Thus $Q_j(n):=Y_n^{\same}(\beta_j)/\lambda_j^n$ has the same leading value
+$c_j$. For any even $M\le n$, moving $U_P$ through the right-hand tensors
+($[U_P,R_j]=0$) isolates the remainder:
 \begin{align}
  Q_j(n)-c_j&=\tnchain[capl=\bar v_j,capr=v_j]{R_j^{M/2},R_j^{n-M}U_P,R_j^{M/2}}\notag\\
- &=\tnchain[capl={\bar w},capr={w}]{R_j^{n-M}U_P},\qquad
- w=R_j^{M/2}v_j.
+ &=\tnchain[capl={\bar y},capr={y}]{R_j^{n-M}U_P},\qquad
+ y=R_j^{M/2}v_j.
  \label{eq:b-signed}
 \end{align}
 Because $\|R_j^{n-M}U_P\|\le1$,
 \begin{equation}
- |Q_j(n)-c_j|\le\|w\|^2=D_M(j),
+ |Q_j(n)-c_j|\le\|y\|^2=D_M(j),
  \label{eq:b-odd-bound}
 \end{equation}
-bounding the odd-length remainder by $D_M(j)$ without requiring positivity of $R_j^n$.
+which bounds the remainder at odd length by $D_M(j)$ without needing
+$R_j^n$ to be positive.
 
-For $M_j\le n\le2M_j$ and $M=M_j=k_{j+1}$, this yields
+\emph{What equal-field purity follows?} For $M_j\le n\le2M_j$ and
+$M=M_j=k_{j+1}$, Eq.~\eqref{eq:b-odd-bound} gives $Q\le c+D_M=B_M$ and
+$Q\ge c-D_M=(1-2e_M)B_M$. With $e_M(j+1)\le x_{j+1}$ from claim (E)
+[Eq.~\eqref{eq:b-x}],
 \begin{equation}
  Q_j(n)\le B_M(j),\quad
  Q_{j+1}(n)\ge(1-2x_{j+1})B_M(j+1)>0.
  \label{eq:b-odd-new}
 \end{equation}
-Dividing these contractions via Eq.~\eqref{eq:b-bridge} gives the equal-field purity:
+Since $\Pt^{\same}(n,\beta_j)=Q_{j+1}(n)\lambda_{j+1}^n/[Q_j(n)\lambda_j^n]^2$,
+inserting these bounds and Eq.~\eqref{eq:b-bridge} at $m=M$, and using
+$r_j^{n-M}\ge r_j^M$ [Eq.~\eqref{eq:b-ratios}] with claims (R) and (T),
+$\varepsilon_j\le x_j$, $\varepsilon_{j+1}\le6x_j^2$, $x_{j+1}=10x_j^2$, gives
+the equal-field purity:
 \begin{align}
  \Pt^{\same}(n,\beta_j)
  &=\frac{Y_n^{\same}(\beta_{j+1})}{Y_n^{\same}(\beta_j)^2}
  \ge(1-2x_{j+1})\Pt^{\opp}(M,\beta_j)r_j^{n-M}\notag\\
  &\ge(1-2x_{j+1})(1-x_j)(1-\varepsilon_j)(1-\varepsilon_{j+1})\notag\\
- &\ge1-2x_j-26x_j^2\ge1-4x_j,
+ &\ge1-2x_j-26x_j^2\ge1-4x_j.
  \label{eq:b-final-purity}
 \end{align}
-using $r_j^{n-M}\ge r_j^M$ [Eq.~\eqref{eq:b-ratios}] and Appendix~\ref{app:b-iteration} bounds ($\varepsilon_j\le x_j$, $\varepsilon_{j+1}\le6x_j^2$, $x_{j+1}=10x_j^2$).
 
 \begin{proof}[Proof of Theorem~\ref{thm:b-gap}]
-The intervals $[M_j,2M_j]$ cover every $n\ge M_5=1920$.
-For odd $n\ge1921$, choose such a $j$.
+The intervals $[M_j,2M_j]$ cover every integer $n\ge M_5=1920$.
+For odd $n\ge1921$, choose $j\ge5$ with $M_j\le n\le2M_j$.
 The largest Gibbs weight satisfies $w_0\ge\Pt^{\same}(n,\beta_j)\ge1-4x_j>1/2$:
 the spectrum looks like \specbars{.97,.02,.01}, so the ground state is unique.
 Equation~\eqref{eq:b-target} gives
@@ -650,7 +890,11 @@ Taking logarithms and using $\beta_j=392\,2^{j-5}$ yields $\Delta_n>(\log10)/392
 \end{proof}
 
 \section{Transfer bounds at the open-chain scales}\label{app:b-periodic}
-For the scales in Eq.~\eqref{eq:b-scales}, Appendix~\ref{app:open} uses
+This appendix proves claim (R) of Appendix~\ref{app:open}: at every
+scale~\eqref{eq:b-scales} the ring purity defect $\varepsilon_j$ is small,
+starting from $\varepsilon_2=.052$ and squaring (times six) at each step. It
+then turns that purity bound into the facts about the transfer operator that
+Appendix~\ref{app:open} uses: a remainder bound and two eigenvalue relations,
 \begin{equation}
  \begin{gathered}
  \|R_j\|^{n_j}\le d(\varepsilon_j),\qquad d(\varepsilon)=\frac{\varepsilon}{2-3\varepsilon},\\
@@ -664,50 +908,63 @@ and
  U_P\Pi_j=\Pi_j.
  \label{eq:b-ratios}
 \end{equation}
-These follow from the first row of Eq.~\eqref{eq:b-seeds} by the doubling
-estimate of the main text, with a larger starting defect: if
-$\Ps(n,\beta),\Pt(2n,\beta)\ge1-\varepsilon$, move~1 of Eq.~\eqref{eq:update}
-gives $\Ps(n,2\beta)\ge(1-\varepsilon)^3$, and squaring with Eq.~\eqref{eq:square} bounds $1-\Ps(2n,2\beta)$ by
+
+\emph{Why does the ring defect square at each scale?} The bound follows from the
+first row of Eq.~\eqref{eq:b-seeds} by the doubling estimate of the main text.
+The only change is the starting defect: $\varepsilon_2=1-.948=.052$ is larger
+than the $1/100$ assumed in Eq.~\eqref{eq:update}, so the constant $5$ there
+becomes $6$. If $\Ps(n,\beta),\Pt(2n,\beta)\ge1-\varepsilon$, Move~1 of
+Eq.~\eqref{eq:update} gives $\Ps(n,2\beta)\ge(1-\varepsilon)^3$, and squaring
+with Eq.~\eqref{eq:square} bounds $1-\Ps(2n,2\beta)$ by
 \begin{equation}
  f(1-(1-\varepsilon)^3)=\frac{\varepsilon^2}{2}
  \left[\sum_{s=1}^3(1-\varepsilon)^{-s}\right]^2\le6\varepsilon^2
  \label{eq:b-periodic-six}
 \end{equation}
-for $0\le\varepsilon\le.052$, in place of $5\varepsilon^2$. Since $6\varepsilon^2\le\varepsilon$,
-moves~3 and 4 give the same bound for $1-\Pt(4n,2\beta)$.
-Induction therefore proves
+for $0\le\varepsilon\le.052$, in place of $5\varepsilon^2$. Since
+$6\varepsilon^2\le\varepsilon$, Moves~3 and 4 give the same bound for
+$1-\Pt(4n,2\beta)$. Induction therefore proves
 $\Ps(n_j,\beta_j),\Pt(M_j,\beta_j)\ge1-\varepsilon_j$.
 
-Consider a probability list with purity at least $1-\varepsilon>1/2$ and
-largest weight $p_0$; put $z=1-p_0$. The purity is at most
-$p_0^2+z^2=1-2z(1-z)$, so $2z(1-z)\le\varepsilon$. It is also at most $p_0$,
-so $p_0>1/2$: the largest weight is unique and $z<1/2$. Then
-$z\le2z(1-z)\le\varepsilon$, hence $z\le\varepsilon/[2(1-\varepsilon)]$ and $z/(1-z)\le d(\varepsilon)$.
-Applied to the eigenvalues $p_i=|\lambda_i(\beta_j)|^{n_j}/Z_{n_j}(\beta_j)$ of $\sigma_{n_j}(\beta_j)$,
-the largest-modulus eigenvalue is simple and
+\emph{How does a purity bound bound the remainder?} A purity close to one
+forces one probability to dominate, \specbars{.9,.06,.04}, and the rest to be
+small. To make this quantitative, consider a probability list with purity at
+least $1-\varepsilon>1/2$ and largest weight $p_0$, and put $z=1-p_0$. The
+purity is at most $p_0^2+z^2=1-2z(1-z)$, so $2z(1-z)\le\varepsilon$. It is also
+at most $p_0$, so $p_0>1/2$: the largest weight is unique and $z<1/2$. Then
+$z\le2z(1-z)\le\varepsilon$, hence $z\le\varepsilon/[2(1-\varepsilon)]$ and
+$z/(1-z)\le d(\varepsilon)$. Applied to the eigenvalues
+$p_i=|\lambda_i(\beta_j)|^{n_j}/Z_{n_j}(\beta_j)$ of $\sigma_{n_j}(\beta_j)$,
+this shows that the largest-modulus eigenvalue is simple and
 \begin{equation}
  \sum_{i\ge1}\left|\frac{\lambda_i(\beta_j)}{\lambda_j}\right|^{n_j}
  \le d(\varepsilon_j),
  \label{eq:b-full-tail}
 \end{equation}
-which implies Eq.~\eqref{eq:b-tail}.
-Positivity of $Z_N(\beta_j)$ for all large odd $N$ ensures that the leading eigenvalue is positive, since a negative leading eigenvalue would make $\trv X_{\beta_j}^N$ negative.
-The residual sum tends to zero since $X_{\beta_j}$ is Hilbert--Schmidt
-and its residual spectral radius is strictly smaller than $\lambda_j$.
+which implies Eq.~\eqref{eq:b-tail}. The leading eigenvalue is positive:
+$Z_N(\beta_j)>0$ for all large odd $N$, whereas a negative leading eigenvalue
+would make $\trv X_{\beta_j}^N$ negative. The remainder sum tends to zero
+because $X_{\beta_j}$ is Hilbert--Schmidt and its remaining spectral radius is
+strictly smaller than $\lambda_j$.
 
-The real kernel admits real orthogonal virtual actions of the three
-$\pi$ rotations and the cyclic permutation of the coordinate axes,
-all commuting with $X_{\beta_j}$. On its real one-dimensional leading
-eigenspace these actions are signs. The order-three cyclic rotation
-has sign $+1$ and conjugates the three $\pi$ rotations into one another,
-so their signs agree. The product of two is the third; their common
-sign is therefore $+1$. This proves $U_P\Pi_j=\Pi_j$.
+\emph{Why is the leading eigenvector unchanged by $U_P$?} This fact,
+$U_P\Pi_j=\Pi_j$ in Eq.~\eqref{eq:b-ratios}, is what lets
+Appendix~\ref{app:open} pass from opposite to equal fields. The real kernel
+admits real orthogonal virtual actions of the three $\pi$ rotations and of the
+cyclic permutation of the coordinate axes, all commuting with $X_{\beta_j}$. On
+the real one-dimensional leading eigenspace these actions are signs. The
+order-three cyclic rotation has sign $+1$ and conjugates the three $\pi$
+rotations into one another, so their signs agree; since the product of two is
+the third, their common sign is $+1$, giving $U_P\Pi_j=\Pi_j$.
 
-Finally $Z_N(\beta_{j+1})\le Z_N(\beta_j)^2$ by physical purity.
-Taking $N$th roots along even $N\to\infty$ gives
-$\lambda_{j+1}\le\lambda_j^2$. For the lower bound at the required
-finite length, the largest eigenvalue of $\sigma_{M_j}(\beta_{j+1})$
-is at least $1-\varepsilon_{j+1}$, since $M_j=n_{j+1}$. Hence
+\emph{How close is $r_j$ to one?} The ratio $r_j=\lambda_{j+1}/\lambda_j^2$ is
+the bulk factor of the length doubling in Appendix~\ref{app:open}
+[Eq.~\eqref{eq:b-coupling}]. Its upper bound holds because the thermal purity
+$\Pt(N,\beta_j)$ is at most one, so $Z_N(\beta_{j+1})\le Z_N(\beta_j)^2$;
+taking $N$th roots along even $N\to\infty$ gives $\lambda_{j+1}\le\lambda_j^2$.
+The lower bound is needed at the finite length $M_j=n_{j+1}$, where the largest
+eigenvalue of $\sigma_{M_j}(\beta_{j+1})$ is at least $1-\varepsilon_{j+1}$.
+Hence
 \begin{align*}
  \lambda_{j+1}^{M_j}
  &\ge(1-\varepsilon_{j+1})Z_{M_j}(\beta_{j+1})\\
@@ -718,7 +975,17 @@ which is the remaining bound in Eq.~\eqref{eq:b-ratios}.
 
 
 \section{Starting estimates for the open chain}\label{app:b-iteration}
-The certified initial estimates~\eqref{eq:b-seeds} combine periodic variational estimates with small-cluster boundary certificates from Ref.~\cite{boundary}:
+This appendix supplies the base case of the induction of
+Appendix~\ref{app:open}: claims (E) and (T) at $j=5$, with all three defects of
+Eq.~\eqref{eq:b-x} below $x_5=.01$. The certified inputs of
+Ref.~\cite{boundary} are given at $j=2$, where the open-chain defects are $.14$
+and $.21$, far too large for the induction step, which assumes $x\le.01$. Three
+explicit steps bridge $j=2$ to $j=5$. The appendix states the inputs, turns the
+three moves of Appendix~\ref{app:open} into numerical update rules, runs those
+rules for three steps, and finally checks the induction step for $j\ge5$.
+
+\emph{What are the inputs?} Ref.~\cite{boundary} certifies, from periodic
+variational estimates and small-cluster boundary computations,
 \begin{equation}
  \begin{gathered}
  \Ps(120,49)\ge .948,\qquad \Pt(240,49)\ge .948,\\
@@ -726,30 +993,42 @@ The certified initial estimates~\eqref{eq:b-seeds} combine periodic variational 
  \end{gathered}
  \label{eq:b-seeds}
 \end{equation}
+The first row gives the ring purity defect $\varepsilon_2=1-.948=.052$ at
+$(n_2,\beta_2)=(120,49)$, used for claim (R) in
+Appendix~\ref{app:b-periodic}. The second row gives the open-chain boundary
+defect at $k_2=142$ [claim (E)] and the opposite-field thermal purity at
+$M_2=240$ [claim (T)].
 
-Combining Eqs.~\eqref{eq:b-new-e} and \eqref{eq:b-new-ratio} gives
+\emph{How do the three moves become numbers?} Write $E_j$ for an upper bound on
+$e_{k_j}(j)$ and $\eta_j$ for an upper bound on $1-\Pt^{\opp}(M_j,\beta_j)$.
+Move~1 controls the overlap: combining Eqs.~\eqref{eq:b-new-e} and
+\eqref{eq:b-new-ratio} gives
 \begin{equation}
  \begin{gathered}
  e_m(j+1)\le F(q,e_k(j),\Pt^{\opp}(m,\beta_j)),\\
- F(q,e,t)=\frac{q}{1-q}\left[\frac1{(1-e)^2t}-1\right].
+ F(q,e,t)=\frac{q}{1-q}\left[\frac1{(1-e)^2t}-1\right],
  \end{gathered}
  \label{eq:b-F}
 \end{equation}
-This function increases with $q,e$ and decreases with $t$.
-Track $e_{k_j}(j)\le E_j$ and $\Pt^{\opp}(M_j,\beta_j)\ge1-\eta_j$.
-With $k_2=142$ and $k_{j+1}=M_j$, the updates are
+which increases with $q,e$ and decreases with $t$. The suppression factor $q$
+must bound $\|R_{j+1}\|^{M_j-k_j}$. Eq.~\eqref{eq:b-tail} bounds
+$\|R_{j+1}\|^{n_{j+1}}$, and $n_{j+1}=M_j$, which fixes the exponent
+$(M_j-k_j)/M_j$ in Eq.~\eqref{eq:b-q}. Moves~2 and 3 control the purity through
+Eqs.~\eqref{eq:b-coupling} and \eqref{eq:square}. With $k_2=142$ and
+$k_{j+1}=M_j$, the updates are
 \begin{align}
  q_j&=d(\varepsilon_{j+1})^{(M_j-k_j)/M_j},\label{eq:b-q}\\
  E_{j+1}&\ge F(q_j,E_j,1-\eta_j),\label{eq:b-E-update}\\
  \eta_{j+1}&\ge f\bigl(1-(1-\eta_j)(1-\varepsilon_j)
-                   (1-\varepsilon_{j+1})(1-E_{j+1})\bigr).
+                   (1-\varepsilon_{j+1})(1-E_{j+1})\bigr),
  \label{eq:b-eta-update}
 \end{align}
-Choose $E_{j+1},\eta_{j+1}$ in $[0,1)$.
-Here $q_j$ follows from Eq.~\eqref{eq:b-tail} with $n_{j+1}=M_j$, while Eqs.~\eqref{eq:b-coupling} and \eqref{eq:square} determine the purity update.
-Thus $\varepsilon_2=.052$, $E_2=.14$, and $\eta_2=.21$ start the iteration.
-Three applications of Eqs.~\eqref{eq:b-E-update}--\eqref{eq:b-eta-update}
-give the following rational upper bounds:
+for any $E_{j+1},\eta_{j+1}\in[0,1)$ satisfying these inequalities.
+
+\emph{What do three steps give?} Starting from $\varepsilon_2=.052$,
+$E_2=.14$, and $\eta_2=1-.79=.21$, three applications of
+Eqs.~\eqref{eq:b-E-update}--\eqref{eq:b-eta-update} give the rational upper
+bounds:
 \begin{center}
 \begin{tabular}{@{}rrrr@{}}
 \toprule
@@ -764,12 +1043,17 @@ $j$ & $E_j$ & $\eta_j$ & $q_j$ (upper bound)\\
 \end{center}
 Both defects collapse along the iteration, $E_j$:
 \specbars[black!45]{1,.86,.11,.007} and $\eta_j$: \specbars{1,.74,.12,.005}
-($j=2,\dots,5$, each relative to $j=2$).
-Rational arithmetic confirms these step bounds (e.g., $d(\varepsilon_3)^{49}<.142^{120}$ at $j=2$, with subsequent steps verified by squaring), with $\varepsilon_5<.000015$.
+($j=2,\dots,5$, each relative to $j=2$). The first step gains little, since
+$q_2\le.142$ and the inputs are still large; once $q_j$ is small the defects
+square.
+Rational arithmetic confirms these step bounds. For example, at $j=2$ the
+exponent in Eq.~\eqref{eq:b-q} is $(240-142)/240=49/120$, so $q_2\le.142$
+amounts to $d(\varepsilon_3)^{49}<.142^{120}$; the later steps are verified by
+squaring. Also $\varepsilon_5<.000015$. This establishes the base case $j=5$
+of Eq.~\eqref{eq:b-x}.
 
-
-Induction on scale verifies Eq.~\eqref{eq:b-x} for all subsequent scales: the base case $j=5$ is given by the table above.
-Assuming the bound at scale $j$ with $x=x_j\le.01$, the relation $k_j=M_j/2$ gives
+\emph{Why does the induction step close?} Assume Eq.~\eqref{eq:b-x} at scale
+$j\ge5$ with $x=x_j\le.01$. The relation $k_j=M_j/2$ gives
 \begin{equation}
  \begin{gathered}
  q_j\le\sqrt{\frac{6x^2}{2-18x^2}}\le2x,\\
@@ -777,8 +1061,12 @@ Assuming the bound at scale $j$ with $x=x_j\le.01$, the relation $k_j=M_j/2$ giv
  \end{gathered}
  \label{eq:b-x-e}
 \end{equation}
-Setting $E_{j+1}=10x^2$ satisfies Eq.~\eqref{eq:b-E-update}.
-The four-factor product in Eq.~\eqref{eq:b-eta-update} is at least $1-2x-16x^2$, and $f(2x+16x^2)<3x^2$, so $\eta_{j+1}=10x^2$ satisfies Eq.~\eqref{eq:b-eta-update} with $\varepsilon_{j+1}\le6x^2$, completing the induction for Eq.~\eqref{eq:b-x}.
+So $E_{j+1}=10x^2$ satisfies Eq.~\eqref{eq:b-E-update}. The four-factor product
+in Eq.~\eqref{eq:b-eta-update} is at least $1-2x-16x^2$, and
+$f(2x+16x^2)<3x^2$, so $\eta_{j+1}=10x^2$ satisfies
+Eq.~\eqref{eq:b-eta-update} with $\varepsilon_{j+1}\le6x^2$. This completes the
+induction for Eq.~\eqref{eq:b-x}; the factor $10$ in $x_{j+1}=10x_j^2$ covers all
+three bounds, $7x^2$, $3x^2$ and $6x^2$.
 
 
 \end{document}

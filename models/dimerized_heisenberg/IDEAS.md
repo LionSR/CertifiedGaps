@@ -1,10 +1,10 @@
 # Candidate routes: dimerized spin-1/2 Heisenberg chain
 
-Grouping each strong bond $(1 + \delta)\,\mathbf{S}_{2j-1}\cdot\mathbf{S}_{2j}$ into a two-spin
+Grouping each strong bond $`(1 + \delta)\,\mathbf{S}_{2j-1}\cdot\mathbf{S}_{2j}`$ into a two-spin
 unit cell produces a translation-invariant ring of $L$ cells connected by weak bonds
-$(1 - \delta)\,\mathbf{S}_{2j}\cdot\mathbf{S}_{2j+1}$. Because a seed at $n_0$ two-spin cells
+$`(1 - \delta)\,\mathbf{S}_{2j}\cdot\mathbf{S}_{2j+1}`$. Because a seed at $n_0$ two-spin cells
 requires evaluating the thermal purity $P_\tau(2n_0, \beta_0)$ on a doubled ring of $2n_0$ cells
-($4n_0$ spins), a 16-spin exact diagonalization ceiling permits even seed lengths $n_0 \in \{2, 4\}$
+($4n_0$ spins), a 16-spin exact diagonalization ceiling permits even seed lengths $`n_0 \in \{2, 4\}`$
 cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
 
 ## Candidate routes
@@ -25,9 +25,9 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
    dense `Float64` eigenvector residuals and orthogonality defects under an a priori binary64
    rounding analysis (now the core `verified_eigen`) certifies complete spectra at $n_0 = 2$ and
    $n_0 = 4$ cells ($8$ and $16$ spins) in a few minutes.
-   **Chosen route for $\delta \in \{1/2, 3/10, 1/4\}$.**
+   **Chosen route for $`\delta \in \{1/2, 3/10, 1/4\}`$.**
 3. **Continuous-$\beta$ interval exclusion covers:** When a grid scan finds no admissible seed at
-   $n_0 \in \{2, 4\}$ for weaker dimerizations ($\delta \in \{1/5, 3/20, 1/10\}$), we can upgrade
+   $`n_0 \in \{2, 4\}`$ for weaker dimerizations ($`\delta \in \{1/5, 3/20, 1/10\}`$), we can upgrade
    that numerical observation to a rigorous all-$\beta$ exclusion theorem by combining thermal
    purity monotonicity on $(0, 1]$, a ground-state energy defect bound on $[B, \infty)$, and a
    finite cover of $[1, B]$ by interval boxes propagating lower defect bounds through the monotone
@@ -35,7 +35,7 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
 4. **Operator-norm perturbation around decoupled dimers ($\delta = 1$):** At $\delta = 1$ ($w = 0$),
    the partition function factors exactly into independent dimers,
    $Z_n^{\mathrm{dimer}}(\beta) = (e^{3\beta s/4} + 3e^{-\beta s/4})^n$. Writing $H_n = H_n^{\mathrm{dimer}} + V_n$
-   with $\|V_n\| \le \frac{3}{4} n (1 - \delta)$ and applying Weyl's inequality bounds
+   with $`\|V_n\| \le \frac{3}{4} n (1 - \delta)`$ and applying Weyl's inequality bounds
    $|\log Z_n - \log Z_n^{\mathrm{dimer}}| \le \frac{3}{4}\beta n (1 - \delta)$ at arbitrary $n$ in
    $O(\log n)$ operations. However, because unlinked norm bounds lose the extensive bulk free-energy
    cancellation between $\log Z_{2n}$ and $2\log Z_n$, the resulting error grows with $n$ and only
@@ -64,10 +64,10 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
   0.058177$).
 - **Rigorous all-$\beta$ exclusions ($n_0 = 2, 4$ cells):** Continuous-$\beta$ interval covers
   prove that no $\beta_0 > 0$ yields an admissible seed for this recurrence at $n_0 = 2$ (for any of
-  the six $\delta$ values) or at $n_0 = 4$ for $\delta \in \{1/5, 3/20, 1/10\}$, establishing
+  the six $\delta$ values) or at $n_0 = 4$ for $`\delta \in \{1/5, 3/20, 1/10\}`$, establishing
   $\delta = 1/4$ as the exact certifiability threshold on rings of at most 16 spins.
 - **Beyond-ED and 20-spin diagnostics:** The arbitrary-$n$ dimer perturbation bound certifies a
   512-spin seed at $\delta = 0.999999$ in the unit tests while quantifying why unlinked norm bounds
   fail at $\delta \le 1/2$. The 20-spin Krylov diagnostics identify a numerical odd-seed candidate
   at $(\delta, n_0, \beta_0) = (1/5, 5, 8.5)$ and confirm that the next even seeds for
-  $\delta \in \{1/5, 3/20, 1/10\}$ require $n_0 \ge 6\text{--}8$ cells ($24\text{--}32$ spins).
+  $`\delta \in \{1/5, 3/20, 1/10\}`$ require $n_0 \ge 6\text{--}8$ cells ($24\text{--}32$ spins).

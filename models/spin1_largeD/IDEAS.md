@@ -1,6 +1,6 @@
 # Route memo: spin-1 chain with single-ion anisotropy $D$
 
-We study the periodic spin-1 chain $H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum_{j=1}^L (S_j^z)^2$
+We study the periodic spin-1 chain $`H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum_{j=1}^L (S_j^z)^2`$
 with single-site unit cells in the Cartesian reflection-positive basis. This memo records the
 candidate routes evaluated prior to Stage 1 (the verified exact-diagonalization baseline) and
 Stage 2 (the transfer-squaring and Weyl-transport extensions), followed by their outcomes.
@@ -27,17 +27,19 @@ Stage 2 (the transfer-squaring and Weyl-transport extensions), followed by their
    For even $n$, $\sigma_n = X_\beta^n / Z_n(\beta)$ is a positive trace-one density operator, and
    squaring bounds the spatial defect at $2n$ by $\varepsilon_{\mathrm{s}}(2n, \beta) \le f(\varepsilon_{\mathrm{s}}(n, \beta)) = \varepsilon_{\mathrm{s}}^2 / [2(1 - \varepsilon_{\mathrm{s}})^2]$.
    Meanwhile, the exact partition-function identity
-   $$P_\tau(4n, \beta) = \frac{P_{\mathrm{s}}(2n, 2\beta)\,P_\tau(2n, \beta)^2}{P_{\mathrm{s}}(2n, \beta)^2} \ge P_{\mathrm{s}}(2n, 2\beta)\,P_\tau(2n, \beta)^2$$
+   ```math
+   P_\tau(4n, \beta) = \frac{P_{\mathrm{s}}(2n, 2\beta)\,P_\tau(2n, \beta)^2}{P_{\mathrm{s}}(2n, \beta)^2} \ge P_{\mathrm{s}}(2n, 2\beta)\,P_\tau(2n, \beta)^2
+   ```
    bounds the thermal purity at $4n = 24$ using only $\log Z_6$ and $\log Z_{12}$ evaluated at
    $\beta$ and $2\beta$ (equivalent to Theorem 2.24(v) of the survey). This lifts an $n_0 = 6$
    spectral calculation to an $n_0 = 12$ (or $24, 48, 96$) seed in $O(\log(n_0/6))$ interval
    operations without ever diagonalizing $L = 24$. **Chosen Stage-2 route.**
 5. **Centered Weyl perturbation transport in $D$ (Stage-2 extension):** Because
    $V = \sum_{j=1}^L (S_j^z)^2$ satisfies $0 \le V \le L I$, centering $V$ by $\frac{L}{2}I$ gives
-   $\|\delta D (V - \frac{L}{2}I)\|_2 \le \frac{1}{2}L|\delta D|$. By Weyl's inequality, shifting
-   $D^* \mapsto D^* + \delta D$ shifts every eigenvalue of $H_L(D) - \frac{L\delta D}{2}I$ by at
-   most $\frac{1}{2}L|\delta D|$, and the constant shift cancels in both purities. This transports
-   verified $\log Z$ enclosures across narrow intervals of $D$ without re-diagonalizing $H_{12}$.
+   $`\|\delta D (V - \frac{L}{2}I)\|_2 \le \frac{1}{2}L|\delta D|`$. By Weyl's inequality, shifting
+   $`D^* \mapsto D^* + \delta D`$ shifts every eigenvalue of $`H_L(D) - \frac{L\delta D}{2}I`$ by at
+   most $`\frac{1}{2}L|\delta D|`$, and the constant shift cancels in both purities. This transports
+   verified $`\log Z`$ enclosures across narrow intervals of $`D`$ without re-diagonalizing $`H_{12}`$.
    **Chosen Stage-2 route.**
 
 ## Outcome

@@ -1,0 +1,108 @@
+name: Check certificates
+
+# Run the fast checker (check.jl, default mode) of model directories. A pull request that changes
+# only models/ checks the changed directories. A pull request that changes the leaderboard rows
+# (home_page/_data/records.yml), a push to main, the weekly schedule and a manual run check every
+# model directory that records.yml references, so every number on the site is rechecked.
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "models/**"
+      - "home_page/_data/records.yml"
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "17 4 * * 1" # Mondays 04:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: certificates-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  changed:
+    name: Find models to check
+    runs-on: ubuntu-latest
+    outputs:
+      models: ${{ steps.list.outputs.models }}
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      # The base commit of a pull request, for the diff; the shallow checkout lacks it.
+      - name: Fetch the base commit
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git fetch --depth=1 origin "$BASE_SHA"
+
+      # Model directories with a check.jl, as a JSON list. lean_seeds is left out: its checker
+      # drives the Lean toolchain (lake build SeedKernel), which blueprint.yml already covers.
+      - name: List model directories
+        id: list
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          records=home_page/_data/records.yml
+          if [ "$EVENT" = pull_request ] && \
+             ! git diff --name-only "$BASE_SHA" HEAD | grep -qx "$records"; then
+            slugs=$(git diff --name-only "$BASE_SHA" HEAD -- models/ | cut -d/ -f2)
+          else
+            # Every directory referenced by a slug, certificate or check field.
+            slugs=$( (grep -oE 'models/[A-Za-z0-9_]+/' "$records" | cut -d/ -f2;
+                      sed -nE 's/^[[:space:]]*slug:[[:space:]]*([A-Za-z0-9_]+).*/\1/p' "$records") )
+          fi
+          models=$(echo "$slugs" | sort -u \
+            | while read -r slug; do
+                if [ -n "$slug" ] && [ -f "models/$slug/check.jl" ] && [ "$slug" != lean_seeds ]; then
+                  echo "$slug"
+                fi
+              done \
+            | jq -R . | jq -cs .)
+          echo "models=$models" >> "$GITHUB_OUTPUT"
+          echo "Models to check: $models"
+
+  check:
+    name: check.jl (${{ matrix.model }})
+    needs: changed
+    if: needs.changed.outputs.models != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        model: ${{ fromJSON(needs.changed.outputs.models) }}
+    env:
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@fa02766e078afaaf09b14210362cee14137e6a32 # v3.0.2
+        with:
+          version: "1.12"
+
+      # One cache for all matrix jobs: they share the core package and most dependencies.
+      - name: Cache Julia packages
+        uses: julia-actions/cache@9353db09a0f2bbbdec6f41791918c75d37391b36 # v3.5.0
+        with:
+          include-matrix: false
+
+      # spin1 checks its outputs against the preprint's evidence files (pinned commit, hashes).
+      - name: Fetch the upstream evidence
+        if: matrix.model == 'spin1'
+        run: julia tools/fetch_upstream.jl
+
+      # Each model's Manifest develops the core package from ../../julia, inside this checkout.
+      - name: Instantiate the model environment
+        run: julia --project=models/${{ matrix.model }} -e 'using Pkg; Pkg.instantiate()'
+
+      - name: Run the checker
+        run: julia --project=models/${{ matrix.model }} models/${{ matrix.model }}/check.jl

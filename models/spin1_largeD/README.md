@@ -16,28 +16,36 @@ $\Delta_L \ge \Delta_{\mathrm{cert}}$ for every even $L \ge 6$ sites. Decimal bo
 
 ## Model
 
-$$H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum_{j=1}^L (S_j^z)^2, \qquad \mathbf{S}_j^2 = 2I.$$
+```math
+H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum_{j=1}^L (S_j^z)^2, \qquad \mathbf{S}_j^2 = 2I.
+```
 The unit cell is one spin-1 site ($c = 1$, local dimension $3$), so all lengths $L$ and $n_0$
 count sites. The core `RingModel` (`ring_model` in `src/model.jl`) uses the $S^z$ basis
 $(|{+1}\rangle, |0\rangle, |{-1}\rangle)$ with the integer matrices
 $S_+ = S^+/\sqrt{2} = |{+1}\rangle\langle 0| + |0\rangle\langle{-1}|$ and $S_- = S_+^T$:
-$$h = S^z \otimes S^z + S_+ \otimes S_- + S_- \otimes S_+, \qquad o = D\operatorname{diag}(1, 0, 1),$$
-with conserved charge $m \in \{1, 0, -1\}$ and the spin flip $F = \operatorname{antidiag}(1, 1, 1)$.
+```math
+h = S^z \otimes S^z + S_+ \otimes S_- + S_- \otimes S_+, \qquad o = D\mathrm{diag}(1, 0, 1),
+```
+with conserved charge $`m \in \{1, 0, -1\}`$ and the spin flip $F = \mathrm{antidiag}(1, 1, 1)$.
 
 **Frame.** The Lean model (`lean/CertifiedGaps/Models/SpinOneLargeD.lean`) uses the Cartesian
 basis with $(S^\alpha)_{ab} = -i\varepsilon_{\alpha ab}$. The unitary $U = W N^{-1/2}$ with
-$$W = \begin{pmatrix} -i & 0 & i \\ 1 & 0 & 1 \\ 0 & i & 0 \end{pmatrix}, \qquad N = W^\dagger W = \operatorname{diag}(2, 1, 2)$$
+```math
+W = \begin{pmatrix} -i & 0 & i \\ 1 & 0 & 1 \\ 0 & i & 0 \end{pmatrix}, \qquad N = W^\dagger W = \mathrm{diag}(2, 1, 2)
+```
 maps it to the $S^z$ basis: $U^\dagger S^z U = S^z$, $U^\dagger S^\pm U = \sqrt{2} S_\pm$ and
-$U^\dagger (S^z)^2 U = \operatorname{diag}(1, 0, 1)$, so $U^{\otimes L}$ conjugates one ring
+$U^\dagger (S^z)^2 U = \mathrm{diag}(1, 0, 1)$, so $U^{\otimes L}$ conjugates one ring
 Hamiltonian into the other. `cartesian_frame` checks these identities in exact Gaussian-integer
 arithmetic, and `test/frame.jl` also compares the verified spectra with dense diagonalization of
 the Cartesian Hamiltonian for $L \le 6$.
 
 ## Reflection positivity
 
-With the real symmetric involution $R = \operatorname{antidiag}(1, -1, 1)$, which commutes with
+With the real symmetric involution $R = \mathrm{antidiag}(1, -1, 1)$, which commutes with
 $o$, one has $R S^z R = -S^z$ and $R S_\pm R = -S_\mp$, hence
-$$-h = \sum_{C \in \{S^z,\, S_+,\, S_-\}} C \otimes R\,\overline{C}\,R,$$
+```math
+-h = \sum_{C \in \{S^z,\, S_+,\, S_-\}} C \otimes R\,\overline{C}\,R,
+```
 the "reflected" RP form with integer factors (`rp_data`). It is verified exactly by
 `CertifiedGaps.RingModels.verify_rp` in `certify_gap`, in `check.jl`, and in `test/frame.jl`
 (which also checks that the exact LDL factorization of the realignment finds this form and that
@@ -87,7 +95,9 @@ $\Delta_{12} \in [1.5453276, 1.5453288]$ at $D = 3.206$.
 - **Stage 2 (`scripts/transfer_certify.jl`):** from the stored $L = 6, 12$ spectra at $\beta$ and
   $2\beta$, transfer-operator squaring bounds $P_{\mathrm{s}}(12, \beta_0)$, and the exact coupling
   identity
-  $$P_\tau(4n, \beta_0) = \frac{P_{\mathrm{s}}(2n, 2\beta_0)\,P_\tau(2n, \beta_0)^2}{P_{\mathrm{s}}(2n, \beta_0)^2}$$
+  ```math
+  P_\tau(4n, \beta_0) = \frac{P_{\mathrm{s}}(2n, 2\beta_0)\,P_\tau(2n, \beta_0)^2}{P_{\mathrm{s}}(2n, \beta_0)^2}
+  ```
   bounds $P_\tau(24, \beta_0)$ without the 24-site ring (Theorem 2.24(v) of the survey). A
   centered Weyl bound ($0 \le \sum_j (S_j^z)^2 \le L$) transports seeds to the fixed intervals
   $D \in [3.2059998, 3.206]$ and $[3.9979773, 4]$. As a diagnostic, the driver also records how
@@ -98,8 +108,8 @@ $\Delta_{12} \in [1.5453276, 1.5453288]$ at $D = 3.206$.
 ### Exploratory numerical scan (floating point, non-certifying)
 
 `results/scan_summary.json` and the numerical points of `results/transfer_curve.*` come from a
-floating-point scan of $D \in \{1, 1.25, \dots, 4\} \cup \{3.205, 3.206\}$,
-$n_0 \in \{2, \dots, 6\}$ and $\beta_0 \in \{0.125, \dots, 20\}$ (refined to $2.75:0.002:3.75$ at
+floating-point scan of $`D \in \{1, 1.25, \dots, 4\} \cup \{3.205, 3.206\}`$,
+$`n_0 \in \{2, \dots, 6\}`$ and $`\beta_0 \in \{0.125, \dots, 20\}`$ (refined to $2.75:0.002:3.75$ at
 $D = 3.205, 3.206$):
 
 | $D$ | Best even seed $(n_0, \beta_0)$ | Numerical bound | $\Delta_{12}$ (ED) | $\max_\beta \min(P_{\mathrm{s}}, P_\tau)$ at $n_0 = 6$ | $\delta(6) = E_0(12) - 2E_0(6)$ |
@@ -190,7 +200,7 @@ by path beyond these sources and the stored spectra.
 
 Until this revision the model had its own pipeline: a local block builder (`model.jl`) with spin
 inversion, a local residual/polar enclosure with a priori $\gamma_{8m+32}$ constants and
-$\|H\|_2 \le L(|D| + 2)$, run-length-encoded $L = 12$ spectra (`src/spectra.jl`), a local
+$`\|H\|_2 \le L(|D| + 2)`$, run-length-encoded $L = 12$ spectra (`src/spectra.jl`), a local
 $\log Z$ with a truncated tail, a per-model environment, and hash-pinned top-level scripts. It was
 replaced by the shared core. The model is now a `RingModel` in the $S^z$ frame (with the Cartesian
 frame checked exactly). Stage 1 is `certify_gap` with `flip`, which gives the same 92 blocks; the

@@ -1,0 +1,44 @@
+name: Propose a target model
+description: Suggest a quantum spin chain whose spectral gap the spacetime bootstrap could certify.
+title: "Target: "
+labels: ["target"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Targets appear in the "Open targets" table of the leaderboard. Floating-point estimates are
+        welcome here; they are labeled as such and are never treated as certificates.
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: A short name, for example "XXZ chain in a staggered field".
+    validations:
+      required: true
+  - type: textarea
+    id: hamiltonian
+    attributes:
+      label: Hamiltonian
+      description: H_L on a periodic ring of L unit cells (LaTeX welcome), the unit cell, and the parameter point(s).
+    validations:
+      required: true
+  - type: textarea
+    id: reflection-positivity
+    attributes:
+      label: Reflection-positive basis
+      description: A local basis (or rotated frame) in which -h = sum_a C_a ⊗ conj(C_a) with a real symmetric on-site term, if known.
+  - type: textarea
+    id: estimate
+    attributes:
+      label: Seed estimate
+      description: Any floating-point estimate of an admissible seed (n0, beta0) and of the resulting bound, with how it was obtained.
+  - type: input
+    id: known-gap
+    attributes:
+      label: Known gap
+      description: The best numerical or exact value of the gap, with its source.
+  - type: textarea
+    id: notes
+    attributes:
+      label: Why this model
+      description: Physical interest, solvable limits, or structure that might make the seed computable (see AGENTS.md, "Approach").
