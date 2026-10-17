@@ -129,21 +129,14 @@ function) hold in exact arithmetic, but the tests evaluate them in `Float64`.
 | `scripts/run.jl` | Command-line runner executing a `.toml` configuration from `scripts/configs/` and writing JSON results |
 | `scripts/configs/*.toml` | The four run configurations listed under "Reproduce" |
 | `test/runtests.jl` | Unit tests verifying projector identities, lattice geometry, and small-system consistency |
-| `.JuliaFormatter.toml` | Formatter settings for this directory (editor tooling, not data) |
 | `.gitignore` | Keeps `results/` local |
 
-`results/` is gitignored and kept locally. The stored files were produced before the move to
-`models/`, with the `spin2` environment, so their `environment/` hashes refer to
-`spin2/Project.toml` and `spin2/Manifest.toml`; `pilot-summary.json` and the two projection files
-there came from local Python helpers that are not part of the repository. Rerun the configurations
-to regenerate the Julia outputs.
+`results/` is gitignored; run the configurations under `## Reproduce` to generate the JSON outputs
+locally.
 
 ## History
 
-- Added with the notes and the Julia core; moved under `models/` when the core was renamed
-  `CertifiedGaps`.
-- #15: README rewritten to state that nothing is certified and to record the negative results;
-  an unused dependency removed.
-- #19: aligned with the common directory format.
-- Run configurations moved from `configs/` to `scripts/configs/`, and `IDEAS.md` reconstructed,
-  to match the directory format.
+Developed alongside [`notes/thermal-mpo-gap-2plus1d.tex`](../../notes/thermal-mpo-gap-2plus1d.tex)
+as an exploratory pilot of the $2+1$-dimensional thermal-purity recursion on small honeycomb tori,
+documenting the snake-ordering MPS bond-compression bias on $2\times 2$, $4\times 2$, and $4\times 4$
+honeycomb quotients.

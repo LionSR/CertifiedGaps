@@ -23,7 +23,7 @@ identifiers do not collide with model-specific code. The top-level module `Certi
 |---|---|---|
 | `Recurrence` | `src/Recurrence.jl`, `src/recurrence/` | the exact doubling recurrence in any number type (`map.jl`), outward-rounded interval gap bounds (`certified.jl`), and the exact-rational doubling chain with the analytic tail bound used by the certificates (`rational.jl`) |
 | `ExactArithmetic` | `src/ExactArithmetic.jl` | rational enclosure helpers with outward rounding: `log_enclosure`, `power_interval`, `integer_root`, `first_true`, `round_up`/`round_down`, and exact fraction parsers |
-| `Results` | `src/Results.jl` | `write_result` (atomic JSON output; pretty, or single-line with `compact = true`; gzip-compressed when the path ends in `.gz`), `read_result`/`read_result_bytes` (plain or `.json.gz`), `source_hashes`/`file_hashes`, `model_provenance` (model-local `source_sha256` and core `core_sha256`, keyed by repository path) and `verify_source_hashes` (compares the in-scope paths only), `run_metadata`, and `parse_exact_json` (which parses arbitrary-precision integers and rationals directly without passing through `Float64`) |
+| `Results` | `src/Results.jl` | `write_result` (atomic JSON output; pretty, or single-line with `compact = true`; gzip-compressed when the path ends in `.gz`), `read_result`/`read_result_bytes`/`read_exact_json` (plain or `.json.gz`), `source_hashes`/`file_hashes`, `model_provenance` (model-local `source_sha256` and core `core_sha256`, keyed by repository path) and `verify_source_hashes` (compares the in-scope paths only), `run_metadata`, and `parse_exact_json` (which parses arbitrary-precision integers and rationals directly without passing through `Float64`) |
 | `Spins` | `src/Spins.jl` | `spin_matrices(s)`, `integer_ladders(j)`, `binomial_weights(j)`, and `cartesian_generators(s)`; exact matrices for RP identities: `exact_pauli(T)`, `exact_spin_half(T)` (with the real antisymmetric `iy`) and `integer_cartesian_generators()` (spin 1) |
 | `ReflectionPositivity` | `src/ReflectionPositivity.jl` | floating-point screening utilities: `realign`, `rp_test`, and `rp_decomposition` |
 | `ExactDiagonalization` | `src/ExactDiagonalization.jl` | `Chain` on arbitrary bond graphs (`ring_bonds`, `open_bonds`, `graph_bonds`), abelian charge sectors, `spectrum` (dense or Lanczos, with optional spin-flip doubling), `PartialSpectrum`, `WeightedSpectrum` (levels with integer multiplicities), `logZ_bounds`, and `log_partition` |
@@ -36,8 +36,7 @@ identifiers do not collide with model-specific code. The top-level module `Certi
 | `CertifiedMPO` | `src/CertifiedMPO/` | certified MPO arithmetic over Nemo/Arb ball matrices (norms, squaring, products, operator truncation bounds, and gauge transforms) |
 
 Besides `src/`, the package contains `ext/` (the ITensors extension), `test/` (run by `Pkg.test()`),
-and `examples/` (two survey screening drivers that use the API but are not loaded by the package;
-see "Usage").
+and `examples/` (two screening drivers that illustrate the core API; see "Usage").
 
 ## Conventions
 
@@ -55,14 +54,13 @@ julia --project=julia julia/examples/tfim.jl        # free-fermion TFIM seeds (B
 julia --project=julia julia/examples/ed_seeds.jl    # float ED seed scans (≈15 min)
 ```
 
-The two examples in `julia/examples/` reproduce reference numbers from the local survey notes (its
-section numbers appear in their comments) using the core API; neither produces a rigorous
-certificate. `ed_seeds.jl` performs floating-point screening for the staggered-field spin-½ and
-spin-1 Heisenberg chains (certified in `models/heisenberg_staggered_field` and reproduced in
-`models/spin1`), and `tfim.jl` evaluates free-fermion partition functions in `BigFloat` with
-heuristic safety padding for the TFIM open targets of `AGENTS.md`. The recurrence constants that the
-former `scripts/constants.jl` printed (the diagonal threshold ε⋆, the note's seeds, odd lengths, and
-the Theorem 2.22 closed forms) are now asserted in `test/runtests.jl`.
+The two scripts in `julia/examples/` are floating-point screening drivers (neither produces a rigorous
+certificate): `ed_seeds.jl` scans candidate seeds for the staggered-field spin-½ and spin-1 Heisenberg
+chains (certified in `models/heisenberg_staggered_field` and reproduced in `models/spin1`), and
+`tfim.jl` evaluates free-fermion partition functions in `BigFloat` with heuristic safety padding for the
+TFIM open targets listed in `AGENTS.md`. Reference constants for the doubling recurrence (the diagonal
+threshold $\varepsilon_*$, note seed bounds, and closed-form partition checks) are tested in
+`test/runtests.jl`.
 
 Models run in this package's environment (`julia --project=julia models/<slug>/...` from the
 repository root), so `using CertifiedGaps` needs no extra setup:

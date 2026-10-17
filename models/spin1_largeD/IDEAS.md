@@ -31,7 +31,7 @@ Stage 2 (the transfer-squaring and Weyl-transport extensions), followed by their
    P_\tau(4n, \beta) = \frac{P_{\mathrm{s}}(2n, 2\beta)\,P_\tau(2n, \beta)^2}{P_{\mathrm{s}}(2n, \beta)^2} \ge P_{\mathrm{s}}(2n, 2\beta)\,P_\tau(2n, \beta)^2
    ```
    bounds the thermal purity at $4n = 24$ using only $\log Z_6$ and $\log Z_{12}$ evaluated at
-   $\beta$ and $2\beta$ (equivalent to Theorem 2.24(v) of the survey). This lifts an $n_0 = 6$
+   $\beta$ and $2\beta$ (see `notes/thermal-mpo-gap-scope.tex`, Appendix E). This lifts an $n_0 = 6$
    spectral calculation to an $n_0 = 12$ (or $24, 48, 96$) seed in $O(\log(n_0/6))$ interval
    operations without ever diagonalizing $L = 24$. **Chosen Stage-2 route.**
 5. **Centered Weyl perturbation transport in $D$ (Stage-2 extension):** Because

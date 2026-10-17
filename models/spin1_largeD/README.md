@@ -98,12 +98,12 @@ $\Delta_{12} \in [1.5453276, 1.5453288]$ at $D = 3.206$.
   ```math
   P_\tau(4n, \beta_0) = \frac{P_{\mathrm{s}}(2n, 2\beta_0)\,P_\tau(2n, \beta_0)^2}{P_{\mathrm{s}}(2n, \beta_0)^2}
   ```
-  bounds $P_\tau(24, \beta_0)$ without the 24-site ring (Theorem 2.24(v) of the survey). A
-  centered Weyl bound ($0 \le \sum_j (S_j^z)^2 \le L$) transports seeds to the fixed intervals
-  $D \in [3.2059998, 3.206]$ and $[3.9979773, 4]$. As a diagnostic, the driver also records how
-  far bisection on a $10^{-7}$ grid could extend these intervals with the current enclosures (to
-  $3.2059997$ and $3.9979771$). Proofs are in [`METHOD.md`](METHOD.md), and the route evaluation
-  is in [`IDEAS.md`](IDEAS.md).
+  bounds $P_\tau(24, \beta_0)$ without the 24-site ring (`notes/thermal-mpo-gap-scope.tex`,
+  Appendix E). A centered Weyl bound ($0 \le \sum_j (S_j^z)^2 \le L$) transports seeds to the
+  fixed intervals $D \in [3.2059998, 3.206]$ and $[3.9979773, 4]$. As a diagnostic, the driver
+  also records how far bisection on a $10^{-7}$ grid could extend these intervals with the
+  current enclosures (to $3.2059997$ and $3.9979771$). Proofs are in [`METHOD.md`](METHOD.md),
+  and the route evaluation is in [`IDEAS.md`](IDEAS.md).
 
 ### Exploratory numerical scan (floating point, non-certifying)
 

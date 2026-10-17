@@ -1,8 +1,7 @@
 # Routes considered
 
-This memo was reconstructed after the fact from the README, `METHOD.md` (formerly
-`OPTIMIZATION.md`) and the history of this directory. The reproduction predates the rule that
-every model directory starts with a route memo.
+This memo was reconstructed after the fact from the README, `METHOD.md`, and the history of this
+directory. The reproduction predates the rule that every model directory starts with a route memo.
 
 The task was different from a new certificate. **The periodic spin-one Haldane gap** (OpenAI,
 September 24, 2026) already proves a uniform gap for the spin-1 Heisenberg ring from two finite
@@ -39,6 +38,7 @@ the upstream evidence (27 thermal certificates, two integer MPS trials, both pur
 bootstrap constants; stored-output audit in `results/verification.json`). The published bounds
 \(\Delta_L\ge\log(20)/784\) (even \(L\ge2304\)) and \((4/105)\log(80/79)\) (even \(L\ge60\)) are
 therefore reproduced. The experiments strengthen them, from the same finite inputs, to
-\(\Delta_L>0.072901771\) for every even \(L\ge36\). The temperature-lifting derivation is a new
-argument that has not been independently reviewed. The reflection-positivity input and the
-analytic transfer and induction arguments are cited from the paper, not re-checked.
+\(\Delta_L>0.072901771\) for every even \(L\ge36\) (proved in
+`experiments/optimized-spin1-bounds.tex` and independently reviewed in #49). The
+reflection-positivity input and the analytic transfer and induction arguments are formalized in
+`lean/` and derived in `notes/`.

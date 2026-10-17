@@ -15,8 +15,8 @@ uniform gap then needs one certified finite seed and a proof of the gluing inequ
   \(U=e^{-i\pi S^y}\), and the quadrupole \(Q=(S^z)^2-\tfrac54\), the note shows
   \(\mathrm{Tr}[e^{-tP^{(3)}}(Q\otimes\theta Q)]=\tfrac75(e^{-t}-1)<0\). This rules out that
   local RP construction, not the scalar gluing inequalities themselves.
-* **Self-adjoint spatial transfer for a projection filter.** Checked at width two (a transfer of
-  dimension 256) with local Python helpers. No positive metric makes \(T\) or \(T^2\)
+* **Self-adjoint spatial transfer for a projection filter.** Checked numerically at width two (a
+  transfer matrix of dimension 256). No positive metric makes \(T\) or \(T^2\)
   self-adjoint, so the self-adjoint route fails for that filter. Exact characteristic polynomials
   still give \(d_{2L}\le d_L^2/4\) at width 2 for every even \(L\ge4\), but this does not extend to
   the mixed-width, mixed-depth tuples the recursion needs.

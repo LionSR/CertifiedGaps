@@ -1,0 +1,4 @@
+models/**/results/*.json linguist-generated=true
+models/**/results/*.json.gz binary linguist-generated=true
+models/**/results/*.bin binary linguist-generated=true
+models/spin1/experiments/*.json linguist-generated=true

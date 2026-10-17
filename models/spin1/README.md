@@ -45,7 +45,7 @@ exact reflection-positive decomposition on every bond:
 ```
 For this package, the reflection-positivity identity is cited from the upstream paper and is
 checked algebraically in the shared core test suite (`julia/test/runtests.jl`) and in the Lean 4
-formalization (`lean/CertifiedGaps/Spin1.lean`).
+formalization (`lean/CertifiedGaps/Local/SpinOne.lean` and `lean/CertifiedGaps/Heisenberg/Main.lean`).
 
 ## Seeds and certified bounds
 
@@ -152,8 +152,8 @@ julia --startup-file=no --threads=4 --project=models/spin1 models/spin1/check.jl
 
 `check.jl` (fast) audits a temporary copy of `results/`, requires the component hashes and the
 implementation fingerprint to equal those in the committed `verification.json`, and runs the
-corrupted-artifact tests on the copy and the two `experiments/` test files (16 checks; about 13 min
-on a heavily loaded machine, a few minutes otherwise). `check.jl --full` runs the complete fresh
+corrupted-artifact tests on the copy and the two `experiments/` test files (16 checks; a few
+minutes). `check.jl --full` runs the complete fresh
 reproduction below into a temporary directory and requires every certified integer, interval, and
 scalar record to equal the committed one. Neither writes anything into the repository.
 
@@ -231,7 +231,7 @@ evidence files before running. These are modified Julia implementations, not ups
 - `check.jl`: the checker (fast stored-output audit, `--full` fresh reproduction); it lies outside
   the fingerprint, so editing it does not invalidate `verification.json`.
 - `IDEAS.md` (route memo, reconstructed) and `METHOD.md` (the $\mathrm{SU}(2)$ reduction, thermal
-  kernel optimizations, and benchmarks; formerly `OPTIMIZATION.md`).
+  kernel optimizations, and benchmarks).
 
 Layout exceptions (top-level entries beyond the standard format), each kept on purpose:
 
@@ -252,8 +252,4 @@ Rationals are stored as `"numerator//denominator"` strings. `Manifest.toml` pins
 The initial unoptimized Julia port is preserved in `results/reference/`. [`METHOD.md`](METHOD.md)
 documents the subsequent $\mathrm{SU}(2)$ multiplicity-block reduction and thermal kernel
 optimizations along with their benchmarks. The improved gap bounds in `experiments/` were derived
-afterward from the frozen finite inputs.
-
-The format tidy renamed `OPTIMIZATION.md` to `METHOD.md` (no fingerprinted file reads it), added
-`IDEAS.md` and the top-level `check.jl`, and documented the layout exceptions; no fingerprinted
-file, result, or experiment record changed.
+afterward from the frozen finite inputs (and reviewed in #49).
