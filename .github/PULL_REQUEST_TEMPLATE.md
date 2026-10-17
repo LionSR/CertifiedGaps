@@ -13,9 +13,8 @@ lengths covered, and the claimed tier. -->
 - [ ] Computer certificate (if any): `models/<slug>/` follows `AGENTS.md`, `results/certificate*.json`
       committed, and `check.jl` passes (run time: ...)
 - [ ] Lean record (if any): name `Leaderboard.Records.<Model>.<point>`, its `L0`, `r` and `beta`
-      match the YAML row, and `lake exe leaderboard_audit` and `lake exe leaderboard_recheck` pass
-- [ ] No `sorry`, `native_decide`, new `axiom`, `implemented_by`/`extern`, or
-      `debug.skipKernelTC` in Lean code
+      match the YAML row, and it follows `leaderboard/README.md`
+      (CI enforces its axiom and kernel rules)
 - [ ] Root `README.md` summary table updated (per `AGENTS.md`) for a new or updated model
 
 ## For reviewers
