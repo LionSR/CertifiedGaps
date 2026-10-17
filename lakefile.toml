@@ -1,7 +1,7 @@
 # The Lean package of the repository. Its sources live in lean/ (srcDir); the lakefile sits at
 # the repository root so that leanblueprint, checkdecls and docgen-action work as designed.
 name = "CertifiedGaps"
-defaultTargets = ["CertifiedGaps", "SeedKernel"]
+defaultTargets = ["CertifiedGaps", "SeedKernel", "Leaderboard"]
 
 [leanOptions]
 pp.unicode.fun = true
@@ -37,3 +37,9 @@ name = "SeedKernelBench"
 srcDir = "lean"
 roots = []
 globs = ["SeedKernel.Bench.+"]
+
+# Leaderboard of certified spectral-gap records (leaderboard/README.md): record statements, the
+# `@[gap_record]` tag and the records proved so far.
+[[lean_lib]]
+name = "Leaderboard"
+srcDir = "leaderboard"
