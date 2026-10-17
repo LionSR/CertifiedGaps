@@ -172,10 +172,12 @@ with no discretization error.</p></div><aside class="side"></aside></div>
     <h2><span class="n">6</span>Histories of a chain</h2>
     <div class="r"><div class="main prose"><p>The classical Ising ring has \(Z=\operatorname{Tr}T^L\): a 2×2 matrix passes one spin from site to site. The quantum chain works the same way after one change of what is passed along.
 Each bond term \(\mathbf S_j\cdot\mathbf S_{j+1}=-\sum_\alpha G_{\alpha,j}G_{\alpha,j+1}\) fires events at random imaginary times, and an event of type \(\alpha\) puts the real 3×3 matrix
-\(G_\alpha=iS^\alpha\) on both of its sites. The thing passed along the ring is the list of events on a bond. A site with events \(a\) on its left bond and \(b\) on its right
-contributes \(X(a,b)\): the trace of its \(G\)'s multiplied in time order. Examples: no events gives 3; one \(z\)-event on each side gives \(\operatorname{Tr}G_zG_z=-2\).</p></div><aside class="side"><p class="note">G<sub>α</sub> = iS<sup>α</sup> in the Cartesian basis |x⟩, |y⟩, |z⟩ are real antisymmetric 3 × 3 matrices.</p></aside></div>
+\(G_\alpha=iS^\alpha\) on both of its sites. The thing passed along the ring is the list of events on a bond. On a single site's world line from \(|s'\rangle\) at \(\tau=0\) to \(\langle s|\) at \(\tau=\beta\),
+events \(a\) from the left bond and \(b\) from the right bond multiply in time order (\(\mathcal T_\tau\) puts later times on the left) to form the local tensor \(W_\beta^{ss'}(a,b)\).
+Gluing \(\tau=\beta\) back to \(\tau=0\) (\(s=s'\)) traces that product into the transfer kernel \(X_\beta(a,b)\): no events gives \(\operatorname{Tr}I=3\); one \(z\)-event on each side gives \(\operatorname{Tr}G_zG_z=-2\).</p></div><aside class="side"><p class="note">G<sub>α</sub> = iS<sup>α</sup> in the Cartesian basis |x⟩, |y⟩, |z⟩ are real antisymmetric 3 × 3 matrices.</p></aside></div>
+    <div class="player" data-ch="ising"></div>
     <div class="player" data-ch="chain"></div>
-    <div class="r"><div class="main eqs">\[ X_\beta(a,b)=\operatorname{Tr}\Big[\mathcal T\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\Big],\qquad Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}\quad\big(\text{cf. }Z=\operatorname{Tr}T^L\big). \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main eqs">\[ W_\beta^{ss'}(a,b)=\Big\langle s\,\Big|\,\mathcal T_\tau\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\,\Big|\,s'\Big\rangle,\qquad X_\beta(a,b)=\sum_s W_\beta^{ss}(a,b)=\operatorname{Tr}\Big[\mathcal T_\tau\!\!\prod_{(\tau,\alpha)\in a\cup b}G_\alpha\Big],\qquad Z_L(\beta)=\operatorname{Tr}X_\beta^{\,L}. \]</div><aside class="side"></aside></div>
     <div class="r"><div class="main"><details class="try"><summary>Try it: compute X(a, b) yourself</summary>
   <div class="tryin"><p class="small">Add events in time order. Each event puts \(G_x\), \(G_y\) or \(G_z\) on the site, from the left bond (a) or the right bond (b).
   X is the trace of the product, later events on the left.</p>
@@ -296,9 +298,9 @@ the ground state is unique, and the weight ratio gives the gap.</p></div><aside 
     <div class="r"><div class="main prose"><p>The certificate never sees the eigenvalues of \(X\); it sees exact traces \(Z_n\) of small rings. Here is the whole logic on a toy with hidden eigenvalues
 1, 0.6, −0.5, 0.4. The sixth moment \(Z_6=1.0664\) caps every \(|\lambda|\) at 1.011. A trial state gives \(Z_{24}\ge1\); if all \(|\lambda|\le0.97\), the sixth-moment
 mass could produce at most 0.484, so one eigenvalue must exceed 0.97. The rest then carry at most 0.233 of the mass, which bounds their contribution and gives
-\(P_{\mathrm s}(24)\ge0.988\). The real certificate runs the same three steps with 12-site rings, exact integers, symmetry sectors and a 72-site trial state.</p></div><aside class="side"><p class="note">Toy numbers are exact to the digits shown; the real certificate uses capped masses with degree-12 filters, as in <code>notes/thermal-mpo-gap-certificate.tex</code>.</p></aside></div>
+\(P_{\mathrm s}(24)\ge0.987\). The real certificate runs the same three steps with 12-site rings, exact integers, symmetry sectors and a 72-site trial state.</p></div><aside class="side"><p class="note">Toy numbers are exact to the digits shown; the real certificate uses capped masses with degree-12 filters, as in <code>notes/thermal-mpo-gap-certificate.tex</code>.</p></aside></div>
     <div class="player" data-ch="seedtoy"></div>
-    <div class="r"><div class="main eqs">\[ \sum_i\lambda_i^{24}\le\underbrace{0.833^4+(1.0664-0.833)^4}_{0.484}<1\le Z_{24}\ \Rightarrow\ \lambda_0>0.97,\qquad P_{\mathrm s}(24)\ge\Big(1+\frac{0.233^4}{0.97^{24}}\Big)^{-2}=0.988 . \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main eqs">\[ \sum_i\lambda_i^{24}\le\underbrace{0.833^4+(1.0664-0.833)^4}_{0.484}<1\le Z_{24}\ \Rightarrow\ \lambda_0>0.97,\qquad P_{\mathrm s}(24)\ge\Big(1+\frac{0.233^4}{0.97^{24}}\Big)^{-2}=0.98765\ldots>0.987 . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="seed">
@@ -345,11 +347,13 @@ mass could produce at most 0.484, so one eigenvalue must exceed 0.97. The rest t
   </section>
   <section class="ch" id="oedge">
     <h2><span class="n">II.1</span>Ends carry free spins</h2>
-    <div class="r"><div class="main prose"><p>Opening the ring changes the physics before it changes the proof. In the valence-bond picture each spin 1 is a pair of spin-½, and neighbouring
+    <div class="r"><div class="main prose"><p>Opening the ring changes the physics before it changes the proof. In the valence-bond picture each spin 1 is a pair of spin-½, and neighboring
 halves bind into singlets; at each end one spin-½ is left over. Exact diagonalization of small chains shows the consequence. Without a field, even chains have three
 states just above the ground state, at 0.51, 0.31, 0.20, 0.14, 0.10 for n = 4, …, 12, and odd chains have a three-fold degenerate ground state. With a field
 \(h=3/5\) on the two end spins, odd chains have a single ground state and a gap of 0.72, 0.64, 0.58, 0.55 for n = 5, …, 11.</p></div><aside class="side"><p class="note">Levels from floating-point exact diagonalization with conserved S<sup>z</sup> (n ≤ 12), a diagnostic and not part of the proof. With an odd number of sites both ends lie on the same sublattice, so equal fields suit both.</p></aside></div>
+    <div class="player" data-ch="owhy"></div>
     <div class="player" data-ch="oedge"></div>
+    <div class="player" data-ch="oising"></div>
     <div class="r"><div class="main eqs">\[ H_n=\sum_{i=1}^{n-1}\mathbf S_i\cdot\mathbf S_{i+1}-h\,(S_1^z+S_n^z),\qquad h=\tfrac35 . \]
 <p>Theorem: for every odd \(n\ge1921\) the ground state is unique and \(\Delta_n>\log10/392\approx0.0059\).</p></div><aside class="side"></aside></div>
     
