@@ -1,25 +1,23 @@
 # Method: two-leg Heisenberg ladder certificate
 
-The first part of this document describes the verification pipeline implemented in `src/`. The second part proves that a naive perturbation expansion around independent rungs fails at every seed size and derives the local coupling continuation used in the certificate.
+The first part of this document describes the frame and the verification pipeline (the shared core plus `src/`). The second part proves that a naive perturbation expansion around independent rungs fails at every seed size and derives the local coupling continuation used in the certificate.
 
 ## Certificate pipeline
 
-### Complete verified spectra (`src/spectra.jl`)
+### Frame and reflection positivity (`src/model.jl`)
 
-The Hilbert space is decomposed by down-spin number, rung momentum, leg exchange, and (at zero magnetization) spin inversion using exact permutation orbits and stabilizers. Opposite magnetizations and conjugate momenta carry exact multiplicities, and the block dimensions are verified to sum to $4^L$. Block entries are enclosed in interval arithmetic and centered to a `Float64` matrix $H$ with $\|H_{\text{exact}} - H\|_2 \le \text{herror}$ (bounded via the maximum absolute row sum).
+The ladder is a core `RingModel` with one rung ($d = 4$) per cell in the leg-rotated frame $U_L = \bigotimes_j (1 \otimes u)$, $u = \exp(i\pi S^y)$: the leg bonds $\mathbf{S} \cdot \mathbf{S}$ are unchanged (both endpoints are rotated), the rung term becomes $o = -J_\perp(X \otimes X + A \otimes A + Z \otimes Z)$, and $S^z_{\text{tot}}$ becomes the additive cell charge $z_1 - z_2$. With the cell reflection $F = \sigma^y \otimes \sigma^y$, which commutes with $o$, the bond satisfies $-h = \sum_\alpha C_\alpha \otimes F C_\alpha F$ over the six real single-spin factors, the reflected RP form of the scope note. Unlike the earlier checkerboard frame (alternating legs, conserved charge only up to a staggering), this frame is translation invariant with a uniform U(1) charge, so the generic core blocks apply. `check_frame` verifies the frame identities exactly.
 
-LAPACK provides tentative eigenpairs $(Q, \Lambda)$. Using interval Frobenius bounds $r \ge \|HQ - Q\Lambda\|_F$ and $\eta \ge \|Q^\dagger Q - I\|_F < 1$—both including the explicit floating-point rounding allowance $\gamma_{8n+32}$ (with unit roundoff $u = 2^{-53}$) and a $2^{-1000}$ underflow allowance—the unitary polar factor $U$ satisfies $\|Q - U\|_2 \le d = \eta / (1 + \sqrt{1 - \eta})$. Weyl's inequality then gives the simultaneous eigenvalue enclosure radius
+### Complete verified spectra (core `VerifiedSpectra`)
 
-$$\rho = r + (\|H\|_F + \max_i |\Lambda_i|)\, d + \text{herror}.$$
-
-Every eigenvalue ball, weighted by its sector multiplicity, is summed with outward-directed rounding to enclose $\log Z_4(\beta_0)$, $\log Z_8(\beta_0)$, and $\log Z_8(2\beta_0)$.
+`verified_ring_spectrum` splits each ring exactly by charge, momentum, the parity of the on-site symmetry leg exchange $U\,\mathrm{SWAP}\,U^\mathsf{T}$ and, in the self-conjugate sector $S^z = 0$, the parity of the flip $F^{\otimes L}$; sectors $\pm S^z$ and momenta $\pm k$ are built once with exact multiplicities, and the block dimensions sum to $4^L$ (91 blocks, largest 715, at 8 rungs). Block entries are enclosed in interval arithmetic; the exactly Hermitian Float64 center and an exact Frobenius bound on its distance to the true block go to `verified_eigen`, which bounds the residual and orthogonality of the LAPACK eigenvectors in Float64 with the a priori allowances $\gamma_{N+8}$ (real blocks) or $\gamma_{2N+8}$ (complex blocks, four real products) on Frobenius norms, takes the smaller of the Ostrowski and polar-factor radii, and adds the block error by Weyl's inequality. The largest radius at 8 rungs is $8.6 \times 10^{-9}$ (the earlier local enclosure gave $4.4 \times 10^{-8}$). `log_partition_enclosure` sums every eigenvalue ball with its multiplicity in outward-rounded interval arithmetic.
 
 ### Seed classification (`src/suite.jl`)
 
-For each coupling, the suite computes the verified spectra of $2$-, $4$-, and $8$-rung rings and classifies all 128 grid seeds $n_0 \in \{2, 4\}$, $\beta_0 = k/4$ ($k = 1, \dots, 64$):
+For each coupling, `seed_bounds` (reusing the three spectra) encloses both defects of all 128 grid seeds $n_0 \in \{2, 4\}$, $\beta_0 = k/4$ ($k = 1, \dots, 64$), with upper ends rounded up to multiples of $10^{-15}$:
 
-- `certified`: the upper defect bounds $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$ (rounded upward to multiples of $10^{-8}$) close `certified_gap_bound`, and the resulting gap lower bound is rounded downward to a multiple of $10^{-9}$;
-- `rejected_by_recurrence`: the lower defect bounds (rounded downward) carry an exact rational divergence witness. With $z = 1 - (1 - \varepsilon_\tau)(1 - \varepsilon_{\mathrm{s}})^2$ and the squaring map $f(z) = z^2 / [2(1 - z)^2]$, once $z \ge 1/2$ (or the intermediate thermal step reaches $1/2$), both components at the next step are at least $1/2$, so the order-preserving recurrence cannot converge to zero (intermediate lower bounds are rounded downward to $10^{-24}$);
+- `certified`: the upper defect bounds close `certified_gap_bound`; the best such seed is passed to `certify_gap`, which also runs the exact rational chain;
+- `rejected_by_recurrence`: the lower defect bounds (rounded downward to multiples of $10^{-15}$) carry an exact rational divergence witness. With $z = 1 - (1 - \varepsilon_\tau)(1 - \varepsilon_{\mathrm{s}})^2$ and the squaring map $f(z) = z^2 / [2(1 - z)^2]$, once $z \ge 1/2$ (or the intermediate thermal step reaches $1/2$), both components at the next step are at least $1/2$, so the order-preserving recurrence cannot converge to zero (intermediate lower bounds are rounded downward to $10^{-24}$);
 - `unresolved`: neither condition holds (this does not occur for any grid seed in the certificate).
 
 ### All-$\beta$ exclusion ($J_\perp = 2, 3/2$)

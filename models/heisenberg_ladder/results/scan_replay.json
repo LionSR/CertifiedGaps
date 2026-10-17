@@ -3,6 +3,7 @@
     "parameters": [
         {
             "J": "4//1",
+            "sector_tables_cover_all_states": true,
             "rings": [
                 2,
                 3,
@@ -13,11 +14,11 @@
                 10
             ],
             "largest_dimension": "1048576//1",
-            "all_exact_sector_counts_pass": true,
             "numerical_grid_reproduced": true
         },
         {
             "J": "7//2",
+            "sector_tables_cover_all_states": true,
             "rings": [
                 2,
                 3,
@@ -28,11 +29,11 @@
                 10
             ],
             "largest_dimension": "1048576//1",
-            "all_exact_sector_counts_pass": true,
             "numerical_grid_reproduced": true
         },
         {
             "J": "3//1",
+            "sector_tables_cover_all_states": true,
             "rings": [
                 2,
                 3,
@@ -43,11 +44,11 @@
                 10
             ],
             "largest_dimension": "1048576//1",
-            "all_exact_sector_counts_pass": true,
             "numerical_grid_reproduced": true
         },
         {
             "J": "5//2",
+            "sector_tables_cover_all_states": true,
             "rings": [
                 2,
                 3,
@@ -58,11 +59,11 @@
                 10
             ],
             "largest_dimension": "1048576//1",
-            "all_exact_sector_counts_pass": true,
             "numerical_grid_reproduced": true
         },
         {
             "J": "2//1",
+            "sector_tables_cover_all_states": true,
             "rings": [
                 2,
                 3,
@@ -73,11 +74,11 @@
                 10
             ],
             "largest_dimension": "1048576//1",
-            "all_exact_sector_counts_pass": true,
             "numerical_grid_reproduced": true
         },
         {
             "J": "3//2",
+            "sector_tables_cover_all_states": true,
             "rings": [
                 2,
                 3,
@@ -88,7 +89,6 @@
                 10
             ],
             "largest_dimension": "1048576//1",
-            "all_exact_sector_counts_pass": true,
             "numerical_grid_reproduced": true
         }
     ],
@@ -143,25 +143,29 @@
         "results/scans/spectrum_J4p0_L8.json": "c6f5c01fa3b10ccb02a1c9582d032d25482248d1b2dac6957738d89e71768bf6"
     },
     "metadata": {
-        "JSON3": "1.14.3",
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "numerical artifact audit; not a spectral certificate",
+        "config": {
+            "scope": "historical numerical scans and sector tables"
+        },
+        "created_utc": "2026-10-17T01:56:34.946",
+        "certified": false,
         "source_sha256": {
-            "models/heisenberg_ladder/certify.jl": "74c1c2a0bd7c277911bd4d08d9608640cedb91fac21f018797eb4eec7ec42c6e",
-            "models/heisenberg_ladder/src/spectra.jl": "06f369eca05ec86766679cc88c60c26f1911d8c27e599128d7f6117660efd0a4",
-            "models/heisenberg_ladder/src/rp.jl": "4b1df155141ee017f511f0c8ca8ce2a8d63a3dac331f7e5b52943c7b996a31d4",
-            "models/heisenberg_ladder/Project.toml": "c0741f9e6413a9342796e468c2362f3d4b01763bc6c0ad545dcbe32e854f8af3",
-            "models/heisenberg_ladder/Manifest.toml": "0b36fd0e3068dcecaaea82283ab3984549722b883ea2964ce6f7a350db19bcbe",
-            "models/heisenberg_ladder/src/HeisenbergLadder.jl": "9bb711ef647ec63119e898a1dd7e20eb0863f5fe0d8d3bfb72fcd107aaedea12",
-            "models/heisenberg_ladder/src/suite.jl": "2102ad1e3086c7cebbc06e0e9e1b929263b469e9719d48b85631fdb5f2dfb5b0",
-            "models/heisenberg_ladder/check.jl": "5f5666a571933c63afda962f28ce00d9a6066b3a1098b027700e18a1c9362605"
+            "models/heisenberg_ladder/certify.jl": "c852220d6672e06b625c0f85886aa22342bc437e49320cad57e12905b7bf5727",
+            "models/heisenberg_ladder/src/model.jl": "e0afbca4b63179272a63502537cc1b6fcde442154c5da6455f53122acd414cff",
+            "models/heisenberg_ladder/src/HeisenbergLadder.jl": "aeca9d75938547d76d95633ac4d966c2bccdcd59a2dd19285ac746496893f0f3",
+            "models/heisenberg_ladder/src/suite.jl": "125b123cfbcc8e108a24882c3357937b434c80a9db3503cf0759180d675df129",
+            "models/heisenberg_ladder/check.jl": "9f382f245cce737f38d1f6156733aeb7c3be6ffdfab1077df2732e3fbf3bf426"
         },
         "core_sha256": {
             "julia/src/ExactDiagonalization.jl": "d9af3857fcbd6da1ff3ee27d01c3dfe427769d664fd718a6b075e2fa6947e52b",
             "julia/src/ReflectionPositivity.jl": "e8d5d3446f680f377bed27d0d9ba44dda8182b7c3055165b9b61701fe736040c",
             "julia/src/Recurrence.jl": "2dc12e517f9739e2064f5de119510c52caa0a2cfba53d0eb8b5d6c85e02f9729",
-            "julia/src/RingModels.jl": "ee4347971bbce70809354c7232fec6514bb592f4462d6a57b239c393861f5c6c",
+            "julia/src/RingModels.jl": "89bb0e9c8a13432c2034fcb1e7538dd3f833ca6730516a50a6e4890a5b25e611",
             "julia/src/Seeds.jl": "55e81986e9784999a32028a26c1665258d8c3bd46c489f81f5471d9c790e21f0",
             "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
-            "julia/src/VerifiedSpectra.jl": "f970f8186158bf0110e8124d647d1b8a7c3ff23ac194c3d569e372d833850df5",
+            "julia/src/VerifiedSpectra.jl": "472e90f1009511df8d2a0083b6d5a666bf419dc5a04c20cf1d1e5a672f63b641",
             "julia/src/CertifiedMPO/GaugeSearch.jl": "96d9fcdcf031b5b84c502a7582ae5715022752276d3385db724143477b2eb4f5",
             "julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
             "julia/src/CertifiedMPO/SchattenBridge.jl": "2300c4f86790906274adf9d50ac8bd43a7ef1ccbfc49e4a9aaafbbe2addc290f",
@@ -172,8 +176,8 @@
             "julia/src/Models.jl": "299d8bc7b0e377361276b26a99023e5a6130e73058639b0bdb13783b51855b2e",
             "julia/src/Purification.jl": "ea8a4b1a03a8a38b01d0289b06da72a8ea255e79287008ccf58456cfda9fadf3",
             "julia/src/ExactArithmetic.jl": "77feece9b1e56011667bd8241ff159864943433d2121f01f351dccefae769882",
-            "julia/src/GapCertificates.jl": "a8497294951be57ebff526beae7732b6d91446d579eeb4c31cabc7d96174e311",
-            "julia/src/Results.jl": "bee48de997ab5fa9acd605e2bf286d88dbc6f31c4113d33d89f9140617e1aaf7",
+            "julia/src/GapCertificates.jl": "c828cbf866fbfa82a8996486a15fae7403d2644e21c0071dafa532a1b0b97b3f",
+            "julia/src/Results.jl": "dda86f08bd426aea0c5f876580f7dda9a1a8bbf208d66268f6926a6f1dc2319f",
             "julia/src/CertifiedMPO/Products.jl": "5207b7d80375c538d531c67c699d048a0014409cf410425ffc633299959a9230",
             "julia/src/CertifiedMPO/Squaring.jl": "9e454f12d3149482d734f33d3a1f47b6c4dab21144329753cdd2826d05c5b03c",
             "julia/src/Spins.jl": "b3dcf5d8f8edb50bd6f8308d18e5da123621adf6074a831f276f56ba629e8f18",
@@ -186,17 +190,7 @@
             "julia/src/CertifiedMPO/PositiveBounds.jl": "8921e7de4f45a27260dfc22e00719b06651674fc3dd792d6580e294b5fd68382",
             "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
         },
-        "status": "numerical artifact audit; not a spectral certificate",
-        "certified": false,
-        "blas_threads": 1,
-        "config": {
-            "scope": "historical numerical scans, fresh exact sector counts"
-        },
-        "created_utc": "2026-10-16T04:11:28.183",
-        "julia_threads": 1,
-        "julia": "1.12.4",
-        "IntervalArithmetic": "1.0.12",
-        "CertifiedGaps": "0.2.0"
+        "blas_threads": 1
     },
-    "seconds": 3.5443460941314697
+    "seconds": 3.7886388301849365
 }

@@ -1,18 +1,39 @@
-# Floating-point seed scan at one coupling (NOT a certificate). Dense complete spectra of the
-# rings of 2–6, 8 and 10 rungs, then every seed n₀ = 2:5, β₀ = 1/4:1/4:16. The ten-rung ring
-# (2^20 states, largest block 8398) takes 20–35 minutes; peak memory is a few GiB per process.
+# Floating-point seed scan at one coupling (NOT a certificate). Unverified dense eigenvalues of
+# the core symmetry blocks (`VerifiedSpectra.ring_blocks` of `ladder_model`) of the rings of
+# 2–6, 8 and 10 rungs, then every seed n₀ = 2:5, β₀ = 1/4:1/4:16. The stored scans were made
+# with the earlier local block builder (ten rungs: 2^20 states, 20–35 minutes each).
 #
-#     OPENBLAS_NUM_THREADS=1 julia --project=models/heisenberg_ladder \
+#     OPENBLAS_NUM_THREADS=1 julia --project=julia \
 #         models/heisenberg_ladder/scripts/scan.jl 7//2
 #
 # Writes results/scans/spectrum_J<tag>_L<L>.json (sector table, log Z on β = 1/4:1/4:32 and
 # the lowest 32 levels; the full level list is not stored) and results/scans/scan_J<tag>.json.
 # Odd n₀ are frustrated diagnostics only: the criterion needs even n₀.
 include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
-using .HeisenbergLadder: BASE, full_spectrum, provenance
+using .HeisenbergLadder: BASE, HASHED, ladder_model
+using CertifiedGaps.VerifiedSpectra: ring_blocks
+using LinearAlgebra: Hermitian, eigvals
 using CertifiedGaps.ExactDiagonalization: PartialSpectrum, log_partition
 using CertifiedGaps.Seeds: scan_seeds, spectral_defects, best_seed
-using CertifiedGaps.Results: write_result
+using CertifiedGaps.Results: write_result, model_metadata
+
+"""
+    numerical_spectrum(J, L) -> (; energies, rows, seconds, dimension)
+
+All 4^L levels of the ring of `L` rungs, sorted, from unverified LAPACK eigenvalues of the core
+symmetry blocks with their exact multiplicities. Floating-point evidence only.
+"""
+function numerical_spectrum(J, L)
+    start = time(); energies = Float64[]; rows = Any[]
+    ring_blocks(ladder_model(J), L) do M, _, mult, label
+        tick = time()
+        e = eigvals(Hermitian(M))
+        for _ in 1:mult; append!(energies, e); end
+        push!(rows, merge(label, Dict("multiplicity" => mult, "seconds" => time() - tick)))
+    end
+    length(energies) == 4^L || error("blocks do not cover the ring")
+    return (; energies = sort!(energies), rows, seconds = time() - start, dimension = 4^L)
+end
 
 "File tag of a coupling, e.g. 7//2 -> \"3p5\"."
 tag(J) = replace(string(Float64(J)), "." => "p")
@@ -24,9 +45,9 @@ seedrow(r) = r === nothing ? nothing : Dict("n0" => r.n₀, "beta" => r.β₀, "
 function scan(J; rings = (2, 3, 4, 5, 6, 8, 10), ns = 2:5, out = joinpath(BASE, "results", "scans"))
     start = time(); spectra = Dict{Int,PartialSpectrum}(); records = Dict{String,Any}()
     for L in rings
-        s = full_spectrum(L, J); es = s.energies
+        s = numerical_spectrum(J, L); es = s.energies
         write_result(joinpath(out, "spectrum_J$(tag(J))_L$(L).json"), Dict(
-            "metadata" => provenance(Dict("J" => string(J), "L" => L)),
+            "metadata" => model_metadata(BASE, Dict("J" => string(J), "L" => L); HASHED...),
             "J" => string(J), "L" => L, "dimension" => s.dimension, "sectors" => s.rows,
             "seconds" => s.seconds, "gap" => es[2] - es[1],
             "lowest_32_numerical_levels" => es[1:min(32, length(es))],
@@ -47,7 +68,8 @@ function scan(J; rings = (2, 3, 4, 5, 6, 8, 10), ns = 2:5, out = joinpath(BASE, 
             "best_bound_seed" => seedrow(best_seed(rs)), "eligible_even_seed" => iseven(n)))
     end
     write_result(joinpath(out, "scan_J$(tag(J)).json"), Dict(
-        "metadata" => provenance(Dict("J" => string(J), "beta_grid" => "1//4:1//4:16//1")),
+        "metadata" => model_metadata(BASE,
+            Dict("J" => string(J), "beta_grid" => "1//4:1//4:16//1"); HASHED...),
         "J" => string(J), "best" => seedrow(best_seed(eligible)), "rings" => records,
         "diagnostics" => diagnostics, "grid" => seedrow.(rows), "seconds" => time() - start))
     println("BEST ", best_seed(eligible))
