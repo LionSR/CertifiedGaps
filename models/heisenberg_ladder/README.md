@@ -1,6 +1,6 @@
 # Two-leg spin-1/2 Heisenberg ladder
 
-This module certifies uniform spectral gaps for the two-leg spin-1/2 Heisenberg ladder at rung couplings $J_\perp = 4$, $7/2$, $3$, $5/2$, and $163069/65536$ from verified complete spectra of rings of $2$, $4$, and $8$ rungs. Each certificate establishes a unique ground state and $\Delta_L \ge$ the bound below for every even $L \ge 4$ rungs. At $J_\perp = 2$ and $3/2$, every seed with $n_0 \in \{2, 4\}$ is rigorously rejected for all $\beta > 0$. The certificate is stored in [`results/certificate.json`](results/certificate.json), the route analysis is in [`IDEAS.md`](IDEAS.md), and the verification pipeline and failed perturbation route are documented in [`METHOD.md`](METHOD.md).
+This module certifies uniform spectral gaps for the two-leg spin-1/2 Heisenberg ladder at rung couplings $J_\perp = 4$, $7/2$, $3$, $5/2$, and $163069/65536$ from verified complete spectra of rings of $2$, $4$, and $8$ rungs. Each certificate establishes a unique ground state and $\Delta_L \ge$ the bound below for every even $L \ge 4$ rungs. At $J_\perp = 2$ and $3/2$, every seed with $`n_0 \in \{2, 4\}`$ is rigorously rejected for all $\beta > 0$. The certificate is stored in [`results/certificate.json`](results/certificate.json), the route analysis is in [`IDEAS.md`](IDEAS.md), and the verification pipeline and failed perturbation route are documented in [`METHOD.md`](METHOD.md).
 
 | $J_\perp$ | seed $(n_0, \beta_0)$ | certified gap $\ge$ | lengths covered |
 |---|---|---:|---|
@@ -9,13 +9,15 @@ This module certifies uniform spectral gaps for the two-leg spin-1/2 Heisenberg 
 | 3 | $(4, 5/2)$ | 0.454189334 | every even $L \ge 4$ rungs |
 | 5/2 | $(4, 3)$ | 0.042433721 | every even $L \ge 4$ rungs |
 | 163069/65536 | $(4, 3)$ | 0.001531165 | every even $L \ge 4$ rungs |
-| 2, 3/2 | none ($n_0 \in \{2, 4\}$ rejected for all $\beta$) | — | no certificate |
+| 2, 3/2 | none ($`n_0 \in \{2, 4\}`$ rejected for all $\beta$) | — | no certificate |
 
 ## Model
 
 The periodic two-leg ladder Hamiltonian on $L$ rungs is
 
-$$H_L = \sum_{j=1}^{L} \sum_{a=1,2} \mathbf{S}_{a,j} \cdot \mathbf{S}_{a,j+1} + J_\perp \sum_{j=1}^{L} \mathbf{S}_{1,j} \cdot \mathbf{S}_{2,j},$$
+```math
+H_L = \sum_{j=1}^{L} \sum_{a=1,2} \mathbf{S}_{a,j} \cdot \mathbf{S}_{a,j+1} + J_\perp \sum_{j=1}^{L} \mathbf{S}_{1,j} \cdot \mathbf{S}_{2,j},
+```
 
 with unit leg coupling and one rung ($d = 4$) per unit cell, so $L$ rungs contain $N = 2L$ spins. At $L = 2$, both periodic leg bonds are included (following the repository's two-cell ring convention). Because seed lengths $n_0$ are counted in rungs, a certificate at $n_0 = 4$ covers every even $L \ge 4$ rungs, corresponding to **$N = 8, 12, 16, \dots$ spins** ($N$ divisible by 4).
 
@@ -23,11 +25,15 @@ with unit leg coupling and one rung ($d = 4$) per unit cell, so $L$ rungs contai
 
 In the standard spin-1/2 basis with real matrices $X = S^x$, $A = iS^y$, and $Z = S^z$, applying the checkerboard rotation $u = \exp(i\pi S^y) = 2A$ to one spin of every rung (alternating legs from rung to rung, which requires $L$ to be even) maps the Hamiltonian to a reflection-positive cell model with
 
-$$-h_{\text{cell}} = \sum_\alpha C_\alpha \otimes C_\alpha, \qquad C_\alpha \in \{X \otimes I, A \otimes I, Z \otimes I, I \otimes X, I \otimes A, I \otimes Z\},$$
+```math
+-h_{\text{cell}} = \sum_\alpha C_\alpha \otimes C_\alpha, \qquad C_\alpha \in \{X \otimes I, A \otimes I, Z \otimes I, I \otimes X, I \otimes A, I \otimes Z\},
+```
 
 and real symmetric on-site rung term
 
-$$o = -J_\perp (X \otimes X + A \otimes A + Z \otimes Z).$$
+```math
+o = -J_\perp (X \otimes X + A \otimes A + Z \otimes Z).
+```
 
 The function `exact_rp` in [`src/rp.jl`](src/rp.jl) verifies the rotation identities for both sublattice orientations over `Rational{BigInt}`, and `rp_model` stores the decomposition factors for verification by `CertifiedGaps.verify_rp` (in both `check.jl` and `check.jl --full`). Because the checkerboard rotation is a unitary equivalence, spectra are computed in the original $\mathrm{SU}(2)$ basis.
 
@@ -43,14 +49,14 @@ Each certified row establishes a unique ground state and $\Delta_L \ge$ the boun
 | 5/2 | $(4, 3)$ | 0.18558434 | 0.05114736 | 0.042433721 | — |
 | 163069/65536 $\approx 2.488235$ | $(4, 3)$ | 0.18772796 | 0.05269516 | 0.001531165 | — |
 | 326133/131072 $\approx 2.488197$ | all 128 grid seeds rejected | | | — | |
-| 2 | $n_0 \in \{2, 4\}$ rejected for every $\beta > 0$ | | | — | |
-| 3/2 | $n_0 \in \{2, 4\}$ rejected for every $\beta > 0$ | | | — | |
+| 2 | $`n_0 \in \{2, 4\}`$ rejected for every $\beta > 0$ | | | — | |
+| 3/2 | $`n_0 \in \{2, 4\}`$ rejected for every $\beta > 0$ | | | — | |
 
 As exact rationals, the $J_\perp = 4$ seed is $(n_0, \beta_0, \varepsilon_{\mathrm{s}}, \varepsilon_\tau) = (4, 2, 3508321/100000000, 123121/5000000)$. Asymmetric defect pairs where $\varepsilon_{\mathrm{s}}$ exceeds the symmetric diagonal threshold $\varepsilon_* \approx 0.12731$ (at $J_\perp \le 5/2$) are certified directly by the asymmetric two-purity recurrence in `certified_gap_bound`.
 
 ### Verification method
 
-For each coupling, the suite encloses every eigenvalue of the $2$-, $4$-, and $8$-rung rings (using symmetry blocks with exact multiplicities, interval block entries, residual and orthogonality bounds, and Weyl's inequality), forms outward-rounded $\log Z$ sums, and classifies all 128 grid seeds $n_0 \in \{2, 4\}$, $\beta_0 = k/4$ ($k = 1, \dots, 64$) into three categories:
+For each coupling, the suite encloses every eigenvalue of the $2$-, $4$-, and $8$-rung rings (using symmetry blocks with exact multiplicities, interval block entries, residual and orthogonality bounds, and Weyl's inequality), forms outward-rounded $\log Z$ sums, and classifies all 128 grid seeds $`n_0 \in \{2, 4\}`$, $\beta_0 = k/4$ ($k = 1, \dots, 64$) into three categories:
 - `certified`: upper defect enclosures close the doubling recurrence;
 - `rejected_by_recurrence`: lower defect bounds carry an exact rational witness showing that the recurrence diverges above $1/2$;
 - `unresolved`: the enclosure is too wide to decide (does not occur for any grid point).
@@ -59,7 +65,7 @@ At $J_\perp = 2$ and $3/2$, monotone temperature-window bounds and a ground-stat
 
 ### Finite-grid threshold and negative rows
 
-On the grid $n_0 \in \{2, 4\}$, $\beta_0 = k/4$ ($k = 1, \dots, 64$), every seed is rigorously rejected at $J_\perp = 326133/131072$ and a seed is certified at $J_\perp = 163069/65536$, locating the grid transition within $(2.48819732666015625, 2.4882354736328125)$. This brackets the threshold of the $(n_0 \le 4)$ seed grid rather than the physical gap-closing coupling (the Heisenberg ladder is gapped for all $J_\perp > 0$). Similarly, the all-$\beta$ rejections at $J_\perp = 2$ and $3/2$ show only that $n_0 \in \{2, 4\}$ is too small at those couplings; the heuristic fit in `results/scans/extrapolation.json` estimates that $n_0 = 6$ ($J_\perp = 2$) and $n_0 = 8$ ($J_\perp = 3/2$) would be required, corresponding to $24$- and $32$-spin rings.
+On the grid $`n_0 \in \{2, 4\}`$, $\beta_0 = k/4$ ($k = 1, \dots, 64$), every seed is rigorously rejected at $J_\perp = 326133/131072$ and a seed is certified at $J_\perp = 163069/65536$, locating the grid transition within $(2.48819732666015625, 2.4882354736328125)$. This brackets the threshold of the $(n_0 \le 4)$ seed grid rather than the physical gap-closing coupling (the Heisenberg ladder is gapped for all $J_\perp > 0$). Similarly, the all-$`\beta`$ rejections at $J_\perp = 2$ and $3/2$ show only that $`n_0 \in \{2, 4\}`$ is too small at those couplings; the heuristic fit in `results/scans/extrapolation.json` estimates that $n_0 = 6$ ($J_\perp = 2$) and $n_0 = 8$ ($J_\perp = 3/2$) would be required, corresponding to $24$- and $32$-spin rings.
 
 ## Reproduce
 
@@ -81,7 +87,7 @@ julia --project=models/heisenberg_ladder models/heisenberg_ladder/scripts/replay
   witnesses), the best seeds, coupling continuations, and README gap claims (`CLAIMED_GAPS`)
   without recomputing spectra.
 - `check.jl --full` (90 s): recomputes all verified spectra, defect and $\log Z$ enclosures, all
-  1,024 grid decisions, and the all-$\beta$ exclusions from scratch.
+  1,024 grid decisions, and the all-$`\beta`$ exclusions from scratch.
 - `certify.jl` (87.5 s on an idle machine, 10–30 s per coupling): generates
   `results/certificate.json`.
 - `scripts/audit.jl` (11 s) and `scripts/replay_scans.jl` (1 s): the independent MPFR seed audit
@@ -103,15 +109,15 @@ concurrently once exceeded 17 GiB of RAM, so run at most one or two at a time.
 
 - **Verified by `check.jl --full` from fresh computation:** exact RP identities, exact symmetry
   sector accounting, all eigenvalue and $\log Z$ enclosures, all 1,024 grid decisions with their
-  upper/lower defect bounds and rejection witnesses, the core recurrence gap bounds, all-$\beta$
+  upper/lower defect bounds and rejection witnesses, the core recurrence gap bounds, all-$`\beta`$
   exclusions, coupling continuations, README claims (`CLAIMED_GAPS`), and the SHA-256 hashes of the
   model-local sources `src/`, `certify.jl`, `check.jl`, and the model environment (tests and
   `scripts/` are not hashed; the core's hashes are recorded as provenance only, since the checker
   reruns the core). No stored spectrum or scan is an input. The fast `check.jl` re-establishes the
   parts that need no spectrum and trusts the stored defect enclosures.
 - **Independent audit:** `scripts/audit.jl` redoes the $J_\perp = 4$ seed with 256-bit
-  directed-rounding MPFR partition sums and checks the exact trace moments $\operatorname{Tr} H = 0$
-  and $\operatorname{Tr}(H^2)$ against the eigenvalue enclosures.
+  directed-rounding MPFR partition sums and checks the exact trace moments $`\mathrm{Tr}\, H = 0`$
+  and $\mathrm{Tr}(H^2)$ against the eigenvalue enclosures.
 - **Trusted base:** the two-purity doubling criterion (proved in `notes/` and formalized in `lean/`
   with the seeds as hypotheses) and IEEE binary64 round-to-nearest arithmetic in OpenBLAS/LAPACK
   under the explicit rounding-error allowances in [`METHOD.md`](METHOD.md).

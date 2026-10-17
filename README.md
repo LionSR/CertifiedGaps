@@ -1,6 +1,6 @@
 # A diagrammatic proof of the Haldane gap
 
-The spin-1 antiferromagnetic Heisenberg chain $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ has a
+The spin-1 antiferromagnetic Heisenberg chain $`H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}`$ has a
 spectral gap $\Delta_L = E_1(L) - E_0(L)$ that stays open as the ring grows (Haldane's conjecture;
 numerically $\Delta \approx 0.4105$). This repository proves a uniform lower bound on that gap using
 spacetime tensor networks drawn as diagrams, certifies the finite numerical inputs by computer, and
@@ -8,8 +8,8 @@ applies the same method to a family of one-dimensional quantum spin chains and l
 
 The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), has two parts:
 
-1. **An analytic criterion.** Write the partition function $Z_L(\beta) = \operatorname{Tr} e^{-\beta H_L}$
-   of a periodic ring as $\operatorname{Tr} X_\beta^L$, where $X_\beta$ is the spatial transfer operator of an
+1. **An analytic criterion.** Write the partition function $`Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}`$
+   of a periodic ring as $`\mathrm{Tr}\, X_\beta^L`$, where $X_\beta$ is the spatial transfer operator of an
    exact continuous-time thermal matrix product operator (MPO). When the bond interaction is reflection
    positive, $X_\beta$ is self-adjoint, so $Z_L(\beta)$ is a sum of $L$-th powers of real transfer
    eigenvalues just as it is a sum of exponentials of energy eigenvalues. Consequently, both the
@@ -63,7 +63,7 @@ only open hypotheses.
 | Ising chain $-ZZ - gX - hZ$, 30 points $g \in [1/4, 2]$, $h \in [1/20, 1]$ | $(6, \text{per point})$ | $\ge 0.0763$ at every point (smallest at $g = 1, h = 1/20$) | [`tfim_longitudinal`](models/tfim_longitudinal/) |
 | spin-1 bilinear–biquadratic, $\theta \in [-7/10, 0]$ | no admissible even seed with $n_0 \le 6$ | negative result; required seed scale estimated | [`blbq_haldane`](models/blbq_haldane/) |
 | spin-2 Heisenberg chain | — | numerical and certified-MPO investigation; no certificate | [`spin2`](models/spin2/) |
-| hexagonal spin-3/2 AKLT ($2+1$ dimensions) | — | numerical pilot of the $2+1$D thermal-purity recursion | [`aklt`](models/aklt/) |
+| hexagonal spin-3/2 AKLT ($2+1$ dimensions) | — | numerical pilot of the $`2+1`$D thermal-purity recursion | [`aklt`](models/aklt/) |
 
 For all certified models outside `spin1/`, the seed defects are computed from complete spectra of the
 seed rings at lengths $n_0$, $2n_0$ (at $\beta_0$ and $2\beta_0$), where every eigenvalue is enclosed by a

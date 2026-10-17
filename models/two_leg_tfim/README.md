@@ -10,7 +10,9 @@ This module certifies a uniform spectral gap for the two-leg transverse-field Is
 
 Each unit cell is a two-spin rung ($d = 4$). In Pauli normalization on a periodic ring of $L$ rungs,
 
-$$H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).$$
+```math
+H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).
+```
 
 Lengths count rungs, and the $L = 2$ ring retains both periodic leg bonds, following the core package convention.
 
@@ -18,7 +20,9 @@ Lengths count rungs, and the $L = 2$ ring retains both periodic leg bonds, follo
 
 In the real $\sigma^z$ rung basis $(\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow)$, setting the diagonal real bond factors $C_1 = Z \otimes I$ and $C_2 = I \otimes Z$ gives
 
-$$-h_{\text{bond}} = C_1 \otimes C_1 + C_2 \otimes C_2,$$
+```math
+-h_{\text{bond}} = C_1 \otimes C_1 + C_2 \otimes C_2,
+```
 
 and the on-site rung operator $o = -Z \otimes Z - g(X \otimes I + I \otimes X)$ is real symmetric. The function `rp_identity` in [`src/Ladder.jl`](src/Ladder.jl) checks this identity over `Rational{BigInt}`, constructing the inter-rung bond independently from four $2 \times 2$ Kronecker factors. Because a single rung is invariant under spatial reflection along the leg direction, no internal cell reflection $F$ is required ($F = I$).
 
@@ -28,7 +32,7 @@ and the on-site rung operator $o = -Z \otimes Z - g(X \otimes I + I \otimes X)$ 
 |---|---|---:|---:|---:|---:|
 | 3 | $(4, 3/2)$ | $\approx 0.11240836635$ | $\approx 0.05161523886$ | 0.636386863 | 2.6618 (numerical) |
 
-The exact rational defect upper bounds are stored as `epsilon_s` and `epsilon_t` in [`results/certificate_g3_1.json.gz`](results/certificate_g3_1.json.gz). Passing them to `CertifiedGaps.certified_gap_bound(εₛ, εₜ, 3//2).bound` yields the exact rational `179126977518527//281474976710656` ($\approx 0.6363868632722607$, rounded down in the table above), which is about $24\%$ of the 8-rung numerical gap. On the scanned field grid $g \in \{2, 5/2, 3, 4\}$, the weaker fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ (numerical bound $2.142$) was not run through full certification because $g = 3$ is already certified.
+The exact rational defect upper bounds are stored as `epsilon_s` and `epsilon_t` in [`results/certificate_g3_1.json.gz`](results/certificate_g3_1.json.gz). Passing them to `CertifiedGaps.certified_gap_bound(εₛ, εₜ, 3//2).bound` yields the exact rational `179126977518527//281474976710656` ($\approx 0.6363868632722607$, rounded down in the table above), which is about $`24\%`$ of the 8-rung numerical gap. On the scanned field grid $`g \in \{2, 5/2, 3, 4\}`$, the weaker fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ (numerical bound $2.142$) was not run through full certification because $g = 3$ is already certified.
 
 ## Reproduce
 
@@ -68,7 +72,7 @@ Measured run times (Julia 1.12.4, one BLAS thread):
 
 - **Verified enclosures and recurrence:** the exact RP identity; complete dense spectra of all 32 symmetry sectors at $4$ and $8$ rungs (dimension sums $256$ and $65{,}536$), each enclosed by a polar/Weyl whole-spectrum bound that accounts for algebraic matrix-construction error and explicit binary64 BLAS rounding error bounds; outward-rounded MPFR log-partition intervals; exact rational seed defects; and the two-purity doubling recurrence. The enclosures rely on IEEE binary64 round-to-nearest arithmetic with gradual underflow and standard BLAS dot-product error bounds (see [`METHOD.md`](METHOD.md)).
 - **Fast vs. full verification:** `check.jl` (fast) uses the stored per-sector eigenvalue radii to recompute $\log Z$, the rational seed defects (each at most the stored one; they coincide), and the recurrence bound. `check.jl --full` and `scripts/replay_audit.jl` rebuild every eigenpair and enclosure radius from the Hamiltonian. On the original Linux OpenBLAS machine, `replay_audit.jl` reproduced the stored certificate bit for bit; on an Apple M5, LAPACK tie-breaking produces slightly tighter radii and a valid bound of $0.6364738604216351$ (so `check_replay.jl` flags the bit-identity comparisons while passing all seed, bound, and source-hash checks).
-- **Numerical only (not used in the proof):** the seed search ($g \in \{2, 5/2, 3, 4\}$, $n_0 \in \{2, 3, 4\}$, $\beta = 1/8 : 1/8 : 32$), the uncertified $g = 4$ candidate, the negative scan results at $g = 2$ and $5/2$, the extrapolated seed sizes, finite-ring ED reference gaps, and the literature critical field $g_c \approx 1.83214(5)$.
+- **Numerical only (not used in the proof):** the seed search ($`g \in \{2, 5/2, 3, 4\}`$, $`n_0 \in \{2, 3, 4\}`$, $\beta = 1/8 : 1/8 : 32$), the uncertified $g = 4$ candidate, the negative scan results at $g = 2$ and $5/2$, the extrapolated seed sizes, finite-ring ED reference gaps, and the literature critical field $g_c \approx 1.83214(5)$.
 
 ## Layout
 

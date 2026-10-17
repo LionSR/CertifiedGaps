@@ -8,7 +8,7 @@ file before starting any task.
 ## The criterion (what a certificate must establish)
 
 For a periodic ring Hamiltonian $H_L = \sum_{j=1}^L h_{j,j+1} + \sum_{j=1}^L o_j$ of $L$ unit cells
-with partition function $Z_L(\beta) = \operatorname{Tr} e^{-\beta H_L}$, define the spatial and thermal
+with partition function $`Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}`$, define the spatial and thermal
 purities:
 
     Pₛ(n, β) = Z_{2n}(β) / Z_n(β)²        (spatial purity)
@@ -62,9 +62,9 @@ Use consistent terminology and notation across all documentation and comments:
   *thermal defect*, bounded at the seed scale $(n_0, \beta_0)$ by $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ (`εₛ`, `εₜ`).
 - **Hamiltonian and transfer operator:** $H_L = \sum_j h_{j,j+1} + \sum_j o_j$ on a ring of $L$ unit cells
   ($N = cL$ spins for a $c$-site cell), with bond term $h$, on-site term $o$, internal cell reflection $F$,
-  and spatial transfer operator $X_\beta$ ($\operatorname{Tr} X_\beta^L = Z_L(\beta)$). For spin-$S$ chains in the
-  Cartesian basis, write $G_\alpha = i S^\alpha$ ($\alpha \in \{x, y, z\}$) for the real antisymmetric spin
-  generators satisfying $-\mathbf{S}_j \cdot \mathbf{S}_{j+1} = \sum_\alpha G_{\alpha,j} \otimes G_{\alpha,j+1}$.
+  and spatial transfer operator $X_\beta$ ($`\mathrm{Tr}\, X_\beta^L = Z_L(\beta)`$). For spin-$`S`$ chains in the
+  Cartesian basis, write $G_\alpha = i S^\alpha$ ($`\alpha \in \{x, y, z\}`$) for the real antisymmetric spin
+  generators satisfying $`-\mathbf{S}_j \cdot \mathbf{S}_{j+1} = \sum_\alpha G_{\alpha,j} \otimes G_{\alpha,j+1}`$.
 - **Spelling:** Use standard American spelling (`diagonalization`, `dimerized`, `normalization`,
   `magnetization`, `formalized`, `optimized`, `parameter`, `neighbor`, `labeled`) throughout Markdown prose.
 
@@ -107,14 +107,14 @@ is valuable documentation.
 
 ## Repository layout
 
-- `notes/`: LaTeX notes (main proof, scope, certificate method, and $2+1$D extension). Do not edit unless asked.
+- `notes/`: LaTeX notes (main proof, scope, certificate method, and $`2+1`$D extension). Do not edit unless asked.
 - `julia/`: shared core package `CertifiedGaps` (recurrence and certified bounds, exact arithmetic,
   results I/O, spin operators, RP tests and exact RP certificates, exact diagonalization, verified ring
   spectra and `certify_gap`, Nemo/Arb certified MPO toolkit, and ITensors purification extension). See
   `julia/README.md`.
 - `models/spin1/`: exact-arithmetic reproduction of the spin-1 Heisenberg certificate (integer Poisson
   trace recursion with twisted rings and symmetry representatives, polynomial filters, and MPS trial
-  contractions). Serves as the reference template for large-$n$ exact certificates.
+  contractions). Serves as the reference template for large-$`n`$ exact certificates.
 - `models/<model-slug>/`: **where new model certificates live** (one directory per model). Update the
   summary table in the root `README.md` whenever you add or update a model.
 - `lean/`: Lean 4 formalization of the criterion and of each certified model's gap theorem (library

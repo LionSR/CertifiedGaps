@@ -13,21 +13,21 @@ whereas $n_0 = 4$ cells would require a $16$-spin ring ($3^{16} = 43{,}046{,}721
 
 1. **Reflected unit-cell RP identity and positive cell-transfer factorization ($X_\beta = K K^*$):**
    In the Cartesian spin-1 basis ($G_\alpha = i S^\alpha$ real and antisymmetric), every bond
-   satisfies $-J\,\mathbf{S}_i\cdot\mathbf{S}_j = J \sum_\alpha G_\alpha \otimes G_\alpha$ with
-   $J > 0$. Inside a two-spin cell $(a, b)$, the weak bond $o = (1 - \delta)\,\mathbf{S}_a\cdot\mathbf{S}_b$
-   is real symmetric and swap-invariant ($F = P$), while the strong inter-cell bond satisfies
-   $-h = (1 + \delta)\sum_\alpha C_\alpha \otimes F \overline{C_\alpha} F$ with $C_\alpha = I \otimes G_\alpha$.
+   satisfies $`-J\,\mathbf{S}_i\cdot\mathbf{S}_j = J \sum_\alpha G_\alpha \otimes G_\alpha`$ with
+   $J > 0$. Inside a two-spin cell $(a, b)$, the weak bond $`o = (1 - \delta)\,\mathbf{S}_a\cdot\mathbf{S}_b`$
+   is real symmetric and swap-invariant ($`F = P`$), while the strong inter-cell bond satisfies
+   $`-h = (1 + \delta)\sum_\alpha C_\alpha \otimes F \overline{C_\alpha} F`$ with $C_\alpha = I \otimes G_\alpha$.
    Crucially, because both incident bonds at any single site insert the exact same real matrices
    $G_\alpha$, the single-site event trace kernel $F_{\mathrm{site}}(a, u)$ is real and symmetric.
    Cutting the ring at the strong bonds and integrating out the weak intra-cell bond history $u$
-   expresses the cell transfer kernel as $X_\beta(a, b) = \int F_{\mathrm{site}}(a, u) F_{\mathrm{site}}(u, b)\,d\mu_-(u) = (K K^*)(a, b)$.
+   expresses the cell transfer kernel as $`X_\beta(a, b) = \int F_{\mathrm{site}}(a, u) F_{\mathrm{site}}(u, b)\,d\mu_-(u) = (K K^*)(a, b)`$.
    Thus $X_\beta$ is positive semidefinite (not merely self-adjoint), so all of its eigenvalues are
    nonnegative and the spatial squaring and moment-interpolation inequalities hold for **odd**
    $n_0 = 3$ cells as well as even $n_0 = 2$. **Chosen theoretical route.**
 2. **Verified dense diagonalization with exact integer dihedral projectors:** In the $S^z$ product
    basis, every off-diagonal exchange matrix element of the spin-1 Heisenberg bond is equal to the
    bond coupling $J_j$ (the $\sqrt{2}$ ladder factors cancel the $1/2$), so $\mathrm{den}(\delta)\cdot H_L$
-   is an exact symmetric integer matrix. For cell counts $L \in \{2, 3, 4, 6\}$, twice every cosine
+   is an exact symmetric integer matrix. For cell counts $`L \in \{2, 3, 4, 6\}`$, twice every cosine
    $2\cos(2\pi k r / L)$ in the real dihedral (translation + reflection) character projector is an
    exact integer. We can therefore verify projector symmetry, idempotence, and exact rank over
    $\mathbb{Z}$ on every permutation orbit, bound the distance from the floating-point orthonormal

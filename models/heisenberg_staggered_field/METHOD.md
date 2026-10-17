@@ -6,7 +6,7 @@ the spin-1/2 Heisenberg chain in a staggered longitudinal field.
 
 ## Outcome and scope
 
-All five target staggered fields $h \in \{1, 3/4, 1/2, 7/20, 1/4\}$ are certified from complete
+All five target staggered fields $`h \in \{1, 3/4, 1/2, 7/20, 1/4\}`$ are certified from complete
 verified 8- and 16-site ring spectra at seed length $n_0 = 8$. Because the alternating sublattice
 rotation produces a homogeneous reflection-positive ring with a single-spin unit cell on any even
 ring length $L$, the resulting uniform spectral gap bounds apply to **every even chain length
@@ -22,17 +22,23 @@ $L = 16$). Those 20-site candidate bounds are reported below as non-certified nu
 ## Model, exact RP identity, and length convention
 
 We consider the periodic spin-1/2 chain
-$$H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z, \qquad h \in \{1, 3/4, 1/2, 7/20, 1/4\},$$
+```math
+H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z, \qquad h \in \{1, 3/4, 1/2, 7/20, 1/4\},
+```
 where the $L = 2$ ring includes both periodic bonds. Define the exact rational spin-1/2 matrices
-$$X = S^x = \begin{pmatrix} 0 & 1/2 \\ 1/2 & 0 \end{pmatrix}, \qquad
+```math
+X = S^x = \begin{pmatrix} 0 & 1/2 \\ 1/2 & 0 \end{pmatrix}, \qquad
 G_y = i S^y = \begin{pmatrix} 0 & 1/2 \\ -1/2 & 0 \end{pmatrix}, \qquad
-Z = S^z = \begin{pmatrix} 1/2 & 0 \\ 0 & -1/2 \end{pmatrix}, \qquad U = 2G_y.$$
+Z = S^z = \begin{pmatrix} 1/2 & 0 \\ 0 & -1/2 \end{pmatrix}, \qquad U = 2G_y.
+```
 (In `src/common.jl`, $G_y$ is denoted `J`.) Rotating every odd site by the real orthogonal matrix
 $U$ (a $\pi$-rotation about the $y$-axis) transforms both odd-to-even and even-to-odd nearest-neighbor
 bonds into the identical homogeneous form
-$$h_{\mathrm{rot}} = -(X \otimes X + G_y \otimes G_y + Z \otimes Z), \qquad
--h_{\mathrm{rot}} = X \otimes X + G_y \otimes G_y + Z \otimes Z = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}.$$
-Every bond factor $C_\alpha \in \{X, G_y, Z\}$ has exact rational entries (note that reflection
+```math
+h_{\mathrm{rot}} = -(X \otimes X + G_y \otimes G_y + Z \otimes Z), \qquad
+-h_{\mathrm{rot}} = X \otimes X + G_y \otimes G_y + Z \otimes Z = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}.
+```
+Every bond factor $`C_\alpha \in \{X, G_y, Z\}`$ has exact rational entries (note that reflection
 positivity requires real $C_\alpha$ when $F = I$, not symmetric $C_\alpha$, so the antisymmetry of
 $G_y$ is completely compatible). Since $U Z U^\top = -Z$, the staggered field becomes the uniform
 real symmetric on-site term $o = -h Z$. The function `exact_rp` in `src/common.jl` verifies the
@@ -40,7 +46,7 @@ bond identity in both orientations and the on-site identity in exact `Rational{B
 
 ## Dense-grid certificates ($n_0 = 8$)
 
-Candidate seeds were scanned over $n_0 \in \{2, 4, 6, 8\}$ and $\beta_0 \in \{0.25, 0.50, \dots, 32.0\}$
+Candidate seeds were scanned over $`n_0 \in \{2, 4, 6, 8\}`$ and $`\beta_0 \in \{0.25, 0.50, \dots, 32.0\}`$
 via `scan_seeds` and `best_seed`, and the optimal $(n_0, \beta_0)$ for each field was certified
 with full dense eigenvector residual and orthogonality bounds. All exact rational parameters and
 seed defects are stored as `"num//den"` strings in `results/certificate_<h>.json`.
@@ -67,13 +73,13 @@ block error enclosures:
 
 ## Complete symmetry sectors and multiplicities
 
-In the physical basis, let $p \in \{0, \dots, L\}$ denote the number of down spins, $m = L/2$ the
-number of two-site unit cells of the physical field pattern, and $k \in \{0, \dots, m-1\}$ the
+In the physical basis, let $`p \in \{0, \dots, L\}`$ denote the number of down spins, $m = L/2$ the
+number of two-site unit cells of the physical field pattern, and $`k \in \{0, \dots, m-1\}`$ the
 momentum index under translation by two sites ($T^2$). A $T^2$-orbit of representative configuration
 $a$ with period $\ell$ supports momentum $k$ if and only if $k\ell$ is a multiple of $m$, with
 normalized basis state $\frac{1}{\sqrt{\ell}} \sum_{r=0}^{\ell-1} e^{-2\pi i k r / m} |T^{2r} a\rangle$.
 For a Hamiltonian transition from representative $a$ into $T^{2t} b$, the projected matrix element
-equals the local transition amplitude multiplied by $\sqrt{\ell_a / \ell_b}\,e^{2\pi i k t / m}$.
+equals the local transition amplitude multiplied by $`\sqrt{\ell_a / \ell_b}\,e^{2\pi i k t / m}`$.
 Small-ring unit tests verify that the merged spectrum across all $(p, k)$ blocks matches full dense
 diagonalization in the shared core.
 
@@ -87,8 +93,8 @@ assert $\sum_{\mathrm{blocks}} \mathrm{multiplicity} \times d_{\mathrm{block}} =
 | 8 | 13 | 20 | 256 | 256 |
 | 16 | 41 | 1620 | 65536 | 65536 |
 
-For $L = 16$ ($m = 8$), the representative block dimensions by down-spin count $p \in \{0, \dots, 8\}$
-and momentum $k \in \{0, 1, 2, 3, 4\}$ (which carry momentum multiplicities $1, 2, 2, 2, 1$) are:
+For $L = 16$ ($m = 8$), the representative block dimensions by down-spin count $`p \in \{0, \dots, 8\}`$
+and momentum $`k \in \{0, 1, 2, 3, 4\}`$ (which carry momentum multiplicities $1, 2, 2, 2, 1$) are:
 
 | Down spins $p$ | Block dimensions for $k = 0, 1, 2, 3, 4$ | Charge multiplicity ($p \leftrightarrow L - p$) |
 |---:|---|---:|
@@ -110,33 +116,41 @@ block and $A$ the `ComplexF64` Hermitian matrix passed to LAPACK. The function `
 in `src/common.jl` evaluates all rational couplings, orbit-normalization square roots
 $\sqrt{\ell_a / \ell_b}$, and trigonometric phases $\exp(2\pi i k t / m)$ in outward-rounded
 `IntervalArithmetic` (using an interval enclosure of $\pi$) to enclose each upper-triangular entry
-of $H$ and bound the entry-construction error $a \ge \|H - A\|_2 \le \|H - A\|_F$ (stored as
+of $H$ and bound the entry-construction error $`a \ge \|H - A\|_2 \le \|H - A\|_F`$ (stored as
 `entry_error`).
 
 Given the approximate eigenvector matrix $Q$ and real eigenvalue vector $\Lambda$ from LAPACK, the
-verifier computes the floating-point residual $\hat{R} = \operatorname{fl}(AQ - Q\Lambda)$ and
-orthogonality defect $\hat{E} = \operatorname{fl}(Q^* Q - I)$. Upper bounds $q \ge \|Q\|_F$,
-$h_{\mathrm{norm}} \ge \|A\|_F$, $\ell \ge \|\Lambda\|_F$, $\|\hat{R}\|_{F,\mathrm{up}}$, and
-$\|\hat{E}\|_{F,\mathrm{up}}$ are accumulated using directed upward rounding (`nextfloat` after
+verifier computes the floating-point residual $\hat{R} = \mathrm{fl}(AQ - Q\Lambda)$ and
+orthogonality defect $\hat{E} = \mathrm{fl}(Q^* Q - I)$. Upper bounds $`q \ge \|Q\|_F`$,
+$`h_{\mathrm{norm}} \ge \|A\|_F`$, $`\ell \ge \|\Lambda\|_F`$, $`\|\hat{R}\|_{F,\mathrm{up}}`$, and
+$`\|\hat{E}\|_{F,\mathrm{up}}`$ are accumulated using directed upward rounding (`nextfloat` after
 each scalar operation, separating real and imaginary components). With unit roundoff $u = 2^{-53}$
 and $\gamma_{32d+32} = (32d+32)u / (1 - (32d+32)u)$, the true residual and orthogonality norms
 satisfy
-$$\|AQ - Q\Lambda\|_F \le r := \|\hat{R}\|_{F,\mathrm{up}} + \gamma_{32d+32}(h_{\mathrm{norm}} q + q\ell) + 10^{-280},$$
-$$\|Q^* Q - I\|_F \le e := \|\hat{E}\|_{F,\mathrm{up}} + \gamma_{32d+32}(q^2 + \sqrt{d}) + 10^{-280}.$$
+```math
+\|AQ - Q\Lambda\|_F \le r := \|\hat{R}\|_{F,\mathrm{up}} + \gamma_{32d+32}(h_{\mathrm{norm}} q + q\ell) + 10^{-280},
+```
+```math
+\|Q^* Q - I\|_F \le e := \|\hat{E}\|_{F,\mathrm{up}} + \gamma_{32d+32}(q^2 + \sqrt{d}) + 10^{-280}.
+```
 This follows from the standard IEEE binary64 dot-product rounding bound
-$|\operatorname{fl}(\sum x_i y_i) - \sum x_i y_i| \le \gamma_s \sum |x_i y_i|$ applied to the real
-and imaginary parts and the submultiplicativity $\||A|\,|B|\|_F \le \|A\|_F \|B\|_F$, where $32d+32$
+$|\mathrm{fl}(\sum x_i y_i) - \sum x_i y_i| \le \gamma_s \sum |x_i y_i|$ applied to the real
+and imaginary parts and the submultiplicativity $`\||A|\,|B|\|_F \le \|A\|_F \|B\|_F`$, where $32d+32$
 conservatively bounds the operation count per complex inner product and subtraction, $\sqrt{d}$
 accounts for subtracting the identity matrix $I$, and $10^{-280}$ covers gradual underflow.
 
 **Polar-factor and Weyl inequality (with multiplicity):** Asserting $e < 1$, the unitary polar
-factor $V = Q(Q^* Q)^{-1/2}$ exists and satisfies $\|Q - V\|_2 \le d_Q := e / (1 + \sqrt{1 - e})$.
+factor $V = Q(Q^* Q)^{-1/2}$ exists and satisfies $`\|Q - V\|_2 \le d_Q := e / (1 + \sqrt{1 - e})`$.
 Consequently,
-$$\|A - V \Lambda V^*\|_2 = \|AV - V\Lambda\|_2 \le r + (\|A\|_2 + \|\Lambda\|_2) d_Q.$$
-Using $\|A\|_2 \le L(3/4 + h/2) + a$ and $\|\Lambda\|_2 = \max_i |\lambda_i|$, Weyl's inequality
-for the Hermitian matrices $H$ and $V \Lambda V^*$ guarantees that the $i$th ordered eigenvalue of
+```math
+\|A - V \Lambda V^*\|_2 = \|AV - V\Lambda\|_2 \le r + (\|A\|_2 + \|\Lambda\|_2) d_Q.
+```
+Using $`\|A\|_2 \le L(3/4 + h/2) + a`$ and $`\|\Lambda\|_2 = \max_i |\lambda_i|`$, Weyl's inequality
+for the Hermitian matrices $H$ and $V \Lambda V^*$ guarantees that the $`i`$th ordered eigenvalue of
 $H$ (counting multiplicity) lies in $[\lambda_i - \eta, \lambda_i + \eta]$ with radius
-$$\eta = a + r + \left(L(3/4 + h/2) + a + \max_i |\lambda_i|\right) d_Q.$$
+```math
+\eta = a + r + \left(L(3/4 + h/2) + a + \max_i |\lambda_i|\right) d_Q.
+```
 All scalar operations defining $r, e, d_Q,$ and $\eta$ are performed with outward interval rounding.
 
 For $\beta > 0$, `enclosed_logz` sums $\exp(-\beta [\lambda_i - \eta, \lambda_i + \eta])$ weighted
@@ -169,7 +183,7 @@ are exploratory numerical estimates:
 At $n_0 \le 10$, the sampled $\beta_0$ grid finds an admissible seed at $h = 3/20 = 0.15$ and none
 at $h = 1/10 = 0.10$. The table below records $\max_\beta \min(P_{\mathrm{s}}(n_0, \beta), P_\tau(2n_0, \beta))$
 and the ground-state spatial energy defect $\delta(n_0) = E_0(2n_0) - 2E_0(n_0)$ across all scanned
-fields and seed lengths $n_0 \in \{2, 4, 6, 8, 10\}$:
+fields and seed lengths $`n_0 \in \{2, 4, 6, 8, 10\}`$:
 
 | $h$ | $n_0$ | $\max_\beta \min(P_{\mathrm{s}}, P_\tau)$ | $\delta(n_0) = E_0(2n_0) - 2E_0(n_0)$ |
 |---|---:|---:|---:|
@@ -232,7 +246,7 @@ scaling locus $n_0(h) \approx 8 h^{-2/3}$ and $\beta_0(h) \approx 5.25 h^{-2/3}$
 Because the admissible region allows seed defects up to $\approx 0.12731$ (whereas the $h = 1$ seed
 has defects $\sim 7 \times 10^{-4}$), $n_0 = 8$ remains sufficient all the way down to $h = 1/4$,
 with the certified bound-to-ED-gap ratio decreasing from $0.613$ at $h = 1$ to $0.264$ at $h = 1/4$.
-At $h = 1/10$, fitting $\log \delta(n_0) \approx 0.19944 - 0.36810 n_0$ over $n_0 \in \{6, 8, 10\}$
+At $h = 1/10$, fitting $\log \delta(n_0) \approx 0.19944 - 0.36810 n_0$ over $`n_0 \in \{6, 8, 10\}`$
 gives a decay scale of $2.72$ sites and predicts a first admissible seed near
 $(n_0, \beta_0) \approx (14, 17.0)$ (requiring a 28-site doubled ring).
 
@@ -243,7 +257,7 @@ and the core recurrence, and executed a complete fresh spectral replay (`scripts
 across all five fields:
 
 1. **Mathematical and numerical verification:** Confirmed the exact rational reflection-positivity
-   identity under the odd-site rotation $U = 2G_y$, the even-$L$ closure condition, the completeness
+   identity under the odd-site rotation $U = 2G_y$, the even-$`L`$ closure condition, the completeness
    of the $(p, k)$ symmetry-sector decomposition ($\sum \mathrm{mult} \times d = 2^L$), the interval
    enclosure of the momentum-block entries, the $\gamma_{32d+32}$ plus $10^{-280}$ rounding bounds
    for residual and orthogonality Frobenius norms, the polar-factor/Weyl eigenvalue enclosure

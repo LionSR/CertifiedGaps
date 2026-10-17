@@ -3,9 +3,9 @@
 **Certified at $\delta = 1/2, 3/10,$ and $1/4$:** for every even chain length $L \ge 4$ two-spin
 unit cells ($N = 2L = 8, 12, 16, \dots$ spins, i.e., $N$ divisible by $4$), the ground state is
 unique and the spectral gap satisfies $\Delta_L \ge 0.534756, 0.173197, 0.058225$. On the six-point
-parameter grid $\delta \in \{1/2, 3/10, 1/4, 1/5, 3/20, 1/10\}$, $\delta = 1/4$ is the smallest
+parameter grid $`\delta \in \{1/2, 3/10, 1/4, 1/5, 3/20, 1/10\}`$, $\delta = 1/4$ is the smallest
 dimerization certifiable by the two-purity doubling recurrence from rings of at most $16$ spins: at
-$\delta \in \{1/5, 3/20, 1/10\}$, the checker rigorously proves via continuous-$\beta$ interval
+$`\delta \in \{1/5, 3/20, 1/10\}`$, the checker rigorously proves via continuous-$`\beta`$ interval
 covers that **every** $\beta_0 > 0$ fails to enter the admissible region at both eligible even seed
 lengths $n_0 = 2$ and $n_0 = 4$ cells. The RP hypothesis is the general internally reflected
 (conjugated-factor) form. The Lean statements in
@@ -23,9 +23,11 @@ lengths $n_0 = 2$ and $n_0 = 4$ cells. The RP hypothesis is the general internal
 We consider a periodic ring of $N = 2L$ spin-1/2 sites grouped into $L$ two-spin unit cells
 (strong dimers), with alternating bond strengths $1 + \delta$ inside each cell and $1 - \delta$
 between adjacent cells:
-$$H_L = (1 + \delta) \sum_{j=1}^L \mathbf{S}_{2j-1} \cdot \mathbf{S}_{2j}
-      + (1 - \delta) \sum_{j=1}^L \mathbf{S}_{2j} \cdot \mathbf{S}_{2j+1}, \qquad
-\mathbf{S}_m = \frac{1}{2}\boldsymbol{\sigma}_m.$$
+```math
+H_L = (1 + \delta) \sum_{j=1}^L \mathbf{S}_{2j-1} \cdot \mathbf{S}_{2j}
++ (1 - \delta) \sum_{j=1}^L \mathbf{S}_{2j} \cdot \mathbf{S}_{2j+1}, \qquad
+\mathbf{S}_m = \frac{1}{2}\boldsymbol{\sigma}_m.
+```
 Lengths $L$ and $n_0$ count two-spin unit cells. Each unit cell contains a single internal bond,
 so the palindromic unit-cell condition is automatically satisfied.
 
@@ -33,34 +35,40 @@ so the palindromic unit-cell condition is automatically satisfied.
 
 Let $s = 1 + \delta$ and $w = 1 - \delta$, and write $A_\alpha = S^\alpha \otimes I$ and
 $B_\alpha = I \otimes S^\alpha$ for the two spins inside a unit cell. First, apply the single-site
-orthogonal rotation $J = 2i S^y = \begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}$ to the
+orthogonal rotation $`J = 2i S^y = \begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}`$ to the
 second spin of every cell ($R = I \otimes J$). Under this local unitary transformation, the
 intra-cell on-site operator $D$ and the inter-cell bond operator $h$ take the form
-$$D_{\mathrm{rot}} = s(-A_x B_x + A_y B_y - A_z B_z), \qquad
--h_{\mathrm{rot}} = w(B_x \otimes A_x - B_y \otimes A_y + B_z \otimes A_z).$$
+```math
+D_{\mathrm{rot}} = s(-A_x B_x + A_y B_y - A_z B_z), \qquad
+-h_{\mathrm{rot}} = w(B_x \otimes A_x - B_y \otimes A_y + B_z \otimes A_z).
+```
 Let $F$ be the two-spin swap operator inside a cell and $\Theta(\cdot) = F \overline{(\cdot)} F$
 the internal cell reflection composed with entrywise complex conjugation. Then $\Theta^2 = I$,
-$\Theta(D_{\mathrm{rot}}) = D_{\mathrm{rot}}$, and $-h_{\mathrm{rot}} = w \sum_\alpha \tilde{C}_\alpha \otimes \Theta(\tilde{C}_\alpha)$
-with real factors $\tilde{C}_\alpha \in \{B_x, i B_y, B_z\}$—matching the general reflected
+$\Theta(D_{\mathrm{rot}}) = D_{\mathrm{rot}}$, and $`-h_{\mathrm{rot}} = w \sum_\alpha \tilde{C}_\alpha \otimes \Theta(\tilde{C}_\alpha)`$
+with real factors $`\tilde{C}_\alpha \in \{B_x, i B_y, B_z\}`$—matching the general reflected
 unit-cell criterion of `notes/thermal-mpo-gap-scope.tex` (Appendix E) and `RPRing` in `lean/`.
 
 Transforming further into the unitary cell basis $U_{\mathrm{cell}} = M / \sqrt{2}$ with columns
 $\frac{1}{\sqrt{2}}(|00\rangle + |11\rangle)$, $\frac{1}{\sqrt{2}}(|00\rangle - |11\rangle)$,
 $\frac{1}{\sqrt{2}}(|01\rangle + |10\rangle)$, and $\frac{i}{\sqrt{2}}(|01\rangle - |10\rangle)$,
-$$M = \begin{pmatrix} 1 & 1 & 0 & 0 \\ 0 & 0 & 1 & i \\ 0 & 0 & 1 & -i \\ 1 & -1 & 0 & 0 \end{pmatrix}, \qquad M^\dagger M = 2I, \qquad \frac{1}{2} M M^\top = F,$$
+```math
+M = \begin{pmatrix} 1 & 1 & 0 & 0 \\ 0 & 0 & 1 & i \\ 0 & 0 & 1 & -i \\ 1 & -1 & 0 & 0 \end{pmatrix}, \qquad M^\dagger M = 2I, \qquad \frac{1}{2} M M^\top = F,
+```
 diagonalizes the internal reflection $F$ so that $\Theta$ becomes plain entrywise conjugation:
-$$-h = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}, \qquad C_\alpha = \frac{\sqrt{w}}{2} K_\alpha, \qquad o = \frac{s}{4}\operatorname{diag}(-3, 1, 1, 1)$$
+```math
+-h = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}, \qquad C_\alpha = \frac{\sqrt{w}}{2} K_\alpha, \qquad o = \frac{s}{4}\mathrm{diag}(-3, 1, 1, 1)
+```
 (with explicit complex matrices $K_\alpha$ given in [`METHOD.md`](METHOD.md)). The module `src/rp.jl`
 verifies these identities in exact `Complex{Rational{BigInt}}` arithmetic at all six $\delta$
 values, and each seed certificate stores the model and factors as a core `RingModels` record
 checked by `RingModels.verify_rp`.
 
-*Why the internal cell swap $F$ is essential:* Any bond decomposition of the unreflected real form
+*Why the internal cell swap* $F$ *is essential:* Any bond decomposition of the unreflected real form
 $\sum_\alpha C_\alpha \otimes C_\alpha$ ($F = I$) must commute with the outer swap $F_{\mathrm{outer}}$
 of two whole unit cells. However, the inter-cell bond $h$ links spin 2 of cell $j$ with spin 1 of
-cell $j+1$, so $\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \frac{3}{8}(1 - \delta)^2 > 0$
+cell $j+1$, so $`\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \frac{3}{8}(1 - \delta)^2 > 0`$
 (or $6(1-\delta)^2$ in Pauli normalization), which is invariant under any common single-cell basis
-change (`src/reflection_conventions.jl`). Including the internal cell reflection $F$ resolves this
+change (`src/reflection_conventions.jl`). Including the internal cell reflection $`F`$ resolves this
 obstruction cleanly.
 
 ## Seeds and certified bounds
@@ -88,20 +96,20 @@ earlier, slightly looser rational seeds from the first certificate pass (`0.5326
 `0.057967`) as hypotheses; the tighter two-pass Cauchy–Schwarz rounding bound in
 [`METHOD.md`](METHOD.md) shrinks the eigenvalue radii and yields the stronger bounds above.
 
-### Rigorous all-$\beta$ exclusions at $n_0 = 2, 4$ for smaller $\delta$
+### Rigorous all-$`\beta`$ exclusions at $n_0 = 2, 4$ for smaller $\delta$
 
 With the largest ring capped at $16$ spins ($8$ cells), the only even seed lengths are $n_0 = 2$
 and $n_0 = 4$ cells. For $n_0 = 2$ at all six $\delta$ values and for $n_0 = 4$ at
-$\delta \in \{1/5, 3/20, 1/10\}$, the function `negative_cover` proves rigorously that
+$`\delta \in \{1/5, 3/20, 1/10\}`$, the function `negative_cover` proves rigorously that
 `certified_gap_bound` fails for **every** $\beta_0 > 0$:
 1. Monotonicity of $P_\tau(2n_0, \beta)$ excludes $0 < \beta_0 \le 1$ once $P_\tau(2n_0, 1) \le 1/2$.
-2. A positive ground-state energy defect $d_E = E_0(2n_0)_{\mathrm{lower}} - 2E_0(n_0)_{\mathrm{upper}} > 0$
+2. A positive ground-state energy defect $`d_E = E_0(2n_0)_{\mathrm{lower}} - 2E_0(n_0)_{\mathrm{upper}} > 0`$
    implies $P_{\mathrm{s}}(n_0, \beta) \le 2^{4n_0} e^{-\beta d_E} \le 1/2$ for all $\beta_0 \ge B$.
 3. The compact interval $[1, B]$ is covered by $6\text{--}12$ rigorous interval boxes, on each of
    which lower bounds on $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ are propagated through the
    monotone doubling recurrence until $z \ge 1/2$.
 
-This establishes that no $n_0 \in \{2, 4\}$ seed exists at $\delta \le 1/5$ for this recurrence;
+This establishes that no $`n_0 \in \{2, 4\}`$ seed exists at $\delta \le 1/5$ for this recurrence;
 certifying $\delta \le 1/5$ requires larger seed rings ($n_0 \ge 6$ cells, i.e., $\ge 24$ spins in
 the doubled ring) or a different method.
 
@@ -112,7 +120,7 @@ The scripts `scripts/numerical_scan.jl` (complete `Float64` spectra up to 16 spi
 sectors using 40 Krylov Ritz values in large blocks, `results/diagnostic20_summary.json`) provide
 numerical diagnostics across all six $\delta$ values:
 
-| $\delta$ | $\Delta_{20}$ (numerical) | $\xi_{\mathrm{eff}}$ (cells) | $\xi_{\mathrm{eff}}\,\delta^{2/3}$ | Estimated even $n_0$ by $\delta^{-2/3}$ scaling |
+| $\delta$ | $\Delta_{20}$ (numerical) | $\xi_{\mathrm{eff}}$ (cells) | $`\xi_{\mathrm{eff}}\,\delta^{2/3}`$ | Estimated even $n_0$ by $\delta^{-2/3}$ scaling |
 |---|---:|---:|---:|---:|
 | $1/2$ | $1.188631$ | $0.5624$ | $0.3543$ | $4$ |
 | $3/10$ | $0.810214$ | $0.8448$ | $0.3786$ | $4$ |
@@ -127,7 +135,7 @@ $n_0 = 5$ cells ($10$ and $20$ spins) enters the admissible region numerically n
 (yielding $\approx 0.086$), while the next even seeds $n_0 = 6, 6, 8$ cells would require $24$- and
 $32$-spin doubled rings.
 
-Finally, `dimer_bounds` in `src/Certification.jl` implements an exact, arbitrary-$n$ operator-norm
+Finally, `dimer_bounds` in `src/Certification.jl` implements an exact, arbitrary-$`n`$ operator-norm
 perturbation sandwich around the decoupled dimer limit $\delta = 1$ (closing a 512-spin ring seed at
 $\delta = 0.999999$ in the unit tests in $O(\log n)$ operations); however, because unlinked norm
 bounds lose bulk free-energy cancellation, their extensive error $O(\beta n (1-\delta))$ is too
@@ -149,7 +157,7 @@ julia --project=models/dimerized_heisenberg models/dimerized_heisenberg/test/run
   stored `RingModels` RP factors, re-derives every symmetry block's residual, orthogonality, and
   eigenvalue-radius witness from its stored component maxima, checks sector dimension completeness
   and conjugate-momentum block reuse, recomputes all $\log Z$ intervals, rational seeds, recurrence
-  bounds, 16-spin gap intervals, dimer perturbation bounds, and continuous-$\beta$ exclusion boxes
+  bounds, 16-spin gap intervals, dimer perturbation bounds, and continuous-$`\beta`$ exclusion boxes
   and tails, checks the model-local source SHA-256 hashes, and checks that
   `results/certificate.json` indexes the certificates.
 - **Full check (`check.jl --full`):** Rebuilds every symmetry block from the model definition,
@@ -178,7 +186,7 @@ julia --project=models/dimerized_heisenberg models/dimerized_heisenberg/scripts/
   complete $(S^z, k, p)$ symmetry-sector coverage; every eigenvalue enclosure via the two-pass
   Cauchy–Schwarz rounding bound and polar-factor/Weyl theorem; outward-rounded $\log Z$ sums, exact
   rational seed defects, and uniform gap lower bounds (including ground-state uniqueness from
-  $P_\tau > 1/2$); the 16-spin gap enclosures; the continuous-$\beta$ exclusion covers; and the
+  $P_\tau > 1/2$); the 16-spin gap enclosures; the continuous-$`\beta`$ exclusion covers; and the
   dimer perturbation bounds.
 - **Trusted base:** IEEE binary64 round-to-nearest arithmetic, standard single-threaded CPU
   OpenBLAS real `GEMM` (`OpenBLAS_jll 0.3.29+0`, with no fast-math, reduced precision, or Strassen
@@ -194,7 +202,7 @@ julia --project=models/dimerized_heisenberg models/dimerized_heisenberg/scripts/
 |---|---|
 | `certify.jl` | Generates `results/rp_audit.json`, `seed_delta_*.json.gz`, and `certificate.json` |
 | `check.jl` | Certificate verifier (also loaded by the tests; fast mode by default, `--full` re-solves every spectrum) |
-| `src/Certification.jl` | Seed verification, continuous-$\beta$ exclusions, dimer perturbation bound, stored/fresh checks |
+| `src/Certification.jl` | Seed verification, continuous-$`\beta`$ exclusions, dimer perturbation bound, stored/fresh checks |
 | `src/verified_spectra.jl` | Interval block construction, two-pass rounding witnesses, Weyl enclosures, and $\log Z$ |
 | `src/rp.jl`, `src/reflection_conventions.jl` | Exact rational reflection-positivity verifiers and basis-obstruction checks |
 | `src/sectors.jl` | Symmetry orbits and `Float64` sector eigensolver for exploratory scans |
@@ -220,15 +228,15 @@ there are no hash-pinned layout exceptions.
 
 PR #23 re-certified the six-point $\delta$ grid: exact RP factors stored as `RingModels` records,
 the two-pass Cauchy–Schwarz rounding bound, conjugate-momentum block reuse, a checker that can
-rebuild every eigenvector and residual, continuous-$\beta$ exclusion covers for $n_0 = 2, 4$
-establishing the grid minimum $\delta = 1/4$, the arbitrary-$n$ dimer perturbation bound, 20-spin
+rebuild every eigenvector and residual, continuous-$`\beta`$ exclusion covers for $n_0 = 2, 4$
+establishing the grid minimum $\delta = 1/4$, the arbitrary-$`n`$ dimer perturbation bound, 20-spin
 Krylov diagnostics, and certificates for all six $\delta$ (`seed_delta_*`, replacing the three
 `verified_delta_*` files, whose bounds `0.532658, 0.172916, 0.057967` are superseded by
 `0.534756, 0.173197, 0.058225`). Earlier results were produced under the core's former name
 `ThermalMPOGap` from `certificates/dimerized_heisenberg/`. Removed over time (all in the git
 history): the 10 MB review output, uncompressed certificates, run logs, `PR_BODY.md`, `REPORT.md`,
 `validate.jl` / `validation.json` (timings now in this README), `review/independent_review.md`, the
-per-$\delta$ `Float64` scans `results/numerical_delta_*.json`, and the 20-spin runs
+per-$`\delta`$ `Float64` scans `results/numerical_delta_*.json`, and the 20-spin runs
 `results/diagnostic20_*.json` (regenerate them with the scripts above).
 
 The source-hash policy change (the checker enforces only model-local sources; core hashes are

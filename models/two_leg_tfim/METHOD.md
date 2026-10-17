@@ -1,47 +1,57 @@
 # Two-leg transverse-field Ising ladder: verification method and results
 
-**Headline result:** $g = 3$ is the smallest certified transverse field on the tested grid $g \in \{2, 5/2, 3, 4\}$. The seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636386863$ and a unique ground state for every even $L \ge 4$ rungs ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ passes the numerical scan but was not run through full verification since $g = 3$ already succeeds.
+**Headline result:** $g = 3$ is the smallest certified transverse field on the tested grid $`g \in \{2, 5/2, 3, 4\}`$. The seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636386863$ and a unique ground state for every even $L \ge 4$ rungs ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ passes the numerical scan but was not run through full verification since $g = 3$ already succeeds.
 
 ## Model and scope
 
 Each unit cell is a two-spin rung ($d = 4$). In Pauli normalization on a periodic ring of $L$ rungs,
 
-$$H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).$$
+```math
+H_L = -\sum_{j=1}^L (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_{j=1}^L (X_{j,a} + X_{j,b}).
+```
 
 The $L = 2$ ring includes both periodic leg bonds, following the core package convention. For every $g > 0$, the off-diagonal terms in the $\sigma^z$ basis form a connected hypercube graph with negative edge weights $-g$, so Perron–Frobenius applied to $cI - H_L$ guarantees a unique ground state on every finite ring (while the two-purity doubling criterion establishes the uniform infinite-volume gap and ground-state uniqueness).
 
-In this Pauli normalization, DMRG finite-size scaling by Xavier, Pereira, Nunes, and Plascak ([arXiv:2111.11404](https://arxiv.org/abs/2111.11404), Eq. (1) and Table I with $J_\perp^x = 0$, $J_\perp^z = 1$, $J_4 = 0$) locates the quantum critical point at $g_c = 1.83214(5)$, placing all four tested fields $g \in \{2, 5/2, 3, 4\}$ in the gapped paramagnetic phase. This literature value is used only for physical context and never enters the certificate.
+In this Pauli normalization, DMRG finite-size scaling by Xavier, Pereira, Nunes, and Plascak ([arXiv:2111.11404](https://arxiv.org/abs/2111.11404), Eq. (1) and Table I with $J_\perp^x = 0$, $J_\perp^z = 1$, $J_4 = 0$) locates the quantum critical point at $g_c = 1.83214(5)$, placing all four tested fields $`g \in \{2, 5/2, 3, 4\}`$ in the gapped paramagnetic phase. This literature value is used only for physical context and never enters the certificate.
 
 ## Exact reflection positivity and symmetry decomposition
 
-In the real $\sigma^z$ cell basis $(\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow)$ with $Z = \operatorname{diag}(1, -1)$ and $X = \bigl(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\bigr)$, setting $C_1 = Z \otimes I$ and $C_2 = I \otimes Z$ gives
+In the real $\sigma^z$ cell basis $(\uparrow\uparrow, \uparrow\downarrow, \downarrow\uparrow, \downarrow\downarrow)$ with $Z = \mathrm{diag}(1, -1)$ and $`X = \bigl(\begin{smallmatrix}0&1\\1&0\end{smallmatrix}\bigr)`$, setting $C_1 = Z \otimes I$ and $C_2 = I \otimes Z$ gives
 
-$$-h_{\text{bond}} = C_1 \otimes C_1 + C_2 \otimes C_2,$$
+```math
+-h_{\text{bond}} = C_1 \otimes C_1 + C_2 \otimes C_2,
+```
 
 with real symmetric on-site rung operator $o = -Z \otimes Z - g(X \otimes I + I \otimes X)$. The function `rp_identity` in [`src/Ladder.jl`](src/Ladder.jl) checks this four-spin matrix identity over `Rational{BigInt}`, constructing the inter-rung bond independently from four $2 \times 2$ Kronecker factors. Because a single rung cell is invariant under spatial reflection along the leg direction, $F = I$.
 
-To block-diagonalize $H_L$ for exact diagonalization, a real Hadamard rotation on every spin diagonalizes the transverse field so that $\mathbb{Z}_2$ spin-flip parity (the parity of the number of down spins in the rotated basis) is conserved, while the $ZZ$ couplings act as pair flips. Leg exchange $S$, rung reflection $R: j \mapsto -j$, and (for even $L$) half-ring translation $T: j \mapsto j + L/2$ are commuting involutions that commute with $H_L$. For each spin-flip parity and real character $\chi$ of the involution group, each permutation orbit $O$ with a $\chi$-trivial stabilizer contributes one normalized basis state $|O, \chi\rangle = |O|^{-1/2} \sum_{s \in O} \chi(s) |s\rangle$, and orbits with non-trivial stabilizer characters vanish. Because distinct orbits have disjoint support and characters are orthogonal, this produces an exact orthonormal decomposition into real symmetric blocks whose dimensions sum to $4^L$.
+To block-diagonalize $H_L$ for exact diagonalization, a real Hadamard rotation on every spin diagonalizes the transverse field so that $`\mathbb{Z}_2`$ spin-flip parity (the parity of the number of down spins in the rotated basis) is conserved, while the $`ZZ`$ couplings act as pair flips. Leg exchange $`S`$, rung reflection $`R: j \mapsto -j`$, and (for even $`L`$) half-ring translation $`T: j \mapsto j + L/2`$ are commuting involutions that commute with $`H_L`$. For each spin-flip parity and real character $`\chi`$ of the involution group, each permutation orbit $`O`$ with a $`\chi`$-trivial stabilizer contributes one normalized basis state $`|O, \chi\rangle = |O|^{-1/2} \sum_{s \in O} \chi(s) |s\rangle`$, and orbits with non-trivial stabilizer characters vanish. Because distinct orbits have disjoint support and characters are orthogonal, this produces an exact orthonormal decomposition into real symmetric blocks whose dimensions sum to $4^L$.
 
 Exact block entries have the algebraic form $A_{ij} / (2\sqrt{m_i / m_j})$, where $A$ is an integer matrix and $m_i = |O_i|$ are orbit sizes; exact symmetry is verified via the integer identity $A_{ij} m_j = A_{ji} m_i$. Small-ring tests check the block spectra against the full $4^L \times 4^L$ Hamiltonian.
 
 ## Implemented enclosure theorem
 
-Let $B$ be an exact real symmetric block of dimension $m$, $H$ its `Float64` approximation, $Q$ the computed eigenvector matrix, and $\Lambda = \operatorname{diag}(\Lambda_1, \dots, \Lambda_m)$ the computed eigenvalues. Suppose we have certified upper bounds
+Let $B$ be an exact real symmetric block of dimension $m$, $H$ its `Float64` approximation, $Q$ the computed eigenvector matrix, and $\Lambda = \mathrm{diag}(\Lambda_1, \dots, \Lambda_m)$ the computed eigenvalues. Suppose we have certified upper bounds
 
-$$\|B - H\|_2 \le d, \qquad \|HQ - Q\Lambda\|_2 \le r, \qquad \|Q^\top Q - I\|_2 \le e < 1.$$
+```math
+\|B - H\|_2 \le d, \qquad \|HQ - Q\Lambda\|_2 \le r, \qquad \|Q^\top Q - I\|_2 \le e < 1.
+```
 
-Then the orthogonal polar factor $U = Q(Q^\top Q)^{-1/2}$ satisfies $\|U - Q\|_2 \le a = e / (1 + \sqrt{1 - e})$, which implies
+Then the orthogonal polar factor $U = Q(Q^\top Q)^{-1/2}$ satisfies $`\|U - Q\|_2 \le a = e / (1 + \sqrt{1 - e})`$, which implies
 
-$$\|U^\top H U - \Lambda\|_2 \le r + (\|H\|_2 + \|\Lambda\|_2)\, a.$$
+```math
+\|U^\top H U - \Lambda\|_2 \le r + (\|H\|_2 + \|\Lambda\|_2)\, a.
+```
 
 By Weyl's inequality and the triangle inequality, every ordered eigenvalue of $B$ (counted with multiplicity) satisfies
 
-$$|\lambda_i(B) - \Lambda_i| \le \eta = d + r + (\|H\|_F + \|\Lambda\|_2)\, a.$$
+```math
+|\lambda_i(B) - \Lambda_i| \le \eta = d + r + (\|H\|_F + \|\Lambda\|_2)\, a.
+```
 
 In the implementation:
-- Each algebraic entry of $B$ is enclosed using 256-bit directed-rounding MPFR arithmetic, and $d \ge \|B - H\|_2$ is bounded by the maximum absolute row sum of $B - H$.
-- Under the IEEE binary64 floating-point model (unit roundoff $u = 2^{-53}$, $\gamma_k = ku / (1 - ku)$ with $k = 2m + 8$, plus an additive $16m^3 \cdot 2^{-1074}$ allowance for gradual underflow), the rounding error of the floating-point matrix products $HQ - Q\Lambda$ and $Q^\top Q - I$ is bounded by $\gamma_k(\|H\|_F \|Q\|_F + \|Q\|_F \|\Lambda\|_2)$ and $\gamma_k(\|Q\|_F^2 + \sqrt{m})$, respectively. All Frobenius norms and combined upper bounds are accumulated in `BigFloat` with upward rounding.
-- Directed-rounding MPFR exponentials, sums, and logarithms enclose $\log Z_n(\beta_0)$, $\log Z_{2n}(\beta_0)$, and $\log Z_{2n}(2\beta_0)$ from the eigenvalue intervals $[\Lambda_i - \eta, \Lambda_i + \eta]$. From the lower bounds on the log-purities $l_{\mathrm{s}} = \operatorname{lo}(\log Z_{2n}(\beta_0)) - 2\operatorname{hi}(\log Z_n(\beta_0))$ and $l_\tau = \operatorname{lo}(\log Z_{2n}(2\beta_0)) - 2\operatorname{hi}(\log Z_{2n}(\beta_0))$, upward-rounded values of $-\operatorname{expm1}(l_{\mathrm{s}})$ and $-\operatorname{expm1}(l_\tau)$ are converted exactly to `Rational{BigInt}` and passed to `CertifiedGaps.certified_gap_bound`.
+- Each algebraic entry of $B$ is enclosed using 256-bit directed-rounding MPFR arithmetic, and $`d \ge \|B - H\|_2`$ is bounded by the maximum absolute row sum of $B - H$.
+- Under the IEEE binary64 floating-point model (unit roundoff $u = 2^{-53}$, $\gamma_k = ku / (1 - ku)$ with $k = 2m + 8$, plus an additive $16m^3 \cdot 2^{-1074}$ allowance for gradual underflow), the rounding error of the floating-point matrix products $HQ - Q\Lambda$ and $Q^\top Q - I$ is bounded by $`\gamma_k(\|H\|_F \|Q\|_F + \|Q\|_F \|\Lambda\|_2)`$ and $`\gamma_k(\|Q\|_F^2 + \sqrt{m})`$, respectively. All Frobenius norms and combined upper bounds are accumulated in `BigFloat` with upward rounding.
+- Directed-rounding MPFR exponentials, sums, and logarithms enclose $\log Z_n(\beta_0)$, $\log Z_{2n}(\beta_0)$, and $\log Z_{2n}(2\beta_0)$ from the eigenvalue intervals $[\Lambda_i - \eta, \Lambda_i + \eta]$. From the lower bounds on the log-purities $l_{\mathrm{s}} = \mathrm{lo}(\log Z_{2n}(\beta_0)) - 2\mathrm{hi}(\log Z_n(\beta_0))$ and $l_\tau = \mathrm{lo}(\log Z_{2n}(2\beta_0)) - 2\mathrm{hi}(\log Z_{2n}(\beta_0))$, upward-rounded values of $-\mathrm{expm1}(l_{\mathrm{s}})$ and $-\mathrm{expm1}(l_\tau)$ are converted exactly to `Rational{BigInt}` and passed to `CertifiedGaps.certified_gap_bound`.
 
 ## Validation and independent audit
 

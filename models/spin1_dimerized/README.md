@@ -19,23 +19,27 @@ route memo is in [`IDEAS.md`](IDEAS.md).
 ## Model
 
 We consider the periodic dimerized spin-1 Heisenberg chain
-$$H_L = \sum_{j=1}^{2L} \left[1 + (-1)^j \delta\right] \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 2I,$$
+```math
+H_L = \sum_{j=1}^{2L} \left[1 + (-1)^j \delta\right] \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 2I,
+```
 on a ring of $L$ two-spin unit cells ($N = 2L$ spins, local cell dimension $3^2 = 9$). Each unit
 cell consists of two adjacent spin-1 sites joined by the weak intra-cell bond $1 - \delta$, while
 neighboring cells are linked by the strong inter-cell bond $1 + \delta$. Lengths $L$ and $n_0$
-count two-spin unit cells. The parameter grid studied is $\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}$
+count two-spin unit cells. The parameter grid studied is $`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$
 on rings of up to $6$ cells ($12$ spins, Hilbert-space dimension $3^{12} = 531{,}441$).
 
 ## Reflection positivity
 
 In the Cartesian spin-1 basis, the spin operators take the form $S^\alpha = -i G_\alpha$ with real,
 integer antisymmetric matrices $G_\alpha = i S^\alpha$, so that every bond satisfies
-$-\mathbf{S}_i \cdot \mathbf{S}_j = \sum_{\alpha \in \{x,y,z\}} G_\alpha \otimes G_\alpha$ with unit
+$`-\mathbf{S}_i \cdot \mathbf{S}_j = \sum_{\alpha \in \{x,y,z\}} G_\alpha \otimes G_\alpha`$ with unit
 positive weights. Grouping sites into two-spin cells $(a, b)$:
-- the intra-cell on-site operator $o = (1 - \delta)\,\mathbf{S}_a \cdot \mathbf{S}_b = -(1 - \delta)\sum_\alpha G_\alpha \otimes G_\alpha$
+- the intra-cell on-site operator $`o = (1 - \delta)\,\mathbf{S}_a \cdot \mathbf{S}_b = -(1 - \delta)\sum_\alpha G_\alpha \otimes G_\alpha`$
   is real symmetric and invariant under the internal two-site swap $F = P$;
 - the inter-cell bond linking site $b$ of cell $j$ to site $a$ of cell $j+1$ satisfies
-  $$-h = (1 + \delta) \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes F \overline{C_\alpha} F, \qquad C_\alpha = I \otimes G_\alpha,$$
+  ```math
+  -h = (1 + \delta) \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes F \overline{C_\alpha} F, \qquad C_\alpha = I \otimes G_\alpha,
+  ```
   because $F (I \otimes G_\alpha) F = G_\alpha \otimes I$.
 
 The module `src/rp.jl` verifies all spin-1 algebraic relations and this $81 \times 81$ reflected
@@ -43,7 +47,7 @@ unit-cell identity in exact integer arithmetic. Furthermore, because both bonds 
 single spin-1 site insert the exact same real matrices $G_\alpha$, cutting the ring at the strong
 inter-cell bonds and integrating out the weak intra-cell bond history factors the cell transfer
 operator as $X_\beta = K K^* \ge 0$ (proved in [`METHOD.md`](METHOD.md)). Positivity of $X_\beta$
-ensures that all transfer eigenvalues are nonnegative, removing the usual even-$n_0$ restriction and
+ensures that all transfer eigenvalues are nonnegative, removing the usual even-$`n_0`$ restriction and
 allowing the $n_0 = 3$ cell seed at $\delta = 7/10$.
 
 ## Seeds and certified bounds
@@ -111,7 +115,7 @@ Measured run times (Julia 1.12, 1 BLAS thread):
   platforms, `check.jl --full` verifies that the fresh $\log Z$ intervals overlap the stored ones
   and independently certify the gap bound.
 - **Numerical only:** the $\beta_0$ grid scans, 12-spin reference ED gaps, and the seed-size
-  extrapolations for $\delta \in \{3/5, 1/2\}$.
+  extrapolations for $`\delta \in \{3/5, 1/2\}`$.
 
 ## Layout
 
@@ -121,7 +125,7 @@ Measured run times (Julia 1.12, 1 BLAS thread):
   `src/rp.jl` (exact integer RP verification), `src/enclosure.jl` (polar/Weyl eigenvalue enclosures,
   $\log Z$ intervals, certificate writer), and `src/verified_blocks.jl` (exact integer dihedral
   character projectors and basis-error bounds for the 12-spin ring).
-- `scripts/`: `scan.jl` (numerical seed scan across $L \in \{2, 3, 4, 6\}$ cells) and `report.jl`
+- `scripts/`: `scan.jl` (numerical seed scan across $`L \in \{2, 3, 4, 6\}`$ cells) and `report.jl`
   (updates `results/summary.json` and the `"Results from completed runs"` section of `METHOD.md`).
 - `test/runtests.jl`: test suite executed by `check.jl`.
 - `results/`: `certificate_d7.json` and `certificate_d9.json` (the gap certificates),

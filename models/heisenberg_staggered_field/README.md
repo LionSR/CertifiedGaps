@@ -20,7 +20,9 @@ and the independent audit are documented in [`METHOD.md`](METHOD.md); the route 
 
 We consider the periodic spin-1/2 antiferromagnetic Heisenberg chain in a staggered longitudinal
 magnetic field $h$:
-$$H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z, \qquad \mathbf{S}_{L+1} \equiv \mathbf{S}_1,$$
+```math
+H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_{j=1}^L (-1)^j S_j^z, \qquad \mathbf{S}_{L+1} \equiv \mathbf{S}_1,
+```
 with unit exchange coupling ($J = 1$) and $\mathbf{S}_j = \frac{1}{2}\boldsymbol{\sigma}_j$. On a
 two-site ring ($L = 2$), both periodic bonds $(1, 2)$ and $(2, 1)$ are included, matching the core
 `CertifiedGaps` convention. Although the staggered field $(-1)^j S_j^z$ has a two-site spatial
@@ -31,13 +33,15 @@ periodically on all even chain lengths $L$.
 
 ## Reflection positivity
 
-We apply the real orthogonal single-site unitary $U = 2i S^y = \begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}$
+We apply the real orthogonal single-site unitary $`U = 2i S^y = \begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}`$
 (a $\pi$-rotation about the $y$-axis) to every odd site $j$. In terms of the exact rational
 matrices $X = S^x$, $G_y = i S^y$ (denoted $J$ in `src/common.jl`, which is real and
 antisymmetric), and $Z = S^z$, conjugating either bond orientation $(j, j+1)$ by $U$ on its odd
 endpoint negates $S^x$ and $S^z$ while fixing $iS^y$, transforming every nearest-neighbor bond into
-$$h_{\mathrm{rot}} = -\left(X \otimes X + G_y \otimes G_y + Z \otimes Z\right), \qquad -h_{\mathrm{rot}} = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}$$
-with real bond factors $C_\alpha \in \{X, G_y, Z\}$. Simultaneously, $U Z U^\top = -Z$ converts the
+```math
+h_{\mathrm{rot}} = -\left(X \otimes X + G_y \otimes G_y + Z \otimes Z\right), \qquad -h_{\mathrm{rot}} = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}
+```
+with real bond factors $`C_\alpha \in \{X, G_y, Z\}`$. Simultaneously, $U Z U^\top = -Z$ converts the
 staggered field $(-1)^j S_j^z$ into a uniform, real diagonal on-site term $o = -h Z$. The function
 `exact_rp` in `src/common.jl` verifies these identities in exact rational arithmetic for both bond
 orientations.
