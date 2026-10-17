@@ -10,109 +10,18 @@
 <script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js" defer></script>
 <script src="core.js"></script>
 <script src="chapters.js"></script>
-<script src="open_chapters.js"></script>
-<style>
-/* Layout: a Tufte page. One text column (about 60%), a right margin for notes and figure captions; figures without frames. */
-:root {
-  --bg: #fffff8; --ink: #111111; --mute: #6b6b66; --line: #d9d6c6; --space: #a2322e; --time: #34628f; --proved: #8f6412; --ok: #2f6b3d; --fail: #a2322e;
-  --space-f: rgba(162,50,46,.08); --time-f: rgba(52,98,143,.08); --proved-f: rgba(143,100,18,.10); --torus-fill: #efede2; --surface: #fffff8;
-  --heat-lo: #f3f1e4; --heat-none: #dedbcb; --stage: var(--bg);
-  --serif: "EB Garamond", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
-}
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #151515; --ink: #dddddd; --mute: #9a9a94; --line: #3a3a37; --space: #e0786c; --time: #84aad4; --proved: #d4a64a; --ok: #7fbf8f; --fail: #e0786c;
-  --space-f: rgba(224,120,108,.10); --time-f: rgba(132,170,212,.10); --proved-f: rgba(212,166,74,.12); --torus-fill: #26262a; --surface: #151515;
-  --heat-lo: #222220; --heat-none: #33332f; color-scheme: dark; } }
-:root[data-theme="dark"] {
-  --bg: #151515; --ink: #dddddd; --mute: #9a9a94; --line: #3a3a37; --space: #e0786c; --time: #84aad4; --proved: #d4a64a; --ok: #7fbf8f; --fail: #e0786c;
-  --space-f: rgba(224,120,108,.10); --time-f: rgba(132,170,212,.10); --proved-f: rgba(212,166,74,.12); --torus-fill: #26262a; --surface: #151515;
-  --heat-lo: #222220; --heat-none: #33332f; color-scheme: dark; }
-body { background: var(--bg); color: var(--ink); font: 19px/1.55 var(--serif); font-variant-numeric: oldstyle-nums; }
-article { max-width: 1240px; margin: 0 auto; padding-block: 48px 96px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-h1 { font-weight: 400; font-size: clamp(2.4rem, 5vw, 3.4rem); line-height: 1.1; margin: 0; }
-.subtitle { font-style: italic; font-size: 1.45rem; margin: 6px 0 0; color: var(--ink); }
-h2 { font-weight: 400; font-style: italic; font-size: 1.8rem; line-height: 1.2; margin: 0 0 14px; }
-h2 .n { font-style: normal; font-size: .95rem; color: var(--mute); margin-right: 14px; font-variant-numeric: lining-nums; }
-a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-code { font: .78em ui-monospace, "SFMono-Regular", Menlo, monospace; }
-.r { display: grid; grid-template-columns: minmax(0, 62%) minmax(0, 1fr); gap: 0 4%; align-items: start; }
-.r > * { min-width: 0; }
-.prose p, .intro p { margin: 0 0 .9em; max-width: 36em; }
-.prose ol { margin: 0 0 .9em; padding-left: 1.3em; max-width: 36em; }
-.side { font-size: .9rem; line-height: 1.4; color: var(--ink); }
-.side .note { margin: .25em 0 0; }
-.ch { padding-block: 44px 8px; }
-.player canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
-.player { margin: 18px 0 6px; }
-.pmeta { margin-top: 10px; }
-.pcap { margin: 0; font-size: 1.02rem; line-height: 1.45; min-height: 4.4em; font-style: italic; max-width: 36em; }
-.pctl { margin: 0; font-size: .85rem; color: var(--mute); }
-.pctl button { font: inherit; font-variant: small-caps; letter-spacing: .04em; color: var(--ink); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-.pctl .bt { display: block; margin-top: 4px; font-style: italic; }
-.pmeta input[type=range] { width: 100%; margin-top: 8px; }
-input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; height: 18px; }
-input[type=range]::-webkit-slider-runnable-track { height: 1px; background: var(--mute); }
-input[type=range]::-moz-range-track { height: 1px; background: var(--mute); }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 11px; height: 11px; border-radius: 50%; background: var(--ink); margin-top: -5px; border: 0; }
-input[type=range]::-moz-range-thumb { width: 11px; height: 11px; border-radius: 50%; background: var(--ink); border: 0; }
-.eqs { margin-top: 6px; }
-.eqs p { margin: 0 0 .6em; }
-mjx-container[display="true"] { margin: .6em 0 !important; overflow-x: auto; overflow-y: hidden; }
-.toc { font-size: .95rem; line-height: 1.8; max-width: 44em; }
-.toc a { white-space: nowrap; }
-video { width: 100%; aspect-ratio: 16 / 9; display: block; background: var(--bg); }
-details.try { margin-top: 12px; }
-details.try > summary { cursor: pointer; font-style: italic; color: var(--ink); }
-details.try > summary::marker { color: var(--mute); }
-.tryin { padding: 6px 0 4px; }
-.two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
-.two-col > * { min-width: 0; }
-.two-col canvas { width: 100%; height: auto; display: block; }
-.fig { width: 100%; max-width: 560px; height: auto; display: block; }
-.small { font-size: .82rem; color: var(--mute); margin: 4px 0; font-style: italic; }
-.ctrl { display: grid; grid-template-columns: minmax(7em, auto) 1fr minmax(6ch, auto); gap: 4px 12px; align-items: center; font-size: .9rem; color: var(--mute); margin-top: 8px; }
-.ctrl output { color: var(--ink); text-align: right; font-variant-numeric: lining-nums tabular-nums; }
-button { font: .85rem var(--serif); color: var(--ink); background: none; border: 0; border-bottom: 1px solid var(--line); padding: 2px 2px; cursor: pointer; }
-button:hover { border-bottom-color: var(--ink); }
-button:focus-visible, input:focus-visible, a:focus-visible, summary:focus-visible, canvas:focus-visible { outline: 1px solid var(--ink); outline-offset: 2px; }
-.presets button.on { border-bottom: 2px solid var(--ink); }
-.row { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; align-items: center; }
-.verdict { font-size: .92rem; margin-top: 8px; }
-.big { font-size: 1.6rem; color: var(--ink); font-variant-numeric: lining-nums; }
-table { border-collapse: collapse; font-size: .82rem; width: 100%; font-variant-numeric: lining-nums tabular-nums; }
-th, td { text-align: right; padding: 2px 6px; white-space: nowrap; }
-th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1px solid var(--line); }
-.tbl { overflow: auto; max-height: 200px; margin-top: 8px; }
-.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 18px; margin: 14px 0; max-width: 62%; }
-.stat .k { font-size: .8rem; color: var(--mute); font-style: italic; }
-.stat .v { font-size: 1.15rem; overflow-wrap: anywhere; font-variant-numeric: lining-nums; }
-.g { color: var(--ink); }
-.chip { display: inline-block; font-size: .85rem; padding: 0 6px; margin: 2px; border-bottom: 1px solid; }
-.chip.cl { color: var(--proved); } .chip.cr { color: var(--time); }
-.part { padding-top: 72px; border-top: 1px solid var(--line); margin-top: 56px; }
-.parth { font-size: clamp(2rem, 4vw, 2.8rem); }
-.foot { color: var(--mute); font-size: .85rem; margin-top: 40px; max-width: 62%; }
-@media (max-width: 760px) {
-  .r { grid-template-columns: minmax(0, 1fr); }
-  .side { margin: 4px 0 12px; padding-left: 12px; border-left: 1px solid var(--line); }
-  .side:empty { display: none; }
-  .pcap { min-height: 0; }
-  .two-col { grid-template-columns: minmax(0, 1fr); }
-  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
-  .foot { max-width: none; }
-}
-</style>
+<link rel="stylesheet" href="page.css">
 </head>
 <body>
 <article>
   <header>
     <h1>The spacetime bootstrap</h1>
-    <p class="subtitle">A proof that the spin-1 Heisenberg ring has a spectral gap, in nineteen figures, with an open-chain sequel</p>
+    <p class="subtitle">A proof that the spin-1 Heisenberg ring has a spectral gap, in nineteen figures, with an <a href="open.html">open-chain sequel</a></p>
   </header>
   <div class="r" style="margin-top: 28px"><div class="main intro">
     <p>A quantum spin chain has discrete energy levels, and its <em>spectral gap</em> \(\Delta\) is the energy step from the lowest level (the ground state) to the first excited level. We want to prove that as a ring of spin-1 sites grows to any even length \(L\), this gap \(\Delta_L\) never shrinks below a fixed positive constant.</p>
     <p>At low temperature (large inverse temperature \(\beta\)), higher-energy states are suppressed by Boltzmann factors \(e^{-\beta E}\), so excited states fade relative to the ground state like \(e^{-\beta\Delta}\). A gap is therefore a decay rate in \(\beta\). The proof measures how close the thermal state is to a single pure state—its <em>purity</em>—on one finite ring, then shows that doubling the ring length and the inverse temperature together improves the purity automatically, step after step, all the way to infinity. Each section below states the question it solves, walks through the step in an animated figure, and ends with the formula.</p>
-    <p class="toc"><a href="#gap">What is a gap?</a> · <a href="#rate">A gap is a decay rate</a> · <a href="#imag">Imaginary time</a> · <a href="#paths">A sum over histories</a> · <a href="#torus">The partition function is a torus</a> · <a href="#chain">Histories of a chain</a> · <a href="#slice">Two ways to slice the torus</a> · <a href="#purity">Purity, seen as squares</a> · <a href="#two">Two purities from one torus</a> · <a href="#square">Squaring sharpens</a> · <a href="#couple">Space and time are tied</a> · <a href="#rpwhy">Why the proof needs a symmetric transfer matrix</a> · <a href="#rpwhere">Where the symmetry comes from</a> · <a href="#rptest">Testing a bond for reflection positivity</a> · <a href="#double">One doubling step</a> · <a href="#iterate">Repeat, and read off the gap</a> · <a href="#seedtoy">The starting numbers, worked on a toy</a> · <a href="#seed">The real certificate</a> · <a href="#lab">The whole machine on a solvable chain</a> · <a href="#part2"><i>Part II: open chains</i></a></p></div>
+    <p class="toc"><a href="#gap">What is a gap?</a> · <a href="#rate">A gap is a decay rate</a> · <a href="#imag">Imaginary time</a> · <a href="#paths">A sum over histories</a> · <a href="#torus">The partition function is a torus</a> · <a href="#chain">Histories of a chain</a> · <a href="#slice">Two ways to slice the torus</a> · <a href="#purity">Purity, seen as squares</a> · <a href="#two">Two purities from one torus</a> · <a href="#square">Squaring sharpens</a> · <a href="#couple">Space and time are tied</a> · <a href="#rpwhy">Why the proof needs a symmetric transfer matrix</a> · <a href="#rpwhere">Where the symmetry comes from</a> · <a href="#rptest">Testing a bond for reflection positivity</a> · <a href="#double">One doubling step</a> · <a href="#iterate">Repeat, and read off the gap</a> · <a href="#seedtoy">The starting numbers, worked on a toy</a> · <a href="#seed">The real certificate</a> · <a href="#lab">The whole machine on a solvable chain</a> · <a href="open.html"><i>Part II: open chains</i></a></p></div>
     <aside class="side"><p class="note">Figures play when they come into view. Use <i>back</i> and <i>next</i> to step, or drag the slider. Red marks space, blue imaginary time.</p></aside></div>
   <div class="r" style="margin-top: 18px"><div class="main"><video src="film.mp4" poster="poster.jpg" controls preload="metadata" playsinline></video></div>
     <aside class="side"><p class="note">The same figures as one film, with the step captions and narration, about twenty-nine minutes.</p></aside></div>
@@ -336,191 +245,14 @@ th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1p
   </section>
   <section class="part" id="part2">
     <h1 class="parth">Part II · Open chains</h1>
-    <div class="r" style="margin-top: 18px"><div class="main prose"><p>In Part I, periodic boundary conditions joined the last spin back to the first, turning the partition function into a trace \(\operatorname{Tr}X_\beta^{\,L}\). Now cut the ring open into a chain with two free ends, and apply a small magnetic field to the two endpoint spins. The bulk of the chain is unchanged, so the ring proof carries over with one new ingredient: the open ends of the network are closed by <em>boundary vectors</em> instead of a trace, and the proof must show that those boundary vectors have a nonzero overlap with the dominant eigenvector of \(X_\beta\). Eleven figures, following Appendices A–C of the note.</p></div>
-      <aside class="side"><p class="note">Theorem from OpenAI’s boundary-field preprint; this part follows <code>notes/thermal-mpo-gap-note.tex</code>, Appendices A–C.</p></aside></div>
-    <div class="r" style="margin-top: 14px"><div class="main"><video src="open-chains.mp4" poster="poster-open.jpg" controls preload="metadata" playsinline></video></div>
-      <aside class="side"><p class="note">The eleven open-chain figures as one film, with narration, about thirteen minutes.</p></aside></div>
-  </section>
-  <section class="ch" id="oedge">
-    <h2><span class="n">II.1</span>Ends carry free spins</h2>
-    <div class="r"><div class="main prose"><p>Opening the ring changes both the network and the physics. In the network, cutting one bond leaves no loop to close, so \(Z\) is no longer \(\operatorname{Tr}X_\beta^{\,n}\). Physically, cutting a bond leaves a nearly free spin-\(\tfrac12\) at each end of the chain. The <em>valence-bond solid</em> (VBS) picture of Affleck, Kennedy, Lieb, and Tasaki (exact for their AKLT chain and a qualitative model for the Heisenberg chain) shows why: view each spin-1 site as a symmetrized pair of spin-\(\tfrac12\) constituents, and pair neighboring halves across each bond into an antisymmetric spin-\(0\) <em>singlet</em> \((|\!\uparrow\downarrow\rangle-|\!\downarrow\uparrow\rangle)/\sqrt2\). On a ring, every spin-\(\tfrac12\) finds a partner; on an open chain, one unpaired spin-\(\tfrac12\) is left over at each end, producing \(2\times2=4\) low-lying states (a singlet and a three-state triplet) whose splitting shrinks as the chain grows.</p>
-<p>Exact diagonalization of small chains shows the consequence. Without a boundary field, even chains have three states just above the ground state, at \(0.51, 0.31, 0.20, 0.14, 0.10\) for \(n = 4, \dots, 12\), and odd chains have a three-fold degenerate ground state, so there is no uniform gap. Applying a pinning field \(h=3/5\) along \(z\) to the two end spins, \(-h(S_1^z+S_n^z)\), splits the four edge states: on odd chains (where both ends lie on the same antiferromagnetic sublattice), the ground state is unique and the gap levels off at \(0.72, 0.64, 0.58, 0.55\) for \(n = 5, \dots, 11\).</p>
-<p>To see how an open end is closed in a transfer-matrix network, return to the classical Ising chain of \(n\) spins with \(n-1\) bond matrices \(T(s_i,s_{i+1})=e^{Ks_is_{i+1}}\) and an endpoint field weight \(u(s)=e^{hs}\) on \(s_1\) and \(s_n\). The vector \(u\) caps the two free outer legs, turning the partition function into \(Z=u^{\mathsf T}T^{n-1}u=\sum_i\lambda_i^{n-1}\langle\varphi_i,u\rangle^2\). Whereas a periodic trace weights every eigenvalue \(\lambda_i\) by \(1\), an open chain weights \(\lambda_i\) by the squared overlap \(\langle\varphi_i,u\rangle^2\) of the boundary vector \(u\) with the eigenvector \(\varphi_i\). For the classical Ising chain, \(T\) and \(u\) have positive entries, so the top eigenvector \(\varphi_0\) is positive by the Perron–Frobenius theorem and the overlap never vanishes; for the quantum chain, the overlap with the top eigenvector must be proved positive and tracked.</p></div><aside class="side"><p class="note">Levels from floating-point exact diagonalization with conserved S<sup>z</sup> (n ≤ 12), a diagnostic and not part of the proof. With an odd number of sites both ends lie on the same sublattice, so equal fields suit both.</p></aside></div>
-    <div class="player" data-ch="owhy"></div>
-    <div class="player" data-ch="oedge"></div>
-    <div class="player" data-ch="oising"></div>
-    <div class="r"><div class="main eqs">\[ H_n=\sum_{i=1}^{n-1}\mathbf S_i\cdot\mathbf S_{i+1}-h\,(S_1^z+S_n^z),\qquad h=\tfrac35 . \]
-<p>Theorem: for every odd \(n\ge1921\) the ground state is unique and \(\Delta_n>\log10/392\approx0.0059\).</p></div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="ocyl">
-    <h2><span class="n">II.2</span>A cylinder, not a torus</h2>
-    <div class="r"><div class="main prose"><p>What replaces the spacetime torus of Section 5 when the chain has two ends? The partition function \(Z=\operatorname{Tr}e^{-\beta H_n}\) of the open chain is still a trace over spin states, which glues \(\tau=\beta\) to \(\tau=0\), so imaginary time is still a circle of length \(\beta\). Space, however, is no longer periodic: the chain is a segment of \(n\) sites with two endpoints.</p>
-<p>The \(n\times\beta\) spacetime sheet therefore closes in imaginary time only, forming a <em>cylinder</em> with two circular boundary rims. Inside the cylinder, every site still carries the exact same bulk transfer operator \(X_\beta\) as on the ring; the only change is at the two ends, where the row of \(n\) transfer matrices \(X_\beta^{\,n}\) is closed by boundary vectors \(\langle v|\) and \(|v\rangle\) instead of a trace.</p></div><aside class="side"></aside></div>
-    <div class="player" data-ch="ocyl"></div>
-    <div class="r"><div class="main eqs">\[ \text{ring: }\ \operatorname{Tr}X^n\qquad\text{open chain: }\ \langle v|\,X^n\,|v\rangle . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="ovec">
-    <h2><span class="n">II.3</span>What a boundary vector is</h2>
-    <div class="r"><div class="main prose"><p>How does an endpoint magnetic field become a vector on bond histories? Each end spin has a bond on its inner side only; on its outer side acts the single-site field term \(\pm hS^z\). When we expand \(e^{-\beta H}\) in imaginary time, a bulk bond fires events that place \(G_\alpha\) on two neighboring sites, whereas the end field acts as half a bond: it fires <em>field events</em> at random imaginary times on the end site's world line alone, each inserting \(G_z=iS^z\) on the end site together with a scalar factor.</p>
-<p>That list of field events on the end site's outer leg is a history \(a\), just like the list of events on a bond, and its weight defines a <em>boundary vector</em> on histories: \(v_\beta(a)=(ih)^d\) when all \(d\) events in \(a\) are of type \(z\) (with \(v_\beta(\varnothing)=1\) for zero events), and \(0\) otherwise. Summing \(|v_\beta(a)|^2=h^{2d}\) over ordered times gives \(\|v_\beta\|^2=\sum_{d\ge0}(\beta h^2)^d/d!=e^{\beta h^2}\).</p>
-<p>Since \(G_z=iS^z\), an event factor \((ih)G_z=-hS^z\) in \(e^{-\beta H}\) corresponds to adding \(+hS_n^z\) to \(H\) on the right end, while the complex-conjugated factor \((-ih)G_z=+hS^z\) corresponds to adding \(-hS_1^z\) on the left end. Thus, with field \(-h\) on the left end and \(+h\) on the right end (the opposite-field chain \(H_n^{\mathrm{opp}}\), with partition function \(Y_n=\langle v|X^n|v\rangle\)), the two caps carry the same vector \(v\), one conjugated, so every even power \(\langle v|X^{2m}|v\rangle=\|X^mv\|^2\ge0\) is a nonnegative squared norm by the symmetry of \(X_\beta\) from section 13. The equal-field chain \(H_n^{\mathrm{same}}\) of the theorem (\(-hS_1^z\) and \(-hS_n^z\)) is reached by applying a \(\pi\) rotation \(U_P\) about the \(x\)-axis (\(S^z\to-S^z\)) to flip the sign of every \(z\)-event on the right cap, giving \(Y_n^{\mathrm{same}}=\langle v|X^nU_P|v\rangle\).</p></div><aside class="side"><p class="note">The left cap is conjugated: its events carry (−ih)G<sub>z</sub> = +hS<sup>z</sup>, adding −hS<sub>1</sub><sup>z</sup>; the right cap adds +hS<sub>n</sub><sup>z</sup>.</p></aside></div>
-    <div class="player" data-ch="ovec"></div>
-    <div class="r"><div class="main eqs">\[ v_\beta(a)=(ih)^d\ \ (\text{all labels }z),\qquad \|v_\beta\|^2=e^{\beta h^2},\qquad Y^{\mathrm{same}}_n=\langle v|X^nU_P|v\rangle . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="over">
-    <h2><span class="n">II.4</span>The overlap</h2>
-    <div class="r"><div class="main prose"><p>A periodic trace \(\operatorname{Tr}X^m=\sum_i\lambda_i^m\) always contains the top eigenvalue \(\lambda_0\) of the transfer matrix with weight \(1\); a boundary vector \(v\) might be orthogonal to the top eigenvector \(\psi\), in which case the open chain would never see \(\lambda_0\). To track how strongly \(v\) couples to \(\psi\), divide \(X_\beta\) by its simple positive top eigenvalue \(\lambda_0\) so that the normalized transfer matrix \(T=X_\beta/\lambda_0\) has top eigenvalue \(1\), and split \(T\) into its unit top eigenvector \(\psi\) and the orthogonal remainder \(R\): \(T=|\psi\rangle\langle\psi|+R\) with \(R|\psi\rangle=0\) and \(\|R\|<1\).</p>
-<p>Because \(\psi\) and \(R\) are orthogonal, \(T^m=|\psi\rangle\langle\psi|+R^m\): repeated application of \(T\) keeps the component of \(v\) along \(\psi\) unchanged while shrinking the perpendicular part by \(\|R\|<1\) at each step. The rescaled opposite-field partition function \(B_m=Y_m/\lambda_0^m=\langle v|T^m|v\rangle\) therefore splits into a length-independent <em>boundary overlap</em> \(c=|\langle\psi,v\rangle|^2\ge0\) plus a remainder \(D_m=\langle v|R^m|v\rangle\) that dies away with the chain length \(m\). The <em>boundary defect</em> \(e_m=D_m/B_m=1-c/B_m\) measures the remainder's share of \(B_m\); certifying \(e_m<1\) proves \(c=(1-e_m)B_m>0\).</p></div><aside class="side"></aside></div>
-    <div class="player" data-ch="over"></div>
-    <div class="r"><div class="main eqs">\[ B_m=\langle v|T^m|v\rangle=\underbrace{|\langle\psi,v\rangle|^2}_{c}+\underbrace{\langle v|R^m|v\rangle}_{D_m},\qquad e_m=\frac{D_m}{B_m}=1-\frac{c}{B_m}. \]</div><aside class="side"></aside></div>
-    <div class="r"><div class="main"><details class="try"><summary>Try it: overlap versus chain length</summary>
-  <div class="tryin"><svg class="fig" id="ovSvg" viewBox="0 0 520 210" role="img" aria-label="Overlap and remainder versus chain length"></svg>
-  <div class="ctrl"><label for="ovC">overlap c</label><input id="ovC" type="range" min="0" max="1" step="0.01" value="0.3"><output id="ovCOut"></output></div>
-  <div class="ctrl"><label for="ovM">length m</label><input id="ovM" type="range" min="2" max="40" step="2" value="8"><output id="ovMOut"></output></div></div></details></div><aside class="side"></aside></div>
-  </section>
-  <section class="ch" id="ofold">
-    <h2><span class="n">II.5</span>Why the remainder is a square</h2>
-    <div class="r"><div class="main prose"><p>The remainder operator \(R\) can have both positive and negative eigenvalues, so why is \(D_m=\langle v|R^m|v\rangle\) nonnegative for even chain lengths \(m\), and how does lengthening the chain shrink the boundary defect \(e_m\)?</p>
-<p>For even \(m\), split \(R^m=R^{m/2}R^{m/2}\) and fold the strip of \(m\) boxes at its midpoint. Because \(X_\beta\) is symmetric by reflection positivity, \(R\) is self-adjoint (\(R^\dagger=R\)), so the two halves of the folded strip are conjugate mirror images and \(D_m=\langle R^{m/2}v,R^{m/2}v\rangle=\|R^{m/2}v\|^2\ge0\) is a squared norm.</p>
-<p>Now compare an even length \(k\) with a longer even length \(m\ge k\). Absorbing \(k/2\) factors of \(R\) into each end defines the vector \(w=R^{k/2}v\), whose squared norm is \(\|w\|^2=D_k\). This leaves \(m-k\) factors of \(R\) in the middle: \(D_m=\langle w|R^{m-k}|w\rangle\le\|R\|^{m-k}\|w\|^2=\|R\|^{m-k}D_k\). Because \(\|R\|<1\), making the chain longer shrinks the remainder \(D_m\) geometrically by \(\|R\|^{m-k}\) while the overlap \(c\) stays unchanged—which drives the boundary defect \(e_m=D_m/(c+D_m)\) down with length.</p></div><aside class="side"></aside></div>
-    <div class="player" data-ch="ofold"></div>
-    <div class="r"><div class="main eqs">\[ D_m=\big\|R^{m/2}v\big\|^2\ge0,\qquad D_m\le\|R\|^{m-k}D_k . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="omoves">
-    <h2><span class="n">II.6</span>Three moves per scale</h2>
-    <div class="r"><div class="main prose"><p>On a ring, we doubled length by squaring the spatial state \(\sigma_n\); an open chain has no spatial loop, so how can we double its length without losing thermal purity? For a long open chain where the overlap \(c(\beta)\) dominates the remainder, \(Y_m(\beta)\approx c(\beta)\lambda_0(\beta)^m\) is a bulk factor \(\lambda_0(\beta)^m\) per site times a boundary factor \(c(\beta)\) independent of \(m\). Its thermal purity \(P_\tau^{\mathrm{opp}}(m,\beta)=Y_m(2\beta)/Y_m(\beta)^2\approx[\lambda_0(2\beta)/\lambda_0(\beta)^2]^m\cdot c(2\beta)/c(\beta)^2\) therefore splits into a bulk eigenvalue ratio \(r=\lambda_0(2\beta)/\lambda_0(\beta)^2\approx1\) (already controlled by the periodic ring) times a boundary ratio \(c(2\beta)/c(\beta)^2\) that does not depend on \(m\)—and so cancels when we compare lengths \(M\) and \(2M\).</p>
-<p>At each scale \(j\) (with \(\beta_j=49\cdot2^{j-2}\), \(n_j=120\cdot2^{j-2}\), and \(M_j=2n_j\)), the open-chain bootstrap tracks two numbers alongside the ring defect \(\varepsilon_j\): the boundary defect \(e_{M_j/2}(j)\le x\) at half-length \(M_j/2\), and the opposite-field thermal purity \(P_\tau^{\mathrm{opp}}(M_j,\beta_j)\ge1-x\) at length \(M_j\). Three moves advance both bounds to \((2M_j,\beta_{j+1})\) with defect \(10x^2\):</p>
-<ol><li><em>Overlap recurrence (squeeze the boundary defect at \(\beta_{j+1}\)):</em> At the next temperature \(\beta_{j+1}\), geometric suppression over the \(M_j-M_j/2=M_j/2\) extra sites (\(D_{M_j}'\le q_jD_{M_j/2}'\)) combined with the imaginary-time bridge identity \(B_m(j+1)=P_\tau^{\mathrm{opp}}(m,\beta_j)r_j^{-m}B_m(j)^2\) squeezes the new boundary defect to \(e_{M_j}(j+1)\le10x^2\).</li>
-<li><em>Double the length from \(M_j\) to \(2M_j\):</em> Dividing the bridge identity at \(2M_j\) by the same identity at \(M_j\) cancels \(c_{j+1}\) and bounds \(P_\tau^{\mathrm{opp}}(2M_j,\beta_j)\ge P_\tau^{\mathrm{opp}}(M_j,\beta_j)\,r_j^{M_j}(1-e_{M_j}(j+1))\ge1-2x-16x^2\), costing very little once the overlap is controlled.</li>
-<li><em>Square the Gibbs state in imaginary time:</em> Stacking two copies of the open-chain Gibbs state \(\rho_{2M_j}^{\mathrm{opp}}(\beta_j)\) doubles \(\beta_j\to\beta_{j+1}\) without needing a ring, and the squaring function \(f\) of Section 10 sends the defect \(2x+16x^2\) below \(10x^2\).</li></ol></div><aside class="side"><p class="note">Composition in imaginary time links the scales: B<sub>m</sub>(j+1) = P<sub>τ</sub><sup>opp</sup>(m, β<sub>j</sub>) r<sub>j</sub><sup>−m</sup> B<sub>m</sub>(j)<sup>2</sup>.</p></aside></div>
-    <div class="player" data-ch="omoves"></div>
-    <div class="r"><div class="main eqs">\[ e_{M_j/2}(j)\le x,\ \ P_\tau^{\mathrm{opp}}(M_j,\beta_j)\ge1-x\ \Longrightarrow\ e_{M_j}(j{+}1)\le10x^2,\ \ P_\tau^{\mathrm{opp}}(2M_j,\beta_{j+1})\ge1-10x^2 . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="onum">
-    <h2><span class="n">II.7</span>One open-chain step, in numbers</h2>
-    <div class="r"><div class="main prose"><p>The clean rule \(x\to10x^2\) holds once all defects are below \(0.01\), whereas the certified starting bounds at scale \(j=2\) (\(\beta_2=49\), \(M_2=240\), \(k_2=142\)) are larger: boundary defect \(E=0.14\) and open-chain thermal defect \(\eta=1-P_\tau^{\mathrm{opp}}=0.21\), together with the periodic ring defects \(\varepsilon_2=0.052\) and \(\varepsilon_3=6\varepsilon_2^2=0.0162\). Walking through the first step \(j=2\to3\) with every number shown demonstrates how the exact formulas of Moves 1–3 bridge this initial regime.</p>
-<p>In Move 1, the periodic ring bound on \(\|R_3\|^{240-142}\) gives the remainder suppression factor \(q=0.142\), so \(q/(1-q)=0.1655\), while the bracket \([1/((1-E)^2(1-\eta))-1]=[1/(0.7396\times0.79)-1]=0.7115\). Multiplying the two gives the new boundary defect bound \(E'\le0.1655\times0.7115=0.118\), below the note's rounded table entry \(0.12\). In Moves 2 and 3, rounding \(E'\) up to \(0.12\) gives a doubled-length purity of at least \((1-\eta)(1-\varepsilon_2)(1-\varepsilon_3)(1-E')=0.79\times0.948\times0.984\times0.88=0.648\) (defect \(0.352\)), and squaring in imaginary time compresses that defect to \(\eta'\le f(0.352)=0.352^2/(2\times0.648^2)=0.147\), below the table entry \(0.155\). Both defects shrink; two more explicit steps (\(j=3\to4\to5\)) reach \(0.001\), after which the rule \(x\to10x^2\) takes over.</p></div><aside class="side"><p class="note">Recomputed from the formulas of Appendix C; each result lies at or below the rational table entry of the note.</p></aside></div>
-    <div class="player" data-ch="onum"></div>
-    <div class="r"><div class="main eqs">\[ E'\le\frac{q}{1-q}\Big[\frac{1}{(1-E)^2(1-\eta)}-1\Big],\qquad \eta'\le f\big(1-(1-\eta)(1-\varepsilon_j)(1-\varepsilon_{j+1})(1-E')\big). \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="ostart">
-    <h2><span class="n">II.8</span>Starting numbers</h2>
-    <div class="r"><div class="main prose"><p>What are the finite-scale inputs that launch the open-chain iteration? The iteration starts at scale \(j=2\) (\(\beta_2=49\)) from four certified numbers: two periodic ring purities \(P_{\mathrm s}(120,49),\,P_\tau(240,49)\ge0.948\) (defect \(\varepsilon_2=0.052\), obtained from the periodic seed of Section 18), and two open-chain bounds from OpenAI's boundary-field paper—the boundary defect \(e_{142}\le0.14\) at length \(142\) and the opposite-field thermal purity \(P_\tau^{\mathrm{opp}}(240,49)\ge0.79\) at length \(240\) (defect \(\eta_2=0.21\)).</p>
-<p>Three explicit rounds of the update rules of Section II.7 (\(j=2\to3\to4\to5\)) bring both open-chain defects down to \(0.001\) at scale \(j=5\), where \(\beta_5=392\) and length \(M_5=1920\). Since \(0.001\) and \(\varepsilon_5\) lie well below \(x_5=0.01=10^{-2}\), the induction rule \(x_{j+1}=10x_j^2\) takes over from \(j=5\) onward and gives \(x_j=10^{-1-2^{j-5}}\)—falling doubly exponentially as \(10^{-2}, 10^{-3}, 10^{-5}, 10^{-9}, 10^{-17}, \dots\), just as on the ring.</p></div><aside class="side"><p class="note">Rows j = 2…5 are the rational table of the note; recomputing the recurrence gives values at or below each entry.</p></aside></div>
-    <div class="player" data-ch="ostart"></div>
-    <div class="r"><div class="main eqs">\[ P_{\mathrm s}(120,49),\,P_\tau(240,49)\ge0.948,\quad e_{142}\le0.14,\quad P_\tau^{\mathrm{opp}}(240,49)\ge0.79 . \]</div><aside class="side"></aside></div>
-    
-  </section>
-  <section class="ch" id="ogap">
-    <h2><span class="n">II.9</span>Odd lengths, and the gap</h2>
-    <div class="r"><div class="main prose"><p>The scale induction controlled the opposite-field chain at even lengths \(M_j=1920\cdot2^{j-5}\); to finish the proof, we must pass to the equal-field chain \(H_n^{\mathrm{same}}\) at every <em>odd</em> length \(n\ge1921\). For odd \(n\), \(R^n\) cannot be folded in half into a square because \(R\) can have negative eigenvalues, and the right cap carries the \(\pi\) rotation \(U_P\).</p>
-<p>Instead, pick the scale \(j\ge5\) whose even window \([M_j,2M_j]\) contains \(n\), and write \(M=M_j\). By the bulk rotation symmetry, \(U_P\) acts trivially next to the top eigenvector (\(|\psi_j\rangle\langle\psi_j|U_P=|\psi_j\rangle\langle\psi_j|\)), so the rescaled equal-field partition function \(Q_j(n)=Y_n^{\mathrm{same}}(\beta_j)/\lambda_j^n\) has the exact same leading overlap \(c_j\) as the opposite-field chain. In the remainder \(Q_j(n)-c_j=\langle v_j|R_j^nU_P|v_j\rangle\), move \(M/2\) factors of \(R_j\) onto each end (\(w=R_j^{M/2}v_j\)), leaving \(R_j^{n-M}U_P\) in the middle. Since \(\|R_j^{n-M}U_P\|\le1\), Cauchy–Schwarz bounds the remainder in magnitude by \(|Q_j(n)-c_j|\le\|w\|^2=D_M(j)\), whatever its sign.</p>
-<p>This traps \(Q_j(n)\) between \(c_j-D_M(j)\) and \(c_j+D_M(j)\) and bounds the equal-field thermal purity throughout the window \([M_j,2M_j]\) by \(P_\tau^{\mathrm{same}}(n,\beta_j)\ge1-4x_j>\tfrac12\). Because the windows \([M_j,2M_j]\) cover every \(n\ge1920\), for every odd \(n\ge1921\) the ground state holds weight \(w_0\ge1-4x_j>\tfrac12\) and is therefore unique, and the weight ratio \(e^{-\beta_j\Delta_n}=w_1/w_0\le4x_j/(1-4x_j)<10^{-2^{j-5}}\) at \(\beta_j=392\cdot2^{j-5}\) gives \(\Delta_n>\log10/392\approx0.0059\).</p></div><aside class="side"></aside></div>
-    <div class="player" data-ch="ogap"></div>
-    <div class="r"><div class="main eqs">\[ e^{-\beta_j\Delta_n}\le\frac{4x_j}{1-4x_j}<10^{-2^{j-5}},\quad\beta_j=392\cdot2^{j-5}\quad\Longrightarrow\quad\Delta_n>\frac{\log10}{392}. \]</div><aside class="side"></aside></div>
-    
+    <div class="r" style="margin-top: 18px"><div class="main prose"><p>Cut the ring open into a chain with two free ends, and pin the two end spins with a small magnetic field. The same bootstrap, with the open ends of the network closed by <em>boundary vectors</em> instead of a trace, proves that the odd open chains have a unique ground state and a uniform gap. That argument, from Appendices A–C of the note, has its own page: <a href="open.html">Open chains</a>, in eleven figures and a thirteen-minute film.</p></div><aside class="side"></aside></div>
   </section>
   <p class="foot">Sources: <code>notes/thermal-mpo-gap-note.tex</code>, <code>notes/thermal-mpo-gap-scope.tex</code>, <code>notes/thermal-mpo-gap-certificate.tex</code>,
     <code>julia/src/recurrence/</code>. Curves in section 1 are schematic.</p>
 </article>
 
+<script src="page.js"></script>
 <script>
-const NS = 'http://www.w3.org/2000/svg';
-const $ = id => document.getElementById(id);
-const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-function el(tag, attrs = {}, parent) {
-  const e = document.createElementNS(NS, tag);
-  for (const k in attrs) e.setAttribute(k, attrs[k]);
-  if (parent) parent.appendChild(e); return e;
-}
-function txt(parent, x, y, s, attrs = {}) {
-  const t = el('text', Object.assign({x, y, 'font-family': 'IBM Plex Mono, monospace', 'font-size': 12, fill: 'var(--mute)'}, attrs), parent);
-  t.textContent = s; return t;
-}
-function barsSvg(svg, x, y, w, h, vals, color) {
-  const gap = 6, bw = (w - gap*(vals.length - 1)) / vals.length;
-  el('line', {x1: x, y1: y+h, x2: x+w, y2: y+h, stroke: 'var(--line)'}, svg);
-  vals.forEach((v, i) => {
-    el('rect', {x: x + i*(bw+gap), y: y + h - v*h, width: bw, height: Math.max(0, v*h), fill: color, opacity: i ? .5 : 1, rx: 2}, svg);
-    if (v > .04) txt(svg, x + i*(bw+gap) + bw/2, y + h - v*h - 5, v.toFixed(2), {'text-anchor': 'middle', fill: 'var(--ink)', 'font-size': 11});
-  });
-}
-const sup = n => String(n).split('').map(c => '⁰¹²³⁴⁵⁶⁷⁸⁹⁻'['0123456789-'.indexOf(c)] || c).join('');
-function sci(x, d = 2) {
-  if (!isFinite(x)) return '–'; if (x === 0) return '0';
-  const e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
-  return Math.abs(e) < 3 ? x.toPrecision(d + 1) : `${m.toFixed(d)}×10${sup(e)}`;
-}
-const fmtLog = l => { if (!isFinite(l)) return '0'; const e = l / Math.LN10, ei = Math.floor(e); return e > -300 ? sci(Math.exp(l)) : `${Math.pow(10, e - ei).toFixed(2)}×10${sup(ei)}`; };
-
-const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-// ---------- theme ----------
-let TH = null;
-function readTheme() {
-  const g = v => css(v);
-  TH = {bg: g('--stage'), surface: g('--surface'), ink: g('--ink'), mute: g('--mute'), line: g('--line'), space: g('--space'), time: g('--time'),
-    proved: g('--proved'), ok: g('--ok'), fail: g('--fail'), spaceF: g('--space-f'), timeF: g('--time-f'), provedF: g('--proved-f'), torusFill: g('--torus-fill')};
-}
-readTheme();
-
-// ---------- TeX on canvas ----------
-const TEXC = new Map(); let texReady = false;
-function texImg(src, color, px) {
-  const key = src + '|' + color + '|' + px; const hit = TEXC.get(key);
-  if (hit) return hit === 'pending' ? null : hit;
-  if (!texReady) return null;
-  TEXC.set(key, 'pending');
-  STBV.texImage(src, color, px).then(im => { TEXC.set(key, im); redrawAll(); }, () => TEXC.delete(key));
-  return null;
-}
-
-// ---------- players ----------
-const PLAYERS = [];
-function makePlayer(host) {
-  const ch = [...STBV.CH, ...STBV.OPEN].find(c => c.id === host.dataset.ch); if (!ch) return;
-  host.innerHTML = `<canvas width="960" height="540" aria-label="${ch.title} animation"></canvas>
-    <div class="r pmeta"><p class="main pcap" aria-live="polite"></p><div class="side"><p class="pctl"><button type="button" class="pp">play</button> · <button type="button" class="pv">back</button> · <button type="button" class="nx">next</button>
-    <span class="bt"></span></p><input type="range" min="0" max="${ch.dur}" step="0.01" aria-label="Scrub"></div></div>`;
-  const cv = host.querySelector('canvas'), cap = host.querySelector('.pcap'), pp = host.querySelector('.pp'), sl = host.querySelector('input'), bt = host.querySelector('.bt');
-  const P = {ch, t: ch.dur, playing: false, seen: false};
-  function size() { const dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = 960 * dpr; cv.height = 540 * dpr; P.dpr = dpr; }
-  size();
-  const beatIdx = () => STBV.beatAt(ch, P.t);
-  P.draw = () => {
-    const ctx = cv.getContext('2d'); ctx.setTransform(P.dpr, 0, 0, P.dpr, 0, 0);
-    ctx.fillStyle = TH.bg; ctx.fillRect(0, 0, 960, 540);
-    ch.draw(STBV.kit(ctx, TH, texImg), P.t);
-    const bi = beatIdx();
-    if (cap.dataset.bi !== String(bi)) { cap.textContent = ch.beats[bi][1]; cap.dataset.bi = bi; }
-    sl.value = P.t; bt.textContent = `step ${bi + 1} of ${ch.beats.length}`;
-    pp.textContent = P.playing ? 'pause' : (P.t >= ch.dur - .01 ? 'replay' : 'play'); pp.setAttribute('aria-label', P.playing ? 'Pause' : 'Play');
-  };
-  pp.addEventListener('click', () => { if (P.playing) P.playing = false; else { if (P.t >= ch.dur - .01) P.t = 0; P.playing = true; } P.draw(); });
-  host.querySelector('.nx').addEventListener('click', () => { const bi = beatIdx(); P.playing = false; P.t = bi + 1 < ch.beats.length ? ch.beats[bi + 1][0] + 2.5 : ch.dur; P.t = Math.min(P.t, bi + 2 < ch.beats.length ? ch.beats[bi + 2][0] - .01 : ch.dur); P.draw(); });
-  host.querySelector('.pv').addEventListener('click', () => { const bi = beatIdx(); P.playing = false; P.t = bi > 0 ? Math.min(ch.beats[bi - 1][0] + 2.5, ch.beats[bi][0] - .01) : 0; P.draw(); });
-  sl.addEventListener('input', () => { P.playing = false; P.t = +sl.value; P.draw(); });
-  PLAYERS.push(P);
-  new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting && !P.seen && !reduce) { P.seen = true; P.t = 0; P.playing = true; } }), {threshold: .55}).observe(host);
-}
-document.querySelectorAll('.player').forEach(makePlayer);
-function redrawAll() { PLAYERS.forEach(P => P.draw()); }
-let last = performance.now();
-function tick(now) {
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
-  for (const P of PLAYERS) if (P.playing) { P.t = Math.min(P.ch.dur, P.t + dt); if (P.t >= P.ch.dur) P.playing = false; P.draw(); }
-  requestAnimationFrame(tick);
-}
-redrawAll(); requestAnimationFrame(tick);
-(function waitMJ() { if (window.MathJax && MathJax.startup && MathJax.startup.promise) MathJax.startup.promise.then(() => { texReady = true; redrawAll(); }); else setTimeout(waitMJ, 100); })();
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(redrawAll);
-
 // ---------- widgets ----------
 // ---------- step 6 ----------
 const PRESETS = [
@@ -777,36 +509,9 @@ function drawXab() {
   $('xabOut').textContent = `X(a, b) = Tr(${XAB.length ? XAB.map(([, a]) => 'G_' + a).reverse().join(' ') : '1'}) = ${tr}`;
 }
 
-// open-chain overlap
-function drawOverlap() {
-  const c = +$('ovC').value, m = +$('ovM').value, svg = $('ovSvg'); svg.innerHTML = '';
-  $('ovCOut').textContent = c.toFixed(2); $('ovMOut').textContent = m;
-  const rs = [.85, .7, -.6, .4], wts = rs.map((_, i) => (1 - c) * [.4, .3, .2, .1][i]);
-  const gx = 50, gy = 16, gw = 440, gh = 140, Mx = 40, Y = v => gy + gh - Math.min(1.2, v) / 1.2 * gh;
-  el('rect', {x: gx, y: gy, width: gw, height: gh, fill: 'none', stroke: 'var(--line)'}, svg);
-  for (let k = 2; k <= Mx; k += 2) {
-    const D = wts.reduce((s, w, i) => s + w * Math.pow(rs[i], k), 0), x = gx + (k - 2) / (Mx - 2) * (gw - 10);
-    const hc = Y(0) - Y(c), hd = Y(c) - Y(c + D);
-    el('rect', {x, y: Y(c), width: 8, height: hc, fill: 'var(--space)', opacity: k === m ? 1 : .55}, svg);
-    el('rect', {x, y: Y(c + D), width: 8, height: hd, fill: 'var(--mute)', opacity: k === m ? 1 : .45}, svg);
-  }
-  [0, .5, 1].forEach(v => txt(svg, gx - 6, Y(v) + 4, String(v), {'text-anchor': 'end'}));
-  txt(svg, gx, gy + gh + 18, 'chain length m →'); txt(svg, gx + gw, gy + gh + 18, 'red: overlap c   grey: remainder Dₘ', {'text-anchor': 'end'});
-  const D = wts.reduce((s, w, i) => s + w * Math.pow(rs[i], m), 0), B = c + D, e = D / B;
-  txt(svg, gx, gy + gh + 42, c === 0 ? 'c = 0: e = 1 at every m; the top eigenvector is never seen' :
-    `m = ${m}: B = ${B.toFixed(3)}, defect e = D/B = ${e.toFixed(3)}, shrinking with m`, {fill: c === 0 ? 'var(--fail)' : 'var(--ink)'});
-}
-['ovC', 'ovM'].forEach(id => $(id).addEventListener('input', drawOverlap));
 
-drawPaths(); drawXXZ(); drawXab(); drawXYZ(); drawDial(); buildMap(); updateExplorer(); drawOverlap(); labChanged();
-
-// ---------- nav ----------
-const links = [...document.querySelectorAll('#toc a')];
-const io = new IntersectionObserver(es => es.forEach(en => { if (en.isIntersecting) links.forEach(a => a.classList.toggle('on', a.getAttribute('href') === '#' + en.target.id)); }), {rootMargin: '-40% 0px -55% 0px'});
-document.querySelectorAll('section.ch').forEach(s => io.observe(s));
-function themeRedraw() { readTheme(); TEXC.clear(); redrawAll(); buildMap(); updateExplorer(); buildHeat(); labChanged(); drawDial(); drawOverlap(); drawPaths(); drawXXZ(); }
-try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeRedraw); } catch (e) {}
-new MutationObserver(themeRedraw).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+drawPaths(); drawXXZ(); drawXab(); drawXYZ(); drawDial(); buildMap(); updateExplorer(); labChanged();
+THEMED.push(buildMap, updateExplorer, buildHeat, labChanged, drawDial, drawPaths, drawXXZ);
 </script>
 
 </body>
