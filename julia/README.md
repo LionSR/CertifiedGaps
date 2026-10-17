@@ -43,7 +43,7 @@ see "Usage").
 
 * `spin_matrices(s)`: ordered basis $m = s, s-1, \dots, -s$; `sz`, `sp`, `sm`, and `sx` are real, while `sy` is purely imaginary.
 * `integer_ladders(j)`: ordered basis $m = -j, \dots, j$ in the binomial gauge, where the ladder matrices have exact integer entries.
-* `ExactDiagonalization`: site $1$ is the most significant base-$d$ digit, and a two-site operator on $(i, j)$ acts as `kron(site i, site j)`. Eigenvalues and partition functions are basis-independent; code that stores explicit basis indices preserves its own digit ordering.
+* `ExactDiagonalization`: site $1$ is the most significant base-$`d`$ digit, and a two-site operator on $(i, j)$ acts as `kron(site i, site j)`. Eigenvalues and partition functions are basis-independent; code that stores explicit basis indices preserves its own digit ordering.
 
 ## Usage
 

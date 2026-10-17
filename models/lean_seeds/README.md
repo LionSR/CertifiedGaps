@@ -26,7 +26,9 @@ exact but conditional on open bridge lemmas or spectral counting anchors:
 ## Model
 
 - **Spin-1 Heisenberg chain** (`seed_design`, `spectrum`, `anchor`, `spin1_kernel`):
-  $$H_n = \sum_{j=1}^n \mathbf{S}_j \cdot \mathbf{S}_{j+1}$$
+  ```math
+  H_n = \sum_{j=1}^n \mathbf{S}_j \cdot \mathbf{S}_{j+1}
+  ```
   on a periodic ring of $n$ sites (lengths count sites), shifted by $\kappa = 700741/500000$ per
   bond (denoted $a$ in the upstream source code), with the closing bond twisted by a rotation
   about the $z$-axis by angle $0$ ($I$), $\pi$ ($P$), or $2\pi/3$ ($C$). The numerical and
@@ -36,7 +38,9 @@ exact but conditional on open bridge lemmas or spectral counting anchors:
   $n = 4\text{--}12$ with twists $I, P$; source 2 evaluates $\beta = 21/2$ on lengths
   $n = 6, 8, 10$ with twists $I, P, C$ (`models/spin1/results/source{1,2}.json`).
 - **Transverse- and longitudinal-field Ising chain** (`ising`):
-  $$H_L = -\sum_{j=1}^L Z_j Z_{j+1} - g \sum_{j=1}^L X_j - h \sum_{j=1}^L Z_j$$
+  ```math
+  H_L = -\sum_{j=1}^L Z_j Z_{j+1} - g \sum_{j=1}^L X_j - h \sum_{j=1}^L Z_j
+  ```
   at $g = 1/4, h = 1/20$, matching `CertifiedGaps.IsingLongitudinal.model (1/4) (1/20)`. The
   kernel checkers scale the Hamiltonian to the integer matrix $A = 20 H_L$ in the computational
   ($\sigma^z$) basis; `test/ising.jl` verifies that its periodic-bond convention at $L = 2$
@@ -50,7 +54,7 @@ already formalized in [`lean/`](../../lean):
   `lean/CertifiedGaps/Heisenberg/Main.lean` ($-h = \sum_\alpha C_\alpha \otimes \overline{C_\alpha}$
   with $C_\alpha = i S^\alpha$); the unitary change-of-basis bridge from that Cartesian matrix to
   the $S^z$-basis integer matrices used in `SeedKernel` remains an open formalization task.
-- For the longitudinal-field Ising chain, reflection positivity holds in the standard Pauli-$Z$
+- For the longitudinal-field Ising chain, reflection positivity holds in the standard Pauli-$`Z`$
   basis with single bond factor $C_1 = Z$ ($-h_{\mathrm{bond}} = Z \otimes Z$) and real diagonal
   on-site term $o = -g X - h Z$, checked directly in `lean/CertifiedGaps/Models/IsingLongitudinal.lean`.
 
@@ -67,9 +71,9 @@ that in `seed_design`, the spatial and thermal seed defects are denoted $(p, q) 
 
 | Design | Thermal trace inputs (lengths; twists; abs. error $\epsilon$) | $\beta_{\mathrm{table}} \to \beta_0$ | Moment $k$; trial $N$ | $\varepsilon_{\mathrm{s}}$ ($p$) | $\varepsilon_\tau$ ($q$) | Certified gap $\Delta_L >$ | Lengths covered |
 |---|---|---|---|---:|---:|---:|---|
-| A (`small_simple`) | $n \in \{6, 8, 10\}$; $I, P, C$; $3/10000$ | $21/2 \to 105/4$ | $30$; $120$ | $0.124048525$ | $0.125580476$ | $0.005966152$ | even $L \ge 60$ |
-| B (`small_relaxed`) | $n \in \{6, 8, 10\}$; $I, P, C$; $4/10000$ | $21/2 \to 525/16$ | $30$; $144$ | $0.117346685$ | $0.128925715$ | $0.006309519$ | even $L \ge 72$ |
-| C (`real_even`) | $n \in \{4, 6, 8, 10, 12\}$; $I, P$; $1/1000$ | $49/4 \to 49/2$ | $30$; $120$ | $0.047914768$ | $0.112578548$ | $0.039036761$ | even $L \ge 60$ |
+| A (`small_simple`) | $`n \in \{6, 8, 10\}`$; $I, P, C$; $3/10000$ | $21/2 \to 105/4$ | $30$; $120$ | $0.124048525$ | $0.125580476$ | $0.005966152$ | even $L \ge 60$ |
+| B (`small_relaxed`) | $`n \in \{6, 8, 10\}`$; $I, P, C$; $4/10000$ | $21/2 \to 525/16$ | $30$; $144$ | $0.117346685$ | $0.128925715$ | $0.006309519$ | even $L \ge 72$ |
+| C (`real_even`) | $`n \in \{4, 6, 8, 10, 12\}`$; $I, P$; $1/1000$ | $49/4 \to 49/2$ | $30$; $120$ | $0.047914768$ | $0.112578548$ | $0.039036761$ | even $L \ge 60$ |
 
 All three designs improve on the published source-1 bound $\log(20)/784 \approx 0.00382$ while
 eliminating odd chain lengths and loosening the required trace tolerance from $3 \times 10^{-5}$
@@ -109,24 +113,26 @@ To tighten the two-half-chain comparison $H \ge H_0 = A_l \otimes I + I \otimes 
 (where $l = n/2$), we add $\mathrm{SU}(2)$-invariant boundary corrections
 $A_l = H_{\mathrm{open}, l} + B_{1,2} + B_{l-1,l}$ with $B = u h + v h^2$. The operator inequality
 $H - H_0 \ge 0$ holds whenever the four-site cut remainder
-$$R = h_{23} - B_{12} - B_{34} - cI$$
+```math
+R = h_{23} - B_{12} - B_{34} - cI
+```
 is positive semidefinite. This $81 \times 81$ condition is verified in exact rational arithmetic
 by block $\mathrm{LDL}^\top$ factorization in every $S^z$ sector (`results/anchor/certificate.json`),
 and the half-chain spectra of $A_l$ (sector dimensions at most $141$ at $l = 6$) are enclosed
 rigorously to radius $\le 2.8 \times 10^{-7}$.
 
-| $n$ | Count-optimized $(u, v, c)$ | $S^z = 0$ count below uniform cutoff: bare / ground-opt / count-opt | Binned-tail $S^z = 0$ count (all-$S^z$ total) | Physical $S^z = 0$ states |
+| $n$ | Count-optimized $(u, v, c)$ | $S^z = 0$ count below uniform cutoff: bare / ground-opt / count-opt | Binned-tail $S^z = 0$ count (all-$`S^z`$ total) | Physical $S^z = 0$ states |
 |---:|---|---|---|---:|
-| $8$ | $(-3/10,\; -1/10,\; -5076841/2500000)$ | $44$ / $63$ / $34$ | $28$ ($98$) | $2$ |
-| $10$ | $(-1/5,\; 0,\; -5538721/2500000)$ | $86$ / $115$ / $62$ | $38$ ($140$) | $5$ |
-| $12$ | $(-1/5,\; 1/20,\; -48533/20000)$ | $191$ / $212$ / $121$ | $49$ ($183$) | $8$ |
+| $8$ | $`(-3/10,\; -1/10,\; -5076841/2500000)`$ | $44$ / $63$ / $34$ | $28$ ($98$) | $2$ |
+| $10$ | $`(-1/5,\; 0,\; -5538721/2500000)`$ | $86$ / $115$ / $62$ | $38$ ($140$) | $5$ |
+| $12$ | $`(-1/5,\; 1/20,\; -48533/20000)`$ | $191$ / $212$ / $121$ | $49$ ($183$) | $8$ |
 
 Replacing the coarse dimension tail $(3^n - k)e^{-\beta \rho}$ by a 32-bin histogram of the exact
 comparison spectrum $H_0$ lowers the initial $S^z = 0$ state count at $n = 12$ from $121$ to
 $49$. However, because the comparison count $K$ still exceeds the number of low-energy physical
 states $k$, a one-shot comparison count does not immediately yield ordered lower bounds on the
-first $k$ eigenvalues (as illustrated by the elementary counterexample $H = \operatorname{diag}(-2, -1, 10)$
-with trial subspace $\operatorname{span}(e_2, e_3)$ and $\rho = 0 \le \lambda_3(H)$). Bridging
+first $k$ eigenvalues (as illustrated by the elementary counterexample $H = \mathrm{diag}(-2, -1, 10)$
+with trial subspace $\mathrm{span}(e_2, e_3)$ and $`\rho = 0 \le \lambda_3(H)`$). Bridging
 from $K$ comparison states to $k$ physical states via homotopy continuation
 $H(t) = H_0 + t(H - H_0)$ succeeded numerically across all $26$ active $(n, g, S^z)$ sectors in
 $658$ total stages ($\approx 40\text{ min}$ in Julia), but a naive Lean kernel translation would
@@ -137,7 +143,7 @@ require an estimated $80\text{--}97$ kernel hours at $n = 12$.
 The modules `lean/SeedKernel/Spin1/H{6,8,10}.lean` (using `Std` only, with no Mathlib imports)
 verify integer Rayleigh–Ritz and residual inequalities (`ritzCheck`) inside the Lean kernel via
 `decide +kernel` on the moments $G = v^\top v$, $A = v^\top F v$, and $C = (Fv)^\top (Fv)$ of the
-Marshall-transformed power-filtered trial state $v = (nI - H_{\mathrm{M}})^q e_{\text{N\'eel}}$:
+Marshall-transformed power-filtered trial state $`v = (nI - H_{\mathrm{M}})^q e_{\text{N\'eel}}`$:
 
 | $n$ | Filter degree $q$ | Lane width (bits) | Kernel-checked Ritz witness $\theta \le$ | Kernel-checked residual witness $\le$ |
 |---|---:|---:|---:|---:|
@@ -161,7 +167,7 @@ classical domain-wall threshold $\rho_n = (82 - 26n)/20$. In `lean/SeedKernel/Is
 kernel checks—with scale $S = 2^{52}$ and generated integer eigenvectors $v_1, v_2$ and candidate
 eigenvalues $\lambda_1, \lambda_2$ for $A = 20H_n$ at $n = 6$ and $n = 12$—that:
 1. $|v_i^\top v_i - S^2| \le 10^{-12} S^2$ and $|v_1^\top v_2| \le 10^{-12} S^2$,
-2. $\sum_{i=1}^2 \|S A v_i - \lambda_i v_i\|^2 \le 10^{-18} S^4$,
+2. $`\sum_{i=1}^2 \|S A v_i - \lambda_i v_i\|^2 \le 10^{-18} S^4`$,
 3. $\lambda_1 + S < \lambda_2$ and $\lambda_2 + S < (82 - 26n) S$, and
 4. exactly two classical spin configurations have diagonal energy below $(82 - 26n)/20 + n g$.
 
@@ -176,11 +182,11 @@ negative tests confirming rejection of corrupted witnesses.
 
 `lean/SeedKernel/Ising/Seed.lean` turns these checks into `first_point_seed`: exactly the first of
 the thirty conjunctions of `IsingLongitudinal.seeds`
-($1 - 9064 \times 10^{-9} \le \mathrm{spatialPurity}\; 6\; (97/4)$ and
-$1 - 3141 \times 10^{-8} \le \mathrm{thermalPurity}\; 12\; (97/4)$), with no hypothesis, and then
+($`1 - 9064 \times 10^{-9} \le \mathrm{spatialPurity}\; 6\; (97/4)`$ and
+$`1 - 3141 \times 10^{-8} \le \mathrm{thermalPurity}\; 12\; (97/4)`$), with no hypothesis, and then
 `ising_gap`. The steps are:
 - a residual bound gives an eigenvalue within $10^{-10}$ of each candidate (`Ising/Spectral`);
-- $\operatorname{Re} \langle x, Hx \rangle \ge \sum_\sigma (E(\sigma) - L/4) |x(\sigma)|^2$ and the
+- $`\mathrm{Re}\, \langle x, Hx \rangle \ge \sum_\sigma (E(\sigma) - L/4) |x(\sigma)|^2`$ and the
   classical count give at most two eigenvalues below the anchor (counting by comparison);
 - the checker's integer sums are identified with the matrix `IsingLongitudinal.model (1/4) (1/20)`
   (`Ising/Hamiltonian`, `Ising/Bridge`);
@@ -208,7 +214,7 @@ Closing an unconditional kernel-checked spin-1 seed requires completing five com
    `FilterCorrect`, etc.) in `lean/SeedKernel/Obligations.lean` and `Spin1/Obligations.lean`, and
    the lane decoding of `Ising/Packed.lean`; nothing assumes them.
 4. **Hamiltonian basis bridges:** identification of the integer matrices checked in `SeedKernel`
-   with the Lean Hamiltonians (Cartesian-to-$S^z$ unitary and boundary twists for spin-1); done for
+   with the Lean Hamiltonians (Cartesian-to-$`S^z`$ unitary and boundary twists for spin-1); done for
    Ising (`Ising/Bridge.lean`).
 5. **Scalar enclosures:** the twisted trace tables with their sector and filter lemmas (spin-1); the
    Ising case is done in `Ising/Seed.lean`.
@@ -322,7 +328,7 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
 | `src/LeanSeeds.jl` | Top-level module `LeanSeeds`, loading one submodule per study |
 | `src/Common.jl` | Shared paths, SHA-256 source hashing, $S^z$ basis utilities, Lake runner, and axiom-audit parser |
 | `src/seed_design.jl` | `SeedDesign`: `Float64` search, exact rational filters/seeds/chains, `certify`, and `check` |
-| `src/spectrum.jl` | `Spectrum`: twisted $S^z$ Hamiltonians, low-energy spectra, fixed-point Chebyshev filters, and data checks |
+| `src/spectrum.jl` | `Spectrum`: twisted $`S^z`$ Hamiltonians, low-energy spectra, fixed-point Chebyshev filters, and data checks |
 | `src/anchor.jl` | `AnchorStudy`: integer bonds, boundary comparison matrices, exact $\mathrm{LDL}^\top$ and half-chain enclosures, `certify` and `check` |
 | `src/spin1_kernel.jl` | `Spin1Kernel`: witness generator, Lean source emitter, witness inventory, and checker |
 | `src/ising.jl` | `IsingSeed`: eigenvector proposal generator, `Generated*.lean` emitter, exact Julia replay, and checker |
@@ -355,7 +361,7 @@ are gitignored and must be regenerated in their respective model directories bef
   `lean_prototype`), and PR #25 (`ising`, then `models/lean_seed_small`), with two standalone Lake
   projects for the Lean prototypes.
 - Consolidation: one Julia project here (the union of the environments, same package versions);
-  one module per study with shared paths, $S^z$ basis, Lake driver, and source hashing; the paper
+  one module per study with shared paths, $`S^z`$ basis, Lake driver, and source hashing; the paper
   fetchers merged into `scripts/fetch_paper.jl`. The two Lake projects became the opt-in library
   `SeedKernel` of `lean/`, with one shared packed-lane module (`SeedKernel/Packed.lean`, now also
   under the Ising `Packed` checks) and `SeedBridge` importing `CertifiedGaps` directly. All exact

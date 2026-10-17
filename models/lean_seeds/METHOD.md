@@ -350,7 +350,7 @@ The open obligations are concrete: the spectral counting anchor is unproved; a c
 needs kernel-checked arithmetic; the finite twisted transfer/sector extension is missing;
 Peierls/Ritz and MPS formulas must be tied to the Lean Hamiltonian and its normalization;
 and the packed kernel's speed has not been measured on these witnesses. An exact scalar
-recheck does not close any of those obligations. The $n_{\max} = 8$ and no-$C$ $n_{\max} = 10$
+recheck does not close any of those obligations. The $n_{\max} = 8$ and no-$`C`$ $n_{\max} = 10$
 failures are negative results for the tested family, not universal lower bounds.
 
 The upstream paper was read at commit `adc7f1241b42e322a6451854ab7e4b4c146bf78a`
@@ -392,7 +392,7 @@ Defer a full Lehmann–Goerisch development until the anchor is known to work.
 
 ### Scope, conventions, and validation
 
-We computed 21 ring/twist pairs: $n = 4\text{--}12$ with $I/P$, and $n = 6, 8, 10$ with $C$. The 357
+We computed 21 ring/twist pairs: $n = 4\text{--}12$ with $I/P$, and $n = 6, 8, 10$ with $`C`$. The 357
 signed-sector rows include dimensions and low eigenvalues. The 189 nonnegative
 sectors were actually diagonalized; negative sectors are marked as inferred.
 Spin inversion maps I/P sectors m to -m; for C it reverses the twist, and complex
@@ -956,7 +956,7 @@ of 1–8 hours requires substantial batching beyond a naive per-stage continuati
 
 The six numerical shifted traces agree with the reproduction's tabulated centers to better than
 $10^{-6}$, verifying the bond operator, normalization, magnetization multiplicities, and $\pi$
-twist. Small-sector dense diagonalization, Hamiltonian identities, negative-$S^z$ symmetry,
+twist. Small-sector dense diagonalization, Hamiltonian identities, negative-$`S^z`$ symmetry,
 exact-checker rejection tests, and the missing-level counterexample are covered by
 `test/anchor.jl`. The conventions and trace centers were read from `models/spin1/src/thermal.jl`,
 and the pinned upstream commit from `models/spin1/NOTICE`.
@@ -1778,7 +1778,7 @@ cluster multiplicities, and scalar bounds (estimated at 8–15k lines total).
    General points still need anchors; the spin-1 $S^z$ basis change is extra work.
 3. Strong staggered fields ($h = 1, 3/4$), then the Heisenberg ladder and the easier spin-1/2
    dimerization targets, prioritized by cluster counts and anchor strength.
-4. Weaker staggered fields, harder dimerization targets, and the Ising ladder (no $S^z$
+4. Weaker staggered fields, harder dimerization targets, and the Ising ladder (no $`S^z`$
    decomposition; the most expensive Gram scenario among the spin-1/2 models).
 5. Large $D = 4$, then $D = 3.206$; the latter has only about $5.85 \times 10^{-10}$ slack against
    its stored enclosure, so redesigning its seed is more promising than a dense Gram plan.

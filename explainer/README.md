@@ -46,7 +46,7 @@ cached in `.voice/` by a hash of their text, so editing one line re-synthesizes 
 ## What is rigorous
 
 Nothing. All numbers on the page are floating-point illustrations. The spin-1 seed numbers
-(defects at $(36, 49/4)$ and the doubling chain to $(2304, 784)$) are copied from
+(defects at $(36, 49/4)$ and the doubling chain to $`(2304, 784)`$) are copied from
 `models/spin1/results/scalars.json` and the notes; the transverse-field Ising lab computes free-fermion
 purities in `Float64`; the open-chain energy levels are a small floating-point exact diagonalization
 (open spin-1 chains, $n = 4 \dots 12$, endpoint fields $h = 0$ and $3/5$) done outside the repository.

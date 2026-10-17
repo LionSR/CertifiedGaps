@@ -4,27 +4,31 @@
 
 | parameters | seed $(n_0 \text{ sites}, \beta_0)$ | certified gap $\ge$ | lengths covered |
 |---|---|---:|---|
-| 30 points $g \in \{1/4, \dots, 2\} \times h \in \{1/20, \dots, 1\}$ | $(6,\; 2\text{ to }97/4\text{ per point})$ | 0.0763 ($g = 1, h = 1/20$) to 3.7050 | every even $L \ge 6$ |
+| 30 points $`g \in \{1/4, \dots, 2\} \times h \in \{1/20, \dots, 1\}`$ | $`(6,\; 2\text{ to }97/4\text{ per point})`$ | 0.0763 ($g = 1, h = 1/20$) to 3.7050 | every even $L \ge 6$ |
 
 ## Model
 
 In Pauli normalization on a periodic ring of $L$ spin-1/2 sites (one site per unit cell),
 
-$$H_L = -\sum_{j=1}^L Z_j Z_{j+1} - g \sum_{j=1}^L X_j - h \sum_{j=1}^L Z_j,$$
+```math
+H_L = -\sum_{j=1}^L Z_j Z_{j+1} - g \sum_{j=1}^L X_j - h \sum_{j=1}^L Z_j,
+```
 
-evaluated on the 30-point coupling grid $g \in \{1/4, 1/2, 3/4, 1, 3/2, 2\} \times h \in \{1/20, 1/10, 1/4, 1/2, 1\}$. For $h > 0$, the model is non-integrable and $\mathbb{Z}_2$ spin-flip symmetry is broken. While Perron–Frobenius guarantees a unique ground state on every finite ring (since $g > 0$ connects the spin-flip hypercube with negative off-diagonal matrix elements), the two-purity doubling criterion establishes the uniform infinite-volume spectral gap and ground-state uniqueness for all even $L \ge 6$.
+evaluated on the 30-point coupling grid $`g \in \{1/4, 1/2, 3/4, 1, 3/2, 2\} \times h \in \{1/20, 1/10, 1/4, 1/2, 1\}`$. For $h > 0$, the model is non-integrable and $\mathbb{Z}_2$ spin-flip symmetry is broken. While Perron–Frobenius guarantees a unique ground state on every finite ring (since $g > 0$ connects the spin-flip hypercube with negative off-diagonal matrix elements), the two-purity doubling criterion establishes the uniform infinite-volume spectral gap and ground-state uniqueness for all even $L \ge 6$.
 
 ## Reflection positivity
 
 In the standard $\sigma^z$ basis, the bond operator satisfies
 
-$$-h_{\text{bond}} = Z \otimes Z \qquad (C_1 = Z,\text{ real diagonal}),$$
+```math
+-h_{\text{bond}} = Z \otimes Z \qquad (C_1 = Z,\text{ real diagonal}),
+```
 
 and the on-site term $o = -gX - hZ$ is real symmetric. The function `rp_check` verifies these identities in `Rational{BigInt}` arithmetic at every grid point.
 
 ## Seeds and certified bounds
 
-Every grid point uses seed size $n_0 = 6$, with $\beta_0 \in \frac{1}{4}\mathbb{Z}$ selected by a numerical scan over $n_0 \in \{2, 4, 6\}$ and $\beta_0 \in \{1/4, \dots, 64\}$. The $6$- and $12$-site rings are block-diagonalized densely in every translation momentum sector $k$ (without spin-flip or reflection reduction). A polar-decomposition and Weyl perturbation bound with explicit binary64 rounding allowances ([`METHOD.md`](METHOD.md)) encloses every eigenvalue with multiplicity. Outward-rounded interval partition sums yield exact rational defect upper bounds $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(6, \beta_0)$ and $\varepsilon_\tau \ge 1 - P_\tau(12, \beta_0)$, which are passed to `CertifiedGaps.certified_gap_bound(εₛ, εₜ, β₀)`. All exact rational seeds and gap bounds are stored in [`results/seeds.json`](results/seeds.json) and formalized in [`lean/CertifiedGaps/Models/IsingLongitudinal.lean`](../../lean/CertifiedGaps/Models/IsingLongitudinal.lean).
+Every grid point uses seed size $n_0 = 6$, with $\beta_0 \in \frac{1}{4}\mathbb{Z}$ selected by a numerical scan over $`n_0 \in \{2, 4, 6\}`$ and $`\beta_0 \in \{1/4, \dots, 64\}`$. The $6$- and $12$-site rings are block-diagonalized densely in every translation momentum sector $k$ (without spin-flip or reflection reduction). A polar-decomposition and Weyl perturbation bound with explicit binary64 rounding allowances ([`METHOD.md`](METHOD.md)) encloses every eigenvalue with multiplicity. Outward-rounded interval partition sums yield exact rational defect upper bounds $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(6, \beta_0)$ and $\varepsilon_\tau \ge 1 - P_\tau(12, \beta_0)$, which are passed to `CertifiedGaps.certified_gap_bound(εₛ, εₜ, β₀)`. All exact rational seeds and gap bounds are stored in [`results/seeds.json`](results/seeds.json) and formalized in [`lean/CertifiedGaps/Models/IsingLongitudinal.lean`](../../lean/CertifiedGaps/Models/IsingLongitudinal.lean).
 
 Certified gap lower bound $\Delta_L \ge$ (with $\beta_0$ in parentheses), indexed by row $g$ and column $h$:
 
@@ -37,7 +41,7 @@ Certified gap lower bound $\Delta_L \ge$ (with $\beta_0$ in parentheses), indexe
 | 3/2 | 0.1692 (7/2) | 0.3601 (13/4) | 1.0556 (11/4) | 2.1293 (5/2) | 3.7050 (5/2) |
 | 2 | 0.9121 (9/4) | 0.9643 (9/4) | 1.2728 (9/4) | 2.0005 (9/4) | 3.4912 (2) |
 
-The certified bounds capture $9\text{–}74\%$ of the 12-site numerical gap. The symmetric diagonal threshold $\varepsilon_* \approx 0.12731$ is sufficient but not necessary: at $g = 1, h = 1/20$, the seed has $\varepsilon_{\mathrm{s}} \approx 0.184$ and $\varepsilon_\tau \approx 0.046$, which closes under the asymmetric recurrence.
+The certified bounds capture $`9\text{–}74\%`$ of the 12-site numerical gap. The symmetric diagonal threshold $\varepsilon_* \approx 0.12731$ is sufficient but not necessary: at $g = 1, h = 1/20$, the seed has $\varepsilon_{\mathrm{s}} \approx 0.184$ and $\varepsilon_\tau \approx 0.046$, which closes under the asymmetric recurrence.
 
 ## Reproduce
 
@@ -61,7 +65,7 @@ julia --project=. certify.jl                             # regenerate all result
 ## What is rigorous
 
 - **Verified by the checker:** the exact rational RP identity; translation sector dimensions; complete eigenvalue enclosures with multiplicity; interval partition sums and exact rational seed defects; and the uniform gap bound for all even $L \ge 6$ at each of the 30 grid points. The fast checker (`check.jl`) recomputes the partition intervals, rational seeds (each at most the stored one), and recurrence bounds from the stored eigenvalue enclosures; `check.jl --full` rebuilds every momentum block from scratch, re-proves its eigenvalue enclosure of radius $\eta$, and verifies in exact rational arithmetic that each fresh interval lies inside the stored interval of radius $2\eta$.
-- **Independent audits:** `scripts/final_audit.jl` independently verifies sector dimensions via Ramanujan sums, exact Pauli trace moments $\operatorname{Tr} H$ and $\operatorname{Tr}(H^2)$, 256-bit interval partition ratios, and all 30 seeds and gap bounds (1,592 checks). `scripts/independent_residual_audit.jl` checks the residual and orthogonality error bounds on all 180 $L = 6$ momentum blocks in exact rational arithmetic (360 inequalities; maximum exact-to-allowed error ratios $0.005$ and $0.017$). `scripts/audit.jl` cross-checks against full computational-basis exact diagonalization and the $h = 0$ free-fermion partition function (maximum discrepancy $7 \times 10^{-13}$).
+- **Independent audits:** `scripts/final_audit.jl` independently verifies sector dimensions via Ramanujan sums, exact Pauli trace moments $`\mathrm{Tr}\, H`$ and $\mathrm{Tr}(H^2)$, 256-bit interval partition ratios, and all 30 seeds and gap bounds (1,592 checks). `scripts/independent_residual_audit.jl` checks the residual and orthogonality error bounds on all 180 $L = 6$ momentum blocks in exact rational arithmetic (360 inequalities; maximum exact-to-allowed error ratios $0.005$ and $0.017$). `scripts/audit.jl` cross-checks against full computational-basis exact diagonalization and the $h = 0$ free-fermion partition function (maximum discrepancy $7 \times 10^{-13}$).
 - **Trusted base:** the IEEE binary64 / MPFR / IntervalArithmetic rounding model with gradual underflow (checked at load time) and single-threaded OpenBLAS without fast-math, under the explicit rounding-error allowances derived in [`METHOD.md`](METHOD.md).
 - **Numerical only:** seed selection ranking, 12-site ED reference gaps, finite-size diagnostics, and the $h = 0$ free-fermion comparison.
 

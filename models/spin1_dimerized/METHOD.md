@@ -1,6 +1,6 @@
 # Spin-1 dimerized ring: uniform-gap certificate
 
-The smallest certified dimerization on the five-point grid $\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}$
+The smallest certified dimerization on the five-point grid $`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$
 within a 6-cell ($12$-spin) ring ceiling is **$\delta = 7/10$**. At seed $(n_0, \beta_0) = (3\text{ cells}, 17/4)$,
 `certified_gap_bound` gives `0.2187941698399417`, establishing a unique ground state and uniform
 spectral gap **$\Delta_L \ge 0.218794169839$** for every even chain length $L \ge 3$ cells
@@ -10,7 +10,7 @@ $\varepsilon_\tau = \text{48363543279}//\text{1000000000000}$ (`results/certific
 $\delta = 9/10$, the $n_0 = 2$ cell seed $(2, 7/2)$ certifies **$\Delta_L \ge 0.528801949327$** for
 every even $L \ge 2$ cells (`results/certificate_d9.json`).
 
-At $\delta = 7/10$, the certified bound equals $17.28\%$ of the 12-spin numerical reference gap
+At $\delta = 7/10$, the certified bound equals $`17.28\%`$ of the 12-spin numerical reference gap
 ($1.2659290109040136$), and the full 12-spin verified eigensolve completed in $1017.27\text{ s}$
 ($16.95\text{ min}$, or $949\text{ s}$ in the computational replay). Across all five grid points,
 numerical scans were completed through $L = 6$ cells ($12$ spins); at $\delta = 3/5$ and $1/2$,
@@ -19,14 +19,16 @@ admissible seeds require larger rings than $6$ cells.
 ## Model, lengths, and scope
 
 We consider the periodic spin-1 chain
-$$H_L = \sum_{j=1}^{2L} \left[1 + (-1)^j \delta\right] \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 2I,$$
+```math
+H_L = \sum_{j=1}^{2L} \left[1 + (-1)^j \delta\right] \mathbf{S}_j \cdot \mathbf{S}_{j+1}, \qquad \mathbf{S}_j^2 = 2I,
+```
 with two spins per unit cell (local cell dimension $3^2 = 9$) and
-$\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}$. A ring of $L$ cells contains $N = 2L$ spins. Computing
-ring spectra at $L \in \{2, 3, 4, 6\}$ cells supports seed sizes $n_0 = 2$ (using $L = 2, 4$) and
+$`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$. A ring of $L$ cells contains $N = 2L$ spins. Computing
+ring spectra at $`L \in \{2, 3, 4, 6\}`$ cells supports seed sizes $n_0 = 2$ (using $L = 2, 4$) and
 $n_0 = 3$ (using $L = 3, 6$), since certifying $P_\tau(2n_0, \beta_0)$ requires the doubled ring
 $2n_0$.
 
-Candidate inverse temperatures $\beta_0 \in \{1/4, 1/2, \dots, 32\}$ are screened numerically using
+Candidate inverse temperatures $`\beta_0 \in \{1/4, 1/2, \dots, 32\}`$ are screened numerically using
 `Seeds.scan_seeds` and `Seeds.best_seed`, and the selected $(n_0, \beta_0)$ seeds at $\delta = 9/10$
 and $\delta = 7/10$ are then certified with verified full-spectrum eigenvalue enclosures and exact
 rational defect bounds in `results/certificate_d9.json` and `results/certificate_d7.json`.
@@ -35,19 +37,25 @@ rational defect bounds in `results/certificate_d9.json` and `results/certificate
 
 In the Cartesian spin-1 basis, define the real, integer antisymmetric matrices $G_\alpha = i S^\alpha$
 ($S^\alpha = -i G_\alpha$):
-$$G_x = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{pmatrix}, \qquad
+```math
+G_x = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{pmatrix}, \qquad
 G_y = \begin{pmatrix} 0 & 0 & -1 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \qquad
-G_z = \begin{pmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.$$
+G_z = \begin{pmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.
+```
 The module `src/rp.jl` verifies in exact integer arithmetic that $[S^x, S^y] = i S^z$,
-$\sum_\alpha (S^\alpha)^2 = 2I$, and that for any coupling $c \in \{1 - \delta, 1 + \delta\} > 0$,
-$$-c\,\mathbf{S}_i \cdot \mathbf{S}_j = c \sum_{\alpha \in \{x,y,z\}} G_\alpha \otimes G_\alpha.$$
+$\sum_\alpha (S^\alpha)^2 = 2I$, and that for any coupling $`c \in \{1 - \delta, 1 + \delta\} > 0`$,
+```math
+-c\,\mathbf{S}_i \cdot \mathbf{S}_j = c \sum_{\alpha \in \{x,y,z\}} G_\alpha \otimes G_\alpha.
+```
 Inside a two-spin cell $(a, b)$ joined by the weak bond $1 - \delta$, the on-site cell operator
 $o = -(1 - \delta)\sum_\alpha G_\alpha \otimes G_\alpha$ is real symmetric. Let $F = P$ be the
 two-site swap operator inside the cell and $\Theta(\cdot) = F \overline{(\cdot)} F$. Setting
 $A_\alpha = I \otimes G_\alpha$ and $B_\alpha = G_\alpha \otimes I$, the strong inter-cell bond
 satisfies the exact $81 \times 81$ identity
-$$-h_{\mathrm{inter}} = (1 + \delta) \sum_{\alpha \in \{x,y,z\}} A_\alpha \otimes \Theta(A_\alpha), \qquad
-\Theta(A_\alpha) = F \overline{A_\alpha} F = B_\alpha, \qquad \Theta(o) = o.$$
+```math
+-h_{\mathrm{inter}} = (1 + \delta) \sum_{\alpha \in \{x,y,z\}} A_\alpha \otimes \Theta(A_\alpha), \qquad
+\Theta(A_\alpha) = F \overline{A_\alpha} F = B_\alpha, \qquad \Theta(o) = o.
+```
 
 ### Why the odd seed $n_0 = 3$ cells is valid ($X_\beta = K K^* \ge 0$)
 
@@ -63,10 +71,12 @@ spin-1 chain in the Cartesian basis, $X_\beta$ is in fact **positive semidefinit
   ($1 - \delta > 0$) and strong ($1 + \delta > 0$) bonds, respectively. Cutting the ring at the
   strong bonds and integrating out the internal weak-bond history $u$ inside each two-spin cell
   yields the cell transfer kernel on $L^2(\mu_+)$:
-  $$X_\beta(a, b) = \int F_{\mathrm{site}}(a, u)\,F_{\mathrm{site}}(u, b)\,d\mu_-(u) = (K K^*)(a, b),$$
+  ```math
+  X_\beta(a, b) = \int F_{\mathrm{site}}(a, u)\,F_{\mathrm{site}}(u, b)\,d\mu_-(u) = (K K^*)(a, b),
+  ```
   where $K : L^2(\mu_-) \to L^2(\mu_+)$ is the Hilbert–Schmidt integral operator with kernel
   $F_{\mathrm{site}}$.
-- Consequently, $X_\beta = K K^*$ is positive trace-class and $Z_L(\beta) = \operatorname{Tr}(X_\beta^L)$
+- Consequently, $X_\beta = K K^*$ is positive trace-class and $Z_L(\beta) = \mathrm{Tr}(X_\beta^L)$
   for every integer $L \ge 1$, with nonnegative transfer eigenvalues $\lambda_i(\beta) \ge 0$.
   Because the only steps in the two-purity doubling proof that use even $n_0$ are the positivity of
   $X_\beta^{n_0}$ (so that $X_\beta^{n_0} / Z_{n_0}(\beta)$ is a density operator) and the
@@ -76,9 +86,9 @@ spin-1 chain in the Cartesian basis, $X_\beta$ is in fact **positive semidefinit
 
 ## Complete dense spectra and exact integer dihedral projectors
 
-In the $S^z$ product basis ($m_j \in \{-1, 0, 1\}$), each allowed nearest-neighbor spin exchange
+In the $S^z$ product basis ($`m_j \in \{-1, 0, 1\}`$), each allowed nearest-neighbor spin exchange
 has matrix element equal to the bond coupling $J_j$ (since the two spin-1 ladder factors of
-$\sqrt{2}$ cancel the $1/2$ in $\frac{1}{2}(S^+ S^- + S^- S^+)$), while the diagonal entry is
+$\sqrt{2}$ cancel the $1/2$ in $`\frac{1}{2}(S^+ S^- + S^- S^+)`$), while the diagonal entry is
 $\sum_j J_j m_j m_{j+1}$. Thus `integer_hamiltonian` in `src/common.jl` constructs an exact
 symmetric integer matrix $A$ such that $H_L = A / \mathrm{den}(\delta)$.
 
@@ -88,7 +98,7 @@ parity), and global spin flip $m_j \mapsto -m_j$:
 - Sectors with $M > 0$ are paired with $-M$ with exact multiplicity $2$; at $M = 0$, global
   spin-flip parity is resolved into $\pm 1$ sectors.
 - Under cell translation and site reversal (forming the dihedral group $D_L$), generic momentum
-  pairs $\{k, L - k\}$ ($0 < k < L/2$) form two-dimensional irreducible representations where the
+  pairs $`\{k, L - k\}`$ ($0 < k < L/2$) form two-dimensional irreducible representations where the
   two reflection parities are intertwined by $T_{\mathrm{cell}} - T_{\mathrm{cell}}^{-1}$; we
   diagonalize the real reflection-even subspace and assign multiplicity $2$. At $k = 0$ and (for
   even $L$) $k = L/2$, both reflection parities are diagonalized separately.
@@ -96,7 +106,7 @@ parity), and global spin flip $m_j \mapsto -m_j$:
 On small rings ($L \le 4$ cells), the verified certificate path block-diagonalizes $H_L$ in complete
 $S^z$ sectors directly. On the 6-cell ($12$-spin) ring, `src/verified_blocks.jl` uses exact
 dihedral character projectors on each permutation orbit: because $2\cos(2\pi k r / L)$ is an exact
-integer for every $L \in \{2, 3, 4, 6\}$, each orbit projector takes the form $P_{\mathrm{num}} / \mathrm{den}$
+integer for every $`L \in \{2, 3, 4, 6\}`$, each orbit projector takes the form $P_{\mathrm{num}} / \mathrm{den}$
 with exact integer entries. The verifier checks exact symmetry, $P_{\mathrm{num}}^2 = \mathrm{den}\cdot P_{\mathrm{num}}$,
 and integer trace/rank on every orbit, and confirms that the multiplicity-weighted block dimensions
 sum to $9^L$ ($531{,}441$ at $L = 6$, across 79 blocks of maximum dimension $11{,}596$).
@@ -104,35 +114,45 @@ sum to $9^L$ ($531{,}441$ at $L = 6$, across 79 blocks of maximum dimension $11{
 ## Eigenvalue-enclosure theorem and rounding error bounds
 
 Let $H$ be an exact real symmetric block of dimension $d$, $Q$ its approximate `Float64`
-eigenvector matrix, and $\Lambda = \operatorname{diag}(\Lambda_1, \dots, \Lambda_d)$ the sorted
-approximate eigenvalues. Given verified upper bounds $r \ge \|H Q - Q\Lambda\|_F$ and
-$e \ge \|Q^\top Q - I\|_F$ with $e < 1$, write the polar decomposition $Q = U S$ with $U$
+eigenvector matrix, and $\Lambda = \mathrm{diag}(\Lambda_1, \dots, \Lambda_d)$ the sorted
+approximate eigenvalues. Given verified upper bounds $`r \ge \|H Q - Q\Lambda\|_F`$ and
+$`e \ge \|Q^\top Q - I\|_F`$ with $e < 1$, write the polar decomposition $Q = U S$ with $U$
 orthogonal and $S = (Q^\top Q)^{1/2}$. Setting $\sigma = \sqrt{1 - e}$ and $d_S = e / (1 + \sigma)$,
-we have $\|Q^{-1}\|_2 \le 1/\sigma$ and $\|S - I\|_2 \le d_S$, so the identity
-$$H - U \Lambda U^\top = (H Q - Q\Lambda) Q^{-1} + U (S \Lambda S^{-1} - \Lambda) U^\top$$
+we have $`\|Q^{-1}\|_2 \le 1/\sigma`$ and $`\|S - I\|_2 \le d_S`$, so the identity
+```math
+H - U \Lambda U^\top = (H Q - Q\Lambda) Q^{-1} + U (S \Lambda S^{-1} - \Lambda) U^\top
+```
 implies
-$$\|H - U \Lambda U^\top\|_2 \le \eta := \frac{r + 2\|\Lambda\|_2 d_S}{\sigma}.$$
+```math
+\|H - U \Lambda U^\top\|_2 \le \eta := \frac{r + 2\|\Lambda\|_2 d_S}{\sigma}.
+```
 Weyl's inequality then guarantees that every ordered eigenvalue of $H$ (with multiplicity) satisfies
 $|\lambda_i(H) - \Lambda_i| \le \eta$.
 
-In `src/enclosure.jl`, `eigen_enclosure` computes $R_{\mathrm{comp}} = \operatorname{fl}(A Q - \mathrm{den}\cdot Q\Lambda)$
-and $E_{\mathrm{comp}} = \operatorname{fl}(Q^\top Q - I)$ in single-threaded `Float64` BLAS and
-adds explicit IEEE binary64 rounding bounds ($u = 2^{-53}$, $\gamma_k = k u / (1 - k u)$):
-$$r \le \frac{\|R_{\mathrm{comp}}\|_F + \gamma_{2d+8}(\|A\|_F \|Q\|_F + \mathrm{den}\cdot \|Q\|_F \|\Lambda\|_2) + d^3 \mathrm{floatmin}}{\mathrm{den}},$$
-$$e \le \|E_{\mathrm{comp}}\|_F + \gamma_{2d+8}(\|Q\|_F^2 + \sqrt{d}) + d^3 \mathrm{floatmin},$$
+In `src/enclosure.jl`, `eigen_enclosure` computes $R_{\mathrm{comp}} = \mathrm{fl}(A Q - \mathrm{den}\cdot Q\Lambda)$
+and $E_{\mathrm{comp}} = \mathrm{fl}(Q^\top Q - I)$ in single-threaded `Float64` BLAS and
+adds explicit IEEE binary64 rounding bounds ($u = 2^{-53}$, $`\gamma_k = k u / (1 - k u)`$):
+```math
+r \le \frac{\|R_{\mathrm{comp}}\|_F + \gamma_{2d+8}(\|A\|_F \|Q\|_F + \mathrm{den}\cdot \|Q\|_F \|\Lambda\|_2) + d^3 \mathrm{floatmin}}{\mathrm{den}},
+```
+```math
+e \le \|E_{\mathrm{comp}}\|_F + \gamma_{2d+8}(\|Q\|_F^2 + \sqrt{d}) + d^3 \mathrm{floatmin},
+```
 where each Frobenius norm sum of $m$ squares is enlarged by $(1 - \gamma_{2m+2})^{-1}$ plus
-$m\,\mathrm{floatmin}$ before taking a directed-rounded 128-bit `BigFloat` square root.
+$`m\,\mathrm{floatmin}`$ before taking a directed-rounded 128-bit `BigFloat` square root.
 
 For the 12-spin symmetry-projected blocks (`src/verified_blocks.jl`), an additional basis-construction
 allowance is added to $\eta$: for each orbit projector $P$ and floating-point basis $B$, verified
-bounds $q \ge \|PB - B\|_F$ and $e_B \ge \|B^\top B - I\|_F$ bound the distance from $B$ to an
-exact orthonormal basis $U_{\mathrm{proj}}$ of $\operatorname{ran}(P)$ by
-$$d_B = q + \frac{w}{1 + \sqrt{1 - w}}, \qquad w = e_B + 2\|B\|_F q + q^2 < 1.$$
-Taking the maximum $d_B$ over disjoint orbits, replacing $B$ by $U_{\mathrm{proj}}$ shifts
-$B^\top H_L B$ in operator norm by at most $\|H_L\|_2 (2d_B + d_B^2) \le 4L (2d_B + d_B^2)$
-(since $\|\mathbf{S}_i\cdot\mathbf{S}_{i+1}\|_2 = 2$ and the couplings sum to $2L$), and the sparse
-projection multiplication $B^\top A B / \mathrm{den}$ is bounded using
-$\gamma_{2\,\mathrm{maxnnz}(A) + 2\,\mathrm{maxnnz}(B) + 12}$. All final eigenvalue radii $\eta$ are
+bounds $`q \ge \|PB - B\|_F`$ and $`e_B \ge \|B^\top B - I\|_F`$ bound the distance from $B$ to an
+exact orthonormal basis $U_{\mathrm{proj}}$ of $\mathrm{ran}(P)$ by
+```math
+d_B = q + \frac{w}{1 + \sqrt{1 - w}}, \qquad w = e_B + 2\|B\|_F q + q^2 < 1.
+```
+Taking the maximum $d_B$ over disjoint orbits, replacing $`B`$ by $`U_{\mathrm{proj}}`$ shifts
+$B^\top H_L B$ in operator norm by at most $`\|H_L\|_2 (2d_B + d_B^2) \le 4L (2d_B + d_B^2)`$
+(since $`\|\mathbf{S}_i\cdot\mathbf{S}_{i+1}\|_2 = 2`$ and the couplings sum to $`2L`$), and the sparse
+projection multiplication $`B^\top A B / \mathrm{den}`$ is bounded using
+$`\gamma_{2\,\mathrm{maxnnz}(A) + 2\,\mathrm{maxnnz}(B) + 12}`$. All final eigenvalue radii $\eta$ are
 rounded up to exact rational multiples of $10^{-12}$.
 
 ## Partition functions, rational seeds, and gap bounds
@@ -142,8 +162,10 @@ outward-rounded `IntervalArithmetic` (after factoring out an exact binary64 ener
 by each block's exact multiplicity, storing rational lower and upper bounds on $\log Z_{n_0}(\beta_0)$,
 $\log Z_{2n_0}(\beta_0)$, and $\log Z_{2n_0}(2\beta_0)$. The upper endpoints of the resulting
 defect intervals
-$$\varepsilon_{\mathrm{s}} \ge 1 - \exp\!\big(\underline{\log Z_{2n_0}(\beta_0)} - 2\,\overline{\log Z_{n_0}(\beta_0)}\big), \qquad
-\varepsilon_\tau \ge 1 - \exp\!\big(\underline{\log Z_{2n_0}(2\beta_0)} - 2\,\overline{\log Z_{2n_0}(\beta_0)}\big)$$
+```math
+\varepsilon_{\mathrm{s}} \ge 1 - \exp\!\big(\underline{\log Z_{2n_0}(\beta_0)} - 2\,\overline{\log Z_{n_0}(\beta_0)}\big), \qquad
+\varepsilon_\tau \ge 1 - \exp\!\big(\underline{\log Z_{2n_0}(2\beta_0)} - 2\,\overline{\log Z_{2n_0}(\beta_0)}\big)
+```
 are rounded up to exact rationals with denominator $10^{12}$ and passed to
 `CertifiedGaps.certified_gap_bound(εₛ, εₜ, β₀)`.
 
