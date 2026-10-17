@@ -187,7 +187,7 @@ records:
     check: models/spin1/experiments/test_temperature_lift.jl
     date: "2026-10-10"
     pr: null
-    contributors: ['thermal-mpo-gap contributors']
+    contributors: ['CertifiedGaps contributors']
     notes: >-
       Computed in exact rational arithmetic from the finite inputs of the OpenAI preprint,
       reproduced here (18 thermal traces of rings up to 12 sites and one matrix-product trial
@@ -210,7 +210,7 @@ records:
     certificate: models/spin1/results/scalars.json
     date: "2026-09-24"
     pr: null
-    contributors: ['OpenAI (preprint)', 'thermal-mpo-gap contributors']
+    contributors: ['OpenAI (preprint)', 'CertifiedGaps contributors']
     notes: >-
       The two inequalities are $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge
       0.99$. The OpenAI preprint proves them by computer, and this repository reproduces that

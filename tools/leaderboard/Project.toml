@@ -1,7 +1,7 @@
 name = "LeaderboardCheck"
 uuid = "beb85ebc-9f50-4b97-b2b5-963f21c7bdae"
 version = "0.1.0"
-authors = ["thermal-mpo-gap"]
+authors = ["CertifiedGaps contributors"]
 
 [deps]
 CertifiedGaps = "5b0c3f0e-7a51-4c55-9b1e-2f7f3d6a8c11"
