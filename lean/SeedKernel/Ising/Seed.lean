@@ -198,20 +198,26 @@ theorem sum_blocks {M : Type*} [AddCommMonoid M] (F : ℕ → M) (c k : ℕ) :
   | zero => simp
   | succ k ih => rw [Finset.sum_range_succ, ih, Nat.mul_succ, Finset.sum_range_add]
 
+/-- Chunked checks are the whole-ring sums: `k` blocks of `c` consecutive basis states, `c k = 2ⁿ`.
+Proved for symbolic vectors so that the kernel never unfolds the concrete witnesses. -/
+theorem sumStats_chunks (n u v : ℕ) (a b : ℤ) (c k : ℕ) (hck : c * k = 2 ^ n) :
+    sumStats ((List.range k).map fun i ↦ chunkStats n u v a b (c * i) c) =
+      (dot n u u, dot n v v, dot n u v, residualSq n u a, residualSq n v b) := by
+  rw [sumStats_map_range]
+  simp only [chunkStats_eq_sum]
+  rw [sum_blocks (fun s ↦ ((entry u s * entry u s, entry v s * entry v s, entry u s * entry v s,
+      (scale * applyH n u s - a * entry u s).natAbs ^ 2,
+      (scale * applyH n v s - b * entry v s).natAbs ^ 2) : Stats)), hck]
+  simp only [dot, residualSq, foldl_add_eq_sum, zero_add]
+  ext <;> simp [Prod.fst_sum, Prod.snd_sum]
+
 /-- The chunked checks of the 12-site ring are the whole-ring sums. -/
 theorem stats12 : sumStats ((List.range 64).map fun b ↦
       chunkStats 12 compact12_1 compact12_2 lam12_1 lam12_2 (64 * b) 64) =
     (dot 12 compact12_1 compact12_1, dot 12 compact12_2 compact12_2,
       dot 12 compact12_1 compact12_2, residualSq 12 compact12_1 lam12_1,
-      residualSq 12 compact12_2 lam12_2) := by
-  rw [sumStats_map_range]
-  simp only [chunkStats_eq_sum]
-  rw [sum_blocks (fun s ↦ ((entry compact12_1 s * entry compact12_1 s,
-      entry compact12_2 s * entry compact12_2 s, entry compact12_1 s * entry compact12_2 s,
-      (scale * applyH 12 compact12_1 s - lam12_1 * entry compact12_1 s).natAbs ^ 2,
-      (scale * applyH 12 compact12_2 s - lam12_2 * entry compact12_2 s).natAbs ^ 2) : Stats))]
-  simp only [dot, residualSq, foldl_add_eq_sum, zero_add]
-  ext <;> simp [Prod.fst_sum, Prod.snd_sum]
+      residualSq 12 compact12_2 lam12_2) :=
+  sumStats_chunks 12 _ _ _ _ 64 64 (by norm_num)
 
 theorem s2_toNat : ((scale ^ 2).toNat : ℝ) = (scale : ℝ) ^ 2 := by
   rw [show (scale ^ 2).toNat = 2 ^ 104 by decide]; norm_num [scale]
