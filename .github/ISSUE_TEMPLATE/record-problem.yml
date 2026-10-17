@@ -1,0 +1,32 @@
+name: Report a problem with a record
+description: Report an error in a leaderboard entry, a certificate, a checker, or a Lean record.
+title: "Record problem: "
+labels: ["record"]
+body:
+  - type: input
+    id: record
+    attributes:
+      label: Record
+      description: The row id from the leaderboard (the "#" link of the row), for example ising-g-1-h-1-20.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of problem
+      options:
+        - The bound or its decimal is wrong
+        - The Hamiltonian, parameter or lengths do not match the certificate or the Lean theorem
+        - The certificate or check.jl fails
+        - The Lean record is wrong or misnamed
+        - The tier is wrong
+        - Something else
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: What you expected, what you found, and how to reproduce it (commands, versions, platform).
+    validations:
+      required: true
