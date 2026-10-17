@@ -6,11 +6,11 @@
 # Two sizes cannot validate exponential scaling; no proof uses this.
 # Writes results/scans/extrapolation.json.
 #
-#     julia --project=models/heisenberg_ladder models/heisenberg_ladder/scripts/extrapolate.jl
+#     julia --project=julia models/heisenberg_ladder/scripts/extrapolate.jl
 include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
-using .HeisenbergLadder: BASE, provenance
+using .HeisenbergLadder: BASE, HASHED
 using CertifiedGaps.Seeds: scan_seeds, best_seed
-using CertifiedGaps.Results: write_result
+using CertifiedGaps.Results: write_result, model_metadata
 using JSON3
 
 "Estimate the first admissible even seed length for every scan without a seed."
@@ -35,8 +35,8 @@ function extrapolate()
             "prediction" => prediction))
     end
     write_result(joinpath(BASE, "results", "scans", "extrapolation.json"), Dict(
-        "metadata" => provenance(Dict("model" =>
-            "delta4 exp(-(n-4)/xi), P_t=exp(-6n exp(-beta gap10))")),
+        "metadata" => model_metadata(BASE, Dict("model" =>
+            "delta4 exp(-(n-4)/xi), P_t=exp(-6n exp(-beta gap10))"); HASHED...),
         "estimates" => estimates))
     foreach(println, estimates)
 end

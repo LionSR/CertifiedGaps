@@ -1,105 +1,117 @@
-# Fast checker: exact RP, small-ring spectra against the core ED, sector counts, log Z and the
-# rational seeds recomputed from the stored eigenvalues and radii, the recurrence, the published
-# bounds, source provenance, and the exact parts of the shared-core cross-check certificate.
-using Test, SHA
+# Fast checks of the five core certificates: the exact sublattice rotation to the RP frame, the
+# stored model, RP data and blocking against their definitions, the exact rational chain
+# (`check_certificate(cert; spectra = false)`), agreement with the seeds hardcoded in the Lean
+# theorem, model-local source hashes, and the compact summary. `check.jl --full` also re-verifies
+# every seed spectrum.
+using Test
 include(joinpath(@__DIR__, "..", "src", "common.jl"))
-@testset "exact RP and rotation" begin
-    for h in FIELDS; @test exact_rp(h);end
-end
-@testset "independent small-ring spectra and sector counts" begin
-    for L in (2,4,6)
-        a=all_spectra(L,3//4;verified=true)
-        b=spectrum(CertifiedGaps.Models.staggered_heisenberg(3//4).chain,L;dense_max=1000)
-        @test a.spec.N==2^L
-        @test maximum(abs.(a.spec.E-b.E))<1e-12
-        @test sum(r["dimension"]*r["multiplicity"] for r in a.records)==2^L
-        for beta in (1//2,3//1)
-            z=enclosed_logz(a.records,beta)
-            @test inf(z)<=log_partition(b.E,beta)<=sup(z)
+using CertifiedGaps.ExactDiagonalization: spectrum
+using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum
+const REPO = normpath(joinpath(ROOT, "..", ".."))
+
+# The two-site operator B (on kron(site i, site j)) on a ring of L sites of dimension d, exactly;
+# site 1 is the most significant tensor factor.
+function two_site(B, i, j, L, d)
+    H = zeros(eltype(B), d^L, d^L)
+    for c in 0:(d^L-1)
+        state = reverse(digits(c; base = d, pad = L))
+        col = state[i] * d + state[j] + 1
+        for row in 1:d^2
+            iszero(B[row, col]) && continue
+            new = copy(state)
+            new[i], new[j] = divrem(row - 1, d)
+            H[foldl((a, x) -> a * d + x, new; init = 0)+1, c+1] += B[row, col]
         end
     end
+    return H
 end
-@testset "stored rational seeds and bound" begin
-    files=filter(f->startswith(f,"certificate_") && endswith(f,".json"),readdir(joinpath(ROOT,"results")))
-    @test !isempty(files)
-    for file in files
-        c=JSON3.read(read(joinpath(ROOT,"results",file),String),Dict{String,Any})
-        @test exact_rp(parse_rational(c["h"]))
-        for (key,L) in (("small_sectors",c["n0"]),("large_sectors",2c["n0"]))
-            records=c[key]
-            @test all(r["dense"] && length(r["eigenvalues"])==r["dimension"] for r in records)
-            @test sum(r["dimension"]*r["multiplicity"] for r in records)==2^L
-            @test all(0<=r["orthogonality_upper"]<1 && r["radius"]>0 for r in records)
-        end
-        beta=parse_rational(c["beta"])
-        s=parse_rational(c["epsilon_s"]);t=parse_rational(c["epsilon_t"])
-        seeds=enclosed_seeds(c["small_sectors"],c["large_sectors"],beta)
-        # Recomputed defects are valid upper bounds; the stored seeds may only be larger.
-        @test seeds.s<=s && seeds.t<=t
-        bound=certified_gap_bound(s,t,beta)
-        @test bound.bound==c["bound"]
-        @test bound.bound>0
+# Σ_j B_{j,j+1} + Σ_j o(j)_j on the ring of L sites (for L = 2 both bonds (1,2) and (2,1)).
+ring_matrix(B, o, L) = sum(two_site(B, j, mod1(j + 1, L), L, 2) +
+                           two_site(kron(o(j), I2), j, mod1(j + 1, L), L, 2) for j in 1:L)
+
+@testset "exact sublattice rotation to the RP frame" begin
+    @test U * U' == I2 && U * X * U' == -X && U * J * U' == J && U * Z * U' == -Z
+    @test kron(U, I2) * physical_bond() * kron(U, I2)' == rotated_bond()
+    @test kron(I2, U) * physical_bond() * kron(I2, U)' == rotated_bond()
+    for h in FIELDS, L in (2, 4, 6)
+        V = reduce(kron, [isodd(j) ? U : I2 for j in 1:L])
+        # Physical H = Σ S·S − h Σ_j (−1)^j Sᶻ_j on sites j = 1, …, L.
+        physical = ring_matrix(physical_bond(), j -> -h * (-1)^j * Z, L)
+        m = site_model(h)
+        rotated = ring_matrix(real(m.bond), j -> real(m.onsite), L)
+        @test V * physical * V' == rotated
     end
 end
-@testset "published bounds follow from both stored and replayed seeds" begin
-    summary=JSON3.read(read(joinpath(ROOT,"results","spectral_replay_summary.json"),String),Dict{String,Any})
-    @test summary["status"]=="complete" && length(summary["records"])==length(FIELDS)
-    for r in summary["records"]
-        h=parse_rational(r["h"]);beta=parse_rational(r["beta"])
-        c=JSON3.read(read(joinpath(ROOT,"results","certificate_$(tag(h)).json"),String),Dict{String,Any})
-        @test r["n0"]==c["n0"] && iseven(r["n0"]) && beta==parse_rational(c["beta"])
-        @test r["original_epsilon_s"]==c["epsilon_s"] && r["original_epsilon_t"]==c["epsilon_t"]
-        published=parse_rational(r["published_bound_rational"])
-        # Each rigorous seed pair (original certificate and fresh replay) proves the claim.
-        for (s,t) in ((c["epsilon_s"],c["epsilon_t"]),(r["epsilon_s"],r["epsilon_t"]))
-            gap=certified_gap_bound(parse_rational(s),parse_rational(t),beta).bound
-            @test gap!==nothing && Rational{BigInt}(gap)>=published>0
-        end
-        @test published==floor(BigInt,min(Rational{BigInt}(r["bound"]),
-            Rational{BigInt}(c["bound"]))*10^6)//big(10)^6
+
+@testset "RP data and the two-site cell charge" begin
+    for h in FIELDS
+        m = site_model(h)
+        @test verify_rp(m, site_rp(h)) && isreal_model(m)
+        # In cells (a, b) the charge Sᶻ_a − Sᶻ_b is minus the physical Sᶻ (U flips site a).
+        @test BLOCKING.charge == [Int(Z[a, a] - Z[b, b]) for a in 1:2 for b in 1:2]
     end
 end
-@testset "provenance of the stored certificates" begin
-    # The certificates were made when this directory was certificates/heisenberg_staggered_field
-    # and the core was named ThermalMPOGap; their source hashes refer to the snapshot of those
-    # sources kept in historical_sources/ at commit HISTORICAL. They attest provenance, not
-    # correctness: checked when that commit is in the local object store, skipped otherwise.
-    HISTORICAL = "cb635a1cdf2ab06630b5b0838fac4356d3c33509"
-    available = success(pipeline(`git -C $REPO cat-file -e $HISTORICAL^\{commit\}`;
-        stderr=devnull))
-    for file in filter(f->startswith(f,"certificate_"),readdir(joinpath(ROOT,"results")))
-        c=JSON3.read(read(joinpath(ROOT,"results",file),String),Dict{String,Any})
-        hashes=c["metadata"]["source_sha256"]
-        @test haskey(c["metadata"],"ThermalMPOGap") && !isempty(hashes)
-        if !available
-            @warn "Historical snapshot $HISTORICAL unavailable; skipping provenance of $file"
-            @test_skip false
-            continue
-        end
-        for (path,hash) in hashes
-            spec="$HISTORICAL:certificates/heisenberg_staggered_field/historical_sources/$path"
-            @test bytes2hex(sha256(read(`git -C $REPO show $spec`)))==hash
-        end
+
+@testset "verified spectra against physical-frame ED" begin
+    for L in (4, 6)
+        spec = verified_ring_spectrum(site_model(3 // 4), L)
+        levels = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spec]))
+        ref = spectrum(CertifiedGaps.Models.staggered_heisenberg(3 // 4).chain, L;
+            dense_max = 10^6).E
+        @test maximum(abs, levels - ref) < 1e-12
     end
 end
-module CoreCrossCheck
-    # The model definition used by scripts/core_certificate.jl (its main block does not run).
-    include(joinpath(@__DIR__, "..", "scripts", "core_certificate.jl"))
+
+# Seeds hardcoded in lean/CertifiedGaps/Models/StaggeredHeisenberg.lean: per point ⟨h, β₀, …⟩
+# the first entries s[0], t[0] of the chain lists, which the Lean theorem takes as seed defects.
+function lean_points()
+    text = read(joinpath(REPO, "lean", "CertifiedGaps", "Models", "StaggeredHeisenberg.lean"),
+        String)
+    q(s) = (p = parse.(BigInt, split(s, "/")); length(p) == 1 ? p[1] // 1 : p[1] // p[2])
+    sci(m, e) = parse(BigInt, m) // big(10)^parse(Int, e)
+    pattern = r"⟨([0-9/ ]+), ([0-9/ ]+), \{\s*s := \[(\d+)e-(\d+),.*?t := \[(\d+)e-(\d+),"s
+    return [(h = q(replace(m[1], " " => "")), β = q(replace(m[2], " " => "")),
+        s = sci(m[3], m[4]), t = sci(m[5], m[6])) for m in eachmatch(pattern, text)]
 end
-@testset "shared-core cross-check at h = 1 (exact parts)" begin
-    path=joinpath(ROOT,"results","core_certificate_1_1.json")
-    cert=CertifiedGaps.Results.read_exact_json(path)
-    # The stored model must be the intended Hamiltonian, not merely self-consistent.
-    model=CertifiedGaps.RingModels.decode_model(cert["model"])
-    reference=CoreCrossCheck.staggered(1)
-    @test model.d==reference.d && model.bond==reference.bond && model.onsite==reference.onsite
-    seed=cert["seed"]
-    c=JSON3.read(read(joinpath(ROOT,"results","certificate_1_1.json"),String),Dict{String,Any})
-    @test parse(Int,string(seed["n0"]))==c["n0"]
-    @test parse_rational(seed["beta0"])==parse_rational(c["beta"])
-    # Exact RP identity and the exact rational chain; the spectra are re-verified by
-    # `check.jl --full` (about 6 minutes).
-    recomputed=CertifiedGaps.GapCertificates.check_certificate(cert; spectra=false)
-    @test recomputed["gap_lower_bound"]==cert["gap_lower_bound"]
-    @test parse_rational(cert["gap_lower_bound"])>1147699//1000000
+
+@testset "certificates (exact parts)" begin
+    lean = lean_points()
+    @test length(lean) == length(SEEDS)
+    for (h, β0) in SEEDS
+        cert = read_exact_json(certificate_path(h))
+        @test parse_rational(cert["staggered_field"]) == h
+        # The stored model and RP data are the intended ones, not merely self-consistent.
+        model = decode_model(cert["model"])
+        reference = site_model(h)
+        @test model.d == 2 && model.bond == reference.bond && model.onsite == reference.onsite
+        rp = decode_rp(cert["reflection_positivity"])
+        @test rp.factors == site_rp(h).factors && rp.reflection === nothing
+        @test parse(Int, cert["seed"]["n0"]) == N0 && parse_rational(cert["seed"]["beta0"]) == β0
+        b = cert["blocking"]
+        cell = decode_model(b["model"])
+        @test parse(Int, b["cell"]) == BLOCKING.cell && cell.d == 4
+        @test cell.charge == BLOCKING.charge && cell.modulus == BLOCKING.modulus
+        recomputed = check_certificate(cert; spectra = false)
+        @test recomputed["gap_lower_bound"] == cert["gap_lower_bound"]
+        @test parse_rational(cert["gap_lower_bound"]) > 0
+        # The Lean theorem's seed hypotheses at the same (h, β₀) follow from the certificate.
+        point = only(filter(p -> p.h == h, lean))
+        @test point.β == β0
+        @test parse_rational(cert["seed"]["eps_s"]) <= point.s
+        @test parse_rational(cert["seed"]["eps_t"]) <= point.t
+    end
+end
+
+@testset "provenance and summary" begin
+    for h in FIELDS
+        meta = read_exact_json(certificate_path(h))["metadata"]
+        @test verify_model_metadata(meta, ROOT; SOURCES...) == 3
+    end
+    summary = read_exact_json(joinpath(ROOT, "results", "summary.json"))
+    @test [parse_rational(r["h"]) for r in summary["points"]] == FIELDS
+    for r in summary["points"]
+        c = read_exact_json(certificate_path(parse_rational(r["h"])))
+        @test all(r[k] == c["seed"][k] for k in ("n0", "beta0", "eps_s", "eps_t"))
+        @test r["gap_lower_bound"] == c["gap_lower_bound"]
+    end
 end

@@ -1,25 +1,27 @@
-# Checker for the dimerized spin-1 certificates.
+# Checker for the dimerized spin-1 certificates results/certificate_d9.json, certificate_d7.json.
 #
-#     julia --project=models/spin1_dimerized models/spin1_dimerized/check.jl          # ~1 min
-#     julia --project=models/spin1_dimerized models/spin1_dimerized/check.jl --full   # + 17-36 min
+#     julia --project=julia models/spin1_dimerized/check.jl [--full]
 #
-# The fast check (test/runtests.jl) recomputes the seeds and bounds from the stored log Z
-# enclosures and recertifies delta = 9/10 from scratch. `--full` also recertifies
-# delta = 7/10 (twelve-spin ring) into a temporary file and checks that its log Z enclosures
-# overlap the stored ones and that it proves a positive bound.
-include("test/runtests.jl")
-if "--full" in ARGS
-    @testset "Fresh recertification of delta = 7/10" begin
-        stored = read_exact_json(joinpath(ROOT, "results", "certificate_d7.json"))
-        path = tempname() * ".json"
-        fresh = certify_selected(7//10; n0 = 3, beta0 = 17//4, output_path = path)
-        rm(path; force = true)
-        @test fresh["bound"] > 0
-        for key in ("logZ_n_beta", "logZ_2n_beta", "logZ_2n_2beta")
-            a = parse_rational.((stored[key]["lower"], stored[key]["upper"]))
-            b = parse_rational.((fresh[key]["lower"], fresh[key]["upper"]))
-            @test max(a[1], b[1]) <= min(a[2], b[2])
-        end
-        @test abs(fresh["bound"] - stored["bound"]) < 1e-8
+# Fast mode (default): per certificate, the recorded model-local source hashes, the stored
+# model, RP data, seed and positive-transfer reference against the point definition, the Lean
+# seed values, the exact RP identity and the exact rational chain (core
+# `check_certificate(cert; spectra = false)`). `--full` also re-encloses the complete spectra of
+# the rings of n₀ and 2n₀ cells with the core (for δ = 7/10 the 6-cell ring, about an hour and
+# 15 GB) and requires the fresh seed defects not to exceed the stored εₛ, εₜ. Any failure throws.
+include(joinpath(@__DIR__, "src", "DimerizedCertificate.jl"))
+using .DimerizedCertificate
+const D = DimerizedCertificate
+
+if abspath(PROGRAM_FILE) == @__FILE__
+    full = "--full" in ARGS
+    paths = D.result_paths()
+    basename.(paths) == [basename(D.certificate_path(δ)) for δ in sort(collect(keys(D.POINTS)))] ||
+        error("the stored certificates are not exactly the certified points")
+    for path in paths
+        r = D.check_point(path; full)
+        println(basename(path), ": gap > ", r["gap_lower_bound"],
+            full ? "  fresh defects ≤ $(Float64(r["defect_s_upper"])), " *
+                   "$(Float64(r["defect_t_upper"]))" : "")
     end
+    println("All $(length(paths)) certificates verified", full ? " (full replay)." : ".")
 end

@@ -1,41 +1,21 @@
-# Checker for the two-leg TFIM certificate.
+# Checker for the two-leg TFIM certificates (results/certificate_g*.json, core format).
 #
-#     julia --project=models/two_leg_tfim models/two_leg_tfim/check.jl          # fast, ~35 s
-#     julia --project=models/two_leg_tfim models/two_leg_tfim/check.jl --full   # + ~11 min
+#     julia --project=julia models/two_leg_tfim/check.jl          # fast
+#     julia --project=julia models/two_leg_tfim/check.jl --full   # + spectra
 #
-# The fast check (test/runtests.jl) recomputes log Z, the rational seeds and the bound from the
-# stored eigenvalues and radii. `--full` first reruns certify.jl at g = 3 into a temporary file
-# (never into results/), which rebuilds every block, eigensystem and radius from the model; the
-# fast checks then verify that fresh certificate as well, with the same seed (g, n0, beta) and a
-# bound at least the stored one. scripts/replay_audit.jl does the same and also reports
-# sector-by-sector agreement.
-using Test
-
-full = "--full" in ARGS
-empty!(ARGS)
-if full
-    fresh = tempname() * ".json"
-    certify = joinpath(@__DIR__, "certify.jl")
-    project = dirname(Base.active_project())
-    run(`$(Base.julia_cmd()) --startup-file=no --project=$project $certify 3//1 $fresh`)
-    push!(ARGS, fresh)
-end
-# Defines the Ladder and Provenance modules used below.
+# The fast check (test/runtests.jl) re-verifies the exact RP identity, the frame change, the
+# stored model against `Ladder.ladder(g)`, the exact rational chain from the stored seeds
+# (`GapCertificates.check_certificate(cert; spectra = false)`) and the model-local source hashes.
+# `--full` also recomputes every verified spectrum and the seed defects from the model
+# (`check_certificate(cert; spectra = true)`), which must not exceed the stored εₛ, εₜ.
 include(joinpath(@__DIR__, "test", "runtests.jl"))
-if full
-    # Same seed, and a fresh bound at least the stored one (as replay_audit.jl's
-    # `original_bound_supported`). The radii depend on the LAPACK/BLAS run, so the enclosures
-    # need not be bit-identical: a run on a loaded machine gave 0.636473... vs 0.636386....
-    @testset "Fresh certificate supports the stored one" begin
-        new = read_result(fresh)
-        old = read_result(joinpath(@__DIR__, ORIGINAL_CERTIFICATE))
-        for key in ("g", "n0", "beta")
-            @test new[key] == old[key]
+if "--full" in ARGS
+    @testset "Seed defects from freshly verified spectra" begin
+        for path in certificate_paths()
+            fresh = check_certificate(read_exact_json(path); spectra = true, progress = true)
+            println(basename(path), ": defect upper ends ", fresh["defect_s_upper"], ", ",
+                fresh["defect_t_upper"])
+            @test fresh["gap_lower_bound"] == read_exact_json(path)["gap_lower_bound"]
         end
-        @test new["bound"] >= old["bound"]
-        identical = all(new[k] == old[k] for k in ("epsilon_s", "epsilon_t", "bound", "logZ"))
-        println("fresh bound $(new["bound"]) vs stored $(old["bound"]); ",
-            identical ? "seeds and log Z identical" : "enclosures differ (radii)")
     end
-    rm(fresh)
 end

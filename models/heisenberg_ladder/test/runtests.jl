@@ -1,53 +1,59 @@
-# Fast tests (under a minute): exact RP, the symmetry builder against an independent full
-# Hamiltonian, verified versus numerical spectra, the rejection witness, continuation, the
-# all-β exclusion and its checker, and the stored certificate without recomputing spectra.
+# Fast tests: the exact frame and RP identities, core verified spectra against an independent
+# dense Hamiltonian in the physical frame, the rejection witness, continuation, the all-β
+# exclusion and its checker, and the stored suite and core certificates (no spectra).
 using Test, LinearAlgebra, IntervalArithmetic
 include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
 const HL = HeisenbergLadder
 using CertifiedGaps.ExactDiagonalization: Chain, sector_hamiltonian
-using CertifiedGaps.RingModels: verify_rp, encode_model, decode_model, encode_rp, decode_rp
-using CertifiedGaps.Results: parse_exact_json, sha256_file
-using CertifiedGaps: certified_gap_bound
+using CertifiedGaps.RingModels: RPCertificate, verify_rp, rp_certificate, encode_rp, decode_rp,
+    exact_matrix
+using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum
+using CertifiedGaps.Results: parse_exact_json, verify_model_metadata
+using CertifiedGaps: to_interval
 
-@testset "Exact RP and original-to-rotated identities" begin
+levels(spec) = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spec]))
+
+@testset "Exact frame unitary and reflection positivity" begin
     for J in HL.COUPLINGS
-        @test HL.exact_rp(J)
-        model, rp = HL.rp_model(J)
-        @test verify_rp(model, rp)
-        @test decode_model(encode_model(model)).bond == model.bond
+        @test HL.check_frame(J)
+        model = HL.ladder_model(J)
+        rp = HL.ladder_rp(model)
+        @test verify_rp(model, rp) && rp.reflection == exact_matrix(HL.cell_reflection())
         bad = deepcopy(encode_rp(rp))
         bad["factors"][1]["weight"] = "2//1"
         @test !verify_rp(model, decode_rp(bad))
     end
+    model = HL.ladder_model(4 // 1)
+    # Without the cell reflection the bond is not RP in this frame (R[−h] is not PSD).
+    @test_throws ArgumentError rp_certificate(model)
+    # The exact LDL† factorisation with the reflection finds an equivalent certificate.
+    @test verify_rp(model, rp_certificate(model; reflection = HL.cell_reflection()))
+    G = exact_matrix(HL.leg_exchange())
+    @test G * G == I && G == transpose(G)
 end
 
-@testset "Sector reconstruction and complete small spectra" begin
+@testset "Core verified spectra against the physical-frame Hamiltonian" begin
+    J = 7 // 2
+    x = [0.0 0.5; 0.5 0.0]
+    a = [0.0 0.5; -0.5 0.0]
+    z = [0.5 0; 0 -0.5]
+    bond = kron(x, x) - kron(a, a) + kron(z, z)
     for L in (2, 3, 4)
-        J = 7 // 2
-        H = zeros(4^L, 4^L)
-        for s in 0:4^L-1, (t, h) in HL.transitions(s, L, J)
-            H[t+1, s+1] = Float64(h)
-        end
-        # Independent shared-core graph builder checks the bit transition convention.
-        x = [0.0 0.5; 0.5 0.0]
-        a = [0.0 0.5; -0.5 0.0]
-        z = [0.5 0; 0 -0.5]
-        bond = kron(x, x) - kron(a, a) + kron(z, z)
+        # Independent dense ED of the physical ladder: site 2j+1 (2j+2) is leg 1 (2) of rung j.
         bonds = [(2j + 1, 2j + 2, Float64(J) * bond) for j in 0:L-1]
         append!(bonds, [(2j + b, 2mod(j + 1, L) + b, bond) for j in 0:L-1 for b in 1:2])
-        chain = Chain(2, _ -> bonds)
-        @test H == Matrix(sector_hamiltonian(chain, 2L, collect(0:4^L-1)))
-        full, rad, _ = HL.verified_eigen(H, 0.0)
-        reduced = HL.full_spectrum(L, J; verified = true)
-        @test all(abs.(full - reduced.energies) .<= rad .+ reduced.radii)
-        # The floating-point scan path must agree with the verified one.
-        numerical = HL.full_spectrum(L, J)
-        @test all(abs.(numerical.energies - reduced.energies) .<= reduced.radii .+ 1e-10)
-        @test sum(d * m for (d, m) in values(HL.sector_dimensions(L))) == 4^L
-        # L=2 has doubled periodic leg bonds, so its second trace moment differs.
+        H = Matrix(sector_hamiltonian(Chain(2, _ -> bonds), 2L, collect(0:4^L-1)))
+        E = eigvals(Symmetric(H))
+        spec = verified_ring_spectrum(HL.ladder_model(J), L)
+        @test length(levels(spec)) == 4^L
+        @test maximum(abs, levels(spec) - E) < 1e-12
+        @test maximum(s.radius for s in spec) < 1 // 10^10
+        # The physical frame (no RP, no flip) has the same spectrum.
+        @test maximum(abs, levels(verified_ring_spectrum(HL.physical_model(J), L)) - E) < 1e-12
+        # Exact second trace moment; L = 2 has doubled periodic leg bonds.
         expected = big(4)^L * (3 // 16) * (L * J^2 + (L == 2 ? 8 : 2L))
-        total = sum((interval(e) + interval(-r, r))^2
-            for (e, r) in zip(reduced.energies, reduced.radii))
+        total = sum(s.multiplicity * sum((interval(c) + interval(-1, 1) *
+            to_interval(s.radius))^2 for c in s.centers) for s in spec)
         @test HL.Q(inf(total)) <= expected <= HL.Q(sup(total))
     end
 end
@@ -63,17 +69,18 @@ end
 end
 
 @testset "Certified coupling continuation" begin
-    seed = Dict("n0" => "4//1", "beta0" => "2//1",
-        "eps_s_upper" => "3508321//100000000", "eps_t_upper" => "123121//5000000")
+    seed = Dict("n0" => "4", "beta0" => "2", "eps_s" => "3508321//100000000",
+        "eps_t" => "123121//5000000")
     c = HL.continuation(seed, big(1) // 10000)
     @test c !== nothing
-    @test HL.q(c["eps_s_upper"]) > HL.q(seed["eps_s_upper"])
-    @test HL.q(c["eps_t_upper"]) > HL.q(seed["eps_t_upper"])
+    @test HL.q(c["eps_s_upper"]) > HL.q(seed["eps_s"])
+    @test HL.q(c["eps_t_upper"]) > HL.q(seed["eps_t"])
     @test HL.q(c["gap_lower_bound"]) > 0
 end
 
 @testset "Continuous-temperature negative certificate and coverage" begin
-    specs = Dict(L => HL.full_spectrum(L, 2 // 1; verified = true) for L in (2, 4))
+    model = HL.ladder_model(2 // 1)
+    specs = Dict(L => verified_ring_spectrum(model, L) for L in (2, 4))
     record = HL.exclude_temperatures(specs, 2)
     @test HL.check_exclusion(specs, record)
     bad = deepcopy(record)
@@ -84,28 +91,22 @@ end
     @test_throws ErrorException HL.check_exclusion(specs, bad)
 end
 
-@testset "Stored certificate: hashes, recurrence and claims (no spectra)" begin
-    cert = parse_exact_json(read(HL.CERTIFICATE, String))
-    @test cert["format"] == HL.FORMAT
-    # Only model-local sources are enforced; the core hashes are provenance.
-    @test Set(String.(keys(cert["metadata"]["source_sha256"]))) == Set(keys(HL.local_hashes()))
-    for (file, hash) in cert["metadata"]["source_sha256"]
-        @test sha256_file(joinpath(HL.ROOT, file)) == hash
-    end
-    @test !isempty(cert["metadata"]["core_sha256"])
-    bad = deepcopy(cert)
-    bad["metadata"]["source_sha256"]["julia/src/Results.jl"] = "0"^64
-    @test_throws ErrorException HL.check_header(bad)
-    for result in cert["parameters"]
-        J = Rational{Int}(HL.q(result["J"]))
-        best = result["best"]
-        @test best == HL.best_row(result["grid"])
-        if best !== nothing
-            b = certified_gap_bound(HL.q(best["eps_s_upper"]), HL.q(best["eps_t_upper"]),
-                HL.q(best["beta0"])).bound
-            @test 0 < HL.q(best["gap_lower_bound"]) <= b
-            @test iseven(Int(HL.q(best["n0"])))
-        end
-        @test HL.check_claim(J, result)
-    end
+@testset "Stored suite and core certificates (no spectra)" begin
+    @test HL.check()
+    suite = parse_exact_json(read(HL.SUITE, String))
+    bad = deepcopy(suite["metadata"])
+    bad["source_sha256"][first(keys(bad["source_sha256"]))] = "0"^64
+    @test_throws ErrorException verify_model_metadata(bad, HL.BASE; HL.HASHED...)
+    record = suite["parameters"][1]
+    J = Rational{Int}(HL.q(record["J"]))
+    @test HL.check_coupling(J, record, nothing)
+    # A tampered upper defect changes the core interval bound; a tampered witness is caught.
+    bad = deepcopy(record)
+    row = bad["grid"][findfirst(r -> r["status"] == "certified", bad["grid"])]
+    row["eps_t_upper"] = string(HL.q(row["eps_t_upper"]) + 1 // 1000)
+    @test_throws ErrorException HL.check_coupling(J, bad, nothing)
+    bad = deepcopy(record)
+    row = bad["grid"][findfirst(r -> r["status"] == "rejected_by_recurrence", bad["grid"])]
+    row["rejection"]["step"] = "99"
+    @test_throws ErrorException HL.check_coupling(J, bad, nothing)
 end

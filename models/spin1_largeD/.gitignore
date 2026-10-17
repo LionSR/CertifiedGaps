@@ -3,5 +3,3 @@
 results/scan_D*.json
 results/summary_*.json
 results/beta_refinement_*.json
-# Full (~30 MB) L = 12 enclosures written by certify.jl; git keeps the compact form.
-results/enclosed_*_L12.json

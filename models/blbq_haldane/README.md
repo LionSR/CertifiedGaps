@@ -83,9 +83,9 @@ From the repository root, with Julia 1.12 and `OPENBLAS_NUM_THREADS=1`:
 
 ```sh
 # Fast check (~19 s, 387 assertions): runs the test suite.
-julia --project=models/blbq_haldane models/blbq_haldane/check.jl
+julia --project=julia models/blbq_haldane/check.jl
 # Full check (~21 s): also recomputes the n₀ = 4 rows from complete 4- and 8-site spectra.
-julia --project=models/blbq_haldane models/blbq_haldane/check.jl --full
+julia --project=julia models/blbq_haldane/check.jl --full
 julia --project=julia models/blbq_haldane/test/runtests.jl
 ```
 
@@ -166,7 +166,8 @@ survey's JSON and source snapshot, and the Householder $\mathrm{SU}(2)$ pilot so
 `su2_householder.jl`, whose hash the $L = 14$ benchmark records). Sources moved into `src/` and
 `scripts/`; the `source_sha256` records already in `results/` name the old flat paths and are kept
 unchanged (no checker verifies them; the test suite verifies only the input hashes of the stored
-references). The project now has its own `Manifest.toml`.
+references). The model later had its own `Manifest.toml`; it now runs in the core environment
+(`--project=julia`) like every certificate model.
 
 The directory-format tidy moved `scan.jl` and `run.sh` from the top level into `scripts/` (adjusting
 the paths inside them) and added `check.jl --full`. The `"scan.jl"` and `"run.sh"` entries in

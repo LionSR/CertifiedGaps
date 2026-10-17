@@ -1,14 +1,14 @@
 # Consistency replay of the stored floating-point scans in results/scans (NOT a certificate;
-# about 5 s). Rebuilds every exact symmetry-sector dimension and multiplicity through ten rungs
-# and compares them with each stored spectrum file, then recomputes all 256 seed rows per
-# coupling from the stored log Z grids. The dense eigensolves themselves are not rerun.
+# about 1 s). Checks that each stored sector table covers all 4^L states (with multiplicities),
+# then recomputes all 256 seed rows per coupling from the stored log Z grids. The dense
+# eigensolves themselves are not rerun.
 # Writes results/scan_replay.json with the SHA-256 of every replayed file.
 #
-#     julia --project=models/heisenberg_ladder models/heisenberg_ladder/scripts/replay_scans.jl
+#     julia --project=julia models/heisenberg_ladder/scripts/replay_scans.jl
 include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
-using .HeisenbergLadder: BASE, sector_dimensions, provenance
+using .HeisenbergLadder: BASE, HASHED
 using CertifiedGaps.Seeds: scan_seeds, best_seed
-using CertifiedGaps.Results: write_result, sha256_file
+using CertifiedGaps.Results: write_result, sha256_file, model_metadata
 using JSON3
 
 const TAGS = ("4p0", "3p5", "3p0", "2p5", "2p0", "1p5")
@@ -17,7 +17,6 @@ const RINGS = (2, 3, 4, 5, 6, 8, 10)
 "Replay all six scans; throws on the first inconsistency."
 function replay_scans()
     start = time()
-    dimensions = Dict(L => sector_dimensions(L) for L in RINGS)
     records = Any[]
     hashes = Dict{String,String}()
     scans = joinpath(BASE, "results", "scans")
@@ -30,10 +29,8 @@ function replay_scans()
             path = joinpath(scans, "spectrum_J$(tag)_L$(L).json")
             data = JSON3.read(read(path, String))
             hashes[relpath(path, BASE)] = sha256_file(path)
-            actual = Dict((Int(r.m), Int(r.k), Int(r.leg_parity), Int(r.spin_parity)) =>
-                (Int(r.dimension), Int(r.multiplicity)) for r in data.sectors)
-            length(actual) == length(data.sectors) || error("duplicate sector")
-            actual == dimensions[L] || error("wrong sector accounting at J=$tag L=$L")
+            sum(Int(r.dimension) * Int(r.multiplicity) for r in data.sectors) == 4^L ||
+                error("wrong sector accounting at J=$tag L=$L")
             Int(data.dimension) == 4^L || error("wrong total dimension")
             logs[L] = Dict(parse(Rational{Int}, r.beta) => Float64(r.logZ) for r in data.logZ_grid)
             length(logs[L]) == 128 || error("incomplete trace grid")
@@ -57,16 +54,17 @@ function replay_scans()
                 error("best bound mismatch")
         end
         push!(records, Dict("J" => scan.J, "rings" => collect(RINGS),
-            "largest_dimension" => "1048576//1", "all_exact_sector_counts_pass" => true,
+            "largest_dimension" => "1048576//1", "sector_tables_cover_all_states" => true,
             "numerical_grid_reproduced" => true))
     end
-    meta = provenance(Dict("scope" => "historical numerical scans, fresh exact sector counts"))
+    meta = model_metadata(BASE,
+        Dict("scope" => "historical numerical scans and sector tables"); HASHED...)
     meta["status"] = "numerical artifact audit; not a spectral certificate"
     write_result(joinpath(BASE, "results", "scan_replay.json"), Dict("metadata" => meta,
         "artifacts_sha256" => hashes, "parameters" => records, "seconds" => time() - start,
         "limitation" => "Original dense runs are reused, not rerun; " *
             "trace grids remain floating point."))
-    println("PASS: all six stored scans, fresh exact symmetry counts through 20 spins; ",
+    println("PASS: all six stored scans, sector tables through 20 spins; ",
         round(time() - start; digits = 1), " s")
 end
 

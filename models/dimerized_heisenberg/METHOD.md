@@ -1,212 +1,133 @@
-# Method: verified spectral, recurrence, and exclusion arguments
+# Method: rotated cell frame, core certificates, and exclusion arguments
 
-This document details the reflection-positivity basis transformation, the symmetry-block
-construction, the two-pass Cauchy–Schwarz rounding error analysis, the unequal-defect recurrence,
-the continuous-$`\beta`$ exclusion covers, and the arbitrary-$`n`$ dimer perturbation bound implemented
-in `certify.jl`, `check.jl`, and `src/Certification.jl`.
+This document details the exact frame in which the dimerized chain is a reflection-positive core
+`RingModel`, how the shared pipeline `CertifiedGaps.GapCertificates` certifies its seeds, the
+continuous-$`\beta`$ exclusion covers, and the arbitrary-$n$ dimer perturbation bound. The
+model-specific code is `src/DimerizedHeisenberg.jl`; everything else is the core.
 
-## Exact reflection positivity in the two-spin cell basis
+## The rotated cell frame
 
-Group each strong bond into a two-spin unit cell, and set $s = 1 + \delta$, $w = 1 - \delta$,
-$A_\alpha = S^\alpha \otimes I$, and $B_\alpha = I \otimes S^\alpha$. In the computational two-spin
-basis, the intra-cell operator is $D = s \sum_\alpha A_\alpha B_\alpha$ and the inter-cell bond
-operator is $h = w \sum_\alpha B_\alpha \otimes A_\alpha$. Define
+Group each strong bond into a two-spin unit cell $(a, b)$, and set $s = 1 + \delta$,
+$w = 1 - \delta$. The physical cell term and inter-cell bond (second spin of a cell, first spin
+of the next, on $\mathrm{cell} \otimes \mathrm{cell}$) are
 ```math
-J = \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix}, \qquad R = I \otimes J, \qquad
-M = \begin{pmatrix}
-1 & 1 & 0 & 0 \\
-0 & 0 & 1 & i \\
-0 & 0 & 1 & -i \\
-1 & -1 & 0 & 0
-\end{pmatrix}, \qquad U = \frac{1}{\sqrt{2}} R M.
+o_{\mathrm{phys}} = s\, \mathbf{S}_a \cdot \mathbf{S}_b, \qquad
+h_{\mathrm{phys}} = w\, (I \otimes \mathbf{S}) \cdot (\mathbf{S} \otimes I).
 ```
-Here $M/\sqrt{2}$ consists of three real triplet combinations and $i$ times the singlet state; it
-satisfies $M^\dagger M = 2I$ and $\frac{1}{2} M M^\top = F$, where $F$ is the two-spin swap inside
-a cell. In the intermediate frame rotated by $R$ alone,
+Rotate the second spin of every cell by
+$`J = 2iS^y = \begin{psmallmatrix} 0 & 1 \\ -1 & 0 \end{psmallmatrix}`$, a real orthogonal matrix with $J^\top S^x J = -S^x$, $J^\top S^z J = -S^z$,
+and $J^\top (iS^y) J = iS^y$. With $W = I \otimes J$ and $U = W^{\otimes L}$, every bond of the
+ring joins a rotated and an unrotated spin, so
 ```math
-D_{\mathrm{rot}} = s(-A_x B_x + A_y B_y - A_z B_z), \qquad
--h_{\mathrm{rot}} = w(B_x \otimes A_x - B_y \otimes A_y + B_z \otimes A_z).
+U^\top H_L U = \sum_j h_{j,j+1} + \sum_j o_j, \qquad
+o = s\,(-S^xS^x + S^yS^y - S^zS^z), \qquad
+h = w\, I \otimes (-S^xS^x + S^yS^y - S^zS^z) \otimes I.
 ```
-The antiunitary involution $\Theta(\cdot) = F \overline{(\cdot)} F$ exchanges the two spins of a
-cell, leaves $D_{\mathrm{rot}}$ invariant, and maps the real channel matrices
-$(B_x, i B_y, B_z)$ to $(A_x, i A_y, A_z)$, matching the antiunitary bond criterion of
-`notes/thermal-mpo-gap-scope.tex` (Appendix E). Transforming by $M/\sqrt{2}$ diagonalizes $F$ and
-turns $\Theta$ into standard entrywise complex conjugation. Explicitly, setting
-$C_\alpha = \frac{\sqrt{w}}{2} K_\alpha$ with
+Because $U$ is a product of cell unitaries, the two local identities
+$W^\top o_{\mathrm{phys}} W = o$ and $(W \otimes W)^\top h_{\mathrm{phys}} (W \otimes W) = h$
+imply unitary equivalence for every $L$; `frame_identity` checks both exactly in
+`Rational{BigInt}`, and the tests also compare the verified 8-spin spectrum with an independent
+`Float64` solver of the physical chain. All entries of $o$ and $h$ are real rationals.
+
+**Conserved charge and flip.** The rotated exchange
+$-S^xS^x + S^yS^y = -\tfrac12(S^+S^+ + S^-S^-)$ raises or lowers both spins of a bond together, and every bond joins an $a$ spin with
+a $b$ spin, so the cell charge $z_a - z_b$ ($[0, 1, -1, 0]$ on
+$|{\uparrow\uparrow}\rangle, |{\uparrow\downarrow}\rangle, |{\downarrow\uparrow}\rangle, |{\downarrow\downarrow}\rangle$) is
+conserved. The cell spin flip $\sigma^x \otimes \sigma^x$ commutes with $o$ and $h$ and
+reverses it. The core `RingModel(…; charge, flip)` checks both exactly; `verified_ring_spectrum`
+then splits every ring by charge and cell momentum and diagonalizes the sectors $q$ and $-q$
+once.
+
+## Reflected reflection positivity
+
+Let $F$ be the swap of the two spins of a cell (real, symmetric, $F^2 = I$, $FoF = o$). With
+$`P_\alpha \in \{S^x, iS^y, S^z\}`$ (real),
 ```math
-K_x = \begin{pmatrix} 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & i \\ 1 & 0 & 0 & 0 \\ 0 & -i & 0 & 0 \end{pmatrix}, \qquad
-K_y = \begin{pmatrix} 0 & 0 & 0 & i \\ 0 & 0 & 1 & 0 \\ 0 & -1 & 0 & 0 \\ i & 0 & 0 & 0 \end{pmatrix}, \qquad
-K_z = \begin{pmatrix} 0 & 1 & 0 & 0 \\ 1 & 0 & 0 & 0 \\ 0 & 0 & 0 & -i \\ 0 & 0 & i & 0 \end{pmatrix},
+-h = w \sum_{\alpha} C_\alpha \otimes F\, \overline{C_\alpha}\, F, \qquad
+C_\alpha = I \otimes P_\alpha, \qquad F (I \otimes P_\alpha) F = P_\alpha \otimes I,
 ```
-we obtain the exact identities
+which is the reflected form of `notes/thermal-mpo-gap-scope.tex` (Appendix E) and of the Lean
+structure `RPRing` (`lean/CertifiedGaps/Models/DimerizedHeisenberg.lean` uses exactly this
+frame). `RingModels.verify_rp` checks it exactly, and every certificate stores the factors, the
+weights $w$, and the reflection $F$. Without $F$ there is no such factorization: the core's exact
+LDL$`^\dagger`$ factorization of the realigned bond fails in this basis, and
+`src/reflection_conventions.jl` shows that no common single-cell basis change helps, since
+$\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \tfrac38 (1 - \delta)^2 > 0$ for the swap
+$`F_{\mathrm{outer}}`$ of two whole cells is basis independent.
+
+`src/rp.jl` (`results/rp_audit.json`) records an equivalent second frame: the singlet/triplet
+basis $M/\sqrt{2}$ with
 ```math
--(U \otimes U)^\dagger h (U \otimes U) = \sum_{\alpha \in \{x,y,z\}} C_\alpha \otimes \overline{C_\alpha}, \qquad
-o = U^\dagger D U = \frac{s}{4}\mathrm{diag}(-3, 1, 1, 1).
+M = \begin{pmatrix} 1 & 1 & 0 & 0 \\ 0 & 0 & 1 & i \\ 0 & 0 & 1 & -i \\ 1 & -1 & 0 & 0
+\end{pmatrix}, \qquad M^\dagger M = 2I, \qquad \tfrac12 M M^\top = F,
 ```
-Because each two-spin cell contains a single internal bond, the palindromic unit-cell condition is
-automatic. The module `src/rp.jl` verifies these identities in exact `Complex{Rational{BigInt}}`
-arithmetic (canceling the $\sqrt{2}$ normalization factors symbolically), and each seed certificate
-stores the model and factors as a core `RingModels` record verified by `RingModels.verify_rp`.
+diagonalizes $F$ and turns the reflected form into the conjugate form
+$`-h = \sum_\alpha C'_\alpha \otimes \overline{C'_\alpha}`$ with complex $C'_\alpha$ and
+$o = \tfrac{s}{4}\mathrm{diag}(-3, 1, 1, 1)$. Both forms are verified exactly; the
+certificates use the real rotated frame because it carries the conserved charge.
 
-## Exact symmetry decomposition and interval block construction
+## Core certificates
 
-On a ring of $N$ physical spins ($L = N/2$ two-spin cells), $H_L$ conserves the number $`q \in \{0, \dots, N\}`$
-of down spins, commutes with translation $T_{\mathrm{cell}}$ by one two-spin cell (two sites), and
-commutes with global spin flip $X^{\otimes N}$. For $q < N/2$, global spin flip maps sector $q$
-isometrically onto sector $N - q$, contributing an exact multiplicity factor of $2$; at half filling
-($q = N/2$), we resolve global spin-flip parity $`p \in \{+1, -1\}`$ explicitly.
+For each seed $(n_0, \beta_0)$, `certify.jl` computes the verified spectra of the rings of $n_0$
+and $2n_0$ cells once with `VerifiedSpectra.verified_ring_spectrum` and passes them to
+`GapCertificates.seed_bounds` and `certify_gap`:
 
-For each symmetry orbit $O$ with representative basis state $s_{\mathrm{rep}}$, a one-dimensional
-character of the abelian group generated by cell translation $`t \in \{0, \dots, L-1\}`$ and spin flip
-$`f \in \{0, 1\}`$ (when $q = N/2$) is $\chi(t, f) = e^{2\pi i k t / L} p^f$. An orbit $O$ contributes
-to sector $(k, p)$ if and only if $\chi$ is trivial on every stabilizer element $(t, f)$ of
-$s_{\mathrm{rep}}$, which is decided by the exact integer congruence
-```math
-2kt + L \cdot \mathbf{1}_{p = -1}\cdot f \equiv 0 \pmod{N}.
-```
-The normalized basis state on a compatible orbit $O$ is $u(g s_{\mathrm{rep}}) = \chi(g) / \sqrt{|O|}$.
-The verifier asserts that the block dimensions in each charge sector $q$ sum to $\binom{N}{q}$ and
-that the multiplicity-weighted sum across all sectors equals $2^N$.
+* every charge and momentum block is built exactly from the rational model (phases and orbit
+  ratios enclosed in interval arithmetic); its binary64 center and an exact Frobenius bound on
+  the construction error go to `verified_eigen`, which bounds the residual and orthogonality
+  defects of the LAPACK eigenvectors under the IEEE binary64 rounding model
+  ($\gamma_{N+8}$ for real blocks, $\gamma_{2N+8}$ for complex blocks evaluated with four real
+  GEMMs, gradual-underflow allowances, Frobenius norms) and returns the smaller of the
+  Ostrowski and polar-factor Weyl radii;
+* $\log Z_{n_0}(\beta_0)$, $\log Z_{2n_0}(\beta_0)$, and $\log Z_{2n_0}(2\beta_0)$ are enclosed by
+  `log_partition_enclosure`, and the defects
+  $1 - P_{\mathrm{s}}(n_0, \beta_0) = 1 - e^{\log Z_{2n_0}(\beta_0) - 2\log Z_{n_0}(\beta_0)}$ and
+  $1 - P_\tau(2n_0, \beta_0) = 1 - e^{\log Z_{2n_0}(2\beta_0) - 2\log Z_{2n_0}(\beta_0)}$ are rounded
+  up to the grid $10^{-15}$ to give $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$;
+* `certified_gap_bound` screens the seed, and `rational_gap_chain` gives the exact rational
+  chain whose final bound is the certificate's strict `gap_lower_bound`.
 
-Commutation of $H_L$ with the symmetry group yields the projected block matrix element between
-compatible orbits $O_i$ and $O_j$:
-```math
-H_{ij} = \sqrt{|O_j|} \sum_{y \in O_i} \overline{u_i(y)}\, \langle y | H_L | s_{\mathrm{rep}, j} \rangle.
-```
-In `src/verified_spectra.jl`, `verified_block` evaluates this sum in outward-rounded
-`IntervalArithmetic` using the exact rational diagonal couplings $\pm J_{\mathrm{bond}}/4$ and
-off-diagonal exchange couplings $J_{\mathrm{bond}}/2$. At $`N \in \{4, 8, 16\}`$ ($`L \in \{2, 4, 8\}`$
-cells), the translation phases $e^{2\pi i k t / L}$ are eighth roots of unity whose real and
-imaginary parts lie in $`\{0, \pm 1, \pm \sqrt{2}/2\}`$, and the orbit-size ratios are square roots
-of exact rationals. Choosing the binary64 midpoint $H_0$ for each upper-triangular entry (and
-completing the lower triangle by exact Hermiticity) bounds the entry-construction error by
-```math
-\|H_{\mathrm{true}} - H_0\|_2 \le \|H_{\mathrm{true}} - H_0\|_F \le 2 d a =: h_{\mathrm{entry}},
-```
-where $a$ is the maximum componentwise interval radius and $h_{\mathrm{entry}}$ is stored as an
-exact rational.
-
-**Conjugate momenta:** Because $H_L$ is real in the computational basis, complex conjugation of the
-character maps $H_{L-k, p} = \overline{H_{k, p}}$ in the identical orbit ordering, so both blocks
-share the exact same real spectrum and enclosure radii. For $k > L/2$, the verifier reuses the
-verified spectrum of $(L - k, p)$ while retaining every sector in the certificate and checking exact
-equality.
-
-## Two-pass Cauchy–Schwarz residual and orthogonality bounds
-
-A dense LAPACK eigensolve on the binary64 midpoint matrix $H_0 = H_r + i H_i$ produces an
-approximate eigenvector matrix $Q = Q_r + i Q_i$ and real diagonal matrix $\Lambda$. Without
-assuming any accuracy from LAPACK, the verifier computes the residual and orthogonality defects
-using four real single-threaded OpenBLAS matrix multiplications (`GEMM`):
-```math
-R_r = H_r Q_r - H_i Q_i - Q_r \Lambda, \qquad R_i = H_r Q_i + H_i Q_r - Q_i \Lambda,
-```
-```math
-E_r = Q_r^\top Q_r + Q_i^\top Q_i - I, \qquad E_i = Q_r^\top Q_i - Q_i^\top Q_r.
-```
-Let $h_{\max}, q_{\max}, \ell_{\max}, r_{\max}, e_{\max}$ be the exact rational conversions of the
-maximum absolute component entries of $H_0, Q, \Lambda, R,$ and $E$. With unit roundoff
-$u = 2^{-53}$, operation count budget $m = 4d + 16$, $\gamma_m = m u / (1 - m u)$, gradual-underflow
-unit $\tau = 8 \cdot 2^{-1022}$, and $\eta_{\mathrm{uf}} = m \tau / (1 - m u)$, standard IEEE
-binary64 dot-product rounding bounds each computed entry of $R$ and $E$ within $\gamma_m$ times the
-sum of absolute products plus $\eta_{\mathrm{uf}}$.
-
-**Two-pass bounding strategy:**
-1. **Coarse pass:** Using only component maxima and the bound $`\|M\|_2 \le 2d \max_{i,j} (\max(|\mathrm{Re}\, M_{ij}|, |\mathrm{Im}\, M_{ij}|))`$
-   for a $d \times d$ complex matrix, we first verify
-   ```math
-   e_{\mathrm{coarse}} = 2d \left[e_{\max} + \gamma_m (2d q_{\max}^2 + 1) + \eta_{\mathrm{uf}}\right] < 1.
-   ```
-   Because $`\|Q^* Q - I\|_2 \le e_{\mathrm{coarse}} < 1`$, every column of $Q$ has Euclidean norm at
-   most $\sqrt{1 + e_{\mathrm{coarse}}} < \sqrt{2}$.
-2. **Cauchy–Schwarz pass:** By Cauchy–Schwarz on the concatenated real and imaginary column vectors
-   of $Q$, the absolute dot-product sum in each entry of $Q_r^\top Q_r + Q_i^\top Q_i$ and
-   $Q_r^\top Q_i - Q_i^\top Q_r$ is bounded by $`\|q_i\|_2 \|q_j\|_2 \le 2`$ (plus $`1`$ for subtracting
-   $`I`$ on the diagonal), rather than $`2d q_{\max}^2`$. Similarly, because every row of $`H_0`$ has
-   $`\ell_1`$-norm bounded by $`2\|H_0\|_2 \le 2(3N/4 + h_{\mathrm{entry}})`$, each absolute residual
-   dot-product sum is bounded by $`2(3N/4 + h_{\mathrm{entry}}) + q_{\max}\ell_{\max}`$. This yields
-   the sharper, non-circular bounds
-   ```math
-   \|H_0 Q - Q\Lambda\|_2 \le r := 2d \left[r_{\max} + \gamma_m\big(2(3N/4 + h_{\mathrm{entry}}) + q_{\max}\ell_{\max}\big) + \eta_{\mathrm{uf}}\right],
-   ```
-   ```math
-   \|Q^* Q - I\|_2 \le e := 2d \left[e_{\max} + 3\gamma_m + \eta_{\mathrm{uf}}\right] < 1.
-   ```
-All arithmetic evaluating $e_{\mathrm{coarse}}, r,$ and $e$ is performed in exact `Rational{BigInt}`.
-
-## Polar-factor and Weyl eigenvalue enclosure theorem
-
-Given $`\|Q^* Q - I\|_2 \le e < 1`$, $Q$ is invertible and its unitary polar factor
-$U = Q(Q^* Q)^{-1/2}$ satisfies $`\|Q - U\|_2 \le e / (1 + \sqrt{1 - e}) \le e`$ and $`\|Q\|_2 < 2`$.
-Using $`\|H_{\mathrm{true}}\|_2 \le 3N/4`$, the triangle inequality gives
-```math
-\|H_{\mathrm{true}} U - U\Lambda\|_2
-\le \|H_0 Q - Q\Lambda\|_2 + \|(H_{\mathrm{true}} - H_0)Q\|_2 + (\|H_{\mathrm{true}}\|_2 + \|\Lambda\|_2)\|U - Q\|_2
-\le r + 2h_{\mathrm{entry}} + \left(\frac{3N}{4} + \ell_{\max}\right) e =: \rho.
-```
-Since $H_{\mathrm{true}}$ and $U\Lambda U^*$ are Hermitian, Weyl's inequality guarantees that the
-$`i`$th ordered eigenvalue of $H_{\mathrm{true}}$ (counting multiplicity) lies in
-$[\lambda_i - \rho, \lambda_i + \rho]$.
-
-## Partition functions, rational seeds, and unequal-defect recurrence
-
-For an exact rational $\beta_0 > 0$, every enclosed eigenvalue interval $[\lambda_i - \rho, \lambda_i + \rho]$
-is exponentiated and summed in outward-rounded interval arithmetic with its exact sector
-multiplicity (using an exact binary64 energy shift $E_{\mathrm{shift}}$ via
-$\log Z(\beta_0) = -\beta_0 E_{\mathrm{shift}} + \log \sum \mathrm{mult} \cdot e^{-\beta_0(E - E_{\mathrm{shift}})}$).
-From the resulting enclosures of $\log Z_{n_0}(\beta_0)$, $\log Z_{2n_0}(\beta_0)$, and
-$\log Z_{2n_0}(2\beta_0)$, the verifier bounds
-```math
-P_{\mathrm{s}}(n_0, \beta_0) \ge \exp\!\big(\underline{\log Z_{2n_0}(\beta_0)} - 2\,\overline{\log Z_{n_0}(\beta_0)}\big), \qquad
-P_\tau(2n_0, \beta_0) \ge \exp\!\big(\underline{\log Z_{2n_0}(2\beta_0)} - 2\,\overline{\log Z_{2n_0}(\beta_0)}\big).
-```
-The upper endpoints of $1 - P_{\mathrm{s}}$ and $1 - P_\tau$ are rounded up to a $10^{-6}$ decimal
-grid plus one grid unit ($10^{-6}$) and stored as exact rationals $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$.
-
-Under the reflected unit-cell RP identity, the spatial transfer operator is self-adjoint and gives
-the positive even-moment expansion $Z_n(\beta) = \sum_i |\lambda_i(\beta)|^n$ (`notes/thermal-mpo-gap-scope.tex`,
-Appendix E).With $z(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) = 1 - (1 - \varepsilon_{\mathrm{s}})^2(1 - \varepsilon_\tau)$
-and $f(z) = z^2 / [2(1 - z)^2]$, the coupled doubling step
-```math
-\varepsilon_{\mathrm{s}}' = f(z(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)), \qquad
-\varepsilon_\tau' = f(z(\varepsilon_\tau, \varepsilon_{\mathrm{s}}'))
-```
-propagates the defect bounds from $(n_0, \beta_0)$ to $(2n_0, 2\beta_0)$, and once $r_J = z_J / (1 - z_J) \le 1/10$
-the quadratic tail bound $\Delta_L \ge -\log(r_J)/\beta_J - \log(5)/\beta_J$ closes the all-scale
-induction for every even $L \ge n_0$ cells ($N = 2L$ divisible by $4$).
+`GapCertificates.check_certificate` re-derives the RP identity and the chain from the stored
+seed (and, with `spectra = true`, the defects from fresh spectra). The 16-spin gap interval is
+`spectral_gap_enclosure` of the 8-cell spectrum, rounded outward to $10^{-6}$.
 
 ## Rigorous all-$`\beta`$ exclusion covers (`negative_cover`)
 
-To prove that no $\beta_0 > 0$ satisfies `certified_gap_bound` at a given $(n_0, \delta)$,
-`negative_cover` in `src/Certification.jl` partitions $(0, \infty)$ into three regimes:
-1. **High-temperature regime $(0, 1]$:** Because $\frac{d}{d\beta}\log P_\tau(2n_0, \beta) = 2(\langle H \rangle_\beta - \langle H \rangle_{2\beta}) \ge 0$,
-   $P_\tau(2n_0, \beta)$ is nondecreasing in $`\beta`$. Verifying $P_\tau(2n_0, 1) \le 1/2$
-   (so $\varepsilon_\tau \ge 1/2$ and $z \ge 1/2$) excludes all $\beta_0 \in (0, 1]$.
-2. **Low-temperature regime $[B, \infty)$:** Whenever the enclosed ground-state energies satisfy
-   $`d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0`$, positivity and dimension counting
-   give $P_{\mathrm{s}}(n_0, \beta) \le 2^{4n_0} e^{-\beta d_E}$. Choosing an exact dyadic $B$ such
-   that $2^{4n_0} e^{-B d_E} \le 1/2$ excludes all $\beta_0 \ge B$.
-3. **Intermediate interval $[1, B]$:** The interval $[1, B]$ is subdivided into contiguous closed
-   subintervals. On each subinterval $[\underline{\beta}, \overline{\beta}]$, interval evaluation of
-   the shifted partition sums produces rigorous *lower* bounds on $\varepsilon_{\mathrm{s}}(\beta)$
-   and $\varepsilon_\tau(\beta)$, which are propagated through the monotone map
-   $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) \mapsto (\varepsilon_{\mathrm{s}}', \varepsilon_\tau')$
-   (using downward rounding to $10^{-15}$ at each step) until $z \ge 1/2$, proving that the
-   recurrence fails everywhere on $[\underline{\beta}, \overline{\beta}]$.
+To prove that no $\beta_0 > 0$ satisfies the doubling recurrence at a given $(n_0, \delta)$,
+`negative_cover` partitions $(0, \infty)$ into three regimes, using only core enclosures of the
+verified spectra of the rings $n_0$ and $2n_0$:
+1. **High temperature $(0, 1]$:**
+   $\frac{d}{d\beta}\log P_\tau(2n_0, \beta) = 2(\langle H \rangle_\beta - \langle H \rangle_{2\beta}) \ge 0$, so $P_\tau(2n_0, \beta)$ is
+   nondecreasing; $P_\tau(2n_0, 1) \le 1/2$ (`log_partition_enclosure` at $\beta = 1$) gives
+   $\varepsilon_\tau \ge 1/2$, hence $z \ge 1/2$, for all $\beta_0 \le 1$.
+2. **Low temperature $[B, \infty)$:** with
+   $`d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0`$ from `ground_energy_enclosure`,
+   $P_{\mathrm{s}}(n_0, \beta) \le 2^{4n_0} e^{-\beta d_E} \le 1/2$ for all $\beta \ge B$, with $B$
+   the smallest power of two $\ge 32$ that works.
+3. **Intermediate $[1, B]$:** $[1, B]$ is bisected into closed boxes. On each box, interval
+   evaluation of `shifted_log_partition` (one exact shift per ring, so the box width does not
+   multiply the ground energies) gives rational lower bounds on $\varepsilon_{\mathrm{s}}(\beta)$
+   and $\varepsilon_\tau(\beta)$; these are propagated through the monotone map
+   $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) \mapsto (\varepsilon_{\mathrm{s}}', \varepsilon_\tau')$,
+   rounding down to $10^{-15}$ at each step, until $z \ge 1/2$.
 
-## Arbitrary-$`n`$ dimer perturbation bound (`dimer_bounds`)
+The summary stores every box with its lower bounds; the fast check reruns the recurrence on them
+and checks that the boxes tile $[1, B]$, and `check.jl --full` recomputes every bound from fresh
+spectra.
 
-At $\delta = 1$ ($w = 0$), the $n$-cell ring consists of $`n`$ decoupled strong dimers with exact
+## Arbitrary-$n$ dimer perturbation bound (`dimer_bounds`)
+
+At $\delta = 1$ ($w = 0$), the $n$-cell ring consists of $n$ decoupled strong dimers with exact
 partition function $Z_n^{\mathrm{dimer}}(\beta) = (e^{3\beta s/4} + 3e^{-\beta s/4})^n$. For
 $w = 1 - \delta > 0$, writing $H_n = H_n^{\mathrm{dimer}} + V_n$ gives
-$`\|V_n\|_2 \le v_n := \frac{3}{4} n w`$, so Weyl's inequality implies
+$\|V_n\|_2 \le v_n := \frac{3}{4} n w$, so Weyl's inequality implies
 $|\log Z_n(\beta) - \log Z_n^{\mathrm{dimer}}(\beta)| \le \beta v_n$ and hence
 ```math
 P_{\mathrm{s}}(n, \beta) \ge e^{-4\beta v_n}, \qquad
 P_\tau(2n, \beta) \ge \left(\frac{1 + 3x^2}{(1 + 3x)^2}\right)^{2n} e^{-8\beta v_n}, \qquad x = e^{-\beta s}.
 ```
-Evaluating these bounds requires only $O(\log n)$ interval operations independently of the $2^{2n}$
-Hilbert-space dimension (certifying $n_0 = 128$ cells / $512$ spins at $\delta = 0.999999, \beta_0 = 8$
-in `test/runtests.jl`), but because the extensive error $4\beta v_n = 3\beta n (1 - \delta)$ does not
-cancel between $Z_{2n}$ and $Z_n^2$, reaching moderate $\delta$ at large $`n`$ would require a linked
-cluster expansion.
+Evaluating these bounds requires only $O(\log n)$ interval operations independently of the
+$2^{2n}$ Hilbert-space dimension (certifying $n_0 = 128$ cells / $512$ spins at
+$\delta = 0.999999, \beta_0 = 8$ in `test/runtests.jl`), but because the extensive error
+$4\beta v_n = 3\beta n (1 - \delta)$ does not cancel between $Z_{2n}$ and $Z_n^2$, reaching
+moderate $\delta$ at large $n$ would require a linked cluster expansion.

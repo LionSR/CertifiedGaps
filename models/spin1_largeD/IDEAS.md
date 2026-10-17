@@ -45,15 +45,20 @@ Stage 2 (the transfer-squaring and Weyl-transport extensions), followed by their
 ## Outcome
 
 - **Stage-1 ED seeds ($n_0 = 6$):** Complete verified $L = 6, 12$ spectra certify $D = 4$
-  ($\Delta_L \ge 0.694694192$ at $\beta_0 = 9/4$) and $D = 1603/500 = 3.206$
-  ($\Delta_L \ge 0.002213456$ at $\beta_0 = 381/125$) for all even $L \ge 6$. On the exploratory
+  ($\Delta_L \ge 0.694746580$ at $\beta_0 = 9/4$) and $D = 1603/500 = 3.206$
+  ($\Delta_L \ge 0.002752708$ at $\beta_0 = 381/125$) for all even $L \ge 6$. On the exploratory
   grid, $D \le 3.205$ has no admissible even seed at $n_0 \le 6$.
 - **Stage-2 transfer squaring ($n_0 = 12, \dots, 96$):** At $D = 4$, lifting from $L = 6, 12$ to a
   seed at $(n_0, \beta_0) = (12, 29/10)$ without constructing $L = 24$ raises the certified uniform
-  gap bound from $0.694694192$ to **$0.899143399$** for all even $L \ge 12$, and verified spectra at
+  gap bound from $0.694746580$ to **$0.899422073$** for all even $L \ge 12$, and verified spectra at
   $L = 6, 8, 10$ bridge the remaining even lengths down to $L \ge 6$. Iterating further certifies
   $n_0 = 24, 48, 96$ as well. At $D = 3.206$, where the $n_0 = 6$ thermal defect is already near
   threshold, spatial lifting without a new thermal input loses too much thermal purity to close.
 - **Stage-2 Weyl transport:** Centered Weyl perturbation around $D^* = 3.206$ certifies the
-  continuous parameter interval $D \in [3.2059998, 3.206]$ ($\Delta_L \ge 0.001001626$ for all even
+  continuous parameter interval $D \in [3.2059998, 3.206]$ ($\Delta_L \ge 0.001821437$ for all even
   $L \ge 6$), and similarly certifies $D \in [3.9979773, 4]$ around $D^* = 4$.
+- **Consolidation onto the shared core:** Stage 1 now runs the core pipeline
+  (`RingModel` in the $S^z$ frame with the reflected RP form and spin flip, `certify_gap`,
+  `verified_eigen`, `write_spectrum`), and stage 2 reads the stored core spectra. The core
+  enclosure is tighter than the former local one, so every defect decreased and every bound
+  increased; the numbers above are the regenerated ones (see `README.md`, `## History`).

@@ -1,194 +1,90 @@
+"""
+    Ladder
+
+The two-leg transverse-field Ising ladder as a core `RingModel` of rungs (d = 4), in the
+Hadamard-rotated frame where it is reflection positive and conserves an additive Z₂ charge,
+so that the shared core (`GapCertificates.certify_gap`, `VerifiedSpectra.ring_blocks`) does all
+of the block reduction, enclosure, log Z and seed arithmetic. Only the model is defined here.
+"""
 module Ladder
-using LinearAlgebra, SparseArrays, CertifiedGaps
-using CertifiedGaps.Results
+using LinearAlgebra
+using CertifiedGaps.RingModels: RingModel, rp_certificate
+using CertifiedGaps.VerifiedSpectra: ring_blocks
 using CertifiedGaps.Spins: exact_pauli
-import CertifiedGaps.Seeds
-using IntervalArithmetic: interval
-export rp_identity, blocks, block_matrix, full_spectrum, verify_eigen, logz_interval,
-    seed_defects, stored_spectra
-BLAS.set_num_threads(1)
+export POINTS, PROVENANCE, LEG_SWAP, physical_terms, rotated_terms, rung_hadamard, ladder,
+    ladder_rp, ladder_energies
 
-"Exact rational check of −h_bond = Σ C⊗C (C = Z⊗I, I⊗Z) and of a real symmetric on-site term."
-function rp_identity(g::Rational)
-    (; x, z, id) = exact_pauli(); X, Z, I2 = x, z, id
-    C = [kron(Z,I2), kron(I2,Z)]
-    # Independent four-spin construction, order (a,b,a′,b′).
-    h = -kron(Z,I2,Z,I2)-kron(I2,Z,I2,Z)
-    o = -kron(Z,Z)-g*(kron(X,I2)+kron(I2,X))
-    @assert -h == sum(kron(c,c) for c in C)
-    @assert all(isreal,o) && issymmetric(o)
-    return true
-end
-
-function permute_bits(s,L,leg,half,refl)
-    t=0
-    for j in 0:L-1, a in 0:1
-        k = refl ? mod(-j,L) : j
-        half && (k=mod(k+L÷2,L))
-        b = leg ? 1-a : a
-        t |= ((s >> (2j+a)) & 1) << (2k+b)
-    end
-    t
-end
-
-"Complete real character blocks of parity, leg exchange, reflection, and half translation."
-function blocks(L)
-    even=iseven(L); ng=even ? 8 : 4; N=4^L
-    # Group elements are commuting involutions; half translation is used only for even L.
-    actions=[(isodd(a),even && isodd(a>>1),isodd(a>>(even ? 2 : 1))) for a in 0:ng-1]
-    orbits=Vector{Vector{Int}}(); elements=Vector{Vector{Int}}(); seen=falses(N)
-    for s in 0:N-1
-        seen[s+1] && continue
-        ys=[permute_bits(s,L,v...) for v in actions]
-        seen[ys .+ 1].=true
-        push!(orbits,sort(unique(ys))); push!(elements,ys)
-    end
-    out=[]
-    for parity in 0:1, ch in 0:ng-1
-        reps=Int[]; sizes=Int[]; lookup=zeros(Int,N); signs=zeros(Int8,N)
-        for (orb,ys) in zip(orbits,elements)
-            s=first(orb)
-            count_ones(s)%2 == parity || continue
-            cs=[isodd(count_ones(ch&a)) ? -1 : 1 for a in 0:ng-1]
-            any(ys[k]==s && cs[k]!=1 for k in eachindex(ys)) && continue
-            push!(reps,s); push!(sizes,length(orb)); j=length(reps)
-            for k in eachindex(ys)
-                lookup[ys[k]+1]=j; signs[ys[k]+1]=cs[k]
-            end
-        end
-        push!(out,(;L,parity,ch,reps,sizes,lookup,signs))
-    end
-    @assert sum(length(b.reps) for b in out)==N
-    out
-end
-
-"Integer coefficient matrix: exact block entry A[i,j]/2 * sqrt(size[j]/size[i])."
-function block_matrix(b,g)
-    L=b.L; m=length(b.reps); ii=Int[]; jj=Int[]; vv=Int[]
-    masks=Int[]
-    for j in 0:L-1
-        push!(masks,(1<<(2j)) ⊻ (1<<(2j+1)))
-        for a in 0:1
-            push!(masks,(1<<(2j+a)) ⊻ (1<<(2mod(j+1,L)+a)))
-        end
-    end
-    for (j,s) in enumerate(b.reps)
-        push!(ii,j);push!(jj,j);push!(vv,Int(-2g*(2L-2count_ones(s))))
-        for mask in masks
-            t=s ⊻ mask; i=b.lookup[t+1]; i==0 && continue
-            push!(ii,i); push!(jj,j); push!(vv,-2Int(b.signs[t+1]))
-        end
-    end
-    A=sparse(ii,jj,vv,m,m); dropzeros!(A)
-    I0,J0,V0=findnz(A)
-    for (i,j,v) in zip(I0,J0,V0)
-        @assert v*b.sizes[j] == A[j,i]*b.sizes[i]
-    end
-    H=zeros(m,m)
-    for (i,j,v) in zip(I0,J0,V0)
-        i<=j || continue
-        H[i,j]=H[j,i]=(v/2)*sqrt(b.sizes[j]/b.sizes[i])
-    end
-    H,A
-end
-
-up(f)=setrounding(BigFloat,RoundUp) do; f(); end
-down(f)=setrounding(BigFloat,RoundDown) do; f(); end
-
-"Polar/Weyl eigenvalue enclosure with rigorous norm upper bounds on BLAS errors."
-function verify_eigen(H,A,b,F)
-    m=size(H,1); Q=F.vectors; lam=F.values
-    # Exact algebraic matrix construction error: interval sqrt, then signed multiplication.
-    rows=zeros(BigFloat,m)
-    I0,J0,V0=findnz(A)
-    for (i,j,v) in zip(I0,J0,V0)
-        lo=down(()->sqrt(BigFloat(b.sizes[j])/BigFloat(b.sizes[i])))
-        hi=up(()->sqrt(BigFloat(b.sizes[j])/BigFloat(b.sizes[i])))
-        a=BigFloat(v)/2
-        l=down(()->a*(v>=0 ? lo : hi)); u=up(()->a*(v>=0 ? hi : lo))
-        err=up(()->max(abs(BigFloat(H[i,j])-l),abs(u-BigFloat(H[i,j]))))
-        rows[i]=up(()->rows[i]+err)
-    end
-    dH=maximum(rows;init=BigFloat(0))
-    R=H*Q-Q*Diagonal(lam); E=Q'Q-I
-    # Frobenius norm of stored residual is bounded by m*maxabs. Products' error
-    # Frobenius norm is gamma*(||H||F||Q||F+||Q||F||Lambda||2).
-    # All scalar norms/bounds below are accumulated with MPFR upward rounding.
-    f_upper(M)=up(()->sqrt(sum(x->BigFloat(x)^2,M)))
-    qf=f_upper(Q); hf=f_upper(H); lf=BigFloat(maximum(abs,lam))
-    gamma=up(()->BigFloat(2m+8)*big(2.0)^(-53)/(1-BigFloat(2m+8)*big(2.0)^(-53)))
-    # Additive underflow allowance, valid also for subnormal intermediate results.
-    tiny=up(()->BigFloat(16)*m^3*BigFloat(2.0)^(-1074))
-    r=up(()->BigFloat(m)*BigFloat(maximum(abs,R))+gamma*(hf*qf+qf*lf)+tiny)
-    e=up(()->BigFloat(m)*BigFloat(maximum(abs,E))+gamma*(qf*qf+sqrt(BigFloat(m)))+tiny)
-    @assert e<1
-    # U=Q(Q'Q)^(-1/2); ||U-Q|| <= e/(1+sqrt(1-e)).
-    den=down(()->1+sqrt(1-e)); a=up(()->e/den)
-    eta=up(()->dH+r+(hf+lf)*a)
-    return (;radius=string(Rational{BigInt}(eta)), residual=string(r),orthogonality=string(e),
-        construction=string(dH), dimension=m)
-end
+const σ = exact_pauli()
+const X, Z, I2 = σ.x, σ.z, σ.id
 
 """
-All eigenvalues of the L-rung ladder at field g, block by block; with `verified=true` each
-block also carries its eigenvalues and a whole-spectrum enclosure radius (`verify_eigen`).
+The model-local sources recorded in each certificate's metadata (`Results.model_metadata`)
+and enforced by the checker (`Results.verify_model_metadata`).
 """
-function full_spectrum(L,g; verified=false)
-    es=Float64[]; sectors=[]; bs=blocks(L); t=time()
-    for b in bs
-        m=length(b.reps); m==0 && continue
-        st=time(); H,A=block_matrix(b,g)
-        if verified
-            F=eigen(Symmetric(H)); ev=F.values
-            check=verify_eigen(H,A,b,F)
-        else
-            ev=eigvals(Symmetric(H)); check=nothing
+const PROVENANCE = (dirs = ("src",),
+    files = ("certify.jl", "check.jl"))
+
+"Leg exchange a ↔ b on one rung, basis (↑↑, ↑↓, ↓↑, ↓↓)."
+const LEG_SWAP = [1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1]
+
+"Certified parameter points: transverse field g and seed (n₀ rungs, β₀)."
+const POINTS = [(; g = 3 // 1, n0 = 4, β0 = 3 // 2)]
+
+"""
+    physical_terms(g) -> (; bond, onsite)
+
+Physical-frame rung terms on (leg a ⊗ leg b): h = −(Z_a Z_a′ + Z_b Z_b′) between rungs and
+o = −Z_a Z_b − g (X_a + X_b), as in `lean/CertifiedGaps/Models/TwoLegIsing.lean`.
+"""
+physical_terms(g) = (; bond = -(kron(Z, I2, Z, I2) + kron(I2, Z, I2, Z)),
+    onsite = -kron(Z, Z) - g * (kron(X, I2) + kron(I2, X)))
+
+"""
+    rotated_terms(g) -> (; bond, onsite)
+
+Rotated-frame terms (Z ↔ X on every spin): h = −(X_a X_a′ + X_b X_b′), o = −X_a X_b − g (Z_a + Z_b).
+"""
+rotated_terms(g) = (; bond = -(kron(X, I2, X, I2) + kron(I2, X, I2, X)),
+    onsite = -kron(X, X) - g * (kron(Z, I2) + kron(I2, Z)))
+
+"""
+    rung_hadamard() -> W
+
+The exact rational orthogonal involution W = (H ⊗ H)/2 with H = [1 1; 1 −1] on one rung, i.e.
+the Hadamard gate on both spins. W^{⊗L} maps the physical ladder to the rotated one: W X W = Z
+spin by spin, so W o_phys W = o_rot and (W ⊗ W) h_phys (W ⊗ W) = h_rot (checked in the tests).
+"""
+rung_hadamard() = (H = Rational{BigInt}[1 1; 1 -1]; kron(H, H) / 2)
+
+"""
+    ladder(g) -> RingModel
+
+The ladder at field g in the rotated frame. The Z₂ charge of a rung basis state is its number
+of down spins mod 2 ([0, 1, 1, 0]); it is conserved because every X flips one spin and every
+bond or rung term flips two. The leg exchange `LEG_SWAP` is an exact on-site Z₂ symmetry, so
+the core also splits every charge and momentum block by its parity.
+"""
+ladder(g) = RingModel(4, rotated_terms(g).bond, rotated_terms(g).onsite;
+    charge = [0, 1, 1, 0], modulus = 2, symmetries = [LEG_SWAP],
+    name = "two-leg TFIM ladder, g = $g, rotated frame")
+
+"Exact RP certificate −h = C₁ ⊗ C₁ + C₂ ⊗ C₂ with C₁ = X ⊗ 1, C₂ = 1 ⊗ X (real, R = 1)."
+ladder_rp(model) = rp_certificate(model; factors = [kron(X, I2), kron(I2, X)])
+
+"""
+    ladder_energies(g, L) -> Vector{Float64}
+
+All 4^L eigenvalues of the ring of L rungs from the core's exact block reduction, by plain
+floating-point diagonalization (not verified; for scans and diagnostics only).
+"""
+function ladder_energies(g, L)
+    es = Float64[]
+    ring_blocks(ladder(g), L) do M, _, mult, _
+        ev = eigvals(Hermitian(M))
+        for _ in 1:mult
+            append!(es, ev)
         end
-        append!(es,ev)
-        push!(sectors,(;parity=b.parity,character=b.ch,dimension=m,seconds=time()-st,
-            verification=check, eigenvalues=verified ? ev : nothing))
-        println("L=$L g=$g parity=$(b.parity) character=$(b.ch) dim=$m seconds=$(round(time()-st,digits=2))")
-        flush(stdout)
     end
-    @assert length(es)==4^L
-    (;L,g=string(g),energies=sort!(es),sectors,seconds=time()-t,dimension=length(es))
+    return sort!(es)
 end
-
-"Directed MPFR interval for log Z, using all eigenvalue enclosures."
-function logz_interval(spec,beta)
-    beta=BigFloat(beta); lows=BigFloat[]; highs=BigFloat[]
-    for sec in spec.sectors
-        rad=parse(Rational{BigInt},sec.verification.radius)
-        rr=up(()->BigFloat(numerator(rad))/BigFloat(denominator(rad)))
-        for e in sec.eigenvalues
-            push!(lows,down(()->BigFloat(e)-rr));push!(highs,up(()->BigFloat(e)+rr))
-        end
-    end
-    lo=down(()->log(sum(e->exp(-beta*e),highs)))
-    hi=up(()->log(sum(e->exp(-beta*e),lows)))
-    (lo,hi)
-end
-
-"""
-    seed_defects(small, large, beta) -> (; es, et, logZ)
-
-Rational upper bounds `es ≥ 1 − Z_{2n}(β)/Z_n(β)²` and `et ≥ 1 − Z_{2n}(2β)/Z_{2n}(β)²` from the
-enclosed spectra of the rings of n and 2n rungs, with the three directed log Z intervals
-`logZ = (log Z_n(β), log Z_{2n}(β), log Z_{2n}(2β))`. The single implementation of the seed
-step, used by certify.jl, the tests and the replay scripts; it rounds in the ambient BigFloat
-precision (256 bits by default). The step from the log Z intervals to the rational defects is
-the core `Seeds.seed_defects` (correctly rounded −expm1 of the directed lower end, as before).
-"""
-function seed_defects(small,large,beta)
-    ln=logz_interval(small,beta); l2=logz_interval(large,beta)
-    l22=logz_interval(large,2beta)
-    enclose((lo,hi))=interval(lo,hi)
-    (;eps_s,eps_t)=Seeds.seed_defects(enclose(ln),enclose(l2),enclose(l22))
-    (;es=eps_s,et=eps_t,logZ=(ln,l2,l22))
-end
-
-"The `spectra` of a stored certificate or replay, in the form `logz_interval` reads."
-stored_spectra(c)=[(;sectors=[(;eigenvalues=Float64.(sec["eigenvalues"]),
-    verification=(;radius=sec["verification"]["radius"])) for sec in sp["sectors"]])
-    for sp in c["spectra"]]
 end

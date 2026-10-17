@@ -9,3 +9,11 @@
 ## Outcome
 
 Symmetry-resolved exact diagonalization certified $g = 3$ at $(n_0, \beta_0) = (4, 3/2)$ using the $4$- and $8$-rung rings ($8$ and $16$ spins), without needing the $10$-rung ring ($4^{10} = 1{,}048{,}576$ states). On the tested grid, $g = 2$ and $g = 5/2$ have no admissible seed with $n_0 \le 4$; the finite-size extrapolation in [`METHOD.md`](METHOD.md) estimates their first admissible seeds at $n_0 \approx 10$ and $n_0 \approx 6$ rungs ($20$- and $12$-rung doubled rings), which lie beyond dense exact diagonalization and would require cluster-expansion or transfer-operator methods.
+
+Later, the local symmetry blocks (Z₂ parity × leg exchange × reflection × half translation),
+the local eigenvalue enclosure and the local log Z code were replaced by the shared core
+pipeline: the ladder is a `RingModel` of rungs in the Hadamard-rotated frame (RP with
+$C = X \otimes 1, 1 \otimes X$; conserved $\mathbb{Z}_2$ charge), certified by
+`GapCertificates.certify_gap`. The core splits by charge, momentum and leg-exchange parity
+(rung reflection is not available), so the 8-rung blocks have about half the old dimension but
+are mostly complex; the seed is unchanged and the tighter core enclosure lowers both defects.

@@ -1,6 +1,7 @@
-# Numerical seed scan (not certified): dense spectra of rings of 2, 3, 4, 6, 8 rungs at field g
-# and a β grid; writes results/spectra_g<g>.json (gitignored) and results/scan_g<g>.json.
-#     julia --project=models/two_leg_tfim models/two_leg_tfim/scripts/scan.jl 3//1
+# Numerical seed scan (not certified): floating-point spectra of the rings of 2, 3, 4, 6, 8
+# rungs at field g from the core's exact block reduction (`Ladder.ladder_energies`) and a β
+# grid; writes results/spectra_g<g>.json (gitignored) and results/scan_g<g>.json.
+#     julia --project=julia models/two_leg_tfim/scripts/scan.jl 3//1
 const ROOT = dirname(@__DIR__)
 include(joinpath(ROOT, "src", "Ladder.jl"))
 using .Ladder, CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds
@@ -9,11 +10,13 @@ using LinearAlgebra
 BLAS.set_num_threads(1)
 g=parse(Rational{Int},get(ARGS,1,"2//1"))
 tag=replace(string(g),"//"=>"_")
-root=ROOT; rp_identity(g); specs=Dict{Int,PartialSpectrum}(); records=[]
+root=ROOT; specs=Dict{Int,PartialSpectrum}(); records=[]
 for L in [2,3,4,6,8]
-    rec=full_spectrum(L,g)
-    push!(records,rec); specs[L]=PartialSpectrum(rec.energies,4^L)
-    write_result(joinpath(root,"results","spectra_g$tag.json"),(;status="numerical, not certified",records,
+    seconds=@elapsed energies=ladder_energies(g,L)
+    push!(records,(;L,g=string(g),energies,seconds)); specs[L]=PartialSpectrum(energies,4^L)
+    println("L=$L g=$g seconds=$(round(seconds,digits=2))"); flush(stdout)
+    write_result(joinpath(root,"results","spectra_g$tag.json"),
+        (;status="numerical, not certified",records,
         source_hashes=source_hashes(root)))
 end
 rs=scan_seeds(spectral_defects(specs),2:4,1/8:1/8:32)

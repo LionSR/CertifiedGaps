@@ -28,7 +28,7 @@ identifiers do not collide with model-specific code. The top-level module `Certi
 | `ReflectionPositivity` | `src/ReflectionPositivity.jl` | floating-point screening utilities: `realign`, `rp_test`, and `rp_decomposition` |
 | `ExactDiagonalization` | `src/ExactDiagonalization.jl` | `Chain` on arbitrary bond graphs (`ring_bonds`, `open_bonds`, `graph_bonds`), abelian charge sectors, `spectrum` (dense or Lanczos, with optional spin-flip doubling), `PartialSpectrum`, `WeightedSpectrum` (levels with integer multiplicities), `logZ_bounds`, and `log_partition` |
 | `RingModels` | `src/RingModels.jl` | `RingModel(d, bond, onsite; charge, modulus)` with exact rational entries, exact reflection-positivity certificates `rp_certificate` and `verify_rp` ($-h = \sum_\alpha w_\alpha C_\alpha \otimes \overline{C_\alpha}$ via explicit factors or exact rational $LDL^\dagger$), and exact JSON serialization |
-| `VerifiedSpectra` | `src/VerifiedSpectra.jl` | `verified_ring_spectrum`: complete block-diagonal spectrum of a ring across charge and translation-momentum sectors with rigorous eigenvalue error radii (residual, Weyl, and Ostrowski bounds with a priori IEEE binary64 rounding bounds), plus `log_partition_enclosure` |
+| `VerifiedSpectra` | `src/VerifiedSpectra.jl` | `verified_eigen`: the eigenvalue enclosure of one Hermitian block (residual, polar-factor, Weyl, and Ostrowski bounds with a priori IEEE binary64 rounding bounds), shared by every model with verified seed spectra; `verified_ring_spectrum`: complete spectrum of a `RingModel` ring across charge and translation-momentum sectors; `log_partition_enclosure` |
 | `GapCertificates` | `src/GapCertificates.jl` | end-to-end certification pipeline `certify_gap(model; n0, β0, rp)` and fast/full verifier `check_certificate`: verifies the exact RP identity, encloses the seed defects from verified ring spectra, and checks the exact `rational_gap_chain` |
 | `Models` | `src/Models.jl` | standard constructors for screening and testing: `tfim` (including closed-form `tfim_logZ`), `heisenberg(s)`, and `staggered_heisenberg` |
 | `Seeds` | `src/Seeds.jl` | floating-point seed screening helpers: `seed_defects(spectra, n, β)`, `scan_seeds`, and `best_seed`; and the rigorous step `seed_defects(logZn, logZ2n, logZ2n_2β)` from three log Z intervals to exact rational upper bounds (εₛ, εₜ) |
@@ -64,8 +64,8 @@ heuristic safety padding for the TFIM open targets of `AGENTS.md`. The recurrenc
 former `scripts/constants.jl` printed (the diagonal threshold ε⋆, the note's seeds, odd lengths, and
 the Theorem 2.22 closed forms) are now asserted in `test/runtests.jl`.
 
-To use `CertifiedGaps` from a model project under `models/`, link it with
-`Pkg.develop(path = "../../julia")`:
+Models run in this package's environment (`julia --project=julia models/<slug>/...` from the
+repository root), so `using CertifiedGaps` needs no extra setup:
 
 ```julia
 using CertifiedGaps                                  # doubling recurrence and gap bounds
@@ -111,7 +111,9 @@ structure (such as symmetry-sector trace recursion, polymer expansions, or varia
   eigenvectors are computed in `Float64`, and the residual and orthogonality defects are enclosed using
   explicit a priori IEEE binary64 rounding bounds (assuming round-to-nearest and the standard $\gamma_n$
   BLAS dot-product bound, valid for any summation order and fused multiply-add). Weyl and Ostrowski
-  perturbation theorems then enclose every eigenvalue, and $\log Z$ is summed in interval arithmetic.
+  perturbation theorems (with the polar factor of the eigenvectors) then enclose every eigenvalue, and
+  $\log Z$ is summed in interval arithmetic. Models with their own exact symmetry reductions build
+  their blocks themselves and call the same `verified_eigen`.
 - **Screening tools (non-rigorous):** Eigenvalues from `ExactDiagonalization.spectrum` are unverified
   floating-point approximations (and when a sector uses Lanczos, degenerate eigenvalues can be missed).
   Similarly, `Purification.purified_log_partition` is an uncertified tensor-network diagnostic.

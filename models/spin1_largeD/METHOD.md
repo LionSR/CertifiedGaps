@@ -1,102 +1,85 @@
 # Method: model, enclosures, transfer squaring, and Weyl transport
 
 This document presents the mathematical derivations for both certification stages of the spin-1
-large-$`D`$ chain: Stage 1 (`certify.jl`, `seed.jl`) constructs complete verified spectra at
-$L = 6, 12$ and certifies the direct $n_0 = 6$ seeds, while Stage 2 (`src/TransferCertificate.jl`,
-`scripts/transfer_certify.jl`) reuses those verified spectra to certify lifted seeds at
+large-$D$ chain. Stage 1 (`certify.jl`) runs the shared core pipeline
+`CertifiedGaps.GapCertificates.certify_gap` on the exact model of `src/model.jl` at $n_0 = 6$ and
+stores the verified spectra of the rings $L = 6, 12$. Stage 2 (`src/TransferCertificate.jl`,
+`scripts/transfer_certify.jl`) reuses those stored spectra to certify lifted seeds at
 $n_0 = 12, 24, 48, 96$ and continuous $D$ intervals without diagonalizing rings larger than
 $L = 12$.
 
-## 1. Exact model and reflection positivity
+## 1. Exact model, frame, and reflection positivity
 
-In the Cartesian spin-1 basis $`\{|x\rangle, |y\rangle, |z\rangle\}`$, define the real, integer
-antisymmetric matrices $G_\alpha = i S^\alpha$ ($S^\alpha = -i G_\alpha$):
+The core `RingModel` is written in the $S^z$ eigenbasis $(|{+1}\rangle, |0\rangle, |{-1}\rangle)$,
+where $`S^\pm = \sqrt{2}\,S_\pm`$ with the integer matrices
+$S_+ = |{+1}\rangle\langle 0| + |0\rangle\langle {-1}|$ (`SP`) and $S_- = S_+^T$ (`SM`). Then
 ```math
-G_x = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{pmatrix}, \qquad
-G_y = \begin{pmatrix} 0 & 0 & -1 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \qquad
-G_z = \begin{pmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.
+h = \mathbf{S} \cdot \mathbf{S} = S^z \otimes S^z + S_+ \otimes S_- + S_- \otimes S_+, \qquad
+o = D (S^z)^2 = D \mathrm{diag}(1, 0, 1),
 ```
-In `model.jl`, `rp_identity` verifies in exact integer arithmetic that $[S^x, S^y] = i S^z$,
-$\sum_\alpha (S^\alpha)^2 = 2I$, that the two-site bond operator
-$h = P - |\Omega\rangle\langle\Omega|$ (where $P$ is the swap and
-$|\Omega\rangle = |xx\rangle + |yy\rangle + |zz\rangle$) equals $\sum_\alpha S^\alpha \otimes S^\alpha$,
-and that
-```math
--h = G_x \otimes G_x + G_y \otimes G_y + G_z \otimes G_z = \sum_{\alpha \in \{x,y,z\}} G_\alpha \otimes \overline{G_\alpha}.
-```
-For any rational $D$, the single-ion anisotropy is the real symmetric on-site operator
-$o = D(S^z)^2 = D\mathrm{diag}(1, 1, 0)$.
+both with exact integer (rational) entries, and the charge $`m \in \{1, 0, -1\}`$ is conserved.
 
-In the normalized $S^z$ eigenbasis $`m \in \{-1, 0, 1\}`$, each allowed nearest-neighbor spin-exchange
-transition $(m_j, m_{j+1}) \mapsto (m_j \pm 1, m_{j+1} \mp 1)$ has unit matrix element $1$, and the
-diagonal is $\sum_{j=1}^L m_j m_{j+1} + D \sum_{j=1}^L m_j^2$. The unit test suite (`test/reviewer.jl`)
-verifies the exact unitary equivalence between the Cartesian and $S^z$ representations, including
-the $L = 2$ convention of retaining both periodic bonds.
+**Frame.** The Lean model uses the Cartesian basis $(|x\rangle, |y\rangle, |z\rangle)$ with
+$`(S^\alpha)_{ab} = -i\varepsilon_{\alpha ab}`$. With
+```math
+W = \begin{pmatrix} -i & 0 & i \\ 1 & 0 & 1 \\ 0 & i & 0 \end{pmatrix}, \qquad
+W^\dagger W = N = \mathrm{diag}(2, 1, 2),
+```
+the matrix $U = W N^{-1/2}$ is unitary and maps the Cartesian frame to the $S^z$ frame:
+`cartesian_frame` checks in exact Gaussian-integer arithmetic that $W^\dagger S^z W = N S^z$,
+$W^\dagger S^\pm W = 2 S_\pm$ and $W^\dagger (S^z)^2 W = N \mathrm{diag}(1, 0, 1)$, i.e.
+$U^\dagger S^z U = S^z$, $U^\dagger S^\pm U = \sqrt{2} S_\pm$ and
+$U^\dagger (S^z)^2 U = \mathrm{diag}(1,0,1)$.
+Hence $U^{\otimes L}$ conjugates the Cartesian ring Hamiltonian into the core one, and the two have
+the same partition functions. `test/frame.jl` also compares the verified spectra with dense
+diagonalization of the Cartesian Hamiltonian for $L \le 6$.
+
+**Reflection positivity.** Let $R = \mathrm{antidiag}(1, -1, 1)$, a real symmetric
+involution commuting with $o$. Then $R S^z R = -S^z$ and $R S_\pm R = -S_\mp$, so
+```math
+-h = S^z \otimes R S^z R + S_+ \otimes R S_+ R + S_- \otimes R S_- R
+= \sum_{C \in \{S^z, S_+, S_-\}} C \otimes R\,\overline{C}\,R,
+```
+the "reflected" RP form of the core (`rp_data`, checked exactly by
+`CertifiedGaps.RingModels.verify_rp`; the exact LDL factorization of the realignment finds the
+same form, while without $R$ the bond is not RP in this basis). In the Cartesian frame this is
+the familiar $-h = \sum_\alpha G_\alpha \otimes G_\alpha$ with $G_\alpha = i S^\alpha$.
 
 ## 2. Symmetry-sector decomposition
 
-Basis product states in the $S^z$ basis are partitioned by total magnetization $q = \sum_j m_j$;
-sectors $q$ and $-q$ are exchanged by global spin flip $m_j \mapsto -m_j$ and have identical
-spectra. Within the $q = 0$ sector, blocks are further labeled by single-site translation momentum
-$k$ and spin-flip parity $p = \pm 1$ (with character $e^{2\pi i k t / L} p^f$), whereas for $q \ne 0$
-translation momentum $k$ alone is used. A group orbit of representative configuration $a$
-contributes to sector $(k, p)$ if and only if the character is trivial on the stabilizer of $a$.
-In the normalized orbit basis, a Hamiltonian transition from representative $a$ to $T^u F^f b$ has
-matrix element
-```math
-h_{ab} \sqrt{\frac{|O_a|}{|O_b|}}\,e^{-2\pi i k u / L}\,p^f.
-```
-Complex conjugation pairs momentum $k$ with $L - k \bmod L$, so each independent block carries
-charge multiplicity $1$ or $2$ and momentum multiplicity $1$ or $2$. Every run asserts that
-$\sum_{\mathrm{blocks}} \mathrm{multiplicity} \times d_{\mathrm{block}} = 3^L$; at $L = 12$, this
-partitions the $531{,}441$ states into $92$ independent blocks of dimension at most $5{,}798$.
-`test/small.jl` verifies all block eigenvalues against full Hilbert-space diagonalization through
-$L = 6$, and `test/symmetry.jl` checks the orbit counts and symmetry covariances through $L = 12$.
+The core `ring_blocks` splits the ring exactly by total charge $q$, by lattice momentum
+$k = 2\pi m/L$ (for this real model only $0 \le m \le L/2$, with multiplicity $2$ for
+$0 < m < L/2$), and uses the spin flip $F = \mathrm{antidiag}(1, 1, 1)$ (`flip`, a charge-
+reversing permutation commuting with $h$ and $o$): the sectors $q$ and $-q$ are built once, and the
+self-conjugate sector $q = 0$ is split by flip parity. At $L = 12$ this gives 92 blocks of
+dimension at most $5{,}798$, the same decomposition as the earlier model-specific code; every run
+checks that the blocks cover all $3^L$ states.
 
 ## 3. Verified eigenvalue enclosures (Stage 1)
 
-Every rational transition amplitude, trigonometric phase, and orbit-ratio square root in a symmetry
-block $H_{\mathrm{block}}$ is evaluated in outward-rounded `IntervalArithmetic`. The `ComplexF64`
-Hermitian midpoint matrix $A$ is formed from the upper triangle, and the maximum row sum of
-entrywise interval radii $|\mathrm{Re}| + |\mathrm{Im}|$ yields an upper bound
-$`c \ge \|H_{\mathrm{block}} - A\|_2`$. Since each Heisenberg bond has eigenvalues in $`\{-2, -1, 1\}`$
-and $`0 \le (S_j^z)^2 \le I`$, $`\|H_{\mathrm{block}}\|_2 \le L(2 + |D|)`$ and hence
-$`\|A\|_2 \le M := L(2 + |D|) + c`$.
+Each block is enclosed by `CertifiedGaps.VerifiedSpectra.verified_eigen`: its interval entries
+(exact couplings times enclosed phases and orbit-norm ratios) give an exactly Hermitian Float64
+center $M$ (real for $m = 0, L/2$) and an exact bound on $\|A - M\|_2$ by the Frobenius norm of
+the entrywise radii. With the LAPACK eigenpairs $(\Lambda, X)$ of $M$, the residual
+$\|MX - X\Lambda\|_2$ and orthogonality $\|X^\dagger X - I\|_2$ are bounded by their computed
+Frobenius norms plus a priori IEEE binary64 rounding bounds ($`\gamma_{N+8}`$ for real blocks,
+$`\gamma_{2N+8}`$ for complex blocks evaluated with four real matrix products, valid for any
+summation order and FMA, with an additive underflow term). The radius is the smaller of the
+Ostrowski and polar-factor Weyl bounds plus the matrix error; every sorted eigenvalue of the
+true block lies within it of the sorted centers. See the docstring of
+`julia/src/VerifiedSpectra.jl` for the inequalities.
 
-Given the approximate dense eigensystem $AQ \approx Q\Lambda$ of an $m \times m$ block, with unit
-roundoff $u = 2^{-53}$ and $\gamma_{8m+32} = (8m + 32)u / (1 - (8m + 32)u)$, the standard IEEE
-binary64 / single-threaded BLAS dot-product rounding model bounds the residual and orthogonality
-errors by
-```math
-\|AQ - Q\Lambda\|_2 \le r := \|\mathrm{fl}(AQ - Q\Lambda)\|_F + \gamma_{8m+32}(\sqrt{m}\,M \|Q\|_F + \|Q\|_F \|\Lambda\|_2) + 10^{-280},
-```
-```math
-\|Q^* Q - I\|_2 \le e := \|\mathrm{fl}(Q^* Q - I)\|_F + \gamma_{8m+32}(\|Q\|_F^2 + \sqrt{m}) + 10^{-280},
-```
-where each floating-point sum of $N$ squared magnitudes is enlarged by $\gamma_{4N+16}$ before
-taking an outward-rounded square root, and $10^{-280}$ covers gradual underflow.
+## 4. Partition functions and Stage-1 seeds
 
-**Polar-factor and Weyl theorem:** Asserting $e < 1$, $Q$ is invertible and its unitary polar
-factor $U = Q(Q^* Q)^{-1/2}$ satisfies $`\|Q - U\|_2 \le d_Q := e / (1 + \sqrt{1 - e})`$. Thus
-$`\|A - U\Lambda U^*\|_2 = \|AU - U\Lambda\|_2 \le r + (M + \|\Lambda\|_2)d_Q`$. By Weyl's
-inequality, each sorted eigenvalue of $`H_{\mathrm{block}}`$ (counting multiplicity) lies within
-```math
-\eta = c + r + (M + \|\Lambda\|_2)\frac{e}{1 + \sqrt{1 - e}}
-```
-of the corresponding sorted diagonal entry of $\Lambda$. Merging and sorting all block centers with
-their multiplicities yields the complete verified spectrum of $H_L$.
-
-## 4. Partition functions and Stage-1 ED seeds
-
-For a complete verified spectrum, $\sum_i \mathrm{mult}_i \cdot \exp(-\beta[\lambda_i - \eta_i, \lambda_i + \eta_i])$
-is summed in outward-rounded interval arithmetic after factoring out an exact binary64 energy shift,
-yielding rigorous intervals for $\log Z_n(\beta)$. The upper endpoints of
-```math
-\varepsilon_{\mathrm{s}} = \mathrm{upper}\,\!\big(1 - \exp(\log Z_{2n}(\beta) - 2\log Z_n(\beta))\big), \qquad
-\varepsilon_\tau = \mathrm{upper}\,\!\big(1 - \exp(\log Z_{2n}(2\beta) - 2\log Z_{2n}(\beta))\big)
-```
-are converted exactly to `Rational{BigInt}` and passed with the rational $\beta_0$ to
-`CertifiedGaps.certified_gap_bound`.
+`seed_bounds` encloses $\log Z_6(\beta_0)$, $\log Z_{12}(\beta_0)$ and $\log Z_{12}(2\beta_0)$ by
+`log_partition_enclosure` (outward-rounded interval sums over every block, each with its radius
+and multiplicity) and rounds the defect enclosures
+$1 - P_{\mathrm{s}}(6, \beta_0) = 1 - e^{\log Z_{12}(\beta_0) - 2\log Z_6(\beta_0)}$ and
+$1 - P_\tau(12, \beta_0) = 1 - e^{\log Z_{12}(2\beta_0) - 2\log Z_{12}(\beta_0)}$ up to the grid
+$10^{-15}$. `certify_gap` then runs the exact rational chain (`rational_gap_chain`) and the
+interval recurrence (`certified_gap_bound`). Both bounds are rigorous; the tables report the
+interval bound and list the chain bound. `certify.jl` writes both spectra with `write_spectrum`
+and pins their SHA-256 in the certificate (`spectrum_sha256`).
 
 ## 5. Spatial transfer squaring and purity coupling without $L = 24$ (Stage 2)
 
@@ -132,7 +115,7 @@ space-and-temperature doubling recurrence `certified_gap_bound`.
 
 Writing $`H_L(D) = H_L(D^*) + \delta D \cdot V`$ with $`V = \sum_{j=1}^L (S_j^z)^2`$ and
 $`0 \le V \le L I`$, centering $`V`$ by $`\frac{L}{2}I`$ gives
-$`\|\delta D (V - \frac{L}{2}I)\|_2 \le \frac{1}{2}L|\delta D|`$. By Weyl's inequality, every ordered
+$\|\delta D (V - \frac{L}{2}I)\|_2 \le \frac{1}{2}L|\delta D|$. By Weyl's inequality, every ordered
 eigenvalue of $`H_L(D) - \frac{L\,\delta D}{2}I`$ lies within $`\frac{1}{2}L|\delta D|`$ of the
 corresponding eigenvalue of $`H_L(D^*)`$, so $\log Z_L(\beta)$ of the shifted Hamiltonian lies within
 $\frac{1}{2}\beta L |\delta D|$ of the reference enclosure at $`D^*`$ (and the constant energy shift
@@ -140,17 +123,11 @@ cancels identically in $`P_{\mathrm{s}}`$ and $`P_\tau`$). For a compact interva
 we replace $`|\delta D|`$ by $`\max_{D \in [D_{\mathrm{lo}}, D_{\mathrm{hi}}]} |D - D^*|`$
 (`transported_logz`).
 
-## 7. Partition tails and finite-ring gap enclosures (Stage 2)
 
-To accelerate repeated $\log Z_{12}$ evaluations in Stage 2, the verifier sums the lowest
-$K = 8{,}192$ sorted levels explicitly in interval arithmetic and bounds the remaining
-$3^{12} - K = 523{,}249$ levels using their certified minimum energy: since every level $i > K$
-satisfies $\lambda_i \ge E_{K+1} - \max_{i > K} r_i$, their shifted Boltzmann sum is enclosed in
-$`[0,\; (3^{12} - K)\exp(-\beta(E_{K+1} - r_{\max} - E_{\mathrm{shift}}))]`$. Because the entire
-531,441-state spectrum is enclosed, this tail bound is completely rigorous.
+## 7. Finite-ring gap enclosures (Stage 2)
 
-Similarly, to enclose a finite-ring spectral gap $\Delta_L = E_1(L) - E_0(L)$, the verifier applies
-the global maximum radius across all blocks to the two lowest sorted eigenvalue centers (plus
-$L|\delta D|$ when transported in $`D`$). At $D = 4$, verified finite-ring gaps at $L = 6, 8, 10$
-(`bridge_certificate`) exceed the $n_0 = 12$ uniform bound $0.899143399$, extending the certificate
-to all even $L \ge 6$.
+Stage 2 sums $\log Z$ over the complete stored spectra (no truncation). The finite-ring gap
+$\Delta_L = E_1(L) - E_0(L)$ is enclosed by the core `spectral_gap_enclosure` (second-smallest
+lower endpoint minus smallest upper endpoint, with multiplicities), widened by $L|\delta D|$ when
+transported in $D$. At $D = 4$, verified finite-ring gaps at $L = 6, 8, 10$ (`bridge_certificate`)
+exceed the $n_0 = 12$ uniform bound, extending that certificate to all even $L \ge 6$.

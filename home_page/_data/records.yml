@@ -302,7 +302,7 @@ records:
     numerical_gap: "1.188631"
     tier: certified
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "2433/100", beta: "6", decimal: "0.5319"}
-    certificate: models/dimerized_heisenberg/results/certificate.json
+    certificate: models/dimerized_heisenberg/results/certificate_delta_1_2_beta_6.json
     date: "2026-10-15"
     pr: 23
     contributors: ['LionSR']
@@ -322,7 +322,7 @@ records:
     numerical_gap: "0.810214"
     tier: certified
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "613/200", beta: "13/2", decimal: "0.1723"}
-    certificate: models/dimerized_heisenberg/results/certificate.json
+    certificate: models/dimerized_heisenberg/results/certificate_delta_3_10_beta_13_2.json
     date: "2026-10-15"
     pr: 23
     contributors: ['LionSR']
@@ -339,7 +339,7 @@ records:
     numerical_gap: "0.707193"
     tier: certified
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "757/500", beta: "29/4", decimal: "0.0572"}
-    certificate: models/dimerized_heisenberg/results/certificate.json
+    certificate: models/dimerized_heisenberg/results/certificate_delta_1_4_beta_29_4.json
     date: "2026-10-15"
     pr: 23
     contributors: ['LionSR']
@@ -369,7 +369,7 @@ records:
     parameter: '$\delta = 7/10$'
     params: {delta: "7/10"}
     lengths: {L0: 4}
-    bound: {value: "1970722683523997/9007199254740992", decimal: "0.218794169839"}
+    bound: {value: "3941427372025601/18014398509481984", decimal: "0.218793170915"}
     seed: {n0: 3, beta0: "17/4", text: 'an odd starting ring is allowed here because the transfer operator of this chain is positive'}
     numerical_gap: "1.2659"
     tier: certified
@@ -377,6 +377,10 @@ records:
     date: "2026-10-12"
     pr: 3
     contributors: ['LionSR']
+    notes: >-
+      Recomputed with the shared verified-spectra pipeline, which has no lattice-reflection
+      reduction yet: its complex 6-cell blocks give eigenvalue radii up to twice those of the
+      former model-specific real blocks, so the bound is 1.0e-6 below the earlier 0.218794169.
   # ---------------------------------------------------------------- spin1-largeD
   - id: spin1-largeD-D-4
     family: spin1-largeD
@@ -452,7 +456,7 @@ records:
     numerical_gap: "3.1375"
     tier: certified
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_4, r: "9033/1000", beta: "2", decimal: "1.1004"}
-    certificate: models/heisenberg_ladder/results/certificate.json
+    certificate: models/heisenberg_ladder/results/certificate_J4.json
     date: "2026-10-12"
     pr: 6
     contributors: ['LionSR']
@@ -468,7 +472,7 @@ records:
     seed: {n0: 4, beta0: "9/4"}
     numerical_gap: "2.6584"
     tier: certified
-    certificate: models/heisenberg_ladder/results/certificate.json
+    certificate: models/heisenberg_ladder/results/certificate_J7_2.json
     date: "2026-10-15"
     pr: 13
     contributors: ['LionSR']
@@ -484,7 +488,7 @@ records:
     seed: {n0: 4, beta0: "5/2"}
     numerical_gap: "2.1864"
     tier: certified
-    certificate: models/heisenberg_ladder/results/certificate.json
+    certificate: models/heisenberg_ladder/results/certificate_J3.json
     date: "2026-10-15"
     pr: 13
     contributors: ['LionSR']
@@ -500,7 +504,7 @@ records:
     seed: {n0: 4, beta0: "3"}
     numerical_gap: "1.7252"
     tier: certified
-    certificate: models/heisenberg_ladder/results/certificate.json
+    certificate: models/heisenberg_ladder/results/certificate_J5_2.json
     date: "2026-10-15"
     pr: 13
     contributors: ['LionSR']
@@ -512,7 +516,7 @@ records:
     bound: {value: "306233/200000000", decimal: "0.001531165"}
     seed: {n0: 4, beta0: "3"}
     tier: certified
-    certificate: models/heisenberg_ladder/results/certificate.json
+    certificate: models/heisenberg_ladder/results/certificate_J163069_65536.json
     date: "2026-10-15"
     pr: 13
     contributors: ['LionSR']
@@ -530,7 +534,7 @@ records:
     numerical_gap: "2.6618"
     tier: certified
     lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "517/200", beta: "3/2", decimal: "0.6331"}
-    certificate: models/two_leg_tfim/results/certificate_g3_1.json.gz
+    certificate: models/two_leg_tfim/results/certificate_g3_1.json
     date: "2026-10-12"
     pr: 1
     contributors: ['LionSR']

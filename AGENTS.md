@@ -135,7 +135,7 @@ result):
 | `README.md` | required; must use the section headings listed below |
 | `IDEAS.md` | required: the route analysis memo written before computing, ending with `## Outcome` |
 | `METHOD.md` | optional: the single detailed method, proof, and audit document (do not create separate `REPORT.md`, `NOTES.md`, etc.) |
-| `Project.toml`, `Manifest.toml` | the Julia package environment |
+| `Project.toml`, `Manifest.toml` | only for a model that needs packages outside the core environment, or whose immutable results pin its own environment (`spin1`, `spin2`, `aklt`, `lean_seeds`); every other model runs in the core environment (see "Environment") |
 | `.gitignore` | local ignores for regenerable data (if any) |
 | `certify.jl` | generates the certificate(s); omitted for a negative result |
 | `check.jl` | verifies the certificate(s): fast rational/hash verification by default, `--full` for the full spectral replay |
@@ -176,10 +176,18 @@ Use Julia 1.12. From the repository root:
 julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 ```
 
-Each model directory is its own Julia project depending on `CertifiedGaps`: run
-`julia --project=models/<slug> -e 'using Pkg; Pkg.develop(path="julia")'` from the root (or use the
-relative path `../../julia` inside the project), or run scripts directly with `--project=julia`. Set
-`OPENBLAS_NUM_THREADS=1` unless multi-threaded BLAS is specifically needed.
+Models share one environment, the core's: run every model script from the repository root with
+`--project=julia` (for example `julia --project=julia models/<slug>/check.jl`). A model does not
+get its own `Project.toml`/`Manifest.toml`; if it needs a package the core lacks, add the
+dependency to the core in a separate commit, or explain in its `README.md` why it cannot share the
+core environment. Set `OPENBLAS_NUM_THREADS=1` unless multi-threaded BLAS is specifically needed.
+
+A gap certificate for a model that is a `RingModel` goes through the shared pipeline:
+`GapCertificates.certify_gap` (exact RP check, `VerifiedSpectra` block spectra with
+`verified_eigen` enclosures, seed defects, exact chain) and `check_certificate` in `check.jl`.
+Symmetry reductions (charge, `flip`, on-site `symmetries`, cell `blocking`), reuse and storage of
+spectra (`seed_bounds(...; spectra)`, `write_spectrum`), and gap enclosures
+(`spectral_gap_enclosure`) are core features; do not reimplement them in a model.
 
 ## Rules
 
@@ -188,7 +196,8 @@ relative path `../../julia` inside the project), or run scripts directly with `-
   separate, minimal commit with unit tests and explain why.
 - **Source hashes:** a checker enforces (fails on mismatch) only **model-local** sources, that is,
   the model's own `src/`, `certify.jl`, `check.jl`, the scripts that produce the certificate, and
-  its `Project.toml`/`Manifest.toml`, recorded in `metadata["source_sha256"]`; if a checker checks
+  its `Project.toml`/`Manifest.toml` if it has its own environment, recorded in
+  `metadata["source_sha256"]`; if a checker checks
   the recorded key set, it compares it with that model-local set only. The shared core
   (`julia/src`, `julia/Project.toml`, `julia/Manifest.toml`) is recorded under
   `metadata["core_sha256"]`, keyed by repository path (`julia/src/Results.jl`), as provenance
@@ -196,8 +205,8 @@ relative path `../../julia` inside the project), or run scripts directly with `-
   `notes/` or `METHOD.md`. Editing or adding core files, notes, or a `METHOD.md` therefore does
   not invalidate a certificate, but checkers rerun the core arithmetic, so any change to
   `julia/src` must keep every model checker and test passing; run them all. Use
-  `Results.model_provenance` to record both hash sets and `Results.verify_source_hashes` to check
-  the model-local set.
+  `Results.model_metadata` to record both hash sets and `Results.verify_model_metadata` (same
+  `dirs` and `files`) to check the model-local set.
 - Never modify `models/spin1/results`, `models/spin2/results`, `models/aklt/results`, or anything under
   `lean/` (except when running `models/lean_seeds/certify.jl` to regenerate the witness files in
   `lean/SeedKernel`).

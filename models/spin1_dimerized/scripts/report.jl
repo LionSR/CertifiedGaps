@@ -1,7 +1,16 @@
 # Rebuilds results/summary.json and the "## Results from completed runs" section of METHOD.md
 # from the scans, the certificates and the regenerated spectra (scripts/scan.jl, all c6 files).
-include(joinpath(dirname(@__DIR__), "src", "common.jl"))
-using Printf
+include(joinpath(dirname(@__DIR__), "src", "DimerizedCertificate.jl"))
+using .DimerizedCertificate, CertifiedGaps.Results, CertifiedGaps.Seeds, JSON3, Printf
+const D = DimerizedCertificate
+const DELTAS, ROOT, ratstr, charge_groups = D.DELTAS, D.ROOT, D.str, D.charge_groups
+"Certificate summary: exact chain bound, interval bound, seed and run time."
+function certificate_entry(cert, gap)
+    bound = parse(Float64, string(cert.gap_lower_bound_decimal))
+    Dict("n0" => cert.seed.n0, "beta0" => cert.seed.beta0, "bound" => bound,
+        "interval_bound" => cert.interval_bound_decimal, "seconds" => cert.seconds,
+        "ratio_to_12_spin_gap_numerical" => bound / gap)
+end
 lower12(x) = let r=Rational{BigInt}(x), d=big(10)^12
     q=fld(numerator(r)*d,denominator(r))
     string(q÷d,".",lpad(string(q%d),12,Char(48)))
@@ -31,9 +40,10 @@ for delta in DELTAS
     spec=JSON3.read(read(joinpath(ROOT,"results","spectrum_d$(tag)_c6.json"),String))
     cp=joinpath(ROOT,"results","certificate_d$tag.json")
     cert=isfile(cp) ? JSON3.read(read(cp,String)) : nothing
-    push!(rows,Dict("delta"=>ratstr(delta),"best_numerical_seed"=>scan.best,"purity_and_energy_scaling"=>scan.summary,"gap_12_spins_numerical"=>spec.gap,"certificate"=>cert===nothing ? nothing : Dict("n0"=>cert.n0,"beta0"=>cert.beta0,"bound"=>cert.bound,"seconds"=>cert.seconds,"ratio_to_12_spin_gap_numerical"=>cert.bound/spec.gap),"extrapolation_numerical_only"=>estimate_next(scan,spec.gap)))
+    push!(rows,Dict("delta"=>ratstr(delta),"best_numerical_seed"=>scan.best,"purity_and_energy_scaling"=>scan.summary,"gap_12_spins_numerical"=>spec.gap,"certificate"=>cert===nothing ? nothing : certificate_entry(cert,spec.gap),"extrapolation_numerical_only"=>estimate_next(scan,spec.gap)))
 end
-metadata=provenance(Dict("purpose"=>"parameter comparison and numerical extrapolation"))
+metadata=model_metadata(ROOT,
+    Dict("purpose"=>"parameter comparison and numerical extrapolation");D.SOURCES...)
 write_result(joinpath(ROOT,"results","summary.json"),Dict("metadata"=>metadata,"parameters"=>rows))
 reportpath=joinpath(ROOT,"METHOD.md")
 base=first(split(read(reportpath,String),"\n## Results from completed runs"))
@@ -51,14 +61,14 @@ open(reportpath,"w") do io
             @printf(io,"| %s | %d | %.2f | %.9f | %.9f | %.9f | %.9f |\n",row["delta"],b.n0,b.beta0,b.epsilon_s,b.epsilon_t,b.bound,row["gap_12_spins_numerical"])
         end
     end
-    println(io,"\nVerified certificates (the 0.9, n=2 result was verified before the larger-ring scan):\n")
+    println(io,"\nVerified certificates (the 0.9, n=2 seed was chosen before the larger-ring scan):\n")
     println(io,"| delta | n | exact beta | certified lower bound | ratio to 12-spin ED gap | verification seconds | validity |")
     println(io,"|---|---:|---:|---:|---:|---:|---|")
     for row in rows
         c=row["certificate"];c===nothing && continue
         @printf(io,"| %s | %d | %s | %s | %.6f | %.2f | even L >= %d cells; N divisible by 4, N >= %d spins |\n",row["delta"],c["n0"],c["beta0"],lower12(c["bound"]),c["ratio_to_12_spin_gap_numerical"],c["seconds"],c["n0"],4cld(c["n0"],2))
     end
-    println(io,"\nThe exact Float64 lower bound is stored also as an exact binary rational in each certificate JSON; these table bounds are rounded down to twelve decimal places.\n")
+    println(io,"\nThe table gives each certificate's exact rational chain bound `gap_lower_bound`; its interval bound `certified_gap_bound` is `interval_bound_decimal` in the certificate (and in README.md). Table bounds are rounded down to twelve decimal places.\n")
     println(io,"| delta | max min purity, n=2 | max min purity, n=3 | E0(4)-2E0(2) | E0(6)-2E0(3) | extrapolated (n,beta), numerical only |")
     println(io,"|---|---:|---:|---:|---:|---|")
     for row in rows

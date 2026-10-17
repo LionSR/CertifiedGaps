@@ -22,9 +22,10 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
    one-cell translation momentum $k$, and global spin flip $p$ commute with $H_L$, decomposing the
    $2^{2n}$-dimensional Hilbert space into orthogonal symmetry blocks whose dimensions and
    multiplicities sum to $2^{2n}$. Enclosing block entries in `IntervalArithmetic` and bounding
-   dense `Float64` eigenvector residuals and orthogonality defects via a two-pass Cauchy–Schwarz
-   $\gamma_{4d+16}$ rounding analysis certifies complete spectra at $n_0 = 2$ and $n_0 = 4$ cells
-   ($8$ and $16$ spins) in a few minutes. **Chosen route for $`\delta \in \{1/2, 3/10, 1/4\}`$.**
+   dense `Float64` eigenvector residuals and orthogonality defects under an a priori binary64
+   rounding analysis (now the core `verified_eigen`) certifies complete spectra at $n_0 = 2$ and
+   $n_0 = 4$ cells ($8$ and $16$ spins) in a few minutes.
+   **Chosen route for $`\delta \in \{1/2, 3/10, 1/4\}`$.**
 3. **Continuous-$`\beta`$ interval exclusion covers:** When a grid scan finds no admissible seed at
    $`n_0 \in \{2, 4\}`$ for weaker dimerizations ($`\delta \in \{1/5, 3/20, 1/10\}`$), we can upgrade
    that numerical observation to a rigorous all-$`\beta`$ exclusion theorem by combining thermal
@@ -34,7 +35,7 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
 4. **Operator-norm perturbation around decoupled dimers ($\delta = 1$):** At $\delta = 1$ ($w = 0$),
    the partition function factors exactly into independent dimers,
    $Z_n^{\mathrm{dimer}}(\beta) = (e^{3\beta s/4} + 3e^{-\beta s/4})^n$. Writing $H_n = H_n^{\mathrm{dimer}} + V_n$
-   with $`\|V_n\| \le \frac{3}{4} n (1 - \delta)`$ and applying Weyl's inequality bounds
+   with $\|V_n\| \le \frac{3}{4} n (1 - \delta)$ and applying Weyl's inequality bounds
    $|\log Z_n - \log Z_n^{\mathrm{dimer}}| \le \frac{3}{4}\beta n (1 - \delta)$ at arbitrary $n$ in
    $O(\log n)$ operations. However, because unlinked norm bounds lose the extensive bulk free-energy
    cancellation between $\log Z_{2n}$ and $2\log Z_n$, the resulting error grows with $n$ and only
@@ -52,17 +53,20 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
 
 ## Outcome
 
-- **Exact RP:** Verified in `Complex{Rational{BigInt}}` across all six $\delta$ values in the
-  reflected singlet/triplet cell basis (`src/rp.jl`, `RingModels.verify_rp`).
-- **Certified positive bounds ($n_0 = 4$ cells):** Complete verified 8- and 16-spin spectra
-  combined with the two-pass Cauchy–Schwarz rounding bound certify $\Delta_L \ge 0.534756$
-  ($\delta = 1/2, \beta_0 = 6$), $\Delta_L \ge 0.173197$ ($\delta = 3/10, \beta_0 = 13/2$), and
-  $\Delta_L \ge 0.058225$ ($\delta = 1/4, \beta_0 = 29/4$) for all even $L \ge 4$ cells.
+- **Exact RP:** Verified with `RingModels.verify_rp` at all six $\delta$ values in the reflected
+  form with the cell swap, in the sublattice-rotated frame where the cell charge $z_a - z_b$ is
+  conserved (and, as an audit, in the conjugate singlet/triplet form, `src/rp.jl`).
+- **Certified positive bounds ($n_0 = 4$ cells):** Route 2, now run entirely by the shared core
+  (`verified_ring_spectrum` by charge, momentum, and charge flip; `certify_gap`), certifies
+  $\Delta_L \ge 0.534794$ ($\delta = 1/2, \beta_0 = 6$), $\Delta_L \ge 0.173204$
+  ($\delta = 3/10, \beta_0 = 13/2$), and $\Delta_L \ge 0.058232$ ($\delta = 1/4, \beta_0 = 29/4$) for
+  all even $L \ge 4$ cells (interval bound; the exact rational chain gives
+  $0.534267, 0.173082, 0.058177$).
 - **Rigorous all-$`\beta`$ exclusions ($n_0 = 2, 4$ cells):** Continuous-$`\beta`$ interval covers
   prove that no $\beta_0 > 0$ yields an admissible seed for this recurrence at $n_0 = 2$ (for any of
   the six $\delta$ values) or at $n_0 = 4$ for $`\delta \in \{1/5, 3/20, 1/10\}`$, establishing
   $\delta = 1/4$ as the exact certifiability threshold on rings of at most 16 spins.
-- **Beyond-ED and 20-spin diagnostics:** The arbitrary-$`n`$ dimer perturbation bound certifies a
+- **Beyond-ED and 20-spin diagnostics:** The arbitrary-$n$ dimer perturbation bound certifies a
   512-spin seed at $\delta = 0.999999$ in the unit tests while quantifying why unlinked norm bounds
   fail at $\delta \le 1/2$. The 20-spin Krylov diagnostics identify a numerical odd-seed candidate
   at $(\delta, n_0, \beta_0) = (1/5, 5, 8.5)$ and confirm that the next even seeds for

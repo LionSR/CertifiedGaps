@@ -1,7 +1,7 @@
-# Symmetry sectors of the dimerised ring: exact orbit enumeration under cell translations and,
-# at half filling, global spin flip. `group_orbits` is shared by the verified enclosures
-# (verified_spectra.jl); `dense_spectrum` is the plain Float64 solver behind the numerical scan
-# and its eigenvalues are NOT certified.
+# Symmetry sectors of the dimerized ring for the Float64 diagnostics: exact orbit enumeration
+# under cell translations and, at half filling, global spin flip. `dense_spectrum` is the plain
+# Float64 solver behind the numerical scans; its eigenvalues are NOT certified (the certificates
+# use the core verified spectra).
 using CertifiedGaps, LinearAlgebra
 using CertifiedGaps.ExactDiagonalization
 BLAS.set_num_threads(1)

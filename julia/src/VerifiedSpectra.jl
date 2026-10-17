@@ -14,20 +14,29 @@ into a guarantee:
   (|fl(Σ aᵢbᵢ) − Σ aᵢbᵢ| ≤ γ_K Σ|aᵢbᵢ|, valid for any summation order and with FMA);
 * Weyl: B = X†MX = Λ + GΛ + X†R, so |λᵢ(B) − Λᵢ| ≤ ‖G‖‖Λ‖ + ‖X‖‖R‖ (sorted eigenvalues);
 * Ostrowski: λᵢ(B) = θᵢ λᵢ(M) with θᵢ ∈ [1 − ‖G‖, 1 + ‖G‖];
+* or the polar factor U of X = UP: ‖X − U‖ ≤ ‖G‖/(1 + √(1 − ‖G‖)), and Weyl for
+  U†MU = Λ + U†(MU − UΛ); the smaller of the two radii is kept;
 * Weyl again for the distance between M and the true block.
 
 Hence every true eigenvalue lies within one radius r of the sorted computed values. No
 inequality rests on an unverified floating-point result. Scalar bounds are exact rationals.
+
+`verified_eigen` (and its short form `enclose_hermitian`) is the enclosure step shared by every
+model. A model with its own exact symmetry reduction (spin flip, reflection, leg exchange, …)
+builds the Float64 center of each block and an exact bound on its distance to the true block
+and passes both here; `ring_blocks` is the generic charge-and-momentum reduction.
 """
 module VerifiedSpectra
 
 using LinearAlgebra, IntervalArithmetic
-using ..ExactArithmetic: RationalBig
-using ..RingModels: RingModel, isreal_model, _reduce
+using ..ExactArithmetic: RationalBig, parse_rational
+using ..Results: write_result, read_result
+using ..RingModels: RingModel, isreal_model, _reduce, _monomial
 using ..Recurrence: to_interval
 
-export BlockSpectrum, enclose_hermitian, ring_blocks, verified_ring_spectrum,
-    log_partition_enclosure, spectrum_summary
+export BlockSpectrum, verified_eigen, enclose_hermitian, ring_blocks, verified_ring_spectrum,
+    shifted_log_partition, log_partition_enclosure, ground_energy_enclosure,
+    spectral_gap_enclosure, write_spectrum, read_spectrum, spectrum_summary
 
 const UNIT = big(1) // big(2)^53                 # unit roundoff of binary64
 const TINY = big(1) // big(2)^1021              # covers gradual underflow or flush-to-zero
@@ -55,19 +64,23 @@ function _fnorm(A::AbstractArray{Float64})
     return _sqrt_up(RationalBig(s) / (1 - _gamma(n + 1)) + n * TINY)
 end
 _sqrt_up(q::RationalBig) = RationalBig(sup(sqrt(interval(BigFloat, q))))
+_sqrt_down(q::RationalBig) = RationalBig(inf(sqrt(interval(BigFloat, q))))
 
 """
-    enclose_hermitian(M; matrix_error = 0) -> (centers, radius)
+    verified_eigen(M; matrix_error = 0) -> (; values, radius, residual, orthogonality, matrix_error)
 
-Sorted eigenvalue approximations of the Hermitian Float64 matrix `M` (real or complex) and an
-exact rational `radius` such that the sorted eigenvalues of every Hermitian A with
-‖A − M‖₂ ≤ `matrix_error` lie within `radius` of `centers`, index by index.
+Sorted eigenvalue approximations `values` of the exactly Hermitian Float64 matrix `M` (real or
+complex) and an exact rational `radius` such that the sorted eigenvalues of every Hermitian A
+with ‖A − M‖₂ ≤ `matrix_error` lie within `radius` of `values`, index by index. `residual` and
+`orthogonality` are the exact upper bounds on ‖MX − XΛ‖₂ and ‖X†X − I‖₂ for the computed
+eigenvectors X; `matrix_error` is returned as an exact rational.
 """
-function enclose_hermitian(M::Matrix{T}; matrix_error = 0) where {T<:Union{Float64,ComplexF64}}
+function verified_eigen(M::Matrix{T}; matrix_error = 0) where {T<:Union{Float64,ComplexF64}}
+    ishermitian(M) || throw(ArgumentError("the block center is not exactly Hermitian"))
     N = size(M, 1)
     F = eigen(Hermitian(M))
     Λ, X = F.values, F.vectors
-    @assert all(isfinite, Λ) && all(isfinite, X)
+    @assert all(isfinite, Λ) && all(isfinite, X) && issorted(Λ)
     K = N + 8                                     # roundings along any dependency path
     if T === Float64
         R = M * X - X .* transpose(Λ)
@@ -92,9 +105,25 @@ function enclose_hermitian(M::Matrix{T}; matrix_error = 0) where {T<:Union{Float
         η = _fnorm(Gr) + _fnorm(Gi) + γ * (2 * (nXr^2 + nXi^2) + N) + 2N * (2N + 8) * TINY
     end
     η < 1 // 4 || error("eigenvectors far from orthonormal (‖X†X − I‖ ≤ $(Float64(η)))")
-    # |λᵢ(M) − Λᵢ| ≤ (‖G‖ max|Λ| + ‖X‖ ‖R‖ + ‖G‖ |Λᵢ|)/(1 − ‖G‖), with ‖X‖ ≤ 1 + ‖G‖.
-    radius = (2η * λmax + (1 + η) * r) / (1 - η) + RationalBig(matrix_error)
-    return sort(Λ), radius
+    # Ostrowski: |λᵢ(M) − Λᵢ| ≤ (‖G‖ max|Λ| + ‖X‖ ‖R‖ + ‖G‖ |Λᵢ|)/(1 − ‖G‖), ‖X‖ ≤ 1 + ‖G‖.
+    ostrowski = (2η * λmax + (1 + η) * r) / (1 - η)
+    # Polar factor: the singular values of X lie in [√(1 − η), √(1 + η)], so ‖X − U‖ ≤ p. Then
+    # U†MU − Λ = U†(MU − UΛ) is Hermitian with norm ≤ r + (‖M‖ + max|Λ|) p, and the first
+    # bound gives ‖M‖ ≤ max|Λ| + `ostrowski`. This roughly halves the orthogonality term.
+    p = η / (1 + _sqrt_down(1 - η))
+    polar = r + (2λmax + ostrowski) * p
+    return (; values = Λ, radius = min(ostrowski, polar) + RationalBig(matrix_error),
+        residual = r, orthogonality = η, matrix_error = RationalBig(matrix_error))
+end
+
+"""
+    enclose_hermitian(M; matrix_error = 0) -> (centers, radius)
+
+The sorted `values` and the `radius` of `verified_eigen(M; matrix_error)`.
+"""
+function enclose_hermitian(M::Matrix{<:Union{Float64,ComplexF64}}; matrix_error = 0)
+    e = verified_eigen(M; matrix_error)
+    return e.values, e.radius
 end
 
 # State codes: digit of site x (0-based) is (code ÷ d^x) % d. The translation T moves the
@@ -104,11 +133,22 @@ _translate(code, d, top) = (code % top) * d + code ÷ top
 """
     ring_blocks(f, model, L)
 
-Exact charge-sector and momentum decomposition of the ring of L sites. For each block it calls
+Exact symmetry decomposition of the ring of L sites into charge sectors, lattice momenta and the
+parities of the model's on-site Z₂ `symmetries`. For each block it calls
 `f(M, matrix_error, multiplicity, label)` with the Float64 center `M` of the interval block
 matrix and an exact bound `matrix_error` on ‖A − M‖₂ for the true block A. Blocks are built
 one at a time, so only one is in memory. For a real model the momenta ±k have the same
 spectrum (A₋ₖ = conj Aₖ), so only 0 ≤ m ≤ L/2 is built, with multiplicity 2 for 0 < m < L/2.
+For a model with a charge `flip`, the sectors q and −q have the same spectrum, so only one of
+them is built (the one with the smaller |q|, else q > 0), with doubled multiplicity; a sector
+with q ≡ −q is split by the parity of F^{⊗L} when the flip is a signed permutation commuting
+with the symmetries.
+
+The basis of a block is the symmetrized orbit states P_χ|r⟩ of the abelian group generated by
+the translation T and the global parities G^{⊗L}, all acting on product states as signed
+permutations. P_χ U_γ = χ(γ) P_χ, so if H r = Σ c_s |s⟩ with |s⟩ = σ U_γ |r_s⟩, then
+⟨s̃|H|r̃⟩ = √(o_r/o_s) Σ c_s σ χ(γ), with o the orbit sizes; r contributes to the block of
+character χ exactly when χ(δ) = σ for every element U_δ r = σ r of its stabilizer.
 """
 function ring_blocks(f, model::RingModel, L::Integer)
     L >= 2 || throw(ArgumentError("a ring needs L ≥ 2"))
@@ -127,42 +167,82 @@ function ring_blocks(f, model::RingModel, L::Integer)
     end
     real_model = isreal_model(model)
     momenta = real_model ? (0:(L÷2)) : (0:(L-1))
+    symmetries = [_monomial(G) for G in model.symmetries]
+    flip = model.flip === nothing ? nothing : _monomial(model.flip)
+    # The flip parity needs F^{⊗L} to be an involutive signed permutation in the abelian group.
+    flip_parity = flip !== nothing && model.flip * model.flip == I &&
+                  all(model.flip * G == G * model.flip for G in model.symmetries)
     total = 0
     for q in sort!(collect(keys(codes_by_charge)))
-        table = _sector_table(model, L, codes_by_charge[q], n, top)
-        for m in momenta
-            built = _momentum_block(table, L, m, real_model)
+        partner = _reduce(model, -q)
+        pair = model.flip === nothing || partner == q ? 1 : 2
+        # Of q and −q, build the one with the smaller |q|, and q > 0 over −q.
+        pair == 2 && (abs(partner), -partner) < (abs(q), -q) && continue
+        maps = flip_parity && partner == q ? [symmetries; [flip]] : symmetries
+        table = _sector_table(model, L, codes_by_charge[q], top, maps)
+        for m in momenta, parities in Iterators.product(fill((1, -1), length(maps))...)
+            built = _momentum_block(table, L, m, collect(Int, parities), real_model)
             built === nothing && continue
             M, ε = built
-            mult = real_model && 0 < 2m < L ? 2 : 1
+            mult = pair * (real_model && 0 < 2m < L ? 2 : 1)
             total += size(M, 1) * mult
-            f(M, ε, mult, Dict{String,Any}("charge" => q, "momentum" => m,
-                "dimension" => size(M, 1)))
+            label = Dict{String,Any}("charge" => q, "momentum" => m, "dimension" => size(M, 1))
+            isempty(symmetries) || (label["parities"] = collect(parities[1:length(symmetries)]))
+            length(maps) > length(symmetries) && (label["flip_parity"] = last(parities))
+            f(M, ε, mult, label)
         end
     end
     total == n || error("blocks cover $total of $n states")
     return nothing
 end
 
-# Orbit representatives of one sector and the exact action of H on them: for representative
-# r, the coefficients c with H r = Σ c · T^l s over representatives s and shifts l.
-function _sector_table(model::RingModel, L, codes, n, top)
+# A global signed permutation ⊗ G (from `_monomial`) applied to a state code: (code′, sign)
+# with G^{⊗L}|code⟩ = sign |code′⟩.
+function _apply(code, (perm, sign), d, L, powers)
+    out, σ, c = 0, 1, code
+    for x in 1:L
+        a = c % d + 1
+        c ÷= d
+        out += perm[a] * powers[x]
+        σ *= sign[a]
+    end
+    return out, σ
+end
+
+# Orbit representatives of one sector under the group generated by T and the global signed
+# permutations `maps` (bit j of g is the j-th map), and the exact action of H on them: for
+# representative r, the coefficients c σ with H r = Σ c |s⟩ and |s⟩ = σ T^l G^g |r_s⟩, keyed
+# by (index of r_s, l, g). Each representative carries its orbit size and the generators
+# (l, g, σ) of its stabilizer, T^l G^g r = σ r, found as the cycles of the breadth-first search.
+function _sector_table(model::RingModel, L, codes, top, maps)
     d = model.d
-    rep = Dict{Int,Tuple{Int,Int}}()             # code => (representative index, shift l)
-    reps, periods = Int[], Int[]
-    for code in codes
+    powers = [d^x for x in 0:(L-1)]
+    rep = Dict{Int,NTuple{4,Int}}()              # code => (representative index, l, g, σ)
+    reps, sizes, stabilizers = Int[], Int[], Vector{Vector{NTuple{3,Int}}}()
+    for code in codes                            # ascending, so each representative is minimal
         haskey(rep, code) && continue
-        orbit = [code]
-        while (next = _translate(orbit[end], d, top)) != code
-            push!(orbit, next)
+        push!(reps, code)
+        k = length(reps)
+        rep[code] = (k, 0, 0, 1)
+        queue, stabilizer, size = [code], Set{NTuple{3,Int}}(), 1
+        while !isempty(queue)
+            s = pop!(queue)
+            _, l, g, σ = rep[s]
+            for j in 0:length(maps)
+                t, τ = j == 0 ? (_translate(s, d, top), 1) : _apply(s, maps[j], d, L, powers)
+                l2, g2, σ2 = j == 0 ? mod(l + 1, L) : l, j == 0 ? g : g ⊻ (1 << (j - 1)), τ * σ
+                if haskey(rep, t)
+                    _, l3, g3, σ3 = rep[t]
+                    push!(stabilizer, (mod(l3 - l2, L), g3 ⊻ g2, σ3 * σ2))
+                else
+                    rep[t] = (k, l2, g2, σ2)
+                    push!(queue, t)
+                    size += 1
+                end
+            end
         end
-        t = argmin(orbit) - 1                    # T^t code = representative
-        p = length(orbit)
-        push!(reps, orbit[t+1])
-        push!(periods, p)
-        for (j, s) in enumerate(orbit)
-            rep[s] = (length(reps), mod(j - 1 - t, p))
-        end
+        push!(sizes, size)
+        push!(stabilizers, collect(stabilizer))
     end
     T = isreal_model(model) ? Rational{Int} : Complex{Rational{Int}}
     convert_entry(x) = T === Rational{Int} ? Rational{Int}(real(x)) :
@@ -172,39 +252,50 @@ function _sector_table(model::RingModel, L, codes, n, top)
     site_cols = [[(i, convert_entry(model.onsite[i, j])) for i in 1:d
                   if !iszero(model.onsite[i, j])]
                  for j in 1:d]
-    powers = [d^x for x in 0:(L-1)]
-    columns = Vector{Dict{Tuple{Int,Int},T}}(undef, length(reps))
+    columns = Vector{Dict{NTuple{3,Int},T}}(undef, length(reps))
     for (k, r) in enumerate(reps)
-        column = Dict{Tuple{Int,Int},T}()
+        column = Dict{NTuple{3,Int},T}()
         digit(x) = (r ÷ powers[x+1]) % d
+        function add!(s, c)
+            index, l, g, σ = rep[s]
+            column[(index, l, g)] = get(column, (index, l, g), zero(T)) + σ * c
+        end
         for x in 0:(L-1)
             y = (x + 1) % L
             a, b = digit(x), digit(y)
             for (i, c) in bond_cols[a*d+b+1]
                 a2, b2 = divrem(i - 1, d)
-                s = r + (a2 - a) * powers[x+1] + (b2 - b) * powers[y+1]
-                key = rep[s]
-                column[key] = get(column, key, zero(T)) + c
+                add!(r + (a2 - a) * powers[x+1] + (b2 - b) * powers[y+1], c)
             end
             for (i, c) in site_cols[a+1]
-                s = r + (i - 1 - a) * powers[x+1]
-                key = rep[s]
-                column[key] = get(column, key, zero(T)) + c
+                add!(r + (i - 1 - a) * powers[x+1], c)
             end
         end
         columns[k] = column
     end
-    return (; periods, columns)
+    return (; sizes, stabilizers, columns)
 end
 
 const _CI = Complex{Interval{Float64}}
 
-# Interval block at momentum k = 2πm/L, then its center and an exact bound on ‖A − M‖_F:
-#     ⟨s,k|H|r,k⟩ = √(p_r/p_s) Σ_l c(r → T^l s) e^{ikl}.
-function _momentum_block(table, L, m, real_model)
-    allowed = findall(p -> (m * p) % L == 0, table.periods)
+# Product of the parities selected by the bits of g.
+_parity(parities, g) = prod((parities[j] for j in eachindex(parities) if isodd(g >> (j - 1)));
+    init = 1)
+
+# Exact test of χ(l, g) = σ for the character χ(l, g) = e^{2πiml/L} · parity(g).
+function _character_is(σ, L, m, parities, l, g)
+    ε = σ * _parity(parities, g)                 # needs e^{2πiml/L} = ε ∈ {±1}
+    return ε == 1 ? (m * l) % L == 0 : (2m * l) % L == 0 && (m * l) % L != 0
+end
+
+# Interval block at momentum k = 2πm/L and the given parities, then its center and an exact
+# bound on ‖A − M‖_F:  ⟨s̃|H|r̃⟩ = √(o_r/o_s) Σ c σ e^{ikl} parity(g)  (see `ring_blocks`).
+function _momentum_block(table, L, m, parities, real_model)
+    allowed = findall(eachindex(table.sizes)) do r
+        all(_character_is(σ, L, m, parities, l, g) for (l, g, σ) in table.stabilizers[r])
+    end
     isempty(allowed) && return nothing
-    index = zeros(Int, length(table.periods))
+    index = zeros(Int, length(table.sizes))
     index[allowed] = 1:length(allowed)
     N = length(allowed)
     realblock = real_model && (2m) % L == 0
@@ -219,14 +310,14 @@ function _momentum_block(table, L, m, real_model)
     err2 = interval(0.0)
     for (j, r) in enumerate(allowed)
         entries = Dict{Int,_CI}()
-        for ((s, l), c) in table.columns[r]
+        for ((s, l, g), c) in table.columns[r]
             i = index[s]
             (i == 0 || i > j) && continue          # upper triangle, allowed states only
-            ratio = get!(ratios, (table.periods[r], table.periods[s])) do
-                sqrt(interval(Float64, table.periods[r]) / interval(Float64, table.periods[s]))
+            ratio = get!(ratios, (table.sizes[r], table.sizes[s])) do
+                sqrt(interval(Float64, table.sizes[r]) / interval(Float64, table.sizes[s]))
             end
             entries[i] = get(entries, i, complex(interval(0.0), interval(0.0))) +
-                         enclose(c) * phases[l+1] * ratio
+                         _parity(parities, g) * enclose(c) * phases[l+1] * ratio
         end
         for (i, v) in entries
             re = mid(real(v))
@@ -263,22 +354,104 @@ function verified_ring_spectrum(model::RingModel, L::Integer; progress = false)
     return out
 end
 
-"""
-    log_partition_enclosure(spectrum, β) -> Interval{Float64}
+_interval(x::Interval) = x
+_interval(x::Float64) = interval(x)
+_interval(x) = to_interval(x)
 
-Enclosure of log Z(β) = log Σ e^{−βλ} over a verified spectrum, for exact β > 0.
 """
-function log_partition_enclosure(spectrum::AbstractVector{BlockSpectrum}, β)
-    b = to_interval(β)
-    @assert inf(b) > 0
-    shift = minimum(minimum(s.centers) for s in spectrum)
+    shifted_log_partition(spectrum, β, shift) -> Interval{Float64}
+
+Enclosure of log Σ e^{−β(λ − shift)} over a verified spectrum (multiplicities included), for β ≥ 0
+exact or an `Interval` and an exact `shift`. Without the −β·shift term, two rings combined with
+one exact shift difference keep a narrow enclosure over a whole β interval.
+"""
+function shifted_log_partition(spectrum::AbstractVector{BlockSpectrum}, β, shift)
+    b, s0 = _interval(β), _interval(shift)
+    inf(b) >= 0 || throw(ArgumentError("β must be nonnegative"))
     total = interval(0.0)
     for s in spectrum
-        part = sum(exp(-b * (interval(c) - interval(shift))) for c in s.centers)
+        part = sum(exp(-b * (interval(c) - s0)) for c in s.centers)
         r = sup(to_interval(s.radius))
         total += s.multiplicity * part * exp(b * interval(-r, r))
     end
-    return log(total) - b * interval(shift)
+    return log(total)
+end
+
+"""
+    log_partition_enclosure(spectrum, β) -> Interval{Float64}
+
+Enclosure of log Z(β) = log Σ e^{−βλ} over a verified spectrum, for β ≥ 0 exact or an
+`Interval`.
+"""
+function log_partition_enclosure(spectrum::AbstractVector{BlockSpectrum}, β)
+    shift = minimum(minimum(s.centers) for s in spectrum)
+    return shifted_log_partition(spectrum, β, shift) - _interval(β) * interval(shift)
+end
+
+# The two smallest eigenvalue balls of the ring, as (lower, upper) endpoint lists with
+# multiplicity: every true eigenvalue lies in its ball, so the k-th smallest eigenvalue lies
+# between the k-th smallest lower endpoint and the k-th smallest upper endpoint.
+function _lowest_two(spectrum)
+    lo, hi = RationalBig[], RationalBig[]
+    for s in spectrum, c in s.centers[1:min(2, end)], _ in 1:min(2, s.multiplicity)
+        push!(lo, RationalBig(c) - s.radius)
+        push!(hi, RationalBig(c) + s.radius)
+    end
+    length(lo) >= 2 || throw(ArgumentError("the spectrum has fewer than two eigenvalues"))
+    return partialsort!(lo, 1:2), partialsort!(hi, 1:2)
+end
+
+"""
+    ground_energy_enclosure(spectrum) -> (lower, upper)
+
+Exact rational bounds lower ≤ E₀ ≤ upper on the ground energy of a verified spectrum.
+"""
+function ground_energy_enclosure(spectrum::AbstractVector{BlockSpectrum})
+    lo, hi = _lowest_two(spectrum)
+    return lo[1], hi[1]
+end
+
+"""
+    spectral_gap_enclosure(spectrum) -> (lower, upper)
+
+Exact rational bounds lower ≤ E₁ − E₀ ≤ upper on the gap of a verified spectrum (E₁ is the second
+eigenvalue counted with multiplicity, so a degenerate ground state has gap 0). `lower` is
+clamped at 0; `lower > 0` proves a unique ground state.
+"""
+function spectral_gap_enclosure(spectrum::AbstractVector{BlockSpectrum})
+    lo, hi = _lowest_two(spectrum)
+    return max(lo[2] - hi[1], zero(RationalBig)), hi[2] - lo[1]
+end
+
+const SPECTRUM_FORMAT = "CertifiedGaps verified spectrum v1"
+
+"""
+    write_spectrum(path, spectrum) -> path
+
+Store a verified spectrum losslessly (`.json` or `.json.gz` via `Results.write_result`): exact
+radii, multiplicities, labels, and every center as its shortest round-trip decimal. The output
+is deterministic, so its SHA-256 can pin the spectrum in a later certificate. The file is read
+back and compared before returning.
+"""
+function write_spectrum(path, spectrum::AbstractVector{BlockSpectrum})
+    blocks = [Dict{String,Any}("centers" => string.(s.centers), "radius" => string(s.radius),
+        "multiplicity" => s.multiplicity, "label" => s.label) for s in spectrum]
+    write_result(path, Dict{String,Any}("format" => SPECTRUM_FORMAT, "blocks" => blocks);
+        compact = true)
+    back = read_spectrum(path)
+    all(a.centers == b.centers && a.radius == b.radius && a.multiplicity == b.multiplicity
+        for (a, b) in zip(back, spectrum)) && length(back) == length(spectrum) ||
+        error("$path does not read back as the spectrum written")
+    return path
+end
+
+"Inverse of `write_spectrum`."
+function read_spectrum(path)
+    data = read_result(path; exact = false)
+    data["format"] == SPECTRUM_FORMAT || error("$path is not a verified spectrum file")
+    return [BlockSpectrum(parse.(Float64, b["centers"]), parse_rational(b["radius"]),
+        Int(b["multiplicity"]), Dict{String,Any}(String(k) => copy(v) for (k, v) in b["label"]))
+            for b in data["blocks"]]
 end
 
 "JSON-ready summary of a verified spectrum (block labels, sizes, radii; no eigenvalues)."

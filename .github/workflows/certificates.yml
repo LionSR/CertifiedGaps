@@ -100,9 +100,19 @@ jobs:
         if: matrix.model == 'spin1'
         run: julia tools/fetch_upstream.jl
 
-      # Each model's Manifest develops the core package from ../../julia, inside this checkout.
-      - name: Instantiate the model environment
-        run: julia --project=models/${{ matrix.model }} -e 'using Pkg; Pkg.instantiate()'
+      # Models run in the core environment (julia/), except the few with their own Project.toml
+      # (AGENTS.md, "Environment"), whose Manifest develops the core from ../../julia.
+      - name: Choose the environment
+        env:
+          MODEL: ${{ matrix.model }}
+        run: |
+          if [ -f "models/$MODEL/Project.toml" ]; then project="models/$MODEL"; else project=julia; fi
+          echo "PROJECT=$project" >> "$GITHUB_ENV"
+
+      - name: Instantiate the environment
+        run: julia --project="$PROJECT" -e 'using Pkg; Pkg.instantiate()'
 
       - name: Run the checker
-        run: julia --project=models/${{ matrix.model }} models/${{ matrix.model }}/check.jl
+        env:
+          MODEL: ${{ matrix.model }}
+        run: julia --project="$PROJECT" "models/$MODEL/check.jl"

@@ -121,27 +121,21 @@
             "bound": 0.6947548159052186
         }
     ],
-    "source_hashes": {
-        "scripts/refine_beta.jl": "d44bb18134d0702a89e2a460a2b9e24c18d23b326e6251375814f1b3fd5d2f3e",
-        "scripts/report.jl": "f22ef5b0a89a3812ae276f8ef4255407df8e66b123a506b3a0259fcbb2d77bf7",
-        "model.jl": "4a62656ff09af98e51ace9502f36e48a492f067ab8df384cc0f45fa3859ee472",
-        "scripts/scan.jl": "9c8f048975c47ce3682cb1a0f9bda384e46c8f3b4896487a7bde495274b1659c"
-    },
-    "certificate_sha256": "eba7965f79dc5fea1ec51a37b63af617f55085a87881cb0b12584a85e4a21847",
+    "certificate_sha256": "adf2d9e8618d01d493e490c7f824cbdcf52fd03feec939d7b6c5deec1ff39cc5",
     "certified": [
         {
             "gap_L12_interval": [
-                "6959497159391323//4503599627370496",
-                "6959581864941733//4503599627370496"
+                "3479763093677219//2251799813685248",
+                "3479776418489213//2251799813685248"
             ],
             "ratio_interval": [
-                "2989111042233749//4611686018427387904",
-                "5978294846705997//9223372036854775808"
+                "2717831244700525//2305843009213693952",
+                "169865103243781//144115188075855872"
             ],
             "status": "certified numerator and finite L=12 denominator interval",
-            "id": "transport-threshold-D1603//500",
+            "id": "transport-D1603//500",
             "D": 3.2059998,
-            "bound": "2309592850505369//2305843009213693952",
+            "bound": "8399898620885147//4611686018427387904",
             "D_interval": [
                 "16029999//5000000",
                 "1603//500"
@@ -149,22 +143,88 @@
         },
         {
             "gap_L12_interval": [
-                "5110348914742333//2251799813685248",
-                "5110385540067043//2251799813685248"
+                "5110365706681183//2251799813685248",
+                "5110368748128161//2251799813685248"
             ],
             "ratio_interval": [
-                "892143781187823//2251799813685248",
-                "892150175086991//2251799813685248"
+                "1784846437123839//4503599627370496",
+                "3569694998759353//9007199254740992"
             ],
             "status": "certified numerator and finite L=12 denominator interval",
             "id": "space-lift-1-D4//1",
             "D": 4,
-            "bound": "8098763755702597//9007199254740992",
+            "bound": "8101273831760347//9007199254740992",
             "D_interval": [
                 "4//1",
                 "4//1"
             ]
         }
     ],
-    "denominator": "finite-ring Delta_12; no thermodynamic gap asserted"
+    "denominator": "finite-ring Delta_12; no thermodynamic gap asserted",
+    "metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "numerical, not certified",
+        "config": {
+            "scanned_D": [
+                "1//1",
+                "5//4",
+                "3//2",
+                "7//4",
+                "2//1",
+                "9//4",
+                "5//2",
+                "11//4",
+                "3//1",
+                "641//200",
+                "1603//500",
+                "13//4",
+                "7//2",
+                "15//4",
+                "4//1"
+            ],
+            "certified_only": true
+        },
+        "created_utc": "2026-10-17T04:05:34.931",
+        "certified": false,
+        "source_sha256": {
+            "models/spin1_largeD/src/model.jl": "98fc4878fd7d1e13ac6d5ec913c74e49b87e1bb4d56d4da419f89278cbb90f98",
+            "models/spin1_largeD/scripts/refine_beta.jl": "af1e8d3b1c32d1e6edefb97cce24dc2b968e8077b5bdb64331820e27771f1973",
+            "models/spin1_largeD/scripts/report.jl": "b501626ccfc4959620bc0e24311c37c04903e2f5e914117fc4a20e46ad94eafe",
+            "models/spin1_largeD/scripts/scan.jl": "e5ea642a3e0259b5d51a9147eb8ead4f1cc4c25b16a30ad4f5ca3a38b036f91c"
+        },
+        "core_sha256": {
+            "julia/src/ExactDiagonalization.jl": "d9af3857fcbd6da1ff3ee27d01c3dfe427769d664fd718a6b075e2fa6947e52b",
+            "julia/src/ReflectionPositivity.jl": "e8d5d3446f680f377bed27d0d9ba44dda8182b7c3055165b9b61701fe736040c",
+            "julia/src/Recurrence.jl": "2dc12e517f9739e2064f5de119510c52caa0a2cfba53d0eb8b5d6c85e02f9729",
+            "julia/src/RingModels.jl": "89bb0e9c8a13432c2034fcb1e7538dd3f833ca6730516a50a6e4890a5b25e611",
+            "julia/src/Seeds.jl": "55e81986e9784999a32028a26c1665258d8c3bd46c489f81f5471d9c790e21f0",
+            "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
+            "julia/src/VerifiedSpectra.jl": "472e90f1009511df8d2a0083b6d5a666bf419dc5a04c20cf1d1e5a672f63b641",
+            "julia/src/CertifiedMPO/GaugeSearch.jl": "96d9fcdcf031b5b84c502a7582ae5715022752276d3385db724143477b2eb4f5",
+            "julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
+            "julia/src/CertifiedMPO/SchattenBridge.jl": "2300c4f86790906274adf9d50ac8bd43a7ef1ccbfc49e4a9aaafbbe2addc290f",
+            "julia/src/recurrence/rational.jl": "2200190e83ddfca094cdbf41b0c959c4254c9244b361fc0ee647b1a7ea2a49f7",
+            "julia/src/CertifiedMPO/AdjointTrace.jl": "38f76a39b09196e1b1cd3d5fc754945e998c2b570d3ae277bd57765396908892",
+            "julia/src/CertifiedMPO/Norms.jl": "6aa188bc7a1725a51e7dd0806b7f0565ac434e5bfc6aba84e5dfdce73d749f8d",
+            "julia/src/CertifiedMPO/MPOAlgebra.jl": "e6da21eb0db582018d480677a4e8cb85e501277259c79d6035cea60f5c58811d",
+            "julia/src/Models.jl": "299d8bc7b0e377361276b26a99023e5a6130e73058639b0bdb13783b51855b2e",
+            "julia/src/Purification.jl": "ea8a4b1a03a8a38b01d0289b06da72a8ea255e79287008ccf58456cfda9fadf3",
+            "julia/src/ExactArithmetic.jl": "77feece9b1e56011667bd8241ff159864943433d2121f01f351dccefae769882",
+            "julia/src/GapCertificates.jl": "c828cbf866fbfa82a8996486a15fae7403d2644e21c0071dafa532a1b0b97b3f",
+            "julia/src/Results.jl": "dda86f08bd426aea0c5f876580f7dda9a1a8bbf208d66268f6926a6f1dc2319f",
+            "julia/src/CertifiedMPO/Products.jl": "5207b7d80375c538d531c67c699d048a0014409cf410425ffc633299959a9230",
+            "julia/src/CertifiedMPO/Squaring.jl": "9e454f12d3149482d734f33d3a1f47b6c4dab21144329753cdd2826d05c5b03c",
+            "julia/src/Spins.jl": "b3dcf5d8f8edb50bd6f8308d18e5da123621adf6074a831f276f56ba629e8f18",
+            "julia/src/CertifiedGaps.jl": "958e839cff840169bfaeb0463a9f06f2a5276453b1472e478111ca36f48ba75b",
+            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+            "julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
+            "julia/Manifest.toml": "422dd9dcc0c0257c0ccd5852c56a5bb43b214080ece90651b2ddd9209eff9b7f",
+            "julia/src/CertifiedMPO/PolynomialBounds.jl": "7acd92b77ef6bf1c22322a93bc33ff1eae741f5cd0f43330f47a6c632ab3ec4a",
+            "julia/Project.toml": "1043d2457f2be2f349c00ddd5b994dd5bd5566672813eab1f54671f8b53a99d1",
+            "julia/src/CertifiedMPO/PositiveBounds.jl": "8921e7de4f45a27260dfc22e00719b06651674fc3dd792d6580e294b5fd68382",
+            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
+        },
+        "blas_threads": 4
+    }
 }

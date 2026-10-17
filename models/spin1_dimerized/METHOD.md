@@ -1,20 +1,19 @@
 # Spin-1 dimerized ring: uniform-gap certificate
 
-The smallest certified dimerization on the five-point grid $`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$
-within a 6-cell ($12$-spin) ring ceiling is **$\delta = 7/10$**. At seed $(n_0, \beta_0) = (3\text{ cells}, 17/4)$,
-`certified_gap_bound` gives `0.2187941698399417`, establishing a unique ground state and uniform
-spectral gap **$\Delta_L \ge 0.218794169839$** for every even chain length $L \ge 3$ cells
-($L = 4, 6, 8, \dots$ cells, i.e., physical spin counts $N = 8, 12, 16, \dots$), from the exact
-rational seed defects $\varepsilon_{\mathrm{s}} = \text{58597799297}//\text{500000000000}$ and
-$\varepsilon_\tau = \text{48363543279}//\text{1000000000000}$ (`results/certificate_d7.json`). At
-$\delta = 9/10$, the $n_0 = 2$ cell seed $(2, 7/2)$ certifies **$\Delta_L \ge 0.528801949327$** for
-every even $L \ge 2$ cells (`results/certificate_d9.json`).
+The smallest certified dimerization on the five-point grid
+$`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$ within a 6-cell ($12$-spin) ring ceiling is
+**$\delta = 7/10$**. At the odd seed $(n_0, \beta_0) = (3\text{ cells}, 17/4)$ the core pipeline
+gives the interval bound **$\Delta_L \ge 0.218793170$** (exact rational chain bound
+$\Delta_L > 0.218606834$) and a unique ground state for every even $L \ge 3$ cells, from
+$\varepsilon_{\mathrm{s}} = 117195722398365/10^{15}$ and $\varepsilon_\tau = 48363998311096/10^{15}$
+(`results/certificate_d7.json`). At $\delta = 9/10$ the seed $(2, 7/2)$ gives
+**$\Delta_L \ge 0.528802288$** (chain $0.528349759$) for every even $L \ge 2$ cells
+(`results/certificate_d9.json`).
 
-At $\delta = 7/10$, the certified bound equals $`17.28\%`$ of the 12-spin numerical reference gap
-($1.2659290109040136$), and the full 12-spin verified eigensolve completed in $1017.27\text{ s}$
-($16.95\text{ min}$, or $949\text{ s}$ in the computational replay). Across all five grid points,
-numerical scans were completed through $L = 6$ cells ($12$ spins); at $\delta = 3/5$ and $1/2$,
-admissible seeds require larger rings than $6$ cells.
+At $\delta = 7/10$ the bound is $`17.28\%`$ of the 12-spin numerical reference gap
+($1.2659290109040136$); the core enclosure of the 6-cell ring took $6512$ s ($109$ min).
+Across all five grid points, numerical scans were completed through $L = 6$ cells ($12$
+spins); at $\delta = 3/5$ and $1/2$, admissible seeds require larger rings than $6$ cells.
 
 ## Model, lengths, and scope
 
@@ -84,95 +83,55 @@ spin-1 chain in the Cartesian basis, $X_\beta$ is in fact **positive semidefinit
   $X_\beta$ makes the exact same recurrence and uniform gap bound hold for the odd seed $n_0 = 3$
   cells.
 
-## Complete dense spectra and exact integer dihedral projectors
+## Core pipeline
 
-In the $S^z$ product basis ($`m_j \in \{-1, 0, 1\}`$), each allowed nearest-neighbor spin exchange
-has matrix element equal to the bond coupling $J_j$ (since the two spin-1 ladder factors of
-$\sqrt{2}$ cancel the $1/2$ in $`\frac{1}{2}(S^+ S^- + S^- S^+)`$), while the diagonal entry is
-$\sum_j J_j m_j m_{j+1}$. Thus `integer_hamiltonian` in `src/common.jl` constructs an exact
-symmetric integer matrix $A$ such that $H_L = A / \mathrm{den}(\delta)$.
+The certificates `results/certificate_d9.json` and `results/certificate_d7.json` are produced by `GapCertificates.certify_gap` on the
+`RingModel` of `src/DimerizedCertificate.jl` (`dimerized(δ)`), in the rotated $S^z$ frame
+$U = \prod_{\text{cells}} (1 \otimes V)$, $V = e^{-i\pi S^y}$, described in `README.md`:
 
-The Hamiltonian commutes with total magnetization $M = \sum_j m_j$, translation $T_{\mathrm{cell}}$
-by one two-spin cell (two sites), site-order reversal $j \mapsto N + 1 - j$ (which preserves bond
-parity), and global spin flip $m_j \mapsto -m_j$:
-- Sectors with $M > 0$ are paired with $-M$ with exact multiplicity $2$; at $M = 0$, global
-  spin-flip parity is resolved into $\pm 1$ sectors.
-- Under cell translation and site reversal (forming the dihedral group $D_L$), generic momentum
-  pairs $`\{k, L - k\}`$ ($0 < k < L/2$) form two-dimensional irreducible representations where the
-  two reflection parities are intertwined by $T_{\mathrm{cell}} - T_{\mathrm{cell}}^{-1}$; we
-  diagonalize the real reflection-even subspace and assign multiplicity $2$. At $k = 0$ and (for
-  even $L$) $k = L/2$, both reflection parities are diagonalized separately.
+- **Exact model.** With $X' = \sqrt2 S^x$, $`A' = \sqrt2\,iS^y`$ and $S^z$ integer matrices,
 
-On small rings ($L \le 4$ cells), the verified certificate path block-diagonalizes $H_L$ in complete
-$S^z$ sectors directly. On the 6-cell ($12$-spin) ring, `src/verified_blocks.jl` uses exact
-dihedral character projectors on each permutation orbit: because $2\cos(2\pi k r / L)$ is an exact
-integer for every $`L \in \{2, 3, 4, 6\}`$, each orbit projector takes the form $P_{\mathrm{num}} / \mathrm{den}$
-with exact integer entries. The verifier checks exact symmetry, $P_{\mathrm{num}}^2 = \mathrm{den}\cdot P_{\mathrm{num}}$,
-and integer trace/rank on every orbit, and confirms that the multiplicity-weighted block dimensions
-sum to $9^L$ ($531{,}441$ at $L = 6$, across 79 blocks of maximum dimension $11{,}596$).
+  $`U (J\,\mathbf{S}_i\cdot\mathbf{S}_j) U^\dagger = -J(\tfrac12 X'\otimes X' + \tfrac12 A'\otimes A' + S^z\otimes S^z)`$
+  for every bond, since $V$ reverses $S^x$ and $S^z$ and keeps $S^y$. The on-site term is this
+  bond with $J = 1 - \delta$ on $(a, b)$, the ring bond is it with $J = 1 + \delta$ on
+  $(b, a')$. The core checks exactly that the cell charge $z_a - z_b$ is conserved and that the
+  flip $P \otimes P$ reverses it and commutes with $h$ and $o$; the tests check $U$ exactly.
+- **RP.** $-h = \sum_\alpha w_\alpha C_\alpha \otimes R C_\alpha R$ with
+  $C_\alpha = 1 \otimes (X', A', S^z)$, $w = ((1+\delta)/2, (1+\delta)/2, 1+\delta)$ and $R$ the
+  cell swap, verified exactly by `verify_rp`.
+- **Spectra.** `verified_ring_spectrum` splits the rings of $n_0$ and $2n_0$ cells exactly into
+  charge sectors (only $q \ge 0$, by the flip; $q = 0$ split by flip parity) and cell momenta and encloses each block with
+  `verified_eigen` (residual and orthogonality in binary64 with a priori $\gamma_{N+8}$ /
+  $\gamma_{2N+8}$ bounds and Frobenius norms, then Ostrowski or polar-factor and Weyl). The
+  4-cell ring has 28 blocks (largest 254, radius $\le 7.4 \times 10^{-10}$); the 6-cell ring
+  has 53 blocks, the largest $11{,}596$ both real ($q = 1$, $k = 0, 3$) and complex ($q = 1$,
+  $k = 1, 2$), with radii up to $2.0 \times 10^{-6}$.
+- **Seed and chain.** $\log Z$ enclosures (`log_partition_enclosure`), the seed defects rounded
+  up to the grid $10^{-15}$, the interval bound `certified_gap_bound` and the exact rational
+  doubling chain. For the odd seed $n_0 = 3$ the core requires the `positive_transfer` reference
+  to the $X_\beta = K K^* \ge 0$ argument above and stores it in the certificate. `check_certificate` reruns the exact parts (fast) and the
+  spectra (`--full`).
 
-## Eigenvalue-enclosure theorem and rounding error bounds
+## Former local pipeline
 
-Let $H$ be an exact real symmetric block of dimension $d$, $Q$ its approximate `Float64`
-eigenvector matrix, and $\Lambda = \mathrm{diag}(\Lambda_1, \dots, \Lambda_d)$ the sorted
-approximate eigenvalues. Given verified upper bounds $`r \ge \|H Q - Q\Lambda\|_F`$ and
-$`e \ge \|Q^\top Q - I\|_F`$ with $e < 1$, write the polar decomposition $Q = U S$ with $U$
-orthogonal and $S = (Q^\top Q)^{1/2}$. Setting $\sigma = \sqrt{1 - e}$ and $d_S = e / (1 + \sigma)$,
-we have $`\|Q^{-1}\|_2 \le 1/\sigma`$ and $`\|S - I\|_2 \le d_S`$, so the identity
-```math
-H - U \Lambda U^\top = (H Q - Q\Lambda) Q^{-1} + U (S \Lambda S^{-1} - \Lambda) U^\top
-```
-implies
-```math
-\|H - U \Lambda U^\top\|_2 \le \eta := \frac{r + 2\|\Lambda\|_2 d_S}{\sigma}.
-```
-Weyl's inequality then guarantees that every ordered eigenvalue of $H$ (with multiplicity) satisfies
-$|\lambda_i(H) - \Lambda_i| \le \eta$.
-
-In `src/enclosure.jl`, `eigen_enclosure` computes $R_{\mathrm{comp}} = \mathrm{fl}(A Q - \mathrm{den}\cdot Q\Lambda)$
-and $E_{\mathrm{comp}} = \mathrm{fl}(Q^\top Q - I)$ in single-threaded `Float64` BLAS and
-adds explicit IEEE binary64 rounding bounds ($u = 2^{-53}$, $`\gamma_k = k u / (1 - k u)`$):
-```math
-r \le \frac{\|R_{\mathrm{comp}}\|_F + \gamma_{2d+8}(\|A\|_F \|Q\|_F + \mathrm{den}\cdot \|Q\|_F \|\Lambda\|_2) + d^3 \mathrm{floatmin}}{\mathrm{den}},
-```
-```math
-e \le \|E_{\mathrm{comp}}\|_F + \gamma_{2d+8}(\|Q\|_F^2 + \sqrt{d}) + d^3 \mathrm{floatmin},
-```
-where each Frobenius norm sum of $m$ squares is enlarged by $(1 - \gamma_{2m+2})^{-1}$ plus
-$`m\,\mathrm{floatmin}`$ before taking a directed-rounded 128-bit `BigFloat` square root.
-
-For the 12-spin symmetry-projected blocks (`src/verified_blocks.jl`), an additional basis-construction
-allowance is added to $\eta$: for each orbit projector $P$ and floating-point basis $B$, verified
-bounds $`q \ge \|PB - B\|_F`$ and $`e_B \ge \|B^\top B - I\|_F`$ bound the distance from $B$ to an
-exact orthonormal basis $U_{\mathrm{proj}}$ of $\mathrm{ran}(P)$ by
-```math
-d_B = q + \frac{w}{1 + \sqrt{1 - w}}, \qquad w = e_B + 2\|B\|_F q + q^2 < 1.
-```
-Taking the maximum $d_B$ over disjoint orbits, replacing $`B`$ by $`U_{\mathrm{proj}}`$ shifts
-$B^\top H_L B$ in operator norm by at most $`\|H_L\|_2 (2d_B + d_B^2) \le 4L (2d_B + d_B^2)`$
-(since $`\|\mathbf{S}_i\cdot\mathbf{S}_{i+1}\|_2 = 2`$ and the couplings sum to $`2L`$), and the sparse
-projection multiplication $`B^\top A B / \mathrm{den}`$ is bounded using
-$`\gamma_{2\,\mathrm{maxnnz}(A) + 2\,\mathrm{maxnnz}(B) + 12}`$. All final eigenvalue radii $\eta$ are
-rounded up to exact rational multiples of $10^{-12}$.
-
-## Partition functions, rational seeds, and gap bounds
-
-For each ring, `verified_logz` sums $\exp(-\beta E)$ over all enclosed eigenvalue intervals in
-outward-rounded `IntervalArithmetic` (after factoring out an exact binary64 energy shift) weighted
-by each block's exact multiplicity, storing rational lower and upper bounds on $\log Z_{n_0}(\beta_0)$,
-$\log Z_{2n_0}(\beta_0)$, and $\log Z_{2n_0}(2\beta_0)$. The upper endpoints of the resulting
-defect intervals
-```math
-\varepsilon_{\mathrm{s}} \ge 1 - \exp\!\big(\underline{\log Z_{2n_0}(\beta_0)} - 2\,\overline{\log Z_{n_0}(\beta_0)}\big), \qquad
-\varepsilon_\tau \ge 1 - \exp\!\big(\underline{\log Z_{2n_0}(2\beta_0)} - 2\,\overline{\log Z_{2n_0}(\beta_0)}\big)
-```
-are rounded up to exact rationals with denominator $10^{12}$ and passed to
-`CertifiedGaps.certified_gap_bound(εₛ, εₜ, β₀)`.
+Until 2026-10 both certificates came from a local pipeline (removed; in the git history of this
+directory). It used the physical $S^z$ basis, where $`\mathrm{den}(\delta)\,H_L`$ is an integer
+matrix, and split the 6-cell ring by $S^z$, spin-flip parity, cell momentum and site reversal
+into 79 real blocks (maximum dimension $11{,}596$) with exact integer dihedral character
+projectors on every orbit. Each block was enclosed by a local polar-factor/Weyl bound with
+binary64 rounding terms plus a bound on the floating-point projector basis. Its $\delta = 7/10$
+seed was $\varepsilon_{\mathrm{s}} = 58597799297/(5 \cdot 10^{11})$,
+$\varepsilon_\tau = 48363543279/10^{12}$ (interval bound $0.2187941698$), slightly tighter than
+the core's, because site reversal made every block real (the core has no lattice reflection, so
+its momentum blocks $k = 1, 2$ are complex, with radii up to $2.0 \times 10^{-6}$ against
+$1.0 \times 10^{-6}$). $\sum n^3$ (complex counted 4 times) is $3.4 \times 10^{13}$ for the core
+blocks against $8.6 \times 10^{12}$ for the old ones (109 min against 17 min).
 
 ## Independent audit (2026-10-11)
 
-An independent audit reviewed `src/rp.jl`, `src/common.jl`, `src/enclosure.jl`,
-`src/verified_blocks.jl`, `certify.jl`, `check.jl`, and `results/certificate_d7.json`:
+An independent audit reviewed the pre-core pipeline (`src/rp.jl`, `src/common.jl`,
+`src/enclosure.jl`, `src/verified_blocks.jl`, since removed), `certify.jl`, `check.jl`, and
+`results/certificate_d7.json`:
 1. **Positive transfer operator and odd seed ($n_0 = 3$):** Confirmed that in the Cartesian basis
    $G_\alpha = i S^\alpha$, the single-site Dyson trace kernel $F_{\mathrm{site}}(a, u)$ is real
    and symmetric in its two incident bond histories, so integrating out the weak intra-cell bond
@@ -202,14 +161,14 @@ Best numerical seed per parameter, over n=2,3 and beta=0.25:0.25:32:
 | 3//5 | — | — | — | — | no seed | 1.010968921 |
 | 1//2 | — | — | — | — | no seed | 0.764485184 |
 
-Verified certificates (the 0.9, n=2 result was verified before the larger-ring scan):
+Verified certificates (the 0.9, n=2 seed was chosen before the larger-ring scan):
 
 | delta | n | exact beta | certified lower bound | ratio to 12-spin ED gap | verification seconds | validity |
 |---|---:|---:|---:|---:|---:|---|
-| 9//10 | 2 | 7//2 | 0.528801949327 | 0.300000 | 1.01 | even L >= 2 cells; N divisible by 4, N >= 4 spins |
-| 7//10 | 3 | 17//4 | 0.218794169839 | 0.172833 | 1017.27 | even L >= 3 cells; N divisible by 4, N >= 8 spins |
+| 9//10 | 2 | 7//2 | 0.528349759000 | 0.299744 | 21.46 | even L >= 2 cells; N divisible by 4, N >= 4 spins |
+| 7//10 | 3 | 17//4 | 0.218606834000 | 0.172685 | 6520.24 | even L >= 3 cells; N divisible by 4, N >= 8 spins |
 
-The exact Float64 lower bound is stored also as an exact binary rational in each certificate JSON; these table bounds are rounded down to twelve decimal places.
+The table gives each certificate's exact rational chain bound `gap_lower_bound`; its interval bound `certified_gap_bound` is `interval_bound_decimal` in the certificate (and in README.md). Table bounds are rounded down to twelve decimal places.
 
 | delta | max min purity, n=2 | max min purity, n=3 | E0(4)-2E0(2) | E0(6)-2E0(3) | extrapolated (n,beta), numerical only |
 |---|---:|---:|---:|---:|---|
