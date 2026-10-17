@@ -29,12 +29,14 @@ and passes both here; `ring_blocks` is the generic charge-and-momentum reduction
 module VerifiedSpectra
 
 using LinearAlgebra, IntervalArithmetic
-using ..ExactArithmetic: RationalBig
+using ..ExactArithmetic: RationalBig, parse_rational
+using ..Results: write_result, read_result
 using ..RingModels: RingModel, isreal_model, _reduce
 using ..Recurrence: to_interval
 
 export BlockSpectrum, verified_eigen, enclose_hermitian, ring_blocks, verified_ring_spectrum,
-    log_partition_enclosure, spectrum_summary
+    shifted_log_partition, log_partition_enclosure, ground_energy_enclosure,
+    spectral_gap_enclosure, write_spectrum, read_spectrum, spectrum_summary
 
 const UNIT = big(1) // big(2)^53                 # unit roundoff of binary64
 const TINY = big(1) // big(2)^1021              # covers gradual underflow or flush-to-zero
@@ -136,6 +138,8 @@ Exact charge-sector and momentum decomposition of the ring of L sites. For each 
 matrix and an exact bound `matrix_error` on ‖A − M‖₂ for the true block A. Blocks are built
 one at a time, so only one is in memory. For a real model the momenta ±k have the same
 spectrum (A₋ₖ = conj Aₖ), so only 0 ≤ m ≤ L/2 is built, with multiplicity 2 for 0 < m < L/2.
+For a model with a charge `flip`, the sectors q and −q have the same spectrum, so only one of
+them is built (the one with the smaller |q|, else q > 0), with doubled multiplicity.
 """
 function ring_blocks(f, model::RingModel, L::Integer)
     L >= 2 || throw(ArgumentError("a ring needs L ≥ 2"))
@@ -156,12 +160,16 @@ function ring_blocks(f, model::RingModel, L::Integer)
     momenta = real_model ? (0:(L÷2)) : (0:(L-1))
     total = 0
     for q in sort!(collect(keys(codes_by_charge)))
+        partner = _reduce(model, -q)
+        pair = model.flip === nothing || partner == q ? 1 : 2
+        # Of q and −q, build the one with the smaller |q|, and q > 0 over −q.
+        pair == 2 && (abs(partner), -partner) < (abs(q), -q) && continue
         table = _sector_table(model, L, codes_by_charge[q], n, top)
         for m in momenta
             built = _momentum_block(table, L, m, real_model)
             built === nothing && continue
             M, ε = built
-            mult = real_model && 0 < 2m < L ? 2 : 1
+            mult = pair * (real_model && 0 < 2m < L ? 2 : 1)
             total += size(M, 1) * mult
             f(M, ε, mult, Dict{String,Any}("charge" => q, "momentum" => m,
                 "dimension" => size(M, 1)))
@@ -290,22 +298,104 @@ function verified_ring_spectrum(model::RingModel, L::Integer; progress = false)
     return out
 end
 
-"""
-    log_partition_enclosure(spectrum, β) -> Interval{Float64}
+_interval(x::Interval) = x
+_interval(x::Float64) = interval(x)
+_interval(x) = to_interval(x)
 
-Enclosure of log Z(β) = log Σ e^{−βλ} over a verified spectrum, for exact β > 0.
 """
-function log_partition_enclosure(spectrum::AbstractVector{BlockSpectrum}, β)
-    b = to_interval(β)
-    @assert inf(b) > 0
-    shift = minimum(minimum(s.centers) for s in spectrum)
+    shifted_log_partition(spectrum, β, shift) -> Interval{Float64}
+
+Enclosure of log Σ e^{−β(λ − shift)} over a verified spectrum (multiplicities included), for β > 0
+exact or an `Interval` and an exact `shift`. Without the −β·shift term, two rings combined with
+one exact shift difference keep a narrow enclosure over a whole β interval.
+"""
+function shifted_log_partition(spectrum::AbstractVector{BlockSpectrum}, β, shift)
+    b, s0 = _interval(β), _interval(shift)
+    inf(b) > 0 || throw(ArgumentError("β must be positive"))
     total = interval(0.0)
     for s in spectrum
-        part = sum(exp(-b * (interval(c) - interval(shift))) for c in s.centers)
+        part = sum(exp(-b * (interval(c) - s0)) for c in s.centers)
         r = sup(to_interval(s.radius))
         total += s.multiplicity * part * exp(b * interval(-r, r))
     end
-    return log(total) - b * interval(shift)
+    return log(total)
+end
+
+"""
+    log_partition_enclosure(spectrum, β) -> Interval{Float64}
+
+Enclosure of log Z(β) = log Σ e^{−βλ} over a verified spectrum, for β > 0 exact or an
+`Interval`.
+"""
+function log_partition_enclosure(spectrum::AbstractVector{BlockSpectrum}, β)
+    shift = minimum(minimum(s.centers) for s in spectrum)
+    return shifted_log_partition(spectrum, β, shift) - _interval(β) * interval(shift)
+end
+
+# The two smallest eigenvalue balls of the ring, as (lower, upper) endpoint lists with
+# multiplicity: every true eigenvalue lies in its ball, so the k-th smallest eigenvalue lies
+# between the k-th smallest lower endpoint and the k-th smallest upper endpoint.
+function _lowest_two(spectrum)
+    lo, hi = RationalBig[], RationalBig[]
+    for s in spectrum, c in s.centers[1:min(2, end)], _ in 1:min(2, s.multiplicity)
+        push!(lo, RationalBig(c) - s.radius)
+        push!(hi, RationalBig(c) + s.radius)
+    end
+    length(lo) >= 2 || throw(ArgumentError("the spectrum has fewer than two eigenvalues"))
+    return partialsort!(lo, 1:2), partialsort!(hi, 1:2)
+end
+
+"""
+    ground_energy_enclosure(spectrum) -> (lower, upper)
+
+Exact rational bounds lower ≤ E₀ ≤ upper on the ground energy of a verified spectrum.
+"""
+function ground_energy_enclosure(spectrum::AbstractVector{BlockSpectrum})
+    lo, hi = _lowest_two(spectrum)
+    return lo[1], hi[1]
+end
+
+"""
+    spectral_gap_enclosure(spectrum) -> (lower, upper)
+
+Exact rational bounds lower ≤ E₁ − E₀ ≤ upper on the gap of a verified spectrum (E₁ is the second
+eigenvalue counted with multiplicity, so a degenerate ground state has gap 0). `lower` is
+clamped at 0; `lower > 0` proves a unique ground state.
+"""
+function spectral_gap_enclosure(spectrum::AbstractVector{BlockSpectrum})
+    lo, hi = _lowest_two(spectrum)
+    return max(lo[2] - hi[1], zero(RationalBig)), hi[2] - lo[1]
+end
+
+const SPECTRUM_FORMAT = "CertifiedGaps verified spectrum v1"
+
+"""
+    write_spectrum(path, spectrum) -> path
+
+Store a verified spectrum losslessly (`.json` or `.json.gz` via `Results.write_result`): exact
+radii, multiplicities, labels, and every center as its shortest round-trip decimal. The output
+is deterministic, so its SHA-256 can pin the spectrum in a later certificate. The file is read
+back and compared before returning.
+"""
+function write_spectrum(path, spectrum::AbstractVector{BlockSpectrum})
+    blocks = [Dict{String,Any}("centers" => string.(s.centers), "radius" => string(s.radius),
+        "multiplicity" => s.multiplicity, "label" => s.label) for s in spectrum]
+    write_result(path, Dict{String,Any}("format" => SPECTRUM_FORMAT, "blocks" => blocks);
+        compact = true)
+    back = read_spectrum(path)
+    all(a.centers == b.centers && a.radius == b.radius && a.multiplicity == b.multiplicity
+        for (a, b) in zip(back, spectrum)) && length(back) == length(spectrum) ||
+        error("$path does not read back as the spectrum written")
+    return path
+end
+
+"Inverse of `write_spectrum`."
+function read_spectrum(path)
+    data = read_result(path; exact = false)
+    data["format"] == SPECTRUM_FORMAT || error("$path is not a verified spectrum file")
+    return [BlockSpectrum(parse.(Float64, b["centers"]), parse_rational(b["radius"]),
+        Int(b["multiplicity"]), Dict{String,Any}(String(k) => copy(v) for (k, v) in b["label"]))
+            for b in data["blocks"]]
 end
 
 "JSON-ready summary of a verified spectrum (block labels, sizes, radii; no eigenvalues)."

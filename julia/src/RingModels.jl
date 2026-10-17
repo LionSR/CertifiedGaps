@@ -15,8 +15,9 @@ using LinearAlgebra
 using ..ExactArithmetic: RationalBig, parse_rational
 using ..ReflectionPositivity: realign
 
-export RingModel, isreal_model, conserves_charge, RPCertificate, rp_certificate, verify_rp,
-    exact_matrix, encode_matrix, decode_matrix, encode_model, decode_model, encode_rp, decode_rp
+export RingModel, cell_model, isreal_model, conserves_charge, RPCertificate, rp_certificate,
+    verify_rp, exact_matrix, encode_matrix, decode_matrix, encode_model, decode_model, encode_rp,
+    decode_rp
 
 const ExactEntry = Complex{RationalBig}
 
@@ -28,12 +29,18 @@ _exact(x::Complex{<:Union{Integer,Rational}}) =
 _exact(x) = throw(ArgumentError("refusing inexact matrix entry $(repr(x)) of type $(typeof(x))"))
 
 """
-    RingModel(d, bond, onsite = zeros(d, d); charge = nothing, modulus = 0, name = "")
+    RingModel(d, bond, onsite = zeros(d, d); charge = nothing, modulus = 0, flip = nothing,
+        name = "")
 
 Ring with local dimension `d`, Hermitian bond `bond` (d²×d², on `kron(x, x+1)`) and Hermitian
 on-site term `onsite`, all with exact entries. `charge[a]` is an optional additive quantum
 number of local state `a`, conserved by H (checked exactly), summed modulo `modulus`
 (0 for a U(1) charge); exact diagonalisation splits the ring into its sectors.
+
+`flip` is an optional exact local unitary F that reverses the charge (F[a, b] ≠ 0 only when
+`charge[a] ≡ −charge[b]`) and leaves h and o invariant, such as a spin flip. Then F^{⊗L} commutes
+with H and with translations and maps the sector q onto −q, so the two have the same spectrum
+and only one of them is diagonalised. All conditions are checked exactly.
 """
 struct RingModel
     name::String
@@ -42,8 +49,9 @@ struct RingModel
     onsite::Matrix{ExactEntry}
     charge::Vector{Int}
     modulus::Int
+    flip::Union{Nothing,Matrix{ExactEntry}}
     function RingModel(d::Integer, bond::AbstractMatrix, onsite::AbstractMatrix = zeros(Int, d, d);
-        charge = nothing, modulus::Integer = 0, name = "")
+        charge = nothing, modulus::Integer = 0, flip = nothing, name = "")
         B, O = exact_matrix(bond), exact_matrix(onsite)
         size(B) == (d^2, d^2) || throw(DimensionMismatch("bond must be $(d^2)×$(d^2)"))
         size(O) == (d, d) || throw(DimensionMismatch("onsite must be $d×$d"))
@@ -51,16 +59,50 @@ struct RingModel
         O == O' || throw(ArgumentError("onsite term is not Hermitian"))
         q = charge === nothing ? zeros(Int, d) : collect(Int, charge)
         length(q) == d || throw(DimensionMismatch("charge must have length $d"))
-        model = new(String(name), Int(d), B, O, q, Int(modulus))
+        F = flip === nothing ? nothing : exact_matrix(flip)
+        model = new(String(name), Int(d), B, O, q, Int(modulus), F)
         conserves_charge(model) || throw(ArgumentError("H does not conserve the given charge"))
+        F === nothing || _valid_flip(model) ||
+            throw(ArgumentError("flip is not a charge-reversing local symmetry of H"))
         return model
     end
+end
+
+"""
+    cell_model(model, c; charge = nothing, kwargs...) -> RingModel
+
+The same Hamiltonian as a ring of c-site cells, built exactly: the cell is `kron` of its c sites,
+the on-site term holds the c on-site terms and the c − 1 bonds inside the cell, and the bond
+joins the last site of a cell to the first site of the next, so the ring of L cells is the ring
+of cL sites. `charge` (length dᶜ) and the other keywords (`modulus`, `flip`, …) are those of
+`RingModel` and are checked exactly for the cell model. A cell may conserve a charge that the
+site model does not (a sublattice charge, say).
+"""
+function cell_model(m::RingModel, c::Integer; charge = nothing, kwargs...)
+    c >= 1 || throw(ArgumentError("a cell has at least one site"))
+    d = m.d
+    id(k) = Matrix{ExactEntry}(I, d^k, d^k)
+    onsite = sum(kron(id(k), m.onsite, id(c - 1 - k)) for k in 0:(c-1)) +
+             sum((kron(id(k), m.bond, id(c - 2 - k)) for k in 0:(c-2));
+                 init = zeros(ExactEntry, d^c, d^c))
+    return RingModel(d^c, kron(id(c - 1), m.bond, id(c - 1)), onsite; charge, kwargs...,
+        name = "$(m.name), $c-site cells")
 end
 
 "True when every entry of the bond and the on-site term is real."
 isreal_model(m::RingModel) = all(iszero ∘ imag, m.bond) && all(iszero ∘ imag, m.onsite)
 
 _reduce(m::RingModel, q) = m.modulus == 0 ? q : mod(q, m.modulus)
+
+# Exact check of the conditions on `flip` stated in the `RingModel` docstring.
+function _valid_flip(m::RingModel)
+    F, d = m.flip, m.d
+    size(F) == (d, d) && F * F' == I || return false
+    all(iszero(F[a, b]) || _reduce(m, m.charge[a] + m.charge[b]) == 0 for a in 1:d, b in 1:d) ||
+        return false
+    FF = kron(F, F)
+    return FF * m.bond * FF' == m.bond && F * m.onsite * F' == m.onsite
+end
 
 "Exact check that every nonzero matrix element of h and o preserves the total charge."
 function conserves_charge(m::RingModel)
@@ -183,14 +225,19 @@ function decode_matrix(record)
     return ExactEntry.(re, im)
 end
 
-"JSON record of a model (exact strings)."
-encode_model(m::RingModel) = Dict{String,Any}("name" => m.name, "d" => m.d,
-    "bond" => encode_matrix(m.bond), "onsite" => encode_matrix(m.onsite),
-    "charge" => m.charge, "charge_modulus" => m.modulus)
+"JSON record of a model (exact strings); `charge_flip` only when the model has one."
+function encode_model(m::RingModel)
+    record = Dict{String,Any}("name" => m.name, "d" => m.d, "bond" => encode_matrix(m.bond),
+        "onsite" => encode_matrix(m.onsite), "charge" => m.charge, "charge_modulus" => m.modulus)
+    m.flip === nothing || (record["charge_flip"] = encode_matrix(m.flip))
+    return record
+end
 
 "Rebuild a `RingModel` from `encode_model` output, re-running all exact checks."
 decode_model(r) = RingModel(_int(r["d"]), decode_matrix(r["bond"]), decode_matrix(r["onsite"]);
-    charge = _int.(r["charge"]), modulus = _int(r["charge_modulus"]), name = String(r["name"]))
+    charge = _int.(r["charge"]), modulus = _int(r["charge_modulus"]),
+    flip = haskey(r, "charge_flip") ? decode_matrix(r["charge_flip"]) : nothing,
+    name = String(r["name"]))
 
 # `parse_exact_json` reads every integer as a string.
 _int(x::AbstractString) = parse(Int, x)
