@@ -9,10 +9,10 @@
 # The leaderboard rows live in _data/records.yml (hand-edited; schema in its header).
 # _data/lean_records.json is generated in CI by `lake exe leaderboard_audit` (not committed).
 
-title: Certified spectral gaps by the spacetime bootstrap
-description: Uniform spectral gaps of quantum spin chains, certified by computer and formalized in Lean 4
+title: Proven energy gaps of quantum spin chains
+description: Lower bounds on the energy gap that hold for every ring length, checked by computer and in the Lean proof assistant
 baseurl: "/haldane-gap-diagrams" # the subpath of the site
-url: "https://LionSR.github.io" # the base hostname and protocol of the site
+url: "https://sirui-lu.com" # the base hostname and protocol of the site
 twitter_username:
 github_username: LionSR
 repository: LionSR/haldane-gap-diagrams
