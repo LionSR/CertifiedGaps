@@ -68,6 +68,11 @@ button:focus-visible, input:focus-visible, a:focus-visible, summary:focus-visibl
 table { border-collapse: collapse; font-size: .82rem; width: 100%; font-variant-numeric: lining-nums tabular-nums; }
 th, td { text-align: right; padding: 2px 6px; white-space: nowrap; }
 th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1px solid var(--line); }
+.gloss { font-size: .95rem; font-variant-numeric: oldstyle-nums; margin-top: 6px; }
+.gloss th, .gloss td { text-align: left; white-space: normal; padding: 7px 10px 7px 0; vertical-align: top; }
+.gloss td { border-bottom: 1px solid var(--line); }
+.gloss td:first-child { white-space: nowrap; }
+.gloss td:last-child { white-space: nowrap; color: var(--mute); }
 .tbl { overflow: auto; max-height: 200px; margin-top: 8px; }
 .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px 18px; margin: 14px 0; max-width: 62%; }
 .stat .k { font-size: .8rem; color: var(--mute); font-style: italic; }
@@ -86,4 +91,6 @@ th { color: var(--mute); font-weight: 400; font-style: italic; border-bottom: 1p
   .two-col { grid-template-columns: minmax(0, 1fr); }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
   .foot { max-width: none; }
+  .gloss td:first-child { white-space: normal; }
+  .gloss { font-size: .88rem; }
 }
