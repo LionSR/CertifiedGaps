@@ -145,6 +145,18 @@ using ITensors, ITensorMPS, CertifiedGaps.Purification
             # Model-relative keys work with the model directory as root.
             local_keys = source_hashes(model; dirs = ("src",))
             @test verify_source_hashes(local_keys, model) == 1
+            # The combined metadata helpers: the recorded file set must be the current one.
+            files = ("check.jl", "Project.toml", "Manifest.toml")
+            meta = model_metadata(model, Dict("x" => 1); files, certified = true)
+            @test meta["status"] == "certified" && haskey(meta, "core_sha256")
+            @test verify_model_metadata(meta, model; files) == 4
+            write(joinpath(repo, "julia/src/Core.jl"), "k = 3\n")
+            @test verify_model_metadata(meta, model; files) == 4
+            write(joinpath(model, "src", "b.jl"), "b = 1\n")
+            @test_throws ErrorException verify_model_metadata(meta, model; files)
+            rm(joinpath(model, "src", "b.jl"))
+            write(joinpath(model, "check.jl"), "c = 2\n")
+            @test_throws ErrorException verify_model_metadata(meta, model; files)
         end
     end
 

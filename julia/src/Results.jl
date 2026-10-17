@@ -14,7 +14,8 @@ module Results
 using Dates, JSON3, LinearAlgebra, SHA
 
 export write_result, read_result, read_result_bytes, sha256_file, file_hashes, source_hashes,
-    model_provenance, verify_source_hashes, run_metadata, parse_exact_json, read_exact_json
+    model_provenance, verify_source_hashes, run_metadata, model_metadata, verify_model_metadata,
+    parse_exact_json, read_exact_json
 
 """
     write_result(path, data; compact = false, gzip = endswith(path, ".gz"), level = 6) -> path
@@ -163,6 +164,42 @@ function run_metadata(config; source_sha256, packages = (), status, certified = 
         record[string(nameof(package))] = string(pkgversion(package))
     end
     return record
+end
+
+"""
+    model_metadata(model_dir, config; dirs = ("src",), files = ("Project.toml", "Manifest.toml"),
+        packages = (), certified = false) -> Dict
+
+`run_metadata` of a model result with the hashes of `model_provenance(model_dir; dirs, files)`:
+the model-local `source_sha256` and the core `core_sha256` (provenance only).
+`verify_model_metadata` with the same `dirs` and `files` checks it.
+"""
+function model_metadata(model_dir, config; dirs = ("src",),
+    files = ("Project.toml", "Manifest.toml"), packages = (), certified = false)
+    (; source_sha256, core_sha256) = model_provenance(model_dir; dirs, files)
+    record = run_metadata(config; source_sha256, packages, certified,
+        status = certified ? "certified" : "numerical, not certified")
+    record["core_sha256"] = core_sha256
+    return record
+end
+
+"""
+    verify_model_metadata(metadata, model_dir; dirs = ("src",),
+        files = ("Project.toml", "Manifest.toml")) -> Int
+
+Check a `model_metadata` record against the checkout: the recorded model-local source paths
+must be exactly the current ones for `dirs` and `files`, and each must have its recorded
+SHA-256. The core hashes are provenance and are not compared. Returns the number of files
+checked; throws on any mismatch.
+"""
+function verify_model_metadata(metadata, model_dir; dirs = ("src",),
+    files = ("Project.toml", "Manifest.toml"))
+    repo = normpath(joinpath(model_dir, "..", ".."))
+    current = model_provenance(model_dir; dirs, files).source_sha256
+    recorded = metadata["source_sha256"]
+    Set(String.(keys(recorded))) == Set(keys(current)) ||
+        error("recorded model-local source files differ from the current set")
+    return verify_source_hashes(recorded, repo; scope = relpath(normpath(model_dir), repo))
 end
 
 "Parse JSON with every bare integer token read as a string, so big integers stay exact."
