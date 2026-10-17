@@ -1,48 +1,52 @@
 \chapter{Kernel-checked seeds}
 \label{chap:seedkernel}
 
-The seed inequalities carry the finite-size physics that the bootstrap cannot produce. The opt-in
-library \texttt{SeedKernel} (\texttt{lake build SeedKernel}) proves seed inequalities inside the
-Lean kernel: Julia generates integer witnesses (approximate eigenvectors scaled by \(2^{52}\)),
-and \texttt{decide +kernel}, evaluated by GMP arithmetic in the kernel and without
-\texttt{native\_decide}, checks them. This chapter covers the seed that is closed: the
-longitudinal-field Ising chain at \(g = 1/4\), \(h = 1/20\), whose seed gives the first
-unconditional gap theorem.
+The two-purity doubling criterion reduces an infinite-volume spectral gap to two seed purity
+inequalities on finite rings. The opt-in library \texttt{SeedKernel}
+(\texttt{lake build SeedKernel}) proves these finite-ring inequalities inside the Lean kernel from
+approximate integer eigenvectors scaled by \(2^{52}\); an external Julia script generates the
+integer vectors, and the Lean kernel verifies the resulting residual inequalities by GMP integer
+arithmetic via \texttt{decide +kernel} without using \texttt{native\_decide}. Carrying out this
+verification for the longitudinal-field Ising chain at \(g = 1/4\) and \(h = 1/20\) proves its
+seed inequalities in the kernel and yields the first unconditional gap theorem.
 
 \section{Two eigenvalue bounds}
 
-To bracket the partition functions \(Z_6(\beta)\) and \(Z_{12}(\beta)\) inside the Lean kernel
-without diagonalizing \(64 \times 64\) and \(4096 \times 4096\) matrices, we combine two elementary
-tools: a Ritz residual bound that encloses the two lowest eigenvalues from approximate integer
-eigenvectors, and a subspace comparison lemma that bounds all remaining \(2^L - 2\) eigenvalues from
-below.
+Bounding the two seed purities \(\Ps(6, \beta)\) and \(\Pt(12, \beta)\) inside the Lean kernel
+requires upper and lower bounds on the partition functions \(Z_6(\beta)\) and \(Z_{12}(\beta)\)
+without diagonalizing the
+full \(64 \times 64\) and \(4096 \times 4096\) Hamiltonians. At large inverse temperature, the
+partition function is dominated by the lowest energy levels, so a Ritz residual bound from two
+approximate integer eigenvectors encloses the two lowest eigenvalues while a subspace comparison
+lemma bounds all remaining \(2^L - 2\) eigenvalues from below.
 
 \begin{lemma}[Residual bound]
   \label{lem:residual}
   \lean{SeedKernel.Ising.exists_eigenvalue_near}
   \leanok
-  For a Hermitian matrix \(A\), a vector \(x\) and \(\theta \in \R\), some eigenvalue satisfies
+  For a Hermitian matrix \(A\), a vector \(x\), and \(\theta \in \R\), some eigenvalue satisfies
   \((\lambda_i - \theta)^2 \|x\|^2 \le \|Ax - \theta x\|^2\).
 \end{lemma}
 \begin{proof}
   \leanok
-  In the eigenbasis \(y = U^\dagger x\), \(\|Ax - \theta x\|^2 = \sum_i (\lambda_i - \theta)^2
-  |y_i|^2 \ge \min_i (\lambda_i - \theta)^2 \|y\|^2\), and \(\|y\| = \|x\|\).
+  Expanding in the unitary eigenbasis via \(y = U^\dagger x\) gives \(\|Ax - \theta x\|^2 = \sum_i
+  (\lambda_i - \theta)^2
+  |y_i|^2 \ge \min_i (\lambda_i - \theta)^2 \|y\|^2\), where \(\|y\| = \|x\|\).
 \end{proof}
 
 \begin{lemma}[Counting by comparison]
   \label{lem:counting}
   \lean{SeedKernel.Ising.card_eigenvalues_lt_le}
   \leanok
-  Let \(A\) be Hermitian, \(B\) a set of basis vectors and \(\rho \in \R\). If
+  Let \(A\) be Hermitian, \(B\) a set of basis vectors, and \(\rho \in \R\). If
   \(\operatorname{Re}\langle x, Ax \rangle \ge \rho \|x\|^2\) for every \(x\) vanishing on \(B\),
   then at most \(|B|\) eigenvalues of \(A\) lie below \(\rho\).
 \end{lemma}
 \begin{proof}
   \leanok
-  If more than \(|B|\) eigenvalues were below \(\rho\), their eigenvectors would span a space of
-  dimension larger than \(|B|\), which meets the subspace of vectors vanishing on \(B\)
-  (codimension \(|B|\)) in a nonzero \(x\) with
+  If more than \(|B|\) eigenvalues were strictly below \(\rho\), their eigenvectors would span a
+  subspace of dimension larger than \(|B|\), which must intersect the codimension-\(|B|\) subspace
+  of vectors vanishing on \(B\) in a nonzero vector \(x\) satisfying
   \(\operatorname{Re}\langle x, Ax \rangle < \rho \|x\|^2\).
 \end{proof}
 
@@ -63,8 +67,8 @@ and its action on bit-encoded configurations reduces to exact integer arithmetic
 \end{lemma}
 \begin{proof}
   \leanok
-  Evaluate the bond and site operators on basis configurations: \(Z \otimes Z\) and \(Z\) are
-  diagonal and \(X\) flips one spin.
+  Evaluating the bond and site operators on basis configurations shows that \(Z \otimes Z\) and
+  \(Z\) act diagonally with the classical Ising energy while each \(X\) flips a single spin.
 \end{proof}
 
 \begin{lemma}[Comparison with the classical energies]
@@ -77,8 +81,10 @@ and its action on bit-encoded configurations reduces to exact integer arithmetic
 \end{lemma}
 \begin{proof}
   \leanok
-  Bound each off-diagonal term by \(\operatorname{Re}(\bar a b) \le (|a|^2 + |b|^2)/2\); every
-  configuration has \(L\) flip neighbors.
+  Bounding each off-diagonal spin-flip product by \(\operatorname{Re}(\bar a b) \le (|a|^2 +
+  |b|^2)/2\)
+  and summing over the \(L\) single-spin flip neighbors of each configuration gives the lower
+  bound.
 \end{proof}
 
 \begin{lemma}[Bridge to the integer checker]
@@ -87,19 +93,20 @@ and its action on bit-encoded configurations reduces to exact integer arithmetic
     SeedKernel.Ising.residualSq_eq}
   \leanok
   \uses{lem:ising-action}
-  Encoding configurations as the bits of a natural number (a spin flip is \(\mathrm{xor}\,2^j\)),
-  the checker's integer action of \(20 H\) and its bit-indexed sums are exactly the action of
-  \(H\), the squared norm and the squared residual of the decoded vector.
+  When spin configurations are encoded as the bits of a natural number so that a single-spin flip
+  is \(\mathrm{xor}\,2^j\), the integer action of \(20 H\) and the bit-indexed sums evaluated by
+  the checker equal the matrix action of \(H\), the squared norm, and the squared residual of the
+  decoded vector.
 \end{lemma}
 \begin{proof}
   \leanok
   Rewrite the sums over \(\{0, \dots, 2^L - 1\}\) as sums over configurations through the
-  encoding bijection.
+  bit-encoding bijection.
 \end{proof}
 
 \section{The seed and the unconditional gap}
 
-Combining the two Ritz enclosures with the classical-energy floor bounds \(Z_6(97/4)\),
+Combining the two Ritz enclosures with the classical-energy lower bound brackets \(Z_6(97/4)\),
 \(Z_{12}(97/4)\), and \(Z_{12}(97/2)\) tightly enough to discharge the seed hypothesis at
 \((g, h) = (1/4, 1/20)\), giving a gap theorem with no hypothesis and no \texttt{sorry} that
 depends only on the standard axioms.
@@ -109,7 +116,8 @@ depends only on the standard axioms.
   \lean{SeedKernel.Ising.LowSpectrum}
   \leanok
   An eigenvalue family \(e\) has low spectrum \((a_0, b_0, a_1, \rho)\) if one eigenvalue lies in
-  \([a_0, b_0]\), a second one is at least \(a_1\), and all others are at least \(\rho\).
+  \([a_0, b_0]\), a second eigenvalue is at least \(a_1\), and all remaining eigenvalues are at
+  least \(\rho\).
 \end{definition}
 
 \begin{lemma}[Partition functions from a low spectrum]
@@ -123,7 +131,9 @@ depends only on the standard axioms.
 \end{lemma}
 \begin{proof}
   \leanok
-  Keep one term for the lower bound; bound the terms termwise for the upper bound.
+  Dropping all terms except the one for the eigenvalue in \([a_0, b_0]\) gives the lower bound, and
+  bounding each Boltzmann
+  weight by the corresponding spectral lower bound gives the upper bound.
 \end{proof}
 
 \begin{lemma}[Low spectra of the seed rings]
@@ -132,17 +142,19 @@ depends only on the standard axioms.
     SeedKernel.Ising.lowSpectrum12, SeedKernel.Ising.allChunks12_eq_range}
   \leanok
   \uses{lem:residual, lem:counting, lem:ising-classical, lem:ising-bridge, def:low-spectrum}
-  At \(g = 1/4\), \(h = 1/20\), the rings of \(6\) and \(12\) sites have low spectra with
-  eigenvalue radius \(10^{-10}\) around the two Ritz values of the generated trial vectors, and
-  anchor \(\rho = c/20 - L/4\), where exactly two classical configurations have \(20 E < c\).
+  At \(g = 1/4\) and \(h = 1/20\), the rings of \(6\) and \(12\) sites have low spectra with
+  eigenvalue radius \(10^{-10}\) around the two Ritz values of the generated trial vectors and
+  excited-state threshold \(\rho = c/20 - L/4\), where exactly two classical configurations satisfy
+  \(20 E < c\).
 \end{lemma}
 \begin{proof}
   \leanok
-  The kernel checks the norms and residuals of two integer trial vectors on each ring (for
-  \(12\) sites in \(64\) chunks, whose coverage of \(\{0, \dots, 4095\}\) is proved) and the
-  count of classical configurations below the cutoff. Lemma~\ref{lem:residual} turns the
-  residuals into eigenvalue enclosures, and Lemmas~\ref{lem:counting}
-  and~\ref{lem:ising-classical} turn the classical count into the anchor.
+  The kernel checks the norms and residuals of two integer trial vectors on each ring (evaluated
+  for \(12\) sites in \(64\) chunks whose union is proved to cover \(\{0, \dots, 4095\}\)) together
+  with the count of classical configurations below the cutoff. Lemma~\ref{lem:residual} converts
+  the residual bounds into eigenvalue enclosures, and Lemmas~\ref{lem:counting}
+  and~\ref{lem:ising-classical} convert the classical count into the lower bound on all remaining
+  eigenvalues.
 \end{proof}
 
 \begin{theorem}[The Ising seed]
@@ -160,10 +172,10 @@ depends only on the standard axioms.
 \end{theorem}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:low-spectrum-z} with the low spectra of Lemma~\ref{lem:ising-low-spectra} gives
-  \(Z \ge e^{-\beta(\theta_0 + r)}\) and \(Z \le e^{-\beta(\theta_0 - r)}(1 + T)\) with \(T\)
-  exponentially small; the ratios \(Z_{12}(\beta)/Z_6(\beta)^2\) and
-  \(Z_{12}(2\beta)/Z_{12}(\beta)^2\) are then bounded below by \((1 - x)/(1 + t)^2\) using
+  Applying Lemma~\ref{lem:low-spectrum-z} to the low spectra of Lemma~\ref{lem:ising-low-spectra}
+  gives \(Z \ge e^{-\beta(\theta_0 + r)}\) and \(Z \le e^{-\beta(\theta_0 - r)}(1 + T)\) with an
+  exponentially small excited-state sum \(T\); the purity ratios \(Z_{12}(\beta)/Z_6(\beta)^2\) and
+  \(Z_{12}(2\beta)/Z_{12}(\beta)^2\) are then bounded from below by \((1 - x)/(1 + t)^2\) using
   \(e^{-14} \le 2.7182818283^{-14}\).
 \end{proof}
 
@@ -182,18 +194,19 @@ depends only on the standard axioms.
 \end{theorem}
 \begin{proof}
   \leanok
-  Theorem~\ref{thm:rp-gap} at the first grid point, whose certificate is valid
-  (Lemma~\ref{lem:ising-longitudinal-valid}) and whose seed is Theorem~\ref{thm:ising-seeds}. The
-  theorem has no hypothesis and no \texttt{sorry}; it depends only on \texttt{propext},
-  \texttt{Classical.choice} and \texttt{Quot.sound}.
+  Apply Theorem~\ref{thm:rp-gap} at the first grid point, using the certificate validity from
+  Lemma~\ref{lem:ising-longitudinal-valid} and the seed bounds from Theorem~\ref{thm:ising-seeds}.
+  The resulting theorem has no open hypotheses and no \texttt{sorry}, depending only on
+  \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
 \end{proof}
 
 \section{Spin-1 seed arithmetic}
 
 \begin{remark}
-  \texttt{SeedKernel/Spin1} implements the packed spin-1 Hamiltonian action and a shifted power
-  filter on \(3^n\)-lane vectors, checks them against a row-wise specification on small rings,
-  and verifies integer Ritz and residual witnesses for a filtered N\'eel trial vector on rings of
-  \(6\), \(8\) and \(10\) sites. These are integer facts, not yet eigenvalue theorems; the plan
-  and the open obligations for a kernel-checked spin-1 seed are in \texttt{models/lean\_seeds/}.
+  The module \texttt{SeedKernel/Spin1} implements the spin-1 Hamiltonian action and a shifted
+  polynomial filter on integer vectors of dimension \(3^n\), checks that they agree with the
+  entrywise matrix action on small rings, and verifies the integer Rayleigh quotients and residuals
+  of a filtered N\'eel trial state on rings of \(6\), \(8\), and \(10\) sites. Connecting these
+  integer residual checks to spectral enclosures of the spin-1 partition functions remains open and
+  is documented in \texttt{models/lean\_seeds/}.
 \end{remark}

@@ -1,17 +1,20 @@
 \chapter{Introduction}
 \label{chap:intro}
 
-This blueprint describes the Lean~4 formalization (the libraries \texttt{CertifiedGaps} and
-\texttt{SeedKernel} in the directory \texttt{lean/}) of the \emph{spacetime bootstrap}, also called
-the \emph{two-purity doubling criterion}, of the main note~\cite{HaldaneNote} and the scope
-note~\cite{ScopeNote}. Every statement below is linked to the Lean declaration that proves it, and
-the dependency graph shows which results rest on which.
+Proving that a quantum spin chain is gapped in the thermodynamic limit requires a lower bound on
+the energy difference between the first excited state and the ground state that is uniform in the
+system size. The \emph{spacetime bootstrap}, also called the \emph{two-purity doubling criterion},
+reduces this infinite-volume problem on periodic rings to two finite-size inequalities, as proved
+in the main note~\cite{HaldaneNote} and the scope note~\cite{ScopeNote}. The Lean~4 libraries
+\texttt{CertifiedGaps} and \texttt{SeedKernel} in \texttt{lean/} formalize this criterion and its
+applications to concrete spin chains; each statement below links to the Lean declaration that
+proves it.
 
 \section*{The criterion}
 
 For a periodic ring Hamiltonian \(H_L = \sum_{j=1}^{L} h_{j,j+1} + \sum_{j=1}^{L} o_j\) of \(L\)
-unit cells, write \(Z_L(\beta) = \Tr e^{-\beta H_L}\) and define the \emph{spatial} and
-\emph{thermal purities}
+unit cells, write \(Z_L(\beta) = \Tr e^{-\beta H_L}\) and define the \emph{spatial purity} and
+\emph{thermal purity}
 \[
   \Ps(n,\beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
   \Pt(n,\beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
@@ -33,41 +36,42 @@ every even \(L \ge n_0\).
 
 \section*{What is formalized}
 
-The blueprint follows the five layers of the formalization:
+The formalization is organized into five parts.
 \begin{enumerate}
-  \item Chapter~\ref{chap:criterion}: the abstract two-purity criterion for any family of finite
-    spectra whose partition functions satisfy three \emph{spatial moment inequalities}
-    (Theorem~\ref{thm:gap-of-seeds}).
-  \item Chapter~\ref{chap:chain}: unequal seed defects, the exact asymmetric doubling recurrence,
-    and rational chain certificates checked in the kernel
-    (Theorem~\ref{thm:gap-of-chain-certificate}).
-  \item Chapter~\ref{chap:rings}: proof that every reflection-positive ring satisfies the spatial
-    moment inequalities, via Trotterized positive semidefinite transfer matrices and a Lie--Trotter
-    product formula (Theorem~\ref{thm:rp-moment-bounds}), giving the end-to-end criterion for rings
+  \item Chapter~\ref{chap:criterion} proves the abstract two-purity doubling criterion for any
+    family of finite spectra whose partition functions satisfy three \emph{spatial moment
+    inequalities} (Theorem~\ref{thm:gap-of-seeds}).
+  \item Chapter~\ref{chap:chain} extends the criterion to unequal seed defects by iterating the
+    exact asymmetric doubling recurrence through rational chain certificates checked in the Lean
+    kernel (Theorem~\ref{thm:gap-of-chain-certificate}).
+  \item Chapter~\ref{chap:rings} proves that every reflection-positive ring satisfies the spatial
+    moment inequalities by constructing Trotterized positive semidefinite transfer matrices and
+    taking the continuous-time limit via the Lie--Trotter product formula
+    (Theorem~\ref{thm:rp-moment-bounds}), which yields the gap criterion for rings
     (Theorem~\ref{thm:rp-gap}).
-  \item Chapters~\ref{chap:heisenberg} and~\ref{chap:models}: the spin-1 Heisenberg ring and seven
-    further model families, each a gap theorem whose only open hypotheses are its two seed
-    inequalities.
-  \item Chapter~\ref{chap:seedkernel}: seed inequalities proved inside the Lean kernel. For the
-    longitudinal-field Ising chain at \(g = 1/4\), \(h = 1/20\), the seed is proved in the kernel,
-    giving the first unconditional gap theorem (Theorem~\ref{thm:ising-gap}).
+  \item Chapters~\ref{chap:heisenberg} and~\ref{chap:models} apply the ring criterion to the
+    spin-1 Heisenberg ring and seven further spin-chain families, establishing a uniform gap
+    theorem for each model conditional only on its two seed inequalities.
+  \item Chapter~\ref{chap:seedkernel} proves the seed inequalities inside the Lean kernel for the
+    longitudinal-field Ising chain at \(g = 1/4\) and \(h = 1/20\), giving an unconditional gap
+    theorem (Theorem~\ref{thm:ising-gap}).
 \end{enumerate}
 
 \section*{How to read the status}
 
-A statement marked as formalized has a Lean declaration with that exact content; a proof marked as
-formalized is complete in Lean. The open nodes of the dependency graph are the seed inequalities of
-each model (finite numerical statements about rings of a few to a few thousand sites, closed by
-\texttt{sorry} in Lean and certified by computer in \texttt{models/}). Everything upstream of them
-depends only on the standard axioms \texttt{propext}, \texttt{Classical.choice}, and
-\texttt{Quot.sound}.
+A statement marked as formalized has a Lean declaration with that exact content, and a proof marked
+as formalized is complete in Lean. The open nodes of the dependency graph are the seed inequalities
+of each model, which are finite numerical bounds on rings of a few to a few thousand sites left as
+\texttt{sorry} in Lean and certified by computer in \texttt{models/}. All other results depend only
+on the standard axioms \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
 
 \begin{remark}[Conventions]
   \label{rem:conventions}
-  The spectral gap is stated through the predicate \(\GapGT(e, c)\) (Definition~\ref{def:gapgt}):
-  the eigenvalue family \(e\) has a nondegenerate minimum and every other eigenvalue lies more than
-  \(c\) above it. This formulation avoids sorting eigenvalues and records ground-state uniqueness
-  and the gap lower bound simultaneously. Partition functions of concrete rings are defined as
-  \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), the real part of a complex matrix trace.
-  Ring lengths count unit cells.
+  The spectral gap is stated through the predicate \(\GapGT(e, c)\) (Definition~\ref{def:gapgt}),
+  which asserts that the eigenvalue family \(e\) has a nondegenerate minimum (attained at a single
+  index) and every other eigenvalue
+  lies more than \(c\) above it. This formulation avoids sorting eigenvalues and records
+  ground-state uniqueness and the gap lower bound simultaneously. Partition functions of concrete
+  rings are defined as \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), the real part of a
+  complex matrix trace. Ring lengths count unit cells.
 \end{remark}
