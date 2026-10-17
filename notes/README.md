@@ -13,6 +13,15 @@ continue the appendix numbering of `thermal-mpo-gap-note.tex` (Appendices A–C)
 | [`thermal-mpo-gap-certificate.tex`](thermal-mpo-gap-certificate.tex) | [PDF](thermal-mpo-gap-certificate.pdf) | *How the Initial Estimate Is Certified* (Appendices I–M). Presents the finite seed certificate at $(n_0, \beta_0) = (2304, 784)$ in tensor-network diagrams: twisted partition functions, symmetry-sector projectors, degree-12 polynomial filters, a matrix-product trial vector at $n = 72$, and six unequal-defect doubling steps from $(36, 49/4)$ (including temperature lifting on the $b_0 = 49/4$ sector moments giving $\Delta_L > 0.0729$ for even $L \ge 36$ and the untwisted one-trace specialization), followed by smaller seed inputs and half-chain comparison operators for formal verification (`models/lean_seeds`), $\mathrm{SU}(2)$ reduced-block trial certificates (`models/spin1`, `models/spin2`), and certified thermal MPO compression (`CertifiedGaps.CertifiedMPO`: Taylor and Araki–Lieb–Thirring majorants, rational matrix gauges, and three-layer trace corrections with backward error propagation). |
 | [`thermal-mpo-gap-2plus1d.tex`](thermal-mpo-gap-2plus1d.tex) | [PDF](thermal-mpo-gap-2plus1d.pdf) | *The Thermal-Purity Recursion in 2+1 Dimensions*. Develops the partition-function-excess recursion for frustration-free Hamiltonians in two spatial dimensions, tested numerically on the hexagonal spin-3/2 AKLT model in [`../models/aklt/`](../models/aklt/). |
 
+## References
+
+[`references.bib`](references.bib) is the concise reference list for the arXiv version of the paper
+(26 BibTeX entries). Every entry was checked against its Crossref DOI record or arXiv page on
+2026-10-16. The notes above do not use it yet; they keep their own bibliographies.
+[`references.html`](references.html) shows the same list with a small figure per entry of what that
+paper did, a line on why to cite it, a suggested disclaimer, and the papers left out; open it in a
+browser.
+
 ## Build
 
 Building the notes requires a LaTeX installation with REVTeX 4.2, TikZ, and `latexmk`. From the
