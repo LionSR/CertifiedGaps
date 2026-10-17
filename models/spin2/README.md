@@ -68,9 +68,9 @@ exact transfer argument extends".
 ## Reproduce
 
 From the repository root, with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1`; the environment pins
-ITensors 0.9.32, ITensorMPS 0.4.2, and Nemo 0.57.0. Times were last measured on a heavily
-oversubscribed machine (load ≈ 100 on 10 cores), so they are upper bounds: `test/runtests.jl` 54 min
-(dominated by the thermal and DMRG controls), the standalone test files 1.5–18 min each.
+ITensors 0.9.32, ITensorMPS 0.4.2, and Nemo 0.57.0. `check.jl` runs in seconds (`--full` in under a
+minute); `test/runtests.jl` includes the ITensors DMRG and thermal-MPO controls (~15–50 min), and
+the standalone `test/*.jl` files take 1.5–18 min each.
 
 ```sh
 julia --startup-file=no --project=models/spin2 -e 'using Pkg; Pkg.instantiate()'
@@ -185,19 +185,12 @@ module hashes) are provenance and are not compared with the checkout.
 
 ## History
 
-- October 7–8, 2026: DMRG and thermal pilots, $\mathrm{SU}(2)$ trial search, and the first exact
-  trial certificates ($D = 24$, then $D = 137$ and $D = 295$).
+- October 7–8, 2026: DMRG and thermal pilots, $\mathrm{SU}(2)$ trial search, and the exact
+  periodic MPS trial certificates ($D = 24$, $D = 137$, and $D = 295$).
 - October 8–11: thermal upper-bound experiments (positive, Hilbert–Schmidt, and spectral
   compression; MPO norms and squaring; polynomial seeds and flows; operator errors; adjoint and
-  Schatten trace corrections; charge blocks). The certified MPO toolkit then moved verbatim into the
-  core as `CertifiedGaps.CertifiedMPO` (with its tests, `julia/test/certified_mpo/`), and the shared
-  spin, ED, purification, and recurrence code into the core as well; hash fields that scripts record
-  for modules have pointed at the new core files since then.
-- October 11 and 14: route memo and the reproducible thermal-starting-point audit (`IDEAS.md`,
+  Schatten trace corrections; charge blocks), documented in [`METHOD.md`](METHOD.md). The generic
+  certified MPO toolkit was promoted into the shared core as `CertifiedGaps.CertifiedMPO` (tested in
+  `julia/test/certified_mpo/`).
+- October 11–14: route memo and reproducible thermal-starting-point audit ([`IDEAS.md`](IDEAS.md),
   PR #26).
-- Layout tidy: the 1400-line lab notebook moved from this README to `METHOD.md` (text unchanged
-  apart from script paths); `configs/` moved to `scripts/configs/`; the flat `scripts/` was grouped
-  by topic (subdirectories above), with `certify_trial.jl` and the externally cited drivers left at
-  the top; `check.jl` and a model `.gitignore` were added.
-- `PolynomialMPO.local_spins` takes its ladder operators from the core `Spins.integer_ladders(2)`
-  (same integer matrices) instead of building them locally.

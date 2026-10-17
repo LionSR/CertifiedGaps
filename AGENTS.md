@@ -90,7 +90,9 @@ that makes the seed purities computable or boundable beyond raw dense diagonaliz
   Peierls–Bogoliubov, Weyl, or operator inequalities) to the target coupling while tracking the
   admissible defect region ($< 0.12731$).
 - **Asymmetric and half-length seeds:** The criterion needs only $P_{\mathrm{s}}(n_0, \beta_0)$ and
-  $P_\tau(2n_0, \beta_0)$. By Theorem 2.24(v) of the local survey notes, $P_\tau(2n_0, \beta_0)$ can be
+  $P_\tau(2n_0, \beta_0)$. By the exact coupling identity
+  $P_\tau(2n_0, \beta_0) = P_{\mathrm{s}}(n_0, 2\beta_0)\,P_\tau(n_0, \beta_0)^2 / P_{\mathrm{s}}(n_0, \beta_0)^2 \ge P_{\mathrm{s}}(n_0, 2\beta_0)\,P_\tau(n_0, \beta_0)^2$
+  (`notes/thermal-mpo-gap-scope.tex`, Appendix E), $P_\tau(2n_0, \beta_0)$ can be
   bounded in terms of $P_\tau(n_0, \beta_0)$ and $P_{\mathrm{s}}(n_0, 2\beta_0)$, halving the largest required
   ring length. Moreover, the asymmetric recurrence is much more tolerant of the spatial defect
   $\varepsilon_{\mathrm{s}}$ than the thermal defect $\varepsilon_\tau$; allocate computational effort accordingly.
@@ -108,6 +110,7 @@ is valuable documentation.
 ## Repository layout
 
 - `notes/`: LaTeX notes (main proof, scope, certificate method, and $`2+1`$D extension). Do not edit unless asked.
+- `explainer/`: illustrated HTML exposition of the ring and open-chain proofs.
 - `julia/`: shared core package `CertifiedGaps` (recurrence and certified bounds, exact arithmetic,
   results I/O, spin operators, RP tests and exact RP certificates, exact diagonalization, verified ring
   spectra and `certify_gap`, Nemo/Arb certified MPO toolkit, and ITensors purification extension). See
@@ -123,6 +126,12 @@ is valuable documentation.
 - `models/lean_seeds/`: generators and studies for seeds checked inside the Lean kernel (`decide +kernel`
   only; Julia generates witness files and Lean verifies them); its generators write the witness files
   under `lean/SeedKernel`.
+- `leaderboard/`: Lean library `Leaderboard` packaging every Lean-verified gap record (`Record.Unconditional`
+  and `Record.Seeded`) and the `leaderboard_audit` executable. See `leaderboard/README.md`.
+- `blueprint/`, `home_page/`: the `leanblueprint` dependency graph/web/PDF and the Jekyll project website
+  and leaderboard (`home_page/_data/records.yml`).
+- `tools/`: `fetch_upstream.jl` (downloads pinned upstream evidence/paper files) and `tools/leaderboard/`
+  (`LeaderboardCheck`, validating `home_page/_data/records.yml` against the certificates and Lean audit).
 
 ## Directory format
 
@@ -207,9 +216,8 @@ spectra (`seed_bounds(...; spectra)`, `write_spectrum`), and gap enclosures
   `julia/src` must keep every model checker and test passing; run them all. Use
   `Results.model_metadata` to record both hash sets and `Results.verify_model_metadata` (same
   `dirs` and `files`) to check the model-local set.
-- Never modify `models/spin1/results`, `models/spin2/results`, `models/aklt/results`, or anything under
-  `lean/` (except when running `models/lean_seeds/certify.jl` to regenerate the witness files in
-  `lean/SeedKernel`).
+- Never modify `models/spin1/results`, `models/spin2/results`, or anything under `lean/` (except when
+  running `models/lean_seeds/certify.jl` to regenerate the witness files in `lean/SeedKernel`).
 - Do not add Python files; all code in this repository is written in Julia, Lean 4, or LaTeX.
 - Store every exact rational or integer in certificate JSON files as a string (`"num//den"` or `"int"`)
   using `CertifiedGaps.Results.write_result` and `parse_exact_json`. Record source file SHA-256 hashes

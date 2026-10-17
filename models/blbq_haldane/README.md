@@ -19,7 +19,7 @@ On a periodic ring of $L$ spin-1 sites (one site per unit cell, $o = 0$, $\kappa
 H_L = \sum_{j=1}^L \bigl(\cos\theta\, X_{j,j+1} + \sin\theta\, X_{j,j+1}^2\bigr), \qquad X_{j,j+1} = \mathbf{S}_j \cdot \mathbf{S}_{j+1},
 ```
 
-evaluated at $`\theta \in \{0, -1/10, -3/10, -1/2, -3/5, -7/10\}`$ radians ($\theta = 0$ is the spin-1 Heisenberg chain, certified at $n_0 = 20$ in [`models/spin1/`](../spin1/README.md), and $\theta = -\pi/4$ is the gapless Takhtajan–Babujian critical point bounding the negative-$`\theta`$ Haldane window). At $L = 2$, both periodic bonds are included.
+evaluated at $`\theta \in \{0, -1/10, -3/10, -1/2, -3/5, -7/10\}`$ radians ($\theta = 0$ is the spin-1 Heisenberg chain, certified at $n_0 = 36, 60, 2304$ from short-ring traces and MPS trials in [`models/spin1/`](../spin1/README.md), and $\theta = -\pi/4$ is the gapless Takhtajan–Babujian critical point bounding the negative-$`\theta`$ Haldane window). At $L = 2$, both periodic bonds are included.
 
 ## Reflection positivity
 
@@ -71,7 +71,7 @@ With zero energy shift ($\kappa = 0$), the spatial purity is bounded above by th
 | $-0.6$ | 1.427 | 0.881 | 0.641 | 0.493 | 5.0 |
 | $-0.7$ | 1.491 | 0.920 | 0.671 | 0.542 | 5.0 |
 
-Fitting $\delta(n)$ to an exponential decay and modeling the thermal purity with a dilute triplet gas estimates the first admissible seed at $n_0 \approx 20\text{–}24$ for $\theta = 0$ (consistent with the $n_0 = 20$ certificate in `models/spin1/`), $n_0 \approx 24\text{–}32$ for $\theta = -0.1$, and $n_0 \approx 30\text{–}48$ for $\theta = -0.3$ (`extrapolations` in `results/scaling.json`). For $\theta \le -0.5$, the $1/L$ and $1/L^2$ gap extrapolations disagree in sign ($n_0 \approx 32\text{–}42$ under the positive extrapolation).
+Fitting $\delta(n)$ to an exponential decay and modeling the thermal purity with a dilute triplet gas estimates the first unshifted admissible seed at $n_0 \approx 20\text{–}24$ for $\theta = 0$ (matching the unshifted MPO seed estimate; [`models/spin1/`](../spin1/README.md) certifies $n_0 = 36, 60, 2304$ using shifted traces and MPS trials), $n_0 \approx 24\text{–}32$ for $\theta = -0.1$, and $n_0 \approx 30\text{–}48$ for $\theta = -0.3$ (`extrapolations` in `results/scaling.json`). For $\theta \le -0.5$, the $1/L$ and $1/L^2$ gap extrapolations disagree in sign ($n_0 \approx 32\text{–}42$ under the positive extrapolation).
 
 ### Resource limit for dense exact diagonalization
 

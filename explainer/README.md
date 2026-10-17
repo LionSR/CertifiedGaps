@@ -50,9 +50,3 @@ Nothing. All numbers on the page are floating-point illustrations. The spin-1 se
 `models/spin1/results/scalars.json` and the notes; the transverse-field Ising lab computes free-fermion
 purities in `Float64`; the open-chain energy levels are a small floating-point exact diagonalization
 (open spin-1 chains, $n = 4 \dots 12$, endpoint fields $h = 0$ and $3/5$) done outside the repository.
-
-## Language note
-
-`AGENTS.md` restricts code to Julia, Lean 4, and LaTeX. This directory is a browser-side exposition
-and is written in HTML and JavaScript because that is what runs in a browser; it holds no certificate
-code and nothing in `julia/`, `models/`, or `lean/` depends on it.

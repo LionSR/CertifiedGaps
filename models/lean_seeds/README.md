@@ -356,25 +356,14 @@ are gitignored and must be regenerated in their respective model directories bef
 
 ## History
 
-- The five studies were originally developed in separate directories, Julia projects, and PRs:
-  PR #24 (`seed_design`), PR #22 (`spectrum`), PR #27 (`anchor`), PR #21 (`spin1_kernel`, then
-  `lean_prototype`), and PR #25 (`ising`, then `models/lean_seed_small`), with two standalone Lake
-  projects for the Lean prototypes.
-- Consolidation: one Julia project here (the union of the environments, same package versions);
-  one module per study with shared paths, $`S^z`$ basis, Lake driver, and source hashing; the paper
-  fetchers merged into `scripts/fetch_paper.jl`. The two Lake projects became the opt-in library
-  `SeedKernel` of `lean/`, with one shared packed-lane module (`SeedKernel/Packed.lean`, now also
-  under the Ising `Packed` checks) and `SeedBridge` importing `CertifiedGaps` directly. All exact
-  records were regenerated: every exact number is identical (only provenance hashes, timings, and
-  the `seed_design` trial-file paths changed), and the Lean witness files are byte-identical apart
-  from module names.
-- Layout tidy: `scripts/fetch_paper.jl` now forwards to the shared
-  `tools/fetch_upstream.jl --paper` (one place for the pinned commit; it also skips files that are
-  already present with the pinned hash), and `scripts/spin1_kernel/audit_mathlib.sh` was ported to
-  `scripts/audit_mathlib.jl` (byte-identical output). The port sits outside `scripts/spin1_kernel/`
-  so that the `spin1_kernel` source-hash set is unchanged. `scripts/spectrum/KernelBench.lean` stays
-  where it is: `scripts/spectrum/provenance.jl` hashes it into `results/spectrum/provenance.json`,
-  and the Lean benchmarks under `lean/` are not edited from model directories.
-- The Ising seed closed: `Ising/Spectral`, `Ising/Hamiltonian`, `Ising/Bridge`, and `Ising/Seed`
-  prove `first_point_seed` and the unconditional `ising_gap` from the existing kernel checks (no new
-  witnesses); `SeedBridge`, `Arithmetic`, and `ResidualLemma` were retired.
+- The five studies were originally developed in separate directories and PRs: PR #24
+  (`seed_design`), PR #22 (`spectrum`), PR #27 (`anchor`), PR #21 (`spin1_kernel`), and PR #25
+  (`ising`), then consolidated into `LeanSeeds` and the opt-in Lean library `SeedKernel` under
+  `lean/` (sharing `SeedKernel/Packed.lean` and `tools/fetch_upstream.jl --paper`). Note that
+  `scripts/audit_mathlib.jl` is kept outside `scripts/spin1_kernel/` so the `spin1_kernel`
+  source-hash set in `results/spin1_kernel/witnesses.json` is unchanged, and
+  `scripts/spectrum/KernelBench.lean` is kept in place because `scripts/spectrum/provenance.jl`
+  hashes it into `results/spectrum/provenance.json`.
+- In `SeedKernel/Ising/`, `Spectral.lean`, `Hamiltonian.lean`, `Bridge.lean`, and `Seed.lean`
+  completed the end-to-end proof of `first_point_seed` and the unconditional `ising_gap` theorem
+  from the kernel-checked 6- and 12-site witnesses.
