@@ -1,34 +1,25 @@
-# Welcome to Jekyll!
+# Jekyll configuration of the project home page (leanblueprint template, cayman remote theme),
+# built by docgen-action in .github/workflows/blueprint.yml.
 #
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely edit after that. If you find
-# yourself editing this file very often, consider using Jekyll's data files
-# feature for the data you need to update frequently.
+# Every page builds links with `relative_url` / `absolute_url`, and GitHub links from
+# `repository`, so moving the site or renaming the repository only changes `url`, `baseurl`
+# and `repository` below. For a local preview at the server root, override them:
+#     bundle exec jekyll build --baseurl "" --config _config.yml,<file with url: "">
 #
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'bundle exec jekyll serve'. If you change this file, please restart the server process.
-#
-# If you need help with YAML syntax, here are some quick references for you:
-# https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
-# https://learnxinyminutes.com/docs/yaml/
-#
-# Site settings
-# These are used to personalize your new site. If you look in the HTML files,
-# you will see them accessed via {{ site.title }}, {{ site.email }}, and so on.
-# You can create any custom variable you would like, and they will be accessible
-# in the templates via {{ site.myvariable }}.
+# The leaderboard rows live in _data/records.yml (hand-edited; schema in its header).
+# _data/lean_records.json is generated in CI by `lake exe leaderboard_audit` (not committed).
 
 title: Certified spectral gaps by the spacetime bootstrap
-#email: your-email@example.com
-description: A Lean 4 formalization of uniform spectral gaps of quantum spin chains
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://LionSR.github.io/haldane-gap-diagrams" # the base hostname & protocol for your site, e.g. http://example.com
+description: Uniform spectral gaps of quantum spin chains, certified by computer and formalized in Lean 4
+baseurl: "/haldane-gap-diagrams" # the subpath of the site
+url: "https://LionSR.github.io" # the base hostname and protocol of the site
 twitter_username:
 github_username: LionSR
 repository: LionSR/haldane-gap-diagrams
+branch: main # the branch that certificate and checker links point to
 
 # Build settings
-remote_theme: pages-themes/cayman@v0.2.0 
+remote_theme: pages-themes/cayman@v0.2.0
 plugins:
   - jekyll-remote-theme
   - jekyll-github-metadata

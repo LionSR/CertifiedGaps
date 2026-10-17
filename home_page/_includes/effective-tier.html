@@ -1,0 +1,17 @@
+{%- comment -%}
+  Sets `eff` (the displayed tier) and `lr` (the Lean record or nil) for the record include.rec.
+  For a record with a Lean name, the tier comes only from site.data.lean_records: "lean-" plus
+  its kind, "lean-missing" if the name is absent, "lean-unavailable" if this build has no file.
+  (Liquid assignments made in an include stay visible to the including template.)
+{%- endcomment -%}
+{%- assign lr = nil -%}
+{%- if include.rec.lean -%}
+  {%- if site.data.lean_records -%}
+    {%- assign lr = site.data.lean_records | where: "name", include.rec.lean.name | first -%}
+    {%- if lr -%}{%- assign eff = 'lean-' | append: lr.kind -%}{%- else -%}{%- assign eff = 'lean-missing' -%}{%- endif -%}
+  {%- else -%}
+    {%- assign eff = 'lean-unavailable' -%}
+  {%- endif -%}
+{%- else -%}
+  {%- assign eff = include.rec.tier -%}
+{%- endif -%}

@@ -1,38 +1,80 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
-# layout: home
 usemathjax: true
 ---
 
-This project formalizes in Lean 4 the **spacetime bootstrap** (the *two-purity doubling
-criterion*): a reflection-positive quantum spin ring whose partition function
-Z<sub>L</sub>(β) = Tr e<sup>−βH<sub>L</sub></sup> has spatial purity
-P<sub>s</sub>(n₀, β₀) = Z<sub>2n₀</sub>(β₀)/Z<sub>n₀</sub>(β₀)² and thermal purity
-P<sub>τ</sub>(2n₀, β₀) = Z<sub>2n₀</sub>(2β₀)/Z<sub>2n₀</sub>(β₀)² close enough to 1 at a single
-seed scale (n₀, β₀) has a unique ground state and a uniform spectral gap on every even ring of
-length L ≥ n₀.
+{% assign repo_url = 'https://github.com/' | append: site.repository %}
+{% assign records = site.data.records.records %}
 
-## Headline theorems
+## What this project proves
 
-* **Unconditional:** for every even L ≥ 6, the Ising ring
-  −∑ Z<sub>j</sub>Z<sub>j+1</sub> − ¼ ∑ X<sub>j</sub> − ¹⁄₂₀ ∑ Z<sub>j</sub> has a unique ground
-  state and gap Δ<sub>L</sub> > log 13480 / (97/4) ≈ 0.392
-  (`SeedKernel.Ising.ising_gap`; the seed is checked in the Lean kernel, no `sorry`).
-* **Conditional on two seed inequalities:** for every even L ≥ 2304, the spin-1 Heisenberg ring
-  ∑ **S**<sub>j</sub> · **S**<sub>j+1</sub> has a unique ground state and
-  Δ<sub>L</sub> > log 20 / 784 ≈ 0.00382, given P<sub>s</sub>(2304, 784) ≥ 0.99 and
-  P<sub>τ</sub>(4608, 784) ≥ 0.99
-  (`CertifiedGaps.SpinOneHeisenberg.spin_one_heisenberg_gap`).
-* Seven further model families (spin-1 with single-ion anisotropy, dimerized spin-1 and
-  spin-½ chains, spin-½ chain in a staggered field, spin-½ and transverse-field Ising ladders,
-  Ising chain in transverse and longitudinal fields), each with its two seed inequalities as the
-  only open hypotheses. The seeds are certified by computer in the repository's `models/`.
+A quantum spin chain is *gapped* when its lowest energy level is separated from the next one by
+an amount that does not shrink as the chain grows. Proving such a gap is hard, because a
+computer can only diagonalize short chains, while the gap is a statement about chains of every
+length.
 
-Useful links:
+The **spacetime bootstrap** (also called the *two-purity doubling criterion*) bridges finite
+computation and infinite chains. It looks at two numbers of a ring of length $$n$$ at inverse
+temperature $$\beta$$, both computed from the partition function
+$$Z_L(\beta) = \operatorname{Tr} e^{-\beta H_L}$$:
 
-* [Blueprint]({{ site.url }}/blueprint/)
-* [Blueprint as pdf]({{ site.url }}/blueprint.pdf)
-* [Dependency graph]({{ site.url }}/blueprint/dep_graph_document.html)
-* [Doc pages for this repository]({{ site.url }}/docs/)
+* the **spatial purity** $$P_{\mathrm{s}}(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2$$, and
+* the **thermal purity** $$P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$$.
+
+When the interaction is reflection positive, doubling the ring length and the inverse
+temperature together makes both purities approach 1 quadratically. So if both are close
+enough to 1 at a single *seed* scale $$(n_0, \beta_0)$$, they stay close to 1 at every dyadic
+scale, and the ring has a unique ground state and a gap $$\Delta_L$$ bounded below by an
+explicit constant for **every** even length $$L \ge n_0$$. The seed is a finite computation: we
+certify it by computer with exact or interval arithmetic, and, for the model families below, we
+prove the deduction from the seed to the gap in Lean 4.
+
+## Headline results
+
+* **Unconditional Lean theorem.** For every even $$L \ge 6$$, the Ising ring
+  $$-\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j$$ has a unique ground
+  state and $$\Delta_L > \log(13480)/(97/4) \approx 0.392$$. The seed itself is checked in the
+  Lean kernel; the theorem uses only the standard axioms.
+* **The spin-1 Heisenberg chain** (Haldane's conjecture). For every even $$L \ge 2304$$, the
+  ring $$\sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$$ has a unique ground state and
+  $$\Delta_L > \log(20)/784 \approx 0.00382$$. Lean proves this from the two seed inequalities
+  $$P_{\mathrm{s}}(2304, 784) \ge 0.99$$ and $$P_\tau(4608, 784) \ge 0.99$$, which the
+  [OpenAI preprint](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026)
+  certified and this repository reproduces in exact arithmetic. A sharper exact computation,
+  not yet independently reviewed, gives $$\Delta_L > 0.0729$$ for every even $$L \ge 36$$.
+* **{{ records | size }} leaderboard entries** across eight certified model families
+  (spin-1/2 chains in a staggered field, dimerized spin-1/2 and spin-1 chains, spin-1 chains
+  with single-ion anisotropy, Heisenberg and Ising ladders, and the Ising chain in transverse
+  and longitudinal fields), together with open targets. See the
+  [leaderboard]({{ '/leaderboard.html' | relative_url }}).
+
+## Read and browse
+
+| Resource | What it is |
+|---|---|
+| [**Leaderboard**]({{ '/leaderboard.html' | relative_url }}) | every certified gap, its verification tier, Lean record, certificate and history |
+| [**Explainer**]({{ '/explainer/' | relative_url }}) | an illustrated, undergraduate-level walk through the proof, with interactive figures (an exposition, not part of any certificate) |
+| [Main note (PDF)]({{ '/notes/thermal-mpo-gap-note.pdf' | relative_url }}) | the criterion and the spin-1 proof, drawn as tensor-network diagrams |
+| [Scope note (PDF)]({{ '/notes/thermal-mpo-gap-scope.pdf' | relative_url }}) | bond reflection positivity, multi-site unit cells and the general scope |
+| [Certificate note (PDF)]({{ '/notes/thermal-mpo-gap-certificate.pdf' | relative_url }}) | a diagrammatic exposition of the spin-1 seed certificate |
+| [2+1D note (PDF)]({{ '/notes/thermal-mpo-gap-2plus1d.pdf' | relative_url }}) | the thermal-purity recursion in two spatial dimensions |
+| [Blueprint]({{ '/blueprint/' | relative_url }}) ([PDF]({{ '/blueprint.pdf' | relative_url }})) | the Lean formalization explained step by step |
+| [Dependency graph]({{ '/blueprint/dep_graph_document.html' | relative_url }}) | which lemmas the main theorems use, and their formalization status |
+| [Lean API docs]({{ '/docs/' | relative_url }}) | every Lean declaration, generated by doc-gen4 |
+| [How to contribute]({{ '/contribute.html' | relative_url }}) | submit a new record or improve one by pull request |
+| [GitHub repository]({{ repo_url }}) | code, certificates, checkers and Lean sources |
+
+The explainer's two narrated films are rendered locally from its sources (see the explainer
+[README]({{ repo_url }}/blob/{{ site.branch }}/explainer/README.md)); the published page shows
+their posters only.
+
+## How results are verified
+
+Every leaderboard entry carries a *tier*. A **Lean** record is a theorem checked by the Lean
+kernel. It is *unconditional* when it has no hypotheses and uses only the standard axioms, and
+*conditional* when its only hypotheses are the two seed inequalities, which are then certified by
+computer in the repository. A **certified** record rests on a rigorous computer certificate
+(exact rational or integer arithmetic, interval arithmetic, or verified eigenvalue enclosures with
+an explicit floating-point rounding analysis) that a standalone checker recomputes.
+Floating-point numerics (exact diagonalization without error bounds, DMRG, Lanczos) appear only
+as comparison values and open targets, never as certificates. The full rules are in
+[`AGENTS.md`]({{ repo_url }}/blob/{{ site.branch }}/AGENTS.md).

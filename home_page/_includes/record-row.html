@@ -1,0 +1,63 @@
+{%- comment -%}
+  One leaderboard row. Parameter: rec (a records.yml entry). For an entry with a Lean record, the
+  tier comes from site.data.lean_records (generated in CI), never from the YAML tier.
+{%- endcomment -%}
+{%- assign rec = include.rec -%}
+{%- assign repo_blob = 'https://github.com/' | append: site.repository | append: '/blob/' | append: site.branch | append: '/' -%}
+{%- include effective-tier.html rec=rec -%}
+<tr id="{{ rec.id }}" class="row-{{ eff }}">
+  <td class="param"><a class="anchor" href="#{{ rec.id }}" aria-label="link to this row">#</a> {{ rec.parameter }}</td>
+  <td class="num">
+    <details><summary><strong>{{ rec.bound.decimal }}</strong></summary>
+      <div class="exact">
+        {%- if rec.bound.r -%}
+          $\Delta_L > \log(r)/\beta$ with <code>r = {{ rec.bound.r }}</code>, <code>β = {{ rec.bound.beta }}</code>
+        {%- else -%}
+          $\Delta_L {% if rec.bound.strict %}>{% else %}\ge{% endif %}$ <code>{{ rec.bound.value }}</code>
+        {%- endif -%}
+        {%- if rec.bound.display %}, that is ${{ rec.bound.display }}${% endif -%}
+        ; the decimal is rounded down.
+      </div>
+    </details>
+  </td>
+  <td>{% include tier-badge.html tier=eff %}</td>
+  <td>{% if rec.lengths.text %}{{ rec.lengths.text }}{% else %}{% if rec.lengths.parity != 'all' %}{{ rec.lengths.parity }} {% endif %}L ≥ {{ rec.lengths.L0 }} {{ rec.lengths.unit }}{% endif %}{% if rec.lengths.boundary == 'open' %} (open chain){% endif %}</td>
+  <td>{% if rec.seed %}({{ rec.seed.n0 }}, {{ rec.seed.beta0 }}){% if rec.seed.text %}<div class="cellnote">{{ rec.seed.text }}</div>{% endif %}{% else %}—{% endif %}</td>
+  <td class="num">
+    {%- if rec.numerical_gap -%}
+      {%- assign ratio = rec.bound.decimal | times: 100.0 | divided_by: rec.numerical_gap.value | round: 1 -%}
+      <details><summary>{{ rec.numerical_gap.value }} <span class="ratio">({{ ratio }}%)</span></summary>
+        <div class="exact">{{ rec.numerical_gap.source }}; the percentage is the certified bound divided by this value.</div>
+      </details>
+    {%- else -%}—{%- endif -%}
+  </td>
+  <td class="lean">
+    {%- if rec.lean -%}
+      {%- assign short = rec.lean.name | remove_first: 'Leaderboard.Records.' -%}
+      <a href="{{ '/docs/find/' | relative_url }}?pattern={{ rec.lean.name | url_encode }}#doc"><code>{{ short }}</code></a>
+      <details><summary>$\Delta_L > \log({{ rec.lean.r }})/({{ rec.lean.beta }})${% if rec.lean.decimal %} ≈ {{ rec.lean.decimal }}{% endif %}</summary>
+        <div class="exact">
+          Every even $L \ge {{ rec.lean.L0 }}$. Full name <code>{{ rec.lean.name }}</code>.
+          {%- if lr %}
+            Spectrum: <code>{{ lr.spectrum }}</code>.
+            {% if lr.hypothesis %}Hypothesis: <code>{{ lr.hypothesis }}</code>.{% else %}No hypotheses.{% endif %}
+            Axioms: {{ lr.axioms | join: ', ' }}.
+          {%- elsif eff == 'lean-missing' %}
+            This record is not in this build's Lean audit.
+          {%- else %}
+            Lean status unavailable in this build.
+          {%- endif %}
+        </div>
+      </details>
+    {%- else -%}—{%- endif -%}
+  </td>
+  <td class="evidence">
+    {%- if rec.certificate -%}<a href="{{ repo_blob }}{{ rec.certificate }}">certificate</a>{%- endif -%}
+    {%- if rec.check -%}{% if rec.certificate %}<br>{% endif %}<a href="{{ repo_blob }}{{ rec.check }}">checker</a>{%- endif -%}
+    {%- if rec.source -%}{% if rec.certificate or rec.check %}<br>{% endif %}{% if rec.source.url %}<a href="{{ rec.source.url }}">source</a>{% else %}<small>{{ rec.source.text }}</small>{% endif %}{%- endif -%}
+  </td>
+  <td>{{ rec.date }}{% if rec.pr %}<br><a href="https://github.com/{{ site.repository }}/pull/{{ rec.pr }}">#{{ rec.pr }}</a>{% endif %}</td>
+</tr>
+{%- if rec.notes %}
+<tr class="notes"><td></td><td colspan="8"><div class="note">{{ rec.notes }}</div></td></tr>
+{%- endif %}

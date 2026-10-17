@@ -7,3 +7,122 @@
 @import "{{ site.theme }}";
 
 /* Put your rules below this line */
+
+/* Wide tables scroll inside their own container, so the page never scrolls sideways on a
+   phone. Cayman makes every table `display: block; overflow: auto`; the wrapper keeps that
+   behavior for tables whose cells hold <details>. */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+.main-content .table-wrap table {
+  display: table;
+  width: max-content;
+  min-width: 100%;
+  margin-bottom: 0;
+}
+.main-content table.records td,
+.main-content table.history td {
+  vertical-align: top;
+}
+.main-content table.records td.num,
+.main-content table.history td.num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.main-content table.records td.param {
+  white-space: nowrap;
+}
+.main-content table.records td.lean {
+  min-width: 14rem;
+}
+.main-content table.records td.lean a code {
+  white-space: nowrap;
+}
+.main-content table .cellnote {
+  font-size: 0.8em;
+  color: #4d5560;
+  max-width: 14rem;
+  white-space: normal;
+}
+.main-content table.records tr.notes td {
+  border-top: none;
+  font-size: 0.85em;
+  color: #4d5560;
+  white-space: normal;
+}
+/* A max-content table would grow to fit a long note on one line; the div caps it. */
+.main-content table.records tr.notes .note {
+  max-width: 48rem;
+}
+/* Pages with `wide: true` (the leaderboard) use more of a large screen. */
+.main-content.wide {
+  max-width: 96rem;
+}
+.main-content table details summary {
+  cursor: pointer;
+}
+.main-content table details .exact {
+  font-size: 0.85em;
+  max-width: 28rem;
+  white-space: normal;
+  word-break: break-word;
+  color: #4d5560;
+}
+.main-content table details .exact code {
+  word-break: break-all;
+}
+.main-content table .ratio {
+  color: #4d5560;
+}
+.main-content a.anchor {
+  color: #9aa3ad;
+  text-decoration: none;
+}
+
+/* Tier badges: glyph + label + border style carry the tier; color only reinforces it. */
+.tier {
+  display: inline-block;
+  padding: 0.05em 0.5em;
+  border: 2px solid;
+  border-radius: 0.3em;
+  font-size: 0.85em;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+.tier-lean-unconditional { background: #155a3a; border-color: #155a3a; color: #fff; }
+.tier-lean-conditional   { background: #e6f2ec; border-color: #155a3a; color: #0f4229; }
+.tier-certified          { background: #e8eef7; border-color: #1f4f8b; color: #173c69; }
+.tier-unreviewed         { background: #fff; border-style: dashed; border-color: #6b5a00; color: #4f4300; }
+.tier-assumed            { background: #fff; border-style: dotted; border-color: #8a3b12; color: #6e2f0e; }
+.tier-target             { background: #fff; border-style: dotted; border-width: 1px; border-color: #59636e; color: #3f4750; font-style: italic; }
+.tier-unknown            { background: #f3f3f3; border-style: double; border-width: 3px; border-color: #777; color: #333; }
+
+dl.tiers dt { margin-top: 0.8rem; }
+dl.tiers dd { margin-left: 1.5rem; }
+
+.callout {
+  border-left: 4px solid #8a3b12;
+  background: #fff7f0;
+  padding: 0.6rem 0.9rem;
+}
+nav.toc {
+  font-size: 0.9em;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+.hamiltonian {
+  overflow-x: auto;
+}
+
+/* On phones, cayman stacks the header buttons full width; seven of them fill the screen, so
+   they wrap inline instead. */
+@media screen and (max-width: 42em) {
+  .page-header .btn {
+    display: inline-block;
+    width: auto;
+    margin: 0.2rem 0.1rem;
+    padding: 0.4rem 0.7rem;
+  }
+}

@@ -1,0 +1,14 @@
+{%- comment -%}
+  A tier badge. Each tier has its own glyph, label and border style, so it reads without color.
+  Parameter: tier (one of the records.yml tiers, or "lean-unavailable" / "lean-missing").
+{%- endcomment -%}
+{%- case include.tier -%}
+{%- when "lean-unconditional" -%}<span class="tier tier-lean-unconditional" title="Lean theorem with no hypotheses, standard axioms only">◆ Lean, unconditional</span>
+{%- when "lean-conditional" -%}<span class="tier tier-lean-conditional" title="Lean theorem from the two seed inequalities; seeds certified by computer">◇ Lean, conditional</span>
+{%- when "certified" -%}<span class="tier tier-certified" title="Rigorous computer certificate with a standalone checker">✓ certified</span>
+{%- when "unreviewed" -%}<span class="tier tier-unreviewed" title="Certificate exists but has not been independently reviewed">○ unreviewed</span>
+{%- when "assumed" -%}<span class="tier tier-assumed" title="Relies on estimates imported from elsewhere">† assumed</span>
+{%- when "target" -%}<span class="tier tier-target" title="Floating-point survey estimates only">◌ target</span>
+{%- when "lean-missing" -%}<span class="tier tier-unknown" title="The Lean record named here is not in this build's lean_records.json">? Lean record not found</span>
+{%- else -%}<span class="tier tier-unknown" title="This build has no lean_records.json">? Lean status unavailable</span>
+{%- endcase -%}
