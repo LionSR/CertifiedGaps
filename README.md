@@ -52,7 +52,7 @@ only open hypotheses.
 | spin-½ Heisenberg + staggered field, $h = 1, 3/4, 1/2, 7/20, 1/4$ | $(8, 21/4 \dots 25/4)$ | $1.148, 0.890, 0.594, 0.383, 0.214$ | [`heisenberg_staggered_field`](models/heisenberg_staggered_field/) |
 | spin-½ dimerized Heisenberg, $\delta = 1/2, 3/10, 1/4$ (2-site cells; $\delta = 1/4$ is the smallest certifiable grid point with rings $\le 16$ spins) | $(4, 6 \dots 29/4)$ | $0.534, 0.173, 0.058$ | [`dimerized_heisenberg`](models/dimerized_heisenberg/) |
 | spin-1 dimerized Heisenberg, $\delta = 9/10, 7/10$ (2-site cells) | $(2, 7/2), (3, 17/4)$ | $0.528, 0.218$ | [`spin1_dimerized`](models/spin1_dimerized/) |
-| spin-1 Heisenberg $+ D \sum (S^z)^2$, $D = 4$ and $D \in [3.2059998, 3.206]$ | $(12, 29/10), (6, 381/125)$ | $0.899, 0.0010$ (every even $L \ge 6$) | [`spin1_largeD`](models/spin1_largeD/) |
+| spin-1 Heisenberg $+ D \sum (S^z)^2$, $D = 4$ and $D \in [3.2059998, 3.206]$ | $(12, 29/10), (6, 381/125)$ | $0.899, 0.0018$ (every even $L \ge 6$) | [`spin1_largeD`](models/spin1_largeD/) |
 | two-leg Heisenberg ladder, $J_\perp = 4, 7/2, 3, 5/2$ (rung cells) | $(4, 2 \dots 3)$ | $1.102, 0.778, 0.454, 0.042$ | [`heisenberg_ladder`](models/heisenberg_ladder/) |
 | two-leg transverse-field Ising ladder, $g = 3$ (rung cells) | $(4, 3/2)$ | $0.636$ | [`two_leg_tfim`](models/two_leg_tfim/) |
 | Ising chain $-ZZ - gX - hZ$, 30 points $g \in [1/4, 2]$, $h \in [1/20, 1]$ | $(6, \text{per point})$ | $\ge 0.0763$ at every point (smallest at $g = 1, h = 1/20$) | [`tfim_longitudinal`](models/tfim_longitudinal/) |
@@ -60,10 +60,14 @@ only open hypotheses.
 | spin-2 Heisenberg chain | — | numerical and certified-MPO investigation; no certificate | [`spin2`](models/spin2/) |
 | hexagonal spin-3/2 AKLT ($2+1$ dimensions) | — | numerical pilot of the $2+1$D thermal-purity recursion | [`aklt`](models/aklt/) |
 
-For all certified models outside `spin1/`, the seed defects are computed from complete spectra of the
-seed rings at lengths $n_0$, $2n_0$ (at $\beta_0$ and $2\beta_0$), where every eigenvalue is enclosed by a
-residual and Weyl/Ostrowski bound whose floating-point rounding error is bounded a priori under the
-IEEE binary64 model (including BLAS matrix products).
+All certified models outside `spin1/` share one pipeline in the core (`CertifiedGaps.GapCertificates`):
+each model is an exact `RingModel` with exact reflection-positivity data, and `certify_gap` computes
+the complete spectra of the seed rings at lengths $n_0$, $2n_0$ by exact symmetry blocks (charge,
+momentum, spin flip, on-site parities, cell blocking), encloses every eigenvalue by one residual,
+polar-factor and Weyl/Ostrowski bound (`verified_eigen`) whose floating-point rounding error is bounded
+a priori under the IEEE binary64 model (including BLAS matrix products), and runs the exact rational
+doubling chain; `check_certificate` re-derives it. The bounds in the table are the outward-rounded
+interval bounds; each certificate also states the exact rational chain bound.
 
 ## Layout
 
