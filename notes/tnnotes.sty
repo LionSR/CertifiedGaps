@@ -3,7 +3,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{tnnotes}[2026/10/07 Shared notation and tensor-network diagrams]
 \RequirePackage{bm,amsthm,tikz}
-\usetikzlibrary{arrows.meta,backgrounds}
+\usetikzlibrary{arrows.meta,backgrounds,calc}
 
 % ---------------------------------------------------------------- notation
 \newcommand{\Tr}{\operatorname{Tr}}
@@ -178,10 +178,17 @@
   \ifnum\pdfstrcmp{\detokenize\expandafter{\tn@it}}{\tn@dotsmark}=0 
    \node[anchor=\tn@anchor,minimum width=1.1em,minimum height=.5em,inner sep=0pt]
      (\tn@name-\tn@i) at \tn@pos {};
+   \ifnum#1=1
    \fill[white] ([xshift=-.5em,yshift=-.12em]\tn@name-\tn@i.center)
      rectangle ([xshift=.5em,yshift=.12em]\tn@name-\tn@i.center);
    \foreach \tn@d in {-.28,0,.28}{
      \fill ([xshift=\tn@d em]\tn@name-\tn@i.center) circle[radius=.055em];}
+   \else
+   \fill[white] ([xshift=-.25em,yshift=-.45em]\tn@name-\tn@i.center)
+     rectangle ([xshift=.25em,yshift=.45em]\tn@name-\tn@i.center);
+   \foreach \tn@d in {-.28,0,.28}{
+     \fill ([yshift=\tn@d em]\tn@name-\tn@i.center) circle[radius=.055em];}
+   \fi
   \else
    \ifnum\tn@i=\tn@count
     \node[tn last,tn extra,anchor=\tn@anchor] (\tn@name-\tn@i) at \tn@pos {\ensuremath{\tn@it}};
@@ -216,15 +223,18 @@
 % \tncolumn[keys]{i1,i2,...}: the same in imaginary time, on a physical double
 % wire running downward; ring closes it into a trace on the right.
 \newcommand{\tncolumnpath}[2][]{%
- \tn@reset{gibbs}\def\tn@gap{.3em}\pgfqkeys{/tn/chain}{#1}%
+ \tn@reset{gibbs}\def\tn@gap{.55em}\pgfqkeys{/tn/chain}{#1}%
  \tn@place0{#2}%
- \coordinate (\tn@name-T) at ([yshift=.45em]\tn@name-1.north);
- \coordinate (\tn@name-B) at ([yshift=-.45em]\tn@name-\tn@count.south);
+ \coordinate (\tn@name-T) at ([yshift=.6em]\tn@name-1.north);
+ \coordinate (\tn@name-B) at ([yshift=-.6em]\tn@name-\tn@count.south);
  \begin{pgfonlayer}{background}
  \iftn@ring
-  \coordinate (\tn@name-X) at ([xshift=.6em]\tn@name-1.east);
+  \coordinate (\tn@name-X) at ([xshift=.95em]\tn@name-1.east);
   \draw[phys,ring] (\tn@name-T)--(\tn@name-T-|\tn@name-X)--(\tn@name-B-|\tn@name-X)
     --(\tn@name-B)--cycle;
+  % the bounding box ignores the double wire's width; pad it so a following
+  % relation symbol does not touch the loop
+  \path ([xshift=.25em]\tn@name-T-|\tn@name-X);
  \else\draw[phys] (\tn@name-T)--(\tn@name-B);\fi
  \end{pgfonlayer}}
 \newcommand{\tncolumn}[2][]{\tikz[tn,tn centered]{\tncolumnpath[#1]{#2}}}
@@ -247,7 +257,7 @@
 % A proof drawn as two lanes read top to bottom, one per kind of bound. Each
 % box states one bound with its full arguments: solid boxes are given or
 % proved, dashed ones are intermediate. A move is a numbered circle on a
-% lane arrow, half a row above its conclusion; thin grey arrows into the
+% lane arrow, in the gap just above its conclusion; thin grey arrows into the
 % circle are the other bounds the move uses.
 %   \begin{prooflanes}[lane separation] ... \end{prooflanes}
 %   \lanebound{kind}{name}{lane}{row}{bound}  kind: s, t, b (spatial,
@@ -265,9 +275,13 @@
  lane b/.style={lanebox,draw=black!50,fill=black!8},
  lane bo/.style={lanebox,draw=black!50,densely dashed,fill=white},
  lanemv/.style={circle,draw=black!55,fill=white,line width=.45pt,inner sep=0pt,
-   minimum size=1.2em,font=\scriptsize},
+   minimum size=1.05em,font=\scriptsize},
  laneuse/.style={-{Latex[length=1.2mm]},black!40,line width=.4pt}}
-\def\lanedx{4}\def\lanedy{1.05}
+% The row pitch \lanedy (cm) leaves a gap between stacked boxes wide enough
+% for a move circle, its label and a visible arrow; \lanemvpos places the
+% circle at that fraction of the gap above the conclusion, leaving the longer
+% stretch below for the arrowhead.
+\def\lanedx{4}\def\lanedy{1.25}\def\lanemvpos{.55}
 \newenvironment{prooflanes}[1][4]{%
  \def\lanedx{#1}\begin{tikzpicture}[x=1cm,y=1cm]}{\end{tikzpicture}}
 \newcommand{\lanebound}[5]{%
@@ -276,10 +290,12 @@
 \newcommand{\tn@outer}[1]{\ifnum\csname tn@lane@#1\endcsname=0 west\else east\fi}
 \newcommand{\tn@inner}[1]{\ifnum\csname tn@lane@#1\endcsname=0 east\else west\fi}
 \newcommand{\lanemove}[5][black!55]{%
- \path (#3) ++(0,{.5*\lanedy}) node[lanemv] (mv#4) {#4};
+ \path let \p1=(#3.north),\p2=(#3.south) in
+   node[lanemv] (mv#4) at (\x1,{\y1+\lanemvpos*(\lanedy*1cm-\y1+\y2)}) {#4};
  \draw[#1,line width=.5pt,shorten <=.5pt] (#2)--(mv#4);
  \draw[flow,#1,shorten >=.5pt] (mv#4)--(#3);
- \node[maprule,anchor=\tn@inner{#2},inner sep=2pt] at (mv#4.\tn@outer{#2}) {#5};}
+ \node[maprule,anchor=\tn@inner{#2},inner sep=1pt,xshift=\ifnum
+   \csname tn@lane@#2\endcsname=0 -\fi 1.5pt] at (mv#4.\tn@outer{#2}) {#5};}
 \newcommand{\laneuse}[2]{\draw[laneuse,shorten <=1pt,shorten >=.5pt] (#1)--(mv#2);}
 \newcommand{\lanetag}[3][inner]{%
  \def\tn@side{#1}\def\tn@inside{inner}%

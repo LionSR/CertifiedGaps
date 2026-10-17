@@ -109,7 +109,7 @@ Want to set the next record? See the [open challenges]({{ '/leaderboard.html' | 
 ## Read
 
 * [Explainer]({{ '/explainer/' | relative_url }}): an illustrated walk through the proof for
-  undergraduates.
+  undergraduates, with a sequel on [open chains]({{ '/explainer/open.html' | relative_url }}).
 {% comment %} The note PDFs are temporary: the paper will replace these links. {% endcomment %}
 * Notes (PDF): [main note]({{ '/notes/thermal-mpo-gap-note.pdf' | relative_url }}) ·
   [scope]({{ '/notes/thermal-mpo-gap-scope.pdf' | relative_url }}) ·

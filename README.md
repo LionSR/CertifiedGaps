@@ -35,7 +35,7 @@ how it is proved, and the open challenges. To submit a result, see [`CONTRIBUTIN
 | $\Delta_L > (\log 20)/784 \approx 0.00382$ for every even $L \ge 2304$ | proved in the main note, given the seed purity bounds at $(n_0, \beta_0) = (2304, 784)$ | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
 | seed purity bounds $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge 0.99$ | reproduced in exact arithmetic (status `passed`) | [`models/spin1/`](models/spin1/) |
 | the two-purity criterion and the spin-1 theorem above, given the two seed bounds | formalized in Lean 4 | [`lean/`](lean/) |
-| [`explainer/`](explainer/) | an illustrated, undergraduate-level exposition of the proof (HTML page and two animated films); floating-point illustrations only, not part of any certificate |
+| [`explainer/`](explainer/) | an illustrated, undergraduate-level exposition of the proof (two HTML pages, ring and open chains, and two animated films); floating-point illustrations only, not part of any certificate |
 | $\Delta_L > 0.0729$ for every even $L \ge 36$ | exact-arithmetic computation combining temperature-lifting with a tighter seed chain; independently reviewed in #49 | [`models/spin1/`](models/spin1/) (`experiments/`) |
 | open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ | proved in Appendices A–C, given four finite estimates from the boundary-field paper | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
 | general scope of the method (bond reflection positivity and multi-site unit cells) | proved in Appendices D–H | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf) |
