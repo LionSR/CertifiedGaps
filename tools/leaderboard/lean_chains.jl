@@ -17,7 +17,7 @@
 
 using LeaderboardCheck
 using LeaderboardCheck: certificate_candidates, load_certificate, match_certificate, cert_exact,
-    log_enclosure, params_agree
+    log_enclosure, params_agree, window_defects
 using YAML
 
 const ROOT = normpath(joinpath(@__DIR__, "..", ".."))
@@ -44,7 +44,8 @@ import CertifiedGaps.ChainCheck
 """
     lean_seed(rec, name)
 
-The exact seed `(n₀, β₀, εₛ, εₜ)` of a row's Lean theorem: the row's seed in its certificate, or,
+The exact seed `(n₀, β₀, εₛ, εₜ)` of a row's Lean theorem (`window_defects` when the seed entry
+states no defects): the row's seed in its certificate, or,
 when the row names `lean.certificate`, the seed of that certificate at `β₀ = lean.beta` (which
 must have a single seed length).
 """
@@ -63,9 +64,12 @@ function lean_seed(rec, name)
         n0 = lengths[1]
     end
     c = match_certificate(joinpath(ROOT, path), n0, β0, params)
-    (c === nothing || c.s === nothing || c.t === nothing) &&
-        error("$(rec["id"]): $path states no exact defects for the seed ($n0, $β0)")
-    return (n0, β0, cert_exact(c.s), cert_exact(c.t))
+    if c !== nothing && c.s !== nothing && c.t !== nothing
+        return (n0, β0, cert_exact(c.s), cert_exact(c.t))
+    end
+    w = window_defects(joinpath(ROOT, path), n0, β0, params)
+    w === nothing && error("$(rec["id"]): $path states no exact defects for the seed ($n0, $β0)")
+    return (n0, β0, w...)
 end
 
 "The decimal of log r / β rounded down at `k` places, or `nothing` if the enclosure straddles."

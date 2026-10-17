@@ -11,10 +11,12 @@ const REPO = normpath(joinpath(@__DIR__, "..", "..", ".."))
 const FIXTURE = joinpath(@__DIR__, "lean_records.fixture.json")
 
 # A repository with one model whose certificate states the seed (6, 97/4), the bound 1/2 and
-# the defects 1/100, next to a floating-point diagnostic that claims more.
+# the defects 1/100, next to a floating-point diagnostic that claims more, and a one-step entry
+# (a bridge seed) at (4, 3).
 const CERT = """{"g": "1/4", "certificate": {"n": 6, "beta": "97/4", "bound_exact_binary": "1/2",
     "epsilon_s": "1/100", "epsilon_t": "1/100"},
-    "diagnostic": {"n": 6, "beta": "97/4", "bound": 0.9, "epsilon_s": 0.001, "epsilon_t": 0.001}}"""
+    "diagnostic": {"n": 6, "beta": "97/4", "bound": 0.9, "epsilon_s": 0.001, "epsilon_t": 0.001},
+    "bridge": {"length_from": 4, "length_to": 8, "beta": "3", "p": "1/50", "q": "1/40"}}"""
 
 const HEAD = """
 tiers:
@@ -133,6 +135,23 @@ fails(report, re) = any(e -> occursin(re, e), report.errors)
         seeds(s, t) = """, "n0": 6, "s": "$s", "t": "$t\""""
         @test passed(check(record(); json = lean_json(seeds = seeds("1/100", "1/50"))))
         @test fails(check(record(); json = lean_json(seeds = seeds("1/200", "1/50"))), "below the certified defect")
+        # a Lean tier may exceed the certificate's bound: the bound is the Lean theorem's
+        big = """{r: "1000000", beta: "97/4", decimal: "0.5697"}"""
+        bigLean = """{name: Leaderboard.Records.Toy.p, r: "1000000", beta: "97/4", decimal: "0.5697"}"""
+        @test passed(check(record(bound = big, lean = bigLean);
+            json = lean_json(r = "1000000", seeds = seeds("1/100", "1/50"))))
+        # the second seed of a two-seed record must be a one-step entry of the certificate
+        seed2(n, s, t) = seeds("1/100", "1/50") * """, "seed2": {"n0": $n, "beta": "3", "s": "$s", "t": "$t"}"""
+        @test passed(check(record(); json = lean_json(seeds = seed2(4, "1/50", "1/40"))))
+        @test fails(check(record(); json = lean_json(seeds = seed2(4, "1/60", "1/40"))), "second seed: Lean assumes s")
+        @test fails(check(record(); json = lean_json(seeds = seed2(5, "1/50", "1/40"))), "no one-step entry")
+        # a record on a parameter interval needs a Lean record on the same interval
+        iv(a, b) = seeds("1/100", "1/50") * """, "interval": ["$a", "$b"]"""
+        ivrow = record(params = """{g_min: "1/5", g_max: "1/4"}""")
+        @test passed(check(ivrow; json = lean_json(seeds = iv("1/5", "1/4"))))
+        @test fails(check(ivrow; json = lean_json(seeds = iv("1/5", "1/3"))), "is not [g_min, g_max]")
+        @test fails(check(ivrow; json = lean_json(seeds = seeds("1/100", "1/50"))), "the Lean record is a point")
+        @test fails(check(record(); json = lean_json(seeds = iv("1/5", "1/4"))), "the row is a point")
     end
 
     @testset "challenges and news" begin

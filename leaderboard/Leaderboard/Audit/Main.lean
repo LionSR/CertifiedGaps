@@ -38,6 +38,8 @@ structure Head where
   seeds : Option (Nat × Nat × Nat)
   /-- The positions of the interval ends `a`, `b`, for a record on a parameter interval. -/
   interval : Option (Nat × Nat) := none
+  /-- The positions of `n₁`, `β₁`, `s₁`, `t₁`, for the second seed of a two-seed record. -/
+  seed2 : Option (Nat × Nat × Nat × Nat) := none
 
 /-- The record heads of `Leaderboard/Record.lean`, with their argument positions. -/
 def heads : List Head := [
@@ -49,7 +51,11 @@ def heads : List Head := [
     spectrum := 3, L₀ := 4, r := 5, β := 6, seeds := some (7, 8, 9) },
   -- `SeededOn {d} [Fintype d] [DecidableEq d] family a b L₀ r β n₀ s t`
   { name := `Leaderboard.Record.SeededOn, kind := "conditional", arity := 12,
-    spectrum := 3, L₀ := 6, r := 7, β := 8, seeds := some (9, 10, 11), interval := some (4, 5) }]
+    spectrum := 3, L₀ := 6, r := 7, β := 8, seeds := some (9, 10, 11), interval := some (4, 5) },
+  -- `TwoSeeded {d} [Fintype d] [DecidableEq d] spectrum L₀ r β n₀ s t n₁ β₁ s₁ t₁`
+  { name := `Leaderboard.Record.TwoSeeded, kind := "conditional", arity := 14,
+    spectrum := 3, L₀ := 4, r := 5, β := 6, seeds := some (7, 8, 9),
+    seed2 := some (10, 11, 12, 13) }]
 
 /-- The record head of a statement and its arguments, after unfolding reducible definitions
 only (so that no model definition is unfolded). -/
@@ -158,11 +164,17 @@ def recordJson (n mod : Name) (h : Head) (args : Array Expr) : MetaM Json := do
   let interval ← match h.interval with
     | some (a, b) => pure (toJson [← evalRat args[a]!, ← evalRat args[b]!])
     | none => pure Json.null
+  let seed2 ← match h.seed2 with
+    | some (n₁, β₁, s₁, t₁) => pure <| Json.mkObj [("n0", toJson (← evalNat args[n₁]!)),
+        ("beta", toJson (← evalRat args[β₁]!)), ("s", toJson (← evalRat args[s₁]!)),
+        ("t", toJson (← evalRat args[t₁]!))]
+    | none => pure Json.null
   return Json.mkObj <| [
     ("name", toJson n.toString), ("module", toJson mod.toString), ("kind", toJson h.kind),
     ("spectrum", ← spectrumJson args[h.spectrum]!), ("L0", toJson (← evalNat args[h.L₀]!)),
     ("r", toJson (← evalRat args[h.r]!)), ("beta", toJson (← evalRat args[h.β]!))] ++ seeds ++
-    [("interval", interval), ("axioms", toJson (axioms.map (·.toString) |>.qsort (· < ·)))]
+    [("interval", interval), ("seed2", seed2),
+      ("axioms", toJson (axioms.map (·.toString) |>.qsort (· < ·)))]
 
 /-- Every record of the `Leaderboard.Records.*` modules, sorted by name, and every problem. -/
 def run : MetaM (Array (Name × Json) × Array String) := do

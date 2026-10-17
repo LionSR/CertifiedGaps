@@ -37,11 +37,13 @@ contain. It goes in a new directory `models/<name>/` with four parts.
 
 The Lean library `Leaderboard` in the directory `leaderboard/` holds one theorem per result. Its
 [README]({{ repo_blob }}leaderboard/README.md) explains how to add one. The theorem either has no
-assumptions, or assumes exactly the two inequalities at the starting scale, which a computer
-proof in `models/` then establishes. It may use only Lean's standard axioms, so no `sorry` and no
-`native_decide`. The automatic checks build the library, list the axioms of every theorem and
-write the file `lean_records.json` that the leaderboard reads. A reviewer checks that the
-Hamiltonian in the theorem is the physical model of the leaderboard row. No program can check
+assumptions, or assumes only the two inequalities at its starting scale (at each of two starting
+scales, for a proof with two), which a computer proof in `models/` then establishes. For a row
+with such a computer proof, `tools/leaderboard/lean_chains.jl` writes the chain of rational
+numbers that the Lean proof checks. The theorem may use only Lean's standard axioms, so no
+`sorry` and no `native_decide`. The automatic checks build the library, list the axioms of every
+theorem and write the file `lean_records.json` that the leaderboard reads. A reviewer checks that
+the Hamiltonian in the theorem is the physical model of the leaderboard row. No program can check
 that.
 
 ## A proposed target

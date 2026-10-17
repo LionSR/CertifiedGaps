@@ -173,8 +173,10 @@ end
 
 A conditional Lean record assumes `P_s(n0, β) ≥ 1 - s` and `P_τ(2n0, β) ≥ 1 - t`. The certificate
 must prove them: the same `n0` and `β`, and defects `εₛ ≤ s` and `ε_τ ≤ t`. The certificate is
-the row's, or `lean.certificate` when the Lean theorem uses another seed. Skipped while the Lean
-record does not state `n0`, `s` and `t`.
+the row's, or `lean.certificate` when the Lean theorem uses another seed. A certificate entry
+without defects falls back to the one-step entry of the seed (`window_defects`). A two-seed
+record (`seed2`) must find its second seed among the one-step entries of the same certificate.
+Skipped while the Lean record does not state `n0`, `s` and `t`.
 """
 function check_lean_seeds!(report, where, rec, lean, leanjson, rowcert, root)
     all(k -> haskey(leanjson, k), (:n0, :s, :t)) || return report
@@ -187,10 +189,29 @@ function check_lean_seeds!(report, where, rec, lean, leanjson, rowcert, root)
     c === nothing && return err!(report, "$where: no certificate entry for the Lean seed")
     (cert_exact(c.n0) == parse_exact(leanjson[:n0]) && cert_exact(c.beta) == parse_exact(lean["beta"])) ||
         return err!(report, "$where: the Lean seed ($(leanjson[:n0]), $(lean["beta"])) is not the certificate's; give lean.certificate")
-    for (k, eps) in ((:s, c.s), (:t, c.t))
+    path = joinpath(root, get(lean, "certificate", rec["certificate"]))
+    params = something(getk(rec, "params"), Dict())
+    s, t = c.s, c.t
+    if s === nothing || t === nothing
+        w = window_defects(path, cert_exact(c.n0), cert_exact(c.beta), params)
+        w === nothing || ((s, t) = w)
+    end
+    compare_defects!(report, where, (s, t), (leanjson[:s], leanjson[:t]))
+    seed2 = get(leanjson, :seed2, nothing)
+    if seed2 !== nothing
+        w = window_defects(path, parse_exact(string(seed2[:n0])), parse_exact(string(seed2[:beta])), params)
+        w === nothing && return err!(report, "$where: the certificate states no one-step entry for the second Lean seed ($(seed2[:n0]), $(seed2[:beta]))")
+        compare_defects!(report, "$where: second seed", w, (seed2[:s], seed2[:t]))
+    end
+    return report
+end
+
+"Each certified defect must be at most the defect the Lean record assumes."
+function compare_defects!(report, where, certified, assumed)
+    for (k, eps, lean) in zip((:s, :t), certified, assumed)
         eps === nothing && (err!(report, "$where: the certificate states no defect $k"); continue)
-        cert_exact(eps) <= parse_exact(string(leanjson[k])) ||
-            err!(report, "$where: Lean assumes $k = $(leanjson[k]), below the certified defect")
+        cert_exact(eps) <= parse_exact(string(lean)) ||
+            err!(report, "$where: Lean assumes $k = $lean, below the certified defect")
     end
     return report
 end

@@ -17,6 +17,20 @@ namespace Leaderboard.Chains.SpinOneHeisenberg
 
 open CertifiedGaps
 
+/-- `spin1-temperature-lifting`: seed `(n₀, β₀) = (60, 833/32)` from
+`models/spin1/experiments/temperature-lift.json`; `log r / β₀ ≥ 0.072930044`. -/
+def temperature_lifting : ChainCertificate where
+  s := [30530206e-9, 69112113e-10, 20498089e-11, 12001763e-14, 31952866e-21, 20628361e-34,
+      85114607e-61, 14488993e-113, 41986184e-219, 35256793e-430, 2486083e-851, 12361218e-1696,
+      30559943e-3385, 18678203e-6762, 69775054e-13517]
+  t := [47955678e-9, 61558236e-10, 79806965e-12, 12760523e-15, 32566273e-23, 21211243e-38,
+      89983366e-69, 16194013e-129, 52449212e-251, 55018397e-494, 60540481e-980, 73302997e-1952,
+      10746659e-3895, 23098136e-7783, 10670478e-15558]
+  r := 66756076e-7
+  ε := 69775054e-13517
+
+theorem temperature_lifting_valid : temperature_lifting.Valid := by decide +kernel
+
 /-- `spin1-source1`: seed `(n₀, β₀) = (2304, 784)` from
 `models/spin1/results/scalars.json`; `log r / β₀ ≥ 0.004742`. -/
 def heisenberg : ChainCertificate where

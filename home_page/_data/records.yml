@@ -46,8 +46,8 @@
 tiers:
   - {key: lean-unconditional, glyph: '◆', label: 'Proved in Lean, no assumptions',
      meaning: 'A theorem checked by the Lean proof assistant with no hypotheses; the finite computation is checked inside Lean too.'}
-  - {key: lean-conditional, glyph: '◇', label: 'Proved in Lean from two computer-checked inequalities',
-     meaning: 'A Lean theorem whose only hypotheses are the two purity inequalities at the starting scale; a computer certificate in the repository proves those.'}
+  - {key: lean-conditional, glyph: '◇', label: 'Proved in Lean from computer-checked inequalities',
+     meaning: 'A Lean theorem whose only hypotheses are the purity inequalities at its starting scale (two, or four for a proof with two starting rings); a computer certificate in the repository proves those.'}
   - {key: certified, glyph: '✓', label: 'Computer-checked proof',
      meaning: 'A rigorous computer proof in exact or interval arithmetic, rerun by a standalone checker. A Lean theorem for the same point proves a bound smaller by about one part in 10⁵: Lean follows the doubling for 14 steps, the computer for 48.'}
   - {key: target, glyph: '◌', label: 'Open target (estimate only)',
@@ -180,14 +180,6 @@ challenges:
       The Lean criterion covers even starts only. Proving the factorization in Lean would give
       this point a Lean theorem like the others.
     link: models/spin1_dimerized/README.md
-  - id: lean-temperature-lifting
-    family: spin1-heisenberg
-    title: 'Lean for temperature lifting'
-    need: >-
-      The spin-1 bound 0.0729 combines the doubling criterion with a second argument, temperature
-      lifting, which compares rings at two temperatures. Lean has only the doubling criterion. A
-      Lean proof of temperature lifting would let Lean check the rest of this proof too.
-    link: models/spin1/experiments/temperature_lift.jl
 
 
 records:
@@ -196,21 +188,27 @@ records:
     family: spin1-heisenberg
     parameter: 'periodic ring'
     lengths: {L0: 36}
-    bound: {value: "72901771/1000000000", strict: true, decimal: "0.072901771"}
+    bound: {r: "16689019/2500000", beta: "833/32", decimal: "0.072930044", display: '\log(6.6756076)/(833/32)'}
     seed: {n0: 60, beta0: "833/32", text: 'a ring of 60 sites; a ring of 36 sites at $\beta_0 = 49/4$ covers the lengths from 36 to 72'}
     numerical_gap: "0.41048"
-    tier: certified
+    tier: lean-conditional
+    lean: {name: Leaderboard.Records.SpinOneHeisenberg.temperature_lifting, r: "16689019/2500000", beta: "833/32", decimal: "0.072930044"}
     certificate: models/spin1/experiments/temperature-lift.json
     check: models/spin1/experiments/test_temperature_lift.jl
-    date: "2026-10-10"
+    date: "2026-10-17"
     pr: null
-    contributors: ['CertifiedGaps contributors']
+    contributors: ['LionSR']
     notes: >-
-      Computed in exact rational arithmetic from the finite inputs of the OpenAI preprint,
-      reproduced here (18 thermal traces of rings up to 12 sites and one matrix-product trial
-      state of 120 sites). Independently reviewed in #49, by re-deriving every inequality and by
-      a separate computation in Arb ball arithmetic that shares no code with the original.
+      The starting inequalities are computed in exact rational arithmetic from the finite inputs
+      of the OpenAI preprint, reproduced here (18 thermal traces of rings up to 12 sites and one
+      matrix-product trial state of 120 sites). Independently reviewed in #49, by re-deriving
+      every inequality and by a separate computation in Arb ball arithmetic that shares no code
+      with the original. The Lean theorem assumes the two inequalities at each starting ring: 60
+      sites at $\beta_0 = 833/32$ and 36 sites at $\beta_0 = 49/4$. Lean follows the doubling for
+      14 steps where the computer proof follows it for 10, so its bound is slightly larger.
     history:
+      - {date: "2026-10-10", decimal: "0.072901771", lengths: 'even L ≥ 36', tier: certified, pr: null,
+         method: 'the computer proof from the same two starting rings'}
       - {date: "2026-10-10", decimal: "0.070450002", lengths: 'even L ≥ 36', tier: certified, pr: null,
          method: 'the same computation with simpler parameters'}
       - {date: "2026-10-10", decimal: "0.016978269", lengths: 'even L ≥ 36', tier: certified, pr: null,

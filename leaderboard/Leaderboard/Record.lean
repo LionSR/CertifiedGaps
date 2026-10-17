@@ -20,6 +20,8 @@ cells.
 * `Record.SeededOn family a b L₀ r β n₀ s t`: `Record.Seeded (family x) L₀ r β n₀ s t` for every
   real parameter `x` in `[a, b]`. A computer certificate that bounds the two defects on the whole
   interval, for example by a perturbation bound, proves the seeds at every `x`.
+* `Record.TwoSeeded spectrum L₀ r β n₀ s t n₁ β₁ s₁ t₁`: the gap holds if the seed inequalities
+  hold at `(n₀, β)` and at a second seed `(n₁, β₁)`, which covers the rings shorter than `n₀`.
 
 Only even rings are covered. Odd rings or open chains would need new record forms.
 -/
@@ -60,6 +62,14 @@ def SeededOn {d : Type*} [Fintype d] [DecidableEq d]
     (family : ℝ → (L : ℕ) → (Fin L → d) → ℝ) (a b : ℚ) (L₀ : ℕ) (r β : ℚ) (n₀ : ℕ) (s t : ℚ) :
     Prop :=
   ∀ x : ℝ, (a : ℝ) ≤ x → x ≤ b → Seeded (family x) L₀ r β n₀ s t
+
+/-- **A record from two seeds.** `log r / β > 0`, and if the seeds `(n₀, β, s, t)` and
+`(n₁, β₁, s₁, t₁)` of `spectrum` hold, then `Δ_L > log r / β` for every even `L ≥ L₀`. The
+second seed covers the short rings: its one-step bound covers the lengths between `n₁` and `2n₁`. -/
+def TwoSeeded {d : Type*} [Fintype d] [DecidableEq d] (spectrum : (L : ℕ) → (Fin L → d) → ℝ)
+    (L₀ : ℕ) (r β : ℚ) (n₀ : ℕ) (s t : ℚ) (n₁ : ℕ) (β₁ s₁ t₁ : ℚ) : Prop :=
+  PositiveBound r β ∧ (SeedBounds spectrum n₀ β s t → SeedBounds spectrum n₁ β₁ s₁ t₁ →
+    UniformGap spectrum L₀ r β)
 
 variable {d : Type*} [Fintype d] [DecidableEq d] {spectrum spectrum' : (L : ℕ) → (Fin L → d) → ℝ}
   {L₀ n₀ : ℕ} {r β s t : ℚ}

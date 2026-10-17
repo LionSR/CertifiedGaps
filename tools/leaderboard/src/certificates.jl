@@ -22,7 +22,7 @@ const PARAM_FIELDS = Dict("g" => ("g",), "h" => ("h", "staggered_field"), "delta
 const SCOPE_FIELDS = union(Set(["D_interval"]), (Set(v) for v in values(PARAM_FIELDS))...)
 
 "A JSON value as an exact rational: integers, exact strings, and floats converted exactly."
-cert_exact(x::AbstractFloat) = Rational{BigInt}(x)
+cert_exact(x::Union{AbstractFloat,Rational}) = Rational{BigInt}(x)
 cert_exact(x) = parse_exact(x)
 
 "Load a certificate (JSON, or gzipped JSON) as nested Dicts and Vectors."
@@ -119,7 +119,8 @@ end
     check_certificate!(report, where, rec, headline, root)
 
 Compare a record with the certificate it links: the certificate must state the record's seed
-`(n0, beta0)` at its parameter point, and a bound at least the record's (exact comparison).
+`(n0, beta0)` at its parameter point, and, unless the bound comes from a Lean theorem (a Lean
+tier), a bound at least the record's (exact comparison).
 Returns the matched certificate entry (for the Lean comparison) or `nothing`.
 """
 function check_certificate!(report, where, rec, headline, root; path = rec["certificate"],
@@ -138,8 +139,38 @@ function check_certificate!(report, where, rec, headline, root; path = rec["cert
     elseif c.bound === nothing
         startswith(rec["tier"], "lean-") ||
             err!(report, "$where: $path states no bound; only a Lean theorem can supply it")
-    elseif headline !== nothing && cert_exact(c.bound) < headline[2]
+    elseif headline !== nothing && !startswith(rec["tier"], "lean-") && cert_exact(c.bound) < headline[2]
+# A Lean tier takes its bound from the Lean theorem, which may exceed the certificate's.
         err!(report, "$where: $path proves $(Float64(cert_exact(c.bound))), less than the row's bound")
     end
     return c
+end
+
+"""
+    window_defects(path, n0, beta, params) -> (s, t) or nothing
+
+The exact defects of a one-step entry of a rational chain certificate (the `finite_intervals` of
+`CertifiedGaps.Recurrence.rational_gap_chain`, or the `bridge` of the spin-1 temperature
+lifting): an object with `length_from = n0`, `beta = beta` and exact `p`, `q`, which bound
+`1 - P_s(n0, β)` and `1 - P_τ(2n0, β)`. Errors if two such objects disagree.
+"""
+function window_defects(path, n0, beta, params)
+    found = Set{Tuple{Rational{BigInt},Rational{BigInt}}}()
+    function walk(x, scope)
+        if x isa AbstractVector
+            foreach(y -> walk(y, scope), x)
+        elseif x isa AbstractDict
+            scope = merge(scope, Dict(k => v for (k, v) in x if k in SCOPE_FIELDS))
+            if all(k -> haskey(x, k), ("length_from", "beta", "p", "q")) &&
+               x["p"] isa AbstractString && x["q"] isa AbstractString &&
+               cert_exact(x["length_from"]) == n0 && cert_exact(x["beta"]) == beta &&
+               params_agree(scope, params)
+                push!(found, (parse_exact(x["p"]), parse_exact(x["q"])))
+            end
+            foreach(v -> walk(v, scope), values(x))
+        end
+    end
+    walk(load_certificate(path), Dict{String,Any}())
+    length(found) > 1 && throw(ArgumentError("$path: several defect pairs at ($n0, $beta)"))
+    return isempty(found) ? nothing : first(found)
 end
