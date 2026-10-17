@@ -51,7 +51,7 @@
   chapter({
     id: 'owhy', title: 'Why a chain with ends is different', dur: 27,
     beats: [[0, 'The ring proof needs a ring: Z = Tr Xⁿ joins the last leg back to the first. The boundary-field theorem is about a chain with two ends. Cut the ring open, and there is no loop left to close.'],
-            [7, 'A picture of spin 1 helps: the valence-bond solid (VBS) of Affleck, Kennedy, Lieb and Tasaki. Write each spin 1 as two spin-½ (the two dots in one oval), combined symmetrically.'],
+            [7, 'A picture of spin 1 helps: the valence-bond solid (VBS) of Affleck, Kennedy, Lieb and Tasaki, exact for their AKLT chain and a qualitative picture for Heisenberg. Write each spin 1 as two spin-½ (the two dots in one oval), combined symmetrically.'],
             [13.5, 'Neighbors pair one half each into a singlet, total spin 0 (blue). On a ring every half finds a partner, and nothing is left free.'],
             [19.5, 'Cut the ring open: the two outermost halves lose their partners. A free spin-½ sits at each end, giving 2 × 2 = 4 low states (a singlet and a triplet) whose splitting shrinks as the chain grows.']],
     draw(K, t) {
@@ -129,27 +129,27 @@
   // How an open end is closed: the open Ising chain u^T K^(n-1) u, and what overlaps do to the spectrum.
   chapter({
     id: 'oising', title: 'Closing an end: the open Ising chain', dur: 28,
-    beats: [[0, 'Back to the classical Ising chain, now open. Each of its n − 1 bonds still gives one matrix K, joined leg to leg, but the first and last spins have an outer leg with nothing attached.'],
-            [6.5, 'An end field gives each end spin an extra weight e^(βh s): a vector u, with one entry per spin value. Attach it to the free outer leg as a cap.'],
-            [13, 'Summing every spin now gives Z = Σ u(s₁) K(s₁, s₂) ⋯ K(sₙ₋₁, sₙ) u(sₙ) = uᵀ Kⁿ⁻¹ u. A ring closes with a trace; an open chain closes with two vectors.'],
-            [20, 'In eigenvalues, uᵀKᵐu = Σ λᵢᵐ ⟨φᵢ, u⟩². A ring weighs every λᵢᵐ by 1; an open chain weighs it by the overlap of u with the eigenvector φᵢ, and misses λ₀ entirely if u ⟂ φ₀.']],
+    beats: [[0, 'Back to the classical Ising chain, now open. Each of its n − 1 bonds still gives one transfer matrix T, joined leg to leg, but the first and last spins have an outer leg with nothing attached.'],
+            [6.5, 'An end field gives each end spin an extra weight e^(h s), with β absorbed into h as into K: a vector u, with one entry per spin value. Attach it to the free outer leg as a cap.'],
+            [13, 'Summing every spin now gives Z = Σ u(s₁) T(s₁, s₂) ⋯ T(sₙ₋₁, sₙ) u(sₙ) = uᵀ Tⁿ⁻¹ u. A ring closes with a trace; an open chain closes with two vectors.'],
+            [20, 'In eigenvalues, uᵀTᵐu = Σ λᵢᵐ ⟨φᵢ, u⟩². A ring weighs every λᵢᵐ by 1; an open chain weighs it by the overlap of u with the eigenvector φᵢ. For Ising the overlap with φ₀ never vanishes: T has positive entries, so φ₀ is positive (Perron–Frobenius), and so is u. Quantum caps have no such guarantee, which is why their overlap must be controlled.']],
     draw(K, t) {
       const {th} = K, n = 6, x0 = 220, dx = 104, y = 160, X = i => x0 + i * dx, A = seg(t, .3, 1), cap = seg(t, 7, 7.8), SB = '₁₂₃₄₅₆';
       K.line(X(0) - 55, y, X(n - 1) + 55, y, {color: th.ink, w: 2, alpha: A});
-      for (let i = 0; i < n - 1; i++) K.box(X(i) + dx / 2, y, 36, 28, 'K', {alpha: A});
+      for (let i = 0; i < n - 1; i++) K.box(X(i) + dx / 2, y, 36, 28, 'T', {alpha: A});
       for (let i = 0; i < n; i++) { K.dot(X(i), y, 5, th.ink, A); K.text(`s${SB[i]}`, X(i), y + 28, {align: 'center', color: th.mute, size: 15, alpha: A}); }
       for (const [x, s] of [[X(0) - 70, -1], [X(n - 1) + 70, 1]]) {
         K.text('?', x, y + 6, {align: 'center', color: th.fail, size: 18, alpha: A * (1 - cap)});
         K.circle(x, y, 15, {color: th.proved, w: 2.5, alpha: cap}); K.text('u', x, y + 6, {align: 'center', color: th.proved, size: 16, alpha: cap});
       }
       const b0 = 1 - seg(t, 6.3, 6.9);
-      K.text('n − 1 bonds: n − 1 boxes K', W / 2, 250, {align: 'center', size: 17, alpha: b0 * seg(t, 1.5, 2.2)});
+      K.text('n − 1 bonds: n − 1 boxes T', W / 2, 250, {align: 'center', size: 17, alpha: b0 * seg(t, 1.5, 2.2)});
       K.text('the two end spins: an outer leg with nothing attached', W / 2, 282, {align: 'center', color: th.fail, size: 17, alpha: b0 * seg(t, 3, 3.7)});
-      K.tex('u(s)=e^{\\beta h s},\\qquad s=\\pm1', W / 2, 260, {align: 'center', size: 20, color: th.proved, alpha: seg(t, 7.5, 8.3)});
-      K.tex('Z=\\sum_{s}u(s_1)K(s_1,s_2)\\cdots K(s_{n-1},s_n)\\,u(s_n)=u^{\\mathsf T}K^{n-1}u', W / 2, 325, {align: 'center', size: 19, alpha: seg(t, 13.5, 14.3)});
-      K.text('ring: join the ends  →  Tr Kⁿ          open: cap the ends  →  uᵀ Kⁿ⁻¹ u', W / 2, 375, {align: 'center', color: th.mute, size: 16, alpha: seg(t, 15.5, 16.2)});
-      K.tex('u^{\\mathsf T}K^m u=\\sum_i\\lambda_i^{\\,m}\\,\\langle\\varphi_i,u\\rangle^2', W / 2, 430, {align: 'center', size: 20, alpha: seg(t, 20.5, 21.3)});
-      K.text('ring: weight 1 for every λᵢ        open: weight ⟨φᵢ, u⟩², zero if u ⟂ φᵢ', W / 2, 480, {align: 'center', color: th.proved, size: 16, alpha: seg(t, 22, 22.7)});
+      K.tex('u(s)=e^{h s},\\qquad s=\\pm1', W / 2, 260, {align: 'center', size: 20, color: th.proved, alpha: seg(t, 7.5, 8.3)});
+      K.tex('Z=\\sum_{s}u(s_1)T(s_1,s_2)\\cdots T(s_{n-1},s_n)\\,u(s_n)=u^{\\mathsf T}T^{n-1}u', W / 2, 325, {align: 'center', size: 19, alpha: seg(t, 13.5, 14.3)});
+      K.text('ring: join the ends  →  Tr Tⁿ          open: cap the ends  →  uᵀ Tⁿ⁻¹ u', W / 2, 375, {align: 'center', color: th.mute, size: 16, alpha: seg(t, 15.5, 16.2)});
+      K.tex('u^{\\mathsf T}T^m u=\\sum_i\\lambda_i^{\\,m}\\,\\langle\\varphi_i,u\\rangle^2', W / 2, 430, {align: 'center', size: 20, alpha: seg(t, 20.5, 21.3)});
+      K.text('ring: weight 1 for every λᵢ        open: weight ⟨φᵢ, u⟩² (> 0 for φ₀ here)', W / 2, 480, {align: 'center', color: th.proved, size: 16, alpha: seg(t, 22, 22.7)});
     }
   });
 
@@ -174,11 +174,11 @@
   // 3 -------------------------------------------------------------------
   chapter({
     id: 'ovec', title: 'What a boundary vector is', dur: 32,
-    beats: [[0, 'What closes an end? The end site has a bond on its inner side only. On its outer side acts the end field, −h Sᶻ, which enters e^(−βH) like a bond term: it fires field events at random imaginary times.'],
-            [6.5, 'A bond event puts G_α on both of its sites; a field event is half a bond: it puts G_z on the end site alone, with a factor ih, since Sᶻ = −iG_z. Here are histories with 0, 1, 2 and 3 field events.'],
-            [13, 'The field events form a history a, just like the missing bond’s, so the end box’s outer leg is capped by a vector of histories: v(a) = (ih)ᵏ when all k events are of type z, and 0 otherwise. Then Yₙ = ⟨v̄| Xⁿ |v⟩, just like uᵀKᵐu.'],
-            [20, 'The left cap uses the conjugate v̄, whose events carry −ih: a field of the opposite sign. So ⟨v̄| Xⁿ |v⟩ is the chain with opposite end fields. Its two caps are the same vector, so its even powers are squared norms, like the ring’s.'],
-            [26, 'The equal-field chain of the theorem is reached by U, the π rotation about x (Sᶻ → −Sᶻ). It flips the sign of one end field: ⟨v̄| Xⁿ U |v⟩.']],
+    beats: [[0, 'What closes an end? The end site has a bond on its inner side only. On its outer side acts the end-field term ±h Sᶻ, which enters e^(−βH) like a bond term: it fires field events at random imaginary times.'],
+            [6.5, 'A bond event puts G_α on both of its sites; a field event is half a bond: it puts G_z on the end site alone, with a number. Since Sᶻ = −iG_z, the term +h Sᶻ gives +ih per event and the theorem’s −h Sᶻ gives −ih. Here are histories with 0, 1, 2 and 3 field events.'],
+            [13, 'The field events form a history a, just like the missing bond’s, so the end box’s outer leg is capped by a vector of histories. For the term +h Sᶻ it is v(a) = (ih)ᵏ when all k events are of type z, and 0 otherwise. The open chain is a row of boxes X between two caps, just like uᵀTᵐu.'],
+            [20, 'The other cap is the conjugate v̄, whose events carry −ih: the theorem’s term −h Sᶻ. So the chain with −h S₁ᶻ and +h Sₙᶻ is Y = v̄ᵀ Xⁿ v = ⟨v| Xⁿ |v⟩: the same vector on both sides, so its even powers are squared norms, like the ring’s.'],
+            [26, 'The equal-field chain of the theorem is reached by U, the π rotation about x (Sᶻ → −Sᶻ). It turns the right term into −h Sₙᶻ: ⟨v| Xⁿ U |v⟩.']],
     draw(K, t) {
       const {th} = K, A = 1 - seg(t, 19.4, 20);
       if (A > 0) {
@@ -198,22 +198,22 @@
         K.text('τ ↑', 50, y0 + 10, {color: th.time, size: 14, alpha: A});
         const b1 = 1 - seg(t, 12.6, 13.2);
         K.text('bond event: G_α on both of its sites', 90, 470, {size: 16, alpha: A * b1 * seg(t, 7, 7.7)});
-        K.text('field event: G_z on the end site only, with factor ih', 90, 496, {size: 16, color: th.space, alpha: A * b1 * seg(t, 8, 8.7)});
-        K.text('the field events fill the outer leg:   Yₙ = ⟨v̄| Xⁿ |v⟩', W / 2, 488, {align: 'center', size: 18, color: th.proved, alpha: A * seg(t, 15, 15.8)});
+        K.text('field event: G_z on the end site only, ±ih for the term ±h Sᶻ', 90, 496, {size: 16, color: th.space, alpha: A * b1 * seg(t, 8, 8.7)});
+        K.text('the field events fill the outer leg:   Yₙ = v̄ᵀ Xⁿ v = ⟨v| Xⁿ |v⟩', W / 2, 488, {align: 'center', size: 18, color: th.proved, alpha: A * seg(t, 15, 15.8)});
       }
       const B = seg(t, 20, 20.7);
       if (B > 0) {
         strip(K, 300, 200, 6, 70, {alpha: B});
-        K.text('field −h', 300 - 70, 150, {align: 'center', color: th.space, size: 15, alpha: B});
+        K.text('−h S₁ᶻ', 300 - 70, 150, {align: 'center', color: th.space, size: 15, alpha: B});
         const flip = seg(t, 26.5, 28);
-        K.text(flip < .5 ? 'field +h' : 'field −h', 300 + 6 * 70, 150, {align: 'center', color: th.space, size: 15, alpha: B});
-        K.text('v̄ carries −ih per event, v carries +ih: opposite fields', W / 2, 270, {align: 'center', size: 16, alpha: B * seg(t, 20.8, 21.5)});
+        K.text(flip < .5 ? '+h Sₙᶻ' : '−h Sₙᶻ', 300 + 6 * 70, 150, {align: 'center', color: th.space, size: 15, alpha: B});
+        K.text('v̄ carries −ih per event (term −h Sᶻ), v carries +ih (term +h Sᶻ)', W / 2, 270, {align: 'center', size: 16, alpha: B * seg(t, 20.8, 21.5)});
         K.text('same vector on both caps: every even power is a squared norm ≥ 0', W / 2, 302, {align: 'center', color: th.ok, size: 16, alpha: B * seg(t, 22.5, 23.3)});
         const ux = 300 + 6 * 70 + 50;
         K.rect(ux - 16, 184, 32, 32, {stroke: th.time, w: 2, alpha: B * seg(t, 26, 26.8)});
         K.text('U', ux, 206, {align: 'center', color: th.time, size: 14, alpha: B * seg(t, 26, 26.8)});
-        K.text('U: π rotation about x, Sᶻ → −Sᶻ: flips the right field, so both ends have −h', W / 2, 350, {align: 'center', color: th.time, size: 16, alpha: B * seg(t, 27, 27.8)});
-        K.text('opposite fields:  ⟨v̄| Xⁿ |v⟩        equal fields:  ⟨v̄| Xⁿ U |v⟩', W / 2, 420, {align: 'center', size: 17, alpha: B * seg(t, 28, 28.8)});
+        K.text('U: π rotation about x, Sᶻ → −Sᶻ: the right term becomes −h Sₙᶻ, as on the left', W / 2, 350, {align: 'center', color: th.time, size: 16, alpha: B * seg(t, 27, 27.8)});
+        K.text('opposite terms:  ⟨v| Xⁿ |v⟩        equal terms:  ⟨v| Xⁿ U |v⟩', W / 2, 420, {align: 'center', size: 17, alpha: B * seg(t, 28, 28.8)});
       }
     }
   });
@@ -221,7 +221,7 @@
   // 4 -------------------------------------------------------------------
   chapter({
     id: 'over', title: 'The overlap', dur: 23,
-    beats: [[0, 'Normalize so the top eigenvalue is 1: T = X/λ₀. The ring estimates show λ₀ is simple and every other eigenvalue is smaller, so T = |ψ⟩⟨ψ| + R with ψ the top eigenvector and ‖R‖ < 1.'],
+    beats: [[0, 'Normalize so the top eigenvalue is 1: T = X/λ₀. The ring estimates show λ₀ is simple and every other eigenvalue is smaller in absolute value, so T = |ψ⟩⟨ψ| + R with ψ the top eigenvector and ‖R‖ < 1.'],
             [5, 'Apply T to the boundary vector, again and again. The part along ψ stays; the rest shrinks by ‖R‖ each time.'],
             [11, 'So the open partition function divided by λ₀ᵐ is Bₘ = ⟨v|Tᵐ|v⟩ = c + Dₘ: a fixed overlap c = |⟨ψ, v⟩|², as for Ising, plus a remainder Dₘ = ⟨v|Rᵐ|v⟩ that dies away with the length m.'],
             [17, 'The boundary defect e = Dₘ / Bₘ is the share not carried by ψ. Any e < 1 proves c > 0: a long chain does see the ground state.']],

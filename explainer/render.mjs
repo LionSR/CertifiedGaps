@@ -35,14 +35,21 @@ const CHUNK = 300, GAP = .22;
 function chunks(text) {
   if (text.length <= CHUNK) return [text];
   const out = []; let cur = '';
-  for (const s of text.split(/(?<=[.?!:;])\s+/)) { if (cur && cur.length + s.length + 1 > CHUNK) { out.push(cur); cur = s; } else cur = cur ? cur + ' ' + s : s; }
+  for (const s of text.split(/(?<=[.?!:;])\s+/)) {
+    if (s.length > CHUNK) throw new Error(`narration sentence longer than ${CHUNK} characters: ${s.slice(0, 60)}…`);
+    if (cur && cur.length + s.length + 1 > CHUNK) { out.push(cur); cur = s; } else cur = cur ? cur + ' ' + s : s;
+  }
   return [...out, cur];
 }
 async function clip(text) {
-  const parts = chunks(text), key = createHash('sha256').update(JSON.stringify(parts.length > 1 ? [MODEL, VOICE, SPEED, parts] : [MODEL, VOICE, SPEED, text])).digest('hex').slice(0, 24);
+  const parts = chunks(text), key = createHash('sha256').update(JSON.stringify(parts.length > 1 ? [MODEL, VOICE, SPEED, GAP, parts] : [MODEL, VOICE, SPEED, text])).digest('hex').slice(0, 24);
   const file = path.join(CACHE, key + '.f32');
   if (!fs.existsSync(file)) {
-    if (!tts) tts = await (await import('kokoro-js')).KokoroTTS.from_pretrained(MODEL, { dtype: 'fp32', device: 'cpu' });
+    if (!tts) {
+      let kokoro;
+      try { kokoro = await import('kokoro-js'); } catch { throw new Error('kokoro-js is missing: run `npm install kokoro-js`, or render silently with --mute'); }
+      tts = await kokoro.KokoroTTS.from_pretrained(MODEL, { dtype: 'fp32', device: 'cpu' });
+    }
     const pieces = [];
     for (const p of parts) {
       const a = await tts.generate(p, { voice: VOICE, speed: SPEED });
@@ -104,6 +111,7 @@ const audioArgs = MUTE ? ['-an'] : ['-map', '0:v', '-map', '1:a', '-af', 'loudno
 const ff = spawn('ffmpeg', ['-y', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', ...(MUTE ? [] : ['-i', wavFile]),
   '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '22', '-preset', 'slow', ...audioArgs, '-movflags', '+faststart', out],
   { stdio: ['pipe', 'ignore', 'inherit'] });
+ff.on('error', e => { console.error(`cannot run ffmpeg (${e.message}); is it installed and on the PATH?`); process.exit(1); });
 const n = Math.round(OUT * FPS);
 let lastT = NaN, png = null;
 for (let i = 0; i < n; i++) {
@@ -117,7 +125,8 @@ for (let i = 0; i < n; i++) {
   if (i % (10 * FPS) === 0) process.stdout.write(`\rframes ${i}/${n}`);
 }
 ff.stdin.end();
-await new Promise(r => ff.on('close', r));
+const code = await new Promise(r => ff.on('close', r));
+if (code !== 0) throw new Error(`ffmpeg exited with code ${code}; ${out} is incomplete`);
 await browser.close();
 fs.rmSync(wavFile);
 console.log(`\r${out}: ${OUT.toFixed(1)} s (film clock ${total.toFixed(1)} s)`);

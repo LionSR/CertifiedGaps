@@ -31,6 +31,7 @@ model (run locally through `kokoro-js`; its ONNX weights, about 300 MB, download
 
 ```sh
 cd explainer && npm install --no-save playwright kokoro-js
+npx playwright install chromium                  # once, if Playwright has no browser yet
 node render.mjs film.html film.mp4               # narrated main film
 node render.mjs film_open.html open-chains.mp4   # narrated open-chain film
 node render.mjs film.html film.mp4 --mute        # silent, on the original caption clock

@@ -298,9 +298,9 @@ the ground state is unique, and the weight ratio gives the gap.</p></div><aside 
     <div class="r"><div class="main prose"><p>The certificate never sees the eigenvalues of \(X\); it sees exact traces \(Z_n\) of small rings. Here is the whole logic on a toy with hidden eigenvalues
 1, 0.6, −0.5, 0.4. The sixth moment \(Z_6=1.0664\) caps every \(|\lambda|\) at 1.011. A trial state gives \(Z_{24}\ge1\); if all \(|\lambda|\le0.97\), the sixth-moment
 mass could produce at most 0.484, so one eigenvalue must exceed 0.97. The rest then carry at most 0.233 of the mass, which bounds their contribution and gives
-\(P_{\mathrm s}(24)\ge0.988\). The real certificate runs the same three steps with 12-site rings, exact integers, symmetry sectors and a 72-site trial state.</p></div><aside class="side"><p class="note">Toy numbers are exact to the digits shown; the real certificate uses capped masses with degree-12 filters, as in <code>notes/thermal-mpo-gap-certificate.tex</code>.</p></aside></div>
+\(P_{\mathrm s}(24)\ge0.987\). The real certificate runs the same three steps with 12-site rings, exact integers, symmetry sectors and a 72-site trial state.</p></div><aside class="side"><p class="note">Toy numbers are exact to the digits shown; the real certificate uses capped masses with degree-12 filters, as in <code>notes/thermal-mpo-gap-certificate.tex</code>.</p></aside></div>
     <div class="player" data-ch="seedtoy"></div>
-    <div class="r"><div class="main eqs">\[ \sum_i\lambda_i^{24}\le\underbrace{0.833^4+(1.0664-0.833)^4}_{0.484}<1\le Z_{24}\ \Rightarrow\ \lambda_0>0.97,\qquad P_{\mathrm s}(24)\ge\Big(1+\frac{0.233^4}{0.97^{24}}\Big)^{-2}=0.988 . \]</div><aside class="side"></aside></div>
+    <div class="r"><div class="main eqs">\[ \sum_i\lambda_i^{24}\le\underbrace{0.833^4+(1.0664-0.833)^4}_{0.484}<1\le Z_{24}\ \Rightarrow\ \lambda_0>0.97,\qquad P_{\mathrm s}(24)\ge\Big(1+\frac{0.233^4}{0.97^{24}}\Big)^{-2}=0.98765\ldots>0.987 . \]</div><aside class="side"></aside></div>
     
   </section>
   <section class="ch" id="seed">
@@ -347,7 +347,7 @@ mass could produce at most 0.484, so one eigenvalue must exceed 0.97. The rest t
   </section>
   <section class="ch" id="oedge">
     <h2><span class="n">II.1</span>Ends carry free spins</h2>
-    <div class="r"><div class="main prose"><p>Opening the ring changes the physics before it changes the proof. In the valence-bond picture each spin 1 is a pair of spin-½, and neighbouring
+    <div class="r"><div class="main prose"><p>Opening the ring changes the physics before it changes the proof. In the valence-bond picture each spin 1 is a pair of spin-½, and neighboring
 halves bind into singlets; at each end one spin-½ is left over. Exact diagonalization of small chains shows the consequence. Without a field, even chains have three
 states just above the ground state, at 0.51, 0.31, 0.20, 0.14, 0.10 for n = 4, …, 12, and odd chains have a three-fold degenerate ground state. With a field
 \(h=3/5\) on the two end spins, odd chains have a single ground state and a gap of 0.72, 0.64, 0.58, 0.55 for n = 5, …, 11.</p></div><aside class="side"><p class="note">Levels from floating-point exact diagonalization with conserved S<sup>z</sup> (n ≤ 12), a diagnostic and not part of the proof. With an odd number of sites both ends lie on the same sublattice, so equal fields suit both.</p></aside></div>

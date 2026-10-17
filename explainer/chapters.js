@@ -493,7 +493,7 @@
   // 5 ------------------------------------------------------------------
   chapter({
     id: 'purity', title: 'Purity, seen as squares', dur: 15,
-    beats: [[0, 'A state with probabilities p₁, p₂, … has purity P = Σ p². Draw each p as a square: P is their total area.'],
+    beats: [[0, 'A state with probabilities p₀, p₁, … has purity P = Σ p². Draw each p as a square: P is their total area.'],
             [5, 'Every square fits under the height of the largest one, p₀. So P ≤ p₀.'],
             [9.5, 'Purity near 1 therefore forces one state to carry almost all the probability.']],
     draw(K, t) {
@@ -654,7 +654,7 @@
     id: 'rpwhy', title: 'Why the proof needs a symmetric transfer matrix', dur: 34,
     beats: [[0, 'The squaring step reads pᵢ = λᵢⁿ / Zₙ as probabilities. Let us test that on a 2×2 transfer matrix, with actual numbers.'],
             [6, 'A symmetric matrix. Its eigenvalues, 1.06 and 0.34, are real. Compute Zₙ = Tr Xⁿ and the spatial purity Z₂ₙ/Zₙ² for n = 1 … 8.'],
-            [14, 'Every purity lies between 0 and 1 and climbs to 1. This is the behaviour the bootstrap relies on.'],
+            [14, 'Every purity lies between 0 and 1 and climbs to 1. This is the behavior the bootstrap relies on.'],
             [19, 'Now a matrix that is not symmetric: a small rotation. Its eigenvalues 0.9 ± 0.4i are complex.'],
             [24.5, 'Zₙ changes sign, and the "purity" becomes negative or huge (−47 at n = 4). The pᵢ are no longer probabilities, so squaring proves nothing. The proof needs X symmetric.']],
     draw(K, t) {
@@ -696,8 +696,8 @@
             [8, 'Test the mirror on one site. An event’s side is the bond it arrives through: the left bond, shared with the left neighbor, or the right bond, shared with the right neighbor. Example: a = {G_z at 0.2, G_x at 0.6} on the left, b = {G_y at 0.4} on the right.'],
             [15.5, 'For Heisenberg an event puts the same matrix G_α on both sites of its bond, so the site gets G_α whichever side the event comes from. In time order it sees G_z, G_y, G_x: X(a, b) = Tr(G_x G_y G_z) = 1.'],
             [22, 'Mirror it: the left events move to the right and the right event to the left. The site sees the same three matrices at the same times, so X(b, a) = 1 too. Heisenberg’s X is symmetric.'],
-            [27.5, 'Counter-example: a bond whose event puts G_z on its left site but P = diag(1, 0, 0), the projector onto |x⟩, on its right site. A site is the right end of its left bond, so it receives P from there, and the left end of its right bond, so it receives G_z from there.'],
-            [36.5, 'Two events through the left bond give Tr(P P) = 1; the same two events through the right bond give Tr(G_z G_z) = −2. So X(a, ∅) ≠ X(∅, a): not symmetric. Reflection positivity is the condition that rules this out: the bond must look the same from both sides, with positive weights.']],
+            [27.5, 'Counter-example: a bond with −h = Q ⊗ P, where P = diag(1, 0, 0) projects onto |x⟩ and Q = diag(1, 1, 0) = −G_z². A site is the right end of its left bond, so it receives P from there, and the left end of its right bond, so it receives Q from there.'],
+            [36.5, 'Two events through the left bond give Tr(P P) = 1; the same two events through the right bond give Tr(Q Q) = 2. So X(a, ∅) ≠ X(∅, a): not symmetric. Reflection positivity is the condition that rules this out: the bond must look the same from both sides, with positive weights.']],
     draw(K, t) {
       const {th} = K, sx = 300, y0 = 110, y1 = 400, Yt = f => y1 - f * (y1 - y0);
       // intro: X as a box whose two legs are its row and column indices
@@ -747,10 +747,10 @@
         K.text('a bond that is not the same from both sides:', 80, 80, {size: 17, alpha: B});
         const bb = B * seg(t, 28.5, 29.2);
         K.line(130, 130, 250, 130, {color: th.fail, w: 3, alpha: bb}); K.dot(130, 130, 6, th.ink, bb); K.dot(250, 130, 6, th.ink, bb);
-        K.text('G_z', 130, 114, {align: 'center', size: 16, alpha: bb}); K.text('P', 250, 114, {align: 'center', size: 16, alpha: bb});
+        K.text('Q', 130, 114, {align: 'center', size: 16, alpha: bb}); K.text('P', 250, 114, {align: 'center', size: 16, alpha: bb});
         K.text('left site', 130, 154, {align: 'center', color: th.mute, size: 13, alpha: bb}); K.text('right site', 250, 154, {align: 'center', color: th.mute, size: 13, alpha: bb});
-        K.text('its event: G_z on the left end, P on the right end', 300, 126, {size: 16, color: th.fail, alpha: bb});
-        K.text('P = diag(1, 0, 0), the projector onto |x⟩', 300, 152, {size: 15, color: th.mute, alpha: B * seg(t, 30, 30.7)});
+        K.text('its event: Q on the left end, P on the right end', 300, 126, {size: 16, color: th.fail, alpha: bb});
+        K.text('P = diag(1, 0, 0) projects onto |x⟩;   Q = diag(1, 1, 0) = −G_z²', 300, 152, {size: 15, color: th.mute, alpha: B * seg(t, 30, 30.7)});
         const panel = (x0, side, nb, me, val, at) => {
           const al = B * seg(t, at, at + .8), x = x0 + 120;
           K.line(x + side * 120, 210, x + side * 120, 400, {color: th.mute, w: 1.5, alpha: al * .6});
@@ -761,9 +761,9 @@
           K.text(side < 0 ? 'two events through the left bond' : 'the same events through the right bond', x, 428, {align: 'center', color: th.mute, size: 14, alpha: al});
           K.text(val, x, 466, {align: 'center', size: 22, alpha: B * seg(t, 37, 37.8) * (side < 0 ? 1 : seg(t, 38, 38.8))});
         };
-        panel(140, -1, 'G_z', 'P', 'Tr(P P) = 1', 31.5);
-        panel(520, 1, 'P', 'G_z', 'Tr(G_z G_z) = −2', 33.5);
-        K.text('X(a, ∅) = 1  ≠  X(∅, a) = −2', W / 2, 508, {align: 'center', size: 18, color: th.fail, alpha: seg(t, 39.5, 40.3)});
+        panel(140, -1, 'Q', 'P', 'Tr(P P) = 1', 31.5);
+        panel(520, 1, 'P', 'Q', 'Tr(Q Q) = 2', 33.5);
+        K.text('X(a, ∅) = 1  ≠  X(∅, a) = 2', W / 2, 508, {align: 'center', size: 18, color: th.fail, alpha: seg(t, 39.5, 40.3)});
       }
     }
   });
@@ -809,7 +809,7 @@
             [16, 'Realignment: read the same 81 numbers with the legs grouped differently, rows (i, k) from the left site and columns (j, l) from the right. Nothing is computed; each entry just moves: ⟨x x| −h |y y⟩ goes to row (x, y), column (x, y).'],
             [24.5, 'Why this grouping: −h is two boxes G_α joined by a summed leg α. Split between the sites, each half is a vector v_α = vec(G_α), and the joined leg is a matrix product: realigned −h = Σ_α v_α v_αᵀ, a sum of squares.'],
             [33, 'A sum of squares has no negative eigenvalues. Here they are 2, 2, 2, 0, …: the antiferromagnet passes.'],
-            [38, 'Ferromagnet: h = −S·S, so −h = −Σ G_α ⊗ G_α and the realigned matrix has eigenvalues −2: not a sum of squares, not reflection positive. In general: realigned −h ⪰ 0, up to an on-site shift, means reflection positive.']],
+            [38, 'Ferromagnet: h = −S·S, so −h = −Σ G_α ⊗ G_α and the realigned matrix has eigenvalues −2: not a sum of squares, so it fails the test in this basis. In general: realigned −h ⪰ 0, up to an on-site shift, means reflection positive.']],
     draw(K, t) {
       const {th} = K, fm = t >= 38, M = minusH(fm ? -1 : 1), cs = 30, ox = 140, oy = 80;
       const mv = ease(seg(t, 20.5, 23)), one = ease(seg(t, 19, 20.5)), hl = t >= 10 && t < 24.5;
@@ -893,7 +893,7 @@
         K.line(gx, Y(0), gx + gw, Y(0), {color: th.mute, w: 1.5, alpha: E2});
         ev.forEach((v, i) => K.rect(gx + i * (bw + 6), Math.min(Y(0), Y(v)), bw, Math.max(2, Math.abs(Y(v) - Y(0))), {fill: v < -1e-9 ? th.fail : th.ok, alpha: E2}));
         K.text('eigenvalues of the realigned matrix', gx, gy - 14, {color: th.mute, size: 14, alpha: E2});
-        K.text(fm ? 'ferromagnet: −2, −2, −2  ✗ not reflection positive' : 'antiferromagnet: 2, 2, 2, 0, …  ✓ reflection positive', gx, gy + gh + 34, {color: fm ? th.fail : th.ok, size: 16, alpha: E2});
+        K.text(fm ? 'ferromagnet: −2, −2, −2  ✗ fails the test in this basis' : 'antiferromagnet: 2, 2, 2, 0, …  ✓ reflection positive', gx, gy + gh + 34, {color: fm ? th.fail : th.ok, size: 16, alpha: E2});
       }
     }
   });
@@ -980,7 +980,7 @@
       [23, 'contradiction', '⇒ λ₀ > 0.97', ''],
       [27.5, 'rest: Σ λ⁶', '≤ 0.233', '1.0664 − 0.833'],
       [29.5, 'rest: Σ |λ|²⁴', '≤ 0.0030', '0.233⁴'],
-      [35, 'Pₛ(24) ≥ (1 + 0.0030/0.97²⁴)⁻²', '= 0.988', 'ε ≈ 0.012'],
+      [35, 'Pₛ(24) ≥ (1 + 0.0030/0.97²⁴)⁻²', '> 0.987', 'ε < 0.013'],
     ];
     K.text('ledger', 80, 230, {color: th.mute, size: 14, italic: true});
     K.line(80, 238, 880, 238, {color: th.line, w: 1});
@@ -1006,7 +1006,7 @@
             [37, 'Now suppose every |λ| were ≤ 0.97, so each λ⁶ ≤ 0.833, with all λ⁶ adding to 1.0664. Since λ²⁴ = (λ⁶)⁴ and fourth powers reward concentration, the worst case is one λ⁶ at the cap and the rest in one more: Σλ²⁴ ≤ 0.833⁴ + 0.233⁴ = 0.484 < 1. Contradiction.'],
             [47, 'So one eigenvalue λ₀ exceeds 0.97, and λ₀⁶ ≥ 0.833. The others share at most 1.0664 − 0.833 = 0.233 of the sixth moment, and for numbers ≥ 0 a sum of fourth powers is at most the fourth power of the sum: Σ_rest |λ|²⁴ ≤ 0.233⁴ = 0.0030.'],
             [55, 'Step 3, the purity. Recall Pₛ(24) = Z₄₈ / Z₂₄² = Σλ⁴⁸ / (Σλ²⁴)². On top every term is ≥ 0, so keep only λ₀: Σλ⁴⁸ ≥ λ₀⁴⁸. Below, Σλ²⁴ = λ₀²⁴ + rest, and the rest is at most 0.0030.'],
-            [62, 'So Pₛ(24) ≥ λ₀⁴⁸ / (λ₀²⁴ + 0.0030)² = (1 + 0.0030/λ₀²⁴)⁻² ≥ (1 + 0.0030/0.97²⁴)⁻² = 0.988: a certified starting purity, defect ε ≈ 0.012, found without knowing the spectrum (the true value is 0.99999).'],
+            [62, 'So Pₛ(24) ≥ λ₀⁴⁸ / (λ₀²⁴ + 0.0030)² = (1 + 0.0030/λ₀²⁴)⁻² ≥ (1 + 0.0030/0.97²⁴)⁻² = 0.98765… > 0.987: a certified starting purity, defect ε < 0.013, found without knowing the spectrum (the true value is 0.99999).'],
             [69, 'The real certificate follows the same three steps on the spin-1 chain, with exact integers throughout. The next chapter draws its ingredients.']],
     draw(K, t) {
       const {th} = K, a = 1 - seg(t, 13.4, 14), b = seg(t, 14, 14.6);
@@ -1058,9 +1058,9 @@
     beats: [[0, 'The real certificate (the inputs of OpenAI’s 2026 proof) runs the toy’s three steps on the spin-1 chain. Step 1 needs exact moments Zₙ = Tr Xⁿ: the closed ring of n boxes X, which is Tr e^(−βH) on a ring of n ≤ 12 sites, evaluated in exact integer arithmetic.'],
             [8, 'A sharper version inserts a symmetry operation g into the ring before closing it: Zₙ(g) = Tr(U_g Xⁿ). These twisted traces separate the eigenvalues by symmetry sector, so each sector gets its own moment bound.'],
             [16, 'Step 2 needs a trial state on 72 sites: a matrix-product state. One box A per site, with a physical leg (the spin) and two virtual legs of dimension 26 joined around the ring.'],
-            [23, 'Its norm ⟨ψ|ψ⟩ glues ψ to its mirror image along the physical legs: a double-layer ring, Tr T⁷² with T = Σₛ Aₛ ⊗ Aₛ. Its energy ⟨ψ|H|ψ⟩ is 72 times the same ring with one h inserted. Both are rings of small matrices, contracted exactly.'],
+            [23, 'Its norm ⟨ψ|ψ⟩ glues ψ to its complex conjugate (the bra) along the physical legs: a double-layer ring, Tr T⁷² with T = Σₛ Aₛ ⊗ Āₛ, which is Σₛ Aₛ ⊗ Aₛ here because this MPS is real. Its energy ⟨ψ|H|ψ⟩ is 72 times the same ring with one h inserted. Both are rings of small matrices, contracted exactly.'],
             [31, 'Why that gives Z₇₂ > 1: energies carry a constant shift κ per site, which cancels in every purity, so Z₇₂ = Σₘ e^(−β(Eₘ + 72κ)) ≥ e^(−β(E₀ + 72κ)). The trial state has energy below −72κ, so E₀ < −72κ and that one factor already exceeds 1.'],
-            [39, 'Then, as in the toy: Z₇₂ = Σ λ⁷² > 1, while the moment bounds cap every λ, forces one eigenvalue λ₀ > 0.999. That certifies both purities at ring length 36.'],
+            [39, 'Then, as in the toy: Z₇₂ = Σ λ⁷² > 1 and the moment caps on every λ together force one eigenvalue λ₀ > 0.999. That certifies the seed at n₀ = 36: Pₛ at length 36 and Pτ at length 72.'],
             [45, 'The doubling step, run six times, carries them to (2304, 784), both defects below 0.01.']],
     draw(K, t) {
       const {th} = K;
@@ -1085,19 +1085,19 @@
           if (hcol && i === 3) K.box(x + dx / 2, (yA + yB) / 2, dx + 44, 30, 'h', {color: th.fail, fill: th.spaceF, alpha: P2 * en});
         }
         boxRing(K, x0, dx, n, yA, 'A', {up: true, alpha: P2});
-        boxRing(K, x0, dx, n, yB, 'A', {alpha: P2 * dbl});
+        boxRing(K, x0, dx, n, yB, 'Ā', {alpha: P2 * dbl});
         K.text('virtual legs: dimension 26', x0 + n * dx + 20, yA - 6, {color: th.mute, size: 14, alpha: P2 * seg(t, 17.5, 18.2) * (1 - dbl)});
         K.text('physical leg: the spin', x0 + n * dx + 20, yA + 50, {color: th.space, size: 14, alpha: P2 * seg(t, 18.5, 19.2) * (1 - dbl)});
         K.text('ψ', x0 - 70, yA + 6, {size: 20, italic: true, alpha: P2});
         K.text('ψ̄', x0 - 70, yB + 6, {size: 20, italic: true, alpha: P2 * dbl});
         K.rect(x0 + dx - 26, yA - 22, 52, yB - yA + 44, {stroke: th.proved, w: 2, dash: [5, 4], alpha: P2 * seg(t, 25, 25.7) * (1 - en)});
         K.text('T', x0 + dx, yB + 42, {align: 'center', color: th.proved, size: 17, alpha: P2 * seg(t, 25, 25.7) * (1 - en)});
-        K.tex('\\langle\\psi|\\psi\\rangle=\\operatorname{Tr}T^{72},\\qquad T=\\textstyle\\sum_s A_s\\otimes A_s', W / 2, 330, {align: 'center', size: 19, alpha: P2 * seg(t, 25.5, 26.2)});
+        K.tex('\\langle\\psi|\\psi\\rangle=\\operatorname{Tr}T^{72},\\qquad T=\\textstyle\\sum_s A_s\\otimes\\bar A_s', W / 2, 330, {align: 'center', size: 19, alpha: P2 * seg(t, 25.5, 26.2)});
         K.tex('\\langle\\psi|H|\\psi\\rangle=72\\times(\\text{ring with one }h)', W / 2, 372, {align: 'center', size: 19, color: th.fail, alpha: P2 * seg(t, 27.5, 28.2)});
         const w = seg(t, 31.5, 32.2);
         K.tex('Z_{72}=\\sum_m e^{-\\beta(E_m+72\\kappa)}\\ \\ge\\ e^{-\\beta(E_0+72\\kappa)}', W / 2, 420, {align: 'center', size: 19, alpha: P2 * w});
         K.tex('E_0\\le\\frac{\\langle\\psi|H|\\psi\\rangle}{\\langle\\psi|\\psi\\rangle}<-72\\kappa\\ \\Rightarrow\\ Z_{72}>1', W / 2, 474, {align: 'center', size: 19, color: th.space, alpha: P2 * seg(t, 34, 34.7)});
-        K.text('+ moment bounds  ⇒  one λ₀ > 0.999  ⇒  purities at length 36', W / 2, 520, {align: 'center', size: 17, color: th.ok, alpha: P2 * seg(t, 39.5, 40.2)});
+        K.text('+ moment bounds  ⇒  one λ₀ > 0.999  ⇒  seed n₀ = 36: Pₛ(36), Pτ(72)', W / 2, 520, {align: 'center', size: 17, color: th.ok, alpha: P2 * seg(t, 39.5, 40.2)});
       }
       // six doublings
       const B = seg(t, 45, 45.8);
