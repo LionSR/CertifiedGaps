@@ -65,13 +65,16 @@ value $b=49/4$, and $X_b$ for the spatial transfer operator of
 Ref.~\cite{main} at $b$. Its eigenvalues $\lambda_i(b)$ are real, and
 $Z_n(b)=\sum_i\lambda_i^n$. Following Ref.~\cite{source}, the Hamiltonian
 is shifted by $\kappa=700741/500000$ per site, $H_n\to H_n+\kappa n$. This
-$\kappa$ lies just below minus the ground-state energy per site (the trial
-state of Sec.~\ref{app:c-spectrum} has energy per site below $-\kappa$), so
-after the shift the leading eigenvalue of $X_b$ is close to one. The shift
+$\kappa$ is set by the matrix-product trial state of
+Sec.~\ref{app:c-spectrum}: it is chosen so that $-\kappa$ lies just above the
+trial state's energy per site, so the trial state certifies $Z_{72}(b)>1$.
+After the shift the leading eigenvalue of $X_b$ is close to one. The shift
 cancels from every purity.
 
-The certificate proceeds in four steps, from twisted partition functions to
-the initial estimate:
+The certificate proceeds in four steps, from twisted partition functions
+$\Tr(X_b^nU_g)$ to a leading-eigenvalue lower bound $\lambda_0>\ell$,
+starting defects $(p_0,q_0)$ at $(36,49/4)$, and six doublings to the
+starting estimate of Ref.~\cite{main}:
 \begin{equation}
  \begin{aligned}
  \underbrace{\tnchain[node=xvertex,last=sym,ring]{,,\cdots,,U_g}}_{n\le12,\ b=49/4}
@@ -98,10 +101,13 @@ Every number is an exact rational or an integer; floating-point
 arithmetic is used nowhere in the proof.
 
 \section{Twisted boundary conditions}\label{app:c-tori}
-\emph{Twists and symmetries.} A proper signed permutation $g$ of the
-Cartesian axes acts on histories by $U_g$, which relabels events and
-multiplies by their signs. Rotating every matrix inside a site trace shows
-that $U_g$ slides through a transfer vertex,
+\emph{Twists and symmetries.} Untwisted traces $Z_n(b)=\sum_i\lambda_i(b)^n$
+sum over all spin-rotation sectors at once; separating the $D_2$-invariant
+sector from the three equivalent nontrivial sectors (the eigenvalue lists $J$
+and $N$ of Sec.~\ref{app:c-spectrum}) requires twisted traces. A
+proper signed permutation $g$ of the Cartesian axes acts on histories by $U_g$,
+which relabels events and multiplies by their signs. Rotating every matrix
+inside a site trace shows that $U_g$ slides through a transfer vertex,
 \begin{equation}
  \tnchain[last=sym]{X_b,U_g}=\tnchain[node=sym,last=xop]{U_g,X_b},
  \label{eq:c-slide}
@@ -125,9 +131,9 @@ Frobenius norm, which splits the imaginary-time circle at half its length,
 so that only columns $Fe_r$ are needed, one basis state $e_r$ at a time.
 
 \emph{Uniformization.} Shift and scale $H$ so that
-$R=1-(\tfrac32n+H)/16$ is a contraction. Uniformization (Jensen's method)
-then writes $F$, up to the scalar $e^{-b(\kappa-3/2)n/2}$, as a Poisson
-mixture of powers of $R$:
+$R=1-(\tfrac32n+H)/16$ is a contraction. Since $8b=98$ at $b=49/4$,
+uniformization (Jensen's method) writes $F$, up to the scalar
+$e^{-b(\kappa-3/2)n/2}$, as a Poisson mixture of powers of $R$:
 \begin{equation}
  F\propto e^{98(R-1)}=\sum_{j\ge0}e^{-98}\frac{98^j}{j!}\;
  \tncolumn[node=gibbs,gap=.15em]{R,R,\cdots,R}\,,
@@ -241,8 +247,10 @@ Removing $\lambda_0$ leaves the following bound on the $k$th moment of the rest:
  \label{eq:c-rest}
 \end{equation}
 
-\emph{Initial defects.} The two purities at the base scale now follow, each
-keeping only the dominant term:
+\emph{Initial defects.} Using $Z_{72}(b)\ge\lambda_0^{72}>\ell^{72}$ in
+$\Ps(36,b)=Z_{72}(b)/Z_{36}(b)^2$ and $Z_{72}(2b)>1$ [Eq.~\eqref{eq:c-z72}] in
+$\Pt(72,b)=Z_{72}(2b)/Z_{72}(b)^2$ bounds both purities at the base scale,
+giving $(p_0,q_0)\simeq(0.0479,0.1815)$:
 \begin{equation}
  \begin{aligned}
  \Ps(36,b)&=\frac{\Zt42}{\Ztsq21}\ge\Bigl(1+\frac{R_A(36)}{\ell^{36}}\Bigr)^{-2}
@@ -252,24 +260,20 @@ keeping only the dominant term:
  \end{aligned}
  \label{eq:c-seed}
 \end{equation}
-The first line uses $Z_{72}\ge\lambda_0^{72}$. The second uses
-$Z_{72}(2b)>1$ from the trial vector. Numerically $p_0=0.0479$ and
-$q_0=0.1815$.
 
 \section{Six doublings}\label{app:c-doubling}
 The thermal defect $q_0$ exceeds the diagonal threshold
 $\varepsilon_*\simeq0.127$ of Ref.~\cite{scope}. A single common $\varepsilon$
-would therefore not start the iteration. The coupled update keeps the two
-defects apart instead:
+would therefore not start the iteration. Instead, Moves~1--4 of Ref.~\cite{main}
+track the two defects separately; with $f(z)=z^2/[2(1-z)^2]$ and
+$\lceil\cdot\rceil_7$ rounding up to a multiple of $10^{-7}$,
 \begin{equation}
  \begin{aligned}
  p_{j+1}&=\bigl\lceil f\bigl(1-(1-p_j)^2(1-q_j)\bigr)\bigr\rceil_7,\\
- q_{j+1}&=\bigl\lceil f\bigl(1-(1-q_j)^2(1-p_{j+1})\bigr)\bigr\rceil_7,
+ q_{j+1}&=\bigl\lceil f\bigl(1-(1-q_j)^2(1-p_{j+1})\bigr)\bigr\rceil_7.
  \end{aligned}
  \label{eq:c-update}
 \end{equation}
-These are moves~1--4 of the doubling diagram of Ref.~\cite{main}, with each output
-rounded up to a multiple of $10^{-7}$.
 
 \begin{proofdiagram}
 \begin{tikzpicture}[x=.95cm,y=1.55cm,font=\scriptsize]
