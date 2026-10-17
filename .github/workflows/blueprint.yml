@@ -9,10 +9,12 @@ on:
       - main # Build and check pull requests into the default branch (no deploy)
   workflow_dispatch:        # Allow manual triggering of the workflow from the GitHub Actions interface
 
-# Cancel previous runs if a new commit is pushed to the same PR or branch
+# One run per ref at a time; a newer push waits for (main) or replaces (PRs) the running one
 concurrency:
   group: ${{ github.ref }}  # Group runs by the ref (branch or PR)
-  cancel-in-progress: true  # Cancel any ongoing runs in the same group
+  # Cancel superseded PR builds only. A deploy on main takes about four hours (most of it
+  # doc-gen4), so cancelling it whenever another PR merges meant no deploy ever finished.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages. Only the push-gated
 # upload and deploy steps use them; pull-request runs, including read-only fork runs, need none.
@@ -29,13 +31,16 @@ jobs:
       - name: Cleanup to free disk space
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
+          # Jekyll copies the generated API docs into _site, which ran out of the 25 GB left after
+          # removing Android alone (run 39019463651). Remove everything except the tool cache, which
+          # holds the Ruby that docgen-action sets up.
           tool-cache: false
           android: true
-          dotnet: false
-          haskell: false
-          large-packages: false
-          docker-images: false
-          swap-storage: false
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
 
       - name: Checkout project
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
