@@ -46,11 +46,32 @@ The underlying verification reduces to three closed tensor networks: twisted rin
 \setcounter{section}{8}
 
 \section{Architecture of the Certificate}\label{app:c-plan}
-Throughout, $X_b$ is the spatial transfer operator of Ref.~\cite{main} at
-inverse temperature $b$, with the energy shift $\kappa=700741/500000$
-absorbed into $H$. Its eigenvalues $\lambda_i(b)$ are real, and
-$Z_n(b)=\sum_i\lambda_i^n$. The certificate proceeds in four steps, from
-twisted partition functions to the initial estimate:
+The proof of Ref.~\cite{main} takes one numerical input: the spatial and
+thermal purities at length $2304$ and inverse temperature $784$ are at
+least $0.99$. Computing them directly would require partition functions of
+rings of $4608$ spins, far beyond any computer. Ref.~\cite{source}
+certifies them instead from rings of at most twelve sites, and this note
+explains how.
+
+The idea is to start at a much smaller scale and let the doubling
+recurrence carry the bounds up. At length $36$ and inverse temperature
+$49/4$, Ref.~\cite{source} certifies upper bounds $p_0$ and $q_0$ on the
+spatial and thermal defects. Six doublings take $(36,49/4)$ to
+$(36\cdot2^6,\tfrac{49}{4}\cdot2^6)=(2304,784)$, and along the way both
+defects fall below $1/100$.
+
+We write $b$ for an inverse temperature in this note, mainly the certificate
+value $b=49/4$, and $X_b$ for the spatial transfer operator of
+Ref.~\cite{main} at $b$. Its eigenvalues $\lambda_i(b)$ are real, and
+$Z_n(b)=\sum_i\lambda_i^n$. Following Ref.~\cite{source}, the Hamiltonian
+is shifted by $\kappa=700741/500000$ per site, $H_n\to H_n+\kappa n$. This
+$\kappa$ lies just below minus the ground-state energy per site (the trial
+state of Sec.~\ref{app:c-spectrum} has energy per site below $-\kappa$), so
+after the shift the leading eigenvalue of $X_b$ is close to one. The shift
+cancels from every purity.
+
+The certificate proceeds in four steps, from twisted partition functions to
+the initial estimate:
 \begin{equation}
  \begin{aligned}
  \underbrace{\tnchain[node=xvertex,last=sym,ring]{,,\cdots,,U_g}}_{n\le12,\ b=49/4}
