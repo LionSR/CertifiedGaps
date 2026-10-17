@@ -49,6 +49,46 @@ jobs:
           lint: false # no lint driver is configured
           mk_all-check: false # mk_all does not follow srcDir = "lean"
 
+      # The leaderboard (home_page/leaderboard.html): build the Lean library of gap records, audit
+      # the axioms of every record into home_page/_data/lean_records.json (read by the page, never
+      # committed), and re-check every record in the kernel. Each step exits nonzero on failure.
+      - name: Build the Leaderboard library
+        run: ~/.elan/bin/lake build Leaderboard
+
+      - name: Audit the leaderboard records
+        run: ~/.elan/bin/lake exe leaderboard_audit home_page/_data/lean_records.json
+
+      - name: Re-check the leaderboard records in the kernel
+        run: ~/.elan/bin/lake exe leaderboard_recheck
+
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@fa02766e078afaaf09b14210362cee14137e6a32 # v3.0.2
+        with:
+          version: "1.12"
+
+      - name: Cache Julia packages
+        uses: julia-actions/cache@9353db09a0f2bbbdec6f41791918c75d37391b36 # v3.5.0
+
+      # Schema, paths, rounded-down decimals (exact arithmetic), agreement with the Lean records,
+      # and a scan of leaderboard/ for sorry, native_decide, axiom, implemented_by and extern.
+      - name: Validate the leaderboard data
+        env:
+          OPENBLAS_NUM_THREADS: 1
+        run: |
+          julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
+          julia --project=tools/leaderboard tools/leaderboard/check_records.jl \
+            --lean-records home_page/_data/lean_records.json
+
+      # Jekyll copies files without front matter verbatim, so the explainer and the PDFs are served
+      # unchanged. These copies are build products (see .gitignore).
+      - name: Copy the explainer and the notes into the site
+        run: |
+          rsync -a --exclude '.*' --exclude '*.mp4' --exclude 'node_modules/' \
+            --exclude 'package*.json' --exclude '*.narration.wav' --exclude 'render.mjs' \
+            --exclude 'README.md' explainer/ home_page/explainer/
+          mkdir -p home_page/notes
+          cp notes/*.pdf home_page/notes/
+
       - name: Compile blueprint and documentation
         uses: leanprover-community/docgen-action@dacc1acc2a3f532cc577266979ba9c36c7593f7c # 2026-10-05
         with:

@@ -41,3 +41,16 @@ lean/.lake
 /blueprint/src/web.bbl
 /blueprint/src/web.paux
 /docbuild/
+
+# Home page build products: docgen-action writes the blueprint and API docs into home_page/,
+# blueprint.yml copies the explainer and the note PDFs there and generates the Lean records
+# (`lake exe leaderboard_audit`), and Jekyll writes _site/.
+/home_page/_site/
+/home_page/.jekyll-cache/
+/home_page/vendor/
+/home_page/blueprint/
+/home_page/blueprint.pdf
+/home_page/docs/
+/home_page/explainer/
+/home_page/notes/
+/home_page/_data/lean_records.json
