@@ -8,7 +8,9 @@ an exposition only: nothing here is part of any certificate.
 
 | file | content |
 |---|---|
-| `index.html` | the explainer page: imaginary time and path sums, the spacetime torus, the two purities, squaring lemma, coupling identity, reflection positivity (with the realignment test), four-move doubling, the numerical seed, and the open-chain argument of Appendices A–C, each with an interactive figure and a worked example |
+| `index.html` | Part I, the ring proof: imaginary time and path sums, the spacetime torus, the two purities, squaring lemma, coupling identity, reflection positivity (with the realignment test), four-move doubling, and the numerical seed, each with an interactive figure and a worked example |
+| `open.html` | Part II, the open-chain argument of Appendices A–C: boundary vectors, the overlap, the three moves per scale, and the odd-length gap |
+| `page.css`, `page.js` | the style and runtime both pages share: drawing helpers, theme colors, TeX on canvas, and the figure players |
 | `film.html`, `film_open.html` | animation pages for the two films (main proof; open chains); each only names its chapter list and title |
 | `film.js` | the shared film player: TeX preloading, captions, the beat timeline, and the frame-deterministic `window.draw(t)` |
 | `narration.js` | the spoken narration of both films, one line per caption beat, with symbols spelled out for speech |
@@ -19,13 +21,13 @@ an exposition only: nothing here is part of any certificate.
 
 ## View
 
-Serve the directory and open `index.html` (MathJax and EB Garamond load from public CDNs):
+Serve the directory and open `index.html` or `open.html` (MathJax and EB Garamond load from public CDNs):
 
 ```sh
 cd explainer && python3 -m http.server 8000   # then open http://localhost:8000
 ```
 
-The page expects `film.mp4` and `open-chains.mp4` next to it. They are not committed; render them
+The pages expect `film.mp4` and `open-chains.mp4` next to them. They are not committed; render them
 with Playwright, ffmpeg, and the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) speech
 model (run locally through `kokoro-js`; its ONNX weights, about 300 MB, download on first use):
 

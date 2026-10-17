@@ -36,7 +36,8 @@ and prove the step from seed to gap in Lean 4.
 ## Read
 
 * [Explainer]({{ '/explainer/' | relative_url }}): an illustrated, undergraduate-level walk
-  through the proof (its films are rendered locally).
+  through the ring proof, with a sequel on [open chains]({{ '/explainer/open.html' | relative_url }})
+  (its films are rendered locally).
 * Notes (PDF): [main note]({{ '/notes/thermal-mpo-gap-note.pdf' | relative_url }}) ·
   [scope]({{ '/notes/thermal-mpo-gap-scope.pdf' | relative_url }}) ·
   [certificate]({{ '/notes/thermal-mpo-gap-certificate.pdf' | relative_url }}) ·
