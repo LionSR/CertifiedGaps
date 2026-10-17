@@ -20,7 +20,7 @@
     <p class="subtitle">Part II of <a href="index.html">the spacetime bootstrap</a>: why an open spin-1 chain with pinned ends has a unique ground state and a gap, in eleven figures</p>
   </header>
     <div class="r" style="margin-top: 18px"><div class="main prose"><p>In <a href="index.html">Part I</a>, periodic boundary conditions joined the last spin back to the first, turning the partition function into a trace \(\operatorname{Tr}X_\beta^{\,L}\). Now cut the ring open into a chain with two free ends, and apply a small magnetic field to the two endpoint spins. The bulk of the chain is unchanged, so the ring proof carries over with one new ingredient: the open ends of the network are closed by <em>boundary vectors</em> instead of a trace, and the proof must show that those boundary vectors have a nonzero overlap with the dominant eigenvector of \(X_\beta\). Eleven figures, following Appendices A–C of the note.</p>
-    <p class="toc"><a href="#oedge">Ends carry free spins</a> · <a href="#ocyl">A cylinder, not a torus</a> · <a href="#ovec">What a boundary vector is</a> · <a href="#over">The overlap</a> · <a href="#ofold">Why the remainder is a square</a> · <a href="#omoves">Three moves per scale</a> · <a href="#onum">One open-chain step, in numbers</a> · <a href="#ostart">Starting numbers</a> · <a href="#ogap">Odd lengths, and the gap</a></p></div>
+    <p class="toc"><a href="#oedge">Ends carry free spins</a> · <a href="#ocyl">A cylinder, not a torus</a> · <a href="#ovec">What a boundary vector is</a> · <a href="#over">The overlap</a> · <a href="#ofold">Why the remainder is a square</a> · <a href="#omoves">Three moves per scale</a> · <a href="#onum">One open-chain step, in numbers</a> · <a href="#ostart">Starting numbers</a> · <a href="#ogap">Odd lengths, and the gap</a> · <a href="#symbols">Symbols, in plain words</a></p></div>
       <aside class="side"><p class="note">Theorem from OpenAI’s boundary-field preprint; this part follows <code>notes/thermal-mpo-gap-note.tex</code>, Appendices A–C.</p></aside></div>
     <div class="r" style="margin-top: 14px"><div class="main"><video src="open-chains.mp4" poster="poster-open.jpg" controls preload="metadata" playsinline></video></div>
       <aside class="side"><p class="note">The eleven open-chain figures as one film, with narration, about thirteen minutes.</p></aside></div>
@@ -108,6 +108,27 @@
     <div class="player" data-ch="ogap"></div>
     <div class="r"><div class="main eqs">\[ e^{-\beta_j\Delta_n}\le\frac{4x_j}{1-4x_j}<10^{-2^{j-5}},\quad\beta_j=392\cdot2^{j-5}\quad\Longrightarrow\quad\Delta_n>\frac{\log10}{392}. \]</div><aside class="side"></aside></div>
     
+  </section>
+  <section class="ch" id="symbols">
+    <h2>Symbols, in plain words</h2>
+    <div class="r"><div class="main prose"><p>The symbols this page adds, in one sentence each. The ring symbols (\(Z\), \(X_\beta\), \(\lambda_i\), the purities, \(f\)) are in the <a href="index.html#symbols">glossary of Part I</a>.</p>
+    <table class="gloss"><thead><tr><th>symbol</th><th>meaning</th><th>§</th></tr></thead><tbody>
+      <tr><td>\(H_n^{\mathrm{same}},\ H_n^{\mathrm{opp}}\)</td><td>Open chains of \(n\) sites with end fields of strength \(h=3/5\): equal fields \(-h(S_1^z+S_n^z)\), the chain of the theorem, or opposite fields \(-hS_1^z+hS_n^z\).</td><td><a href="#oedge">II.1</a>, <a href="#ovec">II.3</a></td></tr>
+      <tr><td>\(v_\beta\)</td><td>The boundary vector: weight \((ih)^d\) on an end history of \(d\) field events, all labeled \(z\), and \(0\) otherwise; \(\|v_\beta\|^2=e^{\beta h^2}\).</td><td><a href="#ovec">II.3</a></td></tr>
+      <tr><td>\(U_P\)</td><td>The rotation by \(\pi\) about the \(x\)-axis (\(S^z\to-S^z\)); on the right cap it turns the opposite-field chain into the equal-field one.</td><td><a href="#ovec">II.3</a></td></tr>
+      <tr><td>\(Y_n,\ Y_n^{\mathrm{same}}\)</td><td>Partition functions of the opposite-field chain, \(\langle v|X^n|v\rangle\), and of the equal-field chain, \(\langle v|X^nU_P|v\rangle\).</td><td><a href="#ovec">II.3</a></td></tr>
+      <tr><td>\(T,\ \psi,\ R\)</td><td>The normalized transfer operator \(X_\beta/\lambda_0=|\psi\rangle\langle\psi|+R\): its top eigenvector \(\psi\), and the remainder \(R\), with \(\|R\|<1\).</td><td><a href="#over">II.4</a></td></tr>
+      <tr><td>\(c\)</td><td>The boundary overlap \(|\langle\psi,v\rangle|^2\), the same at every chain length; the proof must show it is positive.</td><td><a href="#over">II.4</a></td></tr>
+      <tr><td>\(B_m,\ D_m\)</td><td>\(B_m=Y_m/\lambda_0^m=c+D_m\), where the remainder \(D_m=\langle v|R^m|v\rangle\) is a square \(\|R^{m/2}v\|^2\) for even \(m\) and shrinks with \(m\).</td><td><a href="#over">II.4</a>, <a href="#ofold">II.5</a></td></tr>
+      <tr><td>\(e_m\)</td><td>The boundary defect \(D_m/B_m=1-c/B_m\); certifying \(e_m<1\) proves \(c>0\).</td><td><a href="#over">II.4</a></td></tr>
+      <tr><td>\(P_\tau^{\mathrm{opp}}(m,\beta)\)</td><td>Thermal purity \(Y_m(2\beta)/Y_m(\beta)^2\) of the opposite-field chain.</td><td><a href="#omoves">II.6</a></td></tr>
+      <tr><td>\(j;\ \beta_j,\ n_j,\ M_j\)</td><td>The scale index, with \(\beta_j=49\cdot2^{j-2}\), \(n_j=120\cdot2^{j-2}\), and \(M_j=2n_j\) (so \(\beta_5=392\) and \(M_5=1920\)).</td><td><a href="#omoves">II.6</a></td></tr>
+      <tr><td>\(r_j\)</td><td>The bulk eigenvalue ratio \(\lambda_0(2\beta_j)/\lambda_0(\beta_j)^2\approx1\), controlled by the ring proof.</td><td><a href="#omoves">II.6</a></td></tr>
+      <tr><td>\(q_j\)</td><td>How much the remainder shrinks over the extra sites: \(D'_{M_j}\le q_jD'_{M_j/2}\).</td><td><a href="#omoves">II.6</a></td></tr>
+      <tr><td>\(x_j\)</td><td>The defect bound at scale \(j\), with \(x_{j+1}=10x_j^2\) and \(x_5=10^{-2}\).</td><td><a href="#omoves">II.6</a>, <a href="#ostart">II.8</a></td></tr>
+      <tr><td>\(\varepsilon_j\)</td><td>The ring defect at scale \(j\), from Part I (\(\varepsilon_2=0.052\)).</td><td><a href="#onum">II.7</a></td></tr>
+      <tr><td>\(E,\ \eta\)</td><td>Shorthand in the worked step: the boundary defect and the opposite-field thermal defect \(1-P_\tau^{\mathrm{opp}}\) (\(0.14\) and \(0.21\) at \(j=2\)).</td><td><a href="#onum">II.7</a></td></tr>
+    </tbody></table></div><aside class="side"></aside></div>
   </section>
   <p class="foot">Sources: <code>notes/thermal-mpo-gap-note.tex</code>, Appendices A–C, and OpenAI’s boundary-field preprint.
     The energy levels in Section II.1 come from a floating-point exact diagonalization and are not part of the proof.</p>
