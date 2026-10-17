@@ -2,7 +2,7 @@
 
 This document details the exact frame in which the dimerized chain is a reflection-positive core
 `RingModel`, how the shared pipeline `CertifiedGaps.GapCertificates` certifies its seeds, the
-continuous-$`\beta`$ exclusion covers, and the arbitrary-$n$ dimer perturbation bound. The
+continuous-$`\beta`$ exclusion covers, and the arbitrary-$`n`$ dimer perturbation bound. The
 model-specific code is `src/DimerizedHeisenberg.jl`; everything else is the core.
 
 ## The rotated cell frame
@@ -52,7 +52,7 @@ frame). `RingModels.verify_rp` checks it exactly, and every certificate stores t
 weights $w$, and the reflection $F$. Without $F$ there is no such factorization: the core's exact
 LDL$`^\dagger`$ factorization of the realigned bond fails in this basis, and
 `src/reflection_conventions.jl` shows that no common single-cell basis change helps, since
-$\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \tfrac38 (1 - \delta)^2 > 0$ for the swap
+$`\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \tfrac38 (1 - \delta)^2 > 0`$ for the swap
 $`F_{\mathrm{outer}}`$ of two whole cells is basis independent.
 
 `src/rp.jl` (`results/rp_audit.json`) records an equivalent second frame: the singlet/triplet
@@ -115,12 +115,12 @@ The summary stores every box with its lower bounds; the fast check reruns the re
 and checks that the boxes tile $[1, B]$, and `check.jl --full` recomputes every bound from fresh
 spectra.
 
-## Arbitrary-$n$ dimer perturbation bound (`dimer_bounds`)
+## Arbitrary-$`n`$ dimer perturbation bound (`dimer_bounds`)
 
-At $\delta = 1$ ($w = 0$), the $n$-cell ring consists of $n$ decoupled strong dimers with exact
+At $\delta = 1$ ($w = 0$), the $n$-cell ring consists of $`n`$ decoupled strong dimers with exact
 partition function $Z_n^{\mathrm{dimer}}(\beta) = (e^{3\beta s/4} + 3e^{-\beta s/4})^n$. For
 $w = 1 - \delta > 0$, writing $H_n = H_n^{\mathrm{dimer}} + V_n$ gives
-$\|V_n\|_2 \le v_n := \frac{3}{4} n w$, so Weyl's inequality implies
+$`\|V_n\|_2 \le v_n := \frac{3}{4} n w`$, so Weyl's inequality implies
 $|\log Z_n(\beta) - \log Z_n^{\mathrm{dimer}}(\beta)| \le \beta v_n$ and hence
 ```math
 P_{\mathrm{s}}(n, \beta) \ge e^{-4\beta v_n}, \qquad
@@ -130,4 +130,4 @@ Evaluating these bounds requires only $O(\log n)$ interval operations independen
 $2^{2n}$ Hilbert-space dimension (certifying $n_0 = 128$ cells / $512$ spins at
 $\delta = 0.999999, \beta_0 = 8$ in `test/runtests.jl`), but because the extensive error
 $4\beta v_n = 3\beta n (1 - \delta)$ does not cancel between $Z_{2n}$ and $Z_n^2$, reaching
-moderate $\delta$ at large $n$ would require a linked cluster expansion.
+moderate $\delta$ at large $`n`$ would require a linked cluster expansion.

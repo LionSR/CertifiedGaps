@@ -67,6 +67,9 @@ Use consistent terminology and notation across all documentation and comments:
   generators satisfying $`-\mathbf{S}_j \cdot \mathbf{S}_{j+1} = \sum_\alpha G_{\alpha,j} \otimes G_{\alpha,j+1}`$.
 - **Spelling:** Use standard American spelling (`diagonalization`, `dimerized`, `normalization`,
   `magnetization`, `formalized`, `optimized`, `parameter`, `neighbor`, `labeled`) throughout Markdown prose.
+- **Math in Markdown:** GitHub renders `$...$` but rejects `\operatorname` (write `\mathrm{Tr}`) and strips
+  Markdown escapes inside it (`\{`, `\|`, `\,`, `\\`). Write such formulas, and any formula touching a word
+  (`all-$\beta$`) or inside italics, as `` $`...`$ ``; write display math as a ```` ```math ```` block.
 
 ## Approach: think before computing
 
@@ -91,7 +94,7 @@ that makes the seed purities computable or boundable beyond raw dense diagonaliz
   admissible defect region ($< 0.12731$).
 - **Asymmetric and half-length seeds:** The criterion needs only $P_{\mathrm{s}}(n_0, \beta_0)$ and
   $P_\tau(2n_0, \beta_0)$. By the exact coupling identity
-  $P_\tau(2n_0, \beta_0) = P_{\mathrm{s}}(n_0, 2\beta_0)\,P_\tau(n_0, \beta_0)^2 / P_{\mathrm{s}}(n_0, \beta_0)^2 \ge P_{\mathrm{s}}(n_0, 2\beta_0)\,P_\tau(n_0, \beta_0)^2$
+  $`P_\tau(2n_0, \beta_0) = P_{\mathrm{s}}(n_0, 2\beta_0)\,P_\tau(n_0, \beta_0)^2 / P_{\mathrm{s}}(n_0, \beta_0)^2 \ge P_{\mathrm{s}}(n_0, 2\beta_0)\,P_\tau(n_0, \beta_0)^2`$
   (`notes/thermal-mpo-gap-scope.tex`, Appendix E), $P_\tau(2n_0, \beta_0)$ can be
   bounded in terms of $P_\tau(n_0, \beta_0)$ and $P_{\mathrm{s}}(n_0, 2\beta_0)$, halving the largest required
   ring length. Moreover, the asymmetric recurrence is much more tolerant of the spatial defect
