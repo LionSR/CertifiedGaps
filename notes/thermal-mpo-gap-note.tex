@@ -496,8 +496,8 @@ J. Phys.: Condens. Matter \textbf{2}, 5737 (1990).
 \appendix
 \setcounter{secnumdepth}{2}
 \section{Open chain with boundary fields}\label{app:open}
-The networks above also bound the gap of the open chain with equal
-endpoint fields. On $n$ spin-1 sites, with
+The tensor networks of the main text also bound the gap of the open chain with
+equal endpoint fields. On $n$ spin-1 sites, with
 $\sum_\alpha(S^\alpha)^2=2I$, let
 \begin{equation}
  H_n^{\same}=\sum_{i=1}^{n-1}\bm S_i\cdot\bm S_{i+1}
@@ -508,9 +508,10 @@ $\sum_\alpha(S^\alpha)^2=2I$, let
 For every odd $n\ge1921$, the Hamiltonian~\eqref{eq:b-model} has a unique
 ground state and $\Delta_n>(\log10)/392\simeq0.005874$.
 \end{theorem}
-The theorem, the field $h=3/5$, and all finite inputs used below
-[Eq.~\eqref{eq:b-seeds}] are due to Ref.~\cite{boundary}. Appendices~\ref{app:open}--\ref{app:b-iteration} give
-a proof in the language of the main text that uses only those inputs.
+The theorem, the field $h=3/5$, and all finite-scale inputs in
+Eq.~\eqref{eq:b-seeds} come from Ref.~\cite{boundary}.
+Appendices~\ref{app:open}--\ref{app:b-iteration} prove the theorem from those
+inputs in the diagrammatic language of the main text.
 
 \emph{Why are boundary fields needed?} Without them, each end of the open
 spin-1 chain carries an effective spin-$1/2$ boundary mode, and the four lowest
@@ -527,18 +528,18 @@ equal-field thermal purity $\Pt^{\same}(n,\beta)=\sum_mw_m^2$:
  \le\frac{1-\Pt^{\same}(n,\beta)}{\Pt^{\same}(n,\beta)}.
  \label{eq:b-target}
 \end{equation}
-The proof bounds this purity along a ladder of scales on which length and
+We bound this purity along a sequence of scales where length and
 inverse temperature double together,
 \begin{equation}
  \beta_j=49\,2^{j-2},\quad n_j=120\,2^{j-2},\quad
  M_j=2n_j\quad(j\ge2),
  \label{eq:b-scales}
 \end{equation}
-starting from the scale $(n_2,\beta_2)=(120,49)$ of the inputs of
-Ref.~\cite{boundary}. Here $n_j$ is a ring length and $M_j$ an open-chain
-length; a chain of length $n$ with $M_j\le n\le2M_j$ is handled at scale $j$.
-At every scale $j\ge5$ the proof establishes three bounds, with one
-small number $x_j$ that squares (times ten) from scale to scale:
+starting from the input scale $(n_2,\beta_2)=(120,49)$ of
+Ref.~\cite{boundary}. Here $n_j$ is a ring length and $M_j$ is an open-chain
+length; each chain of length $n$ with $M_j\le n\le2M_j$ is handled at scale $j$.
+At every scale $j\ge5$, we bound three defects by a single quantity $x_j$ that
+squares (times ten) from one scale to the next:
 \begin{equation}
  \begin{gathered}
  \varepsilon_j,\ e_{k_j}(j),\ 1-\Pt^{\opp}(M_j,\beta_j)\le x_j\quad(j\ge5),\\
@@ -559,52 +560,53 @@ function not carried by the leading eigenvector, is at most $x_j$.
 defect $1-\Pt^{\opp}(M_j,\beta_j)$ of an auxiliary open chain with opposite end
 fields [Eq.~\eqref{eq:b-a}] is at most $x_j$.
 \end{itemize}
-Together they give $\Pt^{\same}(n,\beta_j)\ge1-4x_j$ for every
-$M_j\le n\le2M_j$ [Eq.~\eqref{eq:b-final-purity}]. Since $x_j\le.01$, the
-right side of Eq.~\eqref{eq:b-target} is then at most $4x_j/(1-4x_j)$, below
-$10^{-2^{j-5}}$, and $\beta_j=392\,2^{j-5}$ turns this into
-$\Delta_n>(\log10)/392$. The three claims depend on each other as follows.
-Claim (R) concerns the ring alone; Appendix~\ref{app:b-periodic} proves it
-from the ring inputs by the doubling estimate of the main text. Claims (E) and
-(T) at scale $j+1$ follow from (E) and (T) at scale $j$ together with (R); this
-is the induction step below. Appendix~\ref{app:b-iteration} supplies the base
-case $j=5$ from the inputs at $j=2$. The intervals $[M_j,2M_j]$ with $j\ge5$
-cover every $n\ge M_5=1920$, which is where the bound $n\ge1921$ (odd) comes
-from.
+Together, claims (R), (E), and (T) give $\Pt^{\same}(n,\beta_j)\ge1-4x_j$ for
+every $M_j\le n\le2M_j$ [Eq.~\eqref{eq:b-final-purity}]. Since $x_j\le.01$, the
+right-hand side of Eq.~\eqref{eq:b-target} is at most $4x_j/(1-4x_j)$, which is
+less than $10^{-2^{j-5}}$, and taking logarithms with $\beta_j=392\,2^{j-5}$
+gives $\Delta_n>(\log10)/392$. The three claims depend on each other as
+follows. Claim (R) concerns the ring alone, and
+Appendix~\ref{app:b-periodic} proves it from the ring inputs by the doubling
+estimate of the main text. In the induction step below, claims (E) and (T) at
+scale $j+1$ follow from (E) and (T) at scale $j$ together with (R), while
+Appendix~\ref{app:b-iteration} supplies the base case $j=5$ from the inputs at
+$j=2$. The intervals $[M_j,2M_j]$ with $j\ge5$ cover every $n\ge M_5=1920$,
+which is where the bound $n\ge1921$ (odd) comes from.
 
 \emph{Why can the ring proof not be applied directly?} An open chain
-\tnchain[node=xvertex,caps]{,\cdots,} has no ring to close: its partition
-function is not a trace of $X_\beta^n$, so there is no spatial purity to
-square. Its bulk, however, is built from the same transfer operator $X_\beta$,
-and only its two ends differ: the outer virtual legs of the first and last
-sites are closed by boundary vectors. A classical example is the open Ising
-chain, whose partition function is $u^{\mathsf T}K^{n-1}u$ with transfer matrix
-$K$ and $u=(e^{\beta h},e^{-\beta h})$ for a field $h$ on each end spin.
-A periodic trace \tnchain[node=xvertex,ring]{,\cdots,} weights every
-eigenvector of $X_\beta$ by one. An open chain instead weights the leading
-eigenvalue $\lambda(\beta)$ by the squared boundary overlap $c(\beta)$
-[Eq.~\eqref{eq:b-overlap}], which vanishes if the boundary vector is
-orthogonal to the leading eigenvector. For long chains the open partition
-function is therefore approximately $c(\beta)\lambda(\beta)^n$, and its thermal
-purity approximately $[\lambda(2\beta)/\lambda(\beta)^2]^n c(2\beta)/c(\beta)^2$.
-The first factor is a bulk factor controlled by the ring [claim (R)]. The
-second is a boundary factor independent of $n$, so it cancels when lengths $M$
-and $2M$ are compared. Doubling the length therefore costs only the bulk
-factor, and doubling the inverse temperature by squaring~\eqref{eq:squaring}
-needs no ring at all. All of this requires the leading term
-$c(\beta)\lambda(\beta)^n$ to dominate the rest; claim (E) states exactly that,
-through the boundary defect $e$, which shrinks as the chain grows.
+\tnchain[node=xvertex,caps]{,\cdots,} does not close into a ring, so its
+partition function is not a trace of $X_\beta^n$ and there is no spatial purity
+to square. Its bulk still uses the transfer operator $X_\beta$, while boundary
+vectors cap the outer virtual legs of the first and last sites. In the
+classical open Ising chain, for example, the partition function is
+$u^{\mathsf T}K^{n-1}u$ with transfer matrix $K$ and boundary vector
+$u=(e^{\beta h},e^{-\beta h})$ for a field $h$ on each end spin. Whereas a
+periodic trace \tnchain[node=xvertex,ring]{,\cdots,} weights every eigenvector
+of $X_\beta$ by one, an open chain weights the leading eigenvalue
+$\lambda(\beta)$ by the squared boundary overlap $c(\beta)$
+[Eq.~\eqref{eq:b-overlap}], which vanishes if the boundary vector is orthogonal
+to the leading eigenvector. For long chains, the open partition function is
+approximately $c(\beta)\lambda(\beta)^n$ and its thermal purity is
+approximately $[\lambda(2\beta)/\lambda(\beta)^2]^n c(2\beta)/c(\beta)^2$. The
+first factor is a bulk ratio controlled by the ring [claim (R)], while the
+second is a boundary ratio independent of $n$ that cancels when we compare
+lengths $M$ and $2M$. Doubling the length therefore costs only the bulk factor,
+and doubling the inverse temperature by squaring~\eqref{eq:squaring} needs no
+ring at all. This cancellation holds once the leading term
+$c(\beta)\lambda(\beta)^n$ dominates the remainder. Claim (E) states this through the
+boundary defect $e$, which shrinks as the chain grows.
 
-\emph{What closes the ends of the chain?} The open chain uses the tensor
+\emph{What closes the ends of the chain?} The open chain uses the bulk tensor
 $W_\beta$ of Eq.~\eqref{eq:local}, with the per-site energy shift
 $\kappa=700741/500000$ of Ref.~\cite{boundary} (called $a$ there) absorbed into
-each tensor as a factor $e^{-\kappa\beta}$, that is,
-$H_n^\nu\to H_n^\nu+\kappa nI$. The shift makes the leading periodic eigenvalue
-$\lambda_0(\beta_j)$ close to one at the scales~\eqref{eq:b-scales} and cancels
-from every Gibbs state and every purity. On an end site, the field
-$\pm hS^z=\mp(ih)G_z$ enters the imaginary-time expansion like half a bond: it
-inserts $G_z$ events on the outer virtual leg, each with weight $ih$. So for a
-history $a$ with $|a|$ events, the boundary vector on $L^2(\mu_\beta)$ is
+each tensor as a factor $e^{-\kappa\beta}$, sending
+$H_n^\nu\to H_n^\nu+\kappa nI$. The shift places the leading periodic
+eigenvalue $\lambda_0(\beta_j)$ near one at the scales~\eqref{eq:b-scales}
+while canceling from every Gibbs state and purity. On an end site, the boundary
+field $\pm hS^z=\mp(ih)G_z$ acts like half a bond in the imaginary-time
+expansion, inserting $G_z$ events of weight $ih$ on the outer virtual leg. For
+a history $a$ with $|a|$ events, the resulting boundary vector on
+$L^2(\mu_\beta)$ is
 \begin{equation}
  v_\beta(a)=
  \begin{cases}(ih)^{|a|},&\text{all labels are }z,\\0,&\text{otherwise},
@@ -612,26 +614,28 @@ history $a$ with $|a|$ events, the boundary vector on $L^2(\mu_\beta)$ is
  \qquad \|v_\beta\|^2=e^{\beta h^2},
  \label{eq:b-vector}
 \end{equation}
-with value one on the empty history ($|a|=0$). The norm follows from the time
-integrals of the $z$ events: $\|v_\beta\|^2$ is the sum of
+with value one on the empty history ($|a|=0$). Integrating the ordered event
+times of the $z$ labels gives $\|v_\beta\|^2$ as the sum of
 $(\beta h^2)^{|a|}/|a|!$ over $|a|\ge0$.
 
 \emph{Which fields do the two caps produce?} The conjugated left cap
-$\bar v_\beta$ weights each $z$ event by $(-ih)G_z=+hS^z$ and so adds $-hS_1^z$
-to the Hamiltonian. The unbarred right cap $v_\beta$ weights each $z$ event by
-$(ih)G_z=-hS^z$ and adds $+hS_n^z$. The two plain caps therefore give the
-opposite-field chain $H_n^{\opp}:=H_n^{\same}+2hS_n^z$, \fieldopp. To restore
-equal fields, the right field must be reversed. The $\pi$ rotation
-$P=\operatorname{diag}(1,-1,-1)$ about $x$ flips $S^z\to-S^z$ and every $z$
-label, so its virtual action $U_P$ on the right cap does this, \fieldsame.
-Opening the ring of Eq.~\eqref{eq:mpo} and capping its ends therefore gives
+$\bar v_\beta$ weights each $z$ event by $(-ih)G_z=+hS^z$ and adds $-hS_1^z$
+to the Hamiltonian, whereas the unbarred right cap $v_\beta$ weights each $z$
+event by $(ih)G_z=-hS^z$ and adds $+hS_n^z$. Capping both ends with the plain
+vector therefore gives the opposite-field chain
+$H_n^{\opp}:=H_n^{\same}+2hS_n^z$, \fieldopp. To restore equal fields, we
+reverse the right field with the $\pi$ rotation
+$P=\operatorname{diag}(1,-1,-1)$ about $x$, which flips $S^z\to-S^z$ and
+negates every $z$ label, so its virtual action $U_P$ on the right cap produces
+equal fields, \fieldsame. Opening the ring of Eq.~\eqref{eq:mpo} and capping
+its ends gives
 \begin{equation}
  e^{-\beta H_n^{\same}}=\tnchain[node=mpo,legs,capl=\bar v_\beta,capr=U_Pv_\beta]{W,W,\cdots,W,W},
  \label{eq:b-mpo}
 \end{equation}
 and tracing the physical legs onto the transfer chain $X_\beta^n$ of
-Eq.~\eqref{eq:states} gives the open-chain partition functions, the open
-counterparts of $Z_n$ in Eq.~\eqref{eq:moment}:
+Eq.~\eqref{eq:states} yields the open-chain counterparts of $Z_n$ in
+Eq.~\eqref{eq:moment}:
 \begin{align}
  Y_n(\beta)&=\Tr e^{-\beta H_n^{\opp}}
  =\tnchain[capl={\bar v_\beta},capr={v_\beta}]{X_\beta^n},\quad\fieldopp,\label{eq:b-y}\\
@@ -639,14 +643,14 @@ counterparts of $Z_n$ in Eq.~\eqref{eq:moment}:
  =\tnchain[capl={\bar v_\beta},capr={U_Pv_\beta}]{X_\beta^n},\quad\fieldsame.
  \label{eq:b-ys}
 \end{align}
-The proof works with the opposite-field chain first because its two caps are
-the same vector, so its even moments are nonnegative; the last step transfers
-the bounds to $H_n^{\same}$. Simultaneous spin rotations of the histories act on
-$L^2(\mu_\beta)$ as real orthogonal operators commuting with $X_\beta$; in
-particular $[U_P,X_\beta]=0$. Before the $\kappa$ shift, the series of absolute
-values for the traced expansion sums to at most
-$3^n e^{\beta[3(n-1)+2h]}<\infty$, so Fubini's theorem justifies regrouping the
-time-ordered series into the site-by-site
+We work with the opposite-field chain first because its two caps use the same
+boundary vector, making its even moments nonnegative, and then transfer the
+bounds to $H_n^{\same}$ at the end. That transfer relies on $[U_P,X_\beta]=0$,
+which holds because simultaneous spin rotations of the histories act on
+$L^2(\mu_\beta)$ as real orthogonal operators commuting with $X_\beta$. Before
+the $\kappa$ shift, the series of absolute values for the traced expansion sums
+to at most $3^n e^{\beta[3(n-1)+2h]}<\infty$, so Fubini's theorem justifies
+regrouping the time-ordered series into the site-by-site
 contractions~\eqref{eq:b-y}--\eqref{eq:b-ys}.
 
 \emph{What does claim (R) say about $X_\beta$?} At successive inverse
@@ -661,60 +665,61 @@ remainder $R_j$ ($\Pi_jR_j=R_j\Pi_j=0$):
  \Pi_j=|\psi_j\rangle\langle\psi_j|,\quad\|\psi_j\|=1,
  \label{eq:b-split}
 \end{equation}
-so $T_j^m=\Pi_j+R_j^m$. Appendix~\ref{app:b-periodic} supplies the needed facts
-about these objects: $\|R_j\|<1$, $U_P\Pi_j=\Pi_j$, and
-$0<r_j:=\lambda_{j+1}/\lambda_j^2\le1$, with quantitative versions in
-Eqs.~\eqref{eq:b-tail}--\eqref{eq:b-ratios}.
+so $T_j^m=\Pi_j+R_j^m$. Appendix~\ref{app:b-periodic} proves that $\|R_j\|<1$,
+$U_P\Pi_j=\Pi_j$, and $0<r_j:=\lambda_{j+1}/\lambda_j^2\le1$, with quantitative
+bounds in Eqs.~\eqref{eq:b-tail}--\eqref{eq:b-ratios}.
 
 \emph{How much of the boundary vector lies along the leading eigenvector?}
-Inserting the leading projector between the two caps cuts the network into
-two pieces:
+With $v_j=v_{\beta_j}$, inserting the leading projector between the two caps
+cuts the network into two pieces:
 \begin{equation}
  \underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{\Pi_j}}_{c_j}
  =\tnchain[capl=\bar v_j,nostubr]{\psi_j}\;\;\tnchain[nostubl,capr=v_j]{\bar\psi_j}
- =|\langle\psi_j,v_j\rangle|^2,
+ =|\langle\psi_j,v_j\rangle|^2.
  \label{eq:b-overlap}
 \end{equation}
-where $v_j=v_{\beta_j}$. The overlap $c_j$ is the squared projection of $v_j$
-onto $\psi_j$, \overlapglyph. On a ring the same insertion gives $\trv\Pi_j=1$;
-here it gives $c_j$, which vanishes when the two vectors are orthogonal. For
-even $m\ge2$, $T_j^m=\Pi_j+R_j^m$ splits the normalized partition function
-$B_m(j):=Y_m(\beta_j)/\lambda_j^m>0$ into $c_j$ and a remainder $D_m(j)$:
+The overlap $c_j$ is the squared projection of $v_j$ onto $\psi_j$,
+\overlapglyph. Whereas on a ring the same insertion gives $\trv\Pi_j=1$, here
+it gives $c_j$, which vanishes when the two vectors are orthogonal. For even
+$m\ge2$, substituting $T_j^m=\Pi_j+R_j^m$ splits the normalized partition
+function $B_m(j):=Y_m(\beta_j)/\lambda_j^m>0$ into $c_j$ and a remainder
+$D_m(j)$:
 \begin{equation}
  \underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{T_j^m}}_{B_m(j)}
  =\underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{\Pi_j}}_{c_j}
  +\underbrace{\tnchain[capl={\bar v_j},capr={v_j}]{R_j^m}}_{D_m(j)}.
  \label{eq:b-boundary-split}
 \end{equation}
-The remainder is nonnegative. Since $R_j$ is self-adjoint, write
-$R_j^m=R_j^{m/2}R_j^{m/2}$ and let each half act on one boundary vector; the
-network becomes a squared norm:
+Because $R_j$ is self-adjoint, factoring $R_j^m=R_j^{m/2}R_j^{m/2}$ and
+applying one half to each boundary vector folds the remainder into a
+nonnegative squared norm:
 \begin{equation}
  D_m(j)=\folded{R_j^{m/2}}=\|R_j^{m/2}v_j\|^2\ge0.
  \label{eq:b-fold}
 \end{equation}
-The \emph{boundary defect} of claim (E) is the remainder's share,
+The \emph{boundary defect} of claim (E) is the remainder's share of the
+partition function,
 \begin{equation}
  e_m(j):=\frac{D_m(j)}{B_m(j)}=1-\frac{c_j}{B_m(j)},
  \label{eq:b-e}
 \end{equation}
-the grey fraction of the bar \stackbar{.14}, drawn at the starting value
-$e_{142}(2)\le.14$ of Eq.~\eqref{eq:b-seeds}. Any $e_m<1$ guarantees a nonzero
-overlap with the leading eigenvector.
+shown as the grey fraction of \stackbar{.14} at the starting value
+$e_{142}(2)\le.14$ of Eq.~\eqref{eq:b-seeds}. Finding $e_m<1$ guarantees a
+nonzero overlap with the leading eigenvector.
 
-\emph{Why does a longer chain help?} A longer chain shrinks the remainder and
-leaves $c_j$ unchanged. For even $m\ge k$, move $k/2$ factors of $R_j$ onto
-each boundary vector and put $y=R_j^{k/2}v_j$:
+\emph{Why does a longer chain help?} Extending the chain shrinks the remainder
+while leaving $c_j$ unchanged. For even $m\ge k$, move $k/2$ factors of $R_j$
+onto each boundary vector and set $y=R_j^{k/2}v_j$:
 \begin{equation}
  D_m(j)=\tnchain[capl={\bar y},capr={y}]{R_j^{m-k}}
  \le\|R_j\|^{m-k}\underbrace{\|y\|^2}_{D_k(j)}.
  \label{eq:b-residual}
 \end{equation}
-So the remainder decays geometrically with the extra length $m-k$,
-\decayglyph[black!50], and $c_j\le B_m(j)\le B_k(j)$.
+The remainder therefore decays geometrically with the extra length $m-k$,
+\decayglyph[black!50], leaving $c_j\le B_m(j)\le B_k(j)$.
 
-\emph{How are two temperatures connected?} Eq.~\eqref{eq:b-mpo} is an exact
-operator identity on the physical Hilbert space, so composing
+\emph{How are two temperatures connected?} Equation~\eqref{eq:b-mpo} is an
+exact operator identity on the physical Hilbert space, so composing
 $e^{-\beta H_m^{\opp}}e^{-\beta H_m^{\opp}}=e^{-2\beta H_m^{\opp}}$ in imaginary
 time links $\beta$ to $2\beta$:
 \begin{equation}
@@ -722,11 +727,11 @@ time links $\beta$ to $2\beta$:
  =\underbrace{\tnchain[node=mpo,legs=1.9em,caps,item={minimum height=1.3em}]{W_{2\beta},W_{2\beta},\cdots,W_{2\beta}}}_{e^{-2\beta H_m^{\opp}}}.
  \label{eq:b-stack-mpo}
 \end{equation}
-This identity holds between the operators; it does not say that two $W_\beta$
-tensors combine into one $W_{2\beta}$ site by site. Normalizing the trace
+This equality holds only for the full operator product, as two $W_\beta$
+tensors do not fuse into one $W_{2\beta}$ site by site. Normalizing the trace
 defines the opposite-field Gibbs state
 $\rho_m^{\opp}(\beta)=e^{-\beta H_m^{\opp}}/Y_m(\beta)$, whose thermal purity is
-the quantity of claim (T):
+the quantity in claim (T):
 \begin{equation}
  \Pt^{\opp}(m,\beta_j):=\frac{Y_m(\beta_{j+1})}{Y_m(\beta_j)^2}=\Tr\rho_m^{\opp}(\beta_j)^2\in(0,1].
  \label{eq:b-a}
@@ -740,68 +745,70 @@ temperatures:
 \end{equation}
 
 \emph{(E) Why does the boundary defect shrink from one scale to the next?}
-This is Move~1. Assume $e_k(j)<1$ at scale $j$, let primes denote scale $j+1$,
-choose even $m>k\ge2$, and let $\|R_{j+1}\|^{m-k}\le q<1$. The suppression
-bound~\eqref{eq:b-residual} at scale $j+1$ gives $D_m'\le qD_k'$. Since $c'$ does
-not depend on the length, $D_k'-D_m'=B_k'-B_m'$. Substituting
-$D_k'=D_m'+B_k'-B_m'$ into $D_m'\le qD_k'$ gives the first inequality below, and
-dividing by $B_m'$ gives the second:
+In Move~1, we advance the boundary defect from scale $j$ to scale $j+1$
+(marked by primes). Assume $e_k(j)<1$, choose even $m>k\ge2$, and let
+$\|R_{j+1}\|^{m-k}\le q<1$. The suppression bound~\eqref{eq:b-residual} at
+scale $j+1$ gives $D_m'\le qD_k'$. Since $c'$ does not depend on the chain
+length, $D_k'-D_m'=B_k'-B_m'$. Substituting $D_k'=D_m'+B_k'-B_m'$ into
+$D_m'\le qD_k'$ yields the first inequality below, and dividing by $B_m'$ gives
+the second:
 \begin{equation}
  (1-q)D_m'\le q(B_k'-B_m'),\qquad
  e_m'\le\frac{q}{1-q}\left(\frac{B_k'}{B_m'}-1\right).
  \label{eq:b-new-e}
 \end{equation}
-The ratio $B_k'/B_m'$ at the new temperature is not known directly, so we
-express it through the old temperature. Using $\Pt^{\opp}(k,\beta_j),r_j\le1$
-and $B_m(j)\ge c_j=[1-e_k(j)]B_k(j)>0$, Eq.~\eqref{eq:b-bridge} gives
+To bound the unknown ratio $B_k'/B_m'$ at the new temperature, we rewrite it at
+the old temperature with Eq.~\eqref{eq:b-bridge} and apply
+$\Pt^{\opp}(k,\beta_j),r_j\le1$ together with $B_m(j)\ge c_j=[1-e_k(j)]B_k(j)>0$:
 \begin{align}
  \frac{B_k'}{B_m'}
  &=\frac{\Pt^{\opp}(k,\beta_j)}{\Pt^{\opp}(m,\beta_j)}\left[\frac{B_k(j)}{B_m(j)}\right]^2r_j^{m-k}\notag\\
  &\le\frac{1}{\Pt^{\opp}(m,\beta_j)[1-e_k(j)]^2}.
  \label{eq:b-new-ratio}
 \end{align}
-Only the old overlap appears in the denominator, so $e_m'<1$ shows that the new
-overlap is again positive. If $e_k(j)$ and $1-\Pt^{\opp}(m,\beta_j)$ are
-$\mathcal O(x)$, the right side of Eq.~\eqref{eq:b-new-ratio} is $1+\mathcal
-O(x)$; choosing $m-k$ so large that $q\le\mathcal O(x)$ then makes $e_m'$ of
-order $x^2$.
+Because the denominator uses only the old overlap, finding $e_m'<1$ certifies
+that the new overlap is also positive. If $e_k(j)$ and $1-\Pt^{\opp}(m,\beta_j)$
+are $\mathcal O(x)$, then the right-hand side of Eq.~\eqref{eq:b-new-ratio} is
+$1+\mathcal O(x)$, and choosing $m-k$ large enough that $q\le\mathcal O(x)$
+makes $e_m'$ of order $x^2$.
 
-\emph{(T) Why does doubling the length keep the purity?} This is Move~2: once
-the overlap is controlled, the length can double at almost no cost in purity.
-Solve Eq.~\eqref{eq:b-bridge} for $\Pt^{\opp}(m,\beta_j)$ and divide the
-$m=2M$ identity by the $m=M$ identity, for even $M$. The two bracketed factors
-are bounded by $B_{2M}(j+1)\ge c_{j+1}=[1-e_M(j+1)]B_M(j+1)$ and
-$B_M(j)\ge B_{2M}(j)$ [Eq.~\eqref{eq:b-residual}]:
+\emph{(T) Why does doubling the length keep the purity?} Once Move~1 controls
+the new boundary defect, Move~2 doubles the chain length at almost no cost in
+purity. Solve Eq.~\eqref{eq:b-bridge} for $\Pt^{\opp}(m,\beta_j)$, divide the
+$m=2M$ relation by the $m=M$ relation for even $M$, and bound the two
+partition-function ratios using $B_{2M}(j+1)\ge c_{j+1}=[1-e_M(j+1)]B_M(j+1)$
+and $B_M(j)\ge B_{2M}(j)$ [Eq.~\eqref{eq:b-residual}]:
 \begin{equation}
  \frac{\Pt^{\opp}(2M,\beta_j)}{\Pt^{\opp}(M,\beta_j)}
  =r_j^M\underbrace{\frac{B_{2M}(j+1)}{B_M(j+1)}}_{\displaystyle\ge1-e_M(j+1)}
        \underbrace{\left[\frac{B_M(j)}{B_{2M}(j)}\right]^2}_{\displaystyle\ge1}.
  \label{eq:b-coupling}
 \end{equation}
-The bulk factor $r_j^M$ is close to one by Eq.~\eqref{eq:b-ratios}, so the
-purity drops only slightly when the length doubles. Move~3 then doubles the
+Because the bulk factor $r_j^M$ is close to one by Eq.~\eqref{eq:b-ratios},
+doubling the length lowers the purity only slightly. Move~3 then doubles the
 inverse temperature by squaring the Gibbs operator, as in
 Eq.~\eqref{eq:squaring}:
 \begin{equation}
  \tncolumn{\rho_m^{\opp},\rho_m^{\opp}}\;=\;\Pt^{\opp}(m,\beta_j)\,\tncolumn[item={minimum height=1.6em}]{\rho_m^{\opp}(\beta_{j+1})},
  \label{eq:stack}
 \end{equation}
-and the squaring bound~\eqref{eq:square} at $m=2M$ brings $1-\Pt^{\opp}$ down to
-order $x^2$.
+and applying the squaring bound~\eqref{eq:square} at $m=2M$ brings
+$1-\Pt^{\opp}$ down to order $x^2$.
 
 \emph{How do the three moves make an induction?} Each step $j\to j+1$ doubles
-length and inverse temperature, with boundary-defect lengths $k_2=142$ (the
-length of the input $e_{142}(2)$) and $k_{j+1}=M_j$. The ring defect
-$\varepsilon_j$ ($\varepsilon_2=.052$, $\varepsilon_{j+1}=6\varepsilon_j^2$) is
-bounded in Appendix~\ref{app:b-periodic} [Eq.~\eqref{eq:b-tail}]. From the
-inputs at $j=2$, three explicit steps in Appendix~\ref{app:b-iteration} reach
-$j=5$, and induction on $j\ge5$ then proves Eq.~\eqref{eq:b-x}. For $j\ge3$,
-$k_j=M_j/2$, which leaves $M_j/2$ sites to suppress the remainder in Move~1.
-In the diagram below, read from top to bottom, each box is one bound: grey for
-the boundary defect $e_k(j)$ [claim (E)], blue for the opposite-field thermal
-purity $\Pt^{\opp}$ [claim (T)]. Solid boxes are given at scale $j$ or proved
-at scale $j+1$, the dashed box is intermediate, and the grey arrow entering a
-move is the second bound it uses:
+both length and inverse temperature, using boundary-defect lengths $k_2=142$
+(matching the input $e_{142}(2)$) and $k_{j+1}=M_j$. For $j\ge3$, this choice
+sets $k_j=M_j/2$, leaving $M_j/2$ sites to suppress the remainder in Move~1.
+The ring defect $\varepsilon_j$ ($\varepsilon_2=.052$,
+$\varepsilon_{j+1}=6\varepsilon_j^2$) is bounded in
+Appendix~\ref{app:b-periodic} [Eq.~\eqref{eq:b-tail}]. Starting from the inputs
+at $j=2$, three explicit steps in Appendix~\ref{app:b-iteration} reach $j=5$,
+where induction on $j\ge5$ takes over to prove Eq.~\eqref{eq:b-x}. Read the
+diagram below from top to bottom, with grey boxes for the boundary defect
+$e_k(j)$ [claim (E)] and blue boxes for the opposite-field thermal purity
+$\Pt^{\opp}$ [claim (T)]. Solid boxes are given at scale $j$ or proved at scale
+$j+1$, the dashed box is intermediate, and each grey arrow supplies the second
+input to a move:
 \begin{proofdiagram}
 \begin{prooflanes}
  \lanebound{b}{e0}{0}{0}{$e_{M_j/2}(j)\le x$}
@@ -816,27 +823,27 @@ move is the second bound it uses:
  \lanetag[below]{e1}{proved} \lanetag{t2}{proved}
 \end{prooflanes}
 \end{proofdiagram}
-Move~1 is the overlap recurrence~\eqref{eq:b-new-e}--\eqref{eq:b-new-ratio},
-Move~2 the length doubling~\eqref{eq:b-coupling}, and Move~3 the
-squaring~\eqref{eq:stack}. Since $M_{j+1}=2M_j$, the proved pair is the given
-pair of scale $j+1$, so the step repeats. The numbers $10x^2$ and
-$1-2x-16x^2$ in the boxes are checked at the end of
-Appendix~\ref{app:b-iteration}. The defect falls
-doubly exponentially,
+Here Move~1 is the overlap recurrence~\eqref{eq:b-new-e}--\eqref{eq:b-new-ratio},
+Move~2 is the length doubling~\eqref{eq:b-coupling}, and Move~3 is the
+squaring~\eqref{eq:stack}. Since $M_{j+1}=2M_j$, the proved pair becomes the
+given pair at scale $j+1$, so the step repeats. The expressions $10x^2$ and
+$1-2x-16x^2$ in the boxes are verified at the end of
+Appendix~\ref{app:b-iteration}. The defect bound falls doubly exponentially,
 $x_5=10^{-2}$\,\sparkline{-17}{-2}{-2,-3,-5,-9,-17}\,$x_9=10^{-17}$ (log
-scale); since $\beta_j=392\,2^{j-5}$, it decays exponentially in inverse
-temperature.
+scale), and hence exponentially in $\beta_j=392\,2^{j-5}$.
 
 \emph{How do the bounds pass to equal fields and odd lengths?} Claims (E) and
-(T) concern the opposite-field chain at even lengths $M_j$. The theorem needs
-the equal-field chain at odd $n$. The rotation $U_P$ connects the two chains
-[Eq.~\eqref{eq:b-ys}], and it acts trivially next to the leading projector:
+(T) control the opposite-field chain at even lengths $M_j$, whereas the theorem
+requires the equal-field chain at odd $n$. The rotation $U_P$ links the two
+partition functions [Eq.~\eqref{eq:b-ys}] and leaves the leading projector
+unchanged:
 \begin{equation}
  \tnchain[last=sym]{\Pi_j,U_P}\;=\;\tnchain{\Pi_j}.
  \label{eq:b-twist}
 \end{equation}
-Thus $Q_j(n):=Y_n^{\same}(\beta_j)/\lambda_j^n$ has the same leading value
-$c_j$. For any even $M\le n$, moving $U_P$ through the right-hand tensors
+The normalized equal-field partition function
+$Q_j(n):=Y_n^{\same}(\beta_j)/\lambda_j^n$ therefore has the same leading term
+$c_j$. For every even $M\le n$, commuting $U_P$ through the right-hand factors
 ($[U_P,R_j]=0$) isolates the remainder:
 \begin{align}
  Q_j(n)-c_j&=\tnchain[capl=\bar v_j,capr=v_j]{R_j^{M/2},R_j^{n-M}U_P,R_j^{M/2}}\notag\\
@@ -861,11 +868,11 @@ $Q\ge c-D_M=(1-2e_M)B_M$. With $e_M(j+1)\le x_{j+1}$ from claim (E)
  Q_{j+1}(n)\ge(1-2x_{j+1})B_M(j+1)>0.
  \label{eq:b-odd-new}
 \end{equation}
-Since $\Pt^{\same}(n,\beta_j)=Q_{j+1}(n)\lambda_{j+1}^n/[Q_j(n)\lambda_j^n]^2$,
-inserting these bounds and Eq.~\eqref{eq:b-bridge} at $m=M$, and using
-$r_j^{n-M}\ge r_j^M$ [Eq.~\eqref{eq:b-ratios}] with claims (R) and (T),
-$\varepsilon_j\le x_j$, $\varepsilon_{j+1}\le6x_j^2$, $x_{j+1}=10x_j^2$, gives
-the equal-field purity:
+Write $\Pt^{\same}(n,\beta_j)=Q_{j+1}(n)\lambda_{j+1}^n/[Q_j(n)\lambda_j^n]^2$
+and substitute these bounds together with Eq.~\eqref{eq:b-bridge} at $m=M$.
+Using $r_j^{n-M}\ge r_j^M$ [Eq.~\eqref{eq:b-ratios}] and claims (R) and (T)
+($\varepsilon_j\le x_j$, $\varepsilon_{j+1}\le6x_j^2$, and $x_{j+1}=10x_j^2$)
+then gives
 \begin{align}
  \Pt^{\same}(n,\beta_j)
  &=\frac{Y_n^{\same}(\beta_{j+1})}{Y_n^{\same}(\beta_j)^2}
@@ -878,8 +885,8 @@ the equal-field purity:
 \begin{proof}[Proof of Theorem~\ref{thm:b-gap}]
 The intervals $[M_j,2M_j]$ cover every integer $n\ge M_5=1920$.
 For odd $n\ge1921$, choose $j\ge5$ with $M_j\le n\le2M_j$.
-The largest Gibbs weight satisfies $w_0\ge\Pt^{\same}(n,\beta_j)\ge1-4x_j>1/2$:
-the spectrum looks like \specbars{.97,.02,.01}, so the ground state is unique.
+The largest Gibbs weight satisfies $w_0\ge\Pt^{\same}(n,\beta_j)\ge1-4x_j>1/2$,
+giving a spectrum like \specbars{.97,.02,.01} with a unique ground state.
 Equation~\eqref{eq:b-target} gives
 \begin{equation}
  e^{-\beta_j\Delta_n}\le\frac{4x_j}{1-4x_j}
@@ -890,11 +897,11 @@ Taking logarithms and using $\beta_j=392\,2^{j-5}$ yields $\Delta_n>(\log10)/392
 \end{proof}
 
 \section{Transfer bounds at the open-chain scales}\label{app:b-periodic}
-This appendix proves claim (R) of Appendix~\ref{app:open}: at every
-scale~\eqref{eq:b-scales} the ring purity defect $\varepsilon_j$ is small,
-starting from $\varepsilon_2=.052$ and squaring (times six) at each step. It
-then turns that purity bound into the facts about the transfer operator that
-Appendix~\ref{app:open} uses: a remainder bound and two eigenvalue relations,
+We now prove claim (R) of Appendix~\ref{app:open} by showing that the ring
+purity defect $\varepsilon_j$ at the scales~\eqref{eq:b-scales} starts at
+$\varepsilon_2=.052$ and shrinks by squaring (times six) at each step. From
+this purity bound we derive the transfer-operator properties used in
+Appendix~\ref{app:open}, namely the remainder bound
 \begin{equation}
  \begin{gathered}
  \|R_j\|^{n_j}\le d(\varepsilon_j),\qquad d(\varepsilon)=\frac{\varepsilon}{2-3\varepsilon},\\
@@ -902,7 +909,7 @@ Appendix~\ref{app:open} uses: a remainder bound and two eigenvalue relations,
  \end{gathered}
  \label{eq:b-tail}
 \end{equation}
-and
+and the eigenvalue and symmetry relations
 \begin{equation}
  0<r_j\le1,\quad r_j^{M_j}\ge(1-\varepsilon_j)(1-\varepsilon_{j+1}),\quad
  U_P\Pi_j=\Pi_j.
@@ -911,9 +918,9 @@ and
 
 \emph{Why does the ring defect square at each scale?} The bound follows from the
 first row of Eq.~\eqref{eq:b-seeds} by the doubling estimate of the main text.
-The only change is the starting defect: $\varepsilon_2=1-.948=.052$ is larger
-than the $1/100$ assumed in Eq.~\eqref{eq:update}, so the constant $5$ there
-becomes $6$. If $\Ps(n,\beta),\Pt(2n,\beta)\ge1-\varepsilon$, Move~1 of
+Because the starting defect $\varepsilon_2=1-.948=.052$ exceeds the threshold
+$1/100$ of Eq.~\eqref{eq:update}, the prefactor $5$ there becomes $6$. If
+$\Ps(n,\beta),\Pt(2n,\beta)\ge1-\varepsilon$, then Move~1 of
 Eq.~\eqref{eq:update} gives $\Ps(n,2\beta)\ge(1-\varepsilon)^3$, and squaring
 with Eq.~\eqref{eq:square} bounds $1-\Ps(2n,2\beta)$ by
 \begin{equation}
@@ -926,45 +933,48 @@ $6\varepsilon^2\le\varepsilon$, Moves~3 and 4 give the same bound for
 $1-\Pt(4n,2\beta)$. Induction therefore proves
 $\Ps(n_j,\beta_j),\Pt(M_j,\beta_j)\ge1-\varepsilon_j$.
 
-\emph{How does a purity bound bound the remainder?} A purity close to one
+\emph{How does a purity bound control the remainder?} A purity close to one
 forces one probability to dominate, \specbars{.9,.06,.04}, and the rest to be
-small. To make this quantitative, consider a probability list with purity at
-least $1-\varepsilon>1/2$ and largest weight $p_0$, and put $z=1-p_0$. The
-purity is at most $p_0^2+z^2=1-2z(1-z)$, so $2z(1-z)\le\varepsilon$. It is also
-at most $p_0$, so $p_0>1/2$: the largest weight is unique and $z<1/2$. Then
-$z\le2z(1-z)\le\varepsilon$, hence $z\le\varepsilon/[2(1-\varepsilon)]$ and
-$z/(1-z)\le d(\varepsilon)$. Applied to the eigenvalues
-$p_i=|\lambda_i(\beta_j)|^{n_j}/Z_{n_j}(\beta_j)$ of $\sigma_{n_j}(\beta_j)$,
-this shows that the largest-modulus eigenvalue is simple and
+small. For a probability distribution with purity at least $1-\varepsilon>1/2$
+and largest weight $p_0$, set $z=1-p_0$. Because the purity cannot exceed $p_0$,
+we have $p_0>1/2$, making the largest weight unique and $z<1/2$. The purity is
+also at most $p_0^2+z^2=1-2z(1-z)$, so $2z(1-z)\le\varepsilon$. Combining this
+with $z<1/2$ gives $z\le2z(1-z)\le\varepsilon$, which implies
+$z\le\varepsilon/[2(1-\varepsilon)]$ and $z/(1-z)\le d(\varepsilon)$. Applying
+this inequality to the eigenvalues
+$p_i=|\lambda_i(\beta_j)|^{n_j}/Z_{n_j}(\beta_j)$ of $\sigma_{n_j}(\beta_j)$
+shows that the largest-modulus eigenvalue is simple and satisfies
 \begin{equation}
  \sum_{i\ge1}\left|\frac{\lambda_i(\beta_j)}{\lambda_j}\right|^{n_j}
  \le d(\varepsilon_j),
  \label{eq:b-full-tail}
 \end{equation}
-which implies Eq.~\eqref{eq:b-tail}. The leading eigenvalue is positive:
-$Z_N(\beta_j)>0$ for all large odd $N$, whereas a negative leading eigenvalue
-would make $\trv X_{\beta_j}^N$ negative. The remainder sum tends to zero
-because $X_{\beta_j}$ is Hilbert--Schmidt and its remaining spectral radius is
-strictly smaller than $\lambda_j$.
+which implies Eq.~\eqref{eq:b-tail}. Finally, the leading eigenvalue is
+positive, since $Z_N(\beta_j)>0$ for all large odd $N$ whereas a negative
+leading eigenvalue would make $\trv X_{\beta_j}^N$ negative once the subleading
+sum decays (as $X_{\beta_j}$ is Hilbert--Schmidt with remaining spectral radius
+strictly smaller than $\lambda_j$).
 
-\emph{Why is the leading eigenvector unchanged by $U_P$?} This fact,
-$U_P\Pi_j=\Pi_j$ in Eq.~\eqref{eq:b-ratios}, is what lets
-Appendix~\ref{app:open} pass from opposite to equal fields. The real kernel
-admits real orthogonal virtual actions of the three $\pi$ rotations and of the
-cyclic permutation of the coordinate axes, all commuting with $X_{\beta_j}$. On
-the real one-dimensional leading eigenspace these actions are signs. The
-order-three cyclic rotation has sign $+1$ and conjugates the three $\pi$
-rotations into one another, so their signs agree; since the product of two is
-the third, their common sign is $+1$, giving $U_P\Pi_j=\Pi_j$.
+\emph{Why is the leading eigenvector unchanged by $U_P$?} The relation
+$U_P\Pi_j=\Pi_j$ in Eq.~\eqref{eq:b-ratios} allows Appendix~\ref{app:open} to
+pass from opposite to equal fields. The real transfer kernel admits real
+orthogonal virtual actions of the three $\pi$ rotations and of the cyclic
+permutation of the coordinate axes, all commuting with $X_{\beta_j}$. Each of
+these symmetries acts as a sign on the real one-dimensional leading eigenspace.
+Because the order-three cyclic permutation has sign $+1$ and conjugates the
+three $\pi$ rotations into one another, all three $\pi$ rotations share the
+same sign; since the product of two is the third, that common sign is $+1$,
+giving $U_P\Pi_j=\Pi_j$.
 
 \emph{How close is $r_j$ to one?} The ratio $r_j=\lambda_{j+1}/\lambda_j^2$ is
 the bulk factor of the length doubling in Appendix~\ref{app:open}
 [Eq.~\eqref{eq:b-coupling}]. Its upper bound holds because the thermal purity
-$\Pt(N,\beta_j)$ is at most one, so $Z_N(\beta_{j+1})\le Z_N(\beta_j)^2$;
+$\Pt(N,\beta_j)$ is at most one, so $Z_N(\beta_{j+1})\le Z_N(\beta_j)^2$, and
 taking $N$th roots along even $N\to\infty$ gives $\lambda_{j+1}\le\lambda_j^2$.
-The lower bound is needed at the finite length $M_j=n_{j+1}$, where the largest
-eigenvalue of $\sigma_{M_j}(\beta_{j+1})$ is at least $1-\varepsilon_{j+1}$.
-Hence
+For the lower bound at the finite length $M_j=n_{j+1}$, where the largest
+eigenvalue of $\sigma_{M_j}(\beta_{j+1})$ is at least $1-\varepsilon_{j+1}$,
+combining this spatial weight bound with the thermal purity bound at scale $j$
+gives
 \begin{align*}
  \lambda_{j+1}^{M_j}
  &\ge(1-\varepsilon_{j+1})Z_{M_j}(\beta_{j+1})\\
@@ -975,17 +985,17 @@ which is the remaining bound in Eq.~\eqref{eq:b-ratios}.
 
 
 \section{Starting estimates for the open chain}\label{app:b-iteration}
-This appendix supplies the base case of the induction of
-Appendix~\ref{app:open}: claims (E) and (T) at $j=5$, with all three defects of
-Eq.~\eqref{eq:b-x} below $x_5=.01$. The certified inputs of
-Ref.~\cite{boundary} are given at $j=2$, where the open-chain defects are $.14$
-and $.21$, far too large for the induction step, which assumes $x\le.01$. Three
-explicit steps bridge $j=2$ to $j=5$. The appendix states the inputs, turns the
-three moves of Appendix~\ref{app:open} into numerical update rules, runs those
-rules for three steps, and finally checks the induction step for $j\ge5$.
+We now establish the base case of the induction in Appendix~\ref{app:open}:
+claims (E) and (T) at $j=5$, with all three defects of Eq.~\eqref{eq:b-x} below
+$x_5=.01$. Because the certified inputs of Ref.~\cite{boundary} at $j=2$ have
+open-chain defects $.14$ and $.21$, above the threshold $x\le.01$ of the
+general induction step, we bridge $j=2$ to $j=5$ in three explicit steps. Below
+we state the inputs, write the three moves of Appendix~\ref{app:open} as
+numerical update rules, run those rules for three steps, and verify the
+induction step for $j\ge5$.
 
-\emph{What are the inputs?} Ref.~\cite{boundary} certifies, from periodic
-variational estimates and small-cluster boundary computations,
+\emph{What are the inputs?} From periodic variational estimates and
+small-cluster boundary computations, Ref.~\cite{boundary} certifies
 \begin{equation}
  \begin{gathered}
  \Ps(120,49)\ge .948,\qquad \Pt(240,49)\ge .948,\\
@@ -1001,8 +1011,8 @@ $M_2=240$ [claim (T)].
 
 \emph{How do the three moves become numbers?} Write $E_j$ for an upper bound on
 $e_{k_j}(j)$ and $\eta_j$ for an upper bound on $1-\Pt^{\opp}(M_j,\beta_j)$.
-Move~1 controls the overlap: combining Eqs.~\eqref{eq:b-new-e} and
-\eqref{eq:b-new-ratio} gives
+In Move~1, combining Eqs.~\eqref{eq:b-new-e} and \eqref{eq:b-new-ratio} bounds
+the new boundary defect by
 \begin{equation}
  \begin{gathered}
  e_m(j+1)\le F(q,e_k(j),\Pt^{\opp}(m,\beta_j)),\\
@@ -1011,10 +1021,10 @@ Move~1 controls the overlap: combining Eqs.~\eqref{eq:b-new-e} and
  \label{eq:b-F}
 \end{equation}
 which increases with $q,e$ and decreases with $t$. The suppression factor $q$
-must bound $\|R_{j+1}\|^{M_j-k_j}$. Eq.~\eqref{eq:b-tail} bounds
-$\|R_{j+1}\|^{n_{j+1}}$, and $n_{j+1}=M_j$, which fixes the exponent
-$(M_j-k_j)/M_j$ in Eq.~\eqref{eq:b-q}. Moves~2 and 3 control the purity through
-Eqs.~\eqref{eq:b-coupling} and \eqref{eq:square}. With $k_2=142$ and
+must bound $\|R_{j+1}\|^{M_j-k_j}$. Because Eq.~\eqref{eq:b-tail} bounds
+$\|R_{j+1}\|^{n_{j+1}}$ and $n_{j+1}=M_j$, taking the $(M_j-k_j)/M_j$ power
+fixes the exponent in Eq.~\eqref{eq:b-q}. Moves~2 and 3 control the purity
+through Eqs.~\eqref{eq:b-coupling} and \eqref{eq:square}. With $k_2=142$ and
 $k_{j+1}=M_j$, the updates are
 \begin{align}
  q_j&=d(\varepsilon_{j+1})^{(M_j-k_j)/M_j},\label{eq:b-q}\\
@@ -1023,7 +1033,7 @@ $k_{j+1}=M_j$, the updates are
                    (1-\varepsilon_{j+1})(1-E_{j+1})\bigr),
  \label{eq:b-eta-update}
 \end{align}
-for any $E_{j+1},\eta_{j+1}\in[0,1)$ satisfying these inequalities.
+for every pair $E_{j+1},\eta_{j+1}\in[0,1)$ satisfying these inequalities.
 
 \emph{What do three steps give?} Starting from $\varepsilon_2=.052$,
 $E_2=.14$, and $\eta_2=1-.79=.21$, three applications of
@@ -1041,16 +1051,16 @@ $j$ & $E_j$ & $\eta_j$ & $q_j$ (upper bound)\\
 \bottomrule
 \end{tabular}
 \end{center}
-Both defects collapse along the iteration, $E_j$:
-\specbars[black!45]{1,.86,.11,.007} and $\eta_j$: \specbars{1,.74,.12,.005}
-($j=2,\dots,5$, each relative to $j=2$). The first step gains little, since
-$q_2\le.142$ and the inputs are still large; once $q_j$ is small the defects
-square.
-Rational arithmetic confirms these step bounds. For example, at $j=2$ the
-exponent in Eq.~\eqref{eq:b-q} is $(240-142)/240=49/120$, so $q_2\le.142$
-amounts to $d(\varepsilon_3)^{49}<.142^{120}$; the later steps are verified by
-squaring. Also $\varepsilon_5<.000015$. This establishes the base case $j=5$
-of Eq.~\eqref{eq:b-x}.
+Both defects collapse along the iteration, with $E_j$ falling as
+\specbars[black!45]{1,.86,.11,.007} and $\eta_j$ as \specbars{1,.74,.12,.005}
+($j=2,\dots,5$, each relative to $j=2$). The first step gains little because
+$q_2\le.142$ and the initial defects are still large, whereas once $q_j$ is
+small the defects square. Rational arithmetic confirms these step bounds: at
+$j=2$, for example, the exponent in Eq.~\eqref{eq:b-q} is
+$(240-142)/240=49/120$, so $q_2\le.142$ amounts to
+$d(\varepsilon_3)^{49}<.142^{120}$, and the later steps are verified by
+squaring. Together with $\varepsilon_5<.000015$, these bounds establish the
+base case $j=5$ of Eq.~\eqref{eq:b-x}.
 
 \emph{Why does the induction step close?} Assume Eq.~\eqref{eq:b-x} at scale
 $j\ge5$ with $x=x_j\le.01$. The relation $k_j=M_j/2$ gives
@@ -1061,12 +1071,13 @@ $j\ge5$ with $x=x_j\le.01$. The relation $k_j=M_j/2$ gives
  \end{gathered}
  \label{eq:b-x-e}
 \end{equation}
-So $E_{j+1}=10x^2$ satisfies Eq.~\eqref{eq:b-E-update}. The four-factor product
-in Eq.~\eqref{eq:b-eta-update} is at least $1-2x-16x^2$, and
+The choice $E_{j+1}=10x^2$ therefore satisfies Eq.~\eqref{eq:b-E-update}. With
+$\varepsilon_{j+1}\le6x^2$, the four-factor product in
+Eq.~\eqref{eq:b-eta-update} is at least $1-2x-16x^2$, and
 $f(2x+16x^2)<3x^2$, so $\eta_{j+1}=10x^2$ satisfies
-Eq.~\eqref{eq:b-eta-update} with $\varepsilon_{j+1}\le6x^2$. This completes the
-induction for Eq.~\eqref{eq:b-x}; the factor $10$ in $x_{j+1}=10x_j^2$ covers all
-three bounds, $7x^2$, $3x^2$ and $6x^2$.
+Eq.~\eqref{eq:b-eta-update}. Because the prefactor $10$ in $x_{j+1}=10x_j^2$
+covers all three bounds $7x^2$, $3x^2$, and $6x^2$, the induction for
+Eq.~\eqref{eq:b-x} is complete.
 
 
 \end{document}
