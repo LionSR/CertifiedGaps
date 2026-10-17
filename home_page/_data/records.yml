@@ -1,1022 +1,1035 @@
-# Leaderboard of certified spectral gaps: the single hand-edited source of every leaderboard row.
+# The leaderboard data: the single hand-edited source of the leaderboard page and of the record
+# items in the home page news. Validate after every edit:
+#     julia --project=tools/leaderboard tools/leaderboard/check_records.jl
+# Exact numbers are strings: "13480", "97/4". Decimals are strings rounded down. LaTeX goes
+# between $...$. Text fields may hold inline HTML; they are not Markdown.
 #
-# Rendered by home_page/leaderboard.html; validated by tools/leaderboard/check_records.jl (run it
-# after every edit: `julia --project=tools/leaderboard tools/leaderboard/check_records.jl`).
-# Exact numbers are strings: integers "13480", rationals "97/4". Decimals are strings rounded DOWN.
-# Math fields hold LaTeX between $...$; it is typeset by MathJax on the page.
+# tiers: the six ways a bound can be established, with the words the site uses for them.
+#   key, glyph, label (the one name used everywhere), meaning (one sentence for the legend)
 #
-# families: one entry per model family (a Hamiltonian with free parameters).
-#   key          unique identifier, referenced by records[].family
-#   name         display name
-#   hamiltonian  LaTeX formula for H_L
-#   slug         default model directory, models/<slug>/ (optional)
-#   cells        what the ring length L counts (sites, two-site cells, rungs, ...)
-#   grid         {rows, cols}: optional; show the family as a grid of params[rows] x params[cols]
+# families: one per Hamiltonian with free parameters.
+#   key, name, hamiltonian (LaTeX), slug (models/<slug>/, optional), cells (what L counts),
+#   gap_source (where the numerical gaps of its records come from),
+#   grid {rows, cols} (optional: show the family as a grid of params[rows] x params[cols])
 #
-# records: one entry per model, parameter point and claim.
-#   id             unique kebab-case identifier (the row's anchor on the page)
-#   family         a families[].key
-#   parameter      display form of the parameter point (LaTeX)
-#   params         machine-readable parameter values, {name: exact string} (optional)
-#   slug           model directory if it differs from the family's (optional)
-#   lengths        {L0, parity: even|odd|all, unit, boundary: periodic|open (default periodic),
-#                   text (optional display override)}: the claim covers every ring length L >= L0
-#                   of that parity
-#   bound          the best rigorous bound on the gap Delta_L at these lengths, in one of two forms:
-#                    {r, beta}  meaning Delta_L > log(r)/beta, or
-#                    {value}    meaning Delta_L >= value (or > value when strict: true),
-#                  plus decimal (rounded down, required), precise (a longer decimal, rounded down;
-#                  required when value has more than 24 characters, and shown instead of it) and
-#                  display (LaTeX of the exact form, optional). Absent for tier target.
-#   seed           {n0, beta0, text (optional)}: the seed scale of the certificate
-#   estimate       tier target only: {n0, beta0, float_bound} from floating-point surveys
-#   numerical_gap  best known numerical estimate {value, source}; the page shows bound/value
-#   tier           the tier of the headline bound (not of the row):
-#                  lean-unconditional | lean-conditional | certified | unreviewed | assumed | target.
-#                  A lean-* tier is allowed exactly when the Lean bound log(r)/beta is at least the
-#                  headline bound (compared exactly by the validator); the page then shows the Lean
-#                  kind from lean_records.json. Otherwise the tier is that of the certificate.
-#   lean           Lean record {name, L0, r, beta, decimal}: the theorem Delta_L > log(r)/beta for
-#                  every even L >= L0, shown in the Lean column with its own badge. Must match the
-#                  record of that name in the generated lean_records.json; the page takes the Lean
-#                  kind (unconditional or conditional) from that file, never from here.
-#   certificate    path of the certificate data (results/certificate*.json[.gz]) from the repo root
-#   check          path of the checker (models/<slug>/check.jl) from the repo root
-#   source         {text, url}: for assumed results, where the imported estimates come from
-#   date           ISO date of the current record; pr: pull request number (or null)
-#   contributors   list of names (optional)
-#   notes          free text with inline HTML and $...$ math, not Markdown (optional)
-#   history        earlier records for the same row, newest first (same date: larger bound first):
-#                  [{date, decimal, display (optional), lengths, method, tier, pr}]
+# challenges: extra entries for the challenge board, besides those derived from the records.
+#   id, title, need (what is needed and what it would establish), family (optional),
+#   link (a URL or a repository path, optional)
 #
-# Tiers (see the legend on the leaderboard page):
-#   lean-unconditional  Lean theorem using only the standard axioms, no hypotheses
-#   lean-conditional    Lean theorem whose only hypotheses are the two seed inequalities; the seeds
-#                       are certified by computer in models/<slug>/
-#   certified           rigorous computer certificate with check.jl (any Lean record is weaker)
-#   unreviewed          certificate exists but has not been independently reviewed
-#   assumed             relies on estimates imported from elsewhere, not reproduced here
-#   target              floating-point survey estimates only
+# records: one per model, parameter point and claim.
+#   id            kebab-case, unique; the row's anchor
+#   family        a family key
+#   parameter     display form (LaTeX); params: {name: exact} (optional, used by the grid)
+#   lengths       {L0, parity (default even), boundary (default periodic)}: the claim covers every
+#                 ring length L >= L0 of that parity
+#   bound         the best rigorous bound: {r, beta} means Delta_L > log(r)/beta; {value} means
+#                 Delta_L >= value (> with strict: true). decimal is its display, rounded down;
+#                 display is LaTeX for the exact form (optional). Absent for targets.
+#   seed          {n0, beta0, text (optional)}: the starting ring length and inverse temperature
+#   estimate      targets only: {n0, beta0, float_bound, text}, floating-point survey values
+#   numerical_gap the best numerical estimate of the gap; gap_source overrides the family's
+#   tier          the tier of the bound shown. A Lean tier is allowed exactly when the Lean
+#                 theorem below proves at least that bound (the validator checks this exactly);
+#                 the page then takes the Lean kind from the generated lean_records.json.
+#   lean          {name, r, beta, decimal}: the Lean theorem Delta_L > log(r)/beta for every even
+#                 L >= lengths.L0; must match lean_records.json. When the theorem starts from
+#                 another seed than the row, lean.certificate names the certificate of that seed
+#   certificate   path of the certificate data; check: path of the checker (default
+#                 models/<slug>/check.jl)
+#   date, pr      when and in which pull request the current bound was set (pr may be null)
+#   contributors  GitHub handles of the people who set the bound (linked to their profiles);
+#                 a group without a handle is written as a plain name, e.g. 'OpenAI (preprint)'
+#   notes         free text (optional)
+#   history       earlier bounds, newest first (larger bound first on the same date):
+#                 [{date, decimal, display (optional), lengths, tier, pr, method}]
+
+tiers:
+  - {key: lean-unconditional, glyph: '◆', label: 'Proved in Lean, no assumptions',
+     meaning: 'A theorem checked by the Lean proof assistant with no hypotheses; the finite computation is checked inside Lean too.'}
+  - {key: lean-conditional, glyph: '◇', label: 'Proved in Lean from two computer-checked inequalities',
+     meaning: 'A Lean theorem whose only hypotheses are the two purity inequalities at the starting scale; a computer certificate in the repository proves those.'}
+  - {key: certified, glyph: '✓', label: 'Computer-checked proof',
+     meaning: 'A rigorous computer proof in exact or interval arithmetic, rerun by a standalone checker. Any Lean theorem for the same point proves a smaller bound.'}
+  - {key: target, glyph: '◌', label: 'Open target (estimate only)',
+     meaning: 'Only floating-point estimates exist; there is no proof yet.'}
+
 
 families:
   - key: spin1-heisenberg
-    name: Spin-1 Heisenberg chain
+    name: 'Spin-1 Heisenberg chain'
     hamiltonian: '$H_L = \sum_{j=1}^{L} \mathbf{S}_j \cdot \mathbf{S}_{j+1}$, $\mathbf{S}_j^2 = 2$'
     slug: spin1
-    cells: sites
+    cells: 'sites'
+    gap_source: >-
+      <a href="https://arxiv.org/abs/cond-mat/9911047">Todo and Kato</a>, quantum Monte Carlo
   - key: spin1-open
-    name: Spin-1 Heisenberg open chain with endpoint fields
+    name: 'Spin-1 Heisenberg open chain with endpoint fields'
     hamiltonian: '$H_n = \sum_{i=1}^{n-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} - h\,(S_1^z + S_n^z)$'
-    cells: sites
+    cells: 'sites'
+    gap_source: >-
+      bulk value of the periodic chain (<a href="https://arxiv.org/abs/cond-mat/9911047">Todo
+      and Kato</a>, quantum Monte Carlo); the open-chain gap is not estimated separately
   - key: heisenberg-staggered-field
-    name: Spin-1/2 Heisenberg chain in a staggered field
+    name: 'Spin-1/2 Heisenberg chain in a staggered field'
     hamiltonian: '$H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_j (-1)^j S_j^z$'
     slug: heisenberg_staggered_field
-    cells: sites
+    cells: 'sites'
+    gap_source: '16-site ring, exact diagonalization (floating point)'
   - key: dimerized-heisenberg
-    name: Dimerized spin-1/2 Heisenberg chain
-    hamiltonian: '$H_L = (1+\delta) \sum_j \mathbf{S}_{2j-1} \cdot \mathbf{S}_{2j} + (1-\delta) \sum_j \mathbf{S}_{2j} \cdot \mathbf{S}_{2j+1}$'
+    name: 'Dimerized spin-1/2 Heisenberg chain'
+    hamiltonian: >-
+      $H_L = (1+\delta) \sum_j \mathbf{S}_{2j-1} \cdot \mathbf{S}_{2j} + (1-\delta) \sum_j
+      \mathbf{S}_{2j} \cdot \mathbf{S}_{2j+1}$
     slug: dimerized_heisenberg
-    cells: two-spin cells ($N = 2L$ spins)
+    cells: 'two-spin cells ($N = 2L$ spins)'
+    gap_source: '20-spin ring, Krylov method (floating point)'
   - key: spin1-dimerized
-    name: Dimerized spin-1 Heisenberg chain
+    name: 'Dimerized spin-1 Heisenberg chain'
     hamiltonian: '$H_L = \sum_{j=1}^{2L} [1 + (-1)^j \delta]\, \mathbf{S}_j \cdot \mathbf{S}_{j+1}$'
     slug: spin1_dimerized
-    cells: two-spin cells ($N = 2L$ spins)
+    cells: 'two-spin cells ($N = 2L$ spins)'
+    gap_source: '12-spin ring, exact diagonalization (floating point)'
   - key: spin1-largeD
-    name: Spin-1 chain with single-ion anisotropy
+    name: 'Spin-1 chain with single-ion anisotropy'
     hamiltonian: '$H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum_j (S_j^z)^2$'
     slug: spin1_largeD
-    cells: sites
+    cells: 'sites'
+    gap_source: '12-site ring, exact diagonalization (floating point)'
   - key: heisenberg-ladder
-    name: Two-leg spin-1/2 Heisenberg ladder
-    hamiltonian: '$H_L = \sum_{j} \sum_{a=1,2} \mathbf{S}_{a,j} \cdot \mathbf{S}_{a,j+1} + J_\perp \sum_j \mathbf{S}_{1,j} \cdot \mathbf{S}_{2,j}$'
+    name: 'Two-leg spin-1/2 Heisenberg ladder'
+    hamiltonian: >-
+      $H_L = \sum_{j} \sum_{a=1,2} \mathbf{S}_{a,j} \cdot \mathbf{S}_{a,j+1} + J_\perp \sum_j
+      \mathbf{S}_{1,j} \cdot \mathbf{S}_{2,j}$
     slug: heisenberg_ladder
-    cells: rungs ($N = 2L$ spins)
+    cells: 'rungs ($N = 2L$ spins)'
+    gap_source: '10-rung ring, exact diagonalization (floating point)'
   - key: two-leg-tfim
-    name: Two-leg transverse-field Ising ladder
-    hamiltonian: '$H_L = -\sum_j (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_j (X_{j,a} + X_{j,b})$'
+    name: 'Two-leg transverse-field Ising ladder'
+    hamiltonian: >-
+      $H_L = -\sum_j (Z_{j,a} Z_{j+1,a} + Z_{j,b} Z_{j+1,b} + Z_{j,a} Z_{j,b}) - g \sum_j
+      (X_{j,a} + X_{j,b})$
     slug: two_leg_tfim
-    cells: rungs ($N = 2L$ spins)
+    cells: 'rungs ($N = 2L$ spins)'
+    gap_source: '8-rung ring, exact diagonalization (floating point)'
   - key: ising-longitudinal
-    name: Ising chain in transverse and longitudinal fields
+    name: 'Ising chain in transverse and longitudinal fields'
     hamiltonian: '$H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j$'
     slug: tfim_longitudinal
-    cells: sites
+    cells: 'sites'
+    gap_source: '12-site ring, exact diagonalization (floating point)'
     grid: {rows: g, cols: h}
   - key: cluster
-    name: Cluster chain in a transverse field
+    name: 'Cluster chain in a transverse field'
     hamiltonian: '$H_L = -\sum_j Z_{j-1} X_j Z_{j+1} - g \sum_j X_j$'
-    cells: two-site cells
+    cells: 'two-site cells'
+    gap_source: 'exact (free fermions)'
   - key: xy-field
-    name: XY chain in a field
+    name: 'XY chain in a field'
     hamiltonian: '$H_L = \sum_j (J_x X_j X_{j+1} + J_y Y_j Y_{j+1}) - h \sum_j Z_j$, $J_x J_y < 0$'
-    cells: sites
+    cells: 'sites'
+    gap_source: 'exact (free fermions)'
   - key: spin1-blbq
-    name: Spin-1 bilinear–biquadratic chain
-    hamiltonian: '$H_L = \sum_j \left[\cos\theta\, \mathbf{S}_j \cdot \mathbf{S}_{j+1} + \sin\theta\, (\mathbf{S}_j \cdot \mathbf{S}_{j+1})^2\right]$'
+    name: 'Spin-1 bilinear–biquadratic chain'
+    hamiltonian: >-
+      $H_L = \sum_j \left[\cos\theta\, \mathbf{S}_j \cdot \mathbf{S}_{j+1} + \sin\theta\,
+      (\mathbf{S}_j \cdot \mathbf{S}_{j+1})^2\right]$
     slug: blbq_haldane
-    cells: sites
+    cells: 'sites'
+    gap_source: 'floating-point estimate'
   - key: spin2-heisenberg
-    name: Spin-2 Heisenberg chain
+    name: 'Spin-2 Heisenberg chain'
     hamiltonian: '$H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$, $\mathbf{S}_j^2 = 6$'
     slug: spin2
-    cells: sites
+    cells: 'sites'
+    gap_source: >-
+      <a href="https://arxiv.org/abs/cond-mat/9911047">Todo and Kato</a>, quantum Monte Carlo
   - key: aklt-honeycomb
-    name: Spin-3/2 AKLT model on the honeycomb lattice (2+1 dimensions)
-    hamiltonian: '$H = \sum_{\langle ij \rangle} P^{(3)}_{ij}$, the projector onto total spin 3 of each bond'
+    name: 'Spin-3/2 AKLT model on the honeycomb lattice (2+1 dimensions)'
+    hamiltonian: >-
+      $H = \sum_{\langle ij \rangle} P^{(3)}_{ij}$, the projector onto total spin 3 of each
+      bond
     slug: aklt
-    cells: tori
+    cells: 'tori'
+    gap_source: '8-spin torus, exact diagonalization (floating point; not a bulk value)'
+
+# Extra challenges for the challenge board, besides those derived from the records.
+challenges:
+  - id: open-chain-boundary-field
+    family: spin1-open
+    title: 'Reproduce the four finite estimates of the boundary-field paper'
+    need: >-
+      Certify in this repository the four finite estimates that the OpenAI boundary-field
+      preprint computes for the open spin-1 chain with end fields $h = 3/5$. This would make
+      $\Delta_n > \log(10)/392$ for every odd $n \ge 1921$ (Appendices A–C of the main note) a
+      computer-checked record.
+    link: 'https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf'
+  - id: spin1-small-seed
+    family: spin1-heisenberg
+    title: 'Certify the small-seed trace tables'
+    need: >-
+      Certify the twisted traces of the spin-1 chain at $n \le 12$ with trace error $10^{-3}$.
+      This would make $\Delta_L > 0.039$ for every even $L \ge 60$ a computer-checked record
+      and give a starting scale small enough to check inside Lean (design C).
+    link: models/lean_seeds/README.md
+
 
 records:
-  # ---------------------------------------------------------------- spin-1 Heisenberg chain
+  # ---------------------------------------------------------------- spin1-heisenberg
   - id: spin1-temperature-lifting
     family: spin1-heisenberg
     parameter: 'periodic ring'
-    lengths: {L0: 36, parity: even, unit: sites}
+    lengths: {L0: 36}
     bound: {value: "72901771/1000000000", strict: true, decimal: "0.072901771"}
-    seed: {n0: 60, beta0: "833/32", text: "lifted seed at $n_0 = 60$; the unlifted seed $(36, 49/4)$ covers $36 \\le L \\le 72$"}
-    numerical_gap: {value: "0.41048", source: "Todo and Kato, PRL 87, 047203 (2001), quantum Monte Carlo"}
-    tier: unreviewed
+    seed: {n0: 60, beta0: "833/32", text: 'a ring of 60 sites; a ring of 36 sites at $\beta_0 = 49/4$ covers the lengths from 36 to 72'}
+    numerical_gap: "0.41048"
+    tier: certified
     certificate: models/spin1/experiments/temperature-lift.json
     check: models/spin1/experiments/test_temperature_lift.jl
     date: "2026-10-10"
     pr: null
-    contributors: [thermal-mpo-gap contributors]
+    contributors: ['thermal-mpo-gap contributors']
     notes: >-
-      Temperature lifting in exact rational arithmetic on the reproduced finite inputs of the
-      OpenAI preprint (18 thermal traces at $L \le 12$ and the length-120 MPS trial); no new trace
-      or trial contraction.
+      Computed in exact rational arithmetic from the finite inputs of the OpenAI preprint,
+      reproduced here (18 thermal traces of rings up to 12 sites and one matrix-product trial
+      state of 120 sites). Independently reviewed in #49, by re-deriving every inequality and by
+      a separate computation in Arb ball arithmetic that shares no code with the original.
     history:
-      - {date: "2026-10-10", decimal: "0.070450002", lengths: "even L ≥ 36", tier: unreviewed, pr: null,
-         method: "temperature lifting, simple parameters (experiments/temperature_lift.jl)"}
-      - {date: "2026-10-10", decimal: "0.016978269", lengths: "even L ≥ 36", tier: unreviewed, pr: null,
-         method: "scalar optimization of the source-1 inputs, unequal-defect recurrence (experiments/optimize_bounds.jl)"}
+      - {date: "2026-10-10", decimal: "0.070450002", lengths: 'even L ≥ 36', tier: certified, pr: null,
+         method: 'the same computation with simpler parameters'}
+      - {date: "2026-10-10", decimal: "0.016978269", lengths: 'even L ≥ 36', tier: certified, pr: null,
+         method: 'a sharper analysis of the same preprint inputs'}
   - id: spin1-source1
     family: spin1-heisenberg
     parameter: 'periodic ring'
-    lengths: {L0: 2304, parity: even, unit: sites}
+    lengths: {L0: 2304}
     bound: {r: "20", beta: "784", decimal: "0.00382", display: '\log(20)/784'}
     seed: {n0: 2304, beta0: "784"}
-    numerical_gap: {value: "0.41048", source: "Todo and Kato, PRL 87, 047203 (2001), quantum Monte Carlo"}
+    numerical_gap: "0.41048"
     tier: lean-conditional
-    lean: {name: Leaderboard.Records.SpinOneHeisenberg.heisenberg, L0: 2304, r: "20", beta: "784", decimal: "0.00382"}
-    certificate: models/spin1/results/source1.json
-    check: models/spin1/check.jl
+    lean: {name: Leaderboard.Records.SpinOneHeisenberg.heisenberg, r: "20", beta: "784", decimal: "0.00382"}
+    certificate: models/spin1/results/scalars.json
     date: "2026-09-24"
     pr: null
-    contributors: [OpenAI (preprint), thermal-mpo-gap contributors (exact reproduction)]
+    contributors: ['OpenAI (preprint)', 'thermal-mpo-gap contributors']
     notes: >-
-      Seeds $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge 0.99$ from
-      <a href="https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026">The periodic spin-one Haldane gap</a>
-      (OpenAI, September 24, 2026), reproduced in exact integer arithmetic in <code>models/spin1</code>.
+      The two inequalities are $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge
+      0.99$. The OpenAI preprint proves them by computer, and this repository reproduces that
+      computation in exact integer arithmetic.
     history:
-      - {date: "2026-09-24", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: "even L ≥ 60", tier: certified, pr: null,
-         method: "source 2 of the OpenAI preprint, seed (60, 105/4), reproduced in models/spin1"}
-  - id: spin1-seed-design-c
-    family: spin1-heisenberg
-    parameter: 'periodic ring, small seed route'
-    lengths: {L0: 60, parity: even, unit: sites}
-    bound: {value: "39036761/1000000000", strict: true, decimal: "0.039036761"}
-    seed: {n0: 60, beta0: "49/2", text: "twisted traces at even $n \\le 12$, real $\\mathrm{SU}(2)$ twists"}
-    numerical_gap: {value: "0.41048", source: "Todo and Kato, PRL 87, 047203 (2001), quantum Monte Carlo"}
-    tier: assumed
-    certificate: models/lean_seeds/results/seed_design/certificate.json
-    check: models/lean_seeds/check.jl
-    date: "2026-10-15"
-    pr: 29
-    notes: >-
-      Exact rational doubling chain (design C), conditional on the finite trace tables at
-      $n \le 12$ with trace error $10^{-3}$ and on the analytic seed lemmas; designed for a future
-      kernel-checked Lean seed.
-  # ---------------------------------------------------------------- spin-1 open chain
-  - id: spin1-open-boundary-field
-    family: spin1-open
-    parameter: 'open chain, $h = 3/5$'
-    params: {h: "3/5"}
-    lengths: {L0: 1921, parity: odd, unit: sites, boundary: open}
-    bound: {r: "10", beta: "392", decimal: "0.005873", display: '\log(10)/392'}
-    numerical_gap: {value: "0.41048", source: "bulk Haldane gap (Todo and Kato 2001); open-chain gap not separately estimated"}
-    tier: assumed
-    source:
-      text: "Appendices A–C of the main note, given four finite estimates from OpenAI, A boundary-field gap for the spin-one Heisenberg chain (September 24, 2026)"
-      url: "https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf"
-    date: "2026-09-24"
-    pr: null
-    contributors: [OpenAI (preprint)]
-    notes: >-
-      The four finite estimates of the boundary-field paper are imported, not reproduced in this
-      repository.
-  # ---------------------------------------------------------------- staggered field
+      - {date: "2026-09-24", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: 'even L ≥ 60', tier: certified, pr: null,
+         method: 'the second computation of the OpenAI preprint, starting from 60 sites at 105/4'}
+  # ---------------------------------------------------------------- heisenberg-staggered-field
   - id: staggered-h-1
     family: heisenberg-staggered-field
     parameter: '$h = 1$'
     params: {h: "1"}
-    lengths: {L0: 8, parity: even, unit: sites}
+    lengths: {L0: 8}
     bound: {value: "1148261/1000000", decimal: "1.148261"}
     seed: {n0: 8, beta0: "21/4"}
-    numerical_gap: {value: "1.87351193", source: "16-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.87351193"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1, L0: 8, r: "2067/5", beta: "21/4", decimal: "1.1475"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1, r: "2067/5", beta: "21/4", decimal: "1.1475"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_1.json
-    check: models/heisenberg_staggered_field/check.jl
     date: "2026-10-12"
     pr: 2
-    notes: Independently cross-checked with the shared core (<code>core_certificate_1_1.json</code>, $\Delta_L > 1.147699$).
+    contributors: ['LionSR']
+    notes: >-
+      A second, independent computation gives 1.147699.
   - id: staggered-h-3-4
     family: heisenberg-staggered-field
     parameter: '$h = 3/4$'
     params: {h: "3/4"}
-    lengths: {L0: 8, parity: even, unit: sites}
+    lengths: {L0: 8}
     bound: {value: "445391/500000", decimal: "0.890782"}
     seed: {n0: 8, beta0: "21/4"}
-    numerical_gap: {value: "1.57089206", source: "16-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.57089206"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_3_4, L0: 8, r: "1069/10", beta: "21/4", decimal: "0.8898"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_3_4, r: "1069/10", beta: "21/4", decimal: "0.8898"}
     certificate: models/heisenberg_staggered_field/results/certificate_3_4.json
-    check: models/heisenberg_staggered_field/check.jl
     date: "2026-10-12"
     pr: 2
+    contributors: ['LionSR']
   - id: staggered-h-1-2
     family: heisenberg-staggered-field
     parameter: '$h = 1/2$'
     params: {h: "1/2"}
-    lengths: {L0: 8, parity: even, unit: sites}
+    lengths: {L0: 8}
     bound: {value: "118957/200000", decimal: "0.594785"}
     seed: {n0: 8, beta0: "11/2"}
-    numerical_gap: {value: "1.23131976", source: "16-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.23131976"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_2, L0: 8, r: "2623/100", beta: "11/2", decimal: "0.5939"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_2, r: "2623/100", beta: "11/2", decimal: "0.5939"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_2.json
-    check: models/heisenberg_staggered_field/check.jl
     date: "2026-10-12"
     pr: 2
+    contributors: ['LionSR']
   - id: staggered-h-7-20
     family: heisenberg-staggered-field
     parameter: '$h = 7/20$'
     params: {h: "7/20"}
-    lengths: {L0: 8, parity: even, unit: sites}
+    lengths: {L0: 8}
     bound: {value: "95877/250000", decimal: "0.383508"}
     seed: {n0: 8, beta0: "23/4"}
-    numerical_gap: {value: "0.994380622", source: "16-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "0.994380622"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_7_20, L0: 8, r: "1807/200", beta: "23/4", decimal: "0.3828"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_7_20, r: "1807/200", beta: "23/4", decimal: "0.3828"}
     certificate: models/heisenberg_staggered_field/results/certificate_7_20.json
-    check: models/heisenberg_staggered_field/check.jl
     date: "2026-10-12"
     pr: 2
+    contributors: ['LionSR']
   - id: staggered-h-1-4
     family: heisenberg-staggered-field
     parameter: '$h = 1/4$'
     params: {h: "1/4"}
-    lengths: {L0: 8, parity: even, unit: sites}
+    lengths: {L0: 8}
     bound: {value: "107243/500000", decimal: "0.214486"}
     seed: {n0: 8, beta0: "25/4"}
-    numerical_gap: {value: "0.812031433", source: "16-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "0.812031433"
     tier: certified
-    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_4, L0: 8, r: "1903/500", beta: "25/4", decimal: "0.2138"}
+    lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_4, r: "1903/500", beta: "25/4", decimal: "0.2138"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_4.json
-    check: models/heisenberg_staggered_field/check.jl
     date: "2026-10-12"
     pr: 2
-  # ---------------------------------------------------------------- dimerized spin-1/2
+    contributors: ['LionSR']
+  # ---------------------------------------------------------------- dimerized-heisenberg
   - id: dimerized-delta-1-2
     family: dimerized-heisenberg
     parameter: '$\delta = 1/2$'
     params: {delta: "1/2"}
-    lengths: {L0: 4, parity: even, unit: cells}
+    lengths: {L0: 4}
     bound: {value: "133689/250000", decimal: "0.534756"}
     seed: {n0: 4, beta0: "6"}
-    numerical_gap: {value: "1.188631", source: "20-spin ring, Krylov diagnostic (floating point)"}
+    numerical_gap: "1.188631"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, L0: 4, r: "2433/100", beta: "6", decimal: "0.5319"}
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "2433/100", beta: "6", decimal: "0.5319"}
     certificate: models/dimerized_heisenberg/results/certificate.json
-    check: models/dimerized_heisenberg/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 23
+    contributors: ['LionSR']
     notes: >-
-      The Lean theorem takes the earlier, slightly looser seeds of the first certificate pass. The
-      seed $(4, 25/4)$ of the prior survey is also certified, with bound $0.533681$.
+      The Lean theorem uses the slightly weaker inequalities of an earlier computation. The
+      starting temperature 25/4 of an earlier survey also works and gives 0.533681.
     history:
-      - {date: "2026-10-12", decimal: "0.532658", lengths: "even L ≥ 4 cells", tier: certified, pr: 4,
-         method: "first certificate pass, seed (4, 6)"}
+      - {date: "2026-10-12", decimal: "0.532658", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
+         method: 'an earlier, less precise computation at the same starting scale'}
   - id: dimerized-delta-3-10
     family: dimerized-heisenberg
     parameter: '$\delta = 3/10$'
     params: {delta: "3/10"}
-    lengths: {L0: 4, parity: even, unit: cells}
+    lengths: {L0: 4}
     bound: {value: "173197/1000000", decimal: "0.173197"}
     seed: {n0: 4, beta0: "13/2"}
-    numerical_gap: {value: "0.810214", source: "20-spin ring, Krylov diagnostic (floating point)"}
+    numerical_gap: "0.810214"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, L0: 4, r: "613/200", beta: "13/2", decimal: "0.1723"}
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "613/200", beta: "13/2", decimal: "0.1723"}
     certificate: models/dimerized_heisenberg/results/certificate.json
-    check: models/dimerized_heisenberg/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 23
+    contributors: ['LionSR']
     history:
-      - {date: "2026-10-12", decimal: "0.172916", lengths: "even L ≥ 4 cells", tier: certified, pr: 4,
-         method: "first certificate pass, seed (4, 13/2)"}
+      - {date: "2026-10-12", decimal: "0.172916", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
+         method: 'an earlier, less precise computation at the same starting scale'}
   - id: dimerized-delta-1-4
     family: dimerized-heisenberg
     parameter: '$\delta = 1/4$'
     params: {delta: "1/4"}
-    lengths: {L0: 4, parity: even, unit: cells}
+    lengths: {L0: 4}
     bound: {value: "2329/40000", decimal: "0.058225"}
     seed: {n0: 4, beta0: "29/4"}
-    numerical_gap: {value: "0.707193", source: "20-spin ring, Krylov diagnostic (floating point)"}
+    numerical_gap: "0.707193"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, L0: 4, r: "757/500", beta: "29/4", decimal: "0.0572"}
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "757/500", beta: "29/4", decimal: "0.0572"}
     certificate: models/dimerized_heisenberg/results/certificate.json
-    check: models/dimerized_heisenberg/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 23
+    contributors: ['LionSR']
     notes: >-
-      Smallest dimerization certifiable from rings of at most 16 spins: for
-      $\delta \in \{1/5, 3/20, 1/10\}$ every $\beta_0 > 0$ is rigorously excluded at $n_0 = 2, 4$.
+      This is the smallest dimerization reachable with rings of at most 16 spins: for $\delta =
+      1/5, 3/20, 1/10$, rings of 2 and 4 cells provably fail at every temperature.
     history:
-      - {date: "2026-10-12", decimal: "0.057967", lengths: "even L ≥ 4 cells", tier: certified, pr: 4,
-         method: "first certificate pass, seed (4, 29/4)"}
-  # ---------------------------------------------------------------- dimerized spin-1
+      - {date: "2026-10-12", decimal: "0.057967", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
+         method: 'an earlier, less precise computation at the same starting scale'}
+  # ---------------------------------------------------------------- spin1-dimerized
   - id: spin1-dimerized-delta-9-10
     family: spin1-dimerized
     parameter: '$\delta = 9/10$'
     params: {delta: "9/10"}
-    lengths: {L0: 2, parity: even, unit: cells}
-    bound: {value: "4763024523889815/9007199254740992", decimal: "0.528801949327", precise: "0.528801949327674"}
+    lengths: {L0: 2}
+    bound: {value: "4763024523889815/9007199254740992", decimal: "0.528801949327"}
     seed: {n0: 2, beta0: "7/2"}
-    numerical_gap: {value: "1.7627", source: "12-spin ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.7627"
     tier: certified
-    lean: {name: Leaderboard.Records.SpinOneDimerized.delta_9_10, L0: 2, r: "6339/1000", beta: "7/2", decimal: "0.5276"}
+    lean: {name: Leaderboard.Records.SpinOneDimerized.delta_9_10, r: "6339/1000", beta: "7/2", decimal: "0.5276"}
     certificate: models/spin1_dimerized/results/certificate_d9.json
-    check: models/spin1_dimerized/check.jl
     date: "2026-10-12"
     pr: 3
+    contributors: ['LionSR']
   - id: spin1-dimerized-delta-7-10
     family: spin1-dimerized
     parameter: '$\delta = 7/10$'
     params: {delta: "7/10"}
-    lengths: {L0: 4, parity: even, unit: cells}
-    bound: {value: "1970722683523997/9007199254740992", decimal: "0.218794169839", precise: "0.218794169839941"}
-    seed: {n0: 3, beta0: "17/4", text: "odd seed, allowed by the positive cell transfer $X_\\beta = K K^*$"}
-    numerical_gap: {value: "1.2659", source: "12-spin ring, exact diagonalization (floating point)"}
+    lengths: {L0: 4}
+    bound: {value: "1970722683523997/9007199254740992", decimal: "0.218794169839"}
+    seed: {n0: 3, beta0: "17/4", text: 'an odd starting ring is allowed here because the transfer operator of this chain is positive'}
+    numerical_gap: "1.2659"
     tier: certified
     certificate: models/spin1_dimerized/results/certificate_d7.json
-    check: models/spin1_dimerized/check.jl
     date: "2026-10-12"
     pr: 3
-  # ---------------------------------------------------------------- spin-1 large D
+    contributors: ['LionSR']
+  # ---------------------------------------------------------------- spin1-largeD
   - id: spin1-largeD-D-4
     family: spin1-largeD
     parameter: '$D = 4$'
     params: {D: "4"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "8098763755702597/9007199254740992", decimal: "0.899143399", precise: "0.899143399258"}
-    seed: {n0: 12, beta0: "29/10", text: "transfer-lifted seed; verified spectra at $L = 6, 8, 10$ bridge the shorter rings"}
-    numerical_gap: {value: "2.26946", source: "12-site ring, exact diagonalization (floating point)"}
+    lengths: {L0: 6}
+    bound: {value: "8098763755702597/9007199254740992", decimal: "0.899143399"}
+    seed: {n0: 12, beta0: "29/10", text: 'a ring of 12 sites; separate verified spectra cover the rings of 6, 8 and 10 sites'}
+    numerical_gap: "2.26946"
     tier: certified
-    lean: {name: Leaderboard.Records.SpinOneLargeD.D_4, L0: 6, r: "951/200", beta: "9/4", decimal: "0.6929"}
+    lean: {name: Leaderboard.Records.SpinOneLargeD.D_4, r: "951/200", beta: "9/4", decimal: "0.6929",
+           certificate: models/spin1_largeD/results/certificate_D4_1.json}
     certificate: models/spin1_largeD/results/certificate.json
-    check: models/spin1_largeD/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 12
-    notes: The Lean theorem uses the Stage-1 seed $(6, 9/4)$, whose certified bound is $0.694694192$.
+    contributors: ['LionSR']
+    notes: >-
+      The Lean theorem starts from a ring of 6 sites at $\beta_0 = 9/4$, where the computer
+      proof gives 0.694694192.
     history:
-      - {date: "2026-10-12", decimal: "0.694694192", lengths: "even L ≥ 6", tier: certified, pr: 7,
-         method: "Stage-1 seed (6, 9/4) from verified spectra at L = 6, 12"}
-      - {date: "2026-10-12", decimal: "0.543812926", lengths: "even L ≥ 6", tier: certified, pr: 7,
-         method: "seed (6, 3) of the prior survey"}
+      - {date: "2026-10-12", decimal: "0.694694192", lengths: 'even L ≥ 6', tier: certified, pr: 7,
+         method: 'a ring of 6 sites at 9/4, from verified spectra of 6 and 12 sites'}
+      - {date: "2026-10-12", decimal: "0.543812926", lengths: 'even L ≥ 6', tier: certified, pr: 7,
+         method: 'a ring of 6 sites at 3, from an earlier survey'}
   - id: spin1-largeD-D-1603-500
     family: spin1-largeD
     parameter: '$D = 1603/500$'
     params: {D: "1603/500"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "5103904342941255/2305843009213693952", decimal: "0.002213465", precise: "0.002213465670"}
+    lengths: {L0: 6}
+    bound: {value: "5103904342941255/2305843009213693952", decimal: "0.002213465"}
     seed: {n0: 6, beta0: "381/125"}
-    numerical_gap: {value: "1.54533", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.54533"
     tier: certified
-    lean: {name: Leaderboard.Records.SpinOneLargeD.D_1603_500, L0: 6, r: "10065429/10000000", beta: "381/125", decimal: "0.002139"}
-    certificate: models/spin1_largeD/results/certificate_D1603_500.json
-    check: models/spin1_largeD/check.jl
+    lean: {name: Leaderboard.Records.SpinOneLargeD.D_1603_500, r: "10065429/10000000", beta: "381/125", decimal: "0.002139"}
+    certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-12"
     pr: 7
+    contributors: ['LionSR']
   - id: spin1-largeD-D-interval-3206
     family: spin1-largeD
     parameter: '$D \in [3.2059998, 3.206]$'
     params: {D_min: "16029999/5000000", D_max: "1603/500"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "2309592850505369/2305843009213693952", decimal: "0.001001626", precise: "0.001001626234"}
-    seed: {n0: 6, beta0: "381/125", text: "Weyl-transported from $D = 3.206$; the known gap is the value at $D = 3.206$"}
-    numerical_gap: {value: "1.54533", source: "12-site ring, exact diagonalization (floating point)"}
+    lengths: {L0: 6}
+    bound: {value: "2309592850505369/2305843009213693952", decimal: "0.001001626"}
+    seed: {n0: 6, beta0: "381/125", text: 'the proof at $D = 3.206$ extends to the interval by a perturbation bound; the numerical gap is the one at $D = 3.206$'}
+    numerical_gap: "1.54533"
     tier: certified
     certificate: models/spin1_largeD/results/certificate.json
-    check: models/spin1_largeD/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 12
+    contributors: ['LionSR']
   - id: spin1-largeD-D-interval-4
     family: spin1-largeD
     parameter: '$D \in [3.9979773, 4]$'
     params: {D_min: "39979773/10000000", D_max: "4"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "6654130513332347/4611686018427387904", decimal: "0.001442884", precise: "0.001442884551"}
-    seed: {n0: 6, beta0: "23/10", text: "Weyl-transported from $D = 4$; the known gap is the value at $D = 4$"}
-    numerical_gap: {value: "2.26946", source: "12-site ring, exact diagonalization (floating point)"}
+    lengths: {L0: 6}
+    bound: {value: "6654130513332347/4611686018427387904", decimal: "0.001442884"}
+    seed: {n0: 6, beta0: "23/10", text: 'the proof at $D = 4$ extends to the interval by a perturbation bound; the numerical gap is the one at $D = 4$'}
+    numerical_gap: "2.26946"
     tier: certified
     certificate: models/spin1_largeD/results/certificate.json
-    check: models/spin1_largeD/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 12
-  # ---------------------------------------------------------------- Heisenberg ladder
+    contributors: ['LionSR']
+  # ---------------------------------------------------------------- heisenberg-ladder
   - id: ladder-Jperp-4
     family: heisenberg-ladder
     parameter: '$J_\perp = 4$'
     params: {Jperp: "4"}
-    lengths: {L0: 4, parity: even, unit: rungs}
+    lengths: {L0: 4}
     bound: {value: "1102403091/1000000000", decimal: "1.102403091"}
     seed: {n0: 4, beta0: "2"}
-    numerical_gap: {value: "3.1375", source: "10-rung ring, exact diagonalization (floating point)"}
+    numerical_gap: "3.1375"
     tier: certified
-    lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_4, L0: 4, r: "9033/1000", beta: "2", decimal: "1.1004"}
+    lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_4, r: "9033/1000", beta: "2", decimal: "1.1004"}
     certificate: models/heisenberg_ladder/results/certificate.json
-    check: models/heisenberg_ladder/check.jl
     date: "2026-10-12"
     pr: 6
-    notes: Continued to $|J_\perp - 4| \le 10^{-4}$ with bound $1.063075969$.
+    contributors: ['LionSR']
+    notes: >-
+      The same proof covers every $J_\perp$ within $10^{-4}$ of 4, with gap at least
+      1.063075969.
   - id: ladder-Jperp-7-2
     family: heisenberg-ladder
     parameter: '$J_\perp = 7/2$'
     params: {Jperp: "7/2"}
-    lengths: {L0: 4, parity: even, unit: rungs}
+    lengths: {L0: 4}
     bound: {value: "77864819/100000000", decimal: "0.778648190"}
     seed: {n0: 4, beta0: "9/4"}
-    numerical_gap: {value: "2.6584", source: "10-rung ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.6584"
     tier: certified
     certificate: models/heisenberg_ladder/results/certificate.json
-    check: models/heisenberg_ladder/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 13
-    notes: Continued to $|J_\perp - 7/2| \le 10^{-4}$ with bound $0.751905791$.
+    contributors: ['LionSR']
+    notes: >-
+      The same proof covers every $J_\perp$ within $10^{-4}$ of 7/2, with gap at least
+      0.751905791.
   - id: ladder-Jperp-3
     family: heisenberg-ladder
     parameter: '$J_\perp = 3$'
     params: {Jperp: "3"}
-    lengths: {L0: 4, parity: even, unit: rungs}
+    lengths: {L0: 4}
     bound: {value: "227094667/500000000", decimal: "0.454189334"}
     seed: {n0: 4, beta0: "5/2"}
-    numerical_gap: {value: "2.1864", source: "10-rung ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.1864"
     tier: certified
     certificate: models/heisenberg_ladder/results/certificate.json
-    check: models/heisenberg_ladder/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 13
-    notes: Continued to $|J_\perp - 3| \le 10^{-4}$ with bound $0.435856503$.
+    contributors: ['LionSR']
+    notes: >-
+      The same proof covers every $J_\perp$ within $10^{-4}$ of 3, with gap at least
+      0.435856503.
   - id: ladder-Jperp-5-2
     family: heisenberg-ladder
     parameter: '$J_\perp = 5/2$'
     params: {Jperp: "5/2"}
-    lengths: {L0: 4, parity: even, unit: rungs}
+    lengths: {L0: 4}
     bound: {value: "42433721/1000000000", decimal: "0.042433721"}
     seed: {n0: 4, beta0: "3"}
-    numerical_gap: {value: "1.7252", source: "10-rung ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.7252"
     tier: certified
     certificate: models/heisenberg_ladder/results/certificate.json
-    check: models/heisenberg_ladder/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 13
+    contributors: ['LionSR']
   - id: ladder-Jperp-163069-65536
     family: heisenberg-ladder
     parameter: '$J_\perp = 163069/65536 \approx 2.488235$'
     params: {Jperp: "163069/65536"}
-    lengths: {L0: 4, parity: even, unit: rungs}
+    lengths: {L0: 4}
     bound: {value: "306233/200000000", decimal: "0.001531165"}
     seed: {n0: 4, beta0: "3"}
     tier: certified
     certificate: models/heisenberg_ladder/results/certificate.json
-    check: models/heisenberg_ladder/check.jl
-    date: "2026-10-14"
+    date: "2026-10-15"
     pr: 13
+    contributors: ['LionSR']
     notes: >-
-      Edge of the $n_0 \le 4$ seed grid: every grid seed is rigorously rejected at
-      $J_\perp = 326133/131072$.
-  # ---------------------------------------------------------------- two-leg TFIM
+      The smallest coupling reachable with rings of at most 4 rungs: at $J_\perp =
+      326133/131072$ every starting temperature provably fails.
+  # ---------------------------------------------------------------- two-leg-tfim
   - id: two-leg-tfim-g-3
     family: two-leg-tfim
     parameter: '$g = 3$'
     params: {g: "3"}
-    lengths: {L0: 4, parity: even, unit: rungs}
-    bound: {value: "179126977518527/281474976710656", decimal: "0.636386863", precise: "0.636386863272"}
+    lengths: {L0: 4}
+    bound: {value: "179126977518527/281474976710656", decimal: "0.636386863"}
     seed: {n0: 4, beta0: "3/2"}
-    numerical_gap: {value: "2.6618", source: "8-rung ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.6618"
     tier: certified
-    lean: {name: Leaderboard.Records.TwoLegIsing.g_3, L0: 4, r: "517/200", beta: "3/2", decimal: "0.6331"}
+    lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "517/200", beta: "3/2", decimal: "0.6331"}
     certificate: models/two_leg_tfim/results/certificate_g3_1.json.gz
-    check: models/two_leg_tfim/check.jl
     date: "2026-10-12"
     pr: 1
-  # ---------------------------------------------------------------- Ising chain, 30 grid points
+    contributors: ['LionSR']
+  # ---------------------------------------------------------------- ising-longitudinal
   - id: ising-g-1-4-h-1-20
     family: ising-longitudinal
     parameter: '$g = 1/4,\ h = 1/20$'
     params: {g: "1/4", h: "1/20"}
-    lengths: {L0: 6, parity: even, unit: sites}
+    lengths: {L0: 6}
     bound: {r: "13480", beta: "97/4", decimal: "0.3921", display: '\log(13480)/(97/4)'}
     seed: {n0: 6, beta0: "97/4"}
-    numerical_gap: {value: "1.1904", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.1904"
     tier: lean-unconditional
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_20, L0: 6, r: "13480", beta: "97/4", decimal: "0.3921"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_20, r: "13480", beta: "97/4", decimal: "0.3921"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_20.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-15"
     pr: 34
+    contributors: ['LionSR']
     notes: >-
-      The seed inequalities are proved inside the Lean kernel (<code>SeedKernel.Ising</code>), so the
-      Lean theorem has no hypotheses. The headline is the Lean bound; the computer certificate alone gives
-      the slightly sharper <code>7066853945252893/18014398509481984</code> &asymp; 0.3922 (tier certified).
+      Lean also checks the finite computation, so the theorem has no assumptions. The computer
+      proof alone gives the slightly larger 0.3922.
     history:
-      - {date: "2026-10-12", decimal: "0.3922", lengths: "even L ≥ 6", tier: certified, pr: 5,
-         method: "computer certificate in models/tfim_longitudinal (verified spectra of the 6- and 12-site rings)"}
-      - {date: "2026-10-12", decimal: "0.3921", lengths: "even L ≥ 6", tier: lean-conditional, pr: 9,
-         method: "Lean theorem with the two seed inequalities as hypotheses; seeds certified in models/tfim_longitudinal"}
+      - {date: "2026-10-12", decimal: "0.3922", lengths: 'even L ≥ 6', tier: certified, pr: 5,
+         method: 'computer proof from verified spectra of the 6- and 12-site rings'}
+      - {date: "2026-10-12", decimal: "0.3921", lengths: 'even L ≥ 6', tier: lean-conditional, pr: 9,
+         method: 'Lean theorem from the two computer-checked inequalities'}
   - id: ising-g-1-4-h-1-10
     family: ising-longitudinal
     parameter: '$g = 1/4,\ h = 1/10$'
     params: {g: "1/4", h: "1/10"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "3302233499695993/4503599627370496", decimal: "0.7332", precise: "0.733243132810"}
+    lengths: {L0: 6}
+    bound: {value: "3302233499695993/4503599627370496", decimal: "0.7332"}
     seed: {n0: 6, beta0: "55/4"}
-    numerical_gap: {value: "2.3807", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.3807"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_10, L0: 6, r: "23810", beta: "55/4", decimal: "0.7329"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_10, r: "23810", beta: "55/4", decimal: "0.7329"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_10.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-4-h-1-4
     family: ising-longitudinal
     parameter: '$g = 1/4,\ h = 1/4$'
     params: {g: "1/4", h: "1/4"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "7478691344159091/4503599627370496", decimal: "1.6606", precise: "1.660603064870"}
+    lengths: {L0: 6}
+    bound: {value: "7478691344159091/4503599627370496", decimal: "1.6606"}
     seed: {n0: 6, beta0: "13/2"}
-    numerical_gap: {value: "4.1902", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "4.1902"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_4, L0: 6, r: "48540", beta: "13/2", decimal: "1.6600"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_4, r: "48540", beta: "13/2", decimal: "1.6600"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_4.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-4-h-1-2
     family: ising-longitudinal
     parameter: '$g = 1/4,\ h = 1/2$'
     params: {g: "1/4", h: "1/2"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "4448837818148203/2251799813685248", decimal: "1.9756", precise: "1.975680871412"}
+    lengths: {L0: 6}
+    bound: {value: "4448837818148203/2251799813685248", decimal: "1.9756"}
     seed: {n0: 6, beta0: "11/2"}
-    numerical_gap: {value: "4.8428", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "4.8428"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_2, L0: 6, r: "52170", beta: "11/2", decimal: "1.9749"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_2, r: "52170", beta: "11/2", decimal: "1.9749"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_2.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-4-h-1
     family: ising-longitudinal
     parameter: '$g = 1/4,\ h = 1$'
     params: {g: "1/4", h: "1"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "4579304145823509/2251799813685248", decimal: "2.0336", precise: "2.033619559781"}
+    lengths: {L0: 6}
+    bound: {value: "4579304145823509/2251799813685248", decimal: "2.0336"}
     seed: {n0: 6, beta0: "21/4"}
-    numerical_gap: {value: "5.9397", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "5.9397"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1, L0: 6, r: "43160", beta: "21/4", decimal: "2.0328"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1, r: "43160", beta: "21/4", decimal: "2.0328"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_1.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-2-h-1-20
     family: ising-longitudinal
     parameter: '$g = 1/2,\ h = 1/20$'
     params: {g: "1/2", h: "1/20"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "8221106264140229/18014398509481984", decimal: "0.4563", precise: "0.456363073116"}
+    lengths: {L0: 6}
+    bound: {value: "8221106264140229/18014398509481984", decimal: "0.4563"}
     seed: {n0: 6, beta0: "13"}
-    numerical_gap: {value: "1.1575", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.1575"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_20, L0: 6, r: "1878/5", beta: "13", decimal: "0.4560"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_20, r: "1878/5", beta: "13", decimal: "0.4560"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_20.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-2-h-1-10
     family: ising-longitudinal
     parameter: '$g = 1/2,\ h = 1/10$'
     params: {g: "1/2", h: "1/10"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "8639350894680277/9007199254740992", decimal: "0.9591", precise: "0.959160628108"}
+    lengths: {L0: 6}
+    bound: {value: "8639350894680277/9007199254740992", decimal: "0.9591"}
     seed: {n0: 6, beta0: "8"}
-    numerical_gap: {value: "2.3145", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.3145"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_10, L0: 6, r: "2141", beta: "8", decimal: "0.9586"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_10, r: "2141", beta: "8", decimal: "0.9586"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_10.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-2-h-1-4
     family: ising-longitudinal
     parameter: '$g = 1/2,\ h = 1/4$'
     params: {g: "1/2", h: "1/4"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "5317854477896093/2251799813685248", decimal: "2.3616", precise: "2.361601793186"}
+    lengths: {L0: 6}
+    bound: {value: "5317854477896093/2251799813685248", decimal: "2.3616"}
     seed: {n0: 6, beta0: "9/2"}
-    numerical_gap: {value: "3.6417", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "3.6417"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_4, L0: 6, r: "41080", beta: "9/2", decimal: "2.3607"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_4, r: "41080", beta: "9/2", decimal: "2.3607"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_4.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-2-h-1-2
     family: ising-longitudinal
     parameter: '$g = 1/2,\ h = 1/2$'
     params: {g: "1/2", h: "1/2"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "6249587996536423/2251799813685248", decimal: "2.7753", precise: "2.775374595270"}
+    lengths: {L0: 6}
+    bound: {value: "6249587996536423/2251799813685248", decimal: "2.7753"}
     seed: {n0: 6, beta0: "4"}
-    numerical_gap: {value: "4.4918", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "4.4918"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_2, L0: 6, r: "66010", beta: "4", decimal: "2.7743"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_2, r: "66010", beta: "4", decimal: "2.7743"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_2.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-2-h-1
     family: ising-longitudinal
     parameter: '$g = 1/2,\ h = 1$'
     params: {g: "1/2", h: "1"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "3071038202321127/1125899906842624", decimal: "2.7276", precise: "2.727629857376"}
+    lengths: {L0: 6}
+    bound: {value: "3071038202321127/1125899906842624", decimal: "2.7276"}
     seed: {n0: 6, beta0: "4"}
-    numerical_gap: {value: "5.7804", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "5.7804"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1, L0: 6, r: "54530", beta: "4", decimal: "2.7266"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1, r: "54530", beta: "4", decimal: "2.7266"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_1.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-4-h-1-20
     family: ising-longitudinal
     parameter: '$g = 3/4,\ h = 1/20$'
     params: {g: "3/4", h: "1/20"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "2855541750003467/9007199254740992", decimal: "0.3170", precise: "0.317028819863"}
+    lengths: {L0: 6}
+    bound: {value: "2855541750003467/9007199254740992", decimal: "0.3170"}
     seed: {n0: 6, beta0: "8"}
-    numerical_gap: {value: "1.0807", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.0807"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_20, L0: 6, r: "629/50", beta: "8", decimal: "0.3165"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_20, r: "629/50", beta: "8", decimal: "0.3165"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_20.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-4-h-1-10
     family: ising-longitudinal
     parameter: '$g = 3/4,\ h = 1/10$'
     params: {g: "3/4", h: "1/10"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "6946503521803545/9007199254740992", decimal: "0.7712", precise: "0.771216815054"}
+    lengths: {L0: 6}
+    bound: {value: "6946503521803545/9007199254740992", decimal: "0.7712"}
     seed: {n0: 6, beta0: "21/4"}
-    numerical_gap: {value: "2.1209", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.1209"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_10, L0: 6, r: "5711/100", beta: "21/4", decimal: "0.7704"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_10, r: "5711/100", beta: "21/4", decimal: "0.7704"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_10.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-4-h-1-4
     family: ising-longitudinal
     parameter: '$g = 3/4,\ h = 1/4$'
     params: {g: "3/4", h: "1/4"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "4732863760365999/2251799813685248", decimal: "2.1018", precise: "2.101813727668"}
+    lengths: {L0: 6}
+    bound: {value: "4732863760365999/2251799813685248", decimal: "2.1018"}
     seed: {n0: 6, beta0: "7/2"}
-    numerical_gap: {value: "3.0756", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "3.0756"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_4, L0: 6, r: "1559", beta: "7/2", decimal: "2.1005"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_4, r: "1559", beta: "7/2", decimal: "2.1005"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_4.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-4-h-1-2
     family: ising-longitudinal
     parameter: '$g = 3/4,\ h = 1/2$'
     params: {g: "3/4", h: "1/2"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "6781813507788343/2251799813685248", decimal: "3.0117", precise: "3.011730202024"}
+    lengths: {L0: 6}
+    bound: {value: "6781813507788343/2251799813685248", decimal: "3.0117"}
     seed: {n0: 6, beta0: "7/2"}
-    numerical_gap: {value: "4.0891", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "4.0891"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_2, L0: 6, r: "37670", beta: "7/2", decimal: "3.0104"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_2, r: "37670", beta: "7/2", decimal: "3.0104"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_2.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-4-h-1
     family: ising-longitudinal
     parameter: '$g = 3/4,\ h = 1$'
     params: {g: "3/4", h: "1"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "7064853518310969/2251799813685248", decimal: "3.1374", precise: "3.137425216653"}
+    lengths: {L0: 6}
+    bound: {value: "7064853518310969/2251799813685248", decimal: "3.1374"}
     seed: {n0: 6, beta0: "7/2"}
-    numerical_gap: {value: "5.5673", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "5.5673"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1, L0: 6, r: "58500", beta: "7/2", decimal: "3.1362"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1, r: "58500", beta: "7/2", decimal: "3.1362"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_1.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-h-1-20
     family: ising-longitudinal
     parameter: '$g = 1,\ h = 1/20$'
     params: {g: "1", h: "1/20"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "2749898627347949/36028797018963968", decimal: "0.0763", precise: "0.076325019286"}
+    lengths: {L0: 6}
+    bound: {value: "2749898627347949/36028797018963968", decimal: "0.0763"}
     seed: {n0: 6, beta0: "13/2"}
-    numerical_gap: {value: "0.8676", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "0.8676"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_20, L0: 6, r: "1633/1000", beta: "13/2", decimal: "0.0754"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_20, r: "1633/1000", beta: "13/2", decimal: "0.0754"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_20.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-h-1-10
     family: ising-longitudinal
     parameter: '$g = 1,\ h = 1/10$'
     params: {g: "1", h: "1/10"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "2271030470095253/4503599627370496", decimal: "0.5042", precise: "0.504270063505"}
+    lengths: {L0: 6}
+    bound: {value: "2271030470095253/4503599627370496", decimal: "0.5042"}
     seed: {n0: 6, beta0: "17/4"}
-    numerical_gap: {value: "1.5324", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.5324"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_10, L0: 6, r: "4247/500", beta: "17/4", decimal: "0.5033"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_10, r: "4247/500", beta: "17/4", decimal: "0.5033"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_10.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-h-1-4
     family: ising-longitudinal
     parameter: '$g = 1,\ h = 1/4$'
     params: {g: "1", h: "1/4"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "7247298563012943/4503599627370496", decimal: "1.6092", precise: "1.609223546197"}
+    lengths: {L0: 6}
+    bound: {value: "7247298563012943/4503599627370496", decimal: "1.6092"}
     seed: {n0: 6, beta0: "3"}
-    numerical_gap: {value: "2.573", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.573"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_4, L0: 6, r: "622/5", beta: "3", decimal: "1.6078"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_4, r: "622/5", beta: "3", decimal: "1.6078"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_4.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-h-1-2
     family: ising-longitudinal
     parameter: '$g = 1,\ h = 1/2$'
     params: {g: "1", h: "1/2"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "6197625565257127/2251799813685248", decimal: "2.7522", precise: "2.752298640221"}
+    lengths: {L0: 6}
+    bound: {value: "6197625565257127/2251799813685248", decimal: "2.7522"}
     seed: {n0: 6, beta0: "3"}
-    numerical_gap: {value: "3.7089", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "3.7089"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_2, L0: 6, r: "3839", beta: "3", decimal: "2.7509"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_2, r: "3839", beta: "3", decimal: "2.7509"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_2.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-1-h-1
     family: ising-longitudinal
     parameter: '$g = 1,\ h = 1$'
     params: {g: "1", h: "1"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "8197240385155753/2251799813685248", decimal: "3.6403", precise: "3.640306005594"}
+    lengths: {L0: 6}
+    bound: {value: "8197240385155753/2251799813685248", decimal: "3.6403"}
     seed: {n0: 6, beta0: "3"}
-    numerical_gap: {value: "5.3425", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "5.3425"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1, L0: 6, r: "55100", beta: "3", decimal: "3.6389"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1, r: "55100", beta: "3", decimal: "3.6389"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_1.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-2-h-1-20
     family: ising-longitudinal
     parameter: '$g = 3/2,\ h = 1/20$'
     params: {g: "3/2", h: "1/20"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "6094718352940729/36028797018963968", decimal: "0.1691", precise: "0.169162416101"}
+    lengths: {L0: 6}
+    bound: {value: "6094718352940729/36028797018963968", decimal: "0.1691"}
     seed: {n0: 6, beta0: "7/2"}
-    numerical_gap: {value: "1.0853", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.0853"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_20, L0: 6, r: "899/500", beta: "7/2", decimal: "0.1676"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_20, r: "899/500", beta: "7/2", decimal: "0.1676"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_20.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-2-h-1-10
     family: ising-longitudinal
     parameter: '$g = 3/2,\ h = 1/10$'
     params: {g: "3/2", h: "1/10"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "3243440810004471/9007199254740992", decimal: "0.3600", precise: "0.360094266627"}
+    lengths: {L0: 6}
+    bound: {value: "3243440810004471/9007199254740992", decimal: "0.3600"}
     seed: {n0: 6, beta0: "13/4"}
-    numerical_gap: {value: "1.2881", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "1.2881"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_10, L0: 6, r: "321/100", beta: "13/4", decimal: "0.3588"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_10, r: "321/100", beta: "13/4", decimal: "0.3588"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_10.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-2-h-1-4
     family: ising-longitudinal
     parameter: '$g = 3/2,\ h = 1/4$'
     params: {g: "3/2", h: "1/4"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "4754104748432683/4503599627370496", decimal: "1.0556", precise: "1.055623310637"}
+    lengths: {L0: 6}
+    bound: {value: "4754104748432683/4503599627370496", decimal: "1.0556"}
     seed: {n0: 6, beta0: "11/4"}
-    numerical_gap: {value: "2.0626", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.0626"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_4, L0: 6, r: "363/20", beta: "11/4", decimal: "1.0540"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_4, r: "363/20", beta: "11/4", decimal: "1.0540"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_4.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-2-h-1-2
     family: ising-longitudinal
     parameter: '$g = 3/2,\ h = 1/2$'
     params: {g: "3/2", h: "1/2"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "1198674532026897/562949953421312", decimal: "2.1292", precise: "2.129273703180"}
+    lengths: {L0: 6}
+    bound: {value: "1198674532026897/562949953421312", decimal: "2.1292"}
     seed: {n0: 6, beta0: "5/2"}
-    numerical_gap: {value: "3.204", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "3.204"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_2, L0: 6, r: "1021/5", beta: "5/2", decimal: "2.1276"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_2, r: "1021/5", beta: "5/2", decimal: "2.1276"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_2.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-3-2-h-1
     family: ising-longitudinal
     parameter: '$g = 3/2,\ h = 1$'
     params: {g: "3/2", h: "1"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "1042857023309191/281474976710656", decimal: "3.7049", precise: "3.704972411743"}
+    lengths: {L0: 6}
+    bound: {value: "1042857023309191/281474976710656", decimal: "3.7049"}
     seed: {n0: 6, beta0: "5/2"}
-    numerical_gap: {value: "4.9782", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "4.9782"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1, L0: 6, r: "10490", beta: "5/2", decimal: "3.7032"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1, r: "10490", beta: "5/2", decimal: "3.7032"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_1.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-2-h-1-20
     family: ising-longitudinal
     parameter: '$g = 2,\ h = 1/20$'
     params: {g: "2", h: "1/20"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "2053827705081559/2251799813685248", decimal: "0.9120", precise: "0.912082722717"}
+    lengths: {L0: 6}
+    bound: {value: "2053827705081559/2251799813685248", decimal: "0.9120"}
     seed: {n0: 6, beta0: "9/4"}
-    numerical_gap: {value: "2.0196", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.0196"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_20, L0: 6, r: "1551/200", beta: "9/4", decimal: "0.9103"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_20, r: "1551/200", beta: "9/4", decimal: "0.9103"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_20.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-2-h-1-10
     family: ising-longitudinal
     parameter: '$g = 2,\ h = 1/10$'
     params: {g: "2", h: "1/10"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "8685218056921241/9007199254740992", decimal: "0.9642", precise: "0.964252906068"}
+    lengths: {L0: 6}
+    bound: {value: "8685218056921241/9007199254740992", decimal: "0.9642"}
     seed: {n0: 6, beta0: "9/4"}
-    numerical_gap: {value: "2.0763", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.0763"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_10, L0: 6, r: "218/25", beta: "9/4", decimal: "0.9624"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_10, r: "218/25", beta: "9/4", decimal: "0.9624"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_10.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-2-h-1-4
     family: ising-longitudinal
     parameter: '$g = 2,\ h = 1/4$'
     params: {g: "2", h: "1/4"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "2866053400128415/2251799813685248", decimal: "1.2727", precise: "1.272783389851"}
+    lengths: {L0: 6}
+    bound: {value: "2866053400128415/2251799813685248", decimal: "1.2727"}
     seed: {n0: 6, beta0: "9/4"}
-    numerical_gap: {value: "2.415", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "2.415"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_4, L0: 6, r: "349/20", beta: "9/4", decimal: "1.2708"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_4, r: "349/20", beta: "9/4", decimal: "1.2708"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_4.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-2-h-1-2
     family: ising-longitudinal
     parameter: '$g = 2,\ h = 1/2$'
     params: {g: "2", h: "1/2"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "140773048703973/70368744177664", decimal: "2.0005", precise: "2.000505342948"}
+    lengths: {L0: 6}
+    bound: {value: "140773048703973/70368744177664", decimal: "2.0005"}
     seed: {n0: 6, beta0: "9/4"}
-    numerical_gap: {value: "3.222", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "3.222"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_2, L0: 6, r: "2244/25", beta: "9/4", decimal: "1.9987"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_2, r: "2244/25", beta: "9/4", decimal: "1.9987"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_2.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
+    contributors: ['LionSR']
   - id: ising-g-2-h-1
     family: ising-longitudinal
     parameter: '$g = 2,\ h = 1$'
     params: {g: "2", h: "1"}
-    lengths: {L0: 6, parity: even, unit: sites}
-    bound: {value: "7861415094695713/2251799813685248", decimal: "3.4911", precise: "3.491169617706"}
+    lengths: {L0: 6}
+    bound: {value: "7861415094695713/2251799813685248", decimal: "3.4911"}
     seed: {n0: 6, beta0: "2"}
-    numerical_gap: {value: "4.8539", source: "12-site ring, exact diagonalization (floating point)"}
+    numerical_gap: "4.8539"
     tier: certified
-    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1, L0: 6, r: "1073", beta: "2", decimal: "3.4891"}
+    lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1, r: "1073", beta: "2", decimal: "3.4891"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_1.json.gz
-    check: models/tfim_longitudinal/check.jl
     date: "2026-10-12"
     pr: 5
-  # ---------------------------------------------------------------- open targets (floating point only)
+    contributors: ['LionSR']
+  # ---------------------------------------------------------------- open targets (estimates only)
   - id: target-tfim-g-2
     family: ising-longitudinal
     parameter: '$g = 2,\ h = 0$'
     params: {g: "2", h: "0"}
-    estimate: {n0: 128, beta0: "32", float_bound: "1.885", text: "free fermions; RP basis $\\sigma^z$, $C = Z$"}
-    numerical_gap: {value: "2", source: "exact (free fermions)"}
+    estimate: {n0: "128", beta0: "32", float_bound: "1.885", text: 'Solvable by free fermions; reflection positive in the $\sigma^z$ basis'}
+    numerical_gap: "2"
+    gap_source: 'exact (free fermions)'
     tier: target
-    source: {text: "AGENTS.md, Open targets (floating-point survey estimate)"}
   - id: target-tfim-g-5-4
     family: ising-longitudinal
     parameter: '$g = 5/4,\ h = 0$'
     params: {g: "5/4", h: "0"}
-    estimate: {n0: 144, beta0: "64", float_bound: "0.451", text: "RP basis $\\sigma^z$"}
-    numerical_gap: {value: "0.5", source: "exact (free fermions)"}
+    estimate: {n0: "144", beta0: "64", float_bound: "0.451", text: 'Reflection positive in the $\sigma^z$ basis'}
+    numerical_gap: "0.5"
+    gap_source: 'exact (free fermions)'
     tier: target
-    source: {text: "AGENTS.md, Open targets (floating-point survey estimate)"}
   - id: target-tfim-g-11-10
     family: ising-longitudinal
     parameter: '$g = 11/10,\ h = 0$'
     params: {g: "11/10", h: "0"}
-    estimate: {n0: 384, beta0: "161", float_bound: "0.178", text: "RP basis $\\sigma^z$"}
-    numerical_gap: {value: "0.2", source: "exact (free fermions)"}
+    estimate: {n0: "384", beta0: "161", float_bound: "0.178", text: 'Reflection positive in the $\sigma^z$ basis'}
+    numerical_gap: "0.2"
+    gap_source: 'exact (free fermions)'
     tier: target
-    source: {text: "AGENTS.md, Open targets (floating-point survey estimate)"}
   - id: target-cluster-g-1-2
     family: cluster
     parameter: '$g = 1/2$'
     params: {g: "1/2"}
-    estimate: {n0: 128, beta0: "64", float_bound: "0.932", text: "2-site cells; RP cell basis $\\mathrm{CS}(H \\otimes H)$"}
-    numerical_gap: {value: "1", source: "exact (free fermions)"}
+    estimate: {n0: "128", beta0: "64", float_bound: "0.932", text: 'Two-site cells, reflection positive in a rotated cell basis'}
+    numerical_gap: "1"
     tier: target
-    source: {text: "AGENTS.md, Open targets (floating-point survey estimate)"}
   - id: target-xy-field
     family: xy-field
     parameter: '$J_x J_y < 0$'
-    estimate: {text: "free fermions; RP in the standard basis; no seed estimate yet"}
+    estimate: {text: 'Solvable by free fermions; reflection positive in the standard basis'}
     tier: target
-    source: {text: "AGENTS.md, Open targets"}
   - id: target-blbq-theta-0-1
     family: spin1-blbq
     parameter: '$\theta = -0.1$'
     params: {theta: "-1/10"}
-    estimate: {n0: 34, beta0: "31", float_bound: "0.107", text: "Cartesian basis; seed scale extrapolated"}
-    numerical_gap: {value: "0.338", source: "floating-point estimate (AGENTS.md survey)"}
+    estimate: {n0: "34", beta0: "31", float_bound: "0.107", text: 'Reflection positive in the Cartesian basis; rings up to 6 sites are too small, and the starting scale is extrapolated'}
+    numerical_gap: "0.338"
     tier: target
-    source: {text: "AGENTS.md, Open targets; models/blbq_haldane (no admissible even seed with $n_0 \\le 6$)"}
   - id: target-spin2
     family: spin2-heisenberg
     parameter: 'periodic ring'
-    estimate: {n0: 256, beta0: "64", float_bound: "0.003019921", text: "conditional target: needs a certified trace bound $\\widehat{Z}_{256}(64) \\le 1.08$"}
-    numerical_gap: {value: "0.08917", source: "Todo and Kato, PRL 87, 047203 (2001), quantum Monte Carlo"}
+    estimate: {n0: "256", beta0: "64", float_bound: "0.003019921", text: 'Needs one certified bound on a partition function, $\widehat{Z}_{256}(64) \le 1.08$'}
+    numerical_gap: "0.08917"
     tier: target
-    source: {text: "models/spin2/README.md"}
   - id: target-dimerized-delta-1-5
     family: dimerized-heisenberg
     parameter: '$\delta = 1/5$'
     params: {delta: "1/5"}
-    estimate: {n0: 5, beta0: "17/2", float_bound: "0.086", text: "odd seed of 5 cells (10 and 20 spins); even seeds need $n_0 \\ge 6$ cells"}
-    numerical_gap: {value: "0.599819", source: "20-spin ring, Krylov diagnostic (floating point)"}
+    estimate: {n0: "5", beta0: "17/2", float_bound: "0.086", text: 'Rings of 2 and 4 cells provably fail at every temperature; a ring of 5 cells (10 and 20 spins) might work'}
+    numerical_gap: "0.599819"
     tier: target
-    source: {text: "models/dimerized_heisenberg/README.md (every $\\beta_0$ rigorously excluded at $n_0 = 2, 4$)"}
   - id: target-ladder-Jperp-2
     family: heisenberg-ladder
     parameter: '$J_\perp = 2$'
     params: {Jperp: "2"}
-    estimate: {n0: 6, text: "heuristic extrapolation: 24-spin rings needed"}
-    numerical_gap: {value: "1.2820", source: "10-rung ring, exact diagonalization (floating point)"}
+    estimate: {n0: "6", text: 'Rings of 2 and 4 rungs provably fail at every temperature; by extrapolation, 6 rungs (24 spins) are needed'}
+    numerical_gap: "1.2820"
     tier: target
-    source: {text: "models/heisenberg_ladder/README.md ($n_0 \\in \\{2, 4\\}$ rigorously rejected for every $\\beta > 0$)"}
   - id: target-aklt-honeycomb
     family: aklt-honeycomb
     parameter: 'honeycomb tori'
-    estimate: {text: "2+1-dimensional thermal-purity recursion; numerical pilot only, no seed resolved"}
-    numerical_gap: {value: "0.09203", source: "8-spin torus, exact diagonalization (floating point; not a bulk estimate)"}
+    estimate: {text: 'A two-dimensional lattice; a numerical pilot of the method found no starting scale yet'}
+    numerical_gap: "0.09203"
     tier: target
-    source: {text: "models/aklt/README.md and notes/thermal-mpo-gap-2plus1d.pdf"}
