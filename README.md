@@ -23,10 +23,10 @@ The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), ha
    preprint [*The periodic spin-one Haldane gap*](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026);
    and for the other models using verified eigenvalue enclosures of complete seed-ring spectra.
 
-**Website:** the [project home page](https://LionSR.github.io/haldane-gap-diagrams/) gathers the
-notes, the explainer, the blueprint and the Lean API docs, and its
-[leaderboard](https://LionSR.github.io/haldane-gap-diagrams/leaderboard.html) lists every certified gap
-with its verification tier and history. To submit a result, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+**Website:** the [project home page](https://sirui-lu.com/CertifiedGaps/) gathers the
+notes, the explainer, the blueprint and the Lean documentation. Its
+[leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) lists every proven gap,
+how it is proved, and the open challenges. To submit a result, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Spin-1 Heisenberg chain
 
@@ -36,7 +36,7 @@ with its verification tier and history. To submit a result, see [`CONTRIBUTING.m
 | seed purity bounds $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge 0.99$ | reproduced in exact arithmetic (status `passed`) | [`models/spin1/`](models/spin1/) |
 | the two-purity criterion and the spin-1 theorem above, given the two seed bounds | formalized in Lean 4 | [`lean/`](lean/) |
 | [`explainer/`](explainer/) | an illustrated, undergraduate-level exposition of the proof (HTML page and two animated films); floating-point illustrations only, not part of any certificate |
-| $\Delta_L > 0.0729$ for every even $L \ge 36$ | exact-arithmetic computation combining temperature-lifting with a tighter seed chain; not yet independently reviewed | [`models/spin1/`](models/spin1/) (`experiments/`) |
+| $\Delta_L > 0.0729$ for every even $L \ge 36$ | exact-arithmetic computation combining temperature-lifting with a tighter seed chain; independently reviewed in #49 | [`models/spin1/`](models/spin1/) (`experiments/`) |
 | open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ | proved in Appendices A–C, given four finite estimates from the boundary-field paper | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
 | general scope of the method (bond reflection positivity and multi-site unit cells) | proved in Appendices D–H | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf) |
 | diagrammatic exposition of the spin-1 seed certificate at $(2304, 784)$ | Appendices I–M | [`notes/thermal-mpo-gap-certificate.pdf`](notes/thermal-mpo-gap-certificate.pdf) |
