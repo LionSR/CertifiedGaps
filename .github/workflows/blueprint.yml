@@ -42,24 +42,26 @@ jobs:
         with:
           fetch-depth: 0 # Fetch all history for all branches and tags
 
-      - name: Build and lint project
+      # The default targets include the Leaderboard library. leanchecker (bundled with the
+      # toolchain) replays every declaration of these prefixes through the kernel, which catches
+      # `set_option debug.skipKernelTC`; LEAN_NUM_THREADS caps its parallel Mathlib imports, as the
+      # lean-action README asks for Mathlib-dependent projects.
+      - name: Build, lint and kernel-check project
         uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1.6.2
+        env:
+          LEAN_NUM_THREADS: "2"
         with:
           build: true
           lint: false # no lint driver is configured
           mk_all-check: false # mk_all does not follow srcDir = "lean"
+          leanchecker: true
+          leanchecker-args: "Leaderboard CertifiedGaps SeedKernel"
 
-      # The leaderboard (home_page/leaderboard.html): build the Lean library of gap records, audit
-      # the axioms of every record into home_page/_data/lean_records.json (read by the page, never
-      # committed), and re-check every record in the kernel. Each step exits nonzero on failure.
-      - name: Build the Leaderboard library
-        run: ~/.elan/bin/lake build Leaderboard
-
+      # The leaderboard (home_page/leaderboard.html): list every Lean record with its numbers and
+      # axioms in home_page/_data/lean_records.json (read by the page, never committed). Fails on
+      # any axiom outside propext, Classical.choice, Quot.sound.
       - name: Audit the leaderboard records
         run: ~/.elan/bin/lake exe leaderboard_audit home_page/_data/lean_records.json
-
-      - name: Re-check the leaderboard records in the kernel
-        run: ~/.elan/bin/lake exe leaderboard_recheck
 
       - name: Set up Julia
         uses: julia-actions/setup-julia@fa02766e078afaaf09b14210362cee14137e6a32 # v3.0.2
