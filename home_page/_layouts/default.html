@@ -19,7 +19,7 @@
   <a id="skip-to-content" href="#content">Skip to the content.</a>
 
   {% assign repo_url = 'https://github.com/' | append: site.repository %}
-  <header class="page-header" role="banner">
+  <header class="page-header{% unless page.url == "/" or page.url == "/index.html" %} compact{% endunless %}" role="banner">
     <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
     <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline
       }}</h2>

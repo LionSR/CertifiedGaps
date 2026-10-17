@@ -8,9 +8,38 @@
 
 /* Put your rules below this line */
 
+$muted: #4d5560;
+
+/* Header: smaller buttons that stay on one line on desktop and wrap on phones; inner pages
+   (class `compact`, set by the layout) get a much shorter header than the home page. */
+.page-header .btn {
+  display: inline-block;
+  width: auto;
+  margin: 0.15rem 0.1rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.85rem;
+}
+.page-header.compact {
+  padding: 1.25rem 1rem 1rem;
+}
+.page-header.compact .project-name {
+  font-size: 1.6rem;
+  margin-bottom: 0.2rem;
+}
+.page-header.compact .project-tagline {
+  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+  opacity: 0.85;
+}
+
+/* Pages with `wide: true` (the leaderboard) use more of a large screen. */
+.main-content.wide {
+  max-width: 80rem;
+}
+
 /* Wide tables scroll inside their own container, so the page never scrolls sideways on a
    phone. Cayman makes every table `display: block; overflow: auto`; the wrapper keeps that
-   behavior for tables whose cells hold <details>. */
+   behavior while the table itself sizes to its content. */
 .table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -22,74 +51,87 @@
   min-width: 100%;
   margin-bottom: 0;
 }
-.main-content table.records td,
-.main-content table.history td {
+.main-content .table-wrap table th,
+.main-content .table-wrap table td {
+  padding: 0.35rem 0.7rem;
   vertical-align: top;
 }
-.main-content table.records td.num,
-.main-content table.history td.num {
+.main-content table td.num {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.main-content table.records td.param {
+.main-content table td.param {
   white-space: nowrap;
 }
-.main-content table.records td.lean {
-  min-width: 14rem;
-}
-.main-content table.records td.lean a code {
-  white-space: nowrap;
-}
+.main-content table .ratio,
 .main-content table .cellnote {
-  font-size: 0.8em;
-  color: #4d5560;
-  max-width: 14rem;
-  white-space: normal;
+  color: $muted;
 }
-.main-content table.records tr.notes td {
-  border-top: none;
+.main-content table td.cellnote {
   font-size: 0.85em;
-  color: #4d5560;
+  min-width: 22rem;
+  max-width: 30rem;
   white-space: normal;
 }
-/* A max-content table would grow to fit a long note on one line; the div caps it. */
-.main-content table.records tr.notes .note {
-  max-width: 48rem;
+.main-content table tr.group th {
+  text-align: left;
+  font-weight: normal;
+  font-style: italic;
+  background: #f6f8fa;
 }
-/* Pages with `wide: true` (the leaderboard) use more of a large screen. */
-.main-content.wide {
-  max-width: 96rem;
-}
-.main-content table details summary {
+
+/* The per-row disclosure: a short summary that opens into a capped-width block. */
+.main-content table td.details details summary {
   cursor: pointer;
-}
-.main-content table details .exact {
+  color: #1e6bb8;
   font-size: 0.85em;
-  max-width: 28rem;
-  white-space: normal;
-  word-break: break-word;
-  color: #4d5560;
 }
-.main-content table details .exact code {
+.main-content table .detail-body {
+  font-size: 0.85em;
+  width: 30rem;
+  max-width: 80vw;
+  white-space: normal;
+  color: $muted;
+}
+.main-content table .detail-body p {
+  margin: 0.3rem 0;
+}
+.main-content table .detail-body code {
   word-break: break-all;
 }
-.main-content table .ratio {
-  color: #4d5560;
+
+.main-content p.caption {
+  font-size: 0.9em;
+  color: $muted;
 }
-.main-content a.anchor {
-  color: #9aa3ad;
+/* A long Hamiltonian scrolls on its own instead of widening the page on phones. */
+.main-content p.caption mjx-container {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  vertical-align: middle;
+}
+.main-content table.grid td.num a {
   text-decoration: none;
+}
+.main-content details.all-rows > summary,
+#history details > summary {
+  cursor: pointer;
+  color: #1e6bb8;
+  margin-bottom: 0.5rem;
 }
 
 /* Tier badges: glyph + label + border style carry the tier; color only reinforces it. */
 .tier {
   display: inline-block;
-  padding: 0.05em 0.5em;
+  padding: 0 0.4em;
   border: 2px solid;
   border-radius: 0.3em;
-  font-size: 0.85em;
+  font-size: 0.75em;
   white-space: nowrap;
   line-height: 1.5;
+  vertical-align: 0.1em;
 }
 .tier-lean-unconditional { background: #155a3a; border-color: #155a3a; color: #fff; }
 .tier-lean-conditional   { background: #e6f2ec; border-color: #155a3a; color: #0f4229; }
@@ -99,6 +141,19 @@
 .tier-target             { background: #fff; border-style: dotted; border-width: 1px; border-color: #59636e; color: #3f4750; font-style: italic; }
 .tier-unknown            { background: #f3f3f3; border-style: double; border-width: 3px; border-color: #777; color: #333; }
 
+/* Tier glyphs alone (grid cells, summary, history, the key). */
+.glyph { font-weight: bold; }
+.glyph-lean-unconditional { color: #155a3a; }
+.glyph-lean-conditional   { color: #155a3a; }
+.glyph-certified          { color: #1f4f8b; }
+.glyph-unreviewed         { color: #6b5a00; }
+.glyph-assumed            { color: #8a3b12; }
+.glyph-target             { color: #59636e; }
+
+p.key {
+  font-size: 0.9em;
+  color: $muted;
+}
 dl.tiers dt { margin-top: 0.8rem; }
 dl.tiers dd { margin-left: 1.5rem; }
 
@@ -106,23 +161,4 @@ dl.tiers dd { margin-left: 1.5rem; }
   border-left: 4px solid #8a3b12;
   background: #fff7f0;
   padding: 0.6rem 0.9rem;
-}
-nav.toc {
-  font-size: 0.9em;
-  line-height: 1.8;
-  margin-bottom: 1.5rem;
-}
-.hamiltonian {
-  overflow-x: auto;
-}
-
-/* On phones, cayman stacks the header buttons full width; seven of them fill the screen, so
-   they wrap inline instead. */
-@media screen and (max-width: 42em) {
-  .page-header .btn {
-    display: inline-block;
-    width: auto;
-    margin: 0.2rem 0.1rem;
-    padding: 0.4rem 0.7rem;
-  }
 }

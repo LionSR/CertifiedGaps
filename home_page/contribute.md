@@ -81,7 +81,10 @@ documents the schema. Each row has an `id`, a `family`, the `parameter`, the cov
 the exact `bound` (either `{r, beta}`, meaning $$\Delta_L > \log(r)/\beta$$, or `{value}`) with
 a `decimal` rounded **down**, the `seed`, the `tier`, the `certificate` and `check` paths, and
 optionally a `lean` record, a `numerical_gap` for comparison, `notes`, and a `history` list of
-earlier bounds. When a bound improves, move the old one into `history`. Then run
+earlier bounds (newest first). The `tier` is that of the headline bound: a Lean tier only when
+the Lean theorem proves at least that bound on at least those lengths (the validator checks this
+in exact arithmetic), and otherwise the certificate's tier. When a bound improves, move the old
+one into `history`. Then run
 
 ```sh
 julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate()'

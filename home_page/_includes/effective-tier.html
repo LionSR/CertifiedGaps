@@ -1,17 +1,22 @@
 {%- comment -%}
-  Sets `eff` (the displayed tier) and `lr` (the Lean record or nil) for the record include.rec.
-  For a record with a Lean name, the tier comes only from site.data.lean_records: "lean-" plus
-  its kind, "lean-missing" if the name is absent, "lean-unavailable" if this build has no file.
+  Sets, for include.rec:
+    eff       the tier of the headline bound: the YAML tier, except that a lean-* tier (allowed
+              only when the Lean bound covers the headline, which the validator checks) is
+              replaced by the kind read from site.data.lean_records;
+    lean_eff  the tier of the Lean record itself, from site.data.lean_records only
+              ("lean-missing" if the name is absent, "lean-unavailable" without the file);
+    lr        the Lean record, or nil.
   (Liquid assignments made in an include stay visible to the including template.)
 {%- endcomment -%}
 {%- assign lr = nil -%}
+{%- assign lean_eff = nil -%}
 {%- if include.rec.lean -%}
   {%- if site.data.lean_records -%}
     {%- assign lr = site.data.lean_records | where: "name", include.rec.lean.name | first -%}
-    {%- if lr -%}{%- assign eff = 'lean-' | append: lr.kind -%}{%- else -%}{%- assign eff = 'lean-missing' -%}{%- endif -%}
+    {%- if lr -%}{%- assign lean_eff = 'lean-' | append: lr.kind -%}{%- else -%}{%- assign lean_eff = 'lean-missing' -%}{%- endif -%}
   {%- else -%}
-    {%- assign eff = 'lean-unavailable' -%}
+    {%- assign lean_eff = 'lean-unavailable' -%}
   {%- endif -%}
-{%- else -%}
-  {%- assign eff = include.rec.tier -%}
 {%- endif -%}
+{%- assign eff = include.rec.tier -%}
+{%- if include.rec.lean and include.rec.tier contains 'lean-' -%}{%- assign eff = lean_eff -%}{%- endif -%}

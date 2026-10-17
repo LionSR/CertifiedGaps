@@ -1,0 +1,11 @@
+{%- comment -%} The glyph of a tier alone, with its name for screen readers and on hover. {%- endcomment -%}
+{%- case include.tier -%}
+{%- when "lean-unconditional" -%}{%- assign g = "◆" -%}{%- assign n = "Lean, unconditional" -%}
+{%- when "lean-conditional" -%}{%- assign g = "◇" -%}{%- assign n = "Lean, conditional" -%}
+{%- when "certified" -%}{%- assign g = "✓" -%}{%- assign n = "certified" -%}
+{%- when "unreviewed" -%}{%- assign g = "○" -%}{%- assign n = "unreviewed" -%}
+{%- when "assumed" -%}{%- assign g = "†" -%}{%- assign n = "assumed" -%}
+{%- when "target" -%}{%- assign g = "◌" -%}{%- assign n = "target" -%}
+{%- else -%}{%- assign g = "?" -%}{%- assign n = "Lean status unavailable" -%}
+{%- endcase -%}
+<span class="glyph glyph-{{ include.tier }}" title="{{ n }}" aria-label="{{ n }}">{{ g }}</span>
