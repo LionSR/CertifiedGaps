@@ -2,23 +2,27 @@
 \label{chap:open}
 
 The open spin-1 Heisenberg chain with equal boundary fields \(h = 3/5\),
-\[
+\begin{equation}
+  \label{eq:open-heisenberg-ham}
   H_n = \sum_{i=0}^{n-2} \mathbf S_i \cdot \mathbf S_{i+1} - h\,(S_0^z + S_{n-1}^z),
-\]
+\end{equation}
 has a unique ground state and a spectral gap \(\Delta_n > (\log 10)/392 \approx 0.005874\) for
-every odd \(n \ge 1921\) (Theorem~2 of~\cite{HaldaneNote}, Appendices~A--C; the theorem and its
-four finite-size inputs are from~\cite{OpenAIBoundary}). This chapter establishes the bound
-conditional on those four finite-size inputs.
+every odd \(n \ge 1921\) (Theorem~\ref{thm:boundary-field-gap}, establishing the theorem of~\cite{OpenAIBoundary}
+from its four finite-size seed inputs). This chapter proves the bound conditional on those four
+finite-size inputs (Lemma~\ref{lem:open-seeds}).
 
 \section{Transfer-operator boundary moments}
 
-At every finite Trotter number, the ring partition functions and the open-chain partition functions
-are spectral moments of a single real symmetric transfer matrix \(X = \mathcal F J\), where
-\(\mathcal F\) is the single-cell transfer matrix and \(J\) reverses imaginary time:
-\(Z_{2N} = \Tr X^{2N}\) and \(G_n = \langle v, X^n v\rangle\) for a real boundary vector \(v\).
-Choosing equal boundary fields at odd chain lengths and opposite boundary fields at even chain
-lengths gives both parities this bilinear moment representation with the same boundary vector
-\(v\).
+At every finite Trotter number \(M\), the ring partition functions and the open-chain partition
+functions are spectral moments of a single real symmetric transfer matrix \(X = \mathcal F J\),
+where \(\mathcal F\) is the single-cell transfer matrix~\eqref{eq:cell-transfer} of
+Definition~\ref{def:cell-transfer} and \(J\) reverses imaginary time:
+\(Z_{2N} = \Tr X^{2N}\) and \(G_n = \langle v, X^n v\rangle\) for a real boundary vector \(v\)
+(Theorem~\ref{thm:open-moment-bounds}). Choosing equal boundary fields at odd chain lengths and
+opposite boundary fields at even chain lengths gives both parities this bilinear moment
+representation with the same boundary vector \(v\), yielding the closed boundary moment
+inequalities~\eqref{eq:open-moment-ineq} (Definition~\ref{def:open-moment-bounds} and
+Lemma~\ref{lem:open-moment-bounds-limit}).
 
 \begin{definition}[Transfer-operator boundary moment inequalities]
   \label{def:open-moment-bounds}
@@ -29,12 +33,16 @@ lengths gives both parities this bilinear moment representation with the same bo
   witness \((\mu, c, \rho, s)\) consists of a leading transfer eigenvalue \(\mu \ge 0\), a leading
   boundary overlap \(c \ge 0\), a subleading spectral ratio \(\rho \in [0, 1]\), and a leading
   parity sign \(s = \pm 1\) satisfying the closed moment inequalities induced by a Hermitian
-  transfer operator: in particular, \(c\mu^{2N} \le G_{2N}\), the subleading decay bound
-  \(\mu^{2K}(G_{2N} - c\mu^{2N}) \le \rho^{2N-2K}\mu^{2N}(G_{2K} - c\mu^{2K})\) for \(K \le N\),
-  and the odd-length bound
-  \(|G_{2N+1} - sc\mu^{2N+1}| \le \mu^{2N+1-2K}(G_{2K} - c\mu^{2K})\). The \emph{boundary defect}
-  is \(e_k = 1 - c\mu^k/G_k\), where \(\mu = \inf_N Z_{2N}^{1/(2N)}\) and
-  \(c = \inf_N G_{2N}/\mu^{2N}\).
+  transfer operator: in particular, \(c\mu^{2N} \le G_{2N}\) and, for \(K \le N\),
+  \begin{equation}
+    \label{eq:open-moment-ineq}
+    \begin{aligned}
+      \mu^{2K}(G_{2N} - c\mu^{2N}) &\le \rho^{2N-2K}\mu^{2N}(G_{2K} - c\mu^{2K}), \\
+      |G_{2N+1} - sc\mu^{2N+1}| &\le \mu^{2N+1-2K}(G_{2K} - c\mu^{2K}).
+    \end{aligned}
+  \end{equation}
+  The \emph{boundary defect} is \(e_k = 1 - c\mu^k/G_k\), where \(\mu = \inf_N Z_{2N}^{1/(2N)}\)
+  and \(c = \inf_N G_{2N}/\mu^{2N}\).
 \end{definition}
 
 \begin{lemma}[Boundary moment inequalities for Hermitian matrices and their limits]
@@ -45,17 +53,18 @@ lengths gives both parities this bilinear moment representation with the same bo
   \leanok
   \uses{def:open-moment-bounds}
   The moments \(\Tr X^{2N}\) and \(\langle v, X^n v\rangle\) of any Hermitian matrix \(X\) satisfy
-  the boundary moment inequalities, and these inequalities are preserved under pointwise limits with
-  \(Z_2, Z_4 > 0\). Every witness satisfies \(\mu = \inf_N Z_{2N}^{1/(2N)}\), and
+  the boundary moment inequalities~\eqref{eq:open-moment-ineq} of
+  Definition~\ref{def:open-moment-bounds}, and these inequalities are preserved under pointwise
+  limits with \(Z_2, Z_4 > 0\). Every witness satisfies \(\mu = \inf_N Z_{2N}^{1/(2N)}\), and
   \(c = \inf_N G_{2N}/\mu^{2N}\) whenever \(\rho < 1\).
 \end{lemma}
 \begin{proof}
   \leanok
   Take \(\mu\) to be the largest eigenvalue modulus of \(X\), \(c\) its boundary overlap weight,
-  and \(\rho\mu\) the next largest eigenvalue modulus; each inequality holds termwise in the
-  spectral decomposition. For pointwise limits, the witnesses lie in a compact box determined by
-  \(Z_2\), \(Z_4\), and \(G_0\), so a convergent subsequence yields a limiting witness because each
-  inequality is closed.
+  and \(\rho\mu\) the next largest eigenvalue modulus; each inequality
+  in~\eqref{eq:open-moment-ineq} holds termwise in the spectral decomposition. For pointwise
+  limits, the witnesses lie in a compact box determined by \(Z_2\), \(Z_4\), and \(G_0\), so a
+  convergent subsequence yields a limiting witness because each inequality is closed.
 \end{proof}
 
 \begin{theorem}[Boundary moments of reflection-positive open chains]
@@ -65,27 +74,32 @@ lengths gives both parities this bilinear moment representation with the same bo
     CertifiedGaps.RPRing.openMomentBounds}
   \leanok
   \uses{lem:open-moment-bounds-limit, def:rpring, def:cell-transfer, lem:chernoff}
-  For a reflection-positive ring with trivial internal reflection (\(F = 1\)) and a boundary
-  operator \(b = -\sum_\alpha w_\alpha C_\alpha\) whose coefficients \(w_\alpha\) are real for
-  symmetric \(C_\alpha\) and purely imaginary for antisymmetric \(C_\alpha\), the ring partition
-  functions and the partition functions of the open chains with boundary operators \((b, b)\) at
-  odd length and \((b, b^{\mathsf T})\) at even length satisfy the boundary moment inequalities at
-  every \(\beta > 0\).
+  For a reflection-positive ring (Definition~\ref{def:rpring}) with trivial internal reflection
+  (\(F = 1\)) and a boundary operator \(b = -\sum_\alpha w_\alpha C_\alpha\) whose coefficients
+  \(w_\alpha\) are real for symmetric \(C_\alpha\) and purely imaginary for antisymmetric
+  \(C_\alpha\), the ring partition functions and the partition functions of the open chains with
+  boundary operators \((b, b)\) at odd length and \((b, b^{\mathsf T})\) at even length satisfy the
+  boundary moment inequalities of Definition~\ref{def:open-moment-bounds} at every \(\beta > 0\).
 \end{theorem}
 \begin{proof}
   \leanok
   Expanding the \(M\)-slice Trotter approximant of the open chain gives the alternating product
-  \(c_L^{\mathsf T} \mathcal F^{\mathsf T} \mathcal F \mathcal F^{\mathsf T} \cdots c_R\).
-  Reversing the imaginary-time sequences via the involution \(J\) satisfies
-  \(\mathcal F^{\mathsf T} = J \mathcal F J\), so \(X = \mathcal F J\) is real symmetric and the
-  \(n\)-site alternating product becomes \(J X^n J\) or \(J X^n\). Because the coefficient
-  condition on \(b\) implies \(J c_L = \overline{c_L}\), both parities take the bilinear form
-  \(\langle v, X^n v\rangle\) while the ring traces equal \(\Tr X^{2N}\). Passing to the
-  \(M \to \infty\) limit via Lemma~\ref{lem:open-moment-bounds-limit} and the Lie--Trotter product
-  formula completes the proof.
+  \(c_L^{\mathsf T} \mathcal F^{\mathsf T} \mathcal F \mathcal F^{\mathsf T} \cdots c_R\), where
+  \(\mathcal F\) is the single-cell transfer matrix~\eqref{eq:cell-transfer} of
+  Definition~\ref{def:cell-transfer}. Reversing the imaginary-time sequences via the involution
+  \(J\) satisfies \(\mathcal F^{\mathsf T} = J \mathcal F J\), so \(X = \mathcal F J\) is real
+  symmetric and the \(n\)-site alternating product becomes \(J X^n J\) or \(J X^n\). Because the
+  coefficient condition on \(b\) implies \(J c_L = \overline{c_L}\), both parities take the
+  bilinear form \(\langle v, X^n v\rangle\) while the ring traces equal \(\Tr X^{2N}\). Passing to
+  the \(M \to \infty\) limit via Lemma~\ref{lem:open-moment-bounds-limit} and the first-order
+  exponential product limit (Lemma~\ref{lem:chernoff}) completes the proof.
 \end{proof}
 
 \section{The open-chain spacetime-bootstrap criterion}
+
+Propagating the ring purities and the open-chain boundary defect across doubled inverse
+temperatures via~\eqref{eq:open-moment-ineq} yields a uniform lower bound on the spectral gap for
+all sufficiently long odd open chains (Theorem~\ref{thm:open-criterion}).
 
 \begin{theorem}[Open-chain spacetime-bootstrap criterion]
   \label{thm:open-criterion}
@@ -96,27 +110,35 @@ lengths gives both parities this bilinear moment representation with the same bo
   \leanok
   \uses{def:open-moment-bounds, lem:doubling-coefficient, lem:purity-squaring, lem:purity-to-gap,
     thm:open-moment-bounds}
-  Assume the transfer-operator moment inequalities for the ring and the boundary moment
-  inequalities at every \(\beta > 0\). If \(\Ps(120, 49) \ge 0.948\) and
-  \(\Pt(240, 49) \ge 0.948\) for the ring, the boundary defect satisfies \(e_{142} \le 0.14\) at
-  \(\beta = 49\), and the opposite-field open-chain thermal purity satisfies
-  \(\Pt(240, 49) \ge 0.79\), then every odd open chain of \(n \ge 1921\) sites has a unique ground
-  state and a spectral gap greater than \((\log 10)/392\).
+  Assume the transfer-operator moment inequalities of Definition~\ref{def:moment-bounds} for the
+  ring and the boundary moment inequalities of Definition~\ref{def:open-moment-bounds} at every
+  \(\beta > 0\). If \(\Ps(120, 49) \ge 0.948\) and \(\Pt(240, 49) \ge 0.948\) for the ring, the
+  boundary defect satisfies \(e_{142} \le 0.14\) at \(\beta = 49\), and the opposite-field
+  open-chain thermal purity satisfies \(\Pt(240, 49) \ge 0.79\), then every odd open chain of
+  \(n \ge 1921\) sites has a unique ground state and a spectral gap greater than
+  \((\log 10)/392\).
 \end{theorem}
 \begin{proof}
   \leanok
   At \(\beta_i = 49 \cdot 2^i\), the ring defects satisfy \(\varepsilon_{i+1} = 6\varepsilon_i^2\)
   (Lemma~\ref{lem:doubling-coefficient} with \(C = 6\)) and control both the subleading spectral
-  ratio and the bulk normalization ratio \(\mu_{i+1}/\mu_i^2\). Three recurrence steps advance the
-  boundary defect and the open-chain thermal purity from scale \(i\) to scale \(i + 1\): the
-  overlap recurrence, length doubling, and thermal squaring. Three explicit rational steps reach
-  \(i = 3\), after which all defects lie below \(x_j = 10^{-1-2^j}\) with \(x_{j+1} = 10x_j^2\).
-  At odd lengths the leading parity sign is \(s = +1\) because the partition function is positive,
-  giving \(\Pt(n, \beta_i) \ge 1 - 4x\) and hence the uniform gap bound by
+  ratio \(\rho\) and the bulk normalization ratio \(\mu_{i+1}/\mu_i^2\) in
+  Definition~\ref{def:open-moment-bounds}. Three recurrence steps advance the boundary defect and
+  the open-chain thermal purity from scale \(i\) to scale \(i + 1\) using~\eqref{eq:open-moment-ineq}
+  and Lemma~\ref{lem:purity-squaring}: the overlap recurrence, length doubling, and thermal
+  squaring. Three explicit rational steps reach \(i = 3\), after which all defects lie below
+  \(x_j = 10^{-1-2^j}\) with \(x_{j+1} = 10x_j^2\). At odd lengths the leading parity sign in
+  \eqref{eq:open-moment-ineq} is \(s = +1\) because the partition function is positive, giving
+  \(\Pt(n, \beta_i) \ge 1 - 4x_j\) and hence the uniform gap bound via~\eqref{eq:purity-to-gap} in
   Lemma~\ref{lem:purity-to-gap}.
 \end{proof}
 
 \section{The open spin-1 Heisenberg chain with boundary fields}
+
+Specializing Theorem~\ref{thm:open-criterion} to the Cartesian spin-1 generators of
+Definition~\ref{def:spin-one-generators} with boundary fields \(h = 3/5\) establishes the open-chain
+Haldane gap bound (Theorem~\ref{thm:boundary-field-gap}) from four finite-size seed inputs
+(Lemma~\ref{lem:open-seeds}).
 
 \begin{lemma}[Finite-size seed bounds for the boundary-field chain]
   \label{lem:open-seeds}
@@ -126,9 +148,9 @@ lengths gives both parities this bilinear moment representation with the same bo
     CertifiedGaps.SpinOneHeisenberg.seed_open_thermal}
   \leanok
   \uses{def:heisenberg-spectrum, def:open-moment-bounds}
-  At \(\beta = 49\), the periodic spin-1 Heisenberg ring satisfies \(\Ps(120) \ge 0.948\) and
-  \(\Pt(240) \ge 0.948\), and the opposite-field open chain with \(h = 3/5\) satisfies
-  \(e_{142} \le 0.14\) and \(\Pt(240) \ge 0.79\).
+  At \(\beta = 49\), the periodic spin-1 Heisenberg ring (Definition~\ref{def:heisenberg-spectrum})
+  satisfies \(\Ps(120) \ge 0.948\) and \(\Pt(240) \ge 0.948\), and the opposite-field open chain
+  with \(h = 3/5\) satisfies \(e_{142} \le 0.14\) and \(\Pt(240) \ge 0.79\).
 \end{lemma}
 \begin{proof}
   These are the four finite-size numerical inputs of~\cite{OpenAIBoundary}, which enter the
@@ -144,15 +166,18 @@ lengths gives both parities this bilinear moment representation with the same bo
     CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap}
   \leanok
   \uses{thm:open-criterion, lem:open-seeds, thm:heisenberg-moments}
-  For every odd \(n \ge 1921\), the open spin-1 Heisenberg chain with equal boundary fields
-  \(h = 3/5\) has a unique ground state, and every excited eigenvalue lies more than
-  \((\log 10)/392\) above the ground energy.
+  For every odd \(n \ge 1921\), the open spin-1 Heisenberg chain~\eqref{eq:open-heisenberg-ham} with
+  equal boundary fields \(h = 3/5\) has a unique ground state, and every excited eigenvalue lies
+  more than \((\log 10)/392\) above the ground energy.
 \end{theorem}
 \begin{proof}
   \leanok
-  In the Cartesian basis, taking the imaginary coefficient \(w_z = -ih\) on the antisymmetric
-  generator \(G_z = i S^z\) produces the boundary operator \(b = -h S^z\), whose transpose is
-  \(b^{\mathsf T} = +h S^z\); the open chain of Theorem~\ref{thm:open-moment-bounds} therefore has
-  equal boundary fields at odd length and opposite boundary fields at even length. Applying
+  In the Cartesian basis (Definition~\ref{def:spin-one-generators}), taking the imaginary
+  coefficient \(w_z = -ih\) on the antisymmetric generator \(G_z = i S^z\) produces the boundary
+  operator \(b = -h S^z\), whose transpose is \(b^{\mathsf T} = +h S^z\); the open chain of
+  Theorem~\ref{thm:open-moment-bounds} therefore has equal boundary fields~\eqref{eq:open-heisenberg-ham}
+  at odd length and opposite boundary fields at even length. Combining
+  Theorem~\ref{thm:heisenberg-moments}, Theorem~\ref{thm:open-moment-bounds}, and
   Theorem~\ref{thm:open-criterion} with the inputs of Lemma~\ref{lem:open-seeds} gives the bound.
 \end{proof}
+

@@ -4,11 +4,9 @@
 Proving that a quantum spin chain is gapped in the thermodynamic limit requires a lower bound on
 the energy difference between the first excited state and the ground state that is uniform in the
 system size. The \emph{spacetime bootstrap}, also called the \emph{two-purity doubling criterion},
-reduces this infinite-volume problem on periodic rings to two finite-size inequalities, as proved
-in the main note~\cite{HaldaneNote} and the scope note~\cite{ScopeNote}. This blueprint presents the
-mathematical structure of the formalization of this criterion and its applications to concrete
-quantum spin chains; each definition, lemma, and theorem links directly to the corresponding formal
-declaration in Lean~4.
+reduces this infinite-volume problem on periodic rings to two finite-size inequalities~\cite{OpenAIHaldane}.
+This document develops the complete mathematical proof of the criterion and its applications to
+concrete quantum spin chains and ladders.
 
 \section{The spacetime-bootstrap criterion}
 
@@ -43,9 +41,9 @@ improve quadratically when length and inverse temperature are doubled together
 yield a uniform lower bound on \(\Delta_L\) for every even \(L \ge n_0\)
 (Theorems~\ref{thm:gap-of-seeds} and~\ref{thm:rp-gap}).
 
-\section{Organization of the blueprint}
+\section{Organization of the document}
 
-The blueprint is organized into seven chapters following this introduction.
+The exposition is organized into seven chapters following this introduction.
 \begin{enumerate}
   \item Chapter~\ref{chap:criterion} establishes the abstract spacetime-bootstrap criterion for any
     family of finite spectra whose partition functions satisfy three transfer-operator moment
@@ -80,28 +78,15 @@ The blueprint is organized into seven chapters following this introduction.
     (Theorem~\ref{thm:ising-gap}).
 \end{enumerate}
 
-\section{Structure of the formalization}
+\section{Notations and conventions}
 
-Every statement marked as formalized corresponds to a verified Lean declaration with that
-mathematical content, and every proof marked as formalized is complete in Lean. The only unproven
-nodes in the dependency graph are the finite-size seed lemmas of the individual spin-chain models
-(Lemmas~\ref{lem:heisenberg-seed36}, \ref{lem:heisenberg-seed60}, \ref{lem:open-seeds},
-\ref{lem:large-d-seeds}, \ref{lem:spin-one-dimerized-seeds}, \ref{lem:two-leg-ising-seeds},
-\ref{lem:ising-longitudinal-seeds}, \ref{lem:staggered-seeds}, \ref{lem:dimerized-seeds},
-and~\ref{lem:ladder-seeds}), which record numerical bounds on finite rings certified by computer
-arithmetic~\cite{CertificateNote}. All other results, including the unconditional gap theorem of
-Chapter~\ref{chap:seedkernel} (Theorem~\ref{thm:ising-gap}), are proved completely from the
-standard foundational axioms.
+Rather than indexing eigenvalues in nondecreasing order, we say that a finite spectrum \(e\) has a
+\emph{spectral gap greater than \(c\)} (Definition~\ref{def:gapgt}) if it attains a nondegenerate
+minimum at some state and every other eigenvalue lies strictly more than \(c\) above that minimum.
+This condition simultaneously expresses ground-state uniqueness and the lower bound
+\(E_1 - E_0 > c\) on the spectral gap (Lemma~\ref{lem:gapgt-monotone}). Partition functions of
+concrete spin rings are written as \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), the real
+part of the complex matrix trace (Definition~\ref{def:ring-spectrum} and
+Lemma~\ref{lem:ring-trace-exp}). Ring lengths \(L\) count unit cells.
 
-\begin{remark}[Conventions]
-  \label{rem:conventions}
-  Rather than indexing eigenvalues in nondecreasing order, we say that a finite spectrum \(e\) has
-  a \emph{spectral gap greater than \(c\)} (Definition~\ref{def:gapgt}) if it attains a
-  nondegenerate minimum at some state and every other eigenvalue lies strictly more than \(c\)
-  above that minimum. This condition simultaneously expresses ground-state uniqueness and the lower
-  bound \(E_1 - E_0 > c\) on the spectral gap (Lemma~\ref{lem:gapgt-monotone}). Partition functions
-  of concrete spin rings are written as \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), the
-  real part of the complex matrix trace (Definition~\ref{def:ring-spectrum} and
-  Lemma~\ref{lem:ring-trace-exp}). Ring lengths \(L\) count unit cells.
-\end{remark}
 

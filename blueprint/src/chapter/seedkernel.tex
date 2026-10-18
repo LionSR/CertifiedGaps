@@ -1,8 +1,9 @@
 \chapter{Rigorous finite-size seeds and an unconditional spectral gap}
 \label{chap:seedkernel}
 
-The spacetime-bootstrap criterion reduces an infinite-volume spectral gap to two finite-size purity
-inequalities at a single seed scale \((n_0, \beta_0)\):
+The spacetime-bootstrap criterion (Theorem~\ref{thm:rp-gap}) reduces an infinite-volume spectral
+gap to the two finite-size purity inequalities~\eqref{eq:rp-seed-hyp} at a single seed scale
+\((n_0, \beta_0)\):
 \[
   \Ps(n_0, \beta_0) = \frac{Z_{2n_0}(\beta_0)}{Z_{n_0}(\beta_0)^2} \ge 1 - s_0, \qquad
   \Pt(2n_0, \beta_0) = \frac{Z_{2n_0}(2\beta_0)}{Z_{2n_0}(\beta_0)^2} \ge 1 - t_0.
@@ -10,42 +11,55 @@ inequalities at a single seed scale \((n_0, \beta_0)\):
 Certifying these inequalities unconditionally requires rigorous upper and lower bounds on the three
 partition functions \(Z_{n_0}(\beta_0)\), \(Z_{2n_0}(\beta_0)\), and \(Z_{2n_0}(2\beta_0)\). At the
 large inverse temperatures needed for the seed purities to approach \(1\), each partition function
-\(Z_L(\beta) = \sum_{m=0}^{d^L-1} e^{-\beta E_L(m)}\) is dominated by the ground state, with a
-small correction from the first excited state and an exponentially suppressed tail from all higher
-levels. Rather than diagonalizing the full \(d^L \times d^L\) Hamiltonian, it therefore suffices to:
+\(Z_L(\beta) = \sum_{m=0}^{d^L-1} e^{-\beta E_L(m)}\) (Lemma~\ref{lem:ring-trace-exp}) is dominated
+by the ground state, with a small correction from the first excited state and an exponentially
+suppressed tail from all higher levels (Definition~\ref{def:low-spectrum} and
+Lemma~\ref{lem:low-spectrum-z}). Rather than diagonalizing the full \(d^L \times d^L\) Hamiltonian,
+it therefore suffices to:
 \begin{enumerate}
   \item enclose the ground-state energy \(E_L(0)\) and first excited energy \(E_L(1)\) within narrow
-  intervals using the Rayleigh--Ritz residuals of two approximate integer eigenvectors, and
+  intervals using the Rayleigh--Ritz residuals of two approximate integer eigenvectors
+  (Lemma~\ref{lem:residual}), and
   \item bound all remaining \(d^L - 2\) eigenvalues from below by a threshold \(\rho\) via a
-  variational comparison with the diagonal part of the Hamiltonian.
+  variational comparison with the diagonal part of the Hamiltonian (Lemmas~\ref{lem:counting}
+  and~\ref{lem:ising-classical}).
 \end{enumerate}
-All matrix-vector products, norms, and residual bounds reduce to exact integer arithmetic. Carrying
-out this argument for the mixed-field Ising chain at \((g, h) = (1/4, 1/20)\) on rings of
-\(n_0 = 6\) and \(2n_0 = 12\) sites discharges the finite-size seed hypothesis of
-Theorem~\ref{thm:ising-longitudinal-gap} and yields a fully unconditional spectral gap theorem.
+All matrix-vector products, norms, and residual bounds reduce to exact integer arithmetic
+(Lemmas~\ref{lem:ising-bridge} and~\ref{lem:ising-low-spectra}). Carrying out this argument for the
+mixed-field Ising chain~\eqref{eq:mixed-ising-ham} at \((g, h) = (1/4, 1/20)\) on rings of
+\(n_0 = 6\) and \(2n_0 = 12\) sites proves the seed purity bounds (Theorem~\ref{thm:ising-seeds}),
+discharging the finite-size seed hypothesis (Lemma~\ref{lem:ising-longitudinal-seeds}) of
+Theorem~\ref{thm:ising-longitudinal-gap} at that point and yielding a fully unconditional spectral
+gap theorem (Theorem~\ref{thm:ising-gap}).
 
 \section{Perturbative and variational eigenvalue bounds}
 
 We first record the two elementary spectral inequalities that turn finite-dimensional trial vectors
 and quadratic-form comparisons into rigorous enclosures of the low-energy spectrum. Given an
 approximate eigenvector \(x\) with Rayleigh quotient \(\theta\), the Euclidean norm of the residual
-\(Ax - \theta x\) bounds the distance from \(\theta\) to the nearest eigenvalue of \(A\). Complementarily,
-if the quadratic form \(\operatorname{Re}\langle x, Ax\rangle\) is bounded below by \(\rho\|x\|^2\)
-on the subspace of vectors vanishing on a finite set \(B\) of basis configurations, then at most
-\(|B|\) eigenvalues of \(A\) can lie below \(\rho\).
+\(Ax - \theta x\) bounds the distance from \(\theta\) to the nearest eigenvalue of \(A\) via
+\eqref{eq:rayleigh-residual} (Lemma~\ref{lem:residual}). Complementarily, if the quadratic form
+\(\operatorname{Re}\langle x, Ax\rangle\) is bounded below by \(\rho\|x\|^2\) on the subspace of
+vectors vanishing on a finite set \(B\) of basis configurations, then at most \(|B|\) eigenvalues
+of \(A\) can lie below \(\rho\) (Lemma~\ref{lem:counting}).
 
 \begin{lemma}[Rayleigh--Ritz residual bound]
   \label{lem:residual}
   \lean{SeedKernel.Ising.exists_eigenvalue_near}
   \leanok
   For a Hermitian matrix \(A\), a vector \(x\), and \(\theta \in \R\), some eigenvalue \(\lambda_i\)
-  of \(A\) satisfies \((\lambda_i - \theta)^2 \|x\|^2 \le \|Ax - \theta x\|^2\).
+  of \(A\) satisfies
+  \begin{equation}
+    \label{eq:rayleigh-residual}
+    (\lambda_i - \theta)^2 \|x\|^2 \le \|Ax - \theta x\|^2.
+  \end{equation}
 \end{lemma}
 \begin{proof}
   \leanok
-  Expanding in the unitary eigenbasis via \(y = U^\dagger x\) gives \(\|Ax - \theta x\|^2 = \sum_i
-  (\lambda_i - \theta)^2
-  |y_i|^2 \ge \min_i (\lambda_i - \theta)^2 \|y\|^2\), where \(\|y\| = \|x\|\).
+  Expanding in the unitary eigenbasis via \(y = U^\dagger x\) gives
+  \(\|Ax - \theta x\|^2 = \sum_i (\lambda_i - \theta)^2 |y_i|^2 \ge
+  \min_i (\lambda_i - \theta)^2 \|y\|^2\), where \(\|y\| = \|x\|\), which proves
+  \eqref{eq:rayleigh-residual}.
 \end{proof}
 
 \begin{lemma}[Variational subspace eigenvalue bound]
@@ -66,29 +80,30 @@ on the subspace of vectors vanishing on a finite set \(B\) of basis configuratio
 
 \section{The mixed-field Ising Hamiltonian in the computational basis}
 
-In the computational \(Z\)-basis, the mixed-field Ising Hamiltonian
-\(H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j\) acts diagonally with the classical
-Ising energy \(E(\sigma)\) up to \(L\) single-spin flips of amplitude \(g\). By Cauchy--Schwarz
-(equivalently, Gershgorin's circle theorem applied to the off-diagonal spin-flip graph), the
-transverse field shifts the quadratic form by at most \(gL\), so any configuration cutoff on the
-classical Ising energy \(E(\sigma)\) immediately yields a variational lower bound on the quantum
-Hamiltonian.
+In the computational \(Z\)-basis, the mixed-field Ising Hamiltonian~\eqref{eq:mixed-ising-ham} acts
+diagonally with the classical Ising energy \(E(\sigma)\) up to \(L\) single-spin flips of amplitude
+\(g\) (Lemma~\ref{lem:ising-action}). By Cauchy--Schwarz (equivalently, Gershgorin's circle theorem
+applied to the off-diagonal spin-flip graph), the transverse field shifts the quadratic form by at
+most \(gL\) in~\eqref{eq:ising-gershgorin} (Lemma~\ref{lem:ising-classical}), so any configuration
+cutoff on the classical Ising energy \(E(\sigma)\) immediately yields a variational lower bound on
+the quantum Hamiltonian via Lemma~\ref{lem:counting}.
 
 \begin{lemma}[Matrix action in the computational \(Z\)-basis]
   \label{lem:ising-action}
   \lean{SeedKernel.Ising.diagE, SeedKernel.Ising.flipAt, SeedKernel.Ising.hamiltonian_mulVec_apply}
   \leanok
   \uses{def:ising-longitudinal}
-  For the mixed-field Ising ring of Definition~\ref{def:ising-longitudinal}, with classical Ising
-  energy \(E(\sigma) = -\sum_j z_j z_{j+1} - h \sum_j z_j\) (\(z_j = \pm 1\)),
-  \((H x)(\sigma) = E(\sigma)\, x(\sigma) - g \sum_j x(\sigma^{(j)})\), where \(\sigma^{(j)}\)
+  For the mixed-field Ising ring~\eqref{eq:mixed-ising-ham} of
+  Definition~\ref{def:ising-longitudinal}, with classical Ising energy
+  \(E(\sigma) = -\sum_j z_j z_{j+1} - h \sum_j z_j\) (\(z_j = \pm 1\)),
+  \((H_L x)(\sigma) = E(\sigma)\, x(\sigma) - g \sum_j x(\sigma^{(j)})\), where \(\sigma^{(j)}\)
   denotes the configuration obtained from \(\sigma\) by flipping spin \(j\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Evaluating the bond and on-site operators on computational basis configurations shows that
-  \(Z \otimes Z\) and \(Z\) act diagonally with the classical Ising energy while each \(X_j\) flips
-  the \(j\)-th spin.
+  Evaluating the bond and on-site operators of Definition~\ref{def:ising-longitudinal} on
+  computational basis configurations shows that \(Z \otimes Z\) and \(Z\) act diagonally with the
+  classical Ising energy \(E(\sigma)\) while each \(X_j\) flips the \(j\)-th spin.
 \end{proof}
 
 \begin{lemma}[Gershgorin lower bound on the quadratic form]
@@ -97,17 +112,17 @@ Hamiltonian.
   \leanok
   \uses{lem:ising-action}
   For \(g \ge 0\),
-  \[
-    \operatorname{Re}\langle x, Hx \rangle \ge \sum_\sigma \bigl(E(\sigma) - gL\bigr)\,
+  \begin{equation}
+    \label{eq:ising-gershgorin}
+    \operatorname{Re}\langle x, H_L x \rangle \ge \sum_\sigma \bigl(E(\sigma) - gL\bigr)\,
     |x(\sigma)|^2.
-  \]
+  \end{equation}
 \end{lemma}
 \begin{proof}
   \leanok
-  Bounding each off-diagonal spin-flip product by \(\operatorname{Re}(\bar a b) \le (|a|^2 +
-  |b|^2)/2\)
-  and summing over the \(L\) single-spin flip neighbors of each configuration gives the lower
-  bound.
+  Bounding each off-diagonal spin-flip product in Lemma~\ref{lem:ising-action} by
+  \(\operatorname{Re}(\bar a b) \le (|a|^2 + |b|^2)/2\) and summing over the \(L\) single-spin flip
+  neighbors of each configuration gives~\eqref{eq:ising-gershgorin}.
 \end{proof}
 
 \begin{lemma}[Binary encoding of spin configurations]
@@ -118,8 +133,9 @@ Hamiltonian.
   \uses{lem:ising-action}
   When spin configurations are encoded as the binary digits of an integer in
   \(\{0, \dots, 2^L - 1\}\) so that flipping spin \(j\) toggles the \(j\)-th bit (bitwise
-  exclusive-or with \(2^j\)), the integer action of \(20 H\) and the bit-indexed sums equal the
-  matrix action of \(H\), the squared norm, and the squared residual of the decoded vector.
+  exclusive-or with \(2^j\)), the integer action of \(20 H_L\) and the bit-indexed sums equal the
+  matrix action of \(H_L\) in Lemma~\ref{lem:ising-action}, the squared norm, and the squared
+  residual of the decoded vector.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -129,10 +145,13 @@ Hamiltonian.
 
 \section{Certified seed purities and the unconditional spectral gap}
 
-Combining the two Rayleigh--Ritz eigenvalue enclosures with the Gershgorin quadratic-form bound
-produces two-sided bounds on the partition functions \(Z_6(97/4)\), \(Z_{12}(97/4)\), and
-\(Z_{12}(97/2)\). These bounds certify the seed purities at \((g, h) = (1/4, 1/20)\) and establish
-an unconditional spectral gap for all even ring lengths \(L \ge 6\).
+Combining the two Rayleigh--Ritz residual bounds (Lemma~\ref{lem:residual}) with the Gershgorin
+comparison (Lemmas~\ref{lem:counting} and~\ref{lem:ising-classical}) yields the low-energy spectral
+enclosures of Lemma~\ref{lem:ising-low-spectra} and the resulting two-sided
+bounds~\eqref{eq:low-spectrum-z} on the partition functions \(Z_6(97/4)\), \(Z_{12}(97/4)\), and
+\(Z_{12}(97/2)\). These bounds certify the seed purities~\eqref{eq:ising-certified-seeds} at
+\((g, h) = (1/4, 1/20)\) (Theorem~\ref{thm:ising-seeds}) and establish the unconditional spectral
+gap~\eqref{eq:ising-uncond-gap} for all even ring lengths \(L \ge 6\) (Theorem~\ref{thm:ising-gap}).
 
 \begin{definition}[Low-energy spectral enclosure]
   \label{def:low-spectrum}
@@ -149,15 +168,18 @@ an unconditional spectral gap for all even ring lengths \(L \ge 6\).
   \leanok
   \uses{def:low-spectrum}
   For \(\beta \ge 0\) and a spectrum of \(N\) eigenvalues admitting the enclosure
-  \((a_0, b_0, a_1, \rho)\),
-  \(e^{-\beta b_0} \le \sum_i e^{-\beta e_i} \le e^{-\beta a_0} + e^{-\beta a_1} +
-  N e^{-\beta \rho}\).
+  \((a_0, b_0, a_1, \rho)\) of Definition~\ref{def:low-spectrum},
+  \begin{equation}
+    \label{eq:low-spectrum-z}
+    e^{-\beta b_0} \le \sum_{i=0}^{N-1} e^{-\beta e_i} \le e^{-\beta a_0} + e^{-\beta a_1} +
+    N e^{-\beta \rho}.
+  \end{equation}
 \end{lemma}
 \begin{proof}
   \leanok
   Dropping all Boltzmann weights except that of the ground state in \([a_0, b_0]\) gives the lower
-  bound, and bounding each Boltzmann weight by the corresponding spectral lower bound gives the
-  upper bound.
+  bound in~\eqref{eq:low-spectrum-z}, and bounding each Boltzmann weight by the corresponding
+  spectral lower bound of Definition~\ref{def:low-spectrum} gives the upper bound.
 \end{proof}
 
 \begin{lemma}[Spectral enclosures of the \(6\)- and \(12\)-site Ising rings]
@@ -167,18 +189,19 @@ an unconditional spectral gap for all even ring lengths \(L \ge 6\).
   \leanok
   \uses{lem:residual, lem:counting, lem:ising-classical, lem:ising-bridge, def:low-spectrum}
   At \(g = 1/4\) and \(h = 1/20\), the rings of \(6\) and \(12\) sites admit low-energy spectral
-  enclosures with eigenvalue radius \(10^{-10}\) around the two Ritz values of the integer trial
-  vectors and excited-state threshold \(\rho = c/20 - L/4\), where exactly two classical
-  configurations satisfy \(20 E < c\).
+  enclosures (Definition~\ref{def:low-spectrum}) with eigenvalue radius \(10^{-10}\) around the two
+  Ritz values of the integer trial vectors and excited-state threshold \(\rho = c/20 - L/4\), where
+  exactly two classical configurations satisfy \(20 E(\sigma) < c\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Exact integer arithmetic verifies the norms and residuals of two integer trial vectors on each
-  ring (evaluated for \(12\) sites in \(64\) blocks whose union covers \(\{0, \dots, 4095\}\))
-  together with the count of classical configurations below the energy cutoff.
-  Lemma~\ref{lem:residual} converts the residual bounds into eigenvalue enclosures, and
-  Lemmas~\ref{lem:counting} and~\ref{lem:ising-classical} convert the classical configuration count
-  into the lower bound on all remaining eigenvalues.
+  Exact integer arithmetic via Lemma~\ref{lem:ising-bridge} verifies the norms and residuals of two
+  integer trial vectors on each ring (evaluated for \(12\) sites in \(64\) blocks whose union
+  covers \(\{0, \dots, 4095\}\)) together with the count of classical configurations below the
+  energy cutoff. Lemma~\ref{lem:residual} converts the residual bounds~\eqref{eq:rayleigh-residual}
+  into eigenvalue enclosures, and Lemmas~\ref{lem:counting} and~\ref{lem:ising-classical} convert
+  the classical configuration count in~\eqref{eq:ising-gershgorin} into the lower bound \(\rho\) on
+  all remaining eigenvalues.
 \end{proof}
 
 \begin{theorem}[Certified seed purities of the mixed-field Ising ring]
@@ -188,20 +211,21 @@ an unconditional spectral gap for all even ring lengths \(L \ge 6\).
   \leanok
   \uses{lem:ising-low-spectra, lem:low-spectrum-z, def:rp-purities, def:ising-longitudinal}
   For \(H_L = -\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j\),
-  \[
+  \begin{equation}
+    \label{eq:ising-certified-seeds}
     \Ps(6, 97/4) \ge 1 - 9064 \cdot 10^{-9}, \qquad \Pt(12, 97/4) \ge 1 - 3141 \cdot 10^{-8}.
-  \]
-  These are the seed purity inequalities of the first grid point of
-  Definition~\ref{def:ising-longitudinal}.
+  \end{equation}
+  These are the seed purity inequalities~\eqref{eq:rp-seed-hyp} of the first grid point of
+  Definition~\ref{def:ising-longitudinal} (Lemma~\ref{lem:ising-longitudinal-seeds}).
 \end{theorem}
 \begin{proof}
   \leanok
-  Applying Lemma~\ref{lem:low-spectrum-z} to the spectral enclosures of
-  Lemma~\ref{lem:ising-low-spectra} gives \(Z \ge e^{-\beta(\theta_0 + r)}\) and
+  Applying~\eqref{eq:low-spectrum-z} from Lemma~\ref{lem:low-spectrum-z} to the spectral enclosures
+  of Lemma~\ref{lem:ising-low-spectra} gives \(Z \ge e^{-\beta(\theta_0 + r)}\) and
   \(Z \le e^{-\beta(\theta_0 - r)}(1 + T)\) with an exponentially small excited-state sum \(T\);
-  the purity ratios \(Z_{12}(\beta)/Z_6(\beta)^2\) and \(Z_{12}(2\beta)/Z_{12}(\beta)^2\) are then
-  bounded from below by \((1 - x)/(1 + t)^2\) using the rational bound
-  \(e^{-14} \le (27182818283/10^{10})^{-14}\).
+  the purity ratios \(Z_{12}(\beta)/Z_6(\beta)^2\) and \(Z_{12}(2\beta)/Z_{12}(\beta)^2\) in
+  Definition~\ref{def:rp-purities} are then bounded from below by \((1 - x)/(1 + t)^2\) using the
+  rational bound \(e^{-14} \le (27182818283/10^{10})^{-14}\), proving~\eqref{eq:ising-certified-seeds}.
 \end{proof}
 
 \begin{theorem}[Unconditional spectral gap of the mixed-field Ising ring]
@@ -213,28 +237,34 @@ an unconditional spectral gap for all even ring lengths \(L \ge 6\).
   For every even \(L \ge 6\), the mixed-field Ising ring
   \(-\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j\) has a unique ground state
   and
-  \[
-    \Delta_L > \frac{\log 13480}{97/4} \approx 0.3921 .
-  \]
+  \begin{equation}
+    \label{eq:ising-uncond-gap}
+    \Delta_L = E_1(L) - E_0(L) > \frac{\log 13480}{97/4} \approx 0.3921 .
+  \end{equation}
 \end{theorem}
 \begin{proof}
   \leanok
-  Apply Theorem~\ref{thm:rp-gap} at the first grid point, using the certificate admissibility from
-  Lemma~\ref{lem:ising-longitudinal-valid} and the seed purity bounds from
-  Theorem~\ref{thm:ising-seeds}. This discharges the seed hypothesis of
-  Theorem~\ref{thm:ising-longitudinal-gap} at \((g, h) = (1/4, 1/20)\), establishing the spectral
-  gap unconditionally.
+  Apply Theorem~\ref{thm:rp-gap} at the first grid point of Definition~\ref{def:ising-longitudinal},
+  using the certificate admissibility from Lemma~\ref{lem:ising-longitudinal-valid} and the seed
+  purity bounds~\eqref{eq:ising-certified-seeds} from Theorem~\ref{thm:ising-seeds}. This discharges
+  the seed hypothesis of Lemma~\ref{lem:ising-longitudinal-seeds} at \((g, h) = (1/4, 1/20)\),
+  establishing the spectral gap~\eqref{eq:ising-uncond-gap} of Theorem~\ref{thm:ising-longitudinal-gap}
+  unconditionally.
 \end{proof}
 
 \section{Exact integer arithmetic for spin-1 trial states}
 
-\begin{remark}
-  The same Rayleigh--Ritz residual strategy extends to integer trial states of the spin-1
-  Heisenberg chain. Applying a shifted polynomial filter \(p(H_n)\) to a N\'eel product state in
-  exact \(3^n\)-dimensional integer arithmetic yields certified ground-state energy upper bounds and
-  residual enclosures on rings of \(n = 6, 8, 10\) sites. Unlike the weakly perturbed Ising chain
-  above, however, the isotropic spin-1 Heisenberg chain is strongly coupled and requires a larger
-  seed ring (\(n_0 = 36\) in Lemma~\ref{lem:heisenberg-seed36}), where a simple diagonal Gershgorin
-  cutoff does not suffice to bound the remaining excited spectrum; see~\cite{CertificateNote} for
-  the twisted-ring trace recursion and polynomial-filter method used to certify the spin-1 seeds.
+\begin{remark}[Rayleigh--Ritz residuals for filtered spin-1 trial states]
+  \label{rem:spin1-trial}
+  The Rayleigh--Ritz residual strategy of Lemma~\ref{lem:residual} extends to integer trial states
+  of the spin-1 Heisenberg chain~\eqref{eq:heisenberg-ham}. Applying a shifted polynomial filter
+  \(p(H_n)\) to a N\'eel product state in exact \(3^n\)-dimensional integer arithmetic yields
+  certified ground-state energy upper bounds and residual enclosures~\eqref{eq:rayleigh-residual}
+  on rings of \(n = 6, 8, 10\) sites. Unlike the weakly perturbed Ising chain of
+  Theorem~\ref{thm:ising-gap}, however, the isotropic spin-1 Heisenberg chain is strongly coupled
+  and requires a larger seed ring (\(n_0 = 36\) in Lemma~\ref{lem:heisenberg-seed36}), where a
+  simple diagonal Gershgorin cutoff such as~\eqref{eq:ising-gershgorin} does not suffice to bound
+  the remaining excited spectrum; see~\cite{OpenAIHaldane} for the twisted-ring trace recursion
+  and polynomial-filter method used to certify the spin-1 seeds~\eqref{eq:heisenberg-seed36}.
 \end{remark}
+

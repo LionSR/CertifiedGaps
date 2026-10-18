@@ -58,10 +58,9 @@ The **spacetime bootstrap** combines two components:
 | statement | status | where |
 |---|---|---|
 | $\Delta_L > 0.0729$ for every even $L \ge 36$ | seed certificates at $(60, 833/32)$ and $(36, 49/4)$ certified in exact rational arithmetic and independently audited (#49); two-seed doubling chain formalized in Lean 4 (`Leaderboard.Records.SpinOneHeisenberg.temperature_lifting`) | [`models/spin1/experiments/`](models/spin1/experiments/), [`lean/`](lean/), [`leaderboard/`](leaderboard/) |
-| $\Delta_L > \log(41.196029)/784 \approx 0.00474$ (and the preprint's rounded bound $(\log 20)/784 \approx 0.00382$) for every even $L \ge 2304$; $\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79} \approx 0.000479$ for every even $L \ge 60$ | proved in the main note; seed purity bounds at $(2304, 784)$, $(36, 49/4)$, and $(60, 105/4)$ reproduced in exact integer and rational arithmetic; formalized in Lean 4 (`SpinOneHeisenberg`) | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf), [`models/spin1/`](models/spin1/), [`lean/`](lean/) |
-| open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392 \approx 0.00587$ for every odd $n \ge 1921$ | proved in Appendices A–C and formalized in Lean 4 (`OpenChain.open_spin_one_heisenberg_gap_1921`), conditional on the four finite seed bounds at $\beta_2 = 49$ from the boundary-field preprint | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf), [`lean/CertifiedGaps/OpenChain.lean`](lean/CertifiedGaps/OpenChain.lean) |
-| general scope of the method (bond reflection positivity and multi-site unit cells) | proved in Appendices D–H and formalized in Lean 4 (`RPRing`) | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf), [`lean/CertifiedGaps/RPRing.lean`](lean/CertifiedGaps/RPRing.lean) |
-| diagrammatic exposition of the spin-1 seed certificate at $(2304, 784)$ | Appendices I–M | [`notes/thermal-mpo-gap-certificate.pdf`](notes/thermal-mpo-gap-certificate.pdf) |
+| $\Delta_L > \log(41.196029)/784 \approx 0.00474$ (and the preprint's rounded bound $(\log 20)/784 \approx 0.00382$) for every even $L \ge 2304$; $\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79} \approx 0.000479$ for every even $L \ge 60$ | seed purity bounds at $(2304, 784)$, $(36, 49/4)$, and $(60, 105/4)$ reproduced in exact integer and rational arithmetic; doubling chains formalized in Lean 4 (`SpinOneHeisenberg`) | [`models/spin1/`](models/spin1/), [`lean/`](lean/), [`leaderboard/`](leaderboard/) |
+| open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392 \approx 0.00587$ for every odd $n \ge 1921$ | formalized in Lean 4 (`OpenChain.open_spin_one_heisenberg_gap_1921`), conditional on the four finite seed bounds at $\beta_2 = 49$ from the boundary-field preprint | [`lean/CertifiedGaps/OpenChain.lean`](lean/CertifiedGaps/OpenChain.lean), [`explainer/open.html`](explainer/open.html) |
+| general reflection-positive ring criterion (bond factorization and multi-site unit cells with internal reflection) | formalized in Lean 4 (`RPRing`, `Criterion`, `Chain`) and implemented in `CertifiedGaps` | [`lean/CertifiedGaps/`](lean/CertifiedGaps/), [`julia/`](julia/), [`blueprint/`](blueprint/) |
 | smaller seed route for Lean verification: $\Delta_L > 0.039$ for even $L \ge 60$ from twisted traces at even $n \le 12$ using real $\mathrm{SU}(2)$ twists only | exact rational doubling chain, conditional on the finite trace tables and analytic seed lemmas | [`models/lean_seeds/`](models/lean_seeds/) (`seed_design`) |
 | kernel-checked spin-1 seed arithmetic (base-3 packed-integer operations, Ritz/residual witnesses for $H_6$, $H_8$, $H_{10}$, and local PSD counting anchors) | kernel-checked arithmetic witnesses and feasibility studies | [`models/lean_seeds/`](models/lean_seeds/), [`lean/`](lean/) (`SeedKernel`) |
 
@@ -104,22 +103,22 @@ interval bounds; each certificate also states the exact rational chain bound.
 
 | directory | content |
 |---|---|
-| [`notes/`](notes/) | LaTeX notes and compiled PDFs, the shared diagram package `tnnotes.sty`, and canonical notation and diagram conventions |
-| [`explainer/`](explainer/) | illustrated, undergraduate-level exposition of the proof (two HTML pages, ring and open chains, and two animated films; floating-point illustrations only, not part of any certificate) |
 | [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core package: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalization, verified ring spectra, certified MPO arithmetic (Nemo/Arb), and thermal purification (ITensors) |
 | [`models/`](models/) | one directory per model in a standardized layout ([`AGENTS.md`](AGENTS.md), "Directory format"): `README.md`, `IDEAS.md`, certificate JSON, `certify.jl`, `check.jl`, and tests; documented layout exceptions are listed in each README's `## Layout`. `spin1/` reproduces the exact-arithmetic spin-1 certificate; `lean_seeds/` develops kernel-checked seed witnesses |
 | [`lean/`](lean/) | Lean 4 + Mathlib formalization of the two-purity criterion and each certified model's gap theorem (with the seeds as hypotheses), plus the opt-in library `SeedKernel` for kernel-checked seed arithmetic |
 | [`leaderboard/`](leaderboard/) | Lean library `Leaderboard` packaging every Lean-verified gap record in a uniform `Record.Unconditional` or `Record.Seeded` statement, plus the kernel axiom/parameter auditor `leaderboard_audit` |
 | [`blueprint/`](blueprint/), [`home_page/`](home_page/) | the `leanblueprint` blueprint of the Lean formalization (web, PDF, dependency graph) and the project home page and leaderboard (`home_page/_data/records.yml`), built from the root `lakefile.toml` and deployed to GitHub Pages |
-| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes; `leaderboard/`: the validator of the leaderboard data `home_page/_data/records.yml` against the certificates and Lean audit |
+| [`explainer/`](explainer/) | interactive visual exposition of the periodic ring and open-chain proofs (two HTML pages and two narrated films; floating-point illustrations only, not part of any certificate) |
+| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes; `leaderboard/`: the validator of `home_page/_data/records.yml` against the certificates and Lean audit |
+| [`notes/`](notes/) | working LaTeX notes and diagram macros (`tnnotes.sty`) |
 
 See [`AGENTS.md`](AGENTS.md) for the exact specification of a gap certificate and instructions on adding new models,
 and [`CONTRIBUTING.md`](CONTRIBUTING.md) for submitting a record to the leaderboard.
 
 ## Reproduce
 
-Requirements: Julia 1.12, `elan` (Lean 4), a LaTeX installation with REVTeX 4.2 and `latexmk`, and
-`leanblueprint` for the blueprint.
+Requirements: Julia 1.12, `elan` (Lean 4), and `leanblueprint` (with a LaTeX installation) for the
+blueprint.
 
 ```sh
 # Julia core and its tests
@@ -147,9 +146,6 @@ julia --project=tools/leaderboard tools/leaderboard/check_records.jl \
 # Blueprint of the Lean formalization
 leanblueprint pdf && leanblueprint web
 lake exe checkdecls blueprint/lean_decls
-
-# LaTeX notes
-latexmk -pdf -outdir=work/latex-build notes/thermal-mpo-gap-note.tex
 ```
 
 The root `lake build` compiles `CertifiedGaps`, `SeedKernel`, and `Leaderboard` into `.lake/`

@@ -126,25 +126,15 @@ lengths $$L \ge n_0$$.
 
 See the [open challenges]({{ '/leaderboard.html' | relative_url }}#challenges) for concrete targets and next steps.
 
-## Documentation and notes
+## Documentation and resources
 
-* [Interactive explainer]({{ '/explainer/' | relative_url }}): visual step-by-step guide to the
-  periodic ring proof and its [open-chain extension]({{ '/explainer/open.html' | relative_url }}).
-{% comment %} The note PDFs are temporary: the paper will replace these links. {% endcomment %}
-* Technical notes (PDF): [main proof]({{ '/notes/thermal-mpo-gap-note.pdf' | relative_url }}) ·
-  [scope and reflection positivity]({{ '/notes/thermal-mpo-gap-scope.pdf' | relative_url }}) ·
-  [certificate method]({{ '/notes/thermal-mpo-gap-certificate.pdf' | relative_url }}) ·
-  [2+1D extension]({{ '/notes/thermal-mpo-gap-2plus1d.pdf' | relative_url }})
-
-## Lean 4 formalization
-
-* [Blueprint]({{ '/blueprint/' | relative_url }}) ([PDF]({{ '/blueprint.pdf' | relative_url }})) ·
+* **Interactive explainers:** [periodic ring proof]({{ '/explainer/' | relative_url }}) ·
+  [open-chain extension]({{ '/explainer/open.html' | relative_url }})
+* **Lean 4 formalization:** [blueprint]({{ '/blueprint/' | relative_url }})
+  ([PDF]({{ '/blueprint.pdf' | relative_url }})) ·
   [dependency graph]({{ '/blueprint/dep_graph_document.html' | relative_url }}) ·
   [API documentation]({{ '/docs/' | relative_url }})
-
-## Contribute
-
-* [Leaderboard]({{ '/leaderboard.html' | relative_url }}) ·
+* **Contribute:** [leaderboard]({{ '/leaderboard.html' | relative_url }}) ·
   [contribution guide]({{ '/contribute.html' | relative_url }}) ·
   [GitHub repository]({{ repo_url }})
 

@@ -1,31 +1,36 @@
 \chapter{Reflection-positive rings}
 \label{chap:rings}
 
-To apply the two-purity doubling criterion to a periodic spin chain, we must show that its
-partition functions satisfy the three transfer-operator moment inequalities. For a nearest-neighbor
+To apply the spacetime-bootstrap criterion of Chapters~\ref{chap:criterion} and~\ref{chap:chain} to
+a periodic spin chain, we must show that its partition functions satisfy the three
+transfer-operator moment inequalities of Definition~\ref{def:moment-bounds}. For a nearest-neighbor
 lattice Hamiltonian that is reflection positive across bonds~\cite{Osterwalder1973Axioms,
 Osterwalder1975Axioms, Dyson1978Phase, Frohlich1978Phase, Biskup2009Reflection,
 Jaffe2016Characterization}, spatial reflection plays the role of Euclidean time
 reflection~\cite{Luscher1977Construction} and makes the column-to-column spatial transfer operator
-self-adjoint~\cite{Suzuki1985Transfermatrix, TangTuWang, ScopeNote}. In continuous imaginary time,
-this spectral moment representation arises from a thermal matrix product operator whose spatial
-transfer operator \(X_\beta\) is a compact self-adjoint operator on a worldline path space, a
-construction that requires measure theory on Poisson configuration spaces and the spectral theorem
-on infinite-dimensional Hilbert spaces. Instead, we discretize imaginary time into finite brickwork
-Trotter slices~\cite{Suzuki1985Transfermatrix} so that each approximant is the trace of a power of
-a finite positive semidefinite spatial transfer matrix; the resulting moment inequalities then pass
-to the continuous-time limit by Lemma~\ref{lem:moment-bounds-limit} (see~\cite{ScopeNote},
-Appendix~E).
+self-adjoint~\cite{Suzuki1985Transfermatrix, TangTuWang}. In continuous imaginary time,
+the spectral moment representation~\eqref{eq:moment-form} arises from a thermal matrix product
+operator whose spatial transfer operator \(X_\beta\) is a compact self-adjoint operator on a
+worldline path space, a construction that requires measure theory on Poisson configuration spaces
+and the spectral theorem on infinite-dimensional Hilbert spaces. Instead, we discretize imaginary
+time into finite brickwork Trotter slices~\cite{Suzuki1985Transfermatrix} (Definition~\ref{def:trotter})
+so that each approximant is the trace of a power of a finite positive semidefinite spatial transfer
+matrix (Theorem~\ref{thm:psd-transfer}); the resulting moment inequalities
+(Lemma~\ref{lem:trotter-moment}) then pass to the continuous-time limit via the matrix
+Lie--Trotter product formula (Theorem~\ref{thm:lie-trotter}) and
+Lemma~\ref{lem:moment-bounds-limit} (Theorem~\ref{thm:rp-moment-bounds}).
 
 \section{Ring Hamiltonians and bond reflection positivity}
 
 Operators on an \(L\)-cell spin ring act on the tensor-product Hilbert space \((\C^d)^{\otimes L}\),
 identified with complex wavefunctions on the product configuration space \(d^L\) for a finite local
-basis \(d\). A reflection-positive ring packages a nearest-neighbor bond interaction in
-reflection-positive form~\cite{Dyson1978Phase, Frohlich1978Phase, Jaffe2016Characterization,
-ScopeNote} with a real symmetric on-site term, ensuring that the ring Hamiltonian is Hermitian and
-that its partition function \(\operatorname{Re}\Tr e^{-\beta H_L}\) equals the Boltzmann sum of
-Chapter~\ref{chap:criterion}.
+basis \(d\) (Definition~\ref{def:ring-operators}). A reflection-positive ring
+(Definition~\ref{def:rpring}) packages a nearest-neighbor bond interaction in the real factored
+form~\eqref{eq:rp-bond}~\cite{Dyson1978Phase, Frohlich1978Phase} together with a real
+symmetric on-site term \(o\) and an internal cell reflection \(F\), ensuring that the ring
+Hamiltonian~\eqref{eq:rp-hamiltonian} is Hermitian (Lemma~\ref{lem:rpring-hermitian}) and that its
+partition function \(\operatorname{Re}\Tr e^{-\beta H_L}\) (Definition~\ref{def:ring-spectrum})
+equals the Boltzmann sum of Definition~\ref{def:partition-function} (Lemma~\ref{lem:ring-trace-exp}).
 
 \begin{definition}[Local operators on a periodic chain]
   \label{def:ring-operators}
@@ -50,14 +55,36 @@ Chapter~\ref{chap:criterion}.
   symmetric on-site operator \(o\), and an internal cell reflection \(F\) (a real symmetric
   involution satisfying \(F^2 = 1\) and \(F o F = o\), with \(F = 1\) by default). The
   nearest-neighbor bond interaction is
-  \[
+  \begin{equation}
+    \label{eq:rp-bond}
     h = -\sum_\alpha C_\alpha \otimes F C_\alpha F,
-  \]
+  \end{equation}
   and the ring Hamiltonian on \(L\) cells is
-  \(H_L = \sum_{j} h_{j, j+1} + \sum_j o_j\) with \(j + 1\) taken cyclically modulo \(L\). A model
-  with a multi-site unit cell is represented as a ring of cells in which \(d\) is the local cell
-  basis and intra-cell interactions are absorbed into \(o\).
+  \begin{equation}
+    \label{eq:rp-hamiltonian}
+    H_L = \sum_{j=0}^{L-1} h_{j, j+1} + \sum_{j=0}^{L-1} o_j
+  \end{equation}
+  with \(j + 1\) taken cyclically modulo \(L\). A model with a multi-site unit cell is represented
+  as a ring of cells in which \(d\) is the local cell basis and intra-cell interactions are
+  absorbed into \(o\).
 \end{definition}
+
+\begin{remark}[Sufficient bond factorization versus the Jaffe--Janssens characterization]
+  \label{rem:jaffe-janssens}
+  Definition~\ref{def:rpring} formalizes the sufficient algebraic condition~\eqref{eq:rp-bond} for
+  bond reflection positivity going back to Dyson, Lieb, and Simon~\cite{Dyson1978Phase} and
+  Fr\"ohlich, Israel, Lieb, and Simon~\cite{Frohlich1978Phase}, extended by the internal cell
+  involution \(F\) for multi-site unit cells. Every certified model in
+  Chapters~\ref{chap:heisenberg}--\ref{chap:models} satisfies~\eqref{eq:rp-bond} directly via an
+  explicit finite family of real symmetric or antisymmetric matrices \(C_\alpha\). The complete
+  classification of reflection-positive spin and Majorana Hamiltonians by Jaffe and
+  Janssens~\cite{Jaffe2016Characterization} establishes that, for any antiunitary reflection
+  \(\Theta\), a bond interaction is reflection positive if and only if \(-h = \sum_\alpha C_\alpha
+  \otimes \Theta(C_\alpha)\) after single-site shifts (equivalently, the bond realignment matrix is
+  Hermitian positive semidefinite). The formalization uses
+  only the sufficient decomposition~\eqref{eq:rp-bond} and does not require the converse
+  classification direction of~\cite{Jaffe2016Characterization}.
+\end{remark}
 
 \begin{lemma}[Hermiticity of the ring Hamiltonian]
   \label{lem:rpring-hermitian}
@@ -66,17 +93,18 @@ Chapter~\ref{chap:criterion}.
     CertifiedGaps.siteOp_isHermitian}
   \leanok
   \uses{def:rpring}
-  The bond interaction \(h\), the on-site operator \(o\), and the ring Hamiltonian \(H_L\) are
-  Hermitian.
+  The bond interaction \(h\) in~\eqref{eq:rp-bond}, the on-site operator \(o\), and the ring
+  Hamiltonian \(H_L\) in~\eqref{eq:rp-hamiltonian} are Hermitian.
 \end{lemma}
 \begin{proof}
   \leanok
-  Because the operators \(C_\alpha\) and the reflection \(F\) are real, each summand of the bond
-  interaction satisfies
+  Because the operators \(C_\alpha\) and the reflection \(F\) in Definition~\ref{def:rpring} are
+  real, each summand of~\eqref{eq:rp-bond} satisfies
   \((C_\alpha \otimes F C_\alpha F)^\dagger = C_\alpha^{\mathsf T} \otimes F C_\alpha^{\mathsf T}
   F\),
   and the two minus signs from an antisymmetric factor \(C_\alpha\) cancel. Embedding Hermitian
-  one- and two-site operators into the ring preserves Hermiticity.
+  one- and two-site operators into the ring via Definition~\ref{def:ring-operators} preserves
+  Hermiticity.
 \end{proof}
 
 \begin{definition}[Eigenvalue spectrum and partition function]
@@ -107,14 +135,18 @@ Chapter~\ref{chap:criterion}.
 
 \section{Brickwork Trotter decomposition and the transfer matrix}
 
-To exhibit the spectral moment representation at finite Trotter number \(M\), we decompose each
-imaginary-time slice into a brickwork product of even bonds, on-site terms, and odd bonds.
-Expanding the linearized bond factors turns the \(M\)-slice trace on a ring of \(2N\) cells into a
-sum, over imaginary-time bond configurations, of products of single-cell traces
-\(\mathcal F_{pq}\); this sum contracts to \(\Tr (\mathcal F^{\mathsf T} \mathcal F)^N\).
-Reflection positivity guarantees that \(\mathcal F\) has real entries, so the two-cell spatial
-transfer matrix \(T = \mathcal F^{\mathsf T} \mathcal F = \mathcal F^\dagger \mathcal F\) is
-positive semidefinite.
+To exhibit the spectral moment representation~\eqref{eq:moment-form} at finite Trotter number \(M\),
+we decompose each imaginary-time slice into a brickwork product~\eqref{eq:trotter-slice} of even
+bonds, on-site terms, and odd bonds (Definition~\ref{def:trotter}). Expanding the linearized bond
+factors (Lemma~\ref{lem:bond-expansion}) turns the \(M\)-slice trace on a ring of \(2N\) cells into
+a sum, over imaginary-time bond configurations, of products of single-cell traces
+\(\mathcal F_{pq}\) defined in~\eqref{eq:cell-transfer} (Definition~\ref{def:cell-transfer} and
+Lemmas~\ref{lem:slice-sum}--\ref{lem:odd-word}); this sum contracts to
+\(\Tr (\mathcal F^{\mathsf T} \mathcal F)^N\) in~\eqref{eq:transfer-factorization}
+(Theorem~\ref{thm:transfer-factorization}). Reflection positivity guarantees that \(\mathcal F\) has
+real entries (Lemma~\ref{lem:real-transfer}), so the two-cell spatial transfer matrix
+\(T = \mathcal F^{\mathsf T} \mathcal F = \mathcal F^\dagger \mathcal F\) is positive semidefinite
+(Theorem~\ref{thm:psd-transfer}).
 
 \begin{definition}[Brickwork Trotter slice]
   \label{def:trotter}
@@ -123,10 +155,11 @@ positive semidefinite.
   \leanok
   \uses{def:rpring}
   A first-order brickwork Trotter slice of step size \(\tau\) is the ordered product
-  \[
+  \begin{equation}
+    \label{eq:trotter-slice}
     S_L(\tau) = \prod_{j \text{ even}} (1 - \tau h_{j,j+1}) \cdot \prod_i (1 - \tau o_i) \cdot
       \prod_{j \text{ odd}} (1 - \tau h_{j,j+1}),
-  \]
+  \end{equation}
   and the \(M\)-slice Trotter approximant of \(Z_L(\beta)\) is
   \(Z^{(M)}_L(\beta) = \operatorname{Re}\Tr S_L(\beta/M)^M\).
 \end{definition}
@@ -144,9 +177,9 @@ positive semidefinite.
 \end{lemma}
 \begin{proof}
   \leanok
-  Substituting the bond decomposition of \(-h\) from Definition~\ref{def:rpring} gives the sum over
-  bond indices; the term \(\gamma = \varnothing\) is the identity operator because \(F^2 = 1\), and
-  the remaining terms use \(\sqrt\tau \cdot \sqrt\tau = \tau\).
+  Substituting the bond decomposition~\eqref{eq:rp-bond} of \(-h\) from Definition~\ref{def:rpring}
+  gives the sum over bond indices; the term \(\gamma = \varnothing\) is the identity operator
+  because \(F^2 = 1\), and the remaining terms use \(\sqrt\tau \cdot \sqrt\tau = \tau\).
 \end{proof}
 
 \begin{lemma}[Trace of a matrix power as a sum over closed paths]
@@ -164,7 +197,7 @@ positive semidefinite.
   \leanok
   Induction on the exponent expands a matrix power as a sum over paths, and taking the trace
   restricts the sum to closed paths; the tensor-product and distributivity identities hold
-  entrywise.
+  entrywise from Definition~\ref{def:ring-operators}.
 \end{proof}
 
 \begin{lemma}[Expansion of a Trotter slice into sitewise operators]
@@ -173,17 +206,17 @@ positive semidefinite.
     CertifiedGaps.RPRing.sliceSite_oddSite}
   \leanok
   \uses{lem:bond-expansion, lem:closed-path}
-  On a ring of \(2N\) cells with \(N \ge 1\), one Trotter slice expands as a sum over bond indices
-  of sitewise tensor products. In each summand, even cell \(2k\) carries the local operator
-  \(C^\tau_{b_k} O\, F C^\tau_{c_{k-1}} F\) and odd cell \(2k+1\) carries
+  On a ring of \(2N\) cells with \(N \ge 1\), one Trotter slice~\eqref{eq:trotter-slice} expands as
+  a sum over bond indices of sitewise tensor products. In each summand, even cell \(2k\) carries the
+  local operator \(C^\tau_{b_k} O\, F C^\tau_{c_{k-1}} F\) and odd cell \(2k+1\) carries
   \(F C^\tau_{b_k} F\, O\, C^\tau_{c_k}\), where \(b_k\) indexes the even bond \((2k, 2k+1)\) and
   \(c_k\) indexes the odd bond \((2k+1, 2k+2)\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Expand each bond factor by Lemma~\ref{lem:bond-expansion} and multiply the resulting sitewise
-  tensor products by Lemma~\ref{lem:closed-path}, using the fact that each cell is incident to one
-  even bond and one odd bond.
+  Expand each bond factor in~\eqref{eq:trotter-slice} by Lemma~\ref{lem:bond-expansion} and multiply
+  the resulting sitewise tensor products by Lemma~\ref{lem:closed-path}, using the fact that each
+  cell is incident to one even bond and one odd bond.
 \end{proof}
 
 \begin{definition}[Single-cell transfer matrix]
@@ -193,9 +226,10 @@ positive semidefinite.
   \uses{lem:bond-expansion}
   For imaginary-time bond sequences \(p, q \in (\iota \sqcup \{\varnothing\})^M\) of length \(M\),
   the single-cell transfer matrix has entries
-  \[
+  \begin{equation}
+    \label{eq:cell-transfer}
     \mathcal F_{pq} = \Tr \prod_{t=0}^{M-1} C^\tau_{p_t}\, O\, F C^\tau_{q_t} F,
-  \]
+  \end{equation}
   given by the trace of the time-ordered product of local operators on an even cell across the
   \(M\) Trotter slices.
 \end{definition}
@@ -210,9 +244,9 @@ positive semidefinite.
 \end{lemma}
 \begin{proof}
   \leanok
-  Because \(F\) commutes with \(O\) and satisfies \(F^2 = 1\), conjugating each slice factor on an
-  even cell by the involution \(F\) gives the corresponding factor on an odd cell, and the trace is
-  invariant under conjugation.
+  Because \(F\) commutes with \(O\) and satisfies \(F^2 = 1\) (Definition~\ref{def:rpring}),
+  conjugating each slice factor in~\eqref{eq:cell-transfer} on an even cell by the involution \(F\)
+  gives the corresponding factor on an odd cell, and the trace is invariant under conjugation.
 \end{proof}
 
 \begin{theorem}[Spatial transfer-matrix factorization]
@@ -222,19 +256,21 @@ positive semidefinite.
   \leanok
   \uses{lem:slice-sum, def:cell-transfer, lem:odd-word, lem:closed-path}
   For \(\tau \ge 0\), \(N \ge 1\), and every Trotter number \(M\),
-  \[
+  \begin{equation}
+    \label{eq:transfer-factorization}
     \Tr S_{2N}(\tau)^M = \Tr \bigl(\mathcal F^{\mathsf T} \mathcal F\bigr)^N .
-  \]
+  \end{equation}
 \end{theorem}
 \begin{proof}
   \leanok
-  Expanding the product of \(M\) slices by Lemma~\ref{lem:closed-path} expresses the ring trace as
-  a sum over spacetime bond configurations of the product of single-cell traces. By
-  Lemma~\ref{lem:odd-word}, both even and odd cells contribute entries of \(\mathcal F\) indexed by
-  the imaginary-time sequences on their two incident bonds. Summing over the even-bond sequences
-  contracts each even cell with the adjacent odd cell into \(\mathcal F^{\mathsf T} \mathcal F\),
-  and the remaining cyclic sum over the odd-bond sequences around the ring of \(N\) cell pairs
-  equals \(\Tr (\mathcal F^{\mathsf T}\mathcal F)^N\).
+  Expanding the product of \(M\) slices~\eqref{eq:trotter-slice} by Lemmas~\ref{lem:closed-path}
+  and~\ref{lem:slice-sum} expresses the ring trace as a sum over spacetime bond configurations of
+  the product of single-cell traces. By Lemma~\ref{lem:odd-word}, both even and odd cells contribute
+  entries of \(\mathcal F\) in~\eqref{eq:cell-transfer} indexed by the imaginary-time sequences on
+  their two incident bonds. Summing over the even-bond sequences contracts each even cell with the
+  adjacent odd cell into \(\mathcal F^{\mathsf T} \mathcal F\), and the remaining cyclic sum over
+  the odd-bond sequences around the ring of \(N\) cell pairs equals
+  \(\Tr (\mathcal F^{\mathsf T}\mathcal F)^N\) by Lemma~\ref{lem:closed-path}.
 \end{proof}
 
 \begin{lemma}[Reality of the single-cell transfer matrix]
@@ -243,13 +279,15 @@ positive semidefinite.
     CertifiedGaps.RPRing.conjTranspose_cellTransfer}
   \leanok
   \uses{def:cell-transfer}
-  The matrix \(\mathcal F\) has real entries, so \(\mathcal F^\dagger = \mathcal F^{\mathsf T}\).
+  The matrix \(\mathcal F\) in~\eqref{eq:cell-transfer} has real entries, so
+  \(\mathcal F^\dagger = \mathcal F^{\mathsf T}\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Each entry \(\mathcal F_{pq}\) is the trace of a product of real matrices, since reflection
-  positivity expresses the negated bond interaction as a sum of tensor products
-  \(C_\alpha \otimes F C_\alpha F\) of real matrices and the on-site operator is real.
+  Each entry \(\mathcal F_{pq}\) in~\eqref{eq:cell-transfer} is the trace of a product of real
+  matrices, since Definition~\ref{def:rpring} expresses the negated bond interaction in
+  \eqref{eq:rp-bond} as a sum of tensor products \(C_\alpha \otimes F C_\alpha F\) of real matrices
+  and the on-site operator \(o\) is real.
 \end{proof}
 
 \begin{theorem}[Positive semidefiniteness of the two-cell transfer matrix]
@@ -262,7 +300,9 @@ positive semidefinite.
 \end{theorem}
 \begin{proof}
   \leanok
-  Set \(T = \mathcal F^\dagger \mathcal F = \mathcal F^{\mathsf T} \mathcal F \succeq 0\).
+  Set \(T = \mathcal F^\dagger \mathcal F = \mathcal F^{\mathsf T} \mathcal F \succeq 0\) by
+  Lemma~\ref{lem:real-transfer} and apply~\eqref{eq:transfer-factorization} from
+  Theorem~\ref{thm:transfer-factorization}.
 \end{proof}
 
 \begin{lemma}[Spectral trace of a matrix power]
@@ -283,14 +323,15 @@ positive semidefinite.
   \leanok
   \uses{lem:trace-pow-eig, def:moment-form}
   If \(T \succeq 0\) and \(Z(2N) = \operatorname{Re}\Tr T^N\) for all \(N \ge 1\), then \(Z\)
-  admits a spectral moment representation above length \(2\), with singular values
-  \(\mu_i = \sqrt{\lambda_i(T)}\) (padded by zeros).
+  admits a spectral moment representation~\eqref{eq:moment-form} above length \(2\), with singular
+  values \(\mu_i = \sqrt{\lambda_i(T)}\) (padded by zeros).
 \end{proposition}
 \begin{proof}
   \leanok
   By Lemma~\ref{lem:trace-pow-eig}, \(\operatorname{Re}\Tr T^N = \sum_i \lambda_i^N = \sum_i
   \mu_i^{2N}\)
-  with \(\lambda_i \ge 0\).
+  with \(\lambda_i \ge 0\), which has the form~\eqref{eq:moment-form} of
+  Definition~\ref{def:moment-form}.
 \end{proof}
 
 \begin{lemma}[Spectral moment representation of Trotter approximants]
@@ -299,7 +340,8 @@ positive semidefinite.
   \leanok
   \uses{thm:psd-transfer, prop:moment-psd}
   For every \(M\) and \(\beta > 0\), the Trotter partition function
-  \(L \mapsto Z^{(M)}_L(\beta)\) admits a spectral moment representation above length \(2\).
+  \(L \mapsto Z^{(M)}_L(\beta)\) of Definition~\ref{def:trotter} admits a spectral moment
+  representation~\eqref{eq:moment-form} above length \(2\).
 \end{lemma}
 \begin{proof}
   \leanok
@@ -309,9 +351,10 @@ positive semidefinite.
 
 \section{The Lie--Trotter product formula}
 
-To pass from the \(M\)-slice Trotter approximants \(Z^{(M)}_L(\beta)\) to the exact partition
-function \(Z_L(\beta)\) at each fixed ring length \(L\), we prove the matrix Lie--Trotter product
-formula by telescoping powers in a normed algebra.
+To pass from the \(M\)-slice Trotter approximants \(Z^{(M)}_L(\beta)\) (Definition~\ref{def:trotter})
+to the exact partition function \(Z_L(\beta)\) (Definition~\ref{def:ring-spectrum}) at each fixed
+ring length \(L\), we prove the matrix Lie--Trotter product formula (Theorem~\ref{thm:lie-trotter})
+by telescoping powers in a normed algebra (Lemmas~\ref{lem:telescoping} and~\ref{lem:chernoff}).
 
 \begin{lemma}[Telescoping bound for powers in a normed algebra]
   \label{lem:telescoping}
@@ -352,8 +395,11 @@ formula by telescoping powers in a normed algebra.
   \leanok
   \uses{lem:chernoff}
   For complex matrices \(h_1, \dots, h_k\) and \(c \in \R\),
-  \(\bigl(\prod_i (1 + \tfrac{c}{M} h_i)\bigr)^M \to \exp\bigl(c \sum_i h_i\bigr)\) as
-  \(M \to \infty\).
+  \begin{equation}
+    \label{eq:lie-trotter}
+    \Bigl(\prod_{i=1}^k \bigl(1 + \tfrac{c}{M} h_i\bigr)\Bigr)^M \longrightarrow
+    \exp\Bigl(c \sum_{i=1}^k h_i\Bigr) \qquad (M \to \infty).
+  \end{equation}
 \end{theorem}
 \begin{proof}
   \leanok
@@ -373,43 +419,48 @@ formula by telescoping powers in a normed algebra.
 \end{lemma}
 \begin{proof}
   \leanok
-  The Trotter slice has the form \(\prod (1 + \tfrac{\beta}{M} h)\) over the list of negated
-  even-bond, on-site, and odd-bond operators, whose sum is \(-H_L\). Apply
-  Theorem~\ref{thm:lie-trotter} and the continuity of the real trace
-  \(A \mapsto \operatorname{Re}\Tr A\).
+  The Trotter slice~\eqref{eq:trotter-slice} has the form \(\prod (1 + \tfrac{\beta}{M} h_i)\) over
+  the list of negated even-bond, on-site, and odd-bond operators, whose sum is \(-H_L\) in
+  \eqref{eq:rp-hamiltonian}. Apply~\eqref{eq:lie-trotter} from Theorem~\ref{thm:lie-trotter} and the
+  continuity of the real trace \(A \mapsto \operatorname{Re}\Tr A\).
 \end{proof}
 
 \section{Moment bounds and the gap criterion for rings}
 
-Combining the finite-\(M\) spectral moment representation with the Lie--Trotter limit shows that
-every reflection-positive ring satisfies the transfer-operator moment inequalities, so an admissible
-rational doubling certificate and two finite-size seed bounds immediately imply a uniform spectral
-gap.
+Combining the finite-\(M\) spectral moment representation (Lemma~\ref{lem:trotter-moment}) with the
+Lie--Trotter limit (Lemma~\ref{lem:trotter-limit}) via Lemma~\ref{lem:moment-bounds-limit} shows
+that every reflection-positive ring satisfies the transfer-operator moment inequalities of
+Definition~\ref{def:moment-bounds} (Theorem~\ref{thm:rp-moment-bounds}). An admissible rational
+doubling certificate (Definition~\ref{def:chain-certificate}) and two finite-size seed bounds then
+immediately imply a uniform spectral gap (Theorem~\ref{thm:rp-gap}).
 
 \begin{theorem}[Transfer-operator moment inequalities for reflection-positive rings]
   \label{thm:rp-moment-bounds}
   \lean{CertifiedGaps.RPRing.spatialMomentBounds, CertifiedGaps.RPRing.hasSpatialMomentBounds}
   \leanok
   \uses{lem:trotter-moment, lem:trotter-limit, lem:moment-bounds-limit, lem:ring-trace-exp}
-  For every reflection-positive ring and every \(\beta > 0\), the partition function
-  \(L \mapsto Z_L(\beta)\) satisfies the transfer-operator moment inequalities above length \(2\).
-  Equivalently, the eigenvalue families \(E_L\) satisfy them.
+  For every reflection-positive ring (Definition~\ref{def:rpring}) and every \(\beta > 0\), the
+  partition function \(L \mapsto Z_L(\beta)\) satisfies the transfer-operator moment inequalities
+  (1)--(3) of Definition~\ref{def:moment-bounds} above length \(2\). Equivalently, the eigenvalue
+  families \(E_L\) satisfy them.
 \end{theorem}
 \begin{proof}
   \leanok
-  The Trotter approximants admit a spectral moment representation by Lemma~\ref{lem:trotter-moment}
-  and converge at each fixed length by Lemma~\ref{lem:trotter-limit}, so
-  Lemma~\ref{lem:moment-bounds-limit} gives the moment inequalities for the matrix traces. Rewriting
-  the traces as eigenvalue sums via Lemma~\ref{lem:ring-trace-exp} yields the spectral statement.
+  The Trotter approximants admit a spectral moment representation~\eqref{eq:moment-form} by
+  Lemma~\ref{lem:trotter-moment} and converge at each fixed length by Lemma~\ref{lem:trotter-limit},
+  so Lemma~\ref{lem:moment-bounds-limit} gives the moment inequalities of
+  Definition~\ref{def:moment-bounds} for the matrix traces. Rewriting the traces as eigenvalue sums
+  via Lemma~\ref{lem:ring-trace-exp} yields the spectral statement.
 \end{proof}
 
 \begin{remark}
-  Passing to the continuous-time limit does not require a Trotter error bound that is uniform in
-  \(L\), because the limit \(M \to \infty\) is taken at each fixed ring length inside the three
-  moment inequalities before the scale-doubling recurrence is iterated. The transfer-operator
-  moment inequalities hold unconditionally for every reflection-positive ring, including gapless and
-  symmetry-broken chains; whether the model is gapped is decided entirely by the two finite-size
-  seed inequalities.
+  Passing to the continuous-time limit in Theorem~\ref{thm:rp-moment-bounds} does not require a
+  Trotter error bound that is uniform in \(L\), because the limit \(M \to \infty\) is taken at each
+  fixed ring length inside the three moment inequalities of Definition~\ref{def:moment-bounds}
+  before the scale-doubling recurrence is iterated. The transfer-operator moment inequalities hold
+  unconditionally for every reflection-positive ring, including gapless and symmetry-broken chains;
+  whether the model is gapped is decided entirely by the two finite-size seed inequalities in
+  Theorem~\ref{thm:rp-gap}.
 \end{remark}
 
 \begin{definition}[Spatial and thermal purities of a ring]
@@ -427,23 +478,31 @@ gap.
   \leanok
   \uses{thm:rp-moment-bounds, thm:gap-of-chain-certificate, def:rp-purities, lem:ring-trace-exp}
   Let \(n_0 \ge 2\) be even, \(\beta_0 > 0\), and \(c\) an admissible rational doubling certificate
-  with initial defects \((s_0, t_0)\) and decay rate \(r\). If \(\Ps(n_0, \beta_0) \ge 1 - s_0\)
-  and \(\Pt(2n_0, \beta_0) \ge 1 - t_0\), then every even ring of \(L \ge n_0\) cells has a unique
-  ground state and a spectral gap greater than \(\log r / \beta_0\).
+  (Definition~\ref{def:chain-certificate}) with initial defects \((s_0, t_0)\) and decay base \(r\).
+  If
+  \begin{equation}
+    \label{eq:rp-seed-hyp}
+    \Ps(n_0, \beta_0) \ge 1 - s_0, \qquad \Pt(2n_0, \beta_0) \ge 1 - t_0,
+  \end{equation}
+  then every even ring of \(L \ge n_0\) cells has a unique ground state and a spectral gap greater
+  than \(\log r / \beta_0\).
 \end{theorem}
 \begin{proof}
   \leanok
   Apply Theorem~\ref{thm:gap-of-chain-certificate} with the moment inequalities of
-  Theorem~\ref{thm:rp-moment-bounds}, rewriting the purities by Lemma~\ref{lem:ring-trace-exp}.
+  Theorem~\ref{thm:rp-moment-bounds}, rewriting the purities~\eqref{eq:rp-seed-hyp} by
+  Lemma~\ref{lem:ring-trace-exp}.
 \end{proof}
 
 \section{Sitewise unitary transformations and sublattice rotations}
 
 Antiferromagnetic spin chains are often reflection positive only after a local basis change, such
 as applying the \(\pi\)-rotation \(e^{i\pi S^y}\) on one sublattice of a bipartite
-lattice~\cite{Dyson1978Phase, Biskup2009Reflection, ScopeNote}. Conjugating the ring by a sitewise
-tensor product of local unitaries preserves the full eigenvalue spectrum, so a spectral gap
-established in the reflection-positive frame holds identically in the physical laboratory frame.
+lattice~\cite{Dyson1978Phase, Biskup2009Reflection}. Conjugating the ring Hamiltonian
+\eqref{eq:rp-hamiltonian} by a sitewise tensor product of local unitaries
+(Lemma~\ref{lem:conj-ops} and Theorem~\ref{thm:conj-hamiltonian}) preserves the full eigenvalue
+spectrum (Theorem~\ref{thm:conj-spectrum}), so a spectral gap established in the reflection-positive
+frame holds identically in the physical laboratory frame.
 
 \begin{lemma}[Action of sitewise unitaries on local operators]
   \label{lem:conj-ops}
@@ -457,8 +516,8 @@ established in the reflection-positive frame holds identically in the physical l
 \end{lemma}
 \begin{proof}
   \leanok
-  Sitewise tensor products multiply factor by factor, and \(a_i a_i^\dagger = 1\) cancels on every
-  cell where the operator acts as the identity.
+  Sitewise tensor products in Definition~\ref{def:ring-operators} multiply factor by factor, and
+  \(a_i a_i^\dagger = 1\) cancels on every cell where the operator acts as the identity.
 \end{proof}
 
 \begin{theorem}[Sitewise unitary conjugation of the ring Hamiltonian]
@@ -467,13 +526,17 @@ established in the reflection-positive frame holds identically in the physical l
   \leanok
   \uses{lem:conj-ops, def:rpring}
   For \(L \ne 1\),
-  \(U H_L U^\dagger = -\sum_j \sum_\alpha (a_j C_\alpha a_j^\dagger)_j \otimes
-  (a_{j+1} F C_\alpha F a_{j+1}^\dagger)_{j+1} + \sum_j (a_j o a_j^\dagger)_j\).
+  \begin{equation}
+    \label{eq:conj-hamiltonian}
+    U H_L U^\dagger = -\sum_j \sum_\alpha (a_j C_\alpha a_j^\dagger)_j \otimes
+    (a_{j+1} F C_\alpha F a_{j+1}^\dagger)_{j+1} + \sum_j (a_j o a_j^\dagger)_j.
+  \end{equation}
 \end{theorem}
 \begin{proof}
   \leanok
-  Conjugating each bond and on-site term by Lemma~\ref{lem:conj-ops} gives the formula, since
-  adjacent cells satisfy \(j \ne j+1\) whenever \(L \ge 2\).
+  Conjugating each bond term~\eqref{eq:rp-bond} and on-site term in~\eqref{eq:rp-hamiltonian} by
+  Lemma~\ref{lem:conj-ops} gives~\eqref{eq:conj-hamiltonian}, since adjacent cells satisfy
+  \(j \ne j+1\) whenever \(L \ge 2\).
 \end{proof}
 
 \begin{theorem}[Unitary invariance of the eigenvalue spectrum]
@@ -482,7 +545,8 @@ established in the reflection-positive frame holds identically in the physical l
   \leanok
   \uses{thm:conj-hamiltonian, def:ring-spectrum}
   Unitary conjugation preserves eigenvalues with multiplicity. Hence any Hermitian operator \(H\)
-  satisfying \(H = U H_L U^\dagger\) shares the eigenvalue spectrum \(E_L\) of the ring.
+  satisfying \(H = U H_L U^\dagger\) shares the eigenvalue spectrum \(E_L\) of the ring
+  (Definition~\ref{def:ring-spectrum}).
 \end{theorem}
 \begin{proof}
   \leanok
@@ -490,3 +554,4 @@ established in the reflection-positive frame holds identically in the physical l
   polynomial is invariant under unitary conjugation, and the eigenvalue family of a Hermitian
   matrix is determined by its characteristic polynomial.
 \end{proof}
+
