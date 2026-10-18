@@ -5,33 +5,29 @@ usemathjax: true
 {% assign repo_url = 'https://github.com/' | append: site.repository %}
 {% assign data = site.data.records %}
 
-In 1983, Haldane conjectured that the spin-1 antiferromagnetic Heisenberg chain
-$$H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1}$$ has a uniform spectral gap
-$$\Delta_L = E_1(L) - E_0(L) > 0$$ in the thermodynamic limit [[1](#ref-1), [2](#ref-2)]. In
-October 2026, OpenAI released two preprints proving uniform gap bounds for the periodic spin-1
-ring [[3](#ref-3)] and for open spin-1 chains with endpoint fields [[4](#ref-4)] by combining
-finite-scale numerical certificates with a coupled spatial-and-thermal doubling argument. This
-project reformulates that mechanism as a general **spacetime bootstrap** (*two-purity doubling
-criterion*) using continuous-time tensor networks, reproduces the spin-1 finite certificates in
-exact integer and rational arithmetic, formalizes the analytic proofs in Lean 4 [[7](#ref-7)], and
-applies the method to certify uniform spectral gaps across eight families of one-dimensional
-quantum spin chains and ladders.
+Haldane (1983) conjectured that the spin-1 antiferromagnetic Heisenberg chain has a uniform spectral
+gap $$\Delta_L = E_1(L) - E_0(L) > 0$$ as the chain length $$L \to \infty$$ [[1](#ref-1), [2](#ref-2)].
+In October 2026, OpenAI released two preprints proving uniform gap bounds for periodic [[3](#ref-3)]
+and open [[4](#ref-4)] spin-1 chains by combining finite-size numerical bounds with a scale-doubling
+argument.
 
-For a periodic ring Hamiltonian $$H_L$$ of $$L$$ unit cells with partition function
-$$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$, define the **spatial purity**
-$$P_{\mathrm{s}}(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2$$ and the **thermal purity**
-$$P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$$. When the nearest-neighbor bond interaction is
-reflection positive [[6](#ref-6)], the spatial transfer operator $$X_\beta$$
-($$Z_L(\beta) = \mathrm{Tr}\, X_\beta^L$$) is self-adjoint, so $$P_{\mathrm{s}}$$ and
-$$P_\tau$$ place symmetric constraints on the transfer spectrum in space and the energy spectrum
-in imaginary time. If the seed purity defects $$\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$$
-and $$\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$$ lie in the admissible region (a sufficient
-condition is $$\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$$) at a single even seed
-length $$n_0$$ and inverse temperature $$\beta_0$$, a doubling recurrence simultaneously doubles
-$$n$$ and $$\beta$$ across all dyadic scales, proving that every even ring $$L \ge n_0$$ has a
-unique ground state and an explicit lower bound on $$\Delta_L$$. All but one record (an odd-seed
-dimerized point) pair a computer-checked seed certificate at $$(n_0, \beta_0)$$ with a Lean 4
-theorem covering the step from the seed to all lengths $$L \ge n_0$$ of the stated parity.
+This project formulates that argument as a general criterion—the **spacetime bootstrap**
+(*two-purity doubling criterion*)—formalizes the analytic proof in **Lean 4** [[7](#ref-7)], and
+certifies the finite numerical inputs in exact or interval arithmetic across **eight families** of
+quantum spin chains and ladders:
+
+* **Two purities:** For a periodic ring $$H_L$$ of $$L$$ unit cells with partition function
+  $$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$, define the spatial and thermal purities
+  $$P_{\mathrm{s}}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad P_\tau(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.$$
+* **Doubling criterion (Lean 4):** When the nearest-neighbor interaction is reflection positive
+  [[6](#ref-6)], both purities contract quadratically toward $$1$$ as $$(n, \beta) \mapsto (2n, 2\beta)$$.
+  Upper bounds $$\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$$ and
+  $$\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$$ at one even seed scale $$(n_0, \beta_0)$$ in the
+  admissible region (for example, $$\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$$)
+  imply a unique ground state and an explicit lower bound on $$\Delta_L$$ for every even $$L \ge n_0$$.
+* **Certified seeds (Julia / Lean kernel):** All but one record (an odd-seed dimerized point) pair a
+  computer-checked seed certificate at $$(n_0, \beta_0)$$ with a Lean 4 theorem covering the step
+  from the seed to all lengths $$L \ge n_0$$ of the stated parity.
 
 ## Headline results
 
