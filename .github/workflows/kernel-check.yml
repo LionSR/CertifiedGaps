@@ -44,12 +44,15 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       # Installs elan and the toolchain and fetches the Mathlib cache; the build is the next step.
+      # No GitHub cache: each run would save another 2 GB .lake cache keyed by commit, and those
+      # pushed docgen's API-docs cache out of the repository's 10 GB limit.
       - name: Set up Lean
         uses: leanprover/lean-action@24581d74d674803a25a81b10b059c5c0cdd344c6 # v1.6.2
         with:
           auto-config: false
           build: false
           use-mathlib-cache: true
+          use-github-cache: false
 
       # Only the Leaderboard library and what it imports, so that the build directory holds
       # exactly the modules to re-check (not the SeedKernel spin-1 benchmarks).
