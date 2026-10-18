@@ -77,9 +77,7 @@ theorem partitionFunction_zero (L : ℕ) (β : ℝ) :
     (model 0).partitionFunction L β = SpinOneHeisenberg.partitionFunction L β := by
   have h0 : ∀ j : Fin L, siteOp j ((((0 : ℝ) : ℂ)) •
       (SpinOneHeisenberg.spinOne 2 * SpinOneHeisenberg.spinOne 2)) = 0 := fun j ↦ by
-    ext σ τ
-    rw [siteOp, piTensor_apply]
-    exact Finset.prod_eq_zero (Finset.mem_univ j) (by simp)
+    simpa using siteOp_zero j
   rw [RPRing.partitionFunction, SpinOneHeisenberg.partitionFunction, hamiltonian_eq,
     Finset.sum_congr rfl fun j _ ↦ h0 j, Finset.sum_const_zero, add_zero]
 

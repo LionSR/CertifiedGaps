@@ -620,7 +620,74 @@ theorem gapGT_of_thermalPurity (L : ℕ) {β : ℝ} (hβ : 0 < β) {z c : ℝ} (
 
 end Steps
 
-/-! ### Lemma 3 and Proposition 1 -/
+/-! ### Lemma 3 and Proposition 1
+
+The doubling step and the criterion are proved for an arbitrary coefficient `C` bounding
+`f(1 - (1 - u)³) = G(u) u²` (Proposition 4.3 of OpenAI's *The periodic spin-one Haldane gap*),
+and specialized to `C = 5`, `u ≤ 1/100` (Lemma 3 and Proposition 1 of the note). -/
+
+/-- The doubling coefficient `G(u) = ½ ((1 - u)⁻¹ + (1 - u)⁻² + (1 - u)⁻³)²`, with
+`f(1 - (1 - u)³) = G(u) u²` (`squaringDefect_couplingDefect_self`). -/
+noncomputable def doublingCoefficient (u : ℝ) : ℝ :=
+  ((1 - u)⁻¹ + (1 - u)⁻¹ ^ 2 + (1 - u)⁻¹ ^ 3) ^ 2 / 2
+
+/-- `G(u) > 0` for `u < 1`. -/
+theorem doublingCoefficient_pos {u : ℝ} (hu : u < 1) : 0 < doublingCoefficient u := by
+  have : 0 < (1 - u)⁻¹ := inv_pos.2 (by linarith)
+  unfold doublingCoefficient; positivity
+
+/-- `f(z(u, u)) = G(u) u²`. -/
+theorem squaringDefect_couplingDefect_self {u : ℝ} (hu : u < 1) :
+    squaringDefect (couplingDefect u u) = doublingCoefficient u * u ^ 2 := by
+  have h : 1 - u ≠ 0 := by linarith
+  unfold squaringDefect couplingDefect doublingCoefficient
+  have h3 : 1 - (1 - (1 - u) * (1 - u) ^ 2) = (1 - u) ^ 3 := by ring
+  rw [h3]
+  field_simp
+  ring
+
+/-- `G` is increasing below `1`. -/
+theorem doublingCoefficient_mono {u v : ℝ} (huv : u ≤ v) (hv : v < 1) :
+    doublingCoefficient u ≤ doublingCoefficient v := by
+  have ha : (1 - u)⁻¹ ≤ (1 - v)⁻¹ := inv_anti₀ (by linarith) (by linarith)
+  have ha0 : 0 ≤ (1 - u)⁻¹ := inv_nonneg.2 (by linarith)
+  unfold doublingCoefficient
+  gcongr
+
+/-- **The doubling step with coefficient `C`.** If `P_s(n, β), P_τ(2n, β) ≥ 1 - u` with `u < 1`,
+`G(u) ≤ C` and `C u ≤ 1`, then `P_s(2n, 2β), P_τ(4n, 2β) ≥ 1 - C u²`. -/
+theorem doubling_of_coefficient (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ}
+    (hZ : HasSpatialMomentBounds E n₀) {n : ℕ} (hn : n₀ ≤ n) (hne : Even n) {β : ℝ}
+    (hβ : 0 < β) {u C : ℝ} (hu0 : 0 ≤ u) (hu1 : u < 1) (hG : doublingCoefficient u ≤ C)
+    (hCu : C * u ≤ 1) (hs : 1 - u ≤ spatialPurity E n β)
+    (ht : 1 - u ≤ thermalPurity E (2 * n) β) :
+    1 - C * u ^ 2 ≤ spatialPurity E (2 * n) (2 * β) ∧
+      1 - C * u ^ 2 ≤ thermalPurity E (4 * n) (2 * β) := by
+  -- `doubling_step` with `s = t = u` and `s' = t' = C u²`, where `z(u, u) = 1 - (1 - u)³`.
+  have hCu2 : C * u ^ 2 ≤ u := by nlinarith
+  have hCu20 : 0 ≤ C * u ^ 2 := by
+    have : 0 ≤ doublingCoefficient u := by unfold doublingCoefficient; positivity
+    nlinarith [sq_nonneg u]
+  have hz : couplingDefect u u = 1 - (1 - u) ^ 3 := by unfold couplingDefect; ring
+  have hz1 : couplingDefect u u < 1 := by
+    rw [hz]; linarith [pow_pos (by linarith : (0 : ℝ) < 1 - u) 3]
+  have hf : squaringDefect (couplingDefect u u) ≤ C * u ^ 2 := by
+    rw [squaringDefect_couplingDefect_self hu1]
+    exact mul_le_mul_of_nonneg_right hG (sq_nonneg u)
+  have hsq : 0 ≤ (1 - u) ^ 2 := sq_nonneg _
+  have hz2 : couplingDefect u (C * u ^ 2) ≤ couplingDefect u u := by
+    unfold couplingDefect; nlinarith [mul_le_mul_of_nonneg_right hCu2 hsq]
+  have hz20 : 0 ≤ couplingDefect u (C * u ^ 2) := by
+    have hsq1 : (1 - u) ^ 2 ≤ 1 := pow_le_one₀ (by linarith) (by linarith)
+    unfold couplingDefect; nlinarith [mul_nonneg hCu20 hsq]
+  exact doubling_step E hZ hn hne hβ hu1.le hu1.le (by linarith) hz1 hf (hz2.trans_lt hz1)
+    ((squaringDefect_mono hz20 hz2 hz1).trans hf) hs ht
+
+/-- `G(1/100) ≤ 5`, the coefficient of the note's eq. (12). -/
+theorem doublingCoefficient_le_five {ε : ℝ} (hε₁ : ε ≤ 1 / 100) :
+    doublingCoefficient ε ≤ 5 :=
+  (doublingCoefficient_mono hε₁ (by norm_num)).trans (by
+    unfold doublingCoefficient; norm_num)
 
 /-- **Lemma 3 (Doubling)** of the thermal-MPO note. Assume the moment form (5), let `n` be even
 and `0 ≤ ε ≤ 1/100`. If `P_s(n, β), P_τ(2n, β) ≥ 1 - ε`, then
@@ -630,22 +697,115 @@ theorem doubling (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hZ : HasSpatialM
     (hε₁ : ε ≤ 1 / 100) (hs : 1 - ε ≤ spatialPurity E n β)
     (ht : 1 - ε ≤ thermalPurity E (2 * n) β) :
     1 - 5 * ε ^ 2 ≤ spatialPurity E (2 * n) (2 * β) ∧
-      1 - 5 * ε ^ 2 ≤ thermalPurity E (4 * n) (2 * β) := by
-  -- `doubling_step` with `s = t = ε` and `s' = t' = 5ε²`, where `z(ε, ε) = 1 - (1 - ε)³`.
-  have h5 : 5 * ε ^ 2 ≤ ε := by nlinarith
-  have hz : couplingDefect ε ε = 1 - (1 - ε) ^ 3 := by unfold couplingDefect; ring
-  have hz1 : couplingDefect ε ε < 1 := by
-    rw [hz]; linarith [pow_pos (by linarith : (0 : ℝ) < 1 - ε) 3]
-  have hf : squaringDefect (couplingDefect ε ε) ≤ 5 * ε ^ 2 := hz ▸ squaringDefect_le hε₀ hε₁
-  -- `0 ≤ z(ε, 5ε²) ≤ z(ε, ε)`, since `0 ≤ 5ε² ≤ ε`.
-  have hsq : 0 ≤ (1 - ε) ^ 2 := sq_nonneg _
-  have hsq1 : (1 - ε) ^ 2 ≤ 1 := pow_le_one₀ (by linarith) (by linarith)
-  have hz2 : couplingDefect ε (5 * ε ^ 2) ≤ couplingDefect ε ε := by
-    unfold couplingDefect; nlinarith [mul_le_mul_of_nonneg_right h5 hsq]
-  have hz20 : 0 ≤ couplingDefect ε (5 * ε ^ 2) := by
-    unfold couplingDefect; nlinarith [mul_nonneg (sq_nonneg ε) hsq]
-  exact doubling_step E hZ hn hne hβ (by linarith) (by linarith) (by nlinarith) hz1 hf
-    (hz2.trans_lt hz1) ((squaringDefect_mono hz20 hz2 hz1).trans hf) hs ht
+      1 - 5 * ε ^ 2 ≤ thermalPurity E (4 * n) (2 * β) :=
+  doubling_of_coefficient E hZ hn hne hβ hε₀ (by linarith) (doublingCoefficient_le_five hε₁)
+    (by linarith) hs ht
+
+/-- Every even length `L ≥ n₀ > 0` lies in a dyadic window `n₀ 2^j ≤ L ≤ 2 n₀ 2^j`. -/
+theorem exists_dyadic_window {n₀ L : ℕ} (hn₀ : 0 < n₀) (hL : n₀ ≤ L) :
+    ∃ j, n₀ * 2 ^ j ≤ L ∧ L ≤ 2 * (n₀ * 2 ^ j) := by
+  have hq : L / n₀ ≠ 0 := (Nat.div_pos hL hn₀).ne'
+  refine ⟨Nat.log 2 (L / n₀), ?_, ?_⟩
+  · calc n₀ * 2 ^ Nat.log 2 (L / n₀) ≤ n₀ * (L / n₀) :=
+          Nat.mul_le_mul_left _ (Nat.pow_log_le_self 2 hq)
+      _ ≤ L := Nat.mul_div_le L n₀
+  · have h1 := Nat.lt_pow_succ_log_self one_lt_two (L / n₀)
+    have h2 : L < n₀ * (L / n₀ + 1) := by
+      rw [mul_comm]; exact Nat.lt_mul_of_div_lt (Nat.lt_succ_self _) hn₀
+    calc L ≤ n₀ * (L / n₀ + 1) := h2.le
+      _ ≤ n₀ * 2 ^ (Nat.log 2 (L / n₀)).succ := Nat.mul_le_mul_left _ h1
+      _ = 2 * (n₀ * 2 ^ Nat.log 2 (L / n₀)) := by rw [pow_succ]; ring
+
+/-- The defects `u_j = (C u₀)^{2^j} / C` of the doubling induction with coefficient `C`, so that
+`u₀` is the seed defect and `u_{j+1} = C u_j²`. -/
+noncomputable def coefficientDefect (C u₀ : ℝ) (j : ℕ) : ℝ := (C * u₀) ^ 2 ^ j / C
+
+/-- `u_{j+1} = C u_j²`. -/
+theorem coefficientDefect_succ {C : ℝ} (hC : C ≠ 0) (u₀ : ℝ) (j : ℕ) :
+    coefficientDefect C u₀ (j + 1) = C * coefficientDefect C u₀ j ^ 2 := by
+  simp only [coefficientDefect, pow_succ 2 j, pow_mul]
+  field_simp
+
+/-- `0 < u_j ≤ u₀` when `0 < C u₀ ≤ 1`. -/
+theorem coefficientDefect_mem {C u₀ : ℝ} (hC : 0 < C) (hu₀ : 0 < u₀) (hr : C * u₀ ≤ 1)
+    (j : ℕ) : 0 < coefficientDefect C u₀ j ∧ coefficientDefect C u₀ j ≤ u₀ := by
+  refine ⟨by unfold coefficientDefect; positivity, ?_⟩
+  unfold coefficientDefect
+  rw [div_le_iff₀ hC, mul_comm u₀ C]
+  exact pow_le_of_le_one (by positivity) hr (pow_pos two_pos j).ne'
+
+/-- The induction on scale with coefficient `C`: with `n_j = n₀ 2^j`, `β_j = β₀ 2^j`,
+`P_s(n_j, β_j), P_τ(2n_j, β_j) ≥ 1 - u_j`. -/
+theorem purities_ge_coefficientDefect (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀ : Even n₀)
+    {β₀ : ℝ} (hβ₀ : 0 < β₀) (hZ : HasSpatialMomentBounds E n₀) {u₀ C : ℝ} (hu₀ : 0 < u₀)
+    (hu₁ : u₀ < 1) (hG : doublingCoefficient u₀ ≤ C) (hr : C * u₀ ≤ 1)
+    (hs : 1 - u₀ ≤ spatialPurity E n₀ β₀) (ht : 1 - u₀ ≤ thermalPurity E (2 * n₀) β₀)
+    (j : ℕ) :
+    1 - coefficientDefect C u₀ j ≤ spatialPurity E (n₀ * 2 ^ j) (β₀ * 2 ^ j) ∧
+      1 - coefficientDefect C u₀ j ≤ thermalPurity E (2 * (n₀ * 2 ^ j)) (β₀ * 2 ^ j) := by
+  have hC : 0 < C := lt_of_lt_of_le (doublingCoefficient_pos (by linarith)) hG
+  induction j with
+  | zero =>
+    simp only [coefficientDefect, pow_zero, pow_one, mul_one]
+    rw [mul_div_cancel_left₀ _ hC.ne']
+    exact ⟨hs, ht⟩
+  | succ j ih =>
+    obtain ⟨hu0, hu⟩ := coefficientDefect_mem hC hu₀ hr j
+    have h := doubling_of_coefficient E hZ (n := n₀ * 2 ^ j)
+      (Nat.le_mul_of_pos_right _ (by positivity)) (hn₀.mul_right _) (by positivity) hu0.le
+      (hu.trans_lt hu₁) ((doublingCoefficient_mono hu hu₁).trans hG)
+      ((mul_le_mul_of_nonneg_left hu hC.le).trans hr) ih.1 ih.2
+    rw [coefficientDefect_succ hC.ne']
+    have e1 : n₀ * 2 ^ (j + 1) = 2 * (n₀ * 2 ^ j) := by ring
+    have e2 : 2 * (n₀ * 2 ^ (j + 1)) = 4 * (n₀ * 2 ^ j) := by ring
+    have e3 : β₀ * 2 ^ (j + 1) = 2 * (β₀ * 2 ^ j) := by ring
+    rw [e1, e3]; rw [e1] at e2; rw [e2]
+    exact h
+
+/-- **The two-purity criterion with coefficient `C`** (Proposition 4.3 of OpenAI's *The
+periodic spin-one Haldane gap*). Assume the moment inequalities above an even `n₀ > 0`, and let
+`0 < u₀ < 1/6`, `G(u₀) ≤ C`, `r = C u₀ < 1` and `C (1 - 3u₀) > 3`. If
+`P_s(n₀, β₀), P_τ(2n₀, β₀) ≥ 1 - u₀`, then every even `L ≥ n₀` has a nondegenerate ground level
+and gap `Δ_L > log (1/r) / β₀`. -/
+theorem gapGT_of_coefficient (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀ : 0 < n₀) (hn₀e : Even n₀)
+    {β₀ : ℝ} (hβ₀ : 0 < β₀) (hZ : HasSpatialMomentBounds E n₀) {u₀ C : ℝ} (hu₀ : 0 < u₀)
+    (hu₁ : u₀ < 1 / 6) (hG : doublingCoefficient u₀ ≤ C) (hr : C * u₀ < 1)
+    (hC3 : 3 < C * (1 - 3 * u₀)) (hs : 1 - u₀ ≤ spatialPurity E n₀ β₀)
+    (ht : 1 - u₀ ≤ thermalPurity E (2 * n₀) β₀) {L : ℕ} (hL : n₀ ≤ L) (hLe : Even L) :
+    GapGT (E L) (log (1 / (C * u₀)) / β₀) := by
+  have hC : 0 < C := lt_of_lt_of_le (doublingCoefficient_pos (by linarith)) hG
+  -- The dyadic window `n_j ≤ L ≤ 2 n_j` and the purities `≥ 1 - u_j` at scale `j`.
+  obtain ⟨j, hjL, hLj⟩ := exists_dyadic_window hn₀ hL
+  obtain ⟨hsj, htj⟩ := purities_ge_coefficientDefect E hn₀e hβ₀ hZ hu₀ (by linarith) hG hr.le
+    hs ht j
+  set u := coefficientDefect C u₀ j
+  obtain ⟨hu0, hu⟩ := coefficientDefect_mem hC hu₀ hr.le j
+  -- Interpolation: `P_τ(L, β_j) ≥ 1 - z(u_j, u_j)` with `0 ≤ z(u, u) ≤ 3u`.
+  have hP := thermalPurity_ge_of_window E hZ (n := n₀ * 2 ^ j)
+    (Nat.le_mul_of_pos_right _ (by positivity)) (hn₀e.mul_right _) (by positivity)
+    (by positivity : (0 : ℝ) < β₀ * 2 ^ j) (by linarith) hsj htj hjL hLj hLe
+  have hz3 : couplingDefect u u ≤ 3 * u := by
+    unfold couplingDefect; nlinarith [sq_nonneg u, mul_nonneg hu0.le (sq_nonneg u)]
+  have hz0 : 0 ≤ couplingDefect u u := by
+    unfold couplingDefect
+    nlinarith [pow_le_one₀ (n := 2) (by linarith : (0 : ℝ) ≤ 1 - u) (by linarith),
+      sq_nonneg (1 - u)]
+  refine gapGT_of_thermalPurity E L (by positivity) (by linarith) hP ?_
+  -- From purity to a gap: `e^{β_j c} = (C u₀)^{-2^j} = 1/(C u_j)`, and `3/C < 1 - 3u_j`.
+  have hexp : exp (β₀ * 2 ^ j * (log (1 / (C * u₀)) / β₀)) * (C * u) = 1 := by
+    rw [show β₀ * 2 ^ j * (log (1 / (C * u₀)) / β₀) = (2 ^ j : ℕ) * log (1 / (C * u₀)) by
+        field_simp; push_cast; ring, exp_nat_mul, exp_log (by positivity)]
+    simp only [u, coefficientDefect]
+    rw [mul_div_cancel₀ _ hC.ne', ← mul_pow]
+    rw [one_div_mul_cancel (by positivity), one_pow]
+  have hE := exp_pos (β₀ * 2 ^ j * (log (1 / (C * u₀)) / β₀))
+  set e := exp (β₀ * 2 ^ j * (log (1 / (C * u₀)) / β₀))
+  have h1 : e * couplingDefect u u ≤ 3 / C := by
+    rw [le_div_iff₀ hC]
+    nlinarith [mul_le_mul_of_nonneg_left hz3 hE.le]
+  have h2 : 3 / C < 1 - 3 * u := by
+    rw [div_lt_iff₀ hC]; nlinarith
+  linarith
 
 /-- The defect sequence `ε_j = (5 ε₀)^{2^j} / 5` of the doubling induction. For `ε₀ = 1/100`
 it is `ε_j = 20^{-2^j} / 5`, eq. (13) of the thermal-MPO note. -/
@@ -673,6 +833,10 @@ theorem defect_le {ε₀ : ℝ} (hε₀ : 0 ≤ ε₀) (hε₁ : ε₀ ≤ 1 / 1
   have := five_mul_pow_le hε₀ (by linarith) j
   unfold defect; linarith
 
+/-- The defects with coefficient `5` are the `ε_j`. -/
+theorem coefficientDefect_five (ε₀ : ℝ) (j : ℕ) : coefficientDefect 5 ε₀ j = defect ε₀ j := by
+  simp only [coefficientDefect, defect]; ring
+
 /-- The induction on scale in the proof of Proposition 1: with `n_j = n₀ 2^j`, `β_j = β₀ 2^j`,
 `P_s(n_j, β_j), P_τ(2n_j, β_j) ≥ 1 - ε_j`. -/
 theorem purities_ge_defect (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀ : Even n₀) {β₀ : ℝ}
@@ -681,33 +845,9 @@ theorem purities_ge_defect (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀ 
     (ht : 1 - ε₀ ≤ thermalPurity E (2 * n₀) β₀) (j : ℕ) :
     1 - defect ε₀ j ≤ spatialPurity E (n₀ * 2 ^ j) (β₀ * 2 ^ j) ∧
       1 - defect ε₀ j ≤ thermalPurity E (2 * (n₀ * 2 ^ j)) (β₀ * 2 ^ j) := by
-  induction j with
-  | zero => simp only [defect_zero, pow_zero, mul_one]; exact ⟨hs, ht⟩
-  | succ j ih =>
-    have h := doubling E hZ (n := n₀ * 2 ^ j) (Nat.le_mul_of_pos_right _ (by positivity))
-      (hn₀.mul_right _) (by positivity) (defect_pos hε₀ j).le (defect_le hε₀.le hε₁ j)
-      ih.1 ih.2
-    rw [defect_succ]
-    have e1 : n₀ * 2 ^ (j + 1) = 2 * (n₀ * 2 ^ j) := by ring
-    have e2 : 2 * (n₀ * 2 ^ (j + 1)) = 4 * (n₀ * 2 ^ j) := by ring
-    have e3 : β₀ * 2 ^ (j + 1) = 2 * (β₀ * 2 ^ j) := by ring
-    rw [e1, e3]; rw [e1] at e2; rw [e2]
-    exact h
-
-/-- Every even length `L ≥ n₀ > 0` lies in a dyadic window `n₀ 2^j ≤ L ≤ 2 n₀ 2^j`. -/
-theorem exists_dyadic_window {n₀ L : ℕ} (hn₀ : 0 < n₀) (hL : n₀ ≤ L) :
-    ∃ j, n₀ * 2 ^ j ≤ L ∧ L ≤ 2 * (n₀ * 2 ^ j) := by
-  have hq : L / n₀ ≠ 0 := (Nat.div_pos hL hn₀).ne'
-  refine ⟨Nat.log 2 (L / n₀), ?_, ?_⟩
-  · calc n₀ * 2 ^ Nat.log 2 (L / n₀) ≤ n₀ * (L / n₀) :=
-          Nat.mul_le_mul_left _ (Nat.pow_log_le_self 2 hq)
-      _ ≤ L := Nat.mul_div_le L n₀
-  · have h1 := Nat.lt_pow_succ_log_self one_lt_two (L / n₀)
-    have h2 : L < n₀ * (L / n₀ + 1) := by
-      rw [mul_comm]; exact Nat.lt_mul_of_div_lt (Nat.lt_succ_self _) hn₀
-    calc L ≤ n₀ * (L / n₀ + 1) := h2.le
-      _ ≤ n₀ * 2 ^ (Nat.log 2 (L / n₀)).succ := Nat.mul_le_mul_left _ h1
-      _ = 2 * (n₀ * 2 ^ Nat.log 2 (L / n₀)) := by rw [pow_succ]; ring
+  rw [← coefficientDefect_five]
+  exact purities_ge_coefficientDefect E hn₀ hβ₀ hZ hε₀ (by linarith)
+    (doublingCoefficient_le_five hε₁) (by linarith) hs ht j
 
 /-- **Proposition 1 (Two-purity criterion)** of the thermal-MPO note, in the general form used
 for all later refinements. Assume the moment inequalities `HasSpatialMomentBounds E n₀`. Let
@@ -717,33 +857,10 @@ theorem gapGT_of_seeds (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀ : 0 
     {β₀ : ℝ} (hβ₀ : 0 < β₀) (hZ : HasSpatialMomentBounds E n₀) {ε₀ : ℝ} (hε₀ : 0 < ε₀)
     (hε₁ : ε₀ ≤ 1 / 100) (hs : 1 - ε₀ ≤ spatialPurity E n₀ β₀)
     (ht : 1 - ε₀ ≤ thermalPurity E (2 * n₀) β₀) {L : ℕ} (hL : n₀ ≤ L) (hLe : Even L) :
-    GapGT (E L) (log (1 / (5 * ε₀)) / β₀) := by
-  -- The dyadic window `n_j ≤ L ≤ 2 n_j` and the purities `≥ 1 - ε_j` at scale `j`.
-  obtain ⟨j, hjL, hLj⟩ := exists_dyadic_window hn₀ hL
-  obtain ⟨hsj, htj⟩ := purities_ge_defect E hn₀e hβ₀ hZ hε₀ hε₁ hs ht j
-  set ε := defect ε₀ j
-  have hεpos : 0 < ε := defect_pos hε₀ j
-  have hε1 : ε ≤ 1 / 100 := defect_le hε₀.le hε₁ j
-  -- Interpolation, eqs. (14) and (15): `P_τ(L, β_j) ≥ 1 - z(ε_j, ε_j)`, `z(ε, ε) ≤ 3ε`.
-  have hP := thermalPurity_ge_of_window E hZ (n := n₀ * 2 ^ j)
-    (Nat.le_mul_of_pos_right _ (by positivity)) (hn₀e.mul_right _) (by positivity)
-    (by positivity : (0 : ℝ) < β₀ * 2 ^ j) (by linarith) hsj htj hjL hLj hLe
-  have hz3 : couplingDefect ε ε ≤ 3 * ε := by
-    unfold couplingDefect; nlinarith [sq_nonneg ε, mul_nonneg hεpos.le (sq_nonneg ε)]
-  have hz0 : 0 ≤ couplingDefect ε ε := by
-    unfold couplingDefect
-    nlinarith [pow_le_one₀ (n := 2) (by linarith : (0 : ℝ) ≤ 1 - ε) (by linarith),
-      sq_nonneg (1 - ε)]
-  refine gapGT_of_thermalPurity E L (by positivity) (by linarith) hP ?_
-  -- From purity to a gap, eqs. (4) and (16): `e^{β_j c} = (5ε₀)^{-2^j} = 1/(5ε_j)`.
-  have hexp : exp (β₀ * 2 ^ j * (log (1 / (5 * ε₀)) / β₀)) * (5 * ε) = 1 := by
-    rw [show β₀ * 2 ^ j * (log (1 / (5 * ε₀)) / β₀) = (2 ^ j : ℕ) * log (1 / (5 * ε₀)) by
-        field_simp; push_cast; ring, exp_nat_mul, exp_log (by positivity),
-      show 5 * ε = (5 * ε₀) ^ 2 ^ j by simp only [ε, defect]; ring, ← mul_pow]
-    field_simp
-    simp
-  have hE := exp_pos (β₀ * 2 ^ j * (log (1 / (5 * ε₀)) / β₀))
-  nlinarith [mul_le_mul_of_nonneg_left hz3 hE.le, mul_le_mul_of_nonneg_left hz3 hεpos.le]
+    GapGT (E L) (log (1 / (5 * ε₀)) / β₀) :=
+  gapGT_of_coefficient E hn₀ hn₀e hβ₀ hZ hε₀ (by linarith)
+    (doublingCoefficient_le_five hε₁) (by linarith) (by linarith) hs ht hL hLe
+
 
 /-- **Proposition 1 (Two-purity criterion)** of the thermal-MPO note, as stated there. Assume the
 moment form (5). Let `n₀` be even and `β₀ > 0`, with `P_s(n₀, β₀), P_τ(2n₀, β₀) ≥ 0.99`. Then the

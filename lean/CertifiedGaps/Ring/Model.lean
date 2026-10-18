@@ -146,6 +146,11 @@ theorem siteOp_isHermitian {L : ℕ} (j : Fin L) {A : Matrix d d ℂ} (hA : A.Is
   · exact conjTranspose_one
 
 omit [Fintype d] in
+/-- The zero operator at one site is zero. -/
+theorem siteOp_zero {L : ℕ} (j : Fin L) : siteOp j (0 : Matrix d d ℂ) = 0 :=
+  piTensor_eq_zero (i₀ := j) (by simp)
+
+omit [Fintype d] in
 /-- `bondOp` is additive in the two-site operator. -/
 theorem bondOp_sum {L : ℕ} (j k : Fin L) {X : Type*} (s : Finset X)
     (B : X → Matrix (d × d) (d × d) ℂ) :
@@ -205,6 +210,13 @@ theorem trace_exp_smul_eq_sum_of_isHermitian {n : Type*} [Fintype n] [DecidableE
     trace_diagonal]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
   rw [Pi.coe_exp, ← Complex.exp_eq_exp_ℂ, Complex.ofReal_exp]
+
+/-- Equal Hermitian matrices have equal eigenvalue families (the Hermiticity proofs are
+irrelevant). -/
+theorem IsHermitian.eigenvalues_eq_of_eq {n : Type*} [Fintype n] [DecidableEq n]
+    {A B : Matrix n n ℂ} (hA : A.IsHermitian) (hB : B.IsHermitian) (h : A = B) :
+    hA.eigenvalues = hB.eigenvalues := by
+  subst h; rfl
 
 /-! ### Reflection-positive rings -/
 

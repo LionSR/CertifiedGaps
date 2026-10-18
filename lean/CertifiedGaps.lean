@@ -15,6 +15,14 @@ import CertifiedGaps.Ring.Conjugation
 import CertifiedGaps.Heisenberg.Hamiltonian
 import CertifiedGaps.Heisenberg.Gap
 import CertifiedGaps.Heisenberg.Main
+-- Open chains with boundary fields (Appendices A–C of the note)
+import CertifiedGaps.Open.MomentBounds
+import CertifiedGaps.Open.Criterion
+import CertifiedGaps.Open.Model
+import CertifiedGaps.Open.Transfer
+import CertifiedGaps.Open.Bounds
+import CertifiedGaps.Open.Gap
+import CertifiedGaps.Heisenberg.OpenChain
 -- Local building blocks of the models
 import CertifiedGaps.Local.Pauli
 import CertifiedGaps.Local.SpinHalf
