@@ -14,6 +14,7 @@ Later, the local symmetry blocks (Z₂ parity × leg exchange × reflection × h
 the local eigenvalue enclosure and the local log Z code were replaced by the shared core
 pipeline: the ladder is a `RingModel` of rungs in the Hadamard-rotated frame (RP with
 $C = X \otimes 1, 1 \otimes X$; conserved $\mathbb{Z}_2$ charge), certified by
-`GapCertificates.certify_gap`. The core splits by charge, momentum and leg-exchange parity
-(rung reflection is not available), so the 8-rung blocks have about half the old dimension but
-are mostly complex; the seed is unchanged and the tighter core enclosure lowers both defects.
+`GapCertificates.certify_point`. The core splits by charge, momentum and leg-exchange parity
+(not by reflection parity), so the 8-rung blocks have about half the old dimension, and the
+declared lattice reflection makes every block real. The seed is unchanged and the tighter core
+enclosure lowers both defects.
