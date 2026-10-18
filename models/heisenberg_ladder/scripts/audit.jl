@@ -8,7 +8,7 @@
 #     OPENBLAS_NUM_THREADS=1 julia --project=julia \
 #         models/heisenberg_ladder/scripts/audit.jl
 include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
-using .HeisenbergLadder: Q, q, BASE, HASHED, certificate_path, ladder_model, check_frame
+using .HeisenbergLadder: Q, q, BASE, certificate_path, ladder_model, check_frame
 using CertifiedGaps: certified_gap_bound, to_interval
 using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum
 using CertifiedGaps.Results: write_result, parse_exact_json, model_metadata
@@ -80,7 +80,7 @@ function audit()
     enc(x) = Dict("lo" => string(Q(x[1])), "hi" => string(Q(x[2])))
     write_result(joinpath(@__DIR__, "..", "results", "audit.json"), Dict(
         "metadata" => model_metadata(BASE, Dict("arithmetic" =>
-            "256-bit directed MPFR and exact rational trace moments"); HASHED...,
+            "256-bit directed MPFR and exact rational trace moments");
             certified = true),
         "seed" => Dict("J" => "4//1", "n0" => n, "beta0" => string(beta),
             "eps_s" => string(eps_s), "eps_t" => string(eps_t)),

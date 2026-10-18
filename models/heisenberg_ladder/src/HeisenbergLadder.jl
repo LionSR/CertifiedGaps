@@ -5,17 +5,18 @@ Gap certificates for the periodic spin-1/2 two-leg Heisenberg ladder (leg coupli
 coupling `J`, one rung per cell), built on the shared core pipeline of `CertifiedGaps`:
 
 - `model.jl`: the ladder as an exact core `RingModel` in the leg-rotated frame (reflection
-  positive with the cell reflection σʸ ⊗ σʸ, conserved Sᶻ, charge flip and leg exchange), its
-  RP certificate and the exact identities relating it to the physical ladder.
+  positive with the cell reflection σʸ ⊗ σʸ, conserved Sᶻ, charge flip, leg exchange and the
+  lattice reflection), its RP certificate and the exact identities relating it to the physical
+  ladder.
 - `suite.jl`: per coupling, core verified spectra and seed defects on the (n₀, β₀) grid, a core
-  `certify_gap` certificate at the best seed, and the model-specific rejection witnesses,
-  all-β exclusions, coupling continuation, `produce` and `check`.
+  certificate (`certify_point`) at the best seed, core all-β exclusions (`Exclusions`), and the
+  model-specific grid classification, coupling continuation, `produce` and `check`.
 """
 module HeisenbergLadder
 
 using CertifiedGaps, LinearAlgebra, JSON3, IntervalArithmetic
 using CertifiedGaps.Results, CertifiedGaps.RingModels, CertifiedGaps.VerifiedSpectra
-using CertifiedGaps.GapCertificates
+using CertifiedGaps.GapCertificates, CertifiedGaps.Exclusions
 using CertifiedGaps.ExactArithmetic: round_up, round_down
 using CertifiedGaps.Spins: exact_spin_half
 
