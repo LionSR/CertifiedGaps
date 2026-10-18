@@ -95,15 +95,17 @@ LEAN_NUM_THREADS=1 lake env leanchecker Leaderboard CertifiedGaps SeedKernel.Isi
 `lake build` builds every default target, `Leaderboard` included. Run it first, because the
 audit reads the compiled `.olean` files.
 
-The audit lists every theorem of a `Leaderboard.Records.*` module whose statement is a record.
-For each record it does three things.
+The audit inspects every theorem in a `Leaderboard.Records.*` module whose type is one of the
+four `Record` structures:
 
-* It collects the axioms of the proof, and fails if any is outside the three above.
-* It reduces `L₀`, `r`, `β`, `n₀`, `s`, `t` to exact literals in the kernel.
-* It reads the model parameters from the spectrum term.
+* It collects all axioms used by the theorem and fails if any lies outside
+  `propext`, `Classical.choice`, and `Quot.sound`.
+* It reduces `L₀`, `r`, `β`, `n₀`, `s`, `t` to exact rational or natural-number literals in the
+  Lean kernel.
+* It extracts the model constant, frame, and parameter arguments from the `spectrum` term.
 
-If anything fails, the audit writes no file and exits 1. Otherwise it writes a JSON array,
-sorted by name, with one object per record:
+If any check fails, the audit writes no output file and exits with status 1. Otherwise it writes
+a sorted JSON array with one object per record:
 
 ```json
 {"name": "Leaderboard.Records.TwoLegIsing.g_3",
@@ -116,27 +118,26 @@ sorted by name, with one object per record:
  "axioms": ["Classical.choice", "Quot.sound", "propext"]}
 ```
 
-* `kind` is `unconditional` or `conditional` (any of the seeded forms). For an unconditional
-  record, `n0`, `s`, `t` are `null`.
-* `interval` is `[a, b]` for a `SeededOn` record, and `seed2` is `{n0, beta, s, t}` of the
+* `kind` is `unconditional` or `conditional` (for any seeded form). For an unconditional record,
+  `n0`, `s`, and `t` are `null`.
+* `interval` is `[a, b]` for a `SeededOn` record, and `seed2` is `{n0, beta, s, t}` for the
   second seed of a `TwoSeeded` record; otherwise both are `null`.
-* In `spectrum`, `model` is the constant that takes the parameters, and `params` are its
+* In `spectrum`, `model` is the constant taking the coupling parameters, and `params` lists its
   explicit arguments as exact rationals. `frame` is `spectrum` for `R.spectrum` of a
-  reflection-positive ring `R`; otherwise it is the last part of the name, such as
-  `physicalSpectrum`. For the family `fun x ↦ …` of a `SeededOn` record, the parameter is
-  listed as `"x"`. `printed` is the full term with full names.
+  reflection-positive ring `R`, or the trailing component of the declaration name (such as
+  `physicalSpectrum`). For the family `fun x ↦ …` of a `SeededOn` record, the bound variable is
+  recorded as `"x"`. `printed` is the fully qualified pretty-printed term.
 
-`leanchecker` comes with the Lean toolchain; it is the upstreamed `lean4checker`. It replays
-every declaration of the listed modules through the kernel. This catches a file that switched
-the kernel off with `set_option debug.skipKernelTC true`. The listed prefixes cover the
-Leaderboard library and the repository modules it imports. With one thread, leanchecker checks
-one module at a time, so its memory peak is that of the largest module, about 9 GB for
-`SeedKernel.Ising.Seed`. Parallel checks need much more memory. CI runs this check in
-`.github/workflows/kernel-check.yml`, apart from the deploy. It runs when `leaderboard/` or
-`lean/` changes, and weekly.
+`leanchecker` (the upstreamed `lean4checker` bundled with the Lean toolchain) replays every
+declaration of the listed modules through the Lean kernel in a fresh process, catching any module
+that disabled kernel type-checking via `set_option debug.skipKernelTC true`. Running single-threaded
+(`LEAN_NUM_THREADS=1`) checks one module at a time, bounding peak memory by the largest module
+(roughly 9 GB for `SeedKernel.Ising.Seed`). CI runs this job in
+`.github/workflows/kernel-check.yml` whenever `leaderboard/` or `lean/` changes, and weekly.
 
-## What a reviewer must still check
+## Maintainer review
 
-The audit cannot check that a record is about the right Hamiltonian. A reviewer must check that
-the model and frame are the claimed Hamiltonian. That includes the unit cell and what `L`
-counts.
+Automated checks verify proof validity and parameter matching, but cannot verify physical modeling
+intent. A human reviewer must check that the Lean `spectrum` definition (including its unit-cell
+convention, local basis or rotated frame, and what `L` counts) represents the claimed physical
+Hamiltonian.

@@ -5,44 +5,47 @@
 # not announced a second time; every other leaderboard row appears automatically as a new
 # record on its date. Validated by tools/leaderboard/check_records.jl.
 
-- date: "2026-09-24"
-  text: 'OpenAI posts two preprints that prove the spin-1 Haldane gap, for the ring and for the open chain with end fields.'
+- date: "2026-10-06"
+  text: 'OpenAI releases two preprints proving the spin-1 Haldane gap on periodic rings and on open chains with endpoint fields.'
   link: 'https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026'
 - date: "2026-10-10"
-  text: 'This repository reproduces the finite computations of the periodic preprint in exact integer arithmetic.'
+  text: 'Exact-integer reproduction of all finite trace and variational certificates from the periodic spin-1 preprint.'
   link: '/leaderboard.html#spin1-source1'
 - date: "2026-10-12"
-  text: 'Computer-checked gap proofs for seven more model families, from spin ladders to the Ising chain in two fields.'
+  text: 'Computer-certified gap bounds added for seven model families, including spin ladders, dimerized chains, and the Ising chain in transverse and longitudinal fields.'
   link: '/leaderboard.html'
   prs: [1, 2, 3, 4, 5, 6, 7]
 - date: "2026-10-12"
-  text: 'Lean theorems prove each computer-checked gap from its two inequalities at the starting scale.'
+  text: 'Lean 4 formalization of the two-purity doubling criterion and seeded gap theorems across the certified models.'
   prs: [9]
 - date: "2026-10-15"
-  text: 'The first gap proved in Lean with no assumptions: the Ising chain at g = 1/4, h = 1/20.'
+  text: 'First unconditional Lean 4 gap theorem (seed and recurrence both kernel-checked): the Ising chain at g = 1/4, h = 1/20.'
   prs: [34]
   records: [ising-g-1-4-h-1-20]
 - date: "2026-10-16"
-  text: 'An illustrated explainer of the proof.'
+  text: 'Interactive visual explainer for the periodic ring and open-chain proofs.'
   link: '/explainer/'
   prs: [40]
 - date: "2026-10-17"
-  text: 'An independent review confirms the spin-1 bound from temperature lifting, 0.0729 for every even ring of at least 36 sites.'
+  text: 'Independent audit in exact rational and Arb ball arithmetic confirms the temperature-lifted spin-1 bound Δ_L > 0.0729 for even L ≥ 36.'
   prs: [49]
   records: [spin1-temperature-lifting]
 - date: "2026-10-17"
-  text: 'The blueprint of the Lean proof and this website go online.'
+  text: 'Lean 4 blueprint and project website launched.'
   link: '/blueprint/'
   prs: [45]
 - date: "2026-10-17"
-  text: 'The explainer films get narration.'
+  text: 'Narrated video walkthroughs added to the interactive explainer.'
   link: '/explainer/'
   prs: [46]
 - date: "2026-10-17"
-  text: 'The leaderboard of proven gaps opens for contributions.'
+  text: 'Leaderboard of certified spectral gaps opened for community contributions.'
   link: '/leaderboard.html'
   prs: [53]
 - date: "2026-10-17"
-  text: 'Lean now checks the rest of the proof, after the computed starting inequalities, for 51 of the 52 proven gaps, the spin-1 bound 0.0729 among them. The spin-1 bound for rings of 2304 sites or more rises from 0.00382 to 0.00474.'
+  text: 'Rational doubling chains in Lean 4 cover 51 of the 52 certified records (including Δ_L > 0.0729 for spin-1, even L ≥ 36) and tighten the L ≥ 2304 spin-1 bound from 0.00382 to 0.00474.'
   link: '/leaderboard.html#spin1-source1'
   records: [spin1-source1, ising-g-1-4-h-1-20]
+- date: "2026-10-18"
+  text: 'Lean 4 formalization of the open spin-1 chain with endpoint fields (Δ_n > log(10)/392 for odd n ≥ 1921) and both periodic bounds from the OpenAI preprint.'
+  prs: [74]

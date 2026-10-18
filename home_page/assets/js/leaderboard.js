@@ -63,32 +63,29 @@
     const closest = ranked.filter(r => r.share != null).sort((a, b) => b.share - a.share).slice(0, 5);
     const newest = [...ranked].sort((a, b) => b.date.localeCompare(a.date) || b.value - a.value).slice(0, 5);
     const lean = ranked.filter(r => r.leanEff && r.leanEff !== 'lean-unavailable');
-    const byFam = {};
-    lean.forEach(r => { byFam[r.family] = (byFam[r.family] || 0) + 1; });
-    const top = Object.entries(byFam).sort((a, b) => b[1] - a[1])[0];
     const count = k => lean.filter(r => r.leanEff === k).length;
     box.append(
       h('section', {class: 'panel'}, h('h3', {}, 'Closest to the numerical gap'),
         h('ol', {}, closest.map(r => h('li', {}, rowLink(r), ': ', h('strong', {}, pct(r.share)))))),
-      h('section', {class: 'panel'}, h('h3', {}, 'Newest results'),
+      h('section', {class: 'panel'}, h('h3', {}, 'Latest records'),
         h('ol', {}, newest.map(r => h('li', {}, rowLink(r), ' ', h('span', {class: 'muted'}, r.date, ' ', prLink(r.pr)))))),
-      h('section', {class: 'panel'}, h('h3', {}, 'Proved in Lean'),
-        h('p', {}, badge('lean-unconditional', true), ' ', count('lean-unconditional'), ' with no assumptions'),
-        h('p', {}, badge('lean-conditional', true), ' ', count('lean-conditional'), ' from computer-checked inequalities'),
-        top ? h('p', {class: 'muted'}, 'Most: ', family[top[0]].name, ' (', top[1], ')') : null));
+      h('section', {class: 'panel'}, h('h3', {}, 'Formalized in Lean 4'),
+        h('p', {}, badge('lean-unconditional', true), ' ', count('lean-unconditional'), ' unconditional (seed + recurrence in Lean kernel)'),
+        h('p', {}, badge('lean-conditional', true), ' ', count('lean-conditional'), ' conditional on computer-certified seed inequalities'),
+        h('p', {class: 'muted'}, `${lean.length} of ${ranked.length} certified records include a Lean 4 theorem.`)));
     typeset(box);
   }
 
   // ---------------------------------------------------------------- the leaderboard table
   const state = {tiers: new Set(), fams: new Set(), lean: false, q: '', sort: 'share', dir: -1, open: new Set()};
   const COLS = [
-    ['model', 'Model and parameters', 'The Hamiltonian family and its coupling constants', r => r.fam.name + ' ' + plain(r.parameter)],
-    ['value', 'Proven gap (lower bound)', 'For every ring length covered, the gap is at least this number (rounded down)', r => r.value],
-    ['share', 'Share of the numerical gap that is proven', 'The proven bound divided by the best numerical estimate of the gap', r => r.share],
-    ['tier', 'How it is proved', 'In Lean, or by a computer-checked proof', r => RANKED.indexOf(r.eff)],
-    ['lengths', 'Ring lengths covered', 'The bound holds for every ring length from this one on', r => r.lengths.L0],
-    ['n0', 'Starting ring and temperature (n₀, β₀)', 'The ring length and inverse temperature of the finite computation the proof starts from', r => r.seed.n0],
-    ['date', 'Date', 'When the current bound was set', r => r.date],
+    ['model', 'Model and parameters', 'Hamiltonian family and coupling parameters', r => r.fam.name + ' ' + plain(r.parameter)],
+    ['value', 'Certified gap ≥', 'Rigorous lower bound on Δ_L (rounded down) across all covered ring lengths', r => r.value],
+    ['share', 'Fraction of numerical gap', 'Certified lower bound divided by the numerical benchmark gap', r => r.share],
+    ['tier', 'Verification', 'Verification tier of the displayed bound (and companion Lean 4 theorem where present)', r => RANKED.indexOf(r.eff)],
+    ['lengths', 'Lengths covered', 'Ring lengths L covered by the theorem', r => r.lengths.L0],
+    ['n0', 'Seed (n₀, β₀)', 'Seed ring length n₀ and inverse temperature β₀ of the finite certificate', r => r.seed.n0],
+    ['date', 'Date', 'Date the current bound was established', r => r.date],
   ];
 
   function controls() {
@@ -101,16 +98,16 @@
     box.append(
       h('input', {type: 'search', placeholder: 'Search models and parameters', 'aria-label': 'Search',
         oninput: e => { state.q = e.target.value.toLowerCase(); board(); }}),
-      h('div', {class: 'chips', role: 'group', 'aria-label': 'How it is proved'},
+      h('div', {class: 'chips', role: 'group', 'aria-label': 'Verification tier'},
         RANKED.map(k => chip(tier[k].glyph + ' ' + tier[k].label, tier[k].meaning, () => state.tiers.has(k), toggleIn(state.tiers, k))),
-        chip('Has a Lean theorem', 'Points with a Lean theorem, even if the computer proof gives a larger bound',
+        chip('Has a Lean 4 theorem', 'Records accompanied by a Lean 4 theorem (51 of 52 records)',
           () => state.lean, () => { state.lean = !state.lean; })),
       h('div', {class: 'chips', role: 'group', 'aria-label': 'Model family'},
         fams.map(f => chip(f.name, f.name, () => state.fams.has(f.key), toggleIn(state.fams, f.key)))));
   }
 
   function visible() {
-    return ranked.filter(r => (!state.tiers.size || state.tiers.has(r.eff)) &&
+    return ranked.filter(r => (!state.tiers.size || state.tiers.has(r.eff) || (r.leanEff && state.tiers.has(r.leanEff))) &&
       (!state.fams.size || state.fams.has(r.family)) && (!state.lean || r.lean) &&
       (!state.q || (r.fam.name + ' ' + plain(r.parameter)).toLowerCase().includes(state.q)));
   }
@@ -130,16 +127,16 @@
     const title = 'Improve: ' + r.fam.name + ', ' + plain(r.parameter);
     return h('div', {class: 'detail'},
       h('p', {}, h('strong', {}, 'Bound. '), h('span', {html: exact}), ' for every ', lengthsText(r), ' (', r.fam.cells, ').'),
-      r.lean ? h('p', {}, h('strong', {}, 'Lean theorem. '), badge(r.leanEff), ' ',
+      r.lean ? h('p', {}, h('strong', {}, 'Lean 4 theorem. '), badge(r.leanEff), ' ',
         h('a', {href: D.docs + '?pattern=' + encodeURIComponent(r.lean.name) + '#doc'}, h('code', {}, r.lean.name.replace('Leaderboard.Records.', ''))),
-        ' proves ', h('span', {html: `$\\Delta_L > \\log(${r.lean.r})/(${r.lean.beta})$`}), ' ≈ ', r.lean.decimal, ', for every even ', lengthsText(r).replace('even ', ''), '.') : null,
-      h('p', {}, h('strong', {}, 'Starting scale. '), 'Ring of ', r.seed.n0, ' ', r.fam.cells, ' at inverse temperature ', r.seed.beta0,
+        ' proves ', h('span', {html: `$\\Delta_L > \\log(${r.lean.r})/(${r.lean.beta})$`}), ' ≈ ', r.lean.decimal, ' for every even ', lengthsText(r).replace('even ', ''), '.') : null,
+      h('p', {}, h('strong', {}, 'Seed. '), 'n₀ = ', r.seed.n0, ' ', r.fam.cells, ', β₀ = ', r.seed.beta0,
         r.seed.text ? h('span', {html: '; ' + r.seed.text}) : null, '.'),
-      r.gap ? h('p', {}, h('strong', {}, 'Numerical gap. '), r.numerical_gap, ' (', h('span', {html: r.gap_source || r.fam.gap_source}), ').') : null,
+      r.gap ? h('p', {}, h('strong', {}, 'Numerical benchmark. '), r.numerical_gap, ' (', h('span', {html: r.gap_source || r.fam.gap_source}), ').') : null,
       r.notes ? h('p', {html: linkPRs(r.notes)}) : null,
-      h('p', {}, h('strong', {}, 'Evidence. '), h('a', {href: repoLink(r.certificate)}, 'certificate'), ' · ',
-        h('a', {href: repoLink(r.check || 'models/' + (r.slug || r.fam.slug) + '/check.jl')}, 'checker program'),
-        ' · set on ', r.date, r.pr ? [' in ', prLink(r.pr)] : null, ' by ',
+      h('p', {}, h('strong', {}, 'Certificate. '), h('a', {href: repoLink(r.certificate)}, 'certificate data'), ' · ',
+        h('a', {href: repoLink(r.check || 'models/' + (r.slug || r.fam.slug) + '/check.jl')}, 'check.jl'),
+        ' · established ', r.date, r.pr ? [' in ', prLink(r.pr)] : null, ' by ',
         r.contributors.map((c, i) => [i ? ', ' : '', person(c)])),
       h('p', {}, h('a', {class: 'button', href: issue(title, r.id)}, 'Improve this record')));
   }
@@ -148,7 +145,7 @@
     const rv = [...new Set(rows.map(r => r.params[fam.grid.rows]))], cv = [...new Set(rows.map(r => r.params[fam.grid.cols]))];
     const at = (a, b) => rows.find(r => r.params[fam.grid.rows] === a && r.params[fam.grid.cols] === b);
     return h('div', {class: 'table-wrap'}, h('table', {class: 'grid'},
-      h('caption', {}, 'Proven gap at each ', fam.grid.rows, ' (rows) and ', fam.grid.cols, ' (columns); select a cell for its details.'),
+      h('caption', {}, 'Certified gap lower bound at each ', fam.grid.rows, ' (rows) and ', fam.grid.cols, ' (columns); select a cell for details.'),
       h('thead', {}, h('tr', {}, h('th', {}, fam.grid.rows + ' \\ ' + fam.grid.cols), cv.map(c => h('th', {}, c)))),
       h('tbody', {}, rv.map(a => h('tr', {}, h('th', {}, a), cv.map(b => {
         const r = at(a, b);
@@ -165,19 +162,23 @@
     if (state.fams.size === 1) {
       const f = family[[...state.fams][0]];
       head.append(h('p', {class: 'family-head'}, h('strong', {}, f.name, '. '), h('span', {html: f.hamiltonian}),
-        '. Ring lengths count ', f.cells, '. Numerical gaps: ', h('span', {html: f.gap_source}), '.'));
+        '. Ring lengths count ', f.cells, '. Numerical benchmark: ', h('span', {html: f.gap_source}), '.'));
       if (f.grid) head.append(grid(f, ranked.filter(r => r.family === f.key)));
     }
     const tbody = h('tbody');
     for (const r of rows) {
       const open = state.open.has(r.id);
+      const companionLean = r.leanEff && r.leanEff !== r.eff ? h('span', {
+        class: 'tier tier-' + r.leanEff,
+        title: `${tier[r.leanEff].label}: proves Δ_L > ${r.lean.decimal}`
+      }, tier[r.leanEff].glyph + ' Lean 4') : null;
       tbody.append(h('tr', {id: r.id, class: open ? 'open' : null},
         h('td', {class: 'model'}, h('span', {class: 'muted'}, r.fam.name), h('br'), h('span', {html: r.parameter})),
         h('td', {class: 'num'}, h('strong', {}, r.bound.decimal)),
         h('td', {class: 'share'}, r.share == null ? h('span', {class: 'muted'}, 'no estimate') :
           h('span', {class: 'bar', title: `${r.bound.decimal} of ${r.numerical_gap}`},
             h('span', {class: 'fill', style: `width:${Math.min(100, 100 * r.share).toFixed(1)}%`}), h('span', {class: 'label'}, pct(r.share)))),
-        h('td', {}, badge(r.eff)),
+        h('td', {}, badge(r.eff), companionLean ? [' ', companionLean] : null),
         h('td', {}, lengthsText(r)),
         h('td', {class: 'num'}, `(${r.seed.n0}, ${r.seed.beta0})`),
         h('td', {class: 'num'}, r.date),
@@ -220,28 +221,27 @@
     const perFamily = (pred, make) => D.families.map(f => [f, ranked.filter(r => r.family === f.key && pred(r))])
       .filter(([, rows]) => rows.length).map(([f, rows]) => make(f, rows)).filter(Boolean);
     const some = (n, one, many) => n === 1 ? one : many;
-    group('Results to check or reproduce', D.challenges.map(c => card(c.id, c.title, c.need, c.link)));
-    group('Open targets (estimate only)', targets.map(r => {
-      const e = r.estimate, from = e.n0 ? ' from a ring of ' + e.n0 + (e.beta0 ? ' at β₀ = ' + e.beta0 : '') : '';
-      return card(r.id, 'Prove a gap: ' + r.fam.name + ', ' + plain(r.parameter), (e.text ? e.text + '. ' : '') +
-        (e.float_bound ? 'A floating-point survey suggests a provable gap near ' + e.float_bound + from + '.' : 'No estimate yet.'));
+    group('Verification and reproduction', D.challenges.map(c => card(c.id, c.title, c.need, c.link)));
+    group('Certify open targets', targets.map(r => {
+      const e = r.estimate, from = e.n0 ? ' at seed (n₀, β₀) = (' + e.n0 + (e.beta0 ? ', ' + e.beta0 : '') + ')' : '';
+      return card(r.id, 'Certify gap: ' + r.fam.name + ', ' + plain(r.parameter), (e.text ? e.text + '. ' : '') +
+        (e.float_bound ? 'Floating-point survey estimate: Δ ≥ ' + e.float_bound + from + '.' : (e.text ? '' : 'No seed estimate yet.')));
     }));
-    group('Get closer to the true gap', perFamily(r => r.share != null, (f, rows) => {
+    group('Tighten certified bounds', perFamily(r => r.share != null, (f, rows) => {
       if (rows.length < 2) return null;
       const w = rows.reduce((a, b) => (b.share < a.share ? b : a));
-      return card(w.id + '-raise', 'Get closer to the true gap: ' + f.name + ', ' + plain(w.parameter),
-        `The proof gives ${w.bound.decimal}, ${pct(w.share)} of the numerical gap ${w.numerical_gap}, the smallest share in this family. ` +
-        'A larger starting ring or a sharper computation would raise it.');
+      return card(w.id + '-raise', 'Tighten bound: ' + f.name + ', ' + plain(w.parameter),
+        `Current certified bound: ${w.bound.decimal} (${pct(w.share)} of the numerical gap ${w.numerical_gap}, the lowest fraction in this family). ` +
+        'A larger seed length n₀ or a sharper spectral enclosure would tighten it.');
     }));
-    group('Prove it in Lean', perFamily(r => !r.lean, (f, rows) => card(f.key + '-lean', 'Prove it in Lean: ' + f.name,
-      `No Lean theorem yet for ${some(rows.length, 'the point', 'the ' + rows.length + ' points')} ` +
-      rows.map(r => plain(r.parameter)).join('; ') + '. A Lean statement from the starting-scale inequalities would ' +
-      some(rows.length, 'make it a Lean result.', 'make them Lean results.'))));
-    group('Remove the assumptions', perFamily(r => r.leanEff === 'lean-conditional', (f, rows) =>
-      card(f.key + '-unconditional', 'Remove the assumptions: ' + f.name,
-        `${rows.length} ${some(rows.length, 'Lean theorem here assumes', 'Lean theorems here assume')} the inequalities at the starting scale ` +
-        'that a computer certificate proves. Checking them inside Lean, as done for the Ising point g = 1/4, h = 1/20, ' +
-        'would remove the assumptions.')));
+    group('Formalize in Lean 4', perFamily(r => !r.lean, (f, rows) => card(f.key + '-lean', 'Formalize in Lean 4: ' + f.name,
+      `No Lean 4 theorem yet for ${some(rows.length, 'parameter point ', rows.length + ' parameter points: ')}` +
+      rows.map(r => plain(r.parameter)).join('; ') + '. Formalize a seeded Lean 4 theorem from the certified seed inequalities.')));
+    group('Prove seed inequalities in Lean 4', perFamily(r => r.leanEff === 'lean-conditional', (f, rows) =>
+      card(f.key + '-unconditional', 'Prove seed in Lean 4: ' + f.name,
+        `${rows.length} ${some(rows.length, 'Lean 4 theorem in this family is', 'Lean 4 theorems in this family are')} conditional on computer-certified seed purity inequalities. ` +
+        'Proving the finite seed inequalities inside the Lean kernel (as done for the Ising chain at g = 1/4, h = 1/20) ' +
+        `makes ${some(rows.length, 'it', 'them')} unconditional.`)));
     const box = document.getElementById('challenge-cards');
     for (const g of groups) box.append(h('h3', {}, g.title, ' ', h('span', {class: 'muted'}, '(' + g.cards.length + ')')),
       h('div', {class: 'cards'}, g.cards.map(c => h('article', {class: 'card'},
@@ -265,9 +265,9 @@
     const rows = Object.entries(tally).sort((a, b) => b[1].records - a[1].records || a[0].localeCompare(b[0]));
     document.getElementById('contributor-table').append(
       h('thead', {}, h('tr', {}, h('th', {}, 'Contributor'),
-        h('th', {title: 'Points whose current proven gap they set'}, 'Current records'),
-        h('th', {title: 'Of those, points with a Lean theorem'}, 'With a Lean theorem'),
-        h('th', {title: 'Of those, points where they improved an earlier bound'}, 'Improved an earlier bound'))),
+        h('th', {title: 'Records where this contributor established the current bound'}, 'Current records'),
+        h('th', {title: 'Current records that include a Lean 4 theorem'}, 'With Lean 4 theorem'),
+        h('th', {title: 'Current records that improved a previous bound'}, 'Improved previous bound'))),
       h('tbody', {}, rows.map(([c, t]) => h('tr', {}, h('td', {}, person(c)),
         h('td', {class: 'num'}, t.records), h('td', {class: 'num'}, t.lean), h('td', {class: 'num'}, t.improved)))));
   }
@@ -306,7 +306,7 @@
     const lo = Math.floor(Math.log10(Math.min(...pts.map(p => p.value)))), hi = Math.ceil(Math.log10(Math.max(...pts.map(p => p.value))));
     const X = d => L + (W - L - R) * (t(d) - t0) / (t1 - t0), Y = v => T + (H - T - B) * (hi - Math.log10(v)) / Math.max(1, hi - lo);
     const svg = s('svg', {viewBox: `0 0 ${W} ${H}`, role: 'img', class: 'timeline',
-      'aria-label': `Best proven gap over time for ${g.label}; the table below lists the points.`});
+      'aria-label': `Best certified gap over time for ${g.label}; the table below lists the points.`});
     for (let k = lo; k <= hi; k++) {
       svg.append(s('line', {x1: L, x2: W - R, y1: Y(10 ** k), y2: Y(10 ** k), class: 'grid'}));
       svg.append(s('text', {x: L - 6, y: Y(10 ** k) + 4, 'text-anchor': 'end', class: 'tick'}, k >= 0 ? String(10 ** k) : (10 ** k).toFixed(-k)));
@@ -315,7 +315,7 @@
     dates.forEach(d => svg.append(s('text', {x: X(d), y: H - B + 16, 'text-anchor': 'middle', class: 'tick'}, d.slice(5))));
     svg.append(s('text', {x: (L + W - R) / 2, y: H - 6, 'text-anchor': 'middle', class: 'axis'}, 'Date (2026)'));
     svg.append(s('text', {x: 14, y: (T + H - B) / 2, transform: `rotate(-90 14 ${(T + H - B) / 2})`, 'text-anchor': 'middle', class: 'axis'},
-      'Proven gap (log scale)'));
+      'Certified gap ≥ (log scale)'));
     // The step line follows the best bound so far.
     let best = 0, path = '';
     for (const p of pts) if (p.value > best) {
@@ -331,7 +331,7 @@
     svg.append(s('text', {x: W - R + 6, y: Y(best) + 4, class: 'endlabel'}, String(best)));
     document.getElementById('timeline-chart').replaceChildren(svg);
     document.getElementById('timeline-table').replaceChildren(
-      h('thead', {}, h('tr', {}, h('th', {}, 'Date'), h('th', {}, 'Proven gap'), h('th', {}, 'Ring lengths'), h('th', {}, 'How'))),
+      h('thead', {}, h('tr', {}, h('th', {}, 'Date'), h('th', {}, 'Certified gap ≥'), h('th', {}, 'Lengths covered'), h('th', {}, 'Method'))),
       h('tbody', {}, pts.slice().reverse().map(p => h('tr', {}, h('td', {}, p.date), h('td', {class: 'num'}, p.value),
         h('td', {}, p.lengths), h('td', {}, p.what)))));
   }

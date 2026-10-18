@@ -1,46 +1,66 @@
-# A diagrammatic proof of the Haldane gap
+# Certified Spectral Gaps of Quantum Spin Chains
 
-The spin-1 antiferromagnetic Heisenberg chain $`H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}`$ has a
-spectral gap $\Delta_L = E_1(L) - E_0(L)$ that stays open as the ring grows (Haldane's conjecture;
-numerically $\Delta \approx 0.4105$). This repository proves a uniform lower bound on that gap using
-spacetime tensor networks drawn as diagrams, certifies the finite numerical inputs by computer, and
-applies the same method to a family of one-dimensional quantum spin chains and ladders.
+[![Check certificates](https://github.com/LionSR/CertifiedGaps/actions/workflows/certificates.yml/badge.svg)](https://github.com/LionSR/CertifiedGaps/actions/workflows/certificates.yml)
+[![Kernel re-check](https://github.com/LionSR/CertifiedGaps/actions/workflows/kernel-check.yml/badge.svg)](https://github.com/LionSR/CertifiedGaps/actions/workflows/kernel-check.yml)
+[![Compile blueprint](https://github.com/LionSR/CertifiedGaps/actions/workflows/blueprint.yml/badge.svg)](https://github.com/LionSR/CertifiedGaps/actions/workflows/blueprint.yml)
+[![Website](https://img.shields.io/badge/Website-CertifiedGaps-0f4c81)](https://sirui-lu.com/CertifiedGaps/)
+[![Leaderboard](https://img.shields.io/badge/Leaderboard-52_records-1f7a3f)](https://sirui-lu.com/CertifiedGaps/leaderboard.html)
+[![Blueprint](https://img.shields.io/badge/Blueprint-HTML_%7C_PDF-2b5b84)](https://sirui-lu.com/CertifiedGaps/blueprint/)
+[![Explainer](https://img.shields.io/badge/Explainer-Interactive-b84a1b)](https://sirui-lu.com/CertifiedGaps/explainer/)
+[![Lean 4](https://img.shields.io/badge/Lean_4-v4.35.0--rc3-blue)](https://github.com/leanprover/lean4)
+[![Julia](https://img.shields.io/badge/Julia-1.12-9558B2)](https://julialang.org/)
 
-The method, the **spacetime bootstrap** (or *two-purity doubling criterion*), has two parts:
+In 1983, Haldane conjectured that the spin-1 antiferromagnetic Heisenberg chain
+$`H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1}`$ has a uniform spectral gap
+$\Delta_L = E_1(L) - E_0(L) > 0$ in the thermodynamic limit (numerically $\Delta \approx 0.4105$).
+In October 2026, OpenAI released two preprints proving uniform gap bounds for the
+[periodic spin-1 ring](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026)
+and for
+[open spin-1 chains with endpoint fields](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026)
+by combining finite-scale numerical certificates with a coupled spatial-and-thermal doubling
+argument. This repository reformulates that mechanism as a general **spacetime bootstrap** (*two-purity
+doubling criterion*) using continuous-time tensor networks, reproduces the spin-1 finite certificates
+in exact integer and rational arithmetic, formalizes the analytic proofs in Lean 4, and applies the
+method to certify uniform spectral gaps across eight families of one-dimensional quantum spin chains
+and ladders.
 
-1. **An analytic criterion.** Write the partition function $`Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}`$
-   of a periodic ring as $`\mathrm{Tr}\, X_\beta^L`$, where $X_\beta$ is the spatial transfer operator of an
-   exact continuous-time thermal matrix product operator (MPO). When the bond interaction is reflection
-   positive, $X_\beta$ is self-adjoint, so $Z_L(\beta)$ is a sum of $L$-th powers of real transfer
-   eigenvalues just as it is a sum of exponentials of energy eigenvalues. Consequently, both the
-   **spatial purity** $P_{\mathrm{s}}(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2$ and the **thermal purity**
-   $P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$ improve quadratically when ring length and inverse
-   temperature are doubled together. Rigorous lower bounds on $P_{\mathrm{s}}(n_0, \beta_0)$ and
-   $P_\tau(2n_0, \beta_0)$ at a single finite scale $(n_0, \beta_0)$ (the *seed*) then propagate across all
-   dyadic scales to yield a uniform lower bound on $\Delta_L$ for every even ring length $L \ge n_0$.
-2. **Certified finite inputs.** The seed purities are bounded by computer: for the spin-1 Heisenberg
-   chain using exact integer and rational arithmetic, reproducing the certificates of OpenAI's
-   preprint [*The periodic spin-one Haldane gap*](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026);
-   and for the other models using verified eigenvalue enclosures of complete seed-ring spectra
-   (with one seed proved outright inside the Lean 4 kernel).
+The **spacetime bootstrap** combines two components:
 
-**Website:** the [project home page](https://sirui-lu.com/CertifiedGaps/) gathers the
-notes, the [explainer](https://sirui-lu.com/CertifiedGaps/explainer/), the
-[blueprint](https://sirui-lu.com/CertifiedGaps/blueprint/) ([PDF](https://sirui-lu.com/CertifiedGaps/blueprint.pdf)),
-and the [Lean documentation](https://sirui-lu.com/CertifiedGaps/docs/). Its
-[leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) lists every proven gap,
-how it is proved, and the open challenges. To submit a result, see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+1. **An analytic criterion (formalized in Lean 4).** Write the partition function
+   $`Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}`$ of a periodic ring of $L$ unit cells as
+   $`\mathrm{Tr}\, X_\beta^L`$, where $X_\beta$ is the spatial transfer operator of an exact
+   continuous-time thermal matrix product operator (MPO). When the nearest-neighbor bond interaction
+   is reflection positive, $X_\beta$ is self-adjoint, so $Z_L(\beta)$ is a sum of $L$-th powers of
+   real transfer eigenvalues just as it is a sum of exponentials of energy eigenvalues. Consequently,
+   both the **spatial purity** $P_{\mathrm{s}}(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2$ and the
+   **thermal purity** $P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$ contract quadratically toward $1$
+   when ring length $n$ and inverse temperature $\beta$ are doubled together. Rigorous upper bounds
+   on the seed purity defects $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$ and
+   $\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$ at a single even seed scale $(n_0, \beta_0)$ in
+   the admissible region ($\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$) propagate
+   across all dyadic scales to prove that every even ring length $L \ge n_0$ has a unique ground state
+   and an explicit lower bound on $\Delta_L$.
+2. **Computer-certified finite seeds.** The seed purity inequalities at $(n_0, \beta_0)$ are certified
+   by computer: for the spin-1 Heisenberg chain in exact integer and rational arithmetic (reproducing
+   and sharpening the finite certificates of the OpenAI periodic preprint), and for the remaining
+   models via verified eigenvalue enclosures of complete symmetry-reduced seed-ring spectra (with one
+   seed proved outright inside the Lean 4 kernel).
+
+**Website & resources:** [Home page](https://sirui-lu.com/CertifiedGaps/) ·
+[Leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) ·
+[Interactive explainer](https://sirui-lu.com/CertifiedGaps/explainer/) ([open chains](https://sirui-lu.com/CertifiedGaps/explainer/open.html)) ·
+[Lean 4 blueprint](https://sirui-lu.com/CertifiedGaps/blueprint/) ([PDF](https://sirui-lu.com/CertifiedGaps/blueprint.pdf)) ·
+[Lean API docs](https://sirui-lu.com/CertifiedGaps/docs/) ·
+[Contribution guide](CONTRIBUTING.md)
 
 ## Spin-1 Heisenberg chain
 
 | statement | status | where |
 |---|---|---|
-| $\Delta_L > (\log 20)/784 \approx 0.00382$ for every even $L \ge 2304$ | proved in the main note, given the seed purity bounds at $(n_0, \beta_0) = (2304, 784)$ | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
-| seed purity bounds $P_{\mathrm{s}}(2304, 784) \ge 0.99$ and $P_\tau(4608, 784) \ge 0.99$ | reproduced in exact integer and rational arithmetic | [`models/spin1/`](models/spin1/) |
-| the two-purity criterion and the spin-1 theorem above, given the two seed bounds | formalized in Lean 4 (`SpinOneHeisenberg.spin_one_heisenberg_gap`) | [`lean/`](lean/), [`leaderboard/`](leaderboard/) |
-| $\Delta_L > 0.0729$ for every even $L \ge 36$ | exact-arithmetic computation combining temperature-lifting with a tighter seed chain; independently reviewed in #49 | [`models/spin1/experiments/`](models/spin1/experiments/) |
-| open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ | proved in Appendices A–C, given four finite estimates from the boundary-field paper | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf) |
-| general scope of the method (bond reflection positivity and multi-site unit cells) | proved in Appendices D–H | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf) |
+| $\Delta_L > 0.0729$ for every even $L \ge 36$ | seed certificates at $(60, 833/32)$ and $(36, 49/4)$ certified in exact rational arithmetic and independently audited (#49); two-seed doubling chain formalized in Lean 4 (`Leaderboard.Records.SpinOneHeisenberg.temperature_lifting`) | [`models/spin1/experiments/`](models/spin1/experiments/), [`lean/`](lean/), [`leaderboard/`](leaderboard/) |
+| $\Delta_L > \log(41.196029)/784 \approx 0.00474$ (and the preprint's rounded bound $(\log 20)/784 \approx 0.00382$) for every even $L \ge 2304$; $\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79} \approx 0.000479$ for every even $L \ge 60$ | proved in the main note; seed purity bounds at $(2304, 784)$, $(36, 49/4)$, and $(60, 105/4)$ reproduced in exact integer and rational arithmetic; formalized in Lean 4 (`SpinOneHeisenberg`) | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf), [`models/spin1/`](models/spin1/), [`lean/`](lean/) |
+| open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392 \approx 0.00587$ for every odd $n \ge 1921$ | proved in Appendices A–C and formalized in Lean 4 (`OpenChain.open_spin_one_heisenberg_gap_1921`), conditional on the four finite seed bounds at $\beta_2 = 49$ from the boundary-field preprint | [`notes/thermal-mpo-gap-note.pdf`](notes/thermal-mpo-gap-note.pdf), [`lean/CertifiedGaps/OpenChain.lean`](lean/CertifiedGaps/OpenChain.lean) |
+| general scope of the method (bond reflection positivity and multi-site unit cells) | proved in Appendices D–H and formalized in Lean 4 (`RPRing`) | [`notes/thermal-mpo-gap-scope.pdf`](notes/thermal-mpo-gap-scope.pdf), [`lean/CertifiedGaps/RPRing.lean`](lean/CertifiedGaps/RPRing.lean) |
 | diagrammatic exposition of the spin-1 seed certificate at $(2304, 784)$ | Appendices I–M | [`notes/thermal-mpo-gap-certificate.pdf`](notes/thermal-mpo-gap-certificate.pdf) |
 | smaller seed route for Lean verification: $\Delta_L > 0.039$ for even $L \ge 60$ from twisted traces at even $n \le 12$ using real $\mathrm{SU}(2)$ twists only | exact rational doubling chain, conditional on the finite trace tables and analytic seed lemmas | [`models/lean_seeds/`](models/lean_seeds/) (`seed_design`) |
 | kernel-checked spin-1 seed arithmetic (base-3 packed-integer operations, Ritz/residual witnesses for $H_6$, $H_8$, $H_{10}$, and local PSD counting anchors) | kernel-checked arithmetic witnesses and feasibility studies | [`models/lean_seeds/`](models/lean_seeds/), [`lean/`](lean/) (`SeedKernel`) |
@@ -51,12 +71,12 @@ Each certified bound establishes a unique ground state and a uniform spectral ga
 every even ring length $L \ge n_0$ (where lengths count unit cells). Bounds in the table below are
 rounded down for display; each model's `README.md` gives the exact rational inputs, the reflection-positive
 basis, the exact seed defects $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$, run times, and the verification
-scope. [`lean/`](lean/) and [`leaderboard/`](leaderboard/) formalize each certified model's gap theorem:
-- **Unconditional in Lean (no `sorry`):** the longitudinal-field Ising chain at $g = 1/4, h = 1/20$ has
+scope. [`lean/`](lean/) and [`leaderboard/`](leaderboard/) formalize 51 of the 52 certified records in Lean 4:
+- **Unconditional Lean 4 theorem (no `sorry`):** the longitudinal-field Ising chain at $g = 1/4, h = 1/20$ has
   $\Delta_L > \log(13480)/(97/4) \approx 0.3921$ for every even $L \ge 6$ (`SeedKernel.Ising.ising_gap`,
-  with the 6- and 12-site seed inequalities proved in the Lean kernel).
-- **Seeded in Lean:** all other certified points are proved in Lean from their two computer-checked seed
-  inequalities (`Record.Seeded`).
+  with the 6- and 12-site seed inequalities proved inside the Lean kernel).
+- **Lean 4 theorems from certified seeds:** all other even-seed certified points are proved in Lean 4 from their
+  computer-certified seed inequalities (`Record.Seeded`).
 
 | model | seed $(n_0, \beta_0)$ | certified uniform gap bound | directory |
 |---|---|---|---|
@@ -139,14 +159,19 @@ trusted arithmetic base.
 
 ## Status of the claims
 
-* **Spin-1 Heisenberg chain:** The analytic proof is complete on paper given the seed purity bounds at
-  $(n_0, \beta_0) = (2304, 784)$. Those bounds are reproduced in [`models/spin1/`](models/spin1/) in
-  exact integer and rational arithmetic, and the deduction of the uniform spectral gap from the two seed
-  bounds is formalized in [`lean/`](lean/). The finite seed computations themselves are not
-  formalized in `CertifiedGaps`: there each model's two seed bounds appear as named `sorry` lemmas.
-  Kernel-checked seed arithmetic proves one seed outright: `SeedKernel.Ising.ising_gap`
-  ([`models/lean_seeds/`](models/lean_seeds/)) is an unconditional, fully kernel-checked gap theorem
-  for the longitudinal-field Ising chain at $g = 1/4$, $h = 1/20$.
+* **Spin-1 Heisenberg chain:** For periodic rings, the seed purity bounds at $(60, 833/32)$,
+  $(36, 49/4)$, $(60, 105/4)$, and $(2304, 784)$ are certified in [`models/spin1/`](models/spin1/) in
+  exact integer and rational arithmetic, and the analytic deductions of the uniform spectral gap from
+  those seeds ($\Delta_L > 0.0729$ for even $L \ge 36$, $\Delta_L > \log(41.196029)/784$ and
+  $(\log 20)/784$ for even $L \ge 2304$, and $\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79}$ for even
+  $L \ge 60$) are formalized in [`lean/`](lean/). For open chains with endpoint fields $h = 3/5$, the
+  analytic deduction of $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ from the four finite seed bounds
+  at $\beta_2 = 49$ of the OpenAI boundary-field preprint is formalized in
+  [`lean/CertifiedGaps/OpenChain.lean`](lean/CertifiedGaps/OpenChain.lean). In `CertifiedGaps`, each
+  seeded theorem takes the finite seed inequalities as named `sorry` lemmas; in `SeedKernel`,
+  `SeedKernel.Ising.ising_gap` ([`models/lean_seeds/`](models/lean_seeds/)) proves both the seed
+  inequalities and the doubling recurrence inside the Lean kernel for the longitudinal-field Ising chain
+  at $g = 1/4$, $h = 1/20$.
 * **Other certified models:** The seed enclosures rest on verified block-diagonal eigenvalue enclosures
   whose rounding analysis assumes standard IEEE binary64 arithmetic and conventional BLAS dot-product
   error bounds; each was independently replayed or reviewed (see the model's `README.md` and

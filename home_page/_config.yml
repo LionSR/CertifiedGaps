@@ -9,8 +9,8 @@
 # The leaderboard rows live in _data/records.yml (hand-edited; schema in its header).
 # _data/lean_records.json is generated in CI by `lake exe leaderboard_audit` (not committed).
 
-title: Proven energy gaps of quantum spin chains
-description: Lower bounds on the energy gap that hold for every ring length, checked by computer and in the Lean proof assistant
+title: Certified spectral gaps of quantum spin chains
+description: Uniform lower bounds on the spectral gap of quantum spin chains, certified by computer and formalized in Lean 4
 baseurl: "/CertifiedGaps" # the subpath of the site
 url: "https://sirui-lu.com" # the base hostname and protocol of the site
 twitter_username:

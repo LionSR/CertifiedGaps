@@ -1,6 +1,6 @@
 ---
-title: Leaderboard of proven spectral gaps
-description: Lower bounds on the energy gap of quantum spin chains, valid for every ring length and checked by computer or in Lean
+title: Leaderboard of certified spectral gaps
+description: Rigorous lower bounds on the spectral gap of quantum spin chains across all ring lengths, certified by computer and formalized in Lean 4
 usemathjax: true
 wide: true
 ---
@@ -14,40 +14,39 @@ wide: true
 <script>document.documentElement.classList.add('js');</script>
 
 <p>
-  The <em>gap</em> of a quantum spin chain is the energy difference between its ground state and
-  its first excited state. Each row below is a theorem: for every ring length in the stated range,
-  the gap is at least the proven number, and the ground state is unique. Numerical methods give
-  the gap itself on finite rings, so the share of that value that is proven shows how close the
-  proof comes to the truth.
+  Each record below certifies that for every ring length $L \ge L_0$ (in unit cells), the
+  Hamiltonian $H_L$ has a unique ground state and a spectral gap $\Delta_L = E_1(L) - E_0(L)$ at
+  least the stated lower bound. Every bound is obtained from the spacetime bootstrap: a
+  computer-certified finite seed at $(n_0, \beta_0)$ paired with the analytic two-purity doubling
+  recurrence across all $L \ge L_0$. In CI, every Lean 4 theorem is re-checked in the Lean kernel
+  (<code>leanchecker</code>) and every finite certificate is re-verified by its standalone
+  <code>check.jl</code> program.
 </p>
 <p class="key">
   {% for t in data.tiers %}{% if shown contains t.key %}<span class="tier tier-{{ t.key }}" title="{{ t.meaning }}">{{ t.glyph }} {{ t.label }}</span> {% endif %}{% endfor %}
-  <a href="#tiers">What these mean</a>
+  <a href="#tiers">Verification tiers</a>
 </p>
-<p class="muted">Every number on this page is rechecked automatically on each update and weekly:
-  proofs by Lean, computations by their checker programs.</p>
 
 <nav class="tabs" aria-label="Sections">
   <a href="#highlights">Highlights</a> <a href="#board">Leaderboard</a>
   <a href="#challenges">Open challenges</a> <a href="#contributors">Contributors</a>
-  <a href="#timeline">Progress over time</a> <a href="#tiers">How results are proved</a>
+  <a href="#timeline">Progress over time</a> <a href="#tiers">Verification tiers</a>
 </nav>
 
 <section id="highlights" class="jsonly panels" aria-label="Highlights"></section>
 
 <section id="board">
   <h2>Leaderboard</h2>
-  <p class="jsonly muted">How to read this table: sort by any column, filter by how a result is
-    proved or by model, and open “details” for the exact bound, the Lean theorem, the evidence
-    and a link to improve the record. The starting ring and temperature $(n_0, \beta_0)$ are the
-    ring length and inverse temperature of the one finite computation each proof starts from.</p>
+  <p class="jsonly muted">Select any column header to sort, filter by verification tier or model
+    family, or expand a row for its exact rational bound, Lean 4 theorem, seed $(n_0, \beta_0)$,
+    certificate data, and checker script.</p>
   <div id="board-controls" class="jsonly"></div>
   <p id="board-count" class="jsonly muted"></p>
   <div id="board-family" class="jsonly"></div>
   <div class="table-wrap jsonly"><table id="board-table" class="board"></table></div>
   <noscript>
     <div class="table-wrap"><table class="board">
-      <thead><tr><th>Model</th><th>Parameters</th><th>Proven gap (lower bound)</th><th>How it is proved</th><th>Ring lengths covered</th><th>Date</th></tr></thead>
+      <thead><tr><th>Model</th><th>Parameters</th><th>Certified gap ≥</th><th>Verification</th><th>Lengths covered</th><th>Date</th></tr></thead>
       <tbody>
       {%- for r in data.records %}{% if r.tier == "target" %}{% continue %}{% endif %}
         {%- assign fam = data.families | where: "key", r.family | first -%}
@@ -68,39 +67,41 @@ wide: true
 
 <section id="challenges" class="jsonly">
   <h2>Open challenges (<span id="challenge-count"></span>)</h2>
-  <p>Concrete next records. “Take this on” opens a GitHub issue so others can see who is working
-    on what; <a href="{{ '/contribute.html' | relative_url }}">how to contribute</a> explains what a
-    submission needs.</p>
+  <p>Concrete targets for new or tighter gap bounds and Lean 4 formalizations. Select “Take this on”
+    to open a pre-filled GitHub issue; see the
+    <a href="{{ '/contribute.html' | relative_url }}">contribution guide</a> for submission
+    requirements.</p>
   <div id="challenge-cards"></div>
 </section>
 
 <section id="contributors" class="jsonly">
   <h2>Contributors</h2>
-  <p class="muted">People and groups credited with the current bounds, from the pull requests that
-    set them.</p>
+  <p class="muted">Contributors credited with the current records, from the pull requests or
+    preprints that established them.</p>
   <div class="table-wrap"><table id="contributor-table"></table></div>
 </section>
 
 <section id="timeline" class="jsonly">
   <h2>Progress over time</h2>
-  <p class="muted">Each dot is a proven bound, the line the best one so far. Hover a dot for its
-    ring lengths and method.</p>
+  <p class="muted">Each point marks a certified lower bound; the step curve tracks the best bound
+    to date. Hover over a point for its covered lengths, verification tier, and method.</p>
   <div id="timeline-pick"></div>
   <figure id="timeline-chart"></figure>
   <details><summary>Data table</summary><div class="table-wrap"><table id="timeline-table"></table></div></details>
 </section>
 
 <section id="tiers">
-  <h2>How results are proved</h2>
+  <h2>Verification tiers</h2>
   <dl class="tiers">
     {%- for t in data.tiers %}{% if shown contains t.key %}
     <dt><span class="tier tier-{{ t.key }}">{{ t.glyph }} {{ t.label }}</span></dt>
     <dd>{{ t.meaning }}</dd>
     {%- endif %}{% endfor %}
   </dl>
-  <p>A badge describes the bound printed next to it. When a point has both a Lean theorem and a
-    computer-checked proof, the row shows the larger bound with its own badge, and “details”
-    shows the Lean theorem with its badge.</p>
+  <p>Each badge indicates the verification tier of the displayed bound. When a parameter point has
+    both a computer-certified bound (48 doubling steps) and a Lean 4 theorem from the same seed
+    (14 rational doubling steps, smaller by ${\sim}10^{-5}$), the table row displays the larger
+    computer-certified bound and “details” links to the companion Lean 4 theorem.</p>
 </section>
 
 <script type="application/json" id="lb-data">

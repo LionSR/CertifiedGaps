@@ -5,73 +5,103 @@ Proving that a quantum spin chain is gapped in the thermodynamic limit requires 
 the energy difference between the first excited state and the ground state that is uniform in the
 system size. The \emph{spacetime bootstrap}, also called the \emph{two-purity doubling criterion},
 reduces this infinite-volume problem on periodic rings to two finite-size inequalities, as proved
-in the main note~\cite{HaldaneNote} and the scope note~\cite{ScopeNote}. The Lean~4 libraries
-\texttt{CertifiedGaps} and \texttt{SeedKernel} in \texttt{lean/} formalize this criterion and its
-applications to concrete spin chains; each statement below links to the Lean declaration that
-proves it.
+in the main note~\cite{HaldaneNote} and the scope note~\cite{ScopeNote}. This blueprint presents the
+mathematical structure of the formalization of this criterion and its applications to concrete
+quantum spin chains; each definition, lemma, and theorem links directly to the corresponding formal
+declaration in Lean~4.
 
-\section*{The criterion}
+\section{The spacetime-bootstrap criterion}
 
 For a periodic ring Hamiltonian \(H_L = \sum_{j=1}^{L} h_{j,j+1} + \sum_{j=1}^{L} o_j\) of \(L\)
-unit cells, write \(Z_L(\beta) = \Tr e^{-\beta H_L}\) and define the \emph{spatial purity} and
-\emph{thermal purity}
-\[
+unit cells, write \(Z_L(\beta) = \Tr e^{-\beta H_L}\) for the partition function
+(Definition~\ref{def:partition-function}) and define the \emph{spatial purity} and \emph{thermal
+purity} (Definition~\ref{def:purities}) by
+\begin{equation}
+  \label{eq:intro-purities}
   \Ps(n,\beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
   \Pt(n,\beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
-\]
-A thermal purity \(\Pt(L, \beta) > 1/2\) means that the ground state carries most of the
-Boltzmann weight. It forces a unique ground state and bounds the spectral gap,
-\(\Delta_L = E_1(L) - E_0(L) \ge \beta^{-1} \log\bigl(\Pt(L, \beta) / (1 - \Pt(L, \beta))\bigr)\)
-(Lemma~\ref{lem:purity-to-gap}). The bound is uniform in \(L\) when the defect
-\(1 - \Pt(L, \beta)\) is bounded uniformly in \(L\), and it stays bounded away from zero as
-\(\beta\) grows only if the defect falls like \(e^{-c\beta}\). Squaring the Gibbs operator in
-imaginary time improves \(\Pt\) at fixed \(L\), but advancing \(L\) and \(\beta\) together requires
-a spatial transfer operator. If the bond
-interaction is reflection positive, \(-h = \sum_\alpha C_\alpha \otimes \overline{C_\alpha}\) in a
-local basis with a real symmetric on-site term \(o\), then \(Z_L(\beta)\) is a moment sum
-\(\sum_i \mu_i^L\) of a positive transfer operator at even lengths \(L\), and both purities improve
-quadratically when length and inverse temperature are doubled together. Two purity bounds at a
-single \emph{seed} scale \((n_0, \beta_0)\) then yield a uniform lower bound on \(\Delta_L\) for
-every even \(L \ge n_0\).
+\end{equation}
+A thermal purity \(\Pt(L, \beta) > 1/2\) means that the ground state carries more than half of the
+Boltzmann weight. It forces a unique ground state and bounds the spectral gap from below by
+\begin{equation}
+  \label{eq:intro-purity-gap}
+  \Delta_L = E_1(L) - E_0(L) \ge \frac{1}{\beta} \log\frac{\Pt(L, \beta)}{1 - \Pt(L, \beta)}
+\end{equation}
+(Lemma~\ref{lem:purity-to-gap}). The bound~\eqref{eq:intro-purity-gap} is uniform in \(L\) when the
+thermal defect \(1 - \Pt(L, \beta)\) is bounded away from \(1/2\) uniformly in \(L\), and it remains
+bounded away from zero as \(\beta\) grows only if the defect decays exponentially in \(\beta\).
+Squaring the Gibbs operator in imaginary time improves \(\Pt\) at fixed \(L\)
+(Lemma~\ref{lem:purity-squaring}), whereas advancing \(L\) and \(\beta\) together via the spacetime
+coupling identities (Lemma~\ref{lem:coupling}) requires a spatial transfer operator. If the
+nearest-neighbor bond interaction is reflection positive (Definition~\ref{def:rpring}), meaning
+\(-h = \sum_\alpha C_\alpha \otimes \overline{C_\alpha}\) in some local basis with a real symmetric
+on-site term \(o\), then \(Z_L(\beta)\) admits a spectral moment representation
+\(\sum_i \mu_i^L\) of a positive semidefinite transfer operator at even lengths \(L\)
+(Definition~\ref{def:moment-form} and Theorem~\ref{thm:rp-moment-bounds}), and both purities
+improve quadratically when length and inverse temperature are doubled together
+(Lemma~\ref{lem:doubling}). Two purity bounds at a single \emph{seed} scale \((n_0, \beta_0)\) then
+yield a uniform lower bound on \(\Delta_L\) for every even \(L \ge n_0\)
+(Theorems~\ref{thm:gap-of-seeds} and~\ref{thm:rp-gap}).
 
-\section*{What is formalized}
+\section{Organization of the blueprint}
 
-The formalization is organized into five parts.
+The blueprint is organized into seven chapters following this introduction.
 \begin{enumerate}
-  \item Chapter~\ref{chap:criterion} proves the abstract two-purity doubling criterion for any
-    family of finite spectra whose partition functions satisfy three \emph{spatial moment
-    inequalities} (Theorem~\ref{thm:gap-of-seeds}).
-  \item Chapter~\ref{chap:chain} extends the criterion to unequal seed defects by iterating the
-    exact asymmetric doubling recurrence through rational chain certificates checked in the Lean
-    kernel (Theorem~\ref{thm:gap-of-chain-certificate}).
-  \item Chapter~\ref{chap:rings} proves that every reflection-positive ring satisfies the spatial
-    moment inequalities by constructing Trotterized positive semidefinite transfer matrices and
-    taking the continuous-time limit via the Lie--Trotter product formula
-    (Theorem~\ref{thm:rp-moment-bounds}), which yields the gap criterion for rings
-    (Theorem~\ref{thm:rp-gap}).
-  \item Chapters~\ref{chap:heisenberg} and~\ref{chap:models} apply the ring criterion to the
-    spin-1 Heisenberg ring and seven further spin-chain families, establishing a uniform gap
-    theorem for each model conditional only on its two seed inequalities.
-  \item Chapter~\ref{chap:seedkernel} proves the seed inequalities inside the Lean kernel for the
-    longitudinal-field Ising chain at \(g = 1/4\) and \(h = 1/20\), giving an unconditional gap
-    theorem (Theorem~\ref{thm:ising-gap}).
+  \item Chapter~\ref{chap:criterion} establishes the abstract spacetime-bootstrap criterion for any
+    family of finite spectra whose partition functions satisfy three transfer-operator moment
+    inequalities (Definition~\ref{def:moment-bounds} and Theorem~\ref{thm:gap-of-seeds}).
+  \item Chapter~\ref{chap:chain} extends the criterion to asymmetric seed defects by iterating the
+    decoupled scale-doubling recurrence (Lemma~\ref{lem:doubling-step}) through finite rational
+    certificates verified in exact arithmetic (Definition~\ref{def:chain-certificate} and
+    Theorem~\ref{thm:gap-of-chain-certificate}).
+  \item Chapter~\ref{chap:rings} proves that every reflection-positive spin ring
+    (Definition~\ref{def:rpring}) satisfies the moment inequalities by constructing brickwork
+    Trotter transfer matrices that are positive semidefinite (Theorem~\ref{thm:psd-transfer}) and
+    passing to the continuous-time limit via the Lie--Trotter product formula
+    (Theorem~\ref{thm:lie-trotter} and Theorem~\ref{thm:rp-moment-bounds}), yielding the general
+    spectral gap criterion for reflection-positive rings (Theorem~\ref{thm:rp-gap}).
+  \item Chapter~\ref{chap:heisenberg} applies the ring criterion to the periodic spin-1
+    antiferromagnetic Heisenberg chain (Definition~\ref{def:heisenberg}), establishing uniform
+    Haldane gap bounds conditional on two finite-size seed inequalities
+    (Theorems~\ref{thm:haldane-gap} and~\ref{thm:haldane-gap-sixty}).
+  \item Chapter~\ref{chap:open} extends the transfer-operator moment method to open spin-1
+    Heisenberg chains with boundary magnetic fields (Theorem~\ref{thm:open-criterion} and
+    Theorem~\ref{thm:boundary-field-gap}).
+  \item Chapter~\ref{chap:models} applies Theorem~\ref{thm:rp-gap} and sitewise unitary conjugation
+    (Theorem~\ref{thm:conj-spectrum}) to six further families of spin-1 and spin-\(\tfrac12\)
+    chains and ladders (Theorems~\ref{thm:large-d-gap}, \ref{thm:spin-one-dimerized-gap},
+    \ref{thm:two-leg-ising-gap}, \ref{thm:ising-longitudinal-gap}, \ref{thm:staggered-physical-gap},
+    \ref{thm:dimerized-physical-gap}, and~\ref{thm:ladder-physical-gap}).
+  \item Chapter~\ref{chap:seedkernel} proves the finite-size seed inequalities from first
+    principles via Rayleigh--Ritz residual bounds (Lemma~\ref{lem:residual}) and Gershgorin
+    comparison (Lemma~\ref{lem:ising-classical}) for the mixed-field Ising chain at
+    \((g, h) = (1/4, 1/20)\), discharging Lemma~\ref{lem:ising-longitudinal-seeds} at that point
+    (Theorem~\ref{thm:ising-seeds}) and yielding an unconditional spectral gap theorem
+    (Theorem~\ref{thm:ising-gap}).
 \end{enumerate}
 
-\section*{How to read the status}
+\section{Structure of the formalization}
 
-A statement marked as formalized has a Lean declaration with that exact content, and a proof marked
-as formalized is complete in Lean. The open nodes of the dependency graph are the seed inequalities
-of each model, which are finite numerical bounds on rings of a few to a few thousand sites left as
-\texttt{sorry} in Lean and certified by computer in \texttt{models/}. All other results depend only
-on the standard axioms \texttt{propext}, \texttt{Classical.choice}, and \texttt{Quot.sound}.
+Every statement marked as formalized corresponds to a verified Lean declaration with that
+mathematical content, and every proof marked as formalized is complete in Lean. The only unproven
+nodes in the dependency graph are the finite-size seed lemmas of the individual spin-chain models
+(Lemmas~\ref{lem:heisenberg-seed36}, \ref{lem:heisenberg-seed60}, \ref{lem:open-seeds},
+\ref{lem:large-d-seeds}, \ref{lem:spin-one-dimerized-seeds}, \ref{lem:two-leg-ising-seeds},
+\ref{lem:ising-longitudinal-seeds}, \ref{lem:staggered-seeds}, \ref{lem:dimerized-seeds},
+and~\ref{lem:ladder-seeds}), which record numerical bounds on finite rings certified by computer
+arithmetic~\cite{CertificateNote}. All other results, including the unconditional gap theorem of
+Chapter~\ref{chap:seedkernel} (Theorem~\ref{thm:ising-gap}), are proved completely from the
+standard foundational axioms.
 
 \begin{remark}[Conventions]
   \label{rem:conventions}
-  The spectral gap is stated through the predicate \(\GapGT(e, c)\) (Definition~\ref{def:gapgt}),
-  which asserts that the eigenvalue family \(e\) has a nondegenerate minimum (attained at a single
-  index) and every other eigenvalue
-  lies more than \(c\) above it. This formulation avoids sorting eigenvalues and records
-  ground-state uniqueness and the gap lower bound simultaneously. Partition functions of concrete
-  rings are defined as \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), the real part of a
-  complex matrix trace. Ring lengths count unit cells.
+  Rather than indexing eigenvalues in nondecreasing order, we say that a finite spectrum \(e\) has
+  a \emph{spectral gap greater than \(c\)} (Definition~\ref{def:gapgt}) if it attains a
+  nondegenerate minimum at some state and every other eigenvalue lies strictly more than \(c\)
+  above that minimum. This condition simultaneously expresses ground-state uniqueness and the lower
+  bound \(E_1 - E_0 > c\) on the spectral gap (Lemma~\ref{lem:gapgt-monotone}). Partition functions
+  of concrete spin rings are written as \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), the
+  real part of the complex matrix trace (Definition~\ref{def:ring-spectrum} and
+  Lemma~\ref{lem:ring-trace-exp}). Ring lengths \(L\) count unit cells.
 \end{remark}
+
