@@ -1,17 +1,17 @@
 # Dimerized spin-1 Heisenberg ring
 
 **Certified at $\delta = 9/10$ and $\delta = 7/10$** by the shared core pipeline
-(`GapCertificates.certify_gap`): a unique ground state and $\Delta_L \ge 0.528802288$ for every
-even ring of $L \ge 2$ two-spin cells at $\delta = 9/10$, and $\Delta_L \ge 0.218793170$ for every
+(`GapCertificates.certify_point`): a unique ground state and $\Delta_L \ge 0.528802288$ for every
+even ring of $L \ge 2$ two-spin cells at $\delta = 9/10$, and $\Delta_L \ge 0.218793401$ for every
 even $L \ge 3$ cells at $\delta = 7/10$ (interval bounds; the exact rational chain bounds are
-$0.528349759$ and $0.218606834$). The odd seed $n_0 = 3$ at $\delta = 7/10$ is valid because the
+$0.528349759$ and $0.218607065$). The odd seed $n_0 = 3$ at $\delta = 7/10$ is valid because the
 cell transfer operator factors as $X_\beta = K K^* \ge 0$. Derivations and the audit are in
 [`METHOD.md`](METHOD.md); the route memo is in [`IDEAS.md`](IDEAS.md).
 
 | parameter | seed $(n_0\text{ cells}, \beta_0)$ | certified gap $\ge$ | lengths covered |
 |---|---|---:|---|
 | $\delta = 9/10$ | $(2, 7/2)$ | $0.528802288$ (chain: $0.528349759$) | every even $L \ge 2$ cells ($N = 2L$ spins) |
-| $\delta = 7/10$ | $(3, 17/4)$ | $0.218793170$ (chain: $0.218606834$) | every even $L \ge 3$ cells |
+| $\delta = 7/10$ | $(3, 17/4)$ | $0.218793401$ (chain: $0.218607065$) | every even $L \ge 3$ cells |
 
 ## Model
 
@@ -37,12 +37,17 @@ U (J\,\mathbf{S}_i \cdot \mathbf{S}_j) U^\dagger
 ```
 In this frame the cell charge $z_a - z_b$ is conserved (an additive U(1) charge), and the spin
 flip $P \otimes P$ ($P$: $m \mapsto -m$) maps charge $q$ onto $-q$, so the core builds the two
-sectors once and splits $q = 0$ by flip parity. `test/runtests.jl` checks
+sectors once and splits $q = 0$ by flip parity. The model also carries the lattice reflection
+(site reversal of the chain): it reverses the cell order and swaps $a \leftrightarrow b$, which
+reverses the cell charge, so it is composed with the flip; its on-site part is
+$\mathrm{SWAP}\,(P \otimes P)$, checked exactly by the core `RingModel`. With it the core builds
+every momentum block as a real symmetric matrix. `test/runtests.jl` checks
 $V S^x V^\dagger = -S^x$, $V (iS^y) V^\dagger = iS^y$, $V S^z V^\dagger = -S^z$, both bond
-identities, and $U H_2^{\mathrm{phys}} U^\dagger$ against the ring assembled from the
-`RingModel`, all exactly; it also compares the core spectrum of 3 cells with floating-point ED
-in the physical frame. The Lean statement uses the Cartesian frame $G_\alpha = iS^\alpha$; all
-frames are unitarily equivalent, so purities and gaps agree.
+identities and the frame change from the physical cell model
+(`RingModels.is_frame_change`), all exactly; it also compares the core spectrum of 3 cells with
+dense floating-point ED of the physical 6-spin Hamiltonian. The Lean statement uses the
+Cartesian frame $G_\alpha = iS^\alpha$; all frames are unitarily equivalent, so purities and
+gaps agree.
 
 ## Reflection positivity
 
@@ -64,15 +69,17 @@ positive. The $\delta = 7/10$ certificate passes this reference to the core as
 
 | $\delta$ | seed | $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$ | $\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$ | interval bound | exact chain bound | 12-spin ED gap |
 |---|---|---|---|---:|---:|---:|
-| $9/10$ | $(2, 7/2)$ | `49715646652051//10^15` | `32054414052989//10^15` | $0.528802288$ | `528349759//10^9` | $1.7627$ |
-| $7/10$ | $(3, 17/4)$ | `117195722398365//10^15` | `48363998311096//10^15` | $0.218793170$ | `218606834//10^9` | $1.2659$ |
+| $9/10$ | $(2, 7/2)$ | `49715646642544//10^15` | `32054414033594//10^15` | $0.528802288$ | `528349759//10^9` | $1.7627$ |
+| $7/10$ | $(3, 17/4)$ | `117195681829365//10^15` | `48363910725858//10^15` | $0.218793401$ | `218607065//10^9` | $1.2659$ |
 
 Each certificate `results/certificate_d<d>.json` stores both rigorous bounds: the
 outward-rounded interval bound `certified_gap_bound(εₛ, εₜ, β₀)` (`interval_bound_decimal`, the
 headline value, rounded down here) and the exact rational chain bound $\Delta_L >$
 `gap_lower_bound`. At $\delta = 9/10$ the seed defects are below the values hardcoded in
 `lean/CertifiedGaps/Models/SpinOneDimerized.lean` ($\varepsilon_{\mathrm{s}} \le 0.04972$,
-$\varepsilon_\tau \le 0.03206$; checked by `check.jl`); the Lean file has no $\delta = 7/10$ point.
+$\varepsilon_\tau \le 0.03206$; read with `GapCertificates.lean_points` and checked by
+`check.jl`); the Lean file has no $\delta = 7/10$ point. Each certificate records its point as
+`params` (`"delta"`).
 The 12-spin ED gaps are floating-point references. At $\delta = 4/5$ the scan also finds an
 admissible seed $(3, 17/4)$ with $\approx 0.5447$; $\delta = 3/5$ and $1/2$ need estimated seeds of
 $n_0 \approx 5$ and $7$ cells.
@@ -83,30 +90,33 @@ From the repository root, with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1`:
 
 ```sh
 julia --project=julia -e 'using Pkg; Pkg.instantiate()'     # once
-julia --project=julia models/spin1_dimerized/certify.jl 9           # 10 s
-julia --project=julia models/spin1_dimerized/certify.jl 7           # 109 min, 22 GB peak
-julia --project=julia models/spin1_dimerized/check.jl               # 10 s
-julia --project=julia models/spin1_dimerized/check.jl --full        # 115 min
-julia --project=julia models/spin1_dimerized/test/runtests.jl       # 41 s
-# Floating-point scan per δ = d/10 (about 9 min each), then summary.json and METHOD.md tables:
+julia --project=julia models/spin1_dimerized/certify.jl 9           # 2 min (16 s certify)
+julia --project=julia models/spin1_dimerized/certify.jl 7           # 173 min, 10 GB peak
+julia --project=julia models/spin1_dimerized/check.jl               # 2 min
+julia --project=julia models/spin1_dimerized/check.jl --full        # as long as certify.jl 7
+julia --project=julia models/spin1_dimerized/test/runtests.jl       # 11 min
+# Floating-point scan per δ = d/10, then summary.json and METHOD.md tables:
 for d in 9 8 7 6 5; do
     julia --project=julia models/spin1_dimerized/scripts/scan.jl $d 2,3,4,6
 done
 julia --project=julia models/spin1_dimerized/scripts/report.jl
 ```
 
-Times are wall clock on an otherwise idle machine, including compilation (Apple silicon, one
-BLAS thread). `certify.jl 7` and `check.jl --full` enclose the 6-cell ring ($9^6 = 531{,}441$
-states) in 53 core blocks, the largest of dimension $11{,}596$ (real and complex); they reached
-12.5 GB resident and a 22 GB peak footprint, so run them alone on a 32 GB machine. The fast check
-and the tests replay only the rings of 2 and 4 cells. The scan caches spectra in gitignored
-`results/spectrum_d<d>_c<cells>.json` files, which `scripts/report.jl` reads.
+Times are wall clock including compilation (Apple silicon, one BLAS thread), measured on a
+heavily shared machine (load average about 200), so an idle machine is faster; the δ = 7/10
+certify used 122 CPU minutes. `certify.jl 7` and `check.jl --full` enclose the 6-cell ring
+($9^6 = 531{,}441$ states) in 53 real core blocks, the largest of dimension $11{,}596$, with
+radii up to $6.6 \times 10^{-7}$; they reached 7.1 GB resident and a 10 GB peak footprint. The
+fast check skips the spectra; the tests replay the rings of 2 and 4 cells. The scan caches
+spectra in gitignored `results/spectrum_d<d>_c<cells>.json` files, which `scripts/report.jl`
+reads.
 
 ## What is rigorous
 
-- **Rigorous:** the exact frame unitary, charge and flip conditions and RP identity (exact
-  rationals); complete spectra of the rings $n_0$ and $2n_0$ from the core
+- **Rigorous:** the exact frame unitary, charge, flip and lattice-reflection conditions and RP
+  identity (exact rationals); complete spectra of the rings $n_0$ and $2n_0$ from the core
   (`VerifiedSpectra.verified_ring_spectrum`: exact charge, momentum and flip-parity blocks,
+  real by the lattice reflection,
   eigenvalue enclosures by `verified_eigen` under the IEEE binary64 + BLAS rounding model with
   $\gamma_{N+8}$ / $\gamma_{2N+8}$ dot-product bounds and Frobenius norms, then the Ostrowski or
   polar-factor and Weyl bounds); outward-rounded $\log Z$ enclosures; exact rational seed
@@ -117,20 +127,21 @@ and the tests replay only the rings of 2 and 4 cells. The scan caches spectra in
 - **Analytic input:** the odd seed $n_0 = 3$ rests on the $X_\beta = K K^* \ge 0$ argument in
   `METHOD.md`, recorded as the certificate's `positive_transfer` reference, not on a computer
   check.
-- **Floating point only:** the $\beta_0$ scans, the 12-spin reference gaps, and the seed-size
-  extrapolations for $`\delta \in \{3/5, 1/2\}`$.
+- **Floating point only:** the $\beta_0$ scans (core `float_ring_spectrum`), the 12-spin
+  reference gaps, and the seed-size extrapolations for $`\delta \in \{3/5, 1/2\}`$.
 
 ## Layout
 
 - `certify.jl`, `check.jl`: certificate generator (per $\delta$) and checker (`--full` replays the
   core spectra).
-- `src/DimerizedCertificate.jl`: the model in the certificate frame, its frame unitary, RP
-  factors, certified points, the `positive_transfer` reference and the Lean seed values,
-  `certify_point` and `check_point`.
-- `src/scan_spectra.jl`: floating-point dihedral and spin-flip block ED for the scan.
+- `src/DimerizedCertificate.jl`: the model in the certificate frame with its lattice
+  reflection, the physical cell model and frame unitary, RP factors, certified points, the
+  `positive_transfer` reference, the Lean seed lookup, and `certify` / `check` (the core
+  `certify_point` / `check_point` at a point).
 - `scripts/scan.jl` (floating-point seed scan), `scripts/report.jl` (`results/summary.json` and
   the last section of `METHOD.md`).
-- `test/runtests.jl`: frame, RP, scan and certificate tests, including tampering.
+- `test/runtests.jl`: frame, Cartesian-identity, reflection, RP, spectrum and certificate tests,
+  including tampering.
 - `results/`: `certificate_d9.json`, `certificate_d7.json` (core format), `scan_d*.json` and
   `summary.json` (floating-point summaries). No hash-pinned files.
 - No `Project.toml` or `Manifest.toml`: everything runs in the core environment
@@ -151,3 +162,13 @@ and the tests replay only the rings of 2 and 4 cells. The scan caches spectra in
   interval bound 0.218794169 to 0.218793170 (chain 0.218606834): slightly looser, because the
   core's complex momentum blocks of dimension $11{,}596$ have radii up to $2.0 \times 10^{-6}$
   against $1.0 \times 10^{-6}$ for the old real dihedral blocks.
+- 2026-10: the model gained the lattice reflection (real momentum blocks) and `params`; the
+  model-local certify and check loops, Lean seed constants, spin and swap matrices and the
+  floating-point scan ED were replaced by the core `certify_point`, `check_point`,
+  `lean_points`, `integer_spin_one`, `swap_matrix`, `is_frame_change` and
+  `float_ring_spectrum`. Both certificates were regenerated. Old to new, $\delta = 9/10$:
+  $\varepsilon_{\mathrm{s}}$ 0.049715646652 to 0.049715646643, $\varepsilon_\tau$ 0.032054414053
+  to 0.032054414034, interval bound 0.5288022883 to 0.5288022884 (chain unchanged).
+  $\delta = 7/10$: $\varepsilon_{\mathrm{s}}$ 0.117195722398 to 0.117195681829,
+  $\varepsilon_\tau$ 0.048363998311 to 0.048363910726, interval bound 0.218793170 to
+  0.218793401, chain 0.218606834 to 0.218607065 (block radii up to $6.6 \times 10^{-7}$).
