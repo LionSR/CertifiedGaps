@@ -65,6 +65,17 @@ def Valid : Prop :=
 /-- The conditions are decidable, so `decide` checks a concrete certificate. -/
 instance : Decidable c.Valid := by unfold Valid; infer_instance
 
+/-- The step conditions of a certificate alone: the defect bounds are at most `1` and follow the
+doubling recurrence. They give the purities at every scale (`purities_ge_chainCertificate`)
+without a hand-over or a rate. -/
+def StepsValid : Prop :=
+  (∀ j < c.J + 1, c.sAt j ≤ 1 ∧ c.tAt j ≤ 1) ∧
+    ∀ j < c.J, zQ (c.sAt j) (c.tAt j) < 1 ∧ fQ (zQ (c.sAt j) (c.tAt j)) ≤ c.sAt (j + 1) ∧
+      zQ (c.tAt j) (c.sAt (j + 1)) < 1 ∧ fQ (zQ (c.tAt j) (c.sAt (j + 1))) ≤ c.tAt (j + 1)
+
+/-- The step conditions are decidable. -/
+instance : Decidable c.StepsValid := by unfold StepsValid; infer_instance
+
 /-- `zQ` computes the coupling defect. -/
 theorem cast_zQ (a b : ℚ) : couplingDefect a b = (zQ a b : ℝ) := by
   simp [couplingDefect, zQ]
@@ -103,5 +114,26 @@ theorem gapGT_of_chainCertificate (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} 
   · obtain ⟨-, -, -, -, h5⟩ := hstep j hj
     simp only [cast_zQ]
     exact_mod_cast h5
+
+/-- **The purities along a rational chain certificate.** Under the moment inequalities above an
+even `n₀`, the step conditions of `c` and seeds `P_s(n₀, β₀) ≥ 1 - s 0`,
+`P_τ(2n₀, β₀) ≥ 1 - t 0` give `P_s(n₀ 2^j, β₀ 2^j) ≥ 1 - s j` and
+`P_τ(2 n₀ 2^j, β₀ 2^j) ≥ 1 - t j` at every scale `j ≤ J`. -/
+theorem purities_ge_chainCertificate (E : (L : ℕ) → ι L → ℝ) {n₀ : ℕ} (hn₀e : Even n₀)
+    {β₀ : ℝ} (hβ₀ : 0 < β₀) (hZ : HasSpatialMomentBounds E n₀) (c : ChainCertificate)
+    (hc : c.StepsValid) (hs : 1 - (c.sAt 0 : ℝ) ≤ spatialPurity E n₀ β₀)
+    (ht : 1 - (c.tAt 0 : ℝ) ≤ thermalPurity E (2 * n₀) β₀) :
+    ∀ j ≤ c.J, 1 - (c.sAt j : ℝ) ≤ spatialPurity E (n₀ * 2 ^ j) (β₀ * 2 ^ j) ∧
+      1 - (c.tAt j : ℝ) ≤ thermalPurity E (2 * (n₀ * 2 ^ j)) (β₀ * 2 ^ j) := by
+  obtain ⟨hrange, hstep⟩ := hc
+  open ChainCertificate in
+  refine purities_ge_chain E hn₀e hβ₀ hZ (fun j ↦ c.sAt j) (fun j ↦ c.tAt j) c.J
+    (fun j hj ↦ ?_) (fun j hj ↦ ?_) hs ht
+  · obtain ⟨h1, h2⟩ := hrange j (by omega)
+    exact ⟨by exact_mod_cast h1, by exact_mod_cast h2⟩
+  · obtain ⟨h1, h2, h3, h4⟩ := hstep j hj
+    simp only [cast_zQ, cast_fQ]
+    exact ⟨by exact_mod_cast h1, by exact_mod_cast h2, by exact_mod_cast h3,
+      by exact_mod_cast h4⟩
 
 end CertifiedGaps
