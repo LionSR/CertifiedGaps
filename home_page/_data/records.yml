@@ -49,7 +49,7 @@ tiers:
   - {key: lean-conditional, glyph: '◇', label: 'Lean 4 (certified seed)',
      meaning: 'Formalized in Lean 4 conditional only on the computer-certified seed purity inequalities at (n₀, β₀).'}
   - {key: certified, glyph: '✓', label: 'Computer-certified',
-     meaning: 'Headline bound computed by 48 interval-arithmetic doubling steps from verified seed spectra and checked by check.jl. In 48 of 49 cases, a companion 14-step rational chain in Lean 4 (◇) proves the same bound to within 10⁻⁵.'}
+     meaning: 'Headline bound computed by 48 interval-arithmetic doubling steps from verified seed spectra and checked by check.jl. Most rows also have a companion 14-step rational chain in Lean 4 (◇) proving a slightly smaller lower bound (typically within 10⁻⁵ when starting from the same seed).'}
   - {key: target, glyph: '◌', label: 'Open target',
      meaning: 'Floating-point survey estimate only; not yet certified.'}
 

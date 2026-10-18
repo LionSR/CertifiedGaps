@@ -78,14 +78,15 @@ julia --project=tools/leaderboard tools/leaderboard/check_records.jl
 
 ## Automated CI verification
 
-Every pull request and weekly scheduled run executes the following checks:
+CI workflows run the following checks according to which paths a pull request modifies, as well as
+on weekly scheduled runs:
 
-| Check | What it verifies |
-|---|---|
-| `lake build` and `leaderboard_audit` | Compiles all Lean 4 theorems, verifies that only standard axioms are used, reduces record parameters to exact kernel literals, and exports `lean_records.json` |
-| `leanchecker` | Replays all declarations in `Leaderboard`, `CertifiedGaps`, and `SeedKernel` through the Lean kernel in a fresh process |
-| `check_records.jl` | Verifies that every row in `records.yml` matches its committed certificate (seed, defects, and exact bound), that all displayed decimals are rounded down, and that every Lean entry matches `lean_records.json` |
-| `models/<slug>/check.jl` | Reruns the standalone certificate checker for every modified model |
+| Check | Trigger | What it verifies |
+|---|---|---|
+| `lake build` and `leaderboard_audit` | Every PR and push to `main` (`blueprint.yml`) | Compiles all Lean 4 theorems, verifies that only standard axioms are used, reduces record parameters to exact kernel literals, and exports `lean_records.json` |
+| `leanchecker` | PRs/pushes modifying Lean code (`lean/`, `leaderboard/`, toolchain files) and weekly (`kernel-check.yml`) | Replays all declarations in `Leaderboard` and the repository modules it imports through the Lean kernel in a fresh process |
+| `check_records.jl` | Every PR and push to `main` (`blueprint.yml`), and on certificate runs (`certificates.yml`) | Verifies that every row in `records.yml` matches its committed certificate (seed, defects, and exact bound), that all displayed decimals are rounded down, and that every Lean entry matches `lean_records.json` |
+| `models/<slug>/check.jl` | PRs/pushes modifying non-documentation files in `models/<slug>/` or `julia/`, and weekly across all models (`certificates.yml`) | Reruns the standalone certificate checker for each modified model (or all models when `julia/` changes or on the weekly schedule) |
 
 ## Maintainer review
 

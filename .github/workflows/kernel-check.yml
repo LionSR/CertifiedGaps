@@ -15,6 +15,7 @@ on:
       - "lakefile.toml"
       - "lake-manifest.json"
       - "lean-toolchain"
+      - "!**/*.md"
   push:
     branches:
       - main
@@ -24,6 +25,7 @@ on:
       - "lakefile.toml"
       - "lake-manifest.json"
       - "lean-toolchain"
+      - "!**/*.md"
   schedule:
     - cron: "41 4 * * 1" # Mondays 04:41 UTC
   workflow_dispatch:

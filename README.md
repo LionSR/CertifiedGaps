@@ -59,8 +59,8 @@ The **spacetime bootstrap** combines two components:
 |---|---|---|
 | $\Delta_L > 0.0729$ for every even $L \ge 36$ | seed certificates at $(60, 833/32)$ and $(36, 49/4)$ certified in exact rational arithmetic and independently audited (#49); two-seed doubling chain formalized in Lean 4 (`Leaderboard.Records.SpinOneHeisenberg.temperature_lifting`) | [`models/spin1/experiments/`](models/spin1/experiments/), [`lean/`](lean/), [`leaderboard/`](leaderboard/) |
 | $\Delta_L > \log(41.196029)/784 \approx 0.00474$ (and the preprint's rounded bound $(\log 20)/784 \approx 0.00382$) for every even $L \ge 2304$; $\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79} \approx 0.000479$ for every even $L \ge 60$ | seed purity bounds at $(2304, 784)$, $(36, 49/4)$, and $(60, 105/4)$ reproduced in exact integer and rational arithmetic; doubling chains formalized in Lean 4 (`SpinOneHeisenberg`) | [`models/spin1/`](models/spin1/), [`lean/`](lean/), [`leaderboard/`](leaderboard/) |
-| open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392 \approx 0.00587$ for every odd $n \ge 1921$ | formalized in Lean 4 (`OpenChain.open_spin_one_heisenberg_gap_1921`), conditional on the four finite seed bounds at $\beta_2 = 49$ from the boundary-field preprint | [`lean/CertifiedGaps/OpenChain.lean`](lean/CertifiedGaps/OpenChain.lean), [`explainer/open.html`](explainer/open.html) |
-| general reflection-positive ring criterion (bond factorization and multi-site unit cells with internal reflection) | formalized in Lean 4 (`RPRing`, `Criterion`, `Chain`) and implemented in `CertifiedGaps` | [`lean/CertifiedGaps/`](lean/CertifiedGaps/), [`julia/`](julia/), [`blueprint/`](blueprint/) |
+| open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392 \approx 0.00587$ for every odd $n \ge 1921$ | formalized in Lean 4 (`SpinOneHeisenberg.spin_one_boundary_field_gap`), conditional on the four finite seed bounds at $\beta_2 = 49$ from the boundary-field preprint | [`lean/CertifiedGaps/Heisenberg/OpenChain.lean`](lean/CertifiedGaps/Heisenberg/OpenChain.lean), [`explainer/open.html`](explainer/open.html) |
+| general reflection-positive ring criterion (bond factorization and multi-site unit cells with internal reflection) | formalized in Lean 4 (`RPRing`, `PurityCriterion`, `Chain`) and implemented in `CertifiedGaps` | [`lean/CertifiedGaps/Ring/`](lean/CertifiedGaps/Ring/), [`julia/`](julia/), [`blueprint/`](blueprint/) |
 | smaller seed route for Lean verification: $\Delta_L > 0.039$ for even $L \ge 60$ from twisted traces at even $n \le 12$ using real $\mathrm{SU}(2)$ twists only | exact rational doubling chain, conditional on the finite trace tables and analytic seed lemmas | [`models/lean_seeds/`](models/lean_seeds/) (`seed_design`) |
 | kernel-checked spin-1 seed arithmetic (base-3 packed-integer operations, Ritz/residual witnesses for $H_6$, $H_8$, $H_{10}$, and local PSD counting anchors) | kernel-checked arithmetic witnesses and feasibility studies | [`models/lean_seeds/`](models/lean_seeds/), [`lean/`](lean/) (`SeedKernel`) |
 
@@ -163,7 +163,7 @@ trusted arithmetic base.
   $L \ge 60$) are formalized in [`lean/`](lean/). For open chains with endpoint fields $h = 3/5$, the
   analytic deduction of $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ from the four finite seed bounds
   at $\beta_2 = 49$ of the OpenAI boundary-field preprint is formalized in
-  [`lean/CertifiedGaps/OpenChain.lean`](lean/CertifiedGaps/OpenChain.lean). In `CertifiedGaps`, each
+  [`lean/CertifiedGaps/Heisenberg/OpenChain.lean`](lean/CertifiedGaps/Heisenberg/OpenChain.lean). In `CertifiedGaps`, each
   seeded theorem takes the finite seed inequalities as named `sorry` lemmas; in `SeedKernel`,
   `SeedKernel.Ising.ising_gap` ([`models/lean_seeds/`](models/lean_seeds/)) proves both the seed
   inequalities and the doubling recurrence inside the Lean kernel for the longitudinal-field Ising chain

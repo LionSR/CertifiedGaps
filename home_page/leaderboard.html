@@ -14,13 +14,14 @@ wide: true
 <script>document.documentElement.classList.add('js');</script>
 
 <p>
-  Each record below certifies that for every ring length $L \ge L_0$ (in unit cells), the
-  Hamiltonian $H_L$ has a unique ground state and a spectral gap $\Delta_L = E_1(L) - E_0(L)$ at
-  least the stated lower bound. Every bound is obtained from the spacetime bootstrap: a
-  computer-certified finite seed at $(n_0, \beta_0)$ paired with the analytic two-purity doubling
-  recurrence across all $L \ge L_0$. In CI, every Lean 4 theorem is re-checked in the Lean kernel
-  (<code>leanchecker</code>) and every finite certificate is re-verified by its standalone
-  <code>check.jl</code> program.
+  Each record below certifies that for every chain or ring length $L \ge L_0$ (in unit cells) of
+  the stated parity (even $L$ on periodic rings; odd $L$ on open spin-1 chains with equal endpoint
+  fields), the Hamiltonian $H_L$ has a unique ground state and a spectral gap
+  $\Delta_L = E_1(L) - E_0(L)$ at least the stated lower bound. Every bound is obtained from the
+  spacetime bootstrap: a computer-certified finite seed at $(n_0, \beta_0)$ paired with the
+  analytic two-purity doubling recurrence across all covered lengths $L \ge L_0$. In CI, every
+  Lean 4 theorem is re-checked in the Lean kernel (<code>leanchecker</code>) and every finite
+  certificate is re-verified by its standalone <code>check.jl</code> program.
 </p>
 <p class="key">
   {% for t in data.tiers %}{% if shown contains t.key %}<span class="tier tier-{{ t.key }}" title="{{ t.meaning }}">{{ t.glyph }} {{ t.label }}</span> {% endif %}{% endfor %}
@@ -99,9 +100,10 @@ wide: true
     {%- endif %}{% endfor %}
   </dl>
   <p>Each badge indicates the verification tier of the displayed bound. When a parameter point has
-    both a computer-certified bound (48 doubling steps) and a Lean 4 theorem from the same seed
-    (14 rational doubling steps, smaller by ${\sim}10^{-5}$), the table row displays the larger
-    computer-certified bound and “details” links to the companion Lean 4 theorem.</p>
+    both a computer-certified bound (48 doubling steps) and a companion Lean 4 theorem (14
+    rational doubling steps, typically smaller by ${\sim}10^{-5}$ when starting from the same
+    seed), the table row displays the larger computer-certified bound alongside a
+    <code>◇ Lean 4</code> badge whose tooltip and expanded details show the exact Lean bound.</p>
 </section>
 
 <script type="application/json" id="lb-data">
