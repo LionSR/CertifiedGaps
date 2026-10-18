@@ -40,8 +40,11 @@ boundary-field preprint).
 
 ## Main results
 
-* `gapGT_of_boundaryFieldInputs`: the gap from the four inputs, without `sorry`.
-* `spin_one_boundary_field_gap`: the gap, with the four inputs as open `sorry` lemmas.
+* `gapGT_of_boundaryFieldInputs_certificate`: the gap from the four inputs and any valid
+  certificate for their seeds, without `sorry`; `gapGT_of_boundaryFieldInputs` and
+  `gapGT_of_boundaryFieldInputs_sharp` are the cases of the note's and the sharper certificate.
+* `spin_one_boundary_field_gap`, `spin_one_boundary_field_gap_sharp`: the gaps `(log 10)/392` and
+  `log(10⁶/2241)/392`, with the four inputs as open `sorry` lemmas.
 -/
 
 open Matrix NormedSpace Real
@@ -170,23 +173,64 @@ structure BoundaryFieldInputs (h : ℝ) : Prop where
   /-- The opposite-field thermal purity `P_τ(240, 49) ≥ 0.79`. -/
   open_thermal : 79 / 100 ≤ oppositeFieldThermalPurity h 240 49
 
+/-- **The boundary-field gap from its inputs and a certificate.** Under
+`BoundaryFieldInputs h`, a valid certificate `c` for the seeds of the inputs (`N₀ = 60`,
+`K₀ = 71`, `u₀ ≥ 0.052`, `E₀ ≥ 0.14`, `η₀ ≥ 0.21`) gives `Δ_n > log(1/(10x)) / (49 · 2^m)` for
+every odd equal-field chain of `n ≥ 240 · 2^m` sites. -/
+theorem gapGT_of_boundaryFieldInputs_certificate {h : ℝ} (hin : BoundaryFieldInputs h)
+    (c : OpenCertificate) (hc : c.Valid) (hN : c.N₀ = 60) (hK : c.K₀ = 71)
+    (hu : 13 / 250 ≤ c.u₀) (hE : 14 / 100 ≤ c.EAt 0) (hη : 21 / 100 ≤ c.ηAt 0) {n : ℕ}
+    (hn : 240 * 2 ^ c.m ≤ n) (hno : Odd n) :
+    GapGT (equalFieldSpectrum h n) (Real.log (1 / (10 * (c.x : ℝ))) / (49 * 2 ^ c.m)) := by
+  rw [← openSpectrum_odd h hno]
+  have hZ : ∀ L β, (SpinOneLargeD.model 0).partitionFunction L β = partitionFunction L β :=
+    SpinOneLargeD.partitionFunction_zero
+  have hu' : (13 / 250 : ℝ) ≤ c.u₀ := by simpa using (Rat.cast_le (K := ℝ)).2 hu
+  have hE' : (14 / 100 : ℝ) ≤ c.EAt 0 := by simpa using (Rat.cast_le (K := ℝ)).2 hE
+  have hη' : (21 / 100 : ℝ) ≤ c.ηAt 0 := by simpa using (Rat.cast_le (K := ℝ)).2 hη
+  refine (SpinOneLargeD.model 0).openGapGT_of_certificate rfl (boundary h) c hc (β₀ := 49)
+    (by norm_num) ?_ ?_ ?_ ?_ (by rw [hN]; omega) hno <;> (try rw [hN]) <;> (try rw [hK])
+  · have := hin.ring_spatial
+    simp only [RPRing.spatialPurity, hZ, spatialPurity] at this ⊢
+    linarith
+  · have := hin.ring_thermal
+    simp only [RPRing.thermalPurity, hZ, thermalPurity] at this ⊢
+    linarith
+  · simp only [hZ]
+    rw [boundaryDefect_congr (G' := fun n ↦ oppositeFieldPartitionFunction h n 49)
+      (openPartitionFunction_even h · 49)]
+    linarith [hin.boundary]
+  · have := hin.open_thermal
+    simp only [RPRing.openThermalPurity, openPartitionFunction_even]
+    simp only [oppositeFieldThermalPurity] at this
+    linarith
+
 /-- **The boundary-field gap from its inputs.** Under `BoundaryFieldInputs h`, every odd
 equal-field chain of `n ≥ 1921` sites has a unique ground state and gap `Δ_n > (log 10)/392`. -/
 theorem gapGT_of_boundaryFieldInputs {h : ℝ} (hin : BoundaryFieldInputs h) {n : ℕ}
     (hn : 1921 ≤ n) (hno : Odd n) : GapGT (equalFieldSpectrum h n) (Real.log 10 / 392) := by
-  rw [← openSpectrum_odd h hno]
-  have hZ : ∀ L β, (SpinOneLargeD.model 0).partitionFunction L β = partitionFunction L β :=
-    SpinOneLargeD.partitionFunction_zero
-  refine (SpinOneLargeD.model 0).openGapGT_of_seeds rfl (boundary h) ?_ ?_ ?_ ?_ hn hno
-  · simpa only [RPRing.spatialPurity, hZ, spatialPurity] using hin.ring_spatial
-  · simpa only [RPRing.thermalPurity, hZ, thermalPurity] using hin.ring_thermal
-  · simp only [hZ]
-    rw [show (142 : ℕ) = 2 * 71 from rfl, boundaryDefect_congr
-      (G' := fun n ↦ oppositeFieldPartitionFunction h n 49) (openPartitionFunction_even h · 49)]
-    exact hin.boundary
-  · have e : (240 : ℕ) = 2 * 120 := rfl
-    simp only [RPRing.openThermalPurity, e, openPartitionFunction_even]
-    exact hin.open_thermal
+  have h := gapGT_of_boundaryFieldInputs_certificate hin boundaryFieldCertificate
+    boundaryFieldCertificate_valid rfl rfl (by decide +kernel) (by decide +kernel)
+    (by decide +kernel) (n := n)
+    (by rw [show boundaryFieldCertificate.m = 3 from rfl]; omega) hno
+  rw [show boundaryFieldCertificate.m = 3 from rfl,
+    show (boundaryFieldCertificate.x : ℝ) = 1 / 100 by norm_num [boundaryFieldCertificate]] at h
+  convert h using 2 <;> norm_num
+
+/-- **A sharper boundary-field gap from the same inputs.** Under `BoundaryFieldInputs h`, the
+certificate `sharpBoundaryFieldCertificate` gives every odd equal-field chain of `n ≥ 1921` sites
+a unique ground state and gap `Δ_n > log(10⁶/2241)/392 ≈ 0.01556`. -/
+theorem gapGT_of_boundaryFieldInputs_sharp {h : ℝ} (hin : BoundaryFieldInputs h) {n : ℕ}
+    (hn : 1921 ≤ n) (hno : Odd n) :
+    GapGT (equalFieldSpectrum h n) (Real.log (1000000 / 2241) / 392) := by
+  have h := gapGT_of_boundaryFieldInputs_certificate hin sharpBoundaryFieldCertificate
+    sharpBoundaryFieldCertificate_valid rfl rfl (by decide +kernel) (by decide +kernel)
+    (by decide +kernel) (n := n)
+    (by rw [show sharpBoundaryFieldCertificate.m = 3 from rfl]; omega) hno
+  rw [show sharpBoundaryFieldCertificate.m = 3 from rfl,
+    show (sharpBoundaryFieldCertificate.x : ℝ) = 2241 / 10000000 by
+      norm_num [sharpBoundaryFieldCertificate]] at h
+  convert h using 2 <;> norm_num
 
 /-- **Open input 1.** The ring spatial purity `P_s(120, 49) ≥ 0.948`. -/
 theorem seed_ring_spatial : 948 / 1000 ≤ spatialPurity 120 49 := by
@@ -213,6 +257,15 @@ more than `(log 10)/392 ≈ 0.005874` above it. -/
 theorem spin_one_boundary_field_gap {n : ℕ} (hn : 1921 ≤ n) (hno : Odd n) :
     GapGT (equalFieldSpectrum (3 / 5) n) (Real.log 10 / 392) :=
   gapGT_of_boundaryFieldInputs ⟨seed_ring_spatial, seed_ring_thermal, seed_boundary,
+    seed_open_thermal⟩ hn hno
+
+/-- **The sharper boundary-field gap.** From the same four inputs as
+`spin_one_boundary_field_gap`, for every odd `n ≥ 1921` the open spin-one Heisenberg chain with
+equal end fields `h = 3/5` has a unique ground state and every other level lies more than
+`log(10⁶/2241)/392 ≈ 0.01556` above it. -/
+theorem spin_one_boundary_field_gap_sharp {n : ℕ} (hn : 1921 ≤ n) (hno : Odd n) :
+    GapGT (equalFieldSpectrum (3 / 5) n) (Real.log (1000000 / 2241) / 392) :=
+  gapGT_of_boundaryFieldInputs_sharp ⟨seed_ring_spatial, seed_ring_thermal, seed_boundary,
     seed_open_thermal⟩ hn hno
 
 end CertifiedGaps.SpinOneHeisenberg

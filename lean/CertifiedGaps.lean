@@ -18,6 +18,7 @@ import CertifiedGaps.Heisenberg.Main
 -- Open chains with boundary fields (Appendices A–C of the note)
 import CertifiedGaps.Open.MomentBounds
 import CertifiedGaps.Open.Criterion
+import CertifiedGaps.Open.Certificate
 import CertifiedGaps.Open.Model
 import CertifiedGaps.Open.Transfer
 import CertifiedGaps.Open.Bounds
