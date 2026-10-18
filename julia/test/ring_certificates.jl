@@ -344,3 +344,17 @@ end
     @test_throws ErrorException exclude_all_beta(verified_ring_spectrum(big6, 4),
         verified_ring_spectrum(big6, 8), 4; max_depth = 4)
 end
+
+@testset "floating-point scan helpers" begin
+    m = rotated_staggered(6)
+    spectra = Dict(L => float_ring_spectrum(m, L) for L in (2, 4, 8))
+    @test spectra[8].N == 2^8 && spectra[8].exact
+    @test maximum(abs, spectra[8].E - levels(verified_ring_spectrum(m, 8))) < 1e-12
+    results = scan_seeds(spectral_defects(spectra), [2, 4], [0.5, 1.0, 2.0])
+    best = best_seed(results)
+    @test seed_record(best)["n0"] == best.n₀ && seed_record(best)["bound"] == best.bound
+    peaks = purity_peaks(results)
+    @test [p["n0"] for p in peaks] == [2, 4]
+    @test all(0 < p["max_min_purity"] <= 1 for p in peaks)
+    @test peaks[2]["best_bound"] == best_seed(filter(r -> r.n₀ == 4, results)).bound
+end

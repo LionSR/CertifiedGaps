@@ -12,7 +12,8 @@ using ..ExactArithmetic: RationalBig
 using ..ExactDiagonalization: logZ_bounds
 using ..Recurrence: certified_gap_bound
 
-export SeedResult, seed_defects, spectral_defects, scan_seeds, best_seed
+export SeedResult, seed_defects, spectral_defects, scan_seeds, best_seed, seed_record,
+    purity_peaks
 
 """
     seed_defects(spectra, n, β) -> (εₛ, εₜ)
@@ -86,6 +87,28 @@ _bound(εₛ, εₜ, β) = (0 <= εₛ < 1 && 0 <= εₜ < 1) ? certified_gap_bo
 function best_seed(results)
     ok = filter(r -> r.bound !== nothing, results)
     isempty(ok) ? nothing : argmax(r -> r.bound, ok)
+end
+
+"A `SeedResult` as a JSON-ready record (floating point: a scan, not a certificate)."
+seed_record(r::SeedResult) = Dict{String,Any}("n0" => r.n₀, "beta0" => r.β₀, "eps_s" => r.εₛ,
+    "eps_t" => r.εₜ, "bound" => r.bound)
+
+"""
+    purity_peaks(results) -> Vector{Dict}
+
+Per seed length n₀ of a scan, the grid β₀ that maximizes min(1 − εₛ, 1 − εₜ) (the smaller
+purity, which decides admissibility), that value, and the best bound at this n₀ (or `nothing`).
+"""
+function purity_peaks(results)
+    map(sort(unique(r.n₀ for r in results))) do n
+        rows = filter(r -> r.n₀ == n, results)
+        peak = argmax(r -> min(1 - r.εₛ, 1 - r.εₜ), rows)
+        best = best_seed(rows)
+        Dict{String,Any}("n0" => n, "peak_beta" => peak.β₀,
+            "max_min_purity" => min(1 - peak.εₛ, 1 - peak.εₜ),
+            "best_bound" => best === nothing ? nothing : best.bound,
+            "best_beta" => best === nothing ? nothing : best.β₀)
+    end
 end
 
 end

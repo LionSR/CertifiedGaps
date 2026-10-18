@@ -33,10 +33,11 @@ using ..ExactArithmetic: RationalBig, parse_rational
 using ..Results: write_result, read_result
 using ..RingModels: RingModel, isreal_model, _reduce, _monomial
 using ..Recurrence: to_interval
+using ..ExactDiagonalization: PartialSpectrum
 
 export BlockSpectrum, verified_eigen, enclose_hermitian, ring_blocks, verified_ring_spectrum,
     shifted_log_partition, log_partition_enclosure, ground_energy_enclosure,
-    spectral_gap_enclosure, write_spectrum, read_spectrum, spectrum_summary
+    spectral_gap_enclosure, write_spectrum, read_spectrum, spectrum_summary, float_ring_spectrum
 
 const UNIT = big(1) // big(2)^53                 # unit roundoff of binary64
 const TINY = big(1) // big(2)^1021              # covers gradual underflow or flush-to-zero
@@ -552,6 +553,24 @@ function spectrum_summary(spectrum::AbstractVector{BlockSpectrum})
         "max_radius_decimal" => Float64(maximum(s.radius for s in spectrum)),
         "seconds" => sum(s.label["seconds"] for s in spectrum),
     )
+end
+
+"""
+    float_ring_spectrum(model, L) -> PartialSpectrum
+
+All d^L levels of the ring of L sites, sorted, from unverified LAPACK eigenvalues of the
+`ring_blocks` blocks with their exact multiplicities. Floating point only: for seed scans and
+diagnostics, never a certificate (`verified_ring_spectrum` is the verified counterpart).
+"""
+function float_ring_spectrum(model::RingModel, L::Integer)
+    E = Float64[]
+    ring_blocks(model, L) do M, _, mult, _
+        e = eigvals(Hermitian(M))
+        for _ in 1:mult
+            append!(E, e)
+        end
+    end
+    return PartialSpectrum(E, model.d^L)
 end
 
 end
