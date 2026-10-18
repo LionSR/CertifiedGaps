@@ -5,7 +5,7 @@
 # fields of the object and its ancestors locate the parameter point. Objects with floating-point
 # defects are diagnostic scans and are skipped.
 
-using CodecZlib: GzipDecompressor, transcode
+using CertifiedGaps.Results: read_result
 
 # Field names for each quantity, in order of preference (first present wins).
 const CERT_FIELDS = (
@@ -26,11 +26,7 @@ cert_exact(x::Union{AbstractFloat,Rational}) = Rational{BigInt}(x)
 cert_exact(x) = parse_exact(x)
 
 "Load a certificate (JSON, or gzipped JSON) as nested Dicts and Vectors."
-function load_certificate(path)
-    bytes = read(path)
-    endswith(path, ".gz") && (bytes = transcode(GzipDecompressor, bytes))
-    return JSON3.read(bytes, Dict{String,Any})
-end
+load_certificate(path) = read_result(path, Dict{String,Any})
 
 """
     core_candidate(data) -> NamedTuple or nothing
