@@ -15,8 +15,10 @@ module GapCertificates
 using IntervalArithmetic
 using ..ExactArithmetic: RationalBig, round_up, parse_rational
 using ..RingModels
+using ..RingModels: _int
 using ..VerifiedSpectra
 using ..Recurrence: rational_gap_chain, certified_gap_bound
+using ..Seeds: seed_defects
 
 export seed_bounds, certify_gap, check_certificate
 
@@ -72,8 +74,7 @@ function seed_bounds(model::RingModel, n0::Integer, β0; blocking = nothing,
     zn = log_partition_enclosure(small, β)
     z2n = log_partition_enclosure(large, β)
     z2n2 = log_partition_enclosure(large, 2β)
-    defect_s = 1 - exp(z2n - 2zn)
-    defect_t = 1 - exp(z2n2 - 2z2n)
+    (; defect_s, defect_t) = seed_defects(zn, z2n, z2n2)
     return (; n0, β0 = β, blocking = _blocking_record(blocking, spectral, c), positive_transfer,
         eps_s = _upper(defect_s), eps_t = _upper(defect_t), defect_s, defect_t,
         log_partition = Dict("logZ_n0_beta0" => _endpoints(zn),
@@ -166,8 +167,6 @@ function _stored_blocking(cert, model)
         error("the stored cell model is not the blocked site model")
     return blocking
 end
-_int(x::AbstractString) = parse(Int, x)
-_int(x::Integer) = Int(x)
 
 """
     check_certificate(cert; spectra = true, progress = false) -> Dict

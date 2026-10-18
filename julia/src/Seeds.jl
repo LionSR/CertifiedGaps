@@ -49,10 +49,11 @@ function seed_defects(logZn::Interval, logZ2n::Interval, logZ2n_2β::Interval)
     return (; eps_s, eps_t, defect_s, defect_t)
 end
 
-# Enclosure of 1 − eˣ and its exact rational upper bound.
+# Enclosure of 1 − eˣ, the intersection of the two enclosures 1 − exp(x) and −expm1(x), and
+# its exact rational upper bound.
 function _defect(x::Interval)
-    a, b = 1 - exp(x), -expm1(x)
-    return a, min(RationalBig(sup(a)), RationalBig(sup(b)))
+    d = intersect_interval(1 - exp(x), -expm1(x))
+    return d, RationalBig(sup(d))
 end
 
 "Seed defects as a function of (n, β), from ring spectra keyed by length."
