@@ -26,6 +26,8 @@ spin chains.
 * `piTensor_one`, `piTensor_mul`, `list_prod_map_piTensor`, `list_prod_ofFn_piTensor`,
   `trace_piTensor`: the tensor
   product is multiplicative sitewise and its trace is the product of the local traces.
+* `dotProduct_list_prod_mulVec`: a matrix element of an ordered product is a sum over open paths.
+* `piTensor_eq_zero`, `sum_smul_piTensor_single`: a zero factor, and linearity at one site.
 -/
 
 open Matrix
@@ -160,5 +162,81 @@ theorem trace_piTensor [DecidableEq ι] (A : ι → Matrix n n R) :
   exact (Fintype.prod_sum fun i s ↦ A i s s).symm
 
 end PiTensor
+
+
+/-! ### Open paths, scalars and reversal -/
+
+/-- The product of factors `c k • A k` is the product of the scalars times the product of the
+`A k`. -/
+theorem list_prod_ofFn_smul {S A : Type*} [CommSemiring S] [Semiring A] [Algebra S A] :
+    ∀ (m : ℕ) (c : Fin m → S) (f : Fin m → A),
+      (List.ofFn fun k ↦ c k • f k).prod = (∏ k, c k) • (List.ofFn f).prod
+  | 0, _, _ => by simp
+  | m + 1, c, f => by
+    rw [List.ofFn_succ, List.prod_cons, list_prod_ofFn_smul m, Fin.prod_univ_succ,
+      List.ofFn_succ, List.prod_cons, smul_mul_smul_comm]
+
+section OpenPath
+
+variable {R D : Type*} [CommSemiring R] [Fintype D] [DecidableEq D]
+
+/-- A matrix element of an ordered product as a sum over open paths `q 0, …, q m`. -/
+theorem dotProduct_list_prod_mulVec (v : D → R) :
+    ∀ (m : ℕ) (A : Fin m → Matrix D D R) (u : D → R),
+      u ⬝ᵥ ((List.ofFn A).prod *ᵥ v) =
+        ∑ q : Fin (m + 1) → D,
+          u (q 0) * (∏ i, A i (q i.castSucc) (q i.succ)) * v (q (Fin.last m))
+  | 0, A, u => by
+    rw [List.ofFn_zero, List.prod_nil, one_mulVec, sum_fin_succ_fun]
+    simp [dotProduct]
+  | m + 1, A, u => by
+    rw [List.ofFn_succ, List.prod_cons, ← mulVec_mulVec, dotProduct_mulVec,
+      dotProduct_list_prod_mulVec v m, sum_fin_succ_fun (n := m + 1), Finset.sum_comm]
+    refine Finset.sum_congr rfl fun q _ ↦ ?_
+    simp only [vecMul, dotProduct, Finset.sum_mul]
+    refine Finset.sum_congr rfl fun y _ ↦ ?_
+    rw [Fin.prod_univ_succ]
+    simp only [Fin.cons_zero, Fin.castSucc_zero, Fin.succ_zero_eq_one, Fin.cons_one,
+      ← Fin.succ_castSucc, Fin.cons_succ, ← Fin.succ_last]
+    ring
+
+end OpenPath
+
+/-- A tensor product with a zero factor vanishes. -/
+theorem piTensor_eq_zero {ι n R : Type*} [Fintype ι] [CommSemiring R] {A : ι → Matrix n n R}
+    {i₀ : ι} (h : A i₀ = 0) : piTensor A = 0 := by
+  ext σ τ
+  rw [piTensor_apply, Matrix.zero_apply]
+  exact Finset.prod_eq_zero (Finset.mem_univ i₀) (by rw [h, Matrix.zero_apply])
+
+/-- A sum of tensor products differing at one site is the tensor product with the sum there. -/
+theorem sum_smul_piTensor_single {ι n R X : Type*} [Fintype ι] [DecidableEq ι] [DecidableEq n]
+    [CommSemiring R] [Fintype X] (j : ι) (c : X → R) (A : X → Matrix n n R) :
+    ∑ x, c x • piTensor (fun i ↦ if i = j then A x else 1) =
+      piTensor fun i ↦ if i = j then ∑ x, c x • A x else 1 := by
+  ext σ τ
+  have key : ∀ B : Matrix n n R, piTensor (fun i ↦ if i = j then B else 1) σ τ =
+      B (σ j) (τ j) * ∏ i ∈ Finset.univ.erase j, (1 : Matrix n n R) (σ i) (τ i) := by
+    intro B
+    rw [piTensor_apply, ← Finset.mul_prod_erase _ _ (Finset.mem_univ j)]
+    simp only [ite_true]
+    congr 1
+    exact Finset.prod_congr rfl fun i hi ↦ by simp [Finset.ne_of_mem_erase hi]
+  simp only [Matrix.sum_apply, Matrix.smul_apply, key, smul_eq_mul, Finset.sum_mul, mul_assoc]
+
+/-- Reversing `List.ofFn f` reverses the argument of `f`. -/
+theorem list_ofFn_reverse {X : Type*} {m : ℕ} (f : Fin m → X) :
+    (List.ofFn f).reverse = List.ofFn fun t ↦ f t.rev := by
+  rw [List.ofFn_eq_map, ← List.map_reverse, List.finRange_reverse, List.map_map, List.ofFn_eq_map]
+  rfl
+
+/-- Conjugation by an involution commutes with powers. -/
+theorem pow_conj_of_mul_self {X : Type*} [Monoid X] {r : X} (hr : r * r = 1) (a : X) :
+    ∀ N : ℕ, (r * a * r) ^ N = r * a ^ N * r
+  | 0 => by simp [hr]
+  | N + 1 => by
+    rw [pow_succ, pow_conj_of_mul_self hr a N, pow_succ]
+    simp only [mul_assoc]
+    rw [← mul_assoc r r, hr, one_mul]
 
 end CertifiedGaps
