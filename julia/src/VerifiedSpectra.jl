@@ -132,7 +132,7 @@ end
 _translate(code, d, top) = (code % top) * d + code ÷ top
 
 """
-    ring_blocks(f, model, L)
+    ring_blocks(f, model, L; exact = true)
 
 Exact symmetry decomposition of the ring of L sites into charge sectors, lattice momenta and the
 parities of the model's on-site Z₂ `symmetries`. For each block it calls
@@ -152,8 +152,11 @@ the translation T and the global parities G^{⊗L}, all acting on product states
 permutations. P_χ U_γ = χ(γ) P_χ, so if H r = Σ c_s |s⟩ with |s⟩ = σ U_γ |r_s⟩, then
 ⟨s̃|H|r̃⟩ = √(o_r/o_s) Σ c_s σ χ(γ), with o the orbit sizes; r contributes to the block of
 character χ exactly when χ(δ) = σ for every element U_δ r = σ r of its stabilizer.
+
+With `exact = false` the blocks are computed in plain Float64 arithmetic and `matrix_error` is
+`nothing`: much faster, for floating-point scans only.
 """
-function ring_blocks(f, model::RingModel, L::Integer)
+function ring_blocks(f, model::RingModel, L::Integer; exact::Bool = true)
     L >= 2 || throw(ArgumentError("a ring needs L ≥ 2"))
     d = model.d
     dim = big(d)^L
@@ -186,7 +189,8 @@ function ring_blocks(f, model::RingModel, L::Integer)
         maps = flip_parity && partner == q ? [symmetries; [flip]] : symmetries
         table = _sector_table(model, L, codes_by_charge[q], top, maps, reflection)
         for m in momenta, parities in Iterators.product(fill((1, -1), length(maps))...)
-            built = _momentum_block(table, L, m, collect(Int, parities), real_model)
+            built = _momentum_block(table, L, m, collect(Int, parities), real_model,
+                _Arith{exact}())
             built === nothing && continue
             M, ε = built
             mult = pair * (paired && 0 < 2m < L ? 2 : 1)
@@ -296,6 +300,22 @@ end
 
 const _CI = Complex{Interval{Float64}}
 
+# Arithmetic of the block entries: intervals (`_Arith{true}`, for the verified enclosure) or
+# plain Float64 (`_Arith{false}`, for floating-point scans, which need no error bound).
+struct _Arith{exact} end
+_zero(::_Arith{true}) = complex(interval(0.0), interval(0.0))
+_zero(::_Arith{false}) = 0.0im
+_cispi(::_Arith{true}, x::Rational) =
+    complex(cospi(interval(Float64, x)), sinpi(interval(Float64, x)))
+_cispi(::_Arith{false}, x::Rational) = cispi(Float64(x))
+_sqrt_ratio(::_Arith{true}, a, b) = sqrt(interval(Float64, a) / interval(Float64, b))
+_sqrt_ratio(::_Arith{false}, a, b) = sqrt(a / b)
+_number(::_Arith{true}, c) =
+    complex(to_interval(Rational{BigInt}(real(c))), to_interval(Rational{BigInt}(imag(c))))
+_number(::_Arith{false}, c) = ComplexF64(c)
+_center(::_Arith{true}, x) = mid(x)
+_center(::_Arith{false}, x) = x
+
 # Product of the parities selected by the bits of g.
 _parity(parities, g) = prod((parities[j] for j in eachindex(parities) if isodd(g >> (j - 1)));
     init = 1)
@@ -308,7 +328,8 @@ end
 
 # Interval block at momentum k = 2πm/L and the given parities, then its center and an exact
 # bound on ‖A − M‖_F:  ⟨s̃|H|r̃⟩ = √(o_r/o_s) Σ c σ e^{ikl} parity(g)  (see `ring_blocks`).
-function _momentum_block(table, L, m, parities, real_model)
+# With `_Arith{false}` the block is computed in Float64 and the bound is `nothing`.
+function _momentum_block(table, L, m, parities, real_model, A = _Arith{true}())
     allowed = findall(eachindex(table.sizes)) do r
         all(_character_is(σ, L, m, parities, l, g) for (l, g, σ) in table.stabilizers[r])
     end
@@ -316,33 +337,30 @@ function _momentum_block(table, L, m, parities, real_model)
     index = zeros(Int, length(table.sizes))
     index[allowed] = 1:length(allowed)
     N = length(allowed)
-    phases = [complex(cospi(interval(Float64, 2 * ((m * l) % L) // L)),
-        sinpi(interval(Float64, 2 * ((m * l) % L) // L))) for l in 0:(L-1)]
-    ratios = Dict{Tuple{Int,Int},Interval{Float64}}()
-    coefficient = Dict{Any,_CI}()
-    enclose(c) = get!(coefficient, c) do
-        complex(to_interval(Rational{BigInt}(real(c))), to_interval(Rational{BigInt}(imag(c))))
-    end
+    exact = A isa _Arith{true}
+    phases = [_cispi(A, 2 * ((m * l) % L) // L) for l in 0:(L-1)]
+    ratios = Dict{Tuple{Int,Int},typeof(real(_zero(A)))}()
+    coefficient = Dict{Any,typeof(_zero(A))}()
+    enclose(c) = get!(() -> _number(A, c), coefficient, c)
     if real_model && table.mirror !== nothing && 0 < 2m < L
-        return _real_block(table, L, m, parities, allowed, phases, ratios, enclose)
+        return _real_block(table, L, m, parities, allowed, phases, ratios, enclose, A)
     end
     realblock = real_model && (2m) % L == 0
     M = realblock ? zeros(Float64, N, N) : zeros(ComplexF64, N, N)
     err2 = interval(0.0)
     for (j, r) in enumerate(allowed)
-        entries = Dict{Int,_CI}()
+        entries = Dict{Int,typeof(_zero(A))}()
         for ((s, l, g), c) in table.columns[r]
             i = index[s]
             (i == 0 || i > j) && continue          # upper triangle, allowed states only
-            ratio = get!(ratios, (table.sizes[r], table.sizes[s])) do
-                sqrt(interval(Float64, table.sizes[r]) / interval(Float64, table.sizes[s]))
-            end
-            entries[i] = get(entries, i, complex(interval(0.0), interval(0.0))) +
+            ratio = get!(() -> _sqrt_ratio(A, table.sizes[r], table.sizes[s]), ratios,
+                (table.sizes[r], table.sizes[s]))
+            entries[i] = get(entries, i, _zero(A)) +
                          _parity(parities, g) * enclose(c) * phases[l+1] * ratio
         end
         for (i, v) in entries
-            re = mid(real(v))
-            im = (realblock || i == j) ? 0.0 : mid(imag(v))
+            re = _center(A, real(v))
+            im = (realblock || i == j) ? 0.0 : _center(A, imag(v))
             if realblock
                 M[i, j] = re
                 M[j, i] = re
@@ -350,11 +368,12 @@ function _momentum_block(table, L, m, parities, real_model)
                 M[i, j] = complex(re, im)
                 M[j, i] = complex(re, -im)
             end
+            exact || continue
             e = interval(mag(real(v) - interval(re)))^2 + interval(mag(imag(v) - interval(im)))^2
             err2 += i == j ? e : 2e                # the mirrored entry has the same error
         end
     end
-    return M, RationalBig(sup(sqrt(err2)))
+    return M, exact ? RationalBig(sup(sqrt(err2))) : nothing
 end
 
 # Real basis of the block at 0 < k < π of a real model with a lattice reflection R. The
@@ -364,11 +383,11 @@ end
 # (|r̃⟩ + c|r̃′⟩)/√2 and i(|r̃⟩ − c|r̃′⟩)/√2 of a pair r ≠ r′, and e^{iθ}|r̃⟩ with e^{2iθ} = c of a
 # fixed r, form an orthonormal basis of the block in which ⟨u|H|v⟩ = conj⟨Au|H|Av⟩ is real.
 # Each basis vector is a list of (orbit index, interval coefficient).
-function _real_basis(table, L, m, parities, allowed, phases)
+function _real_basis(table, L, m, parities, allowed, phases, A = _Arith{true}())
     inblock = falses(length(table.sizes))
     inblock[allowed] .= true
-    h = sqrt(interval(0.5))
-    basis = Vector{Vector{Tuple{Int,_CI}}}()
+    h = _sqrt_ratio(A, 1, 2)
+    basis = Vector{Vector{Tuple{Int,typeof(_zero(A))}}}()
     for r in allowed
         r2, l, g, σ = table.mirror[r]
         inblock[r2] && table.mirror[r2][1] == r || error("the reflection does not pair states")
@@ -376,8 +395,7 @@ function _real_basis(table, L, m, parities, allowed, phases)
         c = ε * phases[l+1]
         if r2 == r
             # θ = π (ml mod L)/L, plus π/2 when ε = −1.
-            θ = interval(Float64, ((m * l) % L) // L + (ε == 1 ? 0 : 1 // 2))
-            push!(basis, [(r, complex(cospi(θ), sinpi(θ)))])
+            push!(basis, [(r, _cispi(A, ((m * l) % L) // L + (ε == 1 ? 0 : 1 // 2)))])
         elseif r < r2
             push!(basis, [(r, complex(h, zero(h))), (r2, c * h)])
             push!(basis, [(r, complex(zero(h), h)), (r2, complex(zero(h), -h) * c)])
@@ -389,40 +407,41 @@ end
 # The block of `_momentum_block` in the real basis of `_real_basis`: a real symmetric center
 # and an exact bound on ‖A − M‖_F. The true entries are real, so only the real part of each
 # interval entry is kept; its imaginary part must contain zero (checked).
-function _real_block(table, L, m, parities, allowed, phases, ratios, enclose)
-    basis = _real_basis(table, L, m, parities, allowed, phases)
-    members = [Tuple{Int,_CI}[] for _ in eachindex(table.sizes)]
+function _real_block(table, L, m, parities, allowed, phases, ratios, enclose, A)
+    basis = _real_basis(table, L, m, parities, allowed, phases, A)
+    T = typeof(_zero(A))
+    members = [Tuple{Int,T}[] for _ in eachindex(table.sizes)]
     for (j, v) in enumerate(basis), (a, w) in v
         push!(members[a], (j, w))
     end
+    exact = A isa _Arith{true}
     N = length(basis)
     M = zeros(Float64, N, N)
-    zero_ci = complex(interval(0.0), interval(0.0))
     err2 = interval(0.0)
     for (j, v) in enumerate(basis)
-        image = Dict{Int,_CI}()                  # H v on the orbit states of the block
+        image = Dict{Int,T}()                    # H v on the orbit states of the block
         for (r, w) in v, ((s, l, g), c) in table.columns[r]
             isempty(members[s]) && continue
-            ratio = get!(ratios, (table.sizes[r], table.sizes[s])) do
-                sqrt(interval(Float64, table.sizes[r]) / interval(Float64, table.sizes[s]))
-            end
-            image[s] = get(image, s, zero_ci) +
+            ratio = get!(() -> _sqrt_ratio(A, table.sizes[r], table.sizes[s]), ratios,
+                (table.sizes[r], table.sizes[s]))
+            image[s] = get(image, s, _zero(A)) +
                        w * (_parity(parities, g) * enclose(c) * phases[l+1] * ratio)
         end
-        entries = Dict{Int,_CI}()
+        entries = Dict{Int,T}()
         for (s, y) in image, (i, w) in members[s]
-            i <= j && (entries[i] = get(entries, i, zero_ci) + conj(w) * y)
+            i <= j && (entries[i] = get(entries, i, _zero(A)) + conj(w) * y)
         end
         for (i, x) in entries
-            in_interval(0, imag(x)) || error("a real-basis block entry is not real")
-            re = mid(real(x))
+            re = _center(A, real(x))
             M[i, j] = re
             M[j, i] = re
+            exact || continue
+            in_interval(0, imag(x)) || error("a real-basis block entry is not real")
             e = interval(mag(real(x) - interval(re)))^2
             err2 += i == j ? e : 2e
         end
     end
-    return M, RationalBig(sup(sqrt(err2)))
+    return M, exact ? RationalBig(sup(sqrt(err2))) : nothing
 end
 
 """
@@ -564,7 +583,7 @@ diagnostics, never a certificate (`verified_ring_spectrum` is the verified count
 """
 function float_ring_spectrum(model::RingModel, L::Integer)
     E = Float64[]
-    ring_blocks(model, L) do M, _, mult, _
+    ring_blocks(model, L; exact = false) do M, _, mult, _
         e = eigvals(Hermitian(M))
         for _ in 1:mult
             append!(E, e)
