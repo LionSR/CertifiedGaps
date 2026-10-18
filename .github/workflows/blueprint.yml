@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main # Trigger on pushes to the default branch
+    # Pages, notes and explainer alone go live through homepage.yml in minutes, without
+    # rebuilding the API docs. The leaderboard rows are validated here, so they still deploy here.
+    paths:
+      - "**"
+      - "!home_page/**"
+      - "!notes/**"
+      - "!explainer/**"
+      - "home_page/_data/records.yml"
   pull_request:
     branches:
       - main # Build and check pull requests into the default branch (no deploy)
@@ -22,6 +30,7 @@ permissions:
   contents: read          # Read access to repository contents
   pages: write            # Write access to GitHub Pages
   id-token: write         # Write access to ID tokens
+  actions: write          # Delete superseded `site` artifacts (see the last step)
 
 jobs:
   build_project:
@@ -108,3 +117,27 @@ jobs:
           blueprint: true
           homepage: home_page
           ruby-version: "3.1" # the Ruby of home_page/Gemfile.lock (github-pages 226)
+
+      # homepage.yml republishes the pages on top of this build's API docs, blueprint and films.
+      # Keep the built site, with the leaderboard data validated above, and only the newest copy.
+      - name: Keep the built site for home-page deploys
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: site
+          path: |
+            home_page/_site
+            home_page/_data/records.yml
+            home_page/_data/lean_records.json
+          retention-days: 90
+
+      - name: Delete older copies of the built site
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --paginate "repos/${{ github.repository }}/actions/artifacts?name=site&per_page=100" \
+            --jq '.artifacts[] | select(.workflow_run.id != ${{ github.run_id }}) | .id' |
+            while read -r id; do
+              gh api -X DELETE "repos/${{ github.repository }}/actions/artifacts/$id"
+            done
