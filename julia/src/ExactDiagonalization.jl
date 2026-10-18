@@ -178,8 +178,7 @@ log Σ exp(−β E) over a complete list of levels, shifted by the minimum for s
 """
 function log_partition(energies, beta)
     beta >= 0 || throw(ArgumentError("beta must be nonnegative"))
-    e0 = minimum(energies)
-    return -beta * e0 + log(sum(exp(-beta * (e - e0)) for e in energies))
+    return _logsumexp(-beta .* energies)
 end
 
 """
@@ -188,13 +187,8 @@ end
 Enclosure of log Z(β): the kept levels give the lower end, and the N − k uncomputed levels,
 each at least E[end], the upper end. Exact when the spectrum is complete.
 """
-function logZ_bounds(spec::PartialSpectrum, β::Real)
-    E₀ = spec.E[1]
-    lo = _logsumexp(-β .* (spec.E .- E₀))
-    hi = spec.exact ? lo :
-         _logaddexp(lo, log(spec.N - length(spec.E)) - β * (spec.E[end] - E₀))
-    return lo - β * E₀, hi - β * E₀
-end
+logZ_bounds(spec::PartialSpectrum, β::Real) =
+_logZ_bounds(spec.E, zeros(length(spec.E)), spec.N - length(spec.E), spec.exact, β)
 
 """
     WeightedSpectrum(E, weights, N, exact)
@@ -217,13 +211,16 @@ log Σᵢ wᵢ e^{−βEᵢ}, shifted by E[1] for stability; both ends equal for
 Otherwise the N − Σw unlisted states, each at least E[end], give the upper end. Floating point
 (a screening tool, not an enclosure).
 """
-function logZ_bounds(s::WeightedSpectrum, β::Real)
-    e0 = s.E[1]
-    z = sum(w * exp(-β * (e - e0)) for (e, w) in zip(s.E, s.weights))
-    lo = log(z) - β * e0
-    s.exact && return lo, lo
-    missing_states = s.N - sum(s.weights)
-    return lo, log(z + missing_states * exp(-β * (s.E[end] - e0))) - β * e0
+logZ_bounds(s::WeightedSpectrum, β::Real) =
+    _logZ_bounds(s.E, log.(s.weights), s.N - sum(s.weights), s.exact, β)
+
+# log Σᵢ e^{logwᵢ − βEᵢ} for ascending levels E, and with the `unlisted` other states each at
+# least E[end] as the upper end, both shifted by E[1] for stability.
+function _logZ_bounds(E, logw, unlisted, exact, β)
+    e0 = E[1]
+    lo = _logsumexp(logw .- β .* (E .- e0))
+    hi = exact ? lo : _logaddexp(lo, log(unlisted) - β * (E[end] - e0))
+    return lo - β * e0, hi - β * e0
 end
 
 _logaddexp(a, b) = max(a, b) + log1p(exp(-abs(a - b)))
