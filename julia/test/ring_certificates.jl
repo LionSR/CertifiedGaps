@@ -222,3 +222,43 @@ end
     # Symmetries survive the exact model record.
     @test decode_model(parse_exact_json(JSON3.write(encode_model(m)))).symmetries == m.symmetries
 end
+
+@testset "lattice reflection: real blocks at every momentum" begin
+    one = [1 0; 0 1]
+    swap = [1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1]
+    # Dimerized Heisenberg in two-site cells (rotated frame); the reflection swaps the cell.
+    rotated(J) = J * (-kron(SX, SX) - kron(ISY, ISY) - kron(SZ, SZ))
+    dimer(; kw...) = RingModel(4, kron(one, rotated(1 // 2), one), rotated(3 // 2); kw...)
+    # Heisenberg ladder in rung cells with its charge, leg exchange and flip; P = I.
+    leg(A, B) = kron(A, one, B, one) + kron(one, A, one, B)
+    ladder(; kw...) = RingModel(4, leg(SX, SX) - leg(ISY, ISY) + leg(SZ, SZ),
+        3 // 2 * (kron(SX, SX) - kron(ISY, ISY) + kron(SZ, SZ)); charge = [2, 0, 0, -2],
+        symmetries = [swap], flip = kron(2SX, 2SX), kw...)
+    eye = Matrix{Int}(I, 4, 4)
+    for (plain, reflected) in ((dimer(), dimer(; reflection = swap)),
+                               (ladder(), ladder(; reflection = eye)))
+        for L in 3:5
+            a, b = verified_ring_spectrum(plain, L), verified_ring_spectrum(reflected, L)
+            @test maximum(abs, levels(a) - levels(b)) < 1e-12
+            kinds = Type[]
+            ring_blocks((M, ε, mult, label) -> push!(kinds, eltype(M)), reflected, L)
+            @test all(==(Float64), kinds)
+            @test maximum(s.radius for s in b) < 1e-9
+        end
+    end
+    # A complex model: only 0 ≤ m ≤ L/2 is built, with the spectrum of the full ring.
+    X, Y, Z = [0 1; 1 0], [0 -im; im 0], [1 0; 0 -1]
+    bond = kron(Z, Z) + kron(X, Y) + kron(Y, X)
+    plain, reflected = RingModel(2, bond, Z), RingModel(2, bond, Z; reflection = one)
+    for L in 4:6
+        b = verified_ring_spectrum(reflected, L)
+        @test maximum(abs, levels(verified_ring_spectrum(plain, L)) - levels(b)) < 1e-12
+        @test maximum(s.label["momentum"] for s in b) == L ÷ 2
+    end
+    # Refused: a bond that is not mirror symmetric, and a P that is not an involution.
+    @test_throws ArgumentError RingModel(2, kron(X, Z) - kron(Z, X); reflection = one)
+    @test_throws ArgumentError RingModel(4, kron(one, rotated(1), one), rotated(1);
+        reflection = [0 1 0 0; 0 0 1 0; 0 0 0 1; 1 0 0 0])
+    m = dimer(; reflection = swap)
+    @test decode_model(parse_exact_json(JSON3.write(encode_model(m)))).reflection == m.reflection
+end

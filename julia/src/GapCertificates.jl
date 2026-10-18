@@ -161,7 +161,7 @@ function _stored_blocking(cert, model)
     c = _int(cert["blocking"]["cell"])
     stored = decode_model(cert["blocking"]["model"])
     blocking = (; cell = c, charge = stored.charge, modulus = stored.modulus, flip = stored.flip,
-        symmetries = stored.symmetries)
+        symmetries = stored.symmetries, reflection = stored.reflection)
     rebuilt, _ = _spectral(model, blocking)
     rebuilt.bond == stored.bond && rebuilt.onsite == stored.onsite ||
         error("the stored cell model is not the blocked site model")
