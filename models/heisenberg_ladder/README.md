@@ -100,14 +100,15 @@ julia --project=julia models/heisenberg_ladder/scripts/replay_scans.jl
 Measured CPU (user) times, Julia 1.12 on an Apple M5 with one BLAS thread, including start-up:
 `certify.jl` 76 s (121 s wall clock on a shared machine; 9–19 s per coupling, most of it the
 8-rung spectrum), `check.jl` 22 s, `check.jl --full` 75 s, `test/runtests.jl` 36 s,
-`scripts/audit.jl` 27 s. Other jobs ran concurrently, so wall-clock times were up to twice as
+`scripts/audit.jl` 27 s, `scripts/replay_scans.jl` 7 s. Other jobs ran concurrently, so wall-clock times were up to twice as
 large.
 
-
 The exploratory floating-point scans are regenerated per coupling by `scripts/scan.jl <J>`
-(unverified eigenvalues of the core symmetry blocks up to 10 rungs), followed by
-`scripts/extrapolate.jl`; `scripts/threshold_bisection.jl` proposes the threshold endpoints. The
-stored scans were produced by the earlier local block builder and were not rerun.
+(`float_ring_spectrum`: unverified eigenvalues of the core symmetry blocks up to 10 rungs, about
+57 min CPU per coupling, almost all of it the 10-rung blocks), followed by `scripts/extrapolate.jl`;
+`scripts/threshold_bisection.jl` (64 s CPU) proposes the threshold endpoints. All stored scans
+were regenerated with these scripts; their best seeds, the threshold bracket and the
+extrapolated seed lengths are unchanged.
 
 ## What is rigorous
 
