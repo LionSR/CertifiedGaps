@@ -2,14 +2,18 @@ name: Check certificates
 
 # Run the fast checker (check.jl, default mode) of model directories. A pull request that changes
 # only models/ checks the changed directories. A pull request that changes the leaderboard rows
-# (home_page/_data/records.yml), a push to main, the weekly schedule and a manual run check every
-# model directory that records.yml references, so every number on the site is rechecked.
+# (home_page/_data/records.yml) or the core package (julia/), a push to main, the weekly schedule
+# and a manual run check every model directory that records.yml references, so every number on
+# the site is rechecked. The core package's tests and the leaderboard validator (without the Lean
+# records, which need the Lean build in blueprint.yml) run on every trigger.
 on:
   pull_request:
     branches:
       - main
     paths:
       - "models/**"
+      - "julia/**"
+      - "tools/leaderboard/**"
       - "home_page/_data/records.yml"
   push:
     branches:
@@ -26,6 +30,31 @@ permissions:
   contents: read
 
 jobs:
+  core:
+    name: Core and leaderboard tests
+    runs-on: ubuntu-latest
+    env:
+      OPENBLAS_NUM_THREADS: 1
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@fa02766e078afaaf09b14210362cee14137e6a32 # v3.0.2
+        with:
+          version: "1.12"
+
+      - name: Cache Julia packages
+        uses: julia-actions/cache@9353db09a0f2bbbdec6f41791918c75d37391b36 # v3.5.0
+
+      - name: Test the core package
+        run: julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+
+      - name: Test the leaderboard validator and check the records against the certificates
+        run: |
+          julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+          julia --project=tools/leaderboard tools/leaderboard/check_records.jl
+
   changed:
     name: Find models to check
     runs-on: ubuntu-latest
@@ -51,8 +80,9 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
           records=home_page/_data/records.yml
+          # Checkers rerun the core arithmetic, so a change to julia/ rechecks every model.
           if [ "$EVENT" = pull_request ] && \
-             ! git diff --name-only "$BASE_SHA" HEAD | grep -qx "$records"; then
+             ! git diff --name-only "$BASE_SHA" HEAD | grep -qE "^($records|julia/)"; then
             slugs=$(git diff --name-only "$BASE_SHA" HEAD -- models/ | cut -d/ -f2)
           else
             # Every directory referenced by a slug, certificate or check field.
