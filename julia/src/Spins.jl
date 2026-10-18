@@ -9,14 +9,14 @@ Local spin operators in the three bases the projects use:
 * `cartesian_generators(s)`: a real basis in which G_α = iS^α are real antisymmetric, so that
   −S·S = Σ_α G_α ⊗ G_α is reflection positive (s = 1, 2);
 * exact matrices for RP identities: `exact_pauli`, `exact_spin_half` (any rational element
-  type) and `integer_cartesian_generators` (spin 1, integer entries).
+  type), `integer_cartesian_generators` and `integer_spin_one` (spin 1, integer entries).
 """
 module Spins
 
 using LinearAlgebra
 
 export spin_matrices, integer_ladders, binomial_weights, cartesian_generators, PAULI,
-    exact_pauli, exact_spin_half, integer_cartesian_generators
+    exact_pauli, exact_spin_half, integer_cartesian_generators, integer_spin_one
 
 """
     spin_matrices(s) -> (; sz, sp, sm, sx, sy)
@@ -125,5 +125,15 @@ end
 "Pauli matrices and the identity."
 const PAULI = (x = ComplexF64[0 1; 1 0], y = ComplexF64[0 -im; im 0],
     z = ComplexF64[1 0; 0 -1], i = ComplexF64[1 0; 0 1])
+
+"""
+    integer_spin_one() -> (; xp, ap, sz, flip, id)
+
+Spin 1 in the Sᶻ basis m = 1, 0, −1 with integer entries (`Matrix{Int}`): `xp = √2 Sˣ`, the
+real antisymmetric `ap = √2 iSʸ`, `sz = Sᶻ`, and the spin flip `flip` (m ↦ −m, which keeps Sˣ
+and reverses Sʸ and Sᶻ). Then S·S = xp⊗xp/2 − ap⊗ap/2 + sz⊗sz exactly.
+"""
+integer_spin_one() = (xp = [0 1 0; 1 0 1; 0 1 0], ap = [0 1 0; -1 0 1; 0 -1 0],
+    sz = [1 0 0; 0 0 0; 0 0 -1], flip = [0 0 1; 0 1 0; 1 0 0], id = [1 0 0; 0 1 0; 0 0 1])
 
 end

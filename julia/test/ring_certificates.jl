@@ -358,3 +358,24 @@ end
     @test all(0 < p["max_min_purity"] <= 1 for p in peaks)
     @test peaks[2]["best_bound"] == best_seed(filter(r -> r.n₀ == 4, results)).bound
 end
+
+@testset "model-building helpers: swap, frame change, integer spin one" begin
+    S = swap_matrix(3)
+    A, B = [1 2 0; 0 1 0; 3 0 1], [0 1 0; 1 0 0; 0 0 2]
+    @test S * kron(A, B) * S == kron(B, A) && S * S == I
+    s1 = integer_spin_one()
+    sx, sy, sz = (spin_matrices(1)[k] for k in (:sx, :sy, :sz))
+    @test s1.xp ≈ sqrt(2) * sx && s1.ap ≈ sqrt(2) * im * sy && s1.sz == sz
+    heis = kron(s1.xp, s1.xp) // 2 - kron(s1.ap, s1.ap) // 2 + kron(s1.sz, s1.sz)
+    @test heis ≈ real(kron(sx, sx) + kron(sy, sy) + kron(sz, sz))
+    @test s1.flip * s1.sz * s1.flip == -s1.sz && s1.flip * s1.xp * s1.flip == s1.xp
+    # The sublattice rotation of spin ½ in two-site cells: (1 ⊗ iσʸ) maps S·S inside the cell
+    # onto its rotated form.
+    one = [1 0; 0 1]
+    heis2 = kron(SX, SX) - kron(ISY, ISY) + kron(SZ, SZ)
+    rotated = -kron(SX, SX) - kron(ISY, ISY) - kron(SZ, SZ)
+    U = kron(one, [0 1; -1 0])
+    physical = RingModel(4, kron(one, heis2, one), heis2)
+    @test is_frame_change(physical, RingModel(4, kron(one, rotated, one), rotated), U)
+    @test !is_frame_change(physical, RingModel(4, kron(one, heis2, one), heis2), 2U)
+end

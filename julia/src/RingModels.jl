@@ -15,7 +15,8 @@ using LinearAlgebra
 using ..ExactArithmetic: RationalBig, parse_rational
 using ..ReflectionPositivity: realign
 
-export RingModel, cell_model, isreal_model, conserves_charge, RPCertificate, rp_certificate,
+export RingModel, cell_model, isreal_model, conserves_charge, swap_matrix, is_frame_change,
+    RPCertificate, rp_certificate,
     verify_rp, exact_matrix, encode_matrix, decode_matrix, encode_model, decode_model, encode_rp,
     decode_rp
 
@@ -148,6 +149,29 @@ function _valid_symmetry(m::RingModel, G)
     return GG * m.bond * GG == m.bond && G * m.onsite * G == m.onsite
 end
 
+"Swap of two d-level sites: S (a ⊗ b) = b ⊗ a (`Matrix{Int}`, state (a, b) at d(a − 1) + b)."
+function swap_matrix(d::Integer)
+    S = zeros(Int, d^2, d^2)
+    for a in 1:d, b in 1:d
+        S[(b-1)*d+a, (a-1)*d+b] = 1
+    end
+    return S
+end
+
+"""
+    is_frame_change(physical, rotated, U) -> Bool
+
+Exact check that the on-site unitary U maps one model onto the other: U is unitary,
+(U ⊗ U)† h (U ⊗ U) is the rotated bond and U† o U the rotated on-site term, so that
+H_rotated = (U^{⊗L})† H_physical U^{⊗L} on every ring.
+"""
+function is_frame_change(physical::RingModel, rotated::RingModel, U::AbstractMatrix)
+    V = exact_matrix(U)
+    UU = kron(V, V)
+    return physical.d == rotated.d == size(V, 1) && V' * V == I &&
+           UU' * physical.bond * UU == rotated.bond && V' * physical.onsite * V == rotated.onsite
+end
+
 # Exact check of the conditions on `reflection` stated in the `RingModel` docstring.
 function _valid_reflection(m::RingModel)
     P, d = m.reflection, m.d
@@ -156,10 +180,7 @@ function _valid_reflection(m::RingModel)
         return false
     all(P * G == G * P for G in m.symmetries) || return false
     m.flip === nothing || P * m.flip == m.flip * P || return false
-    S = zeros(ExactEntry, d^2, d^2)
-    for a in 1:d, b in 1:d
-        S[(b-1)*d+a, (a-1)*d+b] = 1
-    end
+    S = swap_matrix(d)
     PP = kron(P, P)
     return PP * m.bond * PP == S * m.bond * S && P * m.onsite * P == m.onsite
 end
