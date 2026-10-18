@@ -4,7 +4,7 @@
 unique ground state and spectral gap $\Delta_L \ge$ the interval bound `interval_bound_decimal`
 (`certified_gap_bound`) of its certificate, and $\Delta_L >$ the exact rational chain bound
 `gap_lower_bound`, which is at most $`0.13\%`$ smaller. Each certificate is produced end to end by
-the shared core pipeline `CertifiedGaps.GapCertificates.certify_gap` (exact RP identity, verified
+the shared core driver `CertifiedGaps.GapCertificates.certify_point` (exact RP identity, verified
 spectra of the 6- and 12-site rings, doubling recurrence). The smallest bound on the grid is
 $\Delta_L \ge 0.07634$ (interval; chain $76277619/10^9 \approx 0.07628$) at $g = 1, h = 1/20$.
 
@@ -23,9 +23,12 @@ H_L = -\sum_{j=1}^L Z_j Z_{j+1} - g \sum_{j=1}^L X_j - h \sum_{j=1}^L Z_j,
 
 on the 30-point grid $`g \in \{1/4, 1/2, 3/4, 1, 3/2, 2\} \times h \in \{1/20, 1/10, 1/4, 1/2, 1\}`$.
 For $h > 0$ the model is non-integrable and the $\mathbb{Z}_2$ spin-flip symmetry is broken, so no
-additive charge is conserved; the core splits each ring by lattice momentum only. The model is
-the core `RingModel(2, -Z⊗Z, -gX - hZ)` built by `longitudinal(g, h)` in
-`src/LongitudinalCertificate.jl`.
+additive charge is conserved; the core splits each ring by lattice momentum only. The site
+reflection $x \mapsto -x$ (on-site $P = I$, valid because the bond $Z \otimes Z$ is mirror
+symmetric) maps momentum $k$ to $-k$; since the model is real, the core builds every momentum
+block as a real symmetric matrix. The model is the core
+`RingModel(2, -Z⊗Z, -gX - hZ; reflection = I)` built by `longitudinal(g, h)` in
+`src/LongitudinalCertificate.jl`; the constructor checks the reflection exactly.
 
 ## Reflection positivity
 
@@ -39,21 +42,22 @@ identity. There the bond satisfies
 and the on-site term $o = -gX - hZ$ is real symmetric. The core `verify_rp` checks this identity
 in exact rational arithmetic when a certificate is made and again in every check;
 `test/runtests.jl` checks, at all 30 points and against independently written Pauli matrices, that
-the stored terms equal the physical ones conjugated by the identity frame unitary, and that the
-core's exact LDL† factorization also finds an RP certificate.
+the identity is an exact frame change to the physical model (core `is_frame_change`), and that
+the core's exact LDL† factorization also finds an RP certificate.
 
 ## Seeds and certified bounds
 
 Every point uses $n_0 = 6$ with the $\beta_0 \in \frac14\mathbb{Z}$ of the table `BETA0` (chosen by
 the floating-point scan `scripts/scan.jl`). The core encloses the complete spectra of the 6- and
-12-site rings (momentum blocks $0 \le k \le L/2$; largest block 352; eigenvalue radii below
-$1.4 \times 10^{-9}$), encloses $\log Z$, rounds the seed defects up to the grid $10^{-15}$, and
-applies `certified_gap_bound` (interval bound) and `rational_gap_chain` (exact chain). The exact
+12-site rings (real momentum blocks $0 \le k \le L/2$; largest block 352; eigenvalue radii
+below $1.1 \times 10^{-9}$), encloses $\log Z$, rounds the seed defects up to the grid
+$10^{-15}$, and applies `certified_gap_bound` (interval bound) and `rational_gap_chain` (exact
+chain). The exact
 $(n_0, \beta_0, \varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ and bounds of all points are in
 [`results/seeds.json`](results/seeds.json); every
 $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$ is at most the seed defect assumed for that point in
 [`lean/CertifiedGaps/Models/IsingLongitudinal.lean`](../../lean/CertifiedGaps/Models/IsingLongitudinal.lean)
-(checked exactly by the tests).
+(read with the core `lean_points` and checked exactly by `check.jl`).
 
 Certified gap lower bounds, interval bound $\Delta_L \ge$ / exact chain bound $\Delta_L >$ (with
 $\beta_0$ in parentheses):
@@ -76,16 +80,16 @@ the asymmetric recurrence.
 ## Reproduce
 
 From the repository root, in the core environment `julia/` (this model has no environment of
-its own), with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1` (times on an Apple M-series
-laptop):
+its own), with Julia 1.12 and `export OPENBLAS_NUM_THREADS=1` (wall and CPU times on an Apple
+M-series laptop shared with other jobs):
 
 ```sh
 julia --project=julia -e 'using Pkg; Pkg.instantiate()'
-julia --project=julia models/tfim_longitudinal/certify.jl         # ~75 s
-julia --project=julia models/tfim_longitudinal/check.jl           # ~16 s
-julia --project=julia models/tfim_longitudinal/check.jl --full    # ~42 s
-julia --project=julia models/tfim_longitudinal/test/runtests.jl   # ~30 s
-julia --project=julia models/tfim_longitudinal/scripts/scan.jl    # ~27 s
+julia --project=julia models/tfim_longitudinal/certify.jl         # 126 s wall, 56 s CPU
+julia --project=julia models/tfim_longitudinal/check.jl           #  55 s wall, 17 s CPU
+julia --project=julia models/tfim_longitudinal/check.jl --full    # 112 s wall, 30 s CPU
+julia --project=julia models/tfim_longitudinal/test/runtests.jl   # 186 s wall, 41 s CPU
+julia --project=julia models/tfim_longitudinal/scripts/scan.jl    #  71 s wall, 23 s CPU
 ```
 
 `certify.jl` accepts optional point indices `1–30` ($g$-major order); after a run it rewrites
@@ -93,34 +97,36 @@ julia --project=julia models/tfim_longitudinal/scripts/scan.jl    # ~27 s
 
 ## What is rigorous
 
-- **Checked by `check.jl`:** per certificate, the recorded model-local source hashes (enforced),
-  the stored model, RP factor and seed against the grid definition, the exact RP identity and the
-  exact rational chain reproducing the stored bound (core `check_certificate(cert; spectra =
-  false)`), and `results/seeds.json` against the certificates. `--full` also re-encloses both
-  seed spectra with the current core and requires the fresh defect enclosures not to exceed the
-  stored $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$, the only spectral inputs of the chain.
-- **Trusted base:** exact rational arithmetic (RP identity, chain); `IntervalArithmetic` for block
-  entries, $\log Z$ and the defects; and the eigenvalue enclosure
+- **Checked by `check.jl`:** per certificate, the core `check_point` against the grid point's
+  definition: the recorded model-local source hashes (enforced); the stored model (with its
+  reflection), RP factor, seed $(n_0, \beta_0)$ and params $(g, h)$; stored
+  $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$ at most the seed defects of the Lean statement; the
+  exact RP identity, the exact rational chain reproducing the stored bound, and the interval bound
+  (core `check_certificate(cert; spectra = false)`). Then `results/seeds.json` against the
+  certificates. `--full` also re-encloses both seed spectra with the current core and requires
+  the fresh defect enclosures not to exceed the stored
+  $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$, the only spectral inputs of the chain.
+- **Trusted base:** exact rational arithmetic (RP identity, reflection, chain);
+  `IntervalArithmetic` for block entries, $\log Z$ and the defects; and the eigenvalue enclosure
   `CertifiedGaps.VerifiedSpectra.verified_eigen` under the IEEE binary64 + BLAS rounding model
   (round to nearest, $|\mathrm{fl}(\sum a_i b_i) - \sum a_i b_i| \le \gamma_K \sum |a_i b_i|$ for
-  any summation order and FMA, with $K = N + 8$ for the real blocks $k = 0, L/2$ and $K = 2N + 8$
-  for complex blocks, which use four real GEMMs; Frobenius norms; an underflow allowance), then
-  Ostrowski or polar-factor and Weyl bounds. Gradual underflow is checked at load time; BLAS
-  runs single-threaded.
+  any summation order and FMA, with $K = N + 8$, every block being real; Frobenius norms; an
+  underflow allowance), then Ostrowski or polar-factor and Weyl bounds. Gradual underflow is
+  checked at load time; BLAS runs single-threaded.
 - **Floating-point only:** the seed scan `scripts/scan.jl` and `results/scan.json` (it matches
   `BETA0` at 29 of 30 points; at $g = 1/4, h = 1$ it prefers $\beta_0 = 23/4$ because its `Float64`
-  defects there are at rounding level, about $10^{-16}$, so its float bound is meaningless).
+  defects there are zero to rounding, so its float bound is meaningless).
 
 ## Layout
 
 | path | role |
 |---|---|
-| `certify.jl` | loops `certify_gap` over the grid, writes the certificates and `results/seeds.json` |
+| `certify.jl` | runs `certify_point` over the grid, writes the certificates and `results/seeds.json` |
 | `check.jl` | checker entry point (`--full` re-encloses the seed spectra) |
-| `src/LongitudinalCertificate.jl` | model, RP factor, grid and seeds, provenance, per-point checks |
+| `src/LongitudinalCertificate.jl` | model, reflection, RP factor, grid and seeds, Lean seeds, seed table |
 | `scripts/scan.jl` | floating-point seed scan $\to$ `results/scan.json` |
-| `test/runtests.jl` | frame and RP, spectra vs ED, fast checks, tampering, Lean seed bounds |
-| `METHOD.md` | pipeline, checker semantics and the old-versus-new comparison |
+| `test/runtests.jl` | frame, reflection and RP, spectra vs ED, fast checks, tampering, seed table |
+| `METHOD.md` | pipeline, checker semantics and the old-versus-new comparisons |
 | `IDEAS.md` | candidate routes and selection rationale |
 | `results/certificate_g<g>_h<h>.json.gz` | core-format certificate of one grid point (gzip JSON) |
 | `results/seeds.json` | exact $g, h, n_0, \beta_0, \varepsilon_{\mathrm{s}}, \varepsilon_\tau$ and bounds of all points |
@@ -146,3 +152,10 @@ $`0.13\%`$ below the old interval bound at 13 points (e.g. $0.07628$ at $g = 1, 
 See `METHOD.md`.
 The model-local `Project.toml`/`Manifest.toml` were then removed: everything runs in the core
 environment (`--project=julia`), and the certificates were regenerated with identical seeds.
+Later the model was routed through the core drivers `certify_point`, `check_point` and
+`lean_points` (replacing the model-local certify loop, checker and Lean regex), the scan through
+`float_ring_spectrum` and `seed_record`, and the site reflection ($P = I$) and the params
+$(g, h)$ were added to every certificate. At the same seeds the real blocks halve the largest
+eigenvalue radius ($2.6 \to 1.1 \times 10^{-9}$); no defect or bound got worse (17 values of
+$\varepsilon_{\mathrm{s}}$ and 18 of $\varepsilon_\tau$ decreased in the last digits of the
+$10^{-15}$ grid, and 7 chain bounds grew).

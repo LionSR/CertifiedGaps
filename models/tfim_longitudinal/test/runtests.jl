@@ -1,11 +1,10 @@
-# Fast tests: model frame and RP, verified spectra against independent ED, the fast checks of
-# all 30 certificates, tamper detection, one full replay, the seed table and the Lean seeds.
+# Fast tests: model frame, reflection and RP, verified spectra against independent ED, the fast
+# checks of all 30 certificates, tamper detection, one full replay and the seed table.
 using Test, LinearAlgebra
 include(joinpath(@__DIR__, "..", "src", "LongitudinalCertificate.jl"))
 using .LongitudinalCertificate, CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.RingModels
 using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum, log_partition_enclosure
 using CertifiedGaps.ExactDiagonalization: Chain, ring_bonds, spectrum
-using CertifiedGaps.ExactArithmetic: parse_rational
 using CertifiedGaps.Models: tfim_logZ
 using IntervalArithmetic: in_interval
 const C = LongitudinalCertificate
@@ -14,17 +13,18 @@ const C = LongitudinalCertificate
 const PX, PZ = Rational{BigInt}[0 1; 1 0], Rational{BigInt}[1 0; 0 -1]
 levels(spec) = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spec]))
 
-@testset "Frame and exact RP" begin
-    U = Matrix{Rational{BigInt}}(I, 2, 2)
+@testset "Frame, reflection and exact RP" begin
     for (g, h) in C.points()
         m = C.longitudinal(g, h)
-        # The certificate frame is the physical one: the frame unitary U is the identity, so
-        # the stored terms must equal the conjugated physical bond and on-site term exactly.
-        @test m.bond == kron(U, U)' * (-kron(PZ, PZ)) * kron(U, U)
-        @test m.onsite == U' * (-g * PX - h * PZ) * U
+        # The certificate frame is the physical one: the frame unitary is the identity.
+        @test is_frame_change(RingModel(2, -kron(PZ, PZ), -g * PX - h * PZ), m, I(2))
+        @test m.reflection == I(2)
         @test verify_rp(m, C.rp(m)) && verify_rp(m, rp_certificate(m))
         @test isreal_model(m) && all(iszero, m.charge)
     end
+    # The site reflection must map the bond to its mirror image: a non-symmetric bond fails.
+    @test_throws ArgumentError RingModel(2, -kron(PZ, PX) - kron(PX, PZ) + kron(PZ, PX);
+        reflection = I(2))
 end
 
 @testset "Verified spectra against computational-basis ED" begin
@@ -39,57 +39,51 @@ end
     @test in_interval(Float64(tfim_logZ(8, 3//2, 2)), z)
 end
 
-paths = C.result_paths()
+lean = C.lean_seeds()
 @testset "Fast checks of all certificates" begin
-    @test C.check_grid(paths)
-    for path in paths
-        @test C.check_point(path)["gap_lower_bound"] == read_result(path)["gap_lower_bound"]
+    @test C.check_grid(C.result_paths())
+    for (g, h) in C.points()
+        @test C.check(g, h; lean)["gap_lower_bound"] ==
+              read_result(C.certificate_path(g, h))["gap_lower_bound"]
     end
 end
 
 @testset "Tampering is detected" begin
-    path = C.certificate_path(1//1, 1//20)
-    name = basename(path)
-    tampered(f) = (c = read_result(path); f(c); c)
-    @test_throws Exception C.check_record(tampered(c -> c["seed"]["eps_s"] = "1//100"), name)
-    @test_throws Exception C.check_record(tampered(c -> c["gap_lower_bound"] = "1//10"), name)
-    @test_throws Exception C.check_record(tampered(c -> c["seed"]["beta0"] = "7//1"), name)
-    @test_throws Exception C.check_record(tampered(c -> c["h"] = "1//10"), name)
-    @test_throws Exception C.check_record(
-        tampered(c -> c["model"]["onsite"]["re"][1][1] = "-1//10"), name)
-    @test_throws Exception C.check_record(tampered(c ->
-        c["metadata"]["source_sha256"]["models/tfim_longitudinal/check.jl"] = "0"^64), name)
+    g, h = 1//1, 1//20
+    dir = mktempdir()
+    # A copy of the stored certificate with one field changed, at a path of the same name.
+    function tampered(f)
+        c = read_result(C.certificate_path(g, h))
+        f(c)
+        path = joinpath(dir, basename(C.certificate_path(g, h)))
+        write_result(path, c)
+        path
+    end
+    fails(f; full = false, lean = lean) =
+        (@test_throws Exception C.check(g, h; path = tampered(f), full, lean))
+    @test C.check(g, h; path = tampered(identity), lean)["gap_lower_bound"] ==
+          read_result(C.certificate_path(g, h))["gap_lower_bound"]
+    fails(c -> c["seed"]["eps_s"] = "1//100")
+    fails(c -> c["gap_lower_bound"] = "1//10")
+    fails(c -> c["interval_bound_decimal"] = 0.08)
+    fails(c -> c["seed"]["beta0"] = "7//1")
+    fails(c -> c["params"]["h"] = "1//10")
+    fails(c -> c["model"]["onsite"]["re"][1][1] = "-1//10")
+    fails(c -> delete!(c["model"], "reflection"))
+    fails(c -> c["metadata"]["source_sha256"]["models/tfim_longitudinal/check.jl"] = "0"^64)
+    # Stored defects above the Lean seed defects fail even when the certificate is consistent.
+    fails(identity; lean = Dict((g, h) => (s = 18//100, t = 1//100)))
     # A stored εₛ below the fresh enclosure (≈ 0.18399987) fails the full replay.
-    low = tampered(c -> c["seed"]["eps_s"] = "18399//100000")
-    @test_throws Exception C.check_record(low, name; full = true)
+    fails(c -> c["seed"]["eps_s"] = "18399//100000"; full = true)
 end
 
 @testset "Full replay of the critical point g = 1, h = 1/20" begin
-    r = C.check_point(C.certificate_path(1//1, 1//20); full = true)
+    r = C.check(1//1, 1//20; full = true, lean)
     @test r["defect_s_upper"] <= 0.184 && r["defect_t_upper"] <= 0.0075
 end
 
-@testset "Seed table and the Lean seeds" begin
-    table = read_result(joinpath(C.ROOT, "results", "seeds.json"))
-    @test length(table["points"]) == 30
-    @test table["points"] == parse_exact_json(Results.JSON3.write(C.seed_rows()))
-    # lean/CertifiedGaps/Models/IsingLongitudinal.lean states each point's seed defects as the
-    # first entries of its `s` and `t` lists (rounded up); the certified ones must not exceed
-    # them, at the same (g, h, β₀).
-    lean = read(joinpath(C.ROOT, "..", "..", "lean", "CertifiedGaps", "Models",
-        "IsingLongitudinal.lean"), String)
-    frac(s) = (p = split(s, " / "); parse(BigInt, p[1]) //
-        (length(p) == 1 ? 1 : parse(BigInt, p[2])))
-    sci(s) = (m = match(r"^(\d+)e-(\d+)$", s); parse(BigInt, m[1]) // big(10)^parse(Int, m[2]))
-    rows = Dict((parse_rational(r["g"]), parse_rational(r["h"])) => r for r in table["points"])
-    pattern = r"⟨([^,]+), ([^,]+), ([^,]+), \{\s*s := \[([^,]+),[^\]]*\]\s*t := \[([^,]+),"s
-    found = 0
-    for m in eachmatch(pattern, lean)
-        r = rows[(frac(m[1]), frac(m[2]))]
-        @test parse_rational(r["beta0"]) == frac(m[3]) && r["n0"] == "6"
-        @test parse_rational(r["epsilon_s"]) <= sci(m[4])
-        @test parse_rational(r["epsilon_t"]) <= sci(m[5])
-        found += 1
-    end
-    @test found == 30
+@testset "Seed table" begin
+    @test C.check_seed_table()
+    @test length(read_result(joinpath(C.ROOT, "results", "seeds.json"))["points"]) == 30
+    @test length(lean) == 30
 end
