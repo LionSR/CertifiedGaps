@@ -27,9 +27,13 @@ Serve the directory and open `index.html` or `open.html` (MathJax and EB Garamon
 cd explainer && python3 -m http.server 8000   # then open http://localhost:8000
 ```
 
-The pages expect `film.mp4` and `open-chains.mp4` next to them. They are not committed; render them
-with Playwright, ffmpeg, and the [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) speech
-model (run locally through `kokoro-js`; its ONNX weights, about 300 MB, download on first use):
+The pages expect `film.mp4` and `open-chains.mp4` next to them. They are too large for git, so they
+live as assets of the [`films` release](https://github.com/LionSR/CertifiedGaps/releases/tag/films),
+and the site deploy downloads them from there. To view them locally, download them
+(`gh release download films --dir explainer`) or render them with Playwright, ffmpeg, and the
+[Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) speech model (run locally through
+`kokoro-js`; its ONNX weights, about 300 MB, download on first use). Rendering both films takes about
+17 minutes on a laptop once the narration clips are cached:
 
 ```sh
 cd explainer && npm install --no-save playwright kokoro-js
@@ -42,6 +46,12 @@ node render.mjs film.html film.mp4 --mute        # silent, on the original capti
 Each caption beat is read from `narration.js` in the `af_heart` voice. A beat whose line runs longer
 than its caption plays up to 25% slower and then holds its last frame until the line ends. Clips are
 cached in `.voice/` by a hash of their text, so editing one line re-synthesizes only that line.
+
+After re-rendering, replace the release assets; the next deploy (any push to `main`) serves them:
+
+```sh
+gh release upload films film.mp4 open-chains.mp4 --clobber
+```
 
 ## What is rigorous
 
