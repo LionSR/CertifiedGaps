@@ -24,7 +24,7 @@ end
         model = ring_model(D)
         @test verify_rp(model, rp_data(model))
         # The exact LDL factorization of the realignment finds the same reflected form.
-        @test verify_rp(model, rp_certificate(model; reflection = REFLECTION))
+        @test verify_rp(model, rp_certificate(model; reflection = RP_REFLECTION))
     end
     # Without the reflection the bond is not reflection positive in the Sᶻ basis.
     @test_throws ArgumentError rp_certificate(ring_model(4 // 1))
