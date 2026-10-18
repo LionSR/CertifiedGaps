@@ -109,7 +109,11 @@ certify used 122 CPU minutes. `certify.jl 7` and `check.jl --full` enclose the 6
 radii up to $6.6 \times 10^{-7}$; they reached 7.1 GB resident and a 10 GB peak footprint. The
 fast check skips the spectra; the tests replay the rings of 2 and 4 cells. The scan caches
 spectra in gitignored `results/spectrum_d<d>_c<cells>.json` files, which `scripts/report.jl`
-reads.
+reads. `scan_d9.json`, `scan_d8.json` and `scan_d7.json` were regenerated with the core
+`float_ring_spectrum` (30 to 47 min each, up to 6.8 GB peak); `scan_d6.json`, `scan_d5.json`, `summary.json` and
+the results section of `METHOD.md` still hold the output of the former scan code (old record
+keys `epsilon_s`, `epsilon_t`) and are to be regenerated later with the loop above and
+`scripts/report.jl`.
 
 ## What is rigorous
 

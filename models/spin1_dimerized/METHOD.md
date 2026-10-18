@@ -157,6 +157,10 @@ An independent audit reviewed the pre-core pipeline (`src/rp.jl`, `src/common.jl
 
 ## Results from completed runs
 
+This section was written by `scripts/report.jl` from the former scan code; the regenerated
+`scan_d9.json`, `scan_d8.json` and `scan_d7.json` agree with it (same best seeds and purity
+peaks), and the section will be rebuilt once `scan_d6.json` and `scan_d5.json` are rerun.
+
 Best numerical seed per parameter, over n=2,3 and beta=0.25:0.25:32:
 
 | delta | n | beta | epsilon_s | epsilon_t | numerical recurrence bound | ED gap (12 spins) |
