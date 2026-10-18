@@ -2,141 +2,141 @@
     "J": "2//1",
     "lowest_32_numerical_levels": [
         -17.187346252335793,
-        -15.905372927577853,
-        -15.905372927577853,
-        -15.905372927577849,
-        -15.54117779809304,
-        -15.54117779809304,
-        -15.54117779809304,
-        -15.54117779809304,
-        -15.541177798093036,
-        -15.541177798093036,
-        -14.896852339034728,
-        -14.896852339034728,
+        -15.905372927577842,
+        -15.905372927577842,
+        -15.905372927577838,
+        -15.541177798093042,
+        -15.541177798093042,
+        -15.541177798093042,
+        -15.541177798093042,
+        -15.541177798093024,
+        -15.541177798093024,
         -14.896852339034721,
         -14.896852339034721,
         -14.896852339034721,
         -14.896852339034721,
-        -14.438864137522494,
-        -14.42348814322912,
-        -14.42348814322912,
+        -14.896852339034709,
+        -14.896852339034709,
+        -14.438864137522513,
+        -14.423488143229124,
+        -14.423488143229102,
+        -14.423488143229102,
         -14.423488143229095,
-        -14.423488143229088,
-        -14.423488143229088,
-        -14.390102564496638,
-        -14.390102564496638,
-        -14.390102564496638,
-        -14.390102564496638,
-        -14.39010256449663,
-        -14.39010256449663,
-        -14.337505725398756,
-        -14.337505725398756,
-        -14.33750572539873,
-        -14.33750572539873
+        -14.423488143229095,
+        -14.390102564496642,
+        -14.390102564496642,
+        -14.39010256449662,
+        -14.39010256449662,
+        -14.39010256449662,
+        -14.39010256449662,
+        -14.337505725398731,
+        -14.337505725398731,
+        -14.337505725398731,
+        -14.337505725398731
     ],
     "logZ_grid": [
         {
-            "logZ": 14.236706893036951,
+            "logZ": 14.236706893037077,
             "beta": "1//4"
         },
         {
-            "logZ": 15.41964683242314,
+            "logZ": 15.419646832423087,
             "beta": "1//2"
         },
         {
-            "logZ": 17.42054108275446,
+            "logZ": 17.42054108275452,
             "beta": "3//4"
         },
         {
-            "logZ": 20.133762483214912,
+            "logZ": 20.13376248321505,
             "beta": "1//1"
         },
         {
-            "logZ": 23.389040001280954,
+            "logZ": 23.389040001281078,
             "beta": "5//4"
         },
         {
-            "logZ": 27.01757633870579,
+            "logZ": 27.017576338705826,
             "beta": "3//2"
         },
         {
-            "logZ": 30.888210156197538,
+            "logZ": 30.88821015619979,
             "beta": "7//4"
         },
         {
-            "logZ": 34.911726573685115,
+            "logZ": 34.911726573687524,
             "beta": "2//1"
         },
         {
-            "logZ": 39.03133084070407,
+            "logZ": 39.031330840707014,
             "beta": "9//4"
         },
         {
-            "logZ": 43.21177844960748,
+            "logZ": 43.211778449609774,
             "beta": "5//2"
         },
         {
-            "logZ": 47.43124894636928,
+            "logZ": 47.43124894637089,
             "beta": "11//4"
         },
         {
-            "logZ": 51.6761032675867,
+            "logZ": 51.67610326758773,
             "beta": "3//1"
         },
         {
-            "logZ": 55.937691643124616,
+            "logZ": 55.93769164312532,
             "beta": "13//4"
         },
         {
-            "logZ": 60.21044260248325,
+            "logZ": 60.210442602483674,
             "beta": "7//2"
         },
         {
-            "logZ": 64.49071475288045,
+            "logZ": 64.49071475288079,
             "beta": "15//4"
         },
         {
-            "logZ": 68.77609742576026,
+            "logZ": 68.77609742576045,
             "beta": "4//1"
         },
         {
-            "logZ": 73.06497718226024,
+            "logZ": 73.06497718226035,
             "beta": "17//4"
         },
         {
-            "logZ": 77.35626421147258,
+            "logZ": 77.35626421147269,
             "beta": "9//2"
         },
         {
-            "logZ": 81.64921671454186,
+            "logZ": 81.64921671454194,
             "beta": "19//4"
         },
         {
-            "logZ": 85.94332649734378,
+            "logZ": 85.94332649734383,
             "beta": "5//1"
         },
         {
-            "logZ": 90.23824348599256,
+            "logZ": 90.2382434859926,
             "beta": "21//4"
         },
         {
-            "logZ": 94.53372538706164,
+            "logZ": 94.53372538706168,
             "beta": "11//2"
         },
         {
-            "logZ": 98.82960381326517,
+            "logZ": 98.8296038132652,
             "beta": "23//4"
         },
         {
-            "logZ": 103.12576131554863,
+            "logZ": 103.12576131554864,
             "beta": "6//1"
         },
         {
-            "logZ": 107.42211570949831,
+            "logZ": 107.42211570949833,
             "beta": "25//4"
         },
         {
-            "logZ": 111.71860932020792,
+            "logZ": 111.71860932020793,
             "beta": "13//2"
         },
         {
@@ -208,7 +208,7 @@
             "beta": "43//4"
         },
         {
-            "logZ": 189.0608111111436,
+            "logZ": 189.06081111114364,
             "beta": "11//1"
         },
         {
@@ -548,1271 +548,60 @@
             "beta": "32//1"
         }
     ],
-    "gap": 1.2819733247579403,
-    "storage_note": "Full spectrum computed; retained logZ grid and low levels. Rerun scan.jl to regenerate all levels.",
+    "gap": 1.281973324757951,
     "dimension": 1048576,
-    "sectors": [
-        {
-            "spin_parity": 0,
-            "m": 0,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 1,
-            "leg_parity": 1,
-            "seconds": 0.1696009635925293
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 1,
-            "leg_parity": 1,
-            "seconds": 3.981590270996094e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 1,
-            "leg_parity": -1,
-            "seconds": 5.0067901611328125e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 1,
-            "leg_parity": 1,
-            "seconds": 9.059906005859375e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 1,
-            "leg_parity": -1,
-            "seconds": 5.0067901611328125e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 1,
-            "leg_parity": 1,
-            "seconds": 3.814697265625e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 1,
-            "leg_parity": -1,
-            "seconds": 4.0531158447265625e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 1,
-            "leg_parity": 1,
-            "seconds": 3.814697265625e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 1,
-            "leg_parity": -1,
-            "seconds": 5.0067901611328125e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 1,
-            "leg_parity": 1,
-            "seconds": 4.0531158447265625e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 1,
-            "leg_parity": -1,
-            "seconds": 5.0067901611328125e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 1,
-            "leg_parity": 1,
-            "seconds": 4.0531158447265625e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 1,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 1,
-            "leg_parity": -1,
-            "seconds": 3.0994415283203125e-6
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 11,
-            "leg_parity": 1,
-            "seconds": 0.00013899803161621094
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 9,
-            "leg_parity": -1,
-            "seconds": 3.0994415283203125e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 9,
-            "leg_parity": 1,
-            "seconds": 3.504753112792969e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 9,
-            "leg_parity": -1,
-            "seconds": 2.6941299438476562e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 11,
-            "leg_parity": 1,
-            "seconds": 3.2901763916015625e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 9,
-            "leg_parity": -1,
-            "seconds": 2.6941299438476562e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 9,
-            "leg_parity": 1,
-            "seconds": 2.6941299438476562e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 9,
-            "leg_parity": -1,
-            "seconds": 2.384185791015625e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 11,
-            "leg_parity": 1,
-            "seconds": 3.314018249511719e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 9,
-            "leg_parity": -1,
-            "seconds": 2.5987625122070312e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 9,
-            "leg_parity": 1,
-            "seconds": 1.9073486328125e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 2,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 9,
-            "leg_parity": -1,
-            "seconds": 1.71661376953125e-5
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 57,
-            "leg_parity": 1,
-            "seconds": 0.00041604042053222656
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 57,
-            "leg_parity": -1,
-            "seconds": 0.0002799034118652344
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 57,
-            "leg_parity": 1,
-            "seconds": 0.0003151893615722656
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 57,
-            "leg_parity": -1,
-            "seconds": 0.00029397010803222656
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 57,
-            "leg_parity": 1,
-            "seconds": 0.0002999305725097656
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 57,
-            "leg_parity": -1,
-            "seconds": 0.00028395652770996094
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 57,
-            "leg_parity": 1,
-            "seconds": 0.0003380775451660156
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 57,
-            "leg_parity": -1,
-            "seconds": 0.00031280517578125
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 57,
-            "leg_parity": 1,
-            "seconds": 0.00030493736267089844
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 57,
-            "leg_parity": -1,
-            "seconds": 0.0002741813659667969
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 57,
-            "leg_parity": 1,
-            "seconds": 0.00022411346435546875
-        },
-        {
-            "spin_parity": 0,
-            "m": 3,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 57,
-            "leg_parity": -1,
-            "seconds": 0.00023698806762695312
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 249,
-            "leg_parity": 1,
-            "seconds": 0.003170013427734375
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 240,
-            "leg_parity": -1,
-            "seconds": 0.002856016159057617
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 240,
-            "leg_parity": 1,
-            "seconds": 0.0036199092864990234
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 240,
-            "leg_parity": -1,
-            "seconds": 0.0032491683959960938
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 249,
-            "leg_parity": 1,
-            "seconds": 0.0037457942962646484
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 240,
-            "leg_parity": -1,
-            "seconds": 0.003451108932495117
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 240,
-            "leg_parity": 1,
-            "seconds": 0.0036818981170654297
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 240,
-            "leg_parity": -1,
-            "seconds": 0.003507852554321289
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 249,
-            "leg_parity": 1,
-            "seconds": 0.005012035369873047
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 240,
-            "leg_parity": -1,
-            "seconds": 0.003328084945678711
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 240,
-            "leg_parity": 1,
-            "seconds": 0.018908977508544922
-        },
-        {
-            "spin_parity": 0,
-            "m": 4,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 240,
-            "leg_parity": -1,
-            "seconds": 0.002786874771118164
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 776,
-            "leg_parity": 1,
-            "seconds": 0.03656601905822754
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 776,
-            "leg_parity": -1,
-            "seconds": 0.05386686325073242
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 775,
-            "leg_parity": 1,
-            "seconds": 0.06515717506408691
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 775,
-            "leg_parity": -1,
-            "seconds": 0.06471991539001465
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 775,
-            "leg_parity": 1,
-            "seconds": 0.24659299850463867
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 775,
-            "leg_parity": -1,
-            "seconds": 0.05645012855529785
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 775,
-            "leg_parity": 1,
-            "seconds": 0.04020404815673828
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 775,
-            "leg_parity": -1,
-            "seconds": 0.0564119815826416
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 775,
-            "leg_parity": 1,
-            "seconds": 0.04163694381713867
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 775,
-            "leg_parity": -1,
-            "seconds": 0.06135392189025879
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 776,
-            "leg_parity": 1,
-            "seconds": 0.03520989418029785
-        },
-        {
-            "spin_parity": 0,
-            "m": 5,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 776,
-            "leg_parity": -1,
-            "seconds": 0.05220985412597656
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 1956,
-            "leg_parity": 1,
-            "seconds": 0.6426501274108887
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 1932,
-            "leg_parity": -1,
-            "seconds": 0.5611681938171387
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 1932,
-            "leg_parity": 1,
-            "seconds": 0.5418491363525391
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 1932,
-            "leg_parity": -1,
-            "seconds": 0.7457330226898193
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 1956,
-            "leg_parity": 1,
-            "seconds": 0.5245380401611328
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 1932,
-            "leg_parity": -1,
-            "seconds": 0.5060291290283203
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 1932,
-            "leg_parity": 1,
-            "seconds": 0.5074830055236816
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 1932,
-            "leg_parity": -1,
-            "seconds": 0.5098838806152344
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 1956,
-            "leg_parity": 1,
-            "seconds": 0.5509140491485596
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 1932,
-            "leg_parity": -1,
-            "seconds": 0.5258371829986572
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 1932,
-            "leg_parity": 1,
-            "seconds": 0.47850584983825684
-        },
-        {
-            "spin_parity": 0,
-            "m": 6,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 1932,
-            "leg_parity": -1,
-            "seconds": 0.48007988929748535
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 3876,
-            "leg_parity": 1,
-            "seconds": 7.133619070053101
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 3876,
-            "leg_parity": -1,
-            "seconds": 6.800367116928101
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 3876,
-            "leg_parity": 1,
-            "seconds": 7.657264947891235
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 3876,
-            "leg_parity": -1,
-            "seconds": 7.405261039733887
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 3876,
-            "leg_parity": 1,
-            "seconds": 8.022924900054932
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 3876,
-            "leg_parity": -1,
-            "seconds": 7.8356640338897705
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 3876,
-            "leg_parity": 1,
-            "seconds": 7.705672025680542
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 3876,
-            "leg_parity": -1,
-            "seconds": 9.404968976974487
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 3876,
-            "leg_parity": 1,
-            "seconds": 14.436285972595215
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 3876,
-            "leg_parity": -1,
-            "seconds": 8.848621845245361
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 3876,
-            "leg_parity": 1,
-            "seconds": 9.756306886672974
-        },
-        {
-            "spin_parity": 0,
-            "m": 7,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 3876,
-            "leg_parity": -1,
-            "seconds": 9.500123023986816
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 6330,
-            "leg_parity": 1,
-            "seconds": 33.60835385322571
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 6288,
-            "leg_parity": -1,
-            "seconds": 35.60597205162048
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 6288,
-            "leg_parity": 1,
-            "seconds": 36.41286611557007
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 6288,
-            "leg_parity": -1,
-            "seconds": 35.11584711074829
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 6330,
-            "leg_parity": 1,
-            "seconds": 38.481656074523926
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 6288,
-            "leg_parity": -1,
-            "seconds": 38.69280195236206
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 6288,
-            "leg_parity": 1,
-            "seconds": 36.22124910354614
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 6288,
-            "leg_parity": -1,
-            "seconds": 35.477503061294556
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 6330,
-            "leg_parity": 1,
-            "seconds": 35.68592691421509
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 6288,
-            "leg_parity": -1,
-            "seconds": 34.906639099121094
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 6288,
-            "leg_parity": 1,
-            "seconds": 34.693094968795776
-        },
-        {
-            "spin_parity": 0,
-            "m": 8,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 6288,
-            "leg_parity": -1,
-            "seconds": 35.10043692588806
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 8398,
-            "leg_parity": 1,
-            "seconds": 92.78667616844177
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 0,
-            "multiplicity": 2,
-            "dimension": 8398,
-            "leg_parity": -1,
-            "seconds": 89.62150716781616
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 8398,
-            "leg_parity": 1,
-            "seconds": 84.85641694068909
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 1,
-            "multiplicity": 4,
-            "dimension": 8398,
-            "leg_parity": -1,
-            "seconds": 81.51448702812195
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 8398,
-            "leg_parity": 1,
-            "seconds": 90.07213306427002
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 2,
-            "multiplicity": 4,
-            "dimension": 8398,
-            "leg_parity": -1,
-            "seconds": 85.71165204048157
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 8398,
-            "leg_parity": 1,
-            "seconds": 97.32623505592346
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 3,
-            "multiplicity": 4,
-            "dimension": 8398,
-            "leg_parity": -1,
-            "seconds": 86.81726217269897
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 8398,
-            "leg_parity": 1,
-            "seconds": 87.19879102706909
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 4,
-            "multiplicity": 4,
-            "dimension": 8398,
-            "leg_parity": -1,
-            "seconds": 103.77410221099854
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 8398,
-            "leg_parity": 1,
-            "seconds": 83.51792287826538
-        },
-        {
-            "spin_parity": 0,
-            "m": 9,
-            "k": 5,
-            "multiplicity": 2,
-            "dimension": 8398,
-            "leg_parity": -1,
-            "seconds": 59.958820104599
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 0,
-            "multiplicity": 1,
-            "dimension": 4717,
-            "leg_parity": 1,
-            "seconds": 10.241881847381592
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 0,
-            "multiplicity": 1,
-            "dimension": 4561,
-            "leg_parity": 1,
-            "seconds": 10.984428882598877
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 0,
-            "multiplicity": 1,
-            "dimension": 4587,
-            "leg_parity": -1,
-            "seconds": 11.054476022720337
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 0,
-            "multiplicity": 1,
-            "dimension": 4639,
-            "leg_parity": -1,
-            "seconds": 14.230342149734497
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 1,
-            "multiplicity": 2,
-            "dimension": 4587,
-            "leg_parity": 1,
-            "seconds": 10.827630043029785
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 1,
-            "multiplicity": 2,
-            "dimension": 4638,
-            "leg_parity": 1,
-            "seconds": 11.847592830657959
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 1,
-            "multiplicity": 2,
-            "dimension": 4587,
-            "leg_parity": -1,
-            "seconds": 10.196386098861694
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 1,
-            "multiplicity": 2,
-            "dimension": 4638,
-            "leg_parity": -1,
-            "seconds": 10.544677972793579
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 2,
-            "multiplicity": 2,
-            "dimension": 4714,
-            "leg_parity": 1,
-            "seconds": 12.142183065414429
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 2,
-            "multiplicity": 2,
-            "dimension": 4561,
-            "leg_parity": 1,
-            "seconds": 9.329401969909668
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 2,
-            "multiplicity": 2,
-            "dimension": 4587,
-            "leg_parity": -1,
-            "seconds": 9.630796194076538
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 2,
-            "multiplicity": 2,
-            "dimension": 4638,
-            "leg_parity": -1,
-            "seconds": 10.69926381111145
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 3,
-            "multiplicity": 2,
-            "dimension": 4587,
-            "leg_parity": 1,
-            "seconds": 10.623827934265137
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 3,
-            "multiplicity": 2,
-            "dimension": 4638,
-            "leg_parity": 1,
-            "seconds": 11.121165990829468
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 3,
-            "multiplicity": 2,
-            "dimension": 4587,
-            "leg_parity": -1,
-            "seconds": 9.563399076461792
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 3,
-            "multiplicity": 2,
-            "dimension": 4638,
-            "leg_parity": -1,
-            "seconds": 9.763427019119263
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 4,
-            "multiplicity": 2,
-            "dimension": 4714,
-            "leg_parity": 1,
-            "seconds": 11.173798084259033
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 4,
-            "multiplicity": 2,
-            "dimension": 4561,
-            "leg_parity": 1,
-            "seconds": 9.564468145370483
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 4,
-            "multiplicity": 2,
-            "dimension": 4587,
-            "leg_parity": -1,
-            "seconds": 9.710691928863525
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 4,
-            "multiplicity": 2,
-            "dimension": 4638,
-            "leg_parity": -1,
-            "seconds": 10.357237815856934
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 5,
-            "multiplicity": 1,
-            "dimension": 4587,
-            "leg_parity": 1,
-            "seconds": 10.103261947631836
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 5,
-            "multiplicity": 1,
-            "dimension": 4639,
-            "leg_parity": 1,
-            "seconds": 11.166491031646729
-        },
-        {
-            "spin_parity": 1,
-            "m": 10,
-            "k": 5,
-            "multiplicity": 1,
-            "dimension": 4587,
-            "leg_parity": -1,
-            "seconds": 9.39128303527832
-        },
-        {
-            "spin_parity": -1,
-            "m": 10,
-            "k": 5,
-            "multiplicity": 1,
-            "dimension": 4639,
-            "leg_parity": -1,
-            "seconds": 9.956244945526123
-        }
-    ],
     "metadata": {
         "julia_threads": 1,
         "julia": "1.12.4",
-        "IntervalArithmetic": "1.0.12",
-        "ThermalMPOGap": "0.2.0",
         "status": "numerical, not certified",
         "config": {
             "J": "2//1",
             "L": 10
         },
-        "created_utc": "2026-10-11T05:32:08.645",
+        "created_utc": "2026-10-18T08:51:27.859",
         "certified": false,
         "source_sha256": {
-            "certificates/heisenberg_ladder/test/runtests.jl": "f691e968d99ae2136fa29be9fa5b113af7f94b09eabc2ff93f7a1da13e3c386d",
-            "certificates/heisenberg_ladder/test_lowmem.jl": "2eb1c8fe563d0bc541fbafb85fe4166922193c5ab904f0fb0f349f8e5fdd3a9d",
-            "certificates/heisenberg_ladder/check.jl": "c4637091abde17ea83b862796f384041105515c1fd0a2e21b7ec5512e04ceef9",
-            "julia/src/CertifiedMPO/AdjointTrace.jl": "1596f1cf3045f3dd8f8d6aa8445ea2268811228e9c77d3b4c186510d33eb5aa9",
-            "certificates/heisenberg_ladder/threshold.jl": "c3051e516146b83bebca99a46f76353a5062be71d0148df2f982df7298784f27",
-            "certificates/heisenberg_ladder/smoke.jl": "e1dbb2d9c7cab13a4f179f2ba82d0d2a06695c2f2e6b5c031db4553289998ce9",
-            "julia/src/CertifiedMPO/PolynomialBounds.jl": "687a589d85dc527177281a0e1283b8d428df93f962c465ed2221a539b14fa1b9",
-            "certificates/heisenberg_ladder/certify.jl": "cd8c95a1d594edf3d813cc67dc2f3595c743934065d2ae42a1ba773ef7640ef7",
-            "certificates/heisenberg_ladder/small_summary.jl": "3b1d5bfee510aabdf3ed2cb71c23951dff83a66beaf2b2e00975038e53ee0f46",
-            "julia/src/Seeds.jl": "eabb710e3aa6d870e84b6b8bd8e0df4c54dd56e2a7b95495be61388ba1f3f2be",
-            "outputs/thermal-mpo-gap-scope.tex": "4e77e5d839d79efc4472b6b75a505726b54fb79de5fd4604c27d8927b8d809e7",
-            "certificates/heisenberg_ladder/rp.jl": "544abac201bbeb621e720b08018f0b3f3297846c6571792dc8d5251edbd4b152",
-            "julia/src/CertifiedMPO/GaugeSearch.jl": "fc8d1d96088434191c4c09520cb91ca8054ccc1d7b552e9e57448cbb03b3edc8",
-            "julia/src/CertifiedMPO/CertifiedMPO.jl": "67678a11ecd30c3add4fe85c09373d75b5eee63d70b8766a805b12976cae3e9a",
-            "julia/src/recurrence/rational.jl": "be93e303d0a89d36dca4ee284a72a34b2efcf5c0dec93476352f69cacec1f67c",
-            "certificates/heisenberg_ladder/scan.jl": "b97a8996a169d6332af120209578aa257973c369b01361bd70556fa6312cb515",
-            "julia/src/Purification.jl": "f9acd3caf3d413aa540d108af79aa1acff8956b7281fed4009e18eeecaf8c884",
-            "julia/src/Results.jl": "cc886dd20458799780935386400a5594e69d6231aada6d68f5a59f29f6ecb677",
-            "julia/src/CertifiedMPO/Products.jl": "7d15b0e27c8dcefc9fb5f876efa4fec4edc6cca3be8caecfd867e8c72b773b5e",
-            "julia/src/Spins.jl": "a43d59bd120bb765ee50a49001cbb9792aa26bc23838fd4dbcb9e5943aab2090",
-            "julia/src/ThermalMPOGap.jl": "06d393ef52eeb6966404ed21beeeec0ac84182e8d780c6206d7a1e47c1cae5f9",
-            "certificates/heisenberg_ladder/validate.jl": "71c5502137afa44f4347bc5c9597fa44af218b019afddbbb0c49ef7a708c1b97",
-            "julia/src/CertifiedMPO/OperatorError.jl": "7094b07e0d22d8836178d5aab398c7d1f52a6a516e06e6bf0e5374ed6d02b78d",
-            "certificates/heisenberg_ladder/retry_j3p5.jl": "e9673056d8983445048f8a265838ceb496a9abebbcb0c9d085cca99978810b41",
-            "certificates/heisenberg_ladder/recheck_seeds.jl": "cbf1b0d32bc81bee13212319f5f44726e68d58495a7240853d833c141a4d306c",
-            "julia/src/ExactDiagonalization.jl": "936f5c6764ca892769024711bdc0842c299e5c8b5d32fba976199212384551bb",
-            "julia/src/ReflectionPositivity.jl": "653dd5cb1da456a0cb7db215c38c2e394d3658eccfd0e5b93d0fb1581b22c06f",
-            "julia/src/Recurrence.jl": "5c70fbae608abd2d0f26ad529b477967bf4153e7ae1dde603f4e4644252924ed",
-            "julia/src/Models.jl": "03c2ea4f68d313d4dc4b468b66dbe91999929c50c4b71ca8db805792018a30fc",
-            "certificates/heisenberg_ladder/prepare_small.jl": "52062b8b65b826153e69e60ac1d91bd8043d6f3e55d5b678b645352016ec37b8",
-            "certificates/heisenberg_ladder/scan_lowmem.jl": "158943488c8cc16f877763b064d4334cb611b5bc9ed77f36a4a6ad38e7bc54c9",
-            "julia/src/ExactArithmetic.jl": "b0b11c2d5e19ea24f00fed6e93b4949ae86d323117e4344f21e682ea7e778642",
-            "julia/src/CertifiedMPO/Squaring.jl": "e9db2558c5f0472ba82f02139114d53cb2701fa34cdfdceb6bb9b53f4f7f45d8",
-            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
-            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8",
-            "certificates/heisenberg_ladder/sparse_scan_basis.jl": "949f8c17c00b998b42e403aa9d046b3e24fe06512cba7263cc0f7ecabab695a6",
-            "julia/src/CertifiedMPO/PositiveBounds.jl": "97f605694d77949738837020f7a5ef3b54373369317399705a20e32e22b9bcbb",
+            "models/heisenberg_ladder/certify.jl": "c852220d6672e06b625c0f85886aa22342bc437e49320cad57e12905b7bf5727",
+            "models/heisenberg_ladder/src/model.jl": "463e4eafa89620323c10159a86bd378e83e0abde30da8652f575c4b8d0ef532f",
+            "models/heisenberg_ladder/src/HeisenbergLadder.jl": "655303c51c086e749ded0c528f0bf001db528cef0eea7878eaada74260bf2b37",
+            "models/heisenberg_ladder/src/suite.jl": "a868a01d4a55045cdcc91ce01cb8648c2894de478d33aa1b90b607ffdc3336f8",
+            "models/heisenberg_ladder/check.jl": "821c28e80654522d2125d42d86e015a7ae493979a43030de1386e880576ba198"
+        },
+        "core_sha256": {
+            "julia/src/ExactDiagonalization.jl": "521e0b95085eb898e62fd37a09342bb4d3ad5b8a010e5ee3f8290d07cee1805a",
+            "julia/src/ReflectionPositivity.jl": "e8d5d3446f680f377bed27d0d9ba44dda8182b7c3055165b9b61701fe736040c",
+            "julia/src/Recurrence.jl": "2dc12e517f9739e2064f5de119510c52caa0a2cfba53d0eb8b5d6c85e02f9729",
+            "julia/src/RingModels.jl": "40bc01631c1f32b56436f13b4edc3b6572198724e8b4ca09939741003cd2bacd",
+            "julia/src/Seeds.jl": "3e2d5041103c7e6629f7a31a76ef381f9fcd40566b7872460793edfe433387d4",
             "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
-            "julia/src/CertifiedMPO/SchattenBridge.jl": "f826199d1be8e6632bdbcdd5eed279ac37a72cbf6051a0ff3942946de52b06a9",
-            "julia/src/CertifiedMPO/Norms.jl": "6ec3509571238504acdb9eb2052e44794075f69850503a27ea7a0e79f53fae93",
-            "certificates/heisenberg_ladder/ladder.jl": "23707cbb4ecb643c16785e1f22494a9df6ba2c6f736477a640a370c5ca9b2d68",
-            "julia/src/CertifiedMPO/MPOAlgebra.jl": "9106a106a0cf33fc7cec095e803db2ba4a0743169a849da264c71d4336f6856a",
-            "certificates/heisenberg_ladder/compact_results.jl": "9a110caec9069d1d8c6bbd7d560ebded98ff82f7243a82be53c6d25729eb09c4",
-            "certificates/heisenberg_ladder/supervise.jl": "ac3e839f91102e6b844bd1cdf051ee51f1cba60853d7cad47bccc910d36b0a6d",
-            "certificates/heisenberg_ladder/summarize.jl": "1e018a7132a27c9d9e8de973b5bde45d2629830e3be2da80eb5539fe5381ca2f",
-            "julia/Manifest.toml": "6f67f2d98c66ab6a36b577346a4dc78bf4d3187489e736759967b94f03899d80",
-            "julia/Project.toml": "aad0eff0d3aeaeb0afb0e967ccaa245c0d24c2cddafef2289a2e41eacad0e1f3"
+            "julia/src/VerifiedSpectra.jl": "d2d939818290005048fa18accb1d4688d36e73f5ae54c2d4e97e55706384802d",
+            "julia/src/CertifiedMPO/GaugeSearch.jl": "96d9fcdcf031b5b84c502a7582ae5715022752276d3385db724143477b2eb4f5",
+            "julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
+            "julia/src/CertifiedMPO/SchattenBridge.jl": "2300c4f86790906274adf9d50ac8bd43a7ef1ccbfc49e4a9aaafbbe2addc290f",
+            "julia/src/recurrence/rational.jl": "2200190e83ddfca094cdbf41b0c959c4254c9244b361fc0ee647b1a7ea2a49f7",
+            "julia/src/CertifiedMPO/AdjointTrace.jl": "38f76a39b09196e1b1cd3d5fc754945e998c2b570d3ae277bd57765396908892",
+            "julia/src/CertifiedMPO/Norms.jl": "6aa188bc7a1725a51e7dd0806b7f0565ac434e5bfc6aba84e5dfdce73d749f8d",
+            "julia/src/CertifiedMPO/MPOAlgebra.jl": "e6da21eb0db582018d480677a4e8cb85e501277259c79d6035cea60f5c58811d",
+            "julia/src/Models.jl": "299d8bc7b0e377361276b26a99023e5a6130e73058639b0bdb13783b51855b2e",
+            "julia/src/Purification.jl": "ea8a4b1a03a8a38b01d0289b06da72a8ea255e79287008ccf58456cfda9fadf3",
+            "julia/src/ExactArithmetic.jl": "77feece9b1e56011667bd8241ff159864943433d2121f01f351dccefae769882",
+            "julia/src/GapCertificates.jl": "607be6eafe8ac46312e35c1adaebb63e0e98d3022f8cc678f7e59384949ac23e",
+            "julia/src/Results.jl": "fbe920dfa26574a36bb8eb6ea277126a82a36f92d33925bdb474b0f1a2468dcf",
+            "julia/src/CertifiedMPO/Products.jl": "5207b7d80375c538d531c67c699d048a0014409cf410425ffc633299959a9230",
+            "julia/src/CertifiedMPO/Squaring.jl": "9e454f12d3149482d734f33d3a1f47b6c4dab21144329753cdd2826d05c5b03c",
+            "julia/src/Exclusions.jl": "e04adc2f798497a47e087912dd21df57be73c5b6b6d5dec1069e1926092a7358",
+            "julia/src/Spins.jl": "0474b313ac520bebeff4f986dc7bab369af04f8094640c2f68dd3832f2a962c9",
+            "julia/src/CertifiedGaps.jl": "c20ea38e4d4c87d2cdb4ccca7fc8e5e82bd1a8bc4fde3bb08bfa3014c3d08810",
+            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+            "julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
+            "julia/Manifest.toml": "422dd9dcc0c0257c0ccd5852c56a5bb43b214080ece90651b2ddd9209eff9b7f",
+            "julia/src/CertifiedMPO/PolynomialBounds.jl": "7acd92b77ef6bf1c22322a93bc33ff1eae741f5cd0f43330f47a6c632ab3ec4a",
+            "julia/Project.toml": "f9426a1bf9b3fb43b7d0efd3ff8ae1d603fe6354befce98fca4a41be195bc0ed",
+            "julia/src/CertifiedMPO/PositiveBounds.jl": "8921e7de4f45a27260dfc22e00719b06651674fc3dd792d6580e294b5fd68382",
+            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
         },
         "blas_threads": 1
     },
     "L": 10,
-    "seconds": 1840.29461312294
+    "seconds": 4450.297357875
 }

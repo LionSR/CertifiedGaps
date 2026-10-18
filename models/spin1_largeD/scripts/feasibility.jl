@@ -1,7 +1,8 @@
 # Why dense L = 14 is out of reach: count the L = 14, Sz = 1 momentum blocks (translation orbits
 # whose period is compatible with the momentum) without building any matrix, and compare one
-# dense complex block, and the working memory of its verified enclosure, with the host memory
-# limit. Floating-point free, but not a certificate.
+# dense block (real: the lattice reflection makes every momentum block real) and the working
+# memory of its verified enclosure with the host memory limit. Floating-point free, but not a
+# certificate.
 #
 #   julia --project=julia models/spin1_largeD/scripts/feasibility.jl
 using CertifiedGaps.Results
@@ -38,14 +39,13 @@ function feasibility()
     started = time()
     root = dirname(@__DIR__)
     dims = momentum_dimensions(14, 1)
-    bytes = 16 * big(maximum(dims))^2
-    # verified_eigen on a complex block holds about eight dense N×N complex arrays at its peak
-    # (center, eigenvectors, LAPACK workspace, real/imaginary parts, residual and Gram products);
-    # the L = 12 runs peaked near that (see README).
+    bytes = 8 * big(maximum(dims))^2
+    # verified_eigen holds several dense N×N arrays at its peak (center, eigenvectors, LAPACK
+    # workspace, residual and Gram products); eight is a round estimate of that count.
     working = 8bytes
     limit = memory_limit()
     data = Dict("L" => "14", "charge" => "1", "momentum_dimensions" => string.(dims),
-        "one_complex_dense_matrix_bytes" => string(bytes),
+        "one_real_dense_matrix_bytes" => string(bytes),
         "host_memory_limit_bytes" => string(limit), "single_matrix_fits" => bytes <= limit,
         "verified_enclosure_working_bytes_estimate" => string(working),
         "verified_enclosure_fits" => working <= limit,

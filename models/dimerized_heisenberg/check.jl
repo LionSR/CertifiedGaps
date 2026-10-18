@@ -1,21 +1,21 @@
 # Checker for the dimerized Heisenberg certificates.
 #
-# Fast (about 10 s): from the stored files it
+# Fast (default): from the stored files it
 #   1. re-derives every exact RP identity of results/rp_audit.json at all six deltas;
 #   2. for every δ of results/summary.json: checks the frame identity and the model-local source
-#      hashes; for each core certificate checks its SHA-256, that its model and RP data are
-#      `rotated_model(δ)` and `rotated_rp(δ)` with the seed of `SEEDS`, and runs
-#      `GapCertificates.check_certificate(cert; spectra = false)` (exact RP identity and exact
-#      rational chain); checks every all-β exclusion from its stored lower bounds (tiling of
-#      [1, B], the tail, every box rejected by the recurrence), the dimer perturbation bound and
-#      the bound-to-gap ratio.
+#      hashes; for each certificate checks its SHA-256 and summary row and runs the core
+#      `check_point` (exactly the model `rotated_model(δ)`, RP data `rotated_rp(δ)`, seed of
+#      `SEEDS` and params, the defects of the Lean point when the Lean file has it, the exact RP
+#      identity, the exact rational chain and the interval bound); checks every all-β exclusion
+#      with the core `check_exclusion` (tiling of [0, B], the tail, every window rejected), the
+#      dimer perturbation bound and the bound-to-gap ratio.
 # `check.jl --full` recomputes the verified spectra of the rings of 2, 4 and 8 cells from the
-# model and repeats everything from them alone: `check_certificate(cert; spectra = true)`
-# re-derives the seed defects, every exclusion bound is recomputed, and the stored 16-spin gap
-# interval must contain the fresh enclosure.
+# model and repeats everything from them alone: the seed defects, every exclusion bound, and the
+# 16-spin gap interval, which must contain the fresh enclosure.
 # Every check throws on failure, so the tests can feed it corrupted records.
 using CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic, LinearAlgebra, Test
 using CertifiedGaps.RingModels, CertifiedGaps.VerifiedSpectra, CertifiedGaps.GapCertificates
+using CertifiedGaps.Exclusions: check_exclusion
 using CertifiedGaps.ExactArithmetic: parse_rational
 isdefined(@__MODULE__, :DimerizedHeisenberg) ||
     include(joinpath(@__DIR__, "src", "DimerizedHeisenberg.jl"))
@@ -25,11 +25,19 @@ BLAS.set_num_threads(1)
 
 const RESULTS_DIR = joinpath(@__DIR__, "results")
 const REPO = normpath(joinpath(@__DIR__, "..", ".."))
+const LEAN = joinpath(REPO, "lean", "CertifiedGaps", "Models", "DimerizedHeisenberg.lean")
 asint(x) = parse(Int, string(x))
 require(ok, what) = ok === true || error("check failed: $what")
 
-# Exact model-local source set and SHA-256 (the core hashes are provenance only).
-check_source_hashes(metadata) = verify_model_metadata(metadata, MODEL_DIR; SOURCES...) > 0
+"The Lean seed defects `(; s, t)` of the point (δ, β₀), or `nothing` if the Lean file lacks it."
+function lean_seed(δ, β0)
+    hits = [p for p in lean_points(LEAN) if p.params == [δ, β0]]
+    return isempty(hits) ? nothing : only(hits)
+end
+
+"Every Lean point is a certified seed (δ, 4, β₀) of `SEEDS`."
+check_lean_points() = all(p -> length(p.params) == 2 &&
+    (4, p.params[2]) in get(SEEDS, p.params[1], ()), lean_points(LEAN))
 
 "Re-derive the exact RP audit (reflected form holds, identical-factor form fails)."
 function check_audit()
@@ -48,8 +56,11 @@ function check_audit()
                 row["theta_invariant_onsite_exact"] === true &&
                 row["real_identical_factor_identity"] === false, "audit flags")
     end
-    return check_source_hashes(data["metadata"])
+    return verify_model_metadata(data["metadata"], MODEL_DIR) > 0
 end
+
+# A summary row in a form comparable with `certificate_row` of the stored certificate.
+_row(r) = Dict(k => string(v) for (k, v) in r if !(k in ("file", "sha256")))
 
 """
     check_delta(row; full = false) -> true
@@ -64,32 +75,19 @@ function check_delta(row; full = false)
     spectra = full ? Dict(L => verified_ring_spectrum(model, L) for L in (2, 4, 8)) : nothing
     seeds = [(asint(c["n0"]), parse_rational(c["beta0"])) for c in row["certificates"]]
     require(seeds == get(SEEDS, δ, Tuple{Int,Rational{BigInt}}[]), "seed list")
-    for c in row["certificates"]
+    for (c, (n0, β0)) in zip(row["certificates"], seeds)
         path = joinpath(@__DIR__, c["file"])
         require(sha256_file(path) == c["sha256"], "certificate hash")
-        cert = read_result(path)
-        check_source_hashes(cert["metadata"])
-        require(encode_model(decode_model(cert["model"])) == encode_model(model), "model")
-        require(encode_rp(decode_rp(cert["reflection_positivity"])) == encode_rp(rp), "RP data")
-        require((asint(cert["seed"]["n0"]), parse_rational(cert["seed"]["beta0"])) ==
-                (asint(c["n0"]), parse_rational(c["beta0"])), "seed (n0, beta0)")
-        require(cert["seed"]["eps_s"] == c["eps_s"] && cert["seed"]["eps_t"] == c["eps_t"] &&
-                cert["gap_lower_bound"] == c["gap_lower_bound"], "summary row")
+        require(_row(certificate_row(read_result(path))) == _row(c), "summary row")
         # --full hands the core the spectra just computed above from the same model.
-        n0 = asint(c["n0"])
         fresh = full ? Dict(n0 => spectra[n0], 2n0 => spectra[2n0]) : false
-        require(check_certificate(cert; spectra = fresh)["gap_lower_bound"] ==
-                c["gap_lower_bound"], "core certificate")
-        screen = certified_gap_bound(parse_rational(c["eps_s"]), parse_rational(c["eps_t"]),
-            parse_rational(c["beta0"])).bound
-        require(screen == cert["interval_bound_decimal"] == c["interval_bound_decimal"],
-            "interval bound")
+        check_point(path, model; n0, β0, params = point_params(δ), model_dir = MODEL_DIR, rp,
+            lean = lean_seed(δ, β0), spectra = fresh)
     end
-    excluded = [asint(e["n0_cells"]) for e in row["negative_results"]]
+    excluded = [asint(e["n0"]) for e in row["negative_results"]]
     require(sort(vcat(unique(first.(seeds)), excluded)) == [2, 4], "each n0 classified once")
-    for e in row["negative_results"]
-        n = asint(e["n0_cells"])
-        full ? check_cover(e; small = spectra[n], large = spectra[2n]) : check_cover(e)
+    for (e, n) in zip(row["negative_results"], excluded)
+        full ? check_exclusion(e; small = spectra[n], large = spectra[2n]) : check_exclusion(e)
     end
     gl, gh = parse_rational.(row["reference_gap_16_interval"])
     require(0 < gl <= gh, "16-spin gap interval")
@@ -120,9 +118,10 @@ Check results/summary.json and every certificate it indexes, from the stored fil
 """
 function check_summary(; full = false,
     summary = read_result(joinpath(RESULTS_DIR, "summary.json")))
-    check_source_hashes(summary["metadata"])
-    require(summary["format"] == "dimerized-heisenberg-summary-v3", "summary format")
+    verify_model_metadata(summary["metadata"], MODEL_DIR)
+    require(summary["format"] == "dimerized-heisenberg-summary-v4", "summary format")
     require([parse_rational(r["delta"]) for r in summary["parameters"]] == DELTAS, "grid")
+    require(check_lean_points(), "every Lean point has a certificate")
     for row in summary["parameters"]
         seconds = @elapsed check_delta(row; full)
         bounds = [c["interval_bound_decimal"] for c in row["certificates"]]

@@ -3,15 +3,16 @@
 The smallest certified dimerization on the five-point grid
 $`\delta \in \{9/10, 4/5, 7/10, 3/5, 1/2\}`$ within a 6-cell ($12$-spin) ring ceiling is
 **$\delta = 7/10$**. At the odd seed $(n_0, \beta_0) = (3\text{ cells}, 17/4)$ the core pipeline
-gives the interval bound **$\Delta_L \ge 0.218793170$** (exact rational chain bound
-$\Delta_L > 0.218606834$) and a unique ground state for every even $L \ge 3$ cells, from
-$\varepsilon_{\mathrm{s}} = 117195722398365/10^{15}$ and $\varepsilon_\tau = 48363998311096/10^{15}$
+gives the interval bound **$\Delta_L \ge 0.218793401$** (exact rational chain bound
+$\Delta_L > 0.218607065$) and a unique ground state for every even $L \ge 3$ cells, from
+$\varepsilon_{\mathrm{s}} = 117195681829365/10^{15}$ and $\varepsilon_\tau = 48363910725858/10^{15}$
 (`results/certificate_d7.json`). At $\delta = 9/10$ the seed $(2, 7/2)$ gives
 **$\Delta_L \ge 0.528802288$** (chain $0.528349759$) for every even $L \ge 2$ cells
 (`results/certificate_d9.json`).
 
 At $\delta = 7/10$ the bound is $`17.28\%`$ of the 12-spin numerical reference gap
-($1.2659290109040136$); the core enclosure of the 6-cell ring took $6512$ s ($109$ min).
+($1.2659290109040136$); the core enclosure of the 6-cell ring took $10{,}339$ s on a heavily
+shared machine.
 Across all five grid points, numerical scans were completed through $L = 6$ cells ($12$
 spins); at $\delta = 3/5$ and $1/2$, admissible seeds require larger rings than $6$ cells.
 
@@ -41,7 +42,7 @@ G_x = \begin{pmatrix} 0 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{pmatrix}, \qquad
 G_y = \begin{pmatrix} 0 & 0 & -1 \\ 0 & 0 & 0 \\ 1 & 0 & 0 \end{pmatrix}, \qquad
 G_z = \begin{pmatrix} 0 & 1 & 0 \\ -1 & 0 & 0 \\ 0 & 0 & 0 \end{pmatrix}.
 ```
-The module `src/rp.jl` verifies in exact integer arithmetic that $[S^x, S^y] = i S^z$,
+`test/runtests.jl` verifies in exact integer arithmetic that $[S^x, S^y] = i S^z$,
 $\sum_\alpha (S^\alpha)^2 = 2I$, and that for any coupling $`c \in \{1 - \delta, 1 + \delta\} > 0`$,
 ```math
 -c\,\mathbf{S}_i \cdot \mathbf{S}_j = c \sum_{\alpha \in \{x,y,z\}} G_\alpha \otimes G_\alpha.
@@ -85,8 +86,9 @@ spin-1 chain in the Cartesian basis, $X_\beta$ is in fact **positive semidefinit
 
 ## Core pipeline
 
-The certificates `results/certificate_d9.json` and `results/certificate_d7.json` are produced by `GapCertificates.certify_gap` on the
-`RingModel` of `src/DimerizedCertificate.jl` (`dimerized(δ)`), in the rotated $S^z$ frame
+The certificates `results/certificate_d9.json` and `results/certificate_d7.json` are produced by
+`GapCertificates.certify_point` (which runs `certify_gap`) on the `RingModel` of
+`src/DimerizedCertificate.jl` (`dimerized(δ)`), in the rotated $S^z$ frame
 $U = \prod_{\text{cells}} (1 \otimes V)$, $V = e^{-i\pi S^y}$, described in `README.md`:
 
 - **Exact model.** With $X' = \sqrt2 S^x$, $`A' = \sqrt2\,iS^y`$ and $S^z$ integer matrices,
@@ -94,23 +96,28 @@ $U = \prod_{\text{cells}} (1 \otimes V)$, $V = e^{-i\pi S^y}$, described in `REA
   $`U (J\,\mathbf{S}_i\cdot\mathbf{S}_j) U^\dagger = -J(\tfrac12 X'\otimes X' + \tfrac12 A'\otimes A' + S^z\otimes S^z)`$
   for every bond, since $V$ reverses $S^x$ and $S^z$ and keeps $S^y$. The on-site term is this
   bond with $J = 1 - \delta$ on $(a, b)$, the ring bond is it with $J = 1 + \delta$ on
-  $(b, a')$. The core checks exactly that the cell charge $z_a - z_b$ is conserved and that the
-  flip $P \otimes P$ reverses it and commutes with $h$ and $o$; the tests check $U$ exactly.
+  $(b, a')$. The core checks exactly that the cell charge $z_a - z_b$ is conserved, that the
+  flip $P \otimes P$ reverses it and commutes with $h$ and $o$, and that the lattice reflection
+  with on-site part $\mathrm{SWAP}\,(P \otimes P)$ (site reversal of the chain composed with
+  the flip, which keeps the charge) maps $h$ to its mirror image and commutes with $o$; the
+  tests check the frame change exactly (`is_frame_change` from the physical cell model).
 - **RP.** $-h = \sum_\alpha w_\alpha C_\alpha \otimes R C_\alpha R$ with
   $C_\alpha = 1 \otimes (X', A', S^z)$, $w = ((1+\delta)/2, (1+\delta)/2, 1+\delta)$ and $R$ the
   cell swap, verified exactly by `verify_rp`.
 - **Spectra.** `verified_ring_spectrum` splits the rings of $n_0$ and $2n_0$ cells exactly into
-  charge sectors (only $q \ge 0$, by the flip; $q = 0$ split by flip parity) and cell momenta and encloses each block with
-  `verified_eigen` (residual and orthogonality in binary64 with a priori $\gamma_{N+8}$ /
-  $\gamma_{2N+8}$ bounds and Frobenius norms, then Ostrowski or polar-factor and Weyl). The
-  4-cell ring has 28 blocks (largest 254, radius $\le 7.4 \times 10^{-10}$); the 6-cell ring
-  has 53 blocks, the largest $11{,}596$ both real ($q = 1$, $k = 0, 3$) and complex ($q = 1$,
-  $k = 1, 2$), with radii up to $2.0 \times 10^{-6}$.
+  charge sectors (only $q \ge 0$, by the flip; $q = 0$ split by flip parity) and cell momenta
+  $0 \le k \le L/2$ (the reflection pairs $\pm k$ and makes every block real symmetric) and
+  encloses each block with `verified_eigen` (residual and orthogonality in binary64 with a
+  priori $\gamma_{N+8}$ / $\gamma_{2N+8}$ bounds and Frobenius norms, then Ostrowski or
+  polar-factor and Weyl). The 4-cell ring has 28 blocks (largest 254, radius
+  $\le 2.5 \times 10^{-10}$); the 6-cell ring has 53 real blocks, the largest $11{,}596$, with
+  radii up to $6.6 \times 10^{-7}$.
 - **Seed and chain.** $\log Z$ enclosures (`log_partition_enclosure`), the seed defects rounded
   up to the grid $10^{-15}$, the interval bound `certified_gap_bound` and the exact rational
   doubling chain. For the odd seed $n_0 = 3$ the core requires the `positive_transfer` reference
-  to the $X_\beta = K K^* \ge 0$ argument above and stores it in the certificate. `check_certificate` reruns the exact parts (fast) and the
-  spectra (`--full`).
+  to the $X_\beta = K K^* \ge 0$ argument above and stores it in the certificate. The checker's
+  `check_point` compares the stored model, RP data, seed and `params` with the point, and
+  `check_certificate` reruns the exact parts (fast) and the spectra (`--full`).
 
 ## Former local pipeline
 
@@ -121,11 +128,10 @@ into 79 real blocks (maximum dimension $11{,}596$) with exact integer dihedral c
 projectors on every orbit. Each block was enclosed by a local polar-factor/Weyl bound with
 binary64 rounding terms plus a bound on the floating-point projector basis. Its $\delta = 7/10$
 seed was $\varepsilon_{\mathrm{s}} = 58597799297/(5 \cdot 10^{11})$,
-$\varepsilon_\tau = 48363543279/10^{12}$ (interval bound $0.2187941698$), slightly tighter than
-the core's, because site reversal made every block real (the core has no lattice reflection, so
-its momentum blocks $k = 1, 2$ are complex, with radii up to $2.0 \times 10^{-6}$ against
-$1.0 \times 10^{-6}$). $\sum n^3$ (complex counted 4 times) is $3.4 \times 10^{13}$ for the core
-blocks against $8.6 \times 10^{12}$ for the old ones (109 min against 17 min).
+$\varepsilon_\tau = 48363543279/10^{12}$ (interval bound $0.2187941698$). The first core
+certificate, before the core had lattice reflections, had complex momentum blocks $k = 1, 2$
+with radii up to $2.0 \times 10^{-6}$ and the interval bound $0.218793170$; with the
+reflection the core blocks are real again and the bound is $0.218793401$.
 
 ## Independent audit (2026-10-11)
 
@@ -150,6 +156,10 @@ An independent audit reviewed the pre-core pipeline (`src/rp.jl`, `src/common.jl
    for bit.
 
 ## Results from completed runs
+
+This section was written by `scripts/report.jl` from the former scan code; the regenerated
+`scan_d9.json`, `scan_d8.json` and `scan_d7.json` agree with it (same best seeds and purity
+peaks), and the section will be rebuilt once `scan_d6.json` and `scan_d5.json` are rerun.
 
 Best numerical seed per parameter, over n=2,3 and beta=0.25:0.25:32:
 

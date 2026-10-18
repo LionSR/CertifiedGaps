@@ -1,6 +1,7 @@
 # Generic ring models, verified spectra and end-to-end gap certificates.
 
 using CertifiedGaps.RingModels, CertifiedGaps.VerifiedSpectra, CertifiedGaps.GapCertificates
+using CertifiedGaps.Exclusions
 const JSON3 = CertifiedGaps.Results.JSON3          # not a test dependency of its own
 
 const HALF = 1 // 2
@@ -221,4 +222,160 @@ end
     @test_throws ArgumentError RingModel(2, -kron(SX, SX); symmetries = [2SX, 2SZ])
     # Symmetries survive the exact model record.
     @test decode_model(parse_exact_json(JSON3.write(encode_model(m)))).symmetries == m.symmetries
+end
+
+@testset "lattice reflection: real blocks at every momentum" begin
+    one = [1 0; 0 1]
+    swap = [1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1]
+    # Dimerized Heisenberg in two-site cells (rotated frame); the reflection swaps the cell.
+    rotated(J) = J * (-kron(SX, SX) - kron(ISY, ISY) - kron(SZ, SZ))
+    dimer(; kw...) = RingModel(4, kron(one, rotated(1 // 2), one), rotated(3 // 2); kw...)
+    # Heisenberg ladder in rung cells with its charge, leg exchange and flip; P = I.
+    leg(A, B) = kron(A, one, B, one) + kron(one, A, one, B)
+    ladder(; kw...) = RingModel(4, leg(SX, SX) - leg(ISY, ISY) + leg(SZ, SZ),
+        3 // 2 * (kron(SX, SX) - kron(ISY, ISY) + kron(SZ, SZ)); charge = [2, 0, 0, -2],
+        symmetries = [swap], flip = kron(2SX, 2SX), kw...)
+    eye = Matrix{Int}(I, 4, 4)
+    for (plain, reflected) in ((dimer(), dimer(; reflection = swap)),
+                               (ladder(), ladder(; reflection = eye)))
+        for L in 3:5
+            a, b = verified_ring_spectrum(plain, L), verified_ring_spectrum(reflected, L)
+            @test maximum(abs, levels(a) - levels(b)) < 1e-12
+            kinds = Type[]
+            ring_blocks((M, ε, mult, label) -> push!(kinds, eltype(M)), reflected, L)
+            @test all(==(Float64), kinds)
+            @test maximum(s.radius for s in b) < 1e-9
+        end
+    end
+    # A complex model: only 0 ≤ m ≤ L/2 is built, with the spectrum of the full ring.
+    X, Y, Z = [0 1; 1 0], [0 -im; im 0], [1 0; 0 -1]
+    bond = kron(Z, Z) + kron(X, Y) + kron(Y, X)
+    plain, reflected = RingModel(2, bond, Z), RingModel(2, bond, Z; reflection = one)
+    for L in 4:6
+        b = verified_ring_spectrum(reflected, L)
+        @test maximum(abs, levels(verified_ring_spectrum(plain, L)) - levels(b)) < 1e-12
+        @test maximum(s.label["momentum"] for s in b) == L ÷ 2
+    end
+    # Refused: a bond that is not mirror symmetric, and a P that is not an involution.
+    @test_throws ArgumentError RingModel(2, kron(X, Z) - kron(Z, X); reflection = one)
+    @test_throws ArgumentError RingModel(4, kron(one, rotated(1), one), rotated(1);
+        reflection = [0 1 0 0; 0 0 1 0; 0 0 0 1; 1 0 0 0])
+    m = dimer(; reflection = swap)
+    @test decode_model(parse_exact_json(JSON3.write(encode_model(m)))).reflection == m.reflection
+end
+
+@testset "model drivers: certify_point, check_point, certificate_row, lean_points" begin
+    mktempdir() do repo
+        mkpath(joinpath(repo, "julia", "src"))
+        write(joinpath(repo, "julia", "src", "Core.jl"), "k = 1\n")
+        foreach(f -> write(joinpath(repo, "julia", f), ""), ("Project.toml", "Manifest.toml"))
+        dir = joinpath(repo, "models", "demo")
+        mkpath(joinpath(dir, "src"))
+        foreach(f -> write(joinpath(dir, f), "# $f\n"), ("src/a.jl", "certify.jl", "check.jl"))
+        m = rotated_staggered(6)
+        rp = rp_certificate(m; factors = [SX, ISY, SZ])
+        blocking = (; cell = 2, charge = [0, 1, -1, 0])
+        point = (; n0 = 4, β0 = 1, params = Dict("h" => 6), model_dir = dir, rp, blocking)
+        path = joinpath(dir, "results", "certificate_h6.json")
+        cert = certify_point(path, m; point..., record = Dict("note" => "demo"))
+        @test cert["params"] == Dict("h" => "6") && cert["note"] == "demo"
+        @test cert["metadata"]["config"]["h"] == "6" && isfile(path)
+        @test check_point(path, m; point...)["gap_lower_bound"] == cert["gap_lower_bound"]
+        @test check_point(path, m; point..., lean = (s = 1 // 10, t = 1 // 10)) isa Dict
+        row = certificate_row(read_result(path))
+        @test row["h"] == "6" && row["eps_s"] == cert["seed"]["eps_s"]
+        # Every part of the point definition is enforced.
+        for wrong in ((; params = Dict("h" => 5)), (; β0 = 2), (; blocking = nothing),
+                      (; lean = (s = 1 // 10^9, t = 1)),
+                      (; rp = rp_certificate(m)))
+            @test_throws ErrorException check_point(path, m; point..., wrong...)
+        end
+        @test_throws ErrorException check_point(path, rotated_staggered(5); point...)
+        write(joinpath(dir, "src", "a.jl"), "# edited\n")
+        @test_throws ErrorException check_point(path, m; point...)
+    end
+    # The point list of a Lean model file.
+    lean = tempname() * ".lean"
+    write(lean, """
+        def points : List Point := [
+          -- g = 1/4
+          ⟨1 / 4, 1 / 20, 97 / 4, {
+            s := [9064e-9, 1228e-12]
+            t := [3141e-8, 1974e-12] }⟩,
+          ⟨3, 13 / 2, {
+            s := [1125e-4, 5736e-5]
+            t := [5162e-5, 1611e-5] }⟩]
+        """)
+    points = lean_points(lean)
+    @test points[1].params == [1 // 4, 1 // 20, 97 // 4] && points[1].s == 9064 // 10^9
+    @test points[2].params == [3, 13 // 2] && points[2].t == 5162 // 10^5
+    models = joinpath(@__DIR__, "..", "..", "lean", "CertifiedGaps", "Models")
+    if isdir(models)
+        @test length(lean_points(joinpath(models, "IsingLongitudinal.lean"))) == 30
+        @test length(lean_points(joinpath(models, "DimerizedHeisenberg.lean"))) == 3
+    end
+end
+
+@testset "all-β exclusions of a seed length" begin
+    # The gapless Heisenberg ring (rotated frame) fails at every β for n = 2 and 4 sites.
+    m = rotated_staggered(0)
+    spec = Dict(L => verified_ring_spectrum(m, L) for L in (2, 4, 8))
+    for n in (2, 4)
+        r = exclude_all_beta(spec[n], spec[2n], n)
+        @test check_exclusion(r) && check_exclusion(r; small = spec[n], large = spec[2n])
+        stored = parse_exact_json(JSON3.write(r))
+        @test check_exclusion(stored; small = spec[n], large = spec[2n])
+        # A raised lower defect, a gap in the β cover and a weakened witness are refused.
+        bad = deepcopy(stored)
+        bad["windows"][1]["eps_s_lower"] = "1"
+        @test_throws ErrorException check_exclusion(bad; small = spec[n], large = spec[2n])
+        bad = deepcopy(stored)
+        bad["tail"]["beta_from"] = string(2 * parse_rational(bad["tail"]["beta_from"]))
+        @test_throws ErrorException check_exclusion(bad)
+        bad = deepcopy(stored)
+        bad["windows"][1]["eps_t_lower"] = "0"
+        bad["windows"][1]["eps_s_lower"] = "0"
+        @test_throws ErrorException check_exclusion(bad)
+    end
+    # A rejection needs z ≥ 1/2 along the lower orbit; small defects have none.
+    @test rejection(1 // 2, 0) !== nothing && rejection(1 // 1000, 1 // 1000) === nothing
+    # The certified seed of the staggered chain at h = 6 is not excluded.
+    big6 = rotated_staggered(6)
+    @test_throws ErrorException exclude_all_beta(verified_ring_spectrum(big6, 4),
+        verified_ring_spectrum(big6, 8), 4; max_depth = 4)
+end
+
+@testset "floating-point scan helpers" begin
+    m = rotated_staggered(6)
+    spectra = Dict(L => float_ring_spectrum(m, L) for L in (2, 4, 8))
+    @test spectra[8].N == 2^8 && spectra[8].exact
+    @test maximum(abs, spectra[8].E - levels(verified_ring_spectrum(m, 8))) < 1e-12
+    results = scan_seeds(spectral_defects(spectra), [2, 4], [0.5, 1.0, 2.0])
+    best = best_seed(results)
+    @test seed_record(best)["n0"] == best.n₀ && seed_record(best)["bound"] == best.bound
+    peaks = purity_peaks(results)
+    @test [p["n0"] for p in peaks] == [2, 4]
+    @test all(0 < p["max_min_purity"] <= 1 for p in peaks)
+    @test peaks[2]["best_bound"] == best_seed(filter(r -> r.n₀ == 4, results)).bound
+end
+
+@testset "model-building helpers: swap, frame change, integer spin one" begin
+    S = swap_matrix(3)
+    A, B = [1 2 0; 0 1 0; 3 0 1], [0 1 0; 1 0 0; 0 0 2]
+    @test S * kron(A, B) * S == kron(B, A) && S * S == I
+    s1 = integer_spin_one()
+    sx, sy, sz = (spin_matrices(1)[k] for k in (:sx, :sy, :sz))
+    @test s1.xp ≈ sqrt(2) * sx && s1.ap ≈ sqrt(2) * im * sy && s1.sz == sz
+    heis = kron(s1.xp, s1.xp) // 2 - kron(s1.ap, s1.ap) // 2 + kron(s1.sz, s1.sz)
+    @test heis ≈ real(kron(sx, sx) + kron(sy, sy) + kron(sz, sz))
+    @test s1.flip * s1.sz * s1.flip == -s1.sz && s1.flip * s1.xp * s1.flip == s1.xp
+    # The sublattice rotation of spin ½ in two-site cells: (1 ⊗ iσʸ) maps S·S inside the cell
+    # onto its rotated form.
+    one = [1 0; 0 1]
+    heis2 = kron(SX, SX) - kron(ISY, ISY) + kron(SZ, SZ)
+    rotated = -kron(SX, SX) - kron(ISY, ISY) - kron(SZ, SZ)
+    U = kron(one, [0 1; -1 0])
+    physical = RingModel(4, kron(one, heis2, one), heis2)
+    @test is_frame_change(physical, RingModel(4, kron(one, rotated, one), rotated), U)
+    @test !is_frame_change(physical, RingModel(4, kron(one, heis2, one), heis2), 2U)
 end

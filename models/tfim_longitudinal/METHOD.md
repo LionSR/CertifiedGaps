@@ -1,30 +1,34 @@
-# Method: core pipeline, checker semantics, and the regeneration audit
+# Method: core pipeline, checker semantics, and the regeneration audits
 
 ## Pipeline
 
-Each grid point is one call of the shared core:
+Each grid point is one call of the shared core driver:
 
 ```julia
-model = RingModel(2, -kron(Z, Z), -g * X - h * Z)          # exact, physical σᶻ frame
-cert  = certify_gap(model; n0 = 6, β0 = BETA0[(g, h)], rp = rp_certificate(model; factors = [Z]))
+model = RingModel(2, -kron(Z, Z), -g * X - h * Z; reflection = I)   # exact, physical σᶻ frame
+certify_point(path, model; n0 = 6, β0 = BETA0[(g, h)], params = Dict("g" => g, "h" => h),
+    model_dir = ROOT, rp = rp_certificate(model; factors = [Z]))
 ```
 
+`certify_point` runs `certify_gap`, attaches the params and run metadata and writes the file.
 `certify_gap` performs these steps, all in `julia/src`:
 
 1. **RP.** `verify_rp` checks $-h_{\text{bond}} = Z \otimes Z$ and the reality of $o = -gX - hZ$
-   exactly.
+   exactly. The `RingModel` constructor checks the lattice reflection $P = I$ exactly
+   ($`(P \otimes P)\, h\, (P \otimes P) = S h S`$ with $S$ the site swap, and $P o P = o$).
 2. **Sectors.** `ring_blocks` builds the translation orbits of the $2^L$ configurations and, for
    each momentum, the block $`\langle s,k|H|r,k\rangle = \sqrt{p_r/p_s}\sum_l c(r \to T^l s)\,e^{ikl}`$
-   in interval arithmetic (exact couplings, enclosed phases and norm ratios). Its `Float64` center
-   is exactly Hermitian (real for $k = 0, L/2$), and the Frobenius norm of the entrywise radii
-   bounds $`\|A - M\|_2`$. The model is real, so $`A_{-k} = \overline{A_k}`$ has the same spectrum and
-   only $0 \le k \le L/2$ is built, with multiplicity 2 for $0 < k < L/2$. No charge is conserved
-   for $h > 0$, so there is one sector. At $L = 12$: 7 blocks, the largest of dimension 352.
+   in interval arithmetic (exact couplings, enclosed phases and norm ratios), and the Frobenius
+   norm of the entrywise radii bounds $`\|A - M\|_2`$. The reflection maps $k$ to $-k$, so only
+   $0 \le k \le L/2$ is built, with multiplicity 2 for $0 < k < L/2$; since the model is real,
+   the antiunitary reflection fixes every momentum and each block at $0 < k < L/2$ is built in a
+   real basis, so every center is real symmetric. No charge is conserved for $h > 0$, so there
+   is one sector. At $L = 12$: 7 blocks, the largest of dimension 352.
 3. **Enclosure.** `verified_eigen` turns the LAPACK eigenpairs of each center into a guarantee:
-   residual $R = MX - X\Lambda$ and orthogonality defect $G = X^\dagger X - I$ in `Float64` with
-   the a priori bound $\gamma_K \sum |a_i b_i|$ ($K = N + 8$ real, $K = 2N + 8$ complex through four
-   real GEMMs) and Frobenius norms; then the smaller of the Ostrowski and polar-factor radii,
-   plus the construction error, by Weyl. Radii at $L = 12$ are about $10^{-9}$.
+   residual $R = MX - X\Lambda$ and orthogonality defect $G = X^\top X - I$ in `Float64` with
+   the a priori bound $\gamma_K \sum |a_i b_i|$ ($K = N + 8$ for real blocks) and Frobenius
+   norms; then the smaller of the Ostrowski and polar-factor radii, plus the construction error,
+   by Weyl. Radii at $L = 12$ are at most $1.1 \times 10^{-9}$.
 4. **Seeds.** `log_partition_enclosure` encloses $\log Z_6(\beta_0)$, $\log Z_{12}(\beta_0)$ and
    $\log Z_{12}(2\beta_0)$; the defect enclosures' upper ends are rounded up to the grid
    $10^{-15}$ to give the exact $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$.
@@ -33,31 +37,49 @@ cert  = certify_gap(model; n0 = 6, β0 = BETA0[(g, h)], rp = rp_certificate(mode
    `interval_bound_decimal` ($\Delta_L \ge$ it), used as the admissibility screen. The README
    headline quotes the interval bound and lists the chain bound beside it.
 
-The certificate stores the model, RP data, seed, $\log Z$ intervals, spectrum summaries (block
-count, largest block, largest radius) and chain, plus the fields $(g, h)$ and the run metadata
-with `model_provenance` hashes.
+The certificate stores the model (with its reflection), RP data, seed, $\log Z$ intervals,
+spectrum summaries (block count, largest block, largest radius) and chain, plus the `params`
+$(g, h)$ and the run metadata with `model_provenance` hashes.
 
 ## Checker semantics
 
-`check.jl` (fast) enforces the model-local source hashes, compares the stored model, RP factor
-and seed exactly with `longitudinal(g, h)`, `C = Z` and `BETA0`, and reruns the core
-`check_certificate(cert; spectra = false)`: the exact RP identity and the exact chain, which must
-reproduce the stored bound from the stored seed. `check.jl --full` adds `spectra = true`: both
-seed spectra are re-enclosed from scratch and the fresh defect enclosures must not exceed the
-stored $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$. This is the sound replay criterion: the stored
-defects are the only spectral input of the chain, so re-proving that they are upper bounds
-re-proves the certificate, independent of the LAPACK build that produced it. (The earlier local
-checker instead required each fresh eigenvalue interval to lie inside a stored interval of
-doubled radius $2\eta$; the core certificate stores no eigenvalues.)
+`check.jl` (fast) runs the core `check_point` for every grid point: it enforces the model-local
+source hashes, compares the stored model (including the reflection), RP factor, seed and params
+exactly with `longitudinal(g, h)`, `C = Z`, `BETA0` and $(g, h)$, requires the stored defects
+to be at most the seed defects of `IsingLongitudinal.lean` (read by the core `lean_points`,
+which must list exactly the 30 grid points at their $\beta_0$), and reruns the core
+`check_certificate(cert; spectra = false)`: the exact RP identity, the exact chain, which must
+reproduce the stored bound from the stored seed, and the interval bound. `check.jl --full` adds
+`spectra = true`: both seed spectra are re-enclosed from scratch and the fresh defect
+enclosures must not exceed the stored $\varepsilon_{\mathrm{s}}, \varepsilon_\tau$. This is the
+sound replay criterion: the stored defects are the only spectral input of the chain, so
+re-proving that they are upper bounds re-proves the certificate, independent of the LAPACK
+build that produced it. (The earlier local checker instead required each fresh eigenvalue
+interval to lie inside a stored interval of doubled radius $2\eta$; the core certificate stores
+no eigenvalues.)
 
 ## Seed selection
 
 `BETA0` was selected by the earlier floating-point scan over $`n_0 \in \{2, 4, 6\}`$ and
 $`\beta_0 \in \{1/4, \dots, 64\}`$ (best `certified_gap_bound`), kept unchanged so that the seeds of
-the Lean statement stay valid. `scripts/scan.jl` repeats the scan from the core momentum blocks
-and matches 29 of 30 points; at $g = 1/4, h = 1$ its `Float64` defects are at rounding level and
-its preferred $\beta_0 = 23/4$ carries a meaningless float bound. With the tighter enclosures some
-points would now admit a better $\beta_0$; that was not pursued.
+the Lean statement stay valid. `scripts/scan.jl` repeats the scan from the core
+`float_ring_spectrum` and matches 29 of 30 points; at $g = 1/4, h = 1$ its `Float64` defects
+are zero to rounding and its preferred $\beta_0 = 23/4$ carries a meaningless float bound. With
+the tighter enclosures some points would now admit a better $\beta_0$; that was not pursued.
+
+## Routing through the core drivers (reflection added)
+
+The certify loop, the stored-certificate checker and the Lean regex of the tests were replaced
+by the core `certify_point`, `check_point` and `lean_points`, and the scan's own float block
+diagonalization by `float_ring_spectrum`; the site reflection $P = I$ and the params were added.
+All 30 certificates were regenerated at the same seeds and compared exactly with the previous
+ones: no $\varepsilon_{\mathrm{s}}$ or $\varepsilon_\tau$ increased (17 and 18 of them decreased
+by a few units of $10^{-15}$, e.g. $\varepsilon_{\mathrm{s}}$ at $g = 1, h = 1/20$ from
+$0.18399987309439$ to $0.183999873093926$), no `interval_bound_decimal` or `gap_lower_bound`
+decreased (7 chain bounds grew), and every defect is at most its Lean seed. The real blocks
+reduce the largest eigenvalue radius at $L = 12$ from $2.6 \times 10^{-9}$ to
+$1.1 \times 10^{-9}$ and its mean recorded enclosure time from 1.7 s to 0.5 s. The table below
+is the earlier regeneration and is unchanged at its four significant digits.
 
 ## Regeneration with the core (old versus new)
 

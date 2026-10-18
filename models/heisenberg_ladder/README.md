@@ -1,14 +1,14 @@
 # Two-leg spin-1/2 Heisenberg ladder
 
-This module certifies uniform spectral gaps for the two-leg spin-1/2 Heisenberg ladder at rung couplings $J_\perp = 4$, $7/2$, $3$, $5/2$, and $163069/65536$ from verified complete spectra of rings of $2$, $4$, and $8$ rungs, computed entirely with the shared core pipeline (`CertifiedGaps.GapCertificates.certify_gap`). Each certificate establishes a unique ground state and $\Delta_L \ge$ the bound below for every even $L \ge 4$ rungs. At $J_\perp = 2$ and $3/2$, every seed with $`n_0 \in \{2, 4\}`$ is rigorously rejected for all $\beta > 0$. The certificates are `results/certificate_J*.json` (one core certificate per coupling), the grid decisions and negative results are in [`results/suite.json`](results/suite.json), the route analysis is in [`IDEAS.md`](IDEAS.md), and the method and the failed perturbation route are documented in [`METHOD.md`](METHOD.md).
+This module certifies uniform spectral gaps for the two-leg spin-1/2 Heisenberg ladder at rung couplings $J_\perp = 4$, $7/2$, $3$, $5/2$, and $163069/65536$ from verified complete spectra of rings of $2$, $4$, and $8$ rungs, computed entirely with the shared core pipeline (`CertifiedGaps.GapCertificates.certify_point`). Each certificate establishes a unique ground state and $\Delta_L \ge$ the bound below for every even $L \ge 4$ rungs. At $J_\perp = 2$ and $3/2$, every seed with $`n_0 \in \{2, 4\}`$ is rigorously rejected for all $\beta > 0$. The certificates are `results/certificate_J*.json` (one core certificate per coupling), the grid decisions and negative results are in [`results/suite.json`](results/suite.json), the route analysis is in [`IDEAS.md`](IDEAS.md), and the method and the failed perturbation route are documented in [`METHOD.md`](METHOD.md).
 
 | $J_\perp$ | seed $(n_0, \beta_0)$ | certified gap $\ge$ | lengths covered |
 |---|---|---:|---|
-| 4 | $(4, 2)$ | 1.102404331 | every even $L \ge 4$ rungs ($N = 8, 12, 16, \dots$ spins) |
-| 7/2 | $(4, 9/4)$ | 0.778648930 | every even $L \ge 4$ rungs |
-| 3 | $(4, 5/2)$ | 0.454189766 | every even $L \ge 4$ rungs |
-| 5/2 | $(4, 3)$ | 0.042434525 | every even $L \ge 4$ rungs |
-| 163069/65536 | $(4, 3)$ | 0.001540040 | every even $L \ge 4$ rungs |
+| 4 | $(4, 2)$ | 1.102404333 | every even $L \ge 4$ rungs ($N = 8, 12, 16, \dots$ spins) |
+| 7/2 | $(4, 9/4)$ | 0.778648931 | every even $L \ge 4$ rungs |
+| 3 | $(4, 5/2)$ | 0.454189767 | every even $L \ge 4$ rungs |
+| 5/2 | $(4, 3)$ | 0.042434526 | every even $L \ge 4$ rungs |
+| 163069/65536 | $(4, 3)$ | 0.001540056 | every even $L \ge 4$ rungs |
 | 2, 3/2 | none ($`n_0 \in \{2, 4\}`$ rejected for all $\beta$) | — | no certificate |
 
 The gap column is the core interval bound `interval_bound_decimal` (`certified_gap_bound`, rounded down to nine digits); the exact rational chain bound of each certificate is listed below.
@@ -38,7 +38,7 @@ and the physical $S^z_{\text{tot}}$ becomes the cell charge $z_1 - z_2$. With th
 -h = \sum_\alpha C_\alpha \otimes F \overline{C_\alpha} F, \qquad C_\alpha \in \{X \otimes 1, A \otimes 1, Z \otimes 1, 1 \otimes X, 1 \otimes A, 1 \otimes Z\},
 ```
 
-since $\sigma^y X \sigma^y = -X$, $\sigma^y A \sigma^y = A$, $\sigma^y Z \sigma^y = -Z$ on each leg. The core `RingModel` (`ladder_model` in [`src/model.jl`](src/model.jl)) carries the charge $z_1 - z_2$, the charge flip $F$, and the on-site $`\mathbb{Z}_2`$ symmetry leg exchange $`U\,\mathrm{SWAP}\,U^\mathsf{T}`$; the core checks all of them exactly. `ladder_rp` stores the factors and $F$ for `CertifiedGaps.verify_rp`, and `check_frame` verifies over `Rational{BigInt}` that $`U`$ maps the physical bond, rung term, and $S^z_{\text{tot}}$ to the rotated ones (both checker modes and `test/runtests.jl`, which also compares the spectra of both frames with an independent dense Hamiltonian).
+since $\sigma^y X \sigma^y = -X$, $\sigma^y A \sigma^y = A$, $\sigma^y Z \sigma^y = -Z$ on each leg. The core `RingModel` (`ladder_model` in [`src/model.jl`](src/model.jl)) carries the charge $z_1 - z_2$, the charge flip $F$, the on-site $`\mathbb{Z}_2`$ symmetry leg exchange $`U\,\mathrm{SWAP}\,U^\mathsf{T}`$, and the lattice reflection $j \mapsto -j$ acting as the identity on each rung (the leg bond is symmetric under exchanging its two rungs); the core checks all of them exactly. `ladder_rp` stores the factors and $F$ for `CertifiedGaps.verify_rp`, and `check_frame` verifies over `Rational{BigInt}` that $`U`$ maps the physical bond, rung term, and $S^z_{\text{tot}}$ to the rotated ones (both checker modes and `test/runtests.jl`, which also compares the spectra of both frames with an independent dense Hamiltonian).
 
 ## Seeds and certified bounds
 
@@ -46,11 +46,11 @@ Each certified coupling has one core certificate `results/certificate_J<tag>.jso
 
 | $J_\perp$ | seed $(n_0, \beta_0)$ | $\varepsilon_{\mathrm{s}}$ | $\varepsilon_\tau$ | interval $\Delta \ge$ | exact chain $\Delta >$ | on $\|J_\perp - J_*\| \le 10^{-4}$ |
 |---|---|---:|---:|---:|---:|---:|
-| 4 | $(4, 2)$ | 0.035083179771961 | 0.024624083715215 | 1.102404331 | 1.101612406 | 1.063077260 |
-| 7/2 | $(4, 9/4)$ | 0.058068500793985 | 0.029870522063335 | 0.778648930 | 0.777944996 | 0.751906573 |
-| 3 | $(4, 5/2)$ | 0.098963550759311 | 0.044977192016543 | 0.454189766 | 0.453872996 | 0.435856990 |
-| 5/2 | $(4, 3)$ | 0.185584310567304 | 0.051147246075377 | 0.042434525 | 0.042401527 | — |
-| 163069/65536 $\approx 2.488235$ | $(4, 3)$ | 0.187727933251953 | 0.052695044875928 | 0.001540040 | 0.001535915 | — |
+| 4 | $(4, 2)$ | 0.035083179714486 | 0.024624083598950 | 1.102404333 | 1.101612408 | 1.063077261 |
+| 7/2 | $(4, 9/4)$ | 0.058068500731387 | 0.029870521934267 | 0.778648931 | 0.777944997 | 0.751906574 |
+| 3 | $(4, 5/2)$ | 0.098963550679878 | 0.044977191847942 | 0.454189767 | 0.453872996 | 0.435856991 |
+| 5/2 | $(4, 3)$ | 0.185584310499645 | 0.051147245917534 | 0.042434526 | 0.042401528 | — |
+| 163069/65536 $\approx 2.488235$ | $(4, 3)$ | 0.187727933182815 | 0.052695044714438 | 0.001540056 | 0.001535930 | — |
 | 326133/131072 $\approx 2.488197$ | all 128 grid seeds rejected | | | — | | |
 | 2 | $`n_0 \in \{2, 4\}`$ rejected for every $\beta > 0$ | | | — | | |
 | 3/2 | $`n_0 \in \{2, 4\}`$ rejected for every $\beta > 0$ | | | — | | |
@@ -59,12 +59,12 @@ Asymmetric defect pairs where $\varepsilon_{\mathrm{s}}$ exceeds the symmetric d
 
 ### Verification method
 
-For each coupling, `verified_ring_spectrum` encloses every eigenvalue of the $2$-, $4$-, and $8$-rung rings in blocks of charge, momentum, leg-exchange parity, and (at $S^z = 0$) flip parity, with exact multiplicities (largest block 715 at 8 rungs). `seed_bounds` turns them into defect enclosures for all 128 grid seeds $`n_0 \in \{2, 4\}`$, $\beta_0 = k/4$ ($k = 1, \dots, 64$), reusing the spectra, and each seed is classified as
+For each coupling, `verified_ring_spectrum` encloses every eigenvalue of the $2$-, $4$-, and $8$-rung rings in blocks of charge, momentum $0 \le k \le \pi$, leg-exchange parity, and (at $S^z = 0$) flip parity, with exact multiplicities (91 blocks, largest 715, at 8 rungs); the lattice reflection makes every block a real symmetric matrix. `seed_bounds` turns them into defect enclosures for all 128 grid seeds $`n_0 \in \{2, 4\}`$, $\beta_0 = k/4$ ($k = 1, \dots, 64$), reusing the spectra, and each seed is classified as
 - `certified`: the upper defects close the recurrence (`certified_gap_bound`);
 - `rejected_by_recurrence`: the lower defects carry an exact rational witness that the recurrence diverges above $1/2$;
 - `unresolved`: neither (does not occur).
 
-The best certified seed is passed to `certify_gap`, which runs the exact rational chain. At $J_\perp = 2$ and $3/2$, monotone temperature-window bounds and a ground-energy tail (from `shifted_log_partition` and `ground_energy_enclosure`) extend the rejection to every $\beta > 0$. Certified seeds at $J_\perp = 4, 7/2, 3$ are continued across $|J_\perp - J_*| \le 10^{-4}$ using an operator-norm bound on the centered rung sum (see [`METHOD.md`](METHOD.md)).
+The best certified seed is passed to `certify_point`, which runs the exact rational chain and writes the certificate. At $J_\perp = 2$ and $3/2$, monotone temperature-window bounds and a ground-energy tail (`CertifiedGaps.Exclusions.exclude_all_beta`) extend the rejection to every $\beta > 0$. Certified seeds at $J_\perp = 4, 7/2, 3$ are continued across $|J_\perp - J_*| \le 10^{-4}$ using an operator-norm bound on the centered rung sum (see [`METHOD.md`](METHOD.md)).
 
 ### Finite-grid threshold and negative rows
 
@@ -87,25 +87,28 @@ julia --project=julia models/heisenberg_ladder/scripts/replay_scans.jl
 
 - `check.jl` (fast): model-local source hashes (`Results.verify_model_metadata`), exact frame and
   RP identities, all grid decisions from the stored rational defects, the best seeds, each core
-  certificate with `check_certificate(cert; spectra = false)` (RP and the exact chain), the
-  continuations, and the README claims (`CLAIMED_GAPS`), without spectra.
+  certificate with `check_point(...; spectra = false)` (the point's model, RP data, seed and
+  params, the Lean seed of `lean_points` at $J_\perp = 4$, RP, the exact chain and the interval
+  bound), the continuations, the coverage and witnesses of the all-$`\beta`$ exclusions
+  (`Exclusions.check_exclusion`), and the README claims (`CLAIMED_GAPS`), without spectra.
 - `check.jl --full`: also recomputes every verified spectrum, all 1,024 grid defect enclosures,
-  each certificate's seed (`check_certificate` with the fresh spectra), and the all-$`\beta`$
-  exclusions.
+  each certificate's seed (`check_point` with the fresh spectra), and every exclusion bound.
 - `certify.jl`: writes the five core certificates and `results/suite.json`.
 - `scripts/audit.jl` and `scripts/replay_scans.jl`: the independent MPFR audit of the
   $J_\perp = 4$ seed and the replay of the stored scans.
 
 Measured CPU (user) times, Julia 1.12 on an Apple M5 with one BLAS thread, including start-up:
-`certify.jl` 120 s (156 s wall clock on a lightly loaded machine; 15–20 s per coupling, about 13 s
-of it the 8-rung spectrum), `check.jl` 19 s, `check.jl --full` 116 s, `test/runtests.jl` 30 s,
-`scripts/audit.jl` 30 s, `scripts/replay_scans.jl` 9 s. The regeneration ran alongside many other
-jobs (load average 70–130), so wall-clock times were up to 3.6 times larger.
+`certify.jl` 76 s (121 s wall clock on a shared machine; 9–19 s per coupling, most of it the
+8-rung spectrum), `check.jl` 22 s, `check.jl --full` 75 s, `test/runtests.jl` 36 s,
+`scripts/audit.jl` 27 s, `scripts/replay_scans.jl` 7 s. Other jobs ran concurrently, so wall-clock times were up to twice as
+large.
 
 The exploratory floating-point scans are regenerated per coupling by `scripts/scan.jl <J>`
-(unverified eigenvalues of the core symmetry blocks up to 10 rungs), followed by
-`scripts/extrapolate.jl`; `scripts/threshold_bisection.jl` proposes the threshold endpoints. The
-stored scans were produced by the earlier local block builder and were not rerun.
+(`float_ring_spectrum`: unverified eigenvalues of the core symmetry blocks up to 10 rungs, about
+57 min CPU per coupling, almost all of it the 10-rung blocks), followed by `scripts/extrapolate.jl`;
+`scripts/threshold_bisection.jl` (64 s CPU) proposes the threshold endpoints. All stored scans
+were regenerated with these scripts; their best seeds, the threshold bracket and the
+extrapolated seed lengths are unchanged.
 
 ## What is rigorous
 
@@ -143,7 +146,7 @@ certify.jl, check.jl             certificate generator and verifier (fast or --f
 METHOD.md                        frame, pipeline, perturbation analysis, and continuation
 src/HeisenbergLadder.jl          module entry point (model.jl, suite.jl)
 src/model.jl                     core RingModel in the leg-rotated frame, RP data, frame identities
-src/suite.jl                     grid, rejections, exclusions, continuation, produce and check
+src/suite.jl                     grid classification, continuation, produce and check
 test/runtests.jl                 fast unit and verification tests
 scripts/audit.jl                 independent MPFR audit of the J⊥ = 4 seed
 scripts/                         exploratory floating-point scans and replay (not certificates)
@@ -177,3 +180,12 @@ model environment replaced by the core's. Every grid decision, best seed, and ex
 unchanged, every new defect bound is at most the old one, and the interval gap bounds rose
 (old → new): $1.102403091 \to 1.102404331$, $0.778648190 \to 0.778648930$,
 $0.454189334 \to 0.454189766$, $0.042433721 \to 0.042434525$, $0.001531165 \to 0.001540040$.
+
+The model then moved onto the core drivers: `certify_point` and `check_point` (with the Lean seed
+read by `lean_points`) replaced the local certificate writing and checking, `Exclusions`
+replaced the local rejection witnesses and all-$`\beta`$ exclusions, and the scripts use
+`float_ring_spectrum`, `seed_record`, and `purity_peaks`. The lattice reflection added to the
+model makes every block real; every grid decision, best seed, and exclusion is unchanged, every
+defect bound decreased, and the interval gap bounds rose (old → new):
+$1.102404331 \to 1.102404333$, $0.778648930 \to 0.778648931$, $0.454189766 \to 0.454189767$,
+$0.042434525 \to 0.042434526$, $0.001540040 \to 0.001540056$.

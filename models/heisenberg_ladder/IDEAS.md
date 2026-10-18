@@ -15,7 +15,7 @@ Lengths count rungs (two spin-1/2 sites, $d = 4$ per unit cell). In this documen
 ## Practical notes
 
 - Running six 10-rung scans concurrently with dense complex intermediates exceeded 17 GiB of RAM with the original local block builder (since replaced by the core symmetry blocks, which `scripts/scan.jl` now uses). Scans should be run one or two at a time.
-- The 10-rung exploratory scan outputs are stored in compact form (sector table, $\log Z$ grid, and lowest 32 eigenvalues); full eigenvalue lists can be regenerated via `scripts/scan.jl` and are not required by any checker.
+- The 10-rung exploratory scan outputs are stored in compact form ($\log Z$ grid and lowest 32 eigenvalues); full eigenvalue lists can be regenerated via `scripts/scan.jl` and are not required by any checker.
 
 ## Outcome
 

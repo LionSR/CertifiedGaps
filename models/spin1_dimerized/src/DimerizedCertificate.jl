@@ -4,15 +4,15 @@
 Gap certificates for the dimerized spin-1 Heisenberg ring
 `H_L = Σ_j [1 + (-1)^j δ] S_j · S_{j+1}` (2L spins, L two-spin cells) through the shared core
 pipeline. Only the model-specific parts live here: the exact `RingModel` of the two-spin cell in
-the sublattice-rotated S^z frame, its exact frame unitary, its reflected RP factors, the
-certified points with their seeds (n₀, β₀), and the loop over `GapCertificates.certify_gap` /
-`check_certificate`. Block construction, eigenvalue enclosure, log Z, seed defects and the
-rational chain are all core code. The floating-point seed scan lives in `scan_spectra.jl`.
+the sublattice-rotated S^z frame with its lattice reflection, the exact frame unitary, the
+reflected RP factors, and the certified points with their seeds (n₀, β₀). Block construction,
+eigenvalue enclosure, log Z, seed defects, the rational chain, the drivers `certify_point` /
+`check_point` and the floating-point scan spectra are core code.
 """
 module DimerizedCertificate
 using LinearAlgebra, CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.RingModels
-using CertifiedGaps.GapCertificates: certify_gap, check_certificate
-using CertifiedGaps.ExactArithmetic: parse_rational
+using CertifiedGaps.Spins: integer_spin_one
+using CertifiedGaps.GapCertificates: certify_point, check_point, lean_points
 BLAS.set_num_threads(1)
 # Cheap environment guard: the certificates are produced and replayed with gradual underflow.
 get_zero_subnormals() && error("flush-to-zero is enabled; the enclosures assume gradual underflow")
@@ -39,29 +39,19 @@ is a product of cell unitaries, under which X_β stays unitarily equivalent.
 const POSITIVE_TRANSFER = "models/spin1_dimerized/METHOD.md, \"Why the odd seed n0 = 3 cells is " *
     "valid\": X_beta = K K^* >= 0 (Cartesian frame; the rotated frame differs by cell unitaries)"
 
-"""
-Seed defects hardcoded in `lean/CertifiedGaps/Models/SpinOneDimerized.lean` (first entries of
-the chain lists `s` and `t`); a certificate must stay below them. δ = 7/10 has no Lean point.
-"""
-const LEAN_SEEDS = Dict(9//10 => (s = 4972//100000, t = 3206//100000))
+"The Lean model file whose `points` list holds the seed defects of its theorem (δ = 9/10)."
+const LEAN_FILE = normpath(joinpath(ROOT, "..", "..", "lean", "CertifiedGaps", "Models",
+    "SpinOneDimerized.lean"))
 
-# Spin-1 in the S^z basis (m = 1, 0, −1): S^x = XP/√2, iS^y = AP/√2 (real antisymmetric),
-# S^z = SZ, so S·S = XP⊗XP/2 − AP⊗AP/2 + SZ⊗SZ with integer XP, AP, SZ.
-const ONE = Matrix{Int}(I, 3, 3)
-const XP = [0 1 0; 1 0 1; 0 1 0]
-const AP = [0 1 0; -1 0 1; 0 -1 0]
-const SZ = [1 0 0; 0 0 0; 0 0 -1]
+# Spin-1 in the S^z basis (m = 1, 0, −1) with integer XP = √2 S^x, AP = √2 iS^y (real
+# antisymmetric), SZ = S^z, so that S·S = XP⊗XP/2 − AP⊗AP/2 + SZ⊗SZ; P is the flip m ↦ −m.
+const XP, AP, SZ, P, ONE = let s = integer_spin_one()
+    s.xp, s.ap, s.sz, s.flip, s.id
+end
 "Rotation by π about y, V = exp(−iπS^y): V S^x V' = −S^x, V S^y V' = S^y, V S^z V' = −S^z."
 const V = [0 0 1; 0 -1 0; 1 0 0]
-"Spin flip m ↦ −m in the S^z basis: P S^x P = S^x, P S^y P = −S^y, P S^z P = −S^z."
-const P = [0 0 1; 0 1 0; 1 0 0]
 "Swap of the two spins of a cell (state (a, b) has index 3(a−1) + b)."
-const SWAP = let S = zeros(Int, 9, 9)
-    for a in 1:3, b in 1:3
-        S[3(b - 1) + a, 3(a - 1) + b] = 1
-    end
-    S
-end
+const SWAP = swap_matrix(3)
 
 "J S·S in the physical S^z basis (exact rationals)."
 physical_bond(J) = J * (kron(XP, XP) // 2 - kron(AP, AP) // 2 + kron(SZ, SZ))
@@ -71,17 +61,32 @@ rotated_bond(J) = -J * (kron(XP, XP) // 2 + kron(AP, AP) // 2 + kron(SZ, SZ))
 cell_unitary() = kron(ONE, V)
 
 """
+    physical(δ) -> RingModel
+
+The ring of two-spin cells (a, b) in the physical S^z basis: on-site term (1 − δ) S_a·S_b, bond
+(1 + δ) S_b·S_a' between neighboring cells. Used only for the exact frame check
+`is_frame_change(physical(δ), dimerized(δ), cell_unitary())`; the bond is not reflection
+positive in this basis.
+"""
+physical(δ) = RingModel(9, kron(ONE, physical_bond(1 + δ), ONE), physical_bond(1 - δ);
+    name = "dimerized spin-1 Heisenberg, delta = $(str(δ)), two-spin cells, physical frame")
+
+"""
     dimerized(δ) -> RingModel
 
 The ring of two-spin cells (a, b) in the rotated frame U = ⊗_cells (1 ⊗ V): on-site term
 o = rotated_bond(1 − δ) on (a, b), bond h = rotated_bond(1 + δ) on (b, a') of neighboring cells.
 The cell charge z_a − z_b (rotated-frame S^z labels) is conserved, and the flip P ⊗ P maps the
-charge sector q onto −q.
+charge sector q onto −q. The lattice reflection is the site reversal of the spin chain: it
+reverses the cell order and swaps a ↔ b inside each cell, which maps z_a − z_b to z_b − z_a,
+so it is composed with the flip P ⊗ P to keep the charge (on-site part SWAP · (P ⊗ P), checked
+exactly by `RingModel`). With it the core builds every momentum block as a real matrix.
 """
 function dimerized(δ)
     z = [1, 0, -1]
     RingModel(9, kron(ONE, rotated_bond(1 + δ), ONE), rotated_bond(1 - δ);
         charge = [z[a] - z[b] for a in 1:3 for b in 1:3], flip = kron(P, P),
+        reflection = SWAP * kron(P, P),
         name = "dimerized spin-1 Heisenberg, delta = $(str(δ)), two-spin cells, rotated frame")
 end
 
@@ -100,70 +105,50 @@ result_paths() = sort(filter(p -> occursin(r"^certificate_d\d+\.json$", basename
 "Format an exact rational as a `\"num//den\"` string."
 str(x::Rational) = string(numerator(x), "//", denominator(x))
 
-"""
-Model-local sources that produce and check the certificates, as `dirs` and `files` of
-`Results.model_metadata` / `verify_model_metadata` (recorded under `source_sha256`, keyed by
-repository path; the core and the shared environment `julia/Project.toml`, `julia/Manifest.toml`
-are recorded under `core_sha256` as provenance only).
-"""
-const SOURCES = (dirs = ("src",), files = ("certify.jl", "check.jl"))
-
-"""
-    certify_point(δ; progress = false) -> Dict
-
-`certify_gap` at the point's seed `POINTS[δ]`, with δ, the frame and run metadata attached.
-"""
-function certify_point(δ; progress = false)
-    model, (; n0, beta0) = dimerized(δ), POINTS[δ]
-    positive_transfer = isodd(n0) ? POSITIVE_TRANSFER : ""
-    cert = certify_gap(model; n0, β0 = beta0, rp = rp(model, δ), positive_transfer, progress)
-    cert["delta"] = str(δ)
-    cert["frame"] = "rotated: U = prod over cells of (1 (x) V), V = exp(-i pi S^y) on spin b"
-    config = Dict("delta" => str(δ), "n0" => n0, "beta0" => str(beta0))
-    cert["metadata"] = model_metadata(ROOT, config; SOURCES..., packages = (CertifiedGaps,),
-        certified = true)
-    cert
-end
-
-"""
-    check_point(path; full = false) -> Dict
-
-Verify one certificate and return the recomputed values; throw on any mismatch. Enforces the
-recorded model-local source hashes (and that their key set is exactly the current model-local
-set), requires the stored model, RP data and seed to be exactly those of the point, then runs
-the core `check_certificate`: with `full = false` the exact RP identity and the exact rational
-chain from the stored seed; with `full = true` also freshly verified spectra of the rings of
-n₀ and 2n₀ cells, whose defect enclosures must not exceed the stored εₛ, εₜ.
-"""
-function check_point(path; full = false)
-    cert = read_result(path)
-    name = basename(path)
-    verify_model_metadata(cert["metadata"], ROOT; SOURCES...)
-    δ = parse_rational(cert["delta"])
-    haskey(POINTS, δ) || error("$name: δ = $δ is not a certified point")
-    name == basename(certificate_path(δ)) || error("$name: misnamed")
-    model, expected = decode_model(cert["model"]), dimerized(δ)
-    model.bond == expected.bond && model.onsite == expected.onsite &&
-        model.charge == expected.charge && model.flip == expected.flip ||
-        error("$name: stored model differs from the dimerized ring at δ = $δ")
-    stored_rp, expected_rp = decode_rp(cert["reflection_positivity"]), rp(expected, δ)
-    stored_rp.factors == expected_rp.factors && stored_rp.weights == expected_rp.weights &&
-        stored_rp.reflection == expected_rp.reflection ||
-        error("$name: stored RP data differ from the reflected Heisenberg factors")
-    seed = cert["seed"]
-    parse(Int, seed["n0"]) == POINTS[δ].n0 && parse_rational(seed["beta0"]) == POINTS[δ].beta0 ||
-        error("$name: stored seed differs from POINTS")
-    reference = isodd(POINTS[δ].n0) ? POSITIVE_TRANSFER : ""
-    String(get(seed, "positive_transfer", "")) == reference ||
-        error("$name: unexpected positive_transfer reference")
-    if haskey(LEAN_SEEDS, δ)
-        parse_rational(seed["eps_s"]) <= LEAN_SEEDS[δ].s &&
-            parse_rational(seed["eps_t"]) <= LEAN_SEEDS[δ].t ||
-            error("$name: seed defects exceed the values hardcoded in the Lean statement")
+"The seed defects `(s, t)` of the Lean theorem at the point δ, or `nothing` if it has none."
+function lean_seed(δ)
+    for p in lean_points(LEAN_FILE)
+        p.params == [δ, POINTS[δ].beta0] && return (s = p.s, t = p.t)
     end
-    check_certificate(cert; spectra = full)
+    return nothing
 end
 
-include("scan_spectra.jl")
+# The model and the keyword arguments that `certify_point` and `check_point` share at δ.
+function point(δ)
+    (; n0, beta0) = POINTS[δ]
+    model = dimerized(δ)
+    return model, (; n0, β0 = beta0, params = Dict("delta" => δ), model_dir = ROOT,
+        rp = rp(model, δ), positive_transfer = isodd(n0) ? POSITIVE_TRANSFER : "")
+end
+
+"""
+    certify(δ; progress = false) -> Dict
+
+The certificate of the point δ (`GapCertificates.certify_point` at the seed `POINTS[δ]`, with
+the frame recorded), written to `certificate_path(δ)`.
+"""
+function certify(δ; progress = false)
+    model, kw = point(δ)
+    record = Dict{String,Any}("frame" =>
+        "rotated: U = prod over cells of (1 (x) V), V = exp(-i pi S^y) on spin b")
+    return certify_point(certificate_path(δ), model; kw..., record, progress)
+end
+
+"""
+    check(path; full = false) -> Dict
+
+`GapCertificates.check_point` of a stored certificate against its point (δ from the file name):
+model-local source hashes, model, RP data, seed, params, the Lean seed defects where the Lean
+file has the point, the exact RP identity and rational chain, and with `full = true` freshly
+verified spectra of the rings of n₀ and 2n₀ cells. Throws on any mismatch.
+"""
+function check(path; full = false)
+    m = match(r"^certificate_d(\d+)\.json$", basename(path))
+    m === nothing && error("$(basename(path)): not a certificate file name")
+    δ = parse(Int, m[1]) // 10
+    haskey(POINTS, δ) || error("$(basename(path)): δ = $δ is not a certified point")
+    model, kw = point(δ)
+    return check_point(path, model; kw..., lean = lean_seed(δ), spectra = full)
+end
 
 end

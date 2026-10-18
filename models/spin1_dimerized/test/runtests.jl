@@ -1,19 +1,21 @@
-# Fast tests: the exact frame unitary from the physical chain to the rotated-frame RingModel,
-# the exact RP data, the floating-point scan decomposition, the core spectrum against the
-# physical-frame scan code, and every stored certificate (δ = 9/10 including a fresh core
+# Fast tests: the exact frame change from the physical chain to the rotated-frame RingModel, the
+# exact model, reflection and RP data, the core spectrum against an independent dense
+# physical-frame Hamiltonian, and every stored certificate (δ = 9/10 including a fresh core
 # replay of its spectra), with tampering rejected.
 using Test, LinearAlgebra
 include(joinpath(@__DIR__, "..", "src", "DimerizedCertificate.jl"))
 using .DimerizedCertificate, CertifiedGaps.Results, CertifiedGaps.RingModels
-using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum
+using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum, float_ring_spectrum
 using CertifiedGaps.ExactArithmetic: parse_rational
+using CertifiedGaps.Spins: integer_cartesian_generators
 const D = DimerizedCertificate
 
 "Exact operator A ⊗ A on sites `i` and `k` of `n` spin-1 sites (no matrix products)."
 pair_op(A, i, k, n) = foldl(kron, [j in (i, k) ? Rational{Int}.(A) : Matrix{Rational{Int}}(I, 3, 3)
                                    for j in 1:n])
 
-"Physical H on 2·cells spins in the S^z basis: bond (j, j+1) has coupling 1 + (−1)^j δ."
+"Physical H on 2·cells spins in the S^z basis, written site by site: bond (j, j+1) has
+coupling 1 + (−1)^j δ. Independent of the `RingModel` cell construction."
 function physical_ring(δ, cells)
     n = 2cells
     H = zeros(Rational{Int}, 3^n, 3^n)
@@ -34,56 +36,53 @@ end
         @test kron(D.ONE, V) * D.physical_bond(J) * kron(D.ONE, V)' == D.rotated_bond(J)
         @test kron(V, D.ONE) * D.physical_bond(J) * kron(V, D.ONE)' == D.rotated_bond(J)
     end
-    # The whole ring of two cells: U H_phys U' equals the ring assembled from the RingModel.
+    for δ in D.DELTAS
+        @test is_frame_change(D.physical(δ), D.dimerized(δ), D.cell_unitary())
+    end
+    # The cell model of the physical chain is the site-by-site chain (ring of two cells).
     for δ in (9 // 10, 7 // 10)
-        m = D.dimerized(δ)
+        m = D.physical(δ)
         o, h = Rational{Int}.(real(m.onsite)), Rational{Int}.(real(m.bond))
         one9 = Matrix{Rational{Int}}(I, 9, 9)
-        swap = zeros(Rational{Int}, 81, 81)
-        for x in 1:9, y in 1:9
-            swap[9(y - 1) + x, 9(x - 1) + y] = 1
-        end
-        H_model = kron(o, one9) + kron(one9, o) + h + swap * h * swap
-        U = kron(D.cell_unitary(), D.cell_unitary())
-        @test U * physical_ring(δ, 2) * U' == H_model
+        S = swap_matrix(9)
+        @test kron(o, one9) + kron(one9, o) + h + S * h * S == physical_ring(δ, 2)
     end
 end
 
-@testset "Exact model and RP data" begin
+# The Cartesian-frame identities behind METHOD.md's RP and X_β = K K* argument.
+@testset "Cartesian frame identities" begin
+    G = integer_cartesian_generators()
+    S = [-im * g for g in G]                                          # S^α = −i G_α
+    @test S[1] * S[2] - S[2] * S[1] == im * S[3]
+    @test sum(s * s for s in S) == 2I
+    @test -sum(kron(s, s) for s in S) == sum(kron(g, g) for g in G)
+    F, one3 = swap_matrix(3), Matrix{Int}(I, 3, 3)
+    @test all(F * kron(one3, g) * F == kron(g, one3) for g in G)     # Θ(A_α) = B_α
+end
+
+@testset "Exact model, reflection and RP data" begin
     for δ in D.DELTAS
-        m = D.dimerized(δ)                        # charge and flip conditions checked exactly
+        m = D.dimerized(δ)                        # charge, flip, reflection checked exactly
         @test m.flip == kron(D.P, D.P) && m.charge == [0, 1, 2, -1, 0, 1, -2, -1, 0]
+        @test m.reflection == D.SWAP * kron(D.P, D.P)
         cert = D.rp(m, δ)
         @test verify_rp(m, cert) && encode_rp(cert)["form"] == "reflected"
     end
     m = D.dimerized(9 // 10)
+    # The bare cell swap is not a lattice reflection here: it reverses the charge.
+    @test_throws ArgumentError RingModel(9, m.bond, m.onsite; charge = m.charge,
+        flip = m.flip, reflection = D.SWAP)
     @test verify_rp(m, rp_certificate(m; reflection = D.SWAP))       # exact LDL† with R
     @test_throws ArgumentError rp_certificate(m)                      # not RP without R
 end
 
-@testset "Floating-point scan decomposition" begin
-    delta = 1 // 2; cells = 2; groups = D.charge_groups(cells)
-    reference = Float64[]
-    for m in 0:2cells
-        A, den = D.integer_hamiltonian(cells, delta, groups[m+1])
-        E = eigvals(Symmetric(Matrix(A) / den))
-        append!(reference, E); m > 0 && append!(reference, E)
-    end
-    spectrum, _, _ = D.dense_spectrum(cells, delta)
-    @test length(spectrum.E) == 9^cells
-    @test maximum(abs, spectrum.E - sort(reference)) < 1e-12
-    # At the dimer limit each bond has energies −2, −1, 1 with degeneracy 1, 3, 5.
-    decoupled, _, _ = D.dense_spectrum(cells, 1 // 1)
-    single = [-4; fill(-2, 3); fill(2, 5)]
-    @test maximum(abs, decoupled.E - sort([a + b for a in single for b in single])) < 1e-12
-end
-
-@testset "Core spectrum of the rotated frame against the physical frame" begin
+@testset "Core spectrum against the physical frame" begin
     for δ in (9 // 10, 7 // 10)
+        reference = eigvals(Symmetric(Float64.(physical_ring(δ, 3))))
         spec = verified_ring_spectrum(D.dimerized(δ), 3)
         levels = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spec]))
-        reference, _, _ = D.dense_spectrum(3, δ)
-        @test maximum(abs, levels - reference.E) < 1e-12
+        @test maximum(abs, levels - reference) < 1e-12
+        @test maximum(abs, float_ring_spectrum(D.dimerized(δ), 3).E - reference) < 1e-12
         @test all(s.label["charge"] >= 0 for s in spec)             # ±q paired by the flip
     end
 end
@@ -92,14 +91,15 @@ end
     paths = D.result_paths()
     @test basename.(paths) == ["certificate_d7.json", "certificate_d9.json"]
     for path in paths
-        @test D.check_point(path)["gap_lower_bound"] == read_result(path)["gap_lower_bound"]
+        @test D.check(path)["gap_lower_bound"] == read_result(path)["gap_lower_bound"]
     end
     # δ = 9/10: a fresh core replay of the spectra of 2 and 4 cells (δ = 7/10: check.jl --full).
     path = D.certificate_path(9 // 10)
     cert = read_result(path)
-    r = D.check_point(path; full = true)
+    r = D.check(path; full = true)
     @test r["defect_s_upper"] <= parse_rational(cert["seed"]["eps_s"])
     @test r["defect_t_upper"] <= parse_rational(cert["seed"]["eps_t"])
+    @test D.lean_seed(9 // 10) !== nothing && D.lean_seed(7 // 10) === nothing
     @test read_result(D.certificate_path(7 // 10))["seed"]["positive_transfer"] ==
           D.POSITIVE_TRANSFER
 end
@@ -113,7 +113,7 @@ end
         tmp = joinpath(mktempdir(), basename(path))
         write_result(tmp, cert)
         try
-            D.check_point(tmp)
+            D.check(tmp)
             return false
         catch err
             return err isa ErrorException
@@ -123,6 +123,8 @@ end
     @test rejects(c -> c["seed"]["eps_s"] = halve(c["seed"]["eps_s"]))
     @test rejects(c -> c["seed"]["beta0"] = "4")
     @test rejects(c -> c["gap_lower_bound"] = halve(c["gap_lower_bound"]))
-    @test rejects(c -> c["delta"] = "4//5")
+    @test rejects(c -> c["params"]["delta"] = "4//5")
+    @test rejects(c -> c["interval_bound_decimal"] = 2 * c["interval_bound_decimal"])
+    @test rejects(c -> delete!(c["model"], "reflection"))
     @test rejects(c -> (h = c["metadata"]["source_sha256"]; h[first(keys(h))] = repeat("0", 64)))
 end

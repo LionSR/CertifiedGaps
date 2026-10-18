@@ -19,8 +19,10 @@ using ..RingModels: _int
 using ..VerifiedSpectra
 using ..Recurrence: rational_gap_chain, certified_gap_bound
 using ..Seeds: seed_defects
+using ..Results: read_result, write_result, model_metadata, verify_model_metadata
 
-export seed_bounds, certify_gap, check_certificate
+export seed_bounds, certify_gap, check_certificate, certify_point, check_point,
+    certificate_row, lean_points
 
 const FORMAT = "CertifiedGaps ring gap certificate v1"
 const GRID = big(10)^15                          # seed defects are rounded up to this grid
@@ -108,18 +110,19 @@ end
 
 """
     certify_gap(model; n0, β0, rp = rp_certificate(model), blocking = nothing,
-        positive_transfer = "", seed = nothing, progress = false) -> Dict
+        positive_transfer = "", seed = nothing, params = nothing, progress = false) -> Dict
 
 Gap certificate for every even ring length L ≥ `n0`: verifies the RP certificate `rp`, bounds
 the seed defects with `seed_bounds` (with `blocking` and `positive_transfer` as there, both
 recorded in the certificate), and runs `rational_gap_chain`. A `seed` already computed by
 `seed_bounds` with the same arguments is used instead of recomputing the spectra. Throws if the
 seed is not admissible (the interval bound `certified_gap_bound` is the screen). The result's
-`"gap_lower_bound"` is a strict lower bound on Δ_L.
+`"gap_lower_bound"` is a strict lower bound on Δ_L. `params`, the exact parameters of the
+model's point (a `Dict` or `NamedTuple` of integers and rationals), are recorded as `"params"`.
 """
 function certify_gap(model::RingModel; n0::Integer, β0, rp = rp_certificate(model),
     blocking = nothing, positive_transfer::AbstractString = "", seed = nothing,
-    progress = false)
+    params = nothing, progress = false)
     verify_rp(model, rp) || error("the RP certificate does not verify")
     β = RationalBig(β0)
     if seed === nothing
@@ -152,8 +155,16 @@ function certify_gap(model::RingModel; n0::Integer, β0, rp = rp_certificate(mod
         "interval_bound_decimal" => screen.bound,
     )
     seed.blocking === nothing || (cert["blocking"] = seed.blocking)
+    params === nothing || (cert["params"] = _params(params))
     return cert
 end
+
+# Exact parameters as strings "num//den" (or "int"); floats are refused.
+_params(params) = Dict{String,Any}(string(k) => _exact_string(v) for (k, v) in pairs(params))
+_exact_string(x::Union{Integer,Rational}) = denominator(x) == 1 ? string(numerator(x)) :
+    string(numerator(x), "//", denominator(x))
+_exact_string(x::AbstractString) = _exact_string(parse_rational(x))
+_exact_string(x) = throw(ArgumentError("refusing inexact parameter $(repr(x))"))
 
 # The `blocking` argument that reproduces a certificate's stored cell model from its site model.
 function _stored_blocking(cert, model)
@@ -161,7 +172,7 @@ function _stored_blocking(cert, model)
     c = _int(cert["blocking"]["cell"])
     stored = decode_model(cert["blocking"]["model"])
     blocking = (; cell = c, charge = stored.charge, modulus = stored.modulus, flip = stored.flip,
-        symmetries = stored.symmetries)
+        symmetries = stored.symmetries, reflection = stored.reflection)
     rebuilt, _ = _spectral(model, blocking)
     rebuilt.bond == stored.bond && rebuilt.onsite == stored.onsite ||
         error("the stored cell model is not the blocked site model")
@@ -203,7 +214,117 @@ function check_certificate(cert; spectra = true, progress = false)
     chain["gap_strict_lower"] == cert["gap_lower_bound"] == cert["chain"]["gap_strict_lower"] ||
         error("the rational chain does not reproduce the stored bound")
     recomputed["gap_lower_bound"] = chain["gap_strict_lower"]
+    screen = certified_gap_bound(εs, εt, β).bound
+    screen !== nothing && screen == _float(cert["interval_bound_decimal"]) ||
+        error("the interval bound does not reproduce the stored interval_bound_decimal")
+    recomputed["interval_bound_decimal"] = screen
     return recomputed
+end
+
+_float(x::AbstractString) = parse(Float64, x)
+_float(x::Real) = Float64(x)
+
+"""
+    certify_point(path, model; n0, β0, params, model_dir, sources = (;), packages = (),
+        record = Dict(), kwargs...) -> Dict
+
+The certificate of one parameter point of a model, written to `path`: `certify_gap(model; n0,
+β0, params, kwargs...)` (`rp`, `blocking`, `positive_transfer`, `seed`, `progress`), the extra
+top-level fields `record`, and under `"metadata"` the run record `Results.model_metadata` of
+`model_dir` with the model-local `sources` (`dirs`, `files`), the configuration (the params,
+n₀, β₀ and the run time) and the versions of `CertifiedGaps` and `packages`.
+"""
+function certify_point(path, model::RingModel; n0::Integer, β0, params, model_dir,
+    sources = (;), packages = (), record = Dict{String,Any}(), kwargs...)
+    seconds = @elapsed cert = certify_gap(model; n0, β0, params, kwargs...)
+    merge!(cert, record)
+    config = merge(_params(params), Dict{String,Any}("n0" => n0,
+        "beta0" => _exact_string(RationalBig(β0)), "seconds" => seconds))
+    cert["metadata"] = model_metadata(model_dir, config; sources...,
+        packages = (parentmodule(@__MODULE__), packages...), certified = true)
+    write_result(path, cert)
+    return cert
+end
+
+"""
+    check_point(path, model; n0, β0, params, model_dir, sources = (;), rp = rp_certificate(model),
+        blocking = nothing, positive_transfer = "", lean = nothing, spectra = false) -> Dict
+
+Check the stored certificate `path` of one parameter point against its definition, then run
+`check_certificate(cert; spectra)`. Requires the recorded model-local source hashes
+(`Results.verify_model_metadata` of `model_dir` with `sources`), and exactly the point's model
+record (`encode_model(model)`), RP record (`encode_rp(rp)`), seed (n₀, β₀, `positive_transfer`),
+cell blocking and `params`. `lean = (s, t)` are the seed defects hardcoded in the model's Lean
+theorem (see `lean_points`), which the stored εₛ, εₜ must not exceed. Throws on any mismatch
+and returns the values recomputed by `check_certificate`.
+"""
+function check_point(path, model::RingModel; n0::Integer, β0, params, model_dir,
+    sources = (;), rp = rp_certificate(model), blocking = nothing,
+    positive_transfer::AbstractString = "", lean = nothing, spectra = false)
+    name = basename(path)
+    fail(what) = error("$name: $what")
+    cert = read_result(path)
+    verify_model_metadata(cert["metadata"], model_dir; sources...)
+    encode_model(decode_model(cert["model"])) == encode_model(model) ||
+        fail("the stored model is not the point's model")
+    encode_rp(decode_rp(cert["reflection_positivity"])) == encode_rp(rp) ||
+        fail("the stored RP data are not the point's")
+    s = cert["seed"]
+    (_int(s["n0"]), parse_rational(s["beta0"])) == (n0, RationalBig(β0)) ||
+        fail("the stored seed (n0, beta0) is not the point's")
+    String(get(s, "positive_transfer", "")) == positive_transfer ||
+        fail("unexpected positive_transfer reference")
+    spectral, c = _spectral(model, blocking)
+    stored = haskey(cert, "blocking") ?
+        (_int(cert["blocking"]["cell"]), encode_model(decode_model(cert["blocking"]["model"]))) :
+        nothing
+    stored == (blocking === nothing ? nothing : (c, encode_model(spectral))) ||
+        fail("the stored blocking is not the point's")
+    Dict(String(k) => _exact_string(v) for (k, v) in get(cert, "params", Dict())) ==
+        _params(params) || fail("the stored params are not the point's")
+    if lean !== nothing
+        parse_rational(s["eps_s"]) <= lean.s && parse_rational(s["eps_t"]) <= lean.t ||
+            fail("the seed defects exceed those of the Lean theorem")
+    end
+    return check_certificate(cert; spectra)
+end
+
+"""
+    certificate_row(cert) -> Dict
+
+Summary row of a certificate: its params, the seed (n₀, β₀, εₛ, εₜ) and the bounds.
+"""
+function certificate_row(cert)
+    row = Dict{String,Any}(String(k) => v for (k, v) in get(cert, "params", Dict()))
+    for key in ("n0", "beta0", "eps_s", "eps_t")
+        row[key] = cert["seed"][key]
+    end
+    for key in ("gap_lower_bound", "gap_lower_bound_decimal", "interval_bound_decimal")
+        row[key] = cert[key]
+    end
+    return row
+end
+
+"""
+    lean_points(path) -> Vector{NamedTuple}
+
+The points of a Lean model file (`lean/CertifiedGaps/Models/*.lean`): each entry
+`⟨p₁, …, β₀, { s := [s₀, …] t := [t₀, …] … }⟩` of its `points` list as `(; params, s, t)` with
+the exact numbers `params = [p₁, …, β₀]` and the seed defects `s₀`, `t₀` that the Lean theorem
+takes as hypotheses. Numbers are Lean ℚ literals: `7`, `13 / 2` or `9064e-9`.
+"""
+function lean_points(path)
+    text = read(path, String)
+    start = findfirst("def points", text)
+    start === nothing && throw(ArgumentError("$path has no `def points` list"))
+    number(x) = (x = replace(strip(x), " " => "");
+        m = match(r"^(\d+)e-(\d+)$", x);
+        m !== nothing ? parse(BigInt, m[1]) // big(10)^parse(Int, m[2]) : parse_rational(x))
+    entry = r"⟨([^{⟩]*),\s*\{\s*s\s*:=\s*\[([^,\]]+)[^\]]*\]\s*t\s*:=\s*\[([^,\]]+)"
+    points = [(; params = number.(split(m[1], ",")), s = number(m[2]), t = number(m[3]))
+              for m in eachmatch(entry, text[last(start):end])]
+    isempty(points) && throw(ArgumentError("no points found in $path"))
+    return points
 end
 
 end

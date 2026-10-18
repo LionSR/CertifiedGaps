@@ -85,7 +85,7 @@ scope. [`lean/`](lean/) and [`leaderboard/`](leaderboard/) formalize 51 of the 5
 | spin-1 Heisenberg $+ D \sum (S^z)^2$, $D = 4$ and $D \in [3.2059998, 3.206]$ | $(12, 29/10), (6, 381/125)$ | $0.899, 0.0018$ (every even $L \ge 6$) | [`spin1_largeD`](models/spin1_largeD/) |
 | two-leg Heisenberg ladder, $J_\perp = 4, 7/2, 3, 5/2, 163069/65536$ (rung cells) | $(4, 2 \dots 3)$ | $1.102, 0.778, 0.454, 0.042, 0.0015$ | [`heisenberg_ladder`](models/heisenberg_ladder/) |
 | two-leg transverse-field Ising ladder, $g = 3$ (rung cells) | $(4, 3/2)$ | $0.636$ | [`two_leg_tfim`](models/two_leg_tfim/) |
-| Ising chain $-ZZ - gX - hZ$, 30 points $g \in [1/4, 2]$, $h \in [1/20, 1]$ | $(6, 2 \dots 97/4)$ | $0.0763$ to $3.705$ (unconditional in Lean at $g = 1/4, h = 1/20$: $0.392$) | [`tfim_longitudinal`](models/tfim_longitudinal/) |
+| Ising chain $-ZZ - gX - hZ$, 30 points $g \in [1/4, 2]$, $h \in [1/20, 1]$ | $(6, 2 \dots 97/4)$ | $0.0763$ to $4.520$ (unconditional in Lean at $g = 1/4, h = 1/20$: $0.392$) | [`tfim_longitudinal`](models/tfim_longitudinal/) |
 | spin-1 bilinear–biquadratic, $\theta \in [-7/10, 0]$ | no admissible even seed with $n_0 \le 6$ | negative result; required seed scale estimated | [`blbq_haldane`](models/blbq_haldane/) |
 | spin-2 Heisenberg chain | — | certified MPS upper bounds ($N \le 1024$) and certified-MPO study; no gap certificate | [`spin2`](models/spin2/) |
 | hexagonal spin-3/2 AKLT ($2+1$ dimensions) | — | numerical pilot of the $`2+1`$D thermal-purity recursion | [`aklt`](models/aklt/) |

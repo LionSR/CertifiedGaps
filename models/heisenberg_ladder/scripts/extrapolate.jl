@@ -8,7 +8,7 @@
 #
 #     julia --project=julia models/heisenberg_ladder/scripts/extrapolate.jl
 include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
-using .HeisenbergLadder: BASE, HASHED
+using .HeisenbergLadder: BASE
 using CertifiedGaps.Seeds: scan_seeds, best_seed
 using CertifiedGaps.Results: write_result, model_metadata
 using JSON3
@@ -36,7 +36,7 @@ function extrapolate()
     end
     write_result(joinpath(BASE, "results", "scans", "extrapolation.json"), Dict(
         "metadata" => model_metadata(BASE, Dict("model" =>
-            "delta4 exp(-(n-4)/xi), P_t=exp(-6n exp(-beta gap10))"); HASHED...),
+            "delta4 exp(-(n-4)/xi), P_t=exp(-6n exp(-beta gap10))")),
         "estimates" => estimates))
     foreach(println, estimates)
 end

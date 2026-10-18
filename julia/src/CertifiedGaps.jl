@@ -21,6 +21,7 @@ Submodules, each used on its own (`using CertifiedGaps.ExactDiagonalization`):
 | `RingModels` | exact ring models and the exact RP certificate −h = Σ w C ⊗ C̄ |
 | `VerifiedSpectra` | rigorous complete spectra of rings by symmetry blocks, and log Z enclosures |
 | `GapCertificates` | `certify_gap` and `check_certificate`: end-to-end certificates from small seeds |
+| `Exclusions` | all-β rejections of a seed length (negative results for the doubling recurrence) |
 | `Models` | TFIM (with its exact log Z), spin-s Heisenberg, staggered-field Heisenberg |
 | `Seeds` | seed defects from spectra and scans over (n₀, β₀) |
 | `Purification` | thermal purification with ITensors (load ITensors and ITensorMPS to enable) |
@@ -40,6 +41,7 @@ include("Seeds.jl")
 include("RingModels.jl")
 include("VerifiedSpectra.jl")
 include("GapCertificates.jl")
+include("Exclusions.jl")
 include("Models.jl")
 include("Purification.jl")
 include("CertifiedMPO/CertifiedMPO.jl")

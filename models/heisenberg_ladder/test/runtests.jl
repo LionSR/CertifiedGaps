@@ -1,6 +1,6 @@
 # Fast tests: the exact frame and RP identities, core verified spectra against an independent
-# dense Hamiltonian in the physical frame, the rejection witness, continuation, the all-β
-# exclusion and its checker, and the stored suite and core certificates (no spectra).
+# dense Hamiltonian in the physical frame, the continuation, the core all-β exclusion at
+# J⊥ = 2, and the stored suite and core certificates (no spectra).
 using Test, LinearAlgebra, IntervalArithmetic
 include(joinpath(@__DIR__, "..", "src", "HeisenbergLadder.jl"))
 const HL = HeisenbergLadder
@@ -9,6 +9,8 @@ using CertifiedGaps.RingModels: RPCertificate, verify_rp, rp_certificate, encode
     exact_matrix
 using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum
 using CertifiedGaps.Results: parse_exact_json, verify_model_metadata
+using CertifiedGaps.GapCertificates: check_point
+using CertifiedGaps.Exclusions: exclude_all_beta, check_exclusion
 using CertifiedGaps: to_interval
 
 levels(spec) = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spec]))
@@ -26,7 +28,7 @@ levels(spec) = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spe
     model = HL.ladder_model(4 // 1)
     # Without the cell reflection the bond is not RP in this frame (R[−h] is not PSD).
     @test_throws ArgumentError rp_certificate(model)
-    # The exact LDL† factorisation with the reflection finds an equivalent certificate.
+    # The exact LDL† factorization with the reflection finds an equivalent certificate.
     @test verify_rp(model, rp_certificate(model; reflection = HL.cell_reflection()))
     G = exact_matrix(HL.leg_exchange())
     @test G * G == I && G == transpose(G)
@@ -58,16 +60,6 @@ end
     end
 end
 
-@testset "Recurrence rejection is a positive proof" begin
-    @test HL.rejection(big(1) // 2, big(0) // 1) !== nothing
-    @test HL.rejection(big(0) // 1, big(1) // 2) !== nothing
-    @test HL.rejection(big(1) // 100, big(1) // 100) === nothing
-    @test_throws ErrorException HL.rejection(big(-1) // 100, big(1) // 100)
-    # Exact rational inequalities used in the arbitrary-size argument of METHOD.md.
-    @test 1 + 1 + 1 // 2 > 2
-    @test 4 / (1 + 9 // 4)^2 == 64 // 169 < 1 // 2
-end
-
 @testset "Certified coupling continuation" begin
     seed = Dict("n0" => "4", "beta0" => "2", "eps_s" => "3508321//100000000",
         "eps_t" => "123121//5000000")
@@ -76,19 +68,22 @@ end
     @test HL.q(c["eps_s_upper"]) > HL.q(seed["eps_s"])
     @test HL.q(c["eps_t_upper"]) > HL.q(seed["eps_t"])
     @test HL.q(c["gap_lower_bound"]) > 0
+    # Exact rational inequalities used in the arbitrary-size argument of METHOD.md.
+    @test 1 + 1 + 1 // 2 > 2
+    @test 4 / (1 + 9 // 4)^2 == 64 // 169 < 1 // 2
 end
 
-@testset "Continuous-temperature negative certificate and coverage" begin
+@testset "All-β exclusion of n₀ = 2 at J⊥ = 2 (core Exclusions)" begin
     model = HL.ladder_model(2 // 1)
-    specs = Dict(L => verified_ring_spectrum(model, L) for L in (2, 4))
-    record = HL.exclude_temperatures(specs, 2)
-    @test HL.check_exclusion(specs, record)
+    small, large = (verified_ring_spectrum(model, L) for L in (2, 4))
+    record = exclude_all_beta(small, large, 2)
+    @test check_exclusion(record; small, large)
     bad = deepcopy(record)
     bad["windows"][1]["beta_from"] = "1//100"
-    @test_throws ErrorException HL.check_exclusion(specs, bad)
+    @test_throws ErrorException check_exclusion(bad; small, large)
     bad = deepcopy(record)
-    bad["tail"]["eps_s_lower"] = "0//1"
-    @test_throws ErrorException HL.check_exclusion(specs, bad)
+    bad["tail"]["eps_s_lower"] = "0"
+    @test_throws ErrorException check_exclusion(bad; small, large)
 end
 
 @testset "Stored suite and core certificates (no spectra)" begin
@@ -96,7 +91,7 @@ end
     suite = parse_exact_json(read(HL.SUITE, String))
     bad = deepcopy(suite["metadata"])
     bad["source_sha256"][first(keys(bad["source_sha256"]))] = "0"^64
-    @test_throws ErrorException verify_model_metadata(bad, HL.BASE; HL.HASHED...)
+    @test_throws ErrorException verify_model_metadata(bad, HL.BASE)
     record = suite["parameters"][1]
     J = Rational{Int}(HL.q(record["J"]))
     @test HL.check_coupling(J, record, nothing)
@@ -109,4 +104,10 @@ end
     row = bad["grid"][findfirst(r -> r["status"] == "rejected_by_recurrence", bad["grid"])]
     row["rejection"]["step"] = "99"
     @test_throws ErrorException HL.check_coupling(J, bad, nothing)
+    # The J⊥ = 4 certificate must not assume more than the Lean theorem's seed defects.
+    @test HL.lean_seed(4 // 1, 2) !== nothing
+    model = HL.ladder_model(4 // 1)
+    @test_throws ErrorException check_point(HL.certificate_path(4 // 1), model; n0 = 4, β0 = 2,
+        params = HL.point_params(4 // 1), model_dir = HL.BASE, rp = HL.ladder_rp(model),
+        lean = (s = big(1) // 100, t = big(1) // 100))
 end

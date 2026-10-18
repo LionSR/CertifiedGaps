@@ -1,11 +1,51 @@
 # Twenty-spin numerical diagnostics (NOT certified). Every Sz, cell-momentum and spin-flip sector
 # of the 20-spin ring is enumerated; large blocks keep 40 Krylov Ritz values, so the spectrum is
-# partial and nothing here enters a certificate. `run_diagnostic` writes the gitignored
-# results/diagnostic20_<p>_<q>.json (about 390 kB, mostly Ritz values); `summarize_diagnostics`
-# condenses the six files into the tracked results/diagnostic20_summary.json.
+# partial and nothing here enters a certificate. The complete spectra of the smaller rings are
+# the core `float_ring_spectrum` of `rotated_model` (same spectrum as the physical ring).
+# `run_diagnostic` writes the gitignored results/diagnostic20_<p>_<q>.json (about 390 kB, mostly
+# Ritz values); `summarize_diagnostics` condenses the six files into the tracked
+# results/diagnostic20_summary.json.
 module Diagnostics
 using CertifiedGaps, CertifiedGaps.Results, KrylovKit, LinearAlgebra, Random, SparseArrays
-include("sectors.jl")
+using CertifiedGaps.ExactDiagonalization: PartialSpectrum, log_partition, logZ_bounds
+using CertifiedGaps.VerifiedSpectra: float_ring_spectrum
+using ..DimerizedHeisenberg: rotated_model, MODEL_DIR
+
+"Translate a configuration of `L` spins by one two-spin cell."
+rotate_cell(s, L) = ((s << 2) & ((1 << L) - 1)) | (s >> (L - 2))
+
+"""
+    group_orbits(L, q)
+
+Orbits of the configurations of `L` spins with `q` down spins under cell translations (and global
+spin flip when `2q == L`), with each orbit's images and stabilizer; returns `(orbits, useflip)`.
+The sparse 20-spin blocks need this physical-frame Sz basis: the core builds dense blocks only.
+"""
+function group_orbits(L, q)
+    n = L ÷ 2; mask = (1 << L) - 1
+    states = [s for s in 0:mask if count_ones(s) == q]
+    seen = falses(1 << L); orbits = Any[]
+    useflip = (2q == L)
+    for rep in states
+        seen[rep+1] && continue
+        images = Dict{Int,Tuple{Int,Int}}(); stabilizers = Tuple{Int,Int}[]
+        for f in 0:Int(useflip)
+            s = f == 0 ? rep : xor(rep, mask)
+            for t in 0:n-1
+                if haskey(images, s)
+                    t0, f0 = images[s]
+                    push!(stabilizers, (t - t0, f - f0))
+                else
+                    images[s] = (t, f); seen[s+1] = true
+                end
+                s = rotate_cell(s, L)
+            end
+        end
+        push!(orbits, (; rep, images, stabilizers))
+    end
+    @assert sum(length(o.images) for o in orbits) == binomial(L, q)
+    return orbits, useflip
+end
 
 export sparse_block, low_spectrum, run_diagnostic, summarize_diagnostics
 
@@ -115,14 +155,13 @@ end
 "20-spin diagnostic with an explicitly ineligible odd seed n0=5."
 function run_diagnostic(delta::Rational{BigInt})
     start = time()
-    small,_ = dense_spectrum(Float64(delta),10)
+    complete(cells) = float_ring_spectrum(rotated_model(delta), cells)
+    small = complete(5)
     large,blocks = low_spectrum(Float64(delta),20)
-    six,_ = dense_spectrum(Float64(delta),6)
-    twelve,_ = dense_spectrum(Float64(delta),12)
+    six, twelve = complete(3), complete(6)
     defect3 = twelve.E[1]-2six.E[1]
     defect5 = large.E[1]-2small.E[1]
-    eight,_ = dense_spectrum(Float64(delta),8)
-    sixteen,_ = dense_spectrum(Float64(delta),16)
+    eight, sixteen = complete(4), complete(8)
     defect4 = sixteen.E[1]-2eight.E[1]
     xi34 = 1/log(defect3/defect4)
     xi45 = 1/log(defect4/defect5)
@@ -139,7 +178,7 @@ function run_diagnostic(delta::Rational{BigInt})
             "logZ_tail_width_float"=>hi-lo))
     end
     good = filter(r -> r["bound_float"] !== nothing,rows)
-    root = normpath(joinpath(@__DIR__,"../../.."))
+    root = normpath(joinpath(MODEL_DIR, "..", ".."))
     result = Dict("delta"=>string(delta),"spins"=>"20","n0_cells"=>"5",
         "theorem_eligible"=>false,"certified"=>false,
         "reason"=>"Odd seed; partial Float64 Ritz spectra can miss levels or multiplicities",
@@ -155,7 +194,7 @@ function run_diagnostic(delta::Rational{BigInt})
         "metadata"=>run_metadata(Dict("delta"=>string(delta));
             source_sha256=source_hashes(root;dirs=(),files=(
                 "models/dimerized_heisenberg/src/Diagnostics.jl",
-                "models/dimerized_heisenberg/src/sectors.jl")),
+                "models/dimerized_heisenberg/src/DimerizedHeisenberg.jl")),
             packages=(CertifiedGaps,KrylovKit),status="20_spin_diagnostic_only",certified=false))
     path = joinpath(@__DIR__, "..", "results",
         "diagnostic20_$(numerator(delta))_$(denominator(delta)).json")

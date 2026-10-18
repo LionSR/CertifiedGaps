@@ -41,7 +41,10 @@ and the staggered field into the uniform real on-site term $o = -hZ$. The bond f
 which is all that reflection positivity with $F = I$ requires; the antisymmetry of $G_y$ is
 allowed. `test/runtests.jl` checks
 $V_L H_L V_L^\top = \sum_j h_{\mathrm{rot}, j, j+1} + \sum_j o_j$ with
-$V_L = \bigotimes_{j\ \mathrm{odd}} U_j$ exactly on rings of 2, 4 and 6 sites for every field.
+$V_L = \bigotimes_{j\ \mathrm{odd}} U_j$ exactly for every field and every even ring: written in
+two-site cells $(a, b) = (2x - 1, 2x)$, the physical chain is a translation-invariant ring of
+cells, and `RingModels.is_frame_change` checks that the on-site cell unitary $U \otimes I$ maps
+its cell bond and cell on-site term onto those of `cell_model(site_model(h), 2)`.
 The core verifies the RP identity exactly (`RingModels.verify_rp`).
 
 ## Two-site blocking of the seed spectra
@@ -69,6 +72,19 @@ exchange of sublattices that would restore it is a translation or reflection, no
 The old local pipeline used spin flip composed with a one-site translation for this purpose,
 so the core builds about twice as many blocks. Its cost is still 93–119 s per field.
 
+**Reflections.** The rotated bond is symmetric under the exchange of its two sites, so the
+one-site model has the lattice reflection $P = I$ (recorded in `site_model` and checked by the
+core). For a real model with a reflection the core builds the blocks at $0 < k < \pi$ as real
+symmetric matrices, which have smaller enclosure radii. The blocked model cannot use this: an
+exact search over all 384 signed permutations of the four cell states finds exactly four valid
+cell reflections without the charge, the swap of $a$ and $b$ with signs, and each sends $q$ to
+$-q$. The alternative is to diagonalize the site model itself with its reflection and $S^z$
+parity: 18 real blocks of up to 2068 states at 16 sites. At $h = 1$ this gives a largest
+radius of $1.4 \times 10^{-8}$ but larger defects,
+$\varepsilon_{\mathrm{s}} = 6.92657 \times 10^{-4}$ and $\varepsilon_\tau = 7.28529 \times 10^{-4}$
+against $6.92628 \times 10^{-4}$ and $7.28415 \times 10^{-4}$ from the cell blocks, so the
+certificates keep the (charge, momentum) cell blocks.
+
 ## Enclosure and seed defects
 
 Every block is enclosed by `CertifiedGaps.VerifiedSpectra.verified_eigen` (see
@@ -94,7 +110,7 @@ the grid $10^{-15}$. `certify_gap` runs the exact rational chain and the interva
 | `1//4` | `25//4` | `2495802294179//31250000000000` | `44760635388019//1000000000000000` | 0.214491805 | 0.214238387 | 0.812031433 | 117.0 |
 
 *Single-field times on a lightly loaded machine. The final regeneration ran under heavy
-concurrent load, and the `seconds` stored in the certificates (102–519 s) reflect that load.
+concurrent load, and the `seconds` stored in the certificates (143–195 s) reflect that load.
 
 ## Twenty-site numerical exploration and scaling
 
@@ -102,8 +118,10 @@ The 20-site scan was run with the retired local scan, in $(S^z, k)$ blocks under
 two sites. It combined full dense diagonalization for blocks of dimension $\le 2{,}500$ with
 80 low-lying Ritz values from `KrylovKit` for larger blocks (up to dimension $18{,}504$, with
 total weighted dimension $\sum \mathrm{mult} \times d = 1{,}048{,}576 = 2^{20}$). The current
-`scripts/scan.jl` uses the core exact diagonalization in $S^z$ sectors only (Lanczos above
-dimension 2500). It produces the same kind of floating-point estimate and is slower at 20 sites.
+`scripts/scan.jl` computes complete spectra up to 16 sites from unverified LAPACK eigenvalues of
+the certificate's cell blocks (`VerifiedSpectra.float_ring_spectrum`). Beyond 16 sites it uses
+the core exact diagonalization in $S^z$ sectors (Lanczos above dimension 2500). That produces the
+same kind of floating-point estimate and is slower at 20 sites.
 Because Krylov convergence and eigenvalue completeness are not certified, the $n_0 = 10$ rows below
 are exploratory numerical estimates:
 

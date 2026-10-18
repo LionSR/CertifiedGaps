@@ -5,9 +5,10 @@
 #     ... check.jl --full                               # recomputes every verified spectrum
 #
 # The fast check re-derives the hashes, the exact frame and RP identities, every grid decision
-# from its stored rational defects, the exact rational chain of each core certificate
-# (`check_certificate(cert; spectra = false)`), the continuations and the README claims.
-# `--full` also recomputes every verified spectrum, every grid defect enclosure, each
-# certificate's seed (`check_certificate` with the fresh spectra) and the all-β exclusions.
+# from its stored rational defects, each core certificate against its point and the Lean seed
+# with the exact rational chain (`check_point(...; spectra = false)`), the continuations, the
+# coverage and witnesses of the all-β exclusions and the README claims. `--full` also
+# recomputes every verified spectrum, every grid defect enclosure, each certificate's seed
+# (`check_point` with the fresh spectra) and every exclusion bound.
 include(joinpath(@__DIR__, "src", "HeisenbergLadder.jl"))
 HeisenbergLadder.check(; full = "--full" in ARGS)

@@ -2,7 +2,7 @@
 
 We certify uniform spectral gaps for the periodic spin-1 Heisenberg chain with single-ion
 anisotropy $D(S^z)^2$ in two stages. Stage 1 runs the shared core pipeline
-(`CertifiedGaps.GapCertificates.certify_gap`) on complete verified spectra of the rings $L = 6$
+(`CertifiedGaps.GapCertificates.certify_point`) on complete verified spectra of the rings $L = 6$
 and $L = 12$. Stage 2 reuses those stored spectra for spatial transfer-operator squaring, an exact
 purity coupling identity that eliminates the 24-site ring, and centered Weyl perturbation transport
 in $D$. Every certificate gives a unique ground state and a uniform gap
@@ -11,8 +11,8 @@ $\Delta_L \ge \Delta_{\mathrm{cert}}$ for every even $L \ge 6$ sites. Decimal bo
 
 | Single-ion anisotropy $D$ | Seed $(n_0, \beta_0)$ | Certified gap $\Delta_L \ge$ | Lengths covered |
 |---|---|---:|---|
-| $4$ | $(12, 29/10)$ + finite bridge at $L = 6, 8, 10$ | **$0.899422073$** | every even $L \ge 6$ sites |
-| $[3.2059998, 3.206]$ | $(6, 381/125)$, Weyl-transported | **$0.001821437$** | every even $L \ge 6$ sites |
+| $4$ | $(12, 29/10)$ + finite bridge at $L = 6, 8, 10$ | **$0.899422250$** | every even $L \ge 6$ sites |
+| $[3.2059998, 3.206]$ | $(6, 381/125)$, Weyl-transported | **$0.001823729$** | every even $L \ge 6$ sites |
 
 ## Model
 
@@ -21,36 +21,43 @@ H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum_{j=1}^L (S_j^z)^
 ```
 The unit cell is one spin-1 site ($c = 1$, local dimension $3$), so all lengths $L$ and $n_0$
 count sites. The core `RingModel` (`ring_model` in `src/model.jl`) uses the $S^z$ basis
-$(|{+1}\rangle, |0\rangle, |{-1}\rangle)$ with the integer matrices
-$S_+ = S^+/\sqrt{2} = |{+1}\rangle\langle 0| + |0\rangle\langle{-1}|$ and $S_- = S_+^T$:
+$(|{+1}\rangle, |0\rangle, |{-1}\rangle)$ with the integer matrices of
+`CertifiedGaps.Spins.integer_spin_one`, $`x = \sqrt{2}\,S^x`$ and the real antisymmetric
+$`a = \sqrt{2}\,iS^y`$:
 ```math
-h = S^z \otimes S^z + S_+ \otimes S_- + S_- \otimes S_+, \qquad o = D\mathrm{diag}(1, 0, 1),
+h = S^z \otimes S^z + \tfrac{1}{2}\, x \otimes x - \tfrac{1}{2}\, a \otimes a, \qquad o = D\mathrm{diag}(1, 0, 1),
 ```
-with conserved charge $`m \in \{1, 0, -1\}`$ and the spin flip $F = \mathrm{antidiag}(1, 1, 1)$.
+with conserved charge $`m \in \{1, 0, -1\}`$, the spin flip $F = \mathrm{antidiag}(1, 1, 1)$, and
+the lattice reflection $j \mapsto -j$ with trivial on-site map ($P = 1$, since $h$ is symmetric
+under the swap of its two sites).
 
 **Frame.** The Lean model (`lean/CertifiedGaps/Models/SpinOneLargeD.lean`) uses the Cartesian
 basis with $`(S^\alpha)_{ab} = -i\varepsilon_{\alpha ab}`$. The unitary $U = W N^{-1/2}$ with
 ```math
 W = \begin{pmatrix} -i & 0 & i \\ 1 & 0 & 1 \\ 0 & i & 0 \end{pmatrix}, \qquad N = W^\dagger W = \mathrm{diag}(2, 1, 2)
 ```
-maps it to the $S^z$ basis: $U^\dagger S^z U = S^z$, $U^\dagger S^\pm U = \sqrt{2} S_\pm$ and
-$U^\dagger (S^z)^2 U = \mathrm{diag}(1, 0, 1)$, so $U^{\otimes L}$ conjugates one ring
-Hamiltonian into the other. `cartesian_frame` checks these identities in exact Gaussian-integer
-arithmetic, and `test/frame.jl` also compares the verified spectra with dense diagonalization of
-the Cartesian Hamiltonian for $L \le 6$.
+maps it to the $S^z$ basis: $U^\dagger S^x U = x/\sqrt{2}$, $U^\dagger (iS^y) U = a/\sqrt{2}$,
+$U^\dagger S^z U = S^z$ and $U^\dagger (S^z)^2 U = \mathrm{diag}(1, 0, 1)$, so $U^{\otimes L}$
+conjugates one ring Hamiltonian into the other. The $\sqrt{2}$ in $U$ rules out the core's exact
+`is_frame_change`, so `cartesian_frame` checks the equivalent identities for $W$
+($W^\dagger S^x W = x$, $W^\dagger (iS^y) W = a$, $W^\dagger S^z W = N S^z$,
+$W^\dagger (S^z)^2 W = N (S^z)^2$) in exact Gaussian-integer arithmetic, and `test/frame.jl`
+also compares the verified spectra with dense diagonalization of the Cartesian Hamiltonian for
+$L \le 6$.
 
 ## Reflection positivity
 
-With the real symmetric involution $R = \mathrm{antidiag}(1, -1, 1)$, which commutes with
-$o$, one has $R S^z R = -S^z$ and $R S_\pm R = -S_\mp$, hence
+With the real symmetric involution $R = \mathrm{antidiag}(1, -1, 1)$ (`RP_REFLECTION`), which
+commutes with $o$, one has $R S^z R = -S^z$, $R x R = -x$ and $R a R = a$, hence
 ```math
--h = \sum_{C \in \{S^z,\, S_+,\, S_-\}} C \otimes R\,\overline{C}\,R,
+-h = S^z \otimes R S^z R + \tfrac{1}{2}\, x \otimes R x R + \tfrac{1}{2}\, a \otimes R a R,
 ```
-the "reflected" RP form with integer factors (`rp_data`). It is verified exactly by
-`CertifiedGaps.RingModels.verify_rp` in `certify_gap`, in `check.jl`, and in `test/frame.jl`
-(which also checks that the exact LDL factorization of the realignment finds this form and that
-the bond is not RP in this basis without $R$). In the Cartesian frame it is the familiar
-$-h = \sum_\alpha G_\alpha \otimes G_\alpha$ with $G_\alpha = i S^\alpha$ real and antisymmetric.
+the "reflected" RP form with integer factors and weights $(1, 1/2, 1/2)$ (`rp_data`). It is verified
+exactly by `CertifiedGaps.RingModels.verify_rp` in `certify_gap`, in `check.jl` (`check_point`), and
+in `test/frame.jl` (which also checks that the exact LDL factorization of the realignment finds an
+RP form with $R$ and that the bond is not RP in this basis without $R$). In the Cartesian frame it
+is the familiar $-h = \sum_\alpha G_\alpha \otimes G_\alpha$ with $G_\alpha = i S^\alpha$ real and
+antisymmetric.
 
 ## Seeds and certified bounds
 
@@ -60,8 +67,8 @@ bound `gap_lower_bound`; both are rigorous.
 
 | $D$ | $\beta_0$ | $\varepsilon_{\mathrm{s}}$ | $\varepsilon_\tau$ | gap $\ge$ (interval) | gap $>$ (chain) |
 |---|---|---|---|---:|---:|
-| $4$ | $9/4$ | `64102655021057//10^15` | `40520249232839//10^15` | $0.694746580$ | $0.694042646$ |
-| $1603/500$ | $381/125$ | `191641821313353//10^15` | `46451740181234//10^15` | $0.002752708$ | $0.002748647$ |
+| $4$ | $9/4$ | `64102636591415//10^15` | `40520211376808//10^15` | $0.694746846$ | $0.694042913$ |
+| $1603/500$ | $381/125$ | `191641808998499//10^15` | `46451711086584//10^15` | $0.002754398$ | $0.002750338$ |
 
 Both seeds lie below the defects assumed by the Lean file ($\varepsilon_{\mathrm{s}} \le 0.06411$,
 $\varepsilon_\tau \le 0.04053$ at $D = 4$; $\varepsilon_{\mathrm{s}} \le 0.19164415$,
@@ -71,27 +78,28 @@ Stage-2 cases (`results/certificate.json`, interval bounds, every even $L \ge n_
 
 | Case | $D$ | $(n_0, \beta_0)$ | $\varepsilon_{\mathrm{s}}$ | $\varepsilon_\tau$ | gap $\ge$ |
 |---|---|---|---:|---:|---:|
-| reference | $4$ | $(6, 9/4)$ | $0.0641027$ | $0.0405203$ | $0.694746580$ |
-| survey seed | $4$ | $(6, 3)$ | $0.0809098$ | $0.00643408$ | $0.543857012$ |
-| space lift 1 | $4$ | $(12, 29/10)$ | $0.00363252$ | $0.0314054$ | **$0.899422073$** |
-| space lift 2 | $4$ | $(24, 121/40)$ | $7.81249 \times 10^{-6}$ | $0.0565974$ | $0.660561928$ |
-| space lift 3 | $4$ | $(48, 63/20)$ | $4.18929 \times 10^{-11}$ | $0.104277$ | $0.403276789$ |
-| space lift 4 | $4$ | $(96, 133/40)$ | $2.07960 \times 10^{-21}$ | $0.192979$ | $0.064969180$ |
-| transport | $[3.9979773, 4]$ | $(6, 23/10)$ | $0.115897$ | $0.137682$ | $0.002590164$ |
-| reference | $1603/500$ | $(6, 381/125)$ | $0.191642$ | $0.0464518$ | $0.002752708$ |
-| transport | $[3.2059998, 3.206]$ | $(6, 381/125)$ | $0.191648$ | $0.0464657$ | **$0.001821437$** |
+| reference | $4$ | $(6, 9/4)$ | $0.0641027$ | $0.0405203$ | $0.694746846$ |
+| survey seed | $4$ | $(6, 3)$ | $0.0809098$ | $0.00643407$ | $0.543857041$ |
+| space lift 1 | $4$ | $(12, 29/10)$ | $0.00363252$ | $0.0314054$ | **$0.899422250$** |
+| space lift 2 | $4$ | $(24, 121/40)$ | $7.81249 \times 10^{-6}$ | $0.0565974$ | $0.660562073$ |
+| space lift 3 | $4$ | $(48, 63/20)$ | $4.18929 \times 10^{-11}$ | $0.104277$ | $0.403276911$ |
+| space lift 4 | $4$ | $(96, 133/40)$ | $2.07960 \times 10^{-21}$ | $0.192979$ | $0.064969369$ |
+| transport | $[3.9979773, 4]$ | $(6, 23/10)$ | $0.115897$ | $0.137682$ | $0.002594199$ |
+| reference | $1603/500$ | $(6, 381/125)$ | $0.191642$ | $0.0464518$ | $0.002754398$ |
+| transport | $[3.2059998, 3.206]$ | $(6, 381/125)$ | $0.191648$ | $0.0464657$ | **$0.001823729$** |
 
 At $D = 4$ the $n_0 = 12$ bound extends to every even $L \ge 6$ through the finite bridge: the
 verified gaps of the rings $L = 6, 8, 10$ (`results/finite_bridge.json`) exceed it. For
 comparison, $\Delta_{12} \in [2.2694582, 2.2694597]$ at $D = 4$ and
 $\Delta_{12} \in [1.5453276, 1.5453288]$ at $D = 3.206$.
 
-- **Stage 1 (`certify.jl`):** total $S^z$, momentum, and flip parity at $S^z = 0$ (the core
-  `ring_blocks` with `flip`) split the $3^{12} = 531{,}441$ states into 92 blocks of
-  dimension at most $5{,}798$. Each block is enclosed by
-  `CertifiedGaps.VerifiedSpectra.verified_eigen`, and $\log Z$ is summed by
-  `log_partition_enclosure`. The spectra are stored with `write_spectrum`, and their SHA-256 is
-  pinned in the certificate (`spectrum_sha256`).
+- **Stage 1 (`certify.jl`):** total $S^z$, momentum $0 \le m \le 6$, and flip parity at $S^z = 0$
+  (the core `ring_blocks` with `flip` and `reflection`) split the $3^{12} = 531{,}441$ states into
+  92 blocks of dimension at most $5{,}798$; the lattice reflection makes every block a real
+  symmetric matrix. Each block is enclosed by `CertifiedGaps.VerifiedSpectra.verified_eigen`
+  (largest radius $5.2 \times 10^{-7}$), and $\log Z$ is summed by `log_partition_enclosure`. The
+  spectra are stored with `write_spectrum`, and their SHA-256 is pinned in the certificate
+  (`spectrum_sha256`).
 - **Stage 2 (`scripts/transfer_certify.jl`):** from the stored $L = 6, 12$ spectra at $\beta$ and
   $2\beta$, transfer-operator squaring bounds $P_{\mathrm{s}}(12, \beta_0)$, and the exact coupling
   identity
@@ -128,7 +136,7 @@ $D = 3.205, 3.206$):
 
 At $n_0 = 6$, $D = 3.206$ sits at the boundary of the admissible region for direct seeds; smaller
 $D$ needs larger $n_0$. A single $L = 14$, $S^z = 1$ momentum block has dimension $41{,}835$
-($28.0$ GB as one dense complex matrix, about eight times that for a verified enclosure; see
+($14.0$ GB as one dense real matrix, about eight times that for a verified enclosure; see
 `results/feasibility.json`).
 
 ## Reproduce
@@ -138,17 +146,20 @@ From the repository root, in the shared environment (`OPENBLAS_NUM_THREADS=1`):
 ```sh
 export OPENBLAS_NUM_THREADS=1
 julia --project=julia models/spin1_largeD/certify.jl              # Stage 1 (see below)
-julia --project=julia models/spin1_largeD/scripts/transfer_certify.jl   # Stage 2 (~22 s)
+julia --project=julia models/spin1_largeD/scripts/transfer_certify.jl   # Stage 2 (~78 s)
 julia --project=julia models/spin1_largeD/scripts/report.jl --certified-only   # curve points
-julia --project=julia models/spin1_largeD/check.jl                # fast check (~21 s)
-julia --project=julia models/spin1_largeD/check.jl --full         # + L = 6, 12 replay (~1 h 56 min)
-julia --project=julia models/spin1_largeD/test/runtests.jl        # tests + fast check (~30 s)
+julia --project=julia models/spin1_largeD/check.jl                # fast check (~44 s)
+julia --project=julia models/spin1_largeD/check.jl --full         # + L = 6, 12 replay (~1 h 45 min)
+julia --project=julia models/spin1_largeD/test/runtests.jl        # tests + fast check (~63 s)
 ```
 
-Stage 1 costs about 3,900 s of CPU time per point (the $L = 12$ ring dominates), with a peak
-resident memory of 4.4 GB. `certify.jl 1603//500` runs one point; the two points ran as separate
-processes in 1 h 57 min wall time each on a heavily loaded Apple M-series host. The
-floating-point scan uses the core charge-sector exact diagonalization:
+Stage 1 costs about 1,800 s of CPU time per point (the $L = 12$ ring dominates), with a peak
+resident memory of 2.2 GB. `certify.jl 1603//500` runs one point; the two points ran as separate
+processes in 52 min wall time each on an Apple M-series host under a load average near 200, so
+all times above are inflated. The full replay recomputes the same spectra as `certify.jl` (about
+52 min per point under that load, run one point after the other); it was not rerun for this
+revision. The floating-point scan uses the core's unverified block eigenvalues
+(`float_ring_spectrum`):
 
 ```sh
 julia --project=julia models/spin1_largeD/scripts/scan.jl [D ...]
@@ -162,17 +173,20 @@ julia --project=julia models/spin1_largeD/scripts/feasibility.jl
 - **Rigorous (relative to the trusted base):** the exact RP identity and frame change; the exact
   symmetry reduction and block completeness ($3^L$ states); every eigenvalue enclosure at
   $L = 6, 8, 10, 12$ by `CertifiedGaps.VerifiedSpectra.verified_eigen` under the IEEE binary64 +
-  BLAS model (round to nearest, gradual underflow, the $\gamma_{N+8}$ / $\gamma_{2N+8}$ dot-product
-  bounds for any summation order and FMA, Frobenius norms, then Ostrowski or polar-factor Weyl
-  bounds); outward-rounded $\log Z$ intervals over complete spectra; exact rational seed defects;
-  transfer squaring, the purity coupling, and centered Weyl transport; and the recurrence bounds
-  (`certified_gap_bound`, and the exact chain `rational_gap_chain` for stage 1).
-- **Fast vs. full verification:** `check.jl` verifies the stage-1 source hashes and model, RP data
-  and exact chain of each core certificate (`check_certificate(cert; spectra = false)`), the
-  SHA-256 of the stored spectra and the $\log Z$ and defects recomputed from them, the Lean seed
-  bounds, a fresh $L = 6$ replay, every stage-2 case (exact equality), and a fresh $L = 8, 10$
-  bridge. `check.jl --full` re-verifies both points from the model
-  (`check_certificate(cert; spectra = true)`, dense $L = 6$ and $L = 12$).
+  BLAS model (round to nearest, gradual underflow, the $\gamma_{N+8}$ dot-product bound for the
+  real blocks, valid for any summation order and FMA, Frobenius norms, then Ostrowski or
+  polar-factor Weyl bounds); outward-rounded $\log Z$ intervals over complete spectra; exact
+  rational seed defects; transfer squaring, the purity coupling, and centered Weyl transport; and
+  the recurrence bounds (`certified_gap_bound`, and the exact chain `rational_gap_chain` for
+  stage 1).
+- **Fast vs. full verification:** `check.jl` checks each core certificate with
+  `GapCertificates.check_point` (stage-1 source hashes; exactly the point's model, RP data, seed
+  and params; the Lean seed hypotheses read by `lean_points` from
+  `lean/CertifiedGaps/Models/SpinOneLargeD.lean`; the exact chain and interval bound), then the
+  SHA-256 of the stored spectra and the $\log Z$ and defects recomputed from them by
+  `seed_bounds(...; spectra)`, a fresh $L = 6$ replay, every stage-2 case (exact equality), and a
+  fresh $L = 8, 10$ bridge. `check.jl --full` re-verifies both points from the model
+  (`check_point(...; spectra = true)`, dense $L = 6$ and $L = 12$).
 - **Numerical only:** the $(D, n_0, \beta_0)$ scan, the $\Delta_{12}$ plot denominators of the
   scan curve, and the seed-size extrapolations for $D \le 3.2$.
 
@@ -182,7 +196,7 @@ julia --project=julia models/spin1_largeD/scripts/feasibility.jl
 |---|---|
 | `certify.jl` | Stage 1: core certificates and stored spectra at both points |
 | `check.jl` | Verifier for both stages (`--full` re-verifies the spectra) |
-| `src/model.jl` | Exact model, frame, RP data, points, Lean seed bounds, file names |
+| `src/model.jl` | Exact model, frame, RP data, points, Lean file path, file names |
 | `src/TransferCertificate.jl` | Stage 2: transfer squaring, coupling, Weyl transport, bridge, checker |
 | `scripts/transfer_certify.jl` | Stage 2 driver: `results/certificate.json`, `results/finite_bridge.json` |
 | `scripts/` (others) | Floating-point scan, $\beta$ refinement, $L = 14$ feasibility, report/plot |
@@ -198,15 +212,32 @@ by path beyond these sources and the stored spectra.
 
 ## History
 
-Until this revision the model had its own pipeline: a local block builder (`model.jl`) with spin
-inversion, a local residual/polar enclosure with a priori $\gamma_{8m+32}$ constants and
-$`\|H\|_2 \le L(|D| + 2)`$, run-length-encoded $L = 12$ spectra (`src/spectra.jl`), a local
-$\log Z$ with a truncated tail, a per-model environment, and hash-pinned top-level scripts. It was
-replaced by the shared core. The model is now a `RingModel` in the $S^z$ frame (with the Cartesian
-frame checked exactly). Stage 1 is `certify_gap` with `flip`, which gives the same 92 blocks; the
-spectra are stored with `write_spectrum`; and stage 2 sums $\log Z$ over the complete stored
-spectra. Both points were regenerated with the same seeds and $\beta$ choices. Every defect
+**Core drivers and the lattice reflection.** `certify.jl` and `check.jl` now use the core
+`certify_point`, `check_point` and `lean_points` (replacing hand-written Lean seed constants),
+the spin matrices come from `Spins.integer_spin_one`, stage 2 bounds its defects with
+`Seeds.seed_defects`, and the scan uses `float_ring_spectrum`, `seed_record` and `purity_peaks`.
+The model gained the lattice reflection ($P = 1$), so every $L = 12$ block is real (same 92
+blocks), and the largest radius fell from $1.54 \times 10^{-6}$ to $5.2 \times 10^{-7}$. All
+certificates were regenerated with the same seeds, $\beta$ choices and intervals; every defect
 decreased and every bound increased (old $\to$ new):
+
+- stage 1 (interval): $0.694746580 \to 0.694746846$ at $D = 4$ and
+  $0.002752708 \to 0.002754398$ at $D = 3.206$;
+- the $n_0 = 12$ seed: $0.899422073 \to 0.899422250$;
+- the transported intervals: $0.001821437 \to 0.001823729$ on $[3.2059998, 3.206]$ and
+  $0.002590164 \to 0.002594199$ on $[3.9979773, 4]$.
+
+The finite bridge is unchanged on its $10^{-6}$ grid.
+
+**Consolidation onto the shared core.** Before that, the model had its own pipeline: a local block
+builder (`model.jl`) with spin inversion, a local residual/polar enclosure with a priori
+$\gamma_{8m+32}$ constants and $`\|H\|_2 \le L(|D| + 2)`$, run-length-encoded $L = 12$ spectra
+(`src/spectra.jl`), a local $\log Z$ with a truncated tail, a per-model environment, and hash-pinned
+top-level scripts. It was replaced by the shared core. The model is now a `RingModel` in the $S^z$
+frame (with the Cartesian frame checked exactly). Stage 1 is `certify_gap` with `flip`, which gives
+the same 92 blocks; the spectra are stored with `write_spectrum`; and stage 2 sums $\log Z$ over the
+complete stored spectra. Both points were regenerated with the same seeds and $\beta$ choices. Every
+defect decreased and every bound increased (old $\to$ new):
 
 - stage 1: $0.694694192 \to 0.694746580$ at $D = 4$ and $0.002213456 \to 0.002752708$ at
   $D = 3.206$;
@@ -222,12 +253,10 @@ transported intervals are kept fixed: bisection would now reach $3.2059997$ and 
 stage-2 case ids `transport-threshold-*` became `transport-*`.
 
 `results/scan_summary.json` and the numerical points of `results/transfer_curve.json` are still
-those of the earlier floating-point scan, which used momentum-resolved Lanczos with the removed
-local code. `scripts/scan.jl` now uses the core charge-sector exact diagonalization and reproduces
-the stored $L \le 10$ levels to $10^{-13}$. It was not rerun over the full grid, because its
-$L = 12$ Lanczos takes over 15 min per $`D`$. `scripts/report.jl --certified-only` refreshed the
-certified curve points and the plot, and `results/feasibility.json` was regenerated on the current
-host.
+those of the earliest floating-point scan, which used momentum-resolved Lanczos with the removed
+local code; `scripts/scan.jl` (now complete spectra from `float_ring_spectrum`) was not rerun over
+the full grid. At each revision `scripts/report.jl --certified-only` refreshed the certified curve
+points and the plot, and `results/feasibility.json` was regenerated on the current host.
 
 Earlier, the directory-format standardization moved the stage-2 driver to
 `scripts/transfer_certify.jl`, and the source-hash policy change made the core hashes provenance

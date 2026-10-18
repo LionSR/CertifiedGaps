@@ -3,7 +3,7 @@
 **Certified at $h = 1, 3/4, 1/2, 7/20, 1/4$: a unique ground state and a uniform spectral gap
 $\Delta_L \ge 1.148970, 0.890950, 0.594821, 0.383520, 0.214491$ for every even chain length
 $L \ge 8$ sites.** Each certificate is produced by the shared core pipeline
-(`CertifiedGaps.GapCertificates.certify_gap`) from verified complete spectra of the 8- and
+(`CertifiedGaps.GapCertificates.certify_point`) from verified complete spectra of the 8- and
 16-site rings. These spectra are split by an exact two-site blocking with a conserved U(1) cell
 charge. Derivations, sector data and the 20-site exploration are in [`METHOD.md`](METHOD.md);
 the route memo is in [`IDEAS.md`](IDEAS.md).
@@ -41,12 +41,19 @@ V_L H_L V_L^\dagger = \sum_j h_{j,j+1} + \sum_j o_j, \qquad h = -(X \otimes X + 
 because $U$ negates $S^x$ and $S^z$ and fixes $G_y$, and because
 $S^y \otimes S^y = -G_y \otimes G_y$.
 This is `site_model(h)`, the model stored in every certificate.
-`test/runtests.jl` checks $V_L H_L V_L^\dagger$ exactly against the stored model's ring
-Hamiltonian for $L = 2, 4, 6$ and every field.
+`test/runtests.jl` checks the rotation exactly with `RingModels.is_frame_change`: written in
+two-site cells $(a, b) = (2x - 1, 2x)$, the physical chain is mapped by $U \otimes I$ onto
+`cell_model(site_model(h), 2)` for every field, hence on every even ring.
 
 **RP identity.** $`-h = \sum_{C \in \{X, G_y, Z\}} C \otimes \overline{C}`$ with real $C$, and
 $o = -hZ$ is real and symmetric (`site_rp(h)`). The core verifies it exactly
 (`RingModels.verify_rp`) when certifying and again in `check_certificate`.
+
+**Lattice reflection.** The rotated bond is symmetric under the exchange of its two sites, so
+`site_model` carries the lattice reflection $P = I$, which the core checks exactly. The seed
+spectra do not use it. In two-site cells, every on-site map that mirrors the bond sends the cell
+charge below to its negative, so the blocked model admits no reflection. Diagonalizing the site
+model with its reflection and $S^z$ parity instead gives larger defects (see `METHOD.md`).
 
 **Blocking used for the spectra.** In this frame only the $S^z$ parity is a one-site charge.
 In two-site cells $(a, b)$, the rotated bond flips both spins of a pair together or neither, so
@@ -76,7 +83,8 @@ $10^{-15}$. For $h = 1$ they are `27705127843//40000000000000` and
 decimals. The certificate's claim `gap_lower_bound` is the strict exact rational chain bound
 (`rational_gap_chain`), which is slightly smaller. Every $\varepsilon$ is at most the seed constant
 hardcoded in `lean/CertifiedGaps/Models/StaggeredHeisenberg.lean` (first entries of `s` and `t`),
-and `test/runtests.jl` checks this in exact rationals. The 16-site exact diagonalization gaps
+and `check.jl` checks this in exact rationals
+(`GapCertificates.lean_points`). The 16-site exact diagonalization gaps
 are floating-point references.
 
 ## Reproduce
@@ -95,20 +103,20 @@ julia --project=julia models/heisenberg_staggered_field/test/runtests.jl
 julia --project=julia models/heisenberg_staggered_field/scripts/scan.jl 16
 ```
 
-`check.jl` runs `test/runtests.jl`. Measured run times (Julia 1.12, 1 BLAS thread, Apple
-M-series laptop):
-- `certify.jl`: 556 s for all five fields (93–119 s per field) on a lightly loaded machine;
-  the final regeneration took 20 min wall time (472 s CPU) under heavy concurrent load;
-- `check.jl` (`test/runtests.jl`): 102 tests, 36 s including compilation;
-- `check.jl --full`: 117 tests, 28 min wall time (471 s CPU) under the same load, which
-  re-verifies the 8- and 16-site spectra of all five certificates (roughly 8 min on an idle
-  machine, judging by the CPU time).
+Measured run times (Julia 1.12, 1 BLAS thread, Apple M-series laptop under heavy concurrent
+load, so wall times are about twice the CPU times):
+- `certify.jl`: 14 min wall time (481 s CPU) for all five fields, 143–222 s per field;
+- `check.jl`: 27 s including compilation;
+- `check.jl --full`: 15 min wall time (488 s CPU), re-verifying the 8- and 16-site spectra of
+  all five certificates (122–241 s per field);
+- `test/runtests.jl`: 34 tests, 56 s wall time (28 s CPU).
 
 ## What is rigorous
 
-- **Exact arithmetic:** the sublattice rotation (checked on rings of 2, 4 and 6 sites and on
-  the bond), the RP identity, the conservation of the cell charge, the exact cell model, the
-  exact rational chain, and the comparison with the Lean seed constants.
+- **Exact arithmetic:** the sublattice rotation (checked on two-site cells, hence on every
+  even ring), the lattice reflection of the site model, the RP identity, the conservation of
+  the cell charge, the exact cell model, the exact rational chain, and the comparison with the
+  Lean seed constants.
 - **IEEE binary64 + BLAS rounding model:** every block of the 8- and 16-site rings is enclosed
   by `CertifiedGaps.VerifiedSpectra.verified_eigen`. It bounds the residual and orthogonality
   defect of the LAPACK eigenvectors with a priori $\gamma_{N+8}$ (real blocks) or
@@ -120,21 +128,25 @@ M-series laptop):
   (`log_partition_enclosure`) with exact block multiplicities summing to $2^L$. The trusted
   base is the core (`julia/src`), IntervalArithmetic and LAPACK/BLAS used as untrusted
   proposers under that model.
-- **Fast vs. full:** `check.jl` checks the exact parts (frame, model, RP, blocking, chain,
-  Lean constants, model-local source hashes). `check.jl --full` rebuilds every spectrum from the
-  stored model and requires the fresh defects to be at most the stored $\varepsilon$.
+- **Fast vs. full:** `check.jl` checks the exact parts with `GapCertificates.check_point`
+  (model-local source hashes, model, RP data, seed, blocking and params against `src/common.jl`,
+  the Lean seed constants, the chain and the interval bound) and the summary. `check.jl --full`
+  also rebuilds every spectrum from the stored model and requires the fresh defects to be at
+  most the stored $\varepsilon$.
 - **Floating point only:** `scripts/scan.jl`, the 16-site reference gaps and the 20-site
   candidate seeds in `METHOD.md`.
 
 ## Layout
 
-- `certify.jl`: runs `certify_gap` for every point in `SEEDS` and writes the certificates and
-  `results/summary.json`.
-- `check.jl`: runs `test/runtests.jl`; `--full` re-verifies all spectra with `check_certificate`.
+- `certify.jl`: runs `certify_point` for every point in `SEEDS` and writes the certificates and
+  `results/summary.json` (`certificate_row`).
+- `check.jl`: `check_point` for every point (`--full`: with the spectra) and the summary.
 - `src/common.jl`: the frame (`U`, physical and rotated bonds), `site_model`, `site_rp`, the
-  blocking `BLOCKING`, the points `SEEDS`, and the hashed source set `SOURCES`.
-- `scripts/scan.jl`: floating-point seed scan with the core exact diagonalization.
-- `test/runtests.jl`: exact frame and certificate checks, executed by `check.jl`.
+  blocking `BLOCKING`, the points `SEEDS` and their arguments `point(h)`.
+- `scripts/scan.jl`: floating-point seed scan (`float_ring_spectrum` of the certificate's blocks
+  up to 16 sites, the core Lanczos exact diagonalization beyond).
+- `test/runtests.jl`: exact frame, RP, reflection and blocking tests, and verified spectra
+  against an independent physical-frame exact diagonalization.
 - `results/certificate_<h>.json`: core-format gap certificates (one per field), with
   `metadata` from `Results.model_metadata`: `source_sha256` (model-local, enforced by
   `verify_model_metadata`) and `core_sha256` (provenance only).
@@ -158,3 +170,8 @@ No file is hash-pinned by its working-tree path.
   $0.383508 \to 0.383520$ and $0.214486 \to 0.214491$. The spectral replay and audit scripts
   and their summaries were retired with the local enclosure, and the model now runs in the core
   environment (`--project=julia`) instead of its own.
+- The model was moved onto the core drivers `certify_point`, `check_point`, `certificate_row`,
+  `lean_points` and `float_ring_spectrum`; `check.jl` no longer runs the tests, the frame test
+  uses `is_frame_change` on two-site cells, the site model records its reflection $P = I$, and
+  every certificate records `params`. The regenerated certificates have exactly the same seeds,
+  defects and bounds.

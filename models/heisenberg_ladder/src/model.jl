@@ -25,14 +25,11 @@ frame_unitary() = kron(I2, 2A)
 "Cell reflection F = σʸ ⊗ σʸ = −4 A ⊗ A: a real symmetric involution reversing Sᶻ on both legs."
 cell_reflection() = -4 * kron(A, A)
 
-"Exchange of the two spins of a rung."
-swap() = [1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1]
-
 """
 Leg exchange in the rotated frame, U · swap · Uᵀ with U the frame unitary of one rung: a real
 signed permutation and involution commuting with h, o, the charge and F.
 """
-leg_exchange() = frame_unitary() * swap() * transpose(frame_unitary())
+leg_exchange() = frame_unitary() * swap_matrix(2) * transpose(frame_unitary())
 
 """
     physical_model(J) -> RingModel
@@ -48,11 +45,15 @@ physical_model(J) = RingModel(4, leg_bond(), J * exchange(); charge = [1, 0, 0, 
 
 The ladder in the leg-rotated frame U = ⊗_j (1 ⊗ u), u = exp(iπSʸ) on every leg-2 spin: leg
 bonds S·S, rung term o = U(J S₁·S₂)U† = −J(X⊗X + A⊗A + Z⊗Z), charge z₁ − z₂ (the physical
-total Sᶻ), the charge flip F = σʸ ⊗ σʸ (sectors ±Sᶻ are diagonalised once, Sᶻ = 0 is split
+total Sᶻ), the charge flip F = σʸ ⊗ σʸ (sectors ±Sᶻ are diagonalized once, Sᶻ = 0 is split
 by F-parity) and the on-site Z₂ symmetry `leg_exchange`, by whose parity every block is split.
+The leg bond is symmetric under the exchange of its two rungs, so the lattice reflection
+j ↦ −j acts with the identity on each rung (`reflection`): k and −k are diagonalized once, and
+every block of this real model is a real symmetric matrix.
 """
 ladder_model(J) = RingModel(4, leg_bond(), -J * (kron(X, X) + kron(A, A) + kron(Z, Z));
     charge = [0, 1, -1, 0], flip = cell_reflection(), symmetries = [leg_exchange()],
+    reflection = Matrix{Int}(I, 4, 4),
     name = "two-leg Heisenberg ladder, rung coupling $J, leg-2 spins rotated by exp(i pi S^y)")
 
 """
@@ -70,15 +71,14 @@ ladder_rp(model) = rp_certificate(model;
     check_frame(J) -> true
 
 Exact identities relating the physical ladder to `ladder_model(J)`: with U the frame unitary
-of one rung, (U ⊗ U) h (U ⊗ U)ᵀ = h, U (J S₁·S₂) Uᵀ = o and U (Z⊗1 + 1⊗Z) Uᵀ = Z⊗1 − 1⊗Z, so
-U^{⊗L} maps H_L onto the rotated ring and the total Sᶻ onto the rotated charge for every L.
+of one rung, Uᵀ maps the physical bond and rung term onto the rotated ones
+(`is_frame_change`), and U (Z⊗1 + 1⊗Z) Uᵀ = Z⊗1 − 1⊗Z, so U^{⊗L} maps H_L onto the rotated
+ring and the total Sᶻ onto the rotated charge for every L.
 """
 function check_frame(J)
     U = exact_matrix(frame_unitary())
-    phys, rot = physical_model(J), ladder_model(J)
-    U * transpose(U) == I || error("frame unitary is not orthogonal")
-    kron(U, U) * phys.bond * transpose(kron(U, U)) == rot.bond || error("bond frame fails")
-    U * phys.onsite * transpose(U) == rot.onsite || error("rung frame fails")
+    is_frame_change(physical_model(J), ladder_model(J), transpose(U)) ||
+        error("the leg rotation does not map the physical ladder onto the rotated one")
     U * exact_matrix(kron(Z, I2) + kron(I2, Z)) * transpose(U) ==
         exact_matrix(kron(Z, I2) - kron(I2, Z)) || error("charge frame fails")
     return true

@@ -3,300 +3,294 @@
         {
             "best_even_seed": null,
             "ratio": null,
-            "decay_times_delta_two_thirds": 0.39763245362950167,
-            "energy_difference_amplitude": 0.8667601275359361,
+            "decay_times_delta_two_thirds": 0.3976324536294747,
+            "energy_difference_amplitude": 0.8667601275360632,
             "delta": "1//10",
             "reference_spins": 16,
-            "reference_gap": 0.39502870771149823,
-            "thermal_prefactor_per_cell": 0.4335964530298032,
+            "reference_gap": 0.3950287077115071,
+            "thermal_prefactor_per_cell": 0.4335964530298333,
             "surrogate_first_even_seed": {
-                "surrogate_bound": 0.04319376733382209,
+                "surrogate_bound": 0.04319376733383775,
                 "n0_cells": 8,
                 "beta0": 14
             },
-            "effective_energy_difference_decay_cells": 1.8456463566487458,
-            "spectrum_seconds": 20.694546566,
+            "effective_energy_difference_decay_cells": 1.8456463566486208,
+            "spectrum_seconds": 13.902940625,
             "diagnostics": [
                 {
-                    "max_min_purity": 0.4294922247160269,
-                    "best_seed": null,
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.3190453855422426,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 3.5,
-                    "n0_cells": 2,
-                    "energy_difference": 0.31904538554224215,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.4294922247160261,
+                    "n0": 2
                 },
                 {
-                    "max_min_purity": 0.49290533767602507,
-                    "best_seed": null,
+                    "even_seed_eligible": false,
+                    "energy_difference": 0.1705989447768399,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 5.25,
-                    "n0_cells": 3,
-                    "energy_difference": 0.17059894477683368,
-                    "even_seed_eligible": false
+                    "max_min_purity": 0.4929053376760163,
+                    "n0": 3
                 },
                 {
-                    "max_min_purity": 0.5836027230756669,
-                    "best_seed": null,
-                    "peak_beta": 6.5,
-                    "n0_cells": 4,
+                    "even_seed_eligible": true,
                     "energy_difference": 0.09923589992566839,
-                    "even_seed_eligible": true
+                    "best_beta": null,
+                    "best_bound": null,
+                    "peak_beta": 6.5,
+                    "max_min_purity": 0.5836027230756669,
+                    "n0": 4
                 }
             ]
         },
         {
             "best_even_seed": {
-                "numerical_bound": 0.5347953348174902,
-                "epsilon_t": 0.012004541341293175,
-                "n0_cells": 4,
-                "epsilon_s": 0.011265182014107259,
-                "beta0": 6
+                "beta0": 6,
+                "eps_t": 0.012004541341293175,
+                "eps_s": 0.011265182013959726,
+                "bound": 0.5347953348185759,
+                "n0": 4
             },
-            "ratio": 0.44991763064350165,
-            "decay_times_delta_two_thirds": 0.3460434783193115,
-            "energy_difference_amplitude": 2.713006404457314,
+            "ratio": 0.4499176306444036,
+            "decay_times_delta_two_thirds": 0.3460434783168372,
+            "energy_difference_amplitude": 2.713006404562422,
             "delta": "1//2",
             "reference_spins": 16,
-            "reference_gap": 1.1886516517536574,
-            "thermal_prefactor_per_cell": 0.7875423035606364,
+            "reference_gap": 1.1886516517536876,
+            "thermal_prefactor_per_cell": 0.7875423035608267,
             "surrogate_first_even_seed": {
-                "surrogate_bound": 0.5511876913893393,
+                "surrogate_bound": 0.5511876913903261,
                 "n0_cells": 4,
                 "beta0": 5.75
             },
-            "effective_energy_difference_decay_cells": 0.5493097815108099,
-            "spectrum_seconds": 25.987215575,
+            "effective_energy_difference_decay_cells": 0.5493097815068821,
+            "spectrum_seconds": 19.605108,
             "diagnostics": [
                 {
-                    "max_min_purity": 0.7934584408689889,
-                    "best_seed": null,
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.0765252695525449,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 3.25,
-                    "n0_cells": 2,
-                    "energy_difference": 0.07652526955254402,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.7934584408689889,
+                    "n0": 2
                 },
                 {
-                    "max_min_purity": 0.9468287947790075,
-                    "best_seed": {
-                        "numerical_bound": 0.35002785598365116,
-                        "epsilon_t": 0.03283025859402429,
-                        "n0_cells": 3,
-                        "epsilon_s": 0.05598348841665406,
-                        "beta0": 5
-                    },
+                    "even_seed_eligible": false,
+                    "energy_difference": 0.011523788633878596,
+                    "best_beta": 5,
+                    "best_bound": 0.3500278559837275,
                     "peak_beta": 4.75,
-                    "n0_cells": 3,
-                    "energy_difference": 0.011523788633882148,
-                    "even_seed_eligible": false
+                    "max_min_purity": 0.9468287947790277,
+                    "n0": 3
                 },
                 {
-                    "max_min_purity": 0.9882922344282926,
-                    "best_seed": {
-                        "numerical_bound": 0.5347953348174902,
-                        "epsilon_t": 0.012004541341293175,
-                        "n0_cells": 4,
-                        "epsilon_s": 0.011265182014107259,
-                        "beta0": 6
-                    },
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.0018662798725017637,
+                    "best_beta": 6,
+                    "best_bound": 0.5347953348185759,
                     "peak_beta": 6.25,
-                    "n0_cells": 4,
-                    "energy_difference": 0.0018662798725266327,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.988292234428447,
+                    "n0": 4
                 }
             ]
         },
         {
             "best_even_seed": {
-                "numerical_bound": 0.05823218366533664,
-                "epsilon_t": 0.05103438201382419,
-                "n0_cells": 4,
-                "epsilon_s": 0.16567693327925415,
-                "beta0": 7.25
+                "beta0": 7.25,
+                "eps_t": 0.05103438201382419,
+                "eps_s": 0.16567693327926009,
+                "bound": 0.0582321836653272,
+                "n0": 4
             },
-            "ratio": 0.08209258950773322,
-            "decay_times_delta_two_thirds": 0.37745837614448263,
-            "energy_difference_amplitude": 1.7020709894289623,
+            "ratio": 0.08209258950771889,
+            "decay_times_delta_two_thirds": 0.37745837614444694,
+            "energy_difference_amplitude": 1.7020709894296993,
             "delta": "1//4",
             "reference_spins": 16,
-            "reference_gap": 0.709347628263707,
-            "thermal_prefactor_per_cell": 0.5342717939411263,
+            "reference_gap": 0.7093476282637159,
+            "thermal_prefactor_per_cell": 0.5342717939411641,
             "surrogate_first_even_seed": {
-                "surrogate_bound": 0.05801178473064093,
+                "surrogate_bound": 0.0580117847306316,
                 "n0_cells": 4,
                 "beta0": 7
             },
-            "effective_energy_difference_decay_cells": 0.951135507127141,
-            "spectrum_seconds": 20.000408706,
+            "effective_energy_difference_decay_cells": 0.951135507127051,
+            "spectrum_seconds": 12.65927375,
             "diagnostics": [
                 {
-                    "max_min_purity": 0.5352457253331379,
-                    "best_seed": null,
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.21616230049067786,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 3.25,
-                    "n0_cells": 2,
-                    "energy_difference": 0.21616230049067653,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.5352457253331379,
+                    "n0": 2
                 },
                 {
-                    "max_min_purity": 0.7342027248219105,
-                    "best_seed": null,
+                    "even_seed_eligible": false,
+                    "energy_difference": 0.07263713653414161,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 4.75,
-                    "n0_cells": 3,
-                    "energy_difference": 0.07263713653413184,
-                    "even_seed_eligible": false
+                    "max_min_purity": 0.7342027248218819,
+                    "n0": 3
                 },
                 {
-                    "max_min_purity": 0.864766521728791,
-                    "best_seed": {
-                        "numerical_bound": 0.05823218366533664,
-                        "epsilon_t": 0.05103438201382419,
-                        "n0_cells": 4,
-                        "epsilon_s": 0.16567693327925415,
-                        "beta0": 7.25
-                    },
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.02538355217689947,
+                    "best_beta": 7.25,
+                    "best_bound": 0.0582321836653272,
                     "peak_beta": 6,
-                    "n0_cells": 4,
-                    "energy_difference": 0.025383552176898583,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.8647665217287787,
+                    "n0": 4
                 }
             ]
         },
         {
             "best_even_seed": null,
             "ratio": null,
-            "decay_times_delta_two_thirds": 0.38528821881397285,
-            "energy_difference_amplitude": 1.4282969670435883,
+            "decay_times_delta_two_thirds": 0.3852882188140602,
+            "energy_difference_amplitude": 1.4282969670426235,
             "delta": "1//5",
             "reference_spins": 16,
-            "reference_gap": 0.6046145816957145,
-            "thermal_prefactor_per_cell": 0.49721981972769946,
+            "reference_gap": 0.6046145816957234,
+            "thermal_prefactor_per_cell": 0.49721981972773466,
             "surrogate_first_even_seed": {
-                "surrogate_bound": 0.1684172598152177,
+                "surrogate_bound": 0.16841725981517586,
                 "n0_cells": 6,
                 "beta0": 9.25
             },
-            "effective_energy_difference_decay_cells": 1.1265895861364965,
-            "spectrum_seconds": 18.941545058,
+            "effective_energy_difference_decay_cells": 1.126589586136752,
+            "spectrum_seconds": 17.158265417,
             "diagnostics": [
                 {
-                    "max_min_purity": 0.4880378366035515,
-                    "best_seed": null,
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.2523618629512083,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 3.5,
-                    "n0_cells": 2,
-                    "energy_difference": 0.25236186295121055,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.4880378366035558,
+                    "n0": 2
                 },
                 {
-                    "max_min_purity": 0.6605579207477228,
-                    "best_seed": null,
+                    "even_seed_eligible": false,
+                    "energy_difference": 0.0996171168943567,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 4.75,
-                    "n0_cells": 3,
-                    "energy_difference": 0.09961711689436381,
-                    "even_seed_eligible": false
+                    "max_min_purity": 0.6605579207477368,
+                    "n0": 3
                 },
                 {
-                    "max_min_purity": 0.7895944149928976,
-                    "best_seed": null,
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.04100521748997732,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 6.25,
-                    "n0_cells": 4,
-                    "energy_difference": 0.04100521748997199,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.7895944149928752,
+                    "n0": 4
                 }
             ]
         },
         {
             "best_even_seed": {
-                "numerical_bound": 0.17320431229383276,
-                "epsilon_t": 0.05160475505880002,
-                "n0_cells": 4,
-                "epsilon_s": 0.09511390745351037,
-                "beta0": 6.5
+                "beta0": 6.5,
+                "eps_t": 0.05160475505880002,
+                "eps_s": 0.09511390745358109,
+                "bound": 0.17320431229372302,
+                "n0": 4
             },
-            "ratio": 0.21353080070690872,
-            "decay_times_delta_two_thirds": 0.3707595985033983,
-            "energy_difference_amplitude": 1.9524604836098782,
+            "ratio": 0.2135308007067748,
+            "decay_times_delta_two_thirds": 0.37075959850367557,
+            "energy_difference_amplitude": 1.9524604836043833,
             "delta": "3//10",
             "reference_spins": 16,
-            "reference_gap": 0.8111443956582738,
-            "thermal_prefactor_per_cell": 0.5751115285202861,
+            "reference_gap": 0.8111443956582685,
+            "thermal_prefactor_per_cell": 0.5751115285202617,
             "surrogate_first_even_seed": {
-                "surrogate_bound": 0.17915062540021814,
+                "surrogate_bound": 0.17915062540010648,
                 "n0_cells": 4,
                 "beta0": 6.25
             },
-            "effective_energy_difference_decay_cells": 0.8273289726580354,
-            "spectrum_seconds": 20.064469084,
+            "effective_energy_difference_decay_cells": 0.8273289726586541,
+            "spectrum_seconds": 10.797888792,
             "diagnostics": [
                 {
-                    "max_min_purity": 0.5973908780494881,
-                    "best_seed": null,
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.18163093581607548,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 3.25,
-                    "n0_cells": 2,
-                    "energy_difference": 0.1816309358160746,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.5973908780494881,
+                    "n0": 2
                 },
                 {
-                    "max_min_purity": 0.7944178632431675,
-                    "best_seed": null,
+                    "even_seed_eligible": false,
+                    "energy_difference": 0.051972698546714824,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 4.75,
-                    "n0_cells": 3,
-                    "energy_difference": 0.05197269854672015,
-                    "even_seed_eligible": false
+                    "max_min_purity": 0.794417863243193,
+                    "n0": 3
                 },
                 {
-                    "max_min_purity": 0.9125503179819907,
-                    "best_seed": {
-                        "numerical_bound": 0.17320431229383276,
-                        "epsilon_t": 0.05160475505880002,
-                        "n0_cells": 4,
-                        "epsilon_s": 0.09511390745351037,
-                        "beta0": 6.5
-                    },
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.015518137836554757,
+                    "best_beta": 6.5,
+                    "best_bound": 0.17320431229372302,
                     "peak_beta": 6,
-                    "n0_cells": 4,
-                    "energy_difference": 0.015518137836542323,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.9125503179819193,
+                    "n0": 4
                 }
             ]
         },
         {
             "best_even_seed": null,
             "ratio": null,
-            "decay_times_delta_two_thirds": 0.3939949030399809,
-            "energy_difference_amplitude": 1.1420725237558302,
+            "decay_times_delta_two_thirds": 0.3939949030399245,
+            "energy_difference_amplitude": 1.142072523756174,
             "delta": "3//20",
             "reference_spins": 16,
-            "reference_gap": 0.4983262723464188,
-            "thermal_prefactor_per_cell": 0.4637622977847986,
+            "reference_gap": 0.49832627234641524,
+            "thermal_prefactor_per_cell": 0.46376229778473665,
             "surrogate_first_even_seed": {
-                "surrogate_bound": 0.051774737784856535,
+                "surrogate_bound": 0.051774737784903116,
                 "n0_cells": 6,
                 "beta0": 10.5
             },
-            "effective_energy_difference_decay_cells": 1.3956068664323589,
-            "spectrum_seconds": 19.230291404,
+            "effective_energy_difference_decay_cells": 1.395606866432159,
+            "spectrum_seconds": 16.344931166,
             "diagnostics": [
                 {
-                    "max_min_purity": 0.45445295187476964,
-                    "best_seed": null,
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.2878922256591765,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 3.5,
-                    "n0_cells": 2,
-                    "energy_difference": 0.2878922256591778,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.45445295187477375,
+                    "n0": 2
                 },
                 {
-                    "max_min_purity": 0.5797356109074747,
-                    "best_seed": null,
+                    "even_seed_eligible": false,
+                    "energy_difference": 0.13308624818422032,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 5,
-                    "n0_cells": 3,
-                    "energy_difference": 0.1330862481842212,
-                    "even_seed_eligible": false
+                    "max_min_purity": 0.5797356109074768,
+                    "n0": 3
                 },
                 {
-                    "max_min_purity": 0.7017084403022635,
-                    "best_seed": null,
+                    "even_seed_eligible": true,
+                    "energy_difference": 0.0650049379936144,
+                    "best_beta": null,
+                    "best_bound": null,
                     "peak_beta": 6.25,
-                    "n0_cells": 4,
-                    "energy_difference": 0.0650049379936215,
-                    "even_seed_eligible": true
+                    "max_min_purity": 0.7017084403022735,
+                    "n0": 4
                 }
             ]
         }
@@ -308,20 +302,20 @@
         "config": {
             "fit": "two-point exponential ground-energy defect plus independent excitations"
         },
-        "created_utc": "2026-10-11T04:56:54.462",
+        "created_utc": "2026-10-18T06:13:07.844",
         "certified": false,
         "source_sha256": {
-            "certificates/dimerized_heisenberg/summarize_numerics.jl": "2f05ede67c818ba7de1e4f68b402d3b4cd337a2445765d1111ed286cb8db37aa"
+            "models/dimerized_heisenberg/scripts/summarize_numerics.jl": "02d7416cb55493ae10375a4bd2c4019bc29b161e7a2929d29b61cd1c5195151c"
         },
         "blas_threads": 1
     },
     "limitations": "Finite-ring gaps, short-size exponential fits, and independent excitation ansatz; extrapolated seeds are not validated or guaranteed. Odd n=3 used only for fitting, never as theorem seed.",
     "input_hashes": {
-        "certificates/dimerized_heisenberg/results/numerical_delta_1_4.json": "84eb077b73d58490eac243e2c9b17c8f375a1139f5c42d6e358a7de3a75c65b2",
-        "certificates/dimerized_heisenberg/results/numerical_delta_1_2.json": "0214ab711168452028c4a33ceace821bac8bbd5da595d80a9d5bbbd0a48273e2",
-        "certificates/dimerized_heisenberg/results/numerical_delta_1_5.json": "69427881632a6d5235ac9ef670efb2bbbee94675f3d20ea826293ec4250d0e99",
-        "certificates/dimerized_heisenberg/results/numerical_delta_1_10.json": "5086c9d75c907e040b34845559adbffa3a345953a784209ea98df3f1381eda50",
-        "certificates/dimerized_heisenberg/results/numerical_delta_3_20.json": "5bf84b1f5cf65b6003ebda53f4b3e32c2bdaa5a07623970ff2f503e5b8f05508",
-        "certificates/dimerized_heisenberg/results/numerical_delta_3_10.json": "ec901a0c61789558e38b8d045655391f1c3b29cc5904ee97d20fa64c4bdfd12d"
+        "models/dimerized_heisenberg/results/numerical_delta_1_4.json": "d864a399fbf781d83bb016630346372eb7b092c1a3a40d851d27d73f36106987",
+        "models/dimerized_heisenberg/results/numerical_delta_1_2.json": "959fa4ad9756c1b021104d0e0da0bc8f7cb9360f34477cde9671e417eab71043",
+        "models/dimerized_heisenberg/results/numerical_delta_1_10.json": "16be2ab47aca5f4595a72fa68a5764821fb2dc594f371d43503c2d6b628465f5",
+        "models/dimerized_heisenberg/results/numerical_delta_3_10.json": "bff4ea80bae766eb42f1e957ec80b1d1ea98aa95724b555ec117440a18b9a73f",
+        "models/dimerized_heisenberg/results/numerical_delta_1_5.json": "4ebc66ecb98af89669ee4f56e28408b68a69ee5e1cf53758342a4dedec27c91c",
+        "models/dimerized_heisenberg/results/numerical_delta_3_20.json": "b0c7bedcfeef65cb0bbc163bbf0d705132412ef06ded0f07d16f3c04e8d9fcb0"
     }
 }

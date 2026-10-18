@@ -14,6 +14,7 @@ bridge at D = 4. The inequalities are proved in `METHOD.md`.
 module TransferCertificate
 
 using CertifiedGaps, IntervalArithmetic
+using CertifiedGaps.Seeds: seed_defects
 using CertifiedGaps.Results: write_result, read_exact_json, model_metadata, verify_model_metadata,
     sha256_file
 using CertifiedGaps.VerifiedSpectra: verified_ring_spectrum, log_partition_enclosure,
@@ -87,9 +88,10 @@ Each lift squares both spatial defects and updates the thermal one by the exact 
 identity P_τ(4n,β) = P_s(2n,2β) P_τ(2n,β)² / P_s(2n,β)² with P_s ≤ 1.
 """
 function seed_ladder(z6, z12, z6twice, z12twice; max_lifts = 5)
-    s = upper(1 - exp(z12 - 2z6))
-    s2 = upper(1 - exp(z12twice - 2z6twice))
-    t = upper(1 - exp(z12twice - 2z12))
+    direct = seed_defects(z6, z12, z12twice)          # 1 − Pₛ(6, β) and 1 − P_τ(12, β)
+    s, t = upper(direct.defect_s), upper(direct.defect_t)
+    # Only the spatial defect 1 − Pₛ(6, 2β) is used; the thermal slot of this call is a dummy.
+    s2 = upper(seed_defects(z6twice, z12twice, z12twice).defect_s)
     rows = [(; n0 = 6, eps_s = Q(sup(s)), eps_t = Q(sup(t)), lifts = 0)]
     for j in 1:max_lifts
         s, s2 = square_defect(s), square_defect(s2)

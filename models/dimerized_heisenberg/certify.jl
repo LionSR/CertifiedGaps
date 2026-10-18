@@ -7,10 +7,11 @@
 #                                n₀ ∈ {2, 4}, the 16-spin gap, and its row of summary.json
 #   julia certify.jl             all of the above, every δ
 #
-# The certificates are `GapCertificates.certify_gap` outputs for `rotated_model(δ)`;
+# The certificates are `GapCertificates.certify_point` outputs for `rotated_model(δ)`;
 # check.jl verifies everything written here.
 using CertifiedGaps, CertifiedGaps.Results, IntervalArithmetic, LinearAlgebra
 using CertifiedGaps.RingModels, CertifiedGaps.VerifiedSpectra, CertifiedGaps.GapCertificates
+using CertifiedGaps.Exclusions: exclude_all_beta
 using CertifiedGaps.ExactArithmetic: round_up, round_down, parse_rational
 isdefined(@__MODULE__, :DimerizedHeisenberg) ||
     include(joinpath(@__DIR__, "src", "DimerizedHeisenberg.jl"))
@@ -24,8 +25,8 @@ const RESULTS_DIR = joinpath(@__DIR__, "results")
 const SUMMARY = joinpath(RESULTS_DIR, "summary.json")
 const GRID = big(10)^6                  # outward decimal grid of the reported gap intervals
 
-# Run metadata with the model-local and core SHA-256 of every result (`SOURCES`).
-metadata(config; certified) = model_metadata(MODEL_DIR, config; SOURCES...,
+# Run metadata with the model-local and core SHA-256 of a non-certificate result.
+metadata(config; certified) = model_metadata(MODEL_DIR, config;
     packages = (CertifiedGaps, IntervalArithmetic), certified)
 
 _slug(x) = denominator(x) == 1 ? "$(numerator(x))" : "$(numerator(x))_$(denominator(x))"
@@ -76,9 +77,9 @@ end
     certify_delta(δ) -> Dict
 
 Everything for one dimerization from one verified spectrum per ring: the core certificate of
-every seed in `SEEDS`, the all-β exclusions at the even n₀ ∈ {2, 4} without a seed, the
-enclosed 16-spin gap, and the dimer perturbation bound. Writes the certificates and returns the
-summary row.
+every seed in `SEEDS`, the all-β exclusions (`exclude_all_beta`) at the even n₀ ∈ {2, 4}
+without a seed, the enclosed 16-spin gap, and the dimer perturbation bound. Writes the
+certificates and returns the summary row.
 """
 function certify_delta(δ)
     start = time()
@@ -87,25 +88,18 @@ function certify_delta(δ)
     rows = Any[]
     for (n0, β0) in get(SEEDS, δ, Tuple{Int,Rational{BigInt}}[])
         seed = seed_bounds(model, n0, β0; spectra = Dict(n0 => spectra[n0], 2n0 => spectra[2n0]))
-        cert = certify_gap(model; n0, β0, rp, seed)
-        cert["metadata"] = metadata(Dict("delta" => string(δ), "n0" => n0,
-            "beta0" => string(β0)); certified = true)
-        path = write_result(certificate_path(δ, β0), cert)
-        push!(rows, Dict("file" => "results/" * basename(path), "sha256" => sha256_file(path),
-            "n0" => string(n0), "beta0" => string(β0), "eps_s" => cert["seed"]["eps_s"],
-            "eps_t" => cert["seed"]["eps_t"], "gap_lower_bound" => cert["gap_lower_bound"],
-            "gap_lower_bound_decimal" => cert["gap_lower_bound_decimal"],
-            "interval_bound_decimal" => cert["interval_bound_decimal"]))
+        path = certificate_path(δ, β0)
+        cert = certify_point(path, model; n0, β0, params = point_params(δ),
+            model_dir = MODEL_DIR, packages = (IntervalArithmetic,), rp, seed)
+        row = certificate_row(cert)
+        row["file"], row["sha256"] = "results/" * basename(path), sha256_file(path)
+        push!(rows, row)
         println("delta=$δ n0=$n0 beta0=$β0 eps_s=$(Float64(seed.eps_s)) ",
-            "eps_t=$(Float64(seed.eps_t)) gap>$(cert["gap_lower_bound_decimal"])")
+            "eps_t=$(Float64(seed.eps_t)) gap>=$(cert["interval_bound_decimal"]) ",
+            "chain>$(cert["gap_lower_bound_decimal"])")
     end
-    exclusions = Any[]
-    for n in (2, 4)
-        any(r -> r["n0"] == string(n), rows) && continue
-        cover = negative_cover(spectra[n], spectra[2n], n)
-        cover["status"] == "all_beta_rejected" || error("delta=$δ n0=$n: $(cover["status"])")
-        push!(exclusions, cover)
-    end
+    exclusions = [exclude_all_beta(spectra[n], spectra[2n], n) for n in (2, 4)
+                  if !any(r -> r["n0"] == n, rows)]
     lo, hi = spectral_gap_enclosure(spectra[8])
     lo > 0 || error("the 16-spin ground state is not separated")
     gap = [round_down(lo, GRID), round_up(hi, GRID)]
@@ -140,7 +134,7 @@ function certify_summary(deltas)
     Set(keys(rows)) == Set(DELTAS) || error("summary rows missing; run certify.jl")
     certified = [δ for δ in DELTAS if !isempty(rows[δ]["certificates"])]
     write_result(SUMMARY, Dict(
-        "format" => "dimerized-heisenberg-summary-v3", "parameters" => [rows[δ] for δ in DELTAS],
+        "format" => "dimerized-heisenberg-summary-v4", "parameters" => [rows[δ] for δ in DELTAS],
         "model" => "H = sum over a ring of 2L spins of (1+delta) S.S inside each two-spin " *
             "cell plus (1-delta) S.S between neighboring cells",
         "frame" => "Certificates are for the rotated frame U'HU, U = (1 x J)^{x L}, " *

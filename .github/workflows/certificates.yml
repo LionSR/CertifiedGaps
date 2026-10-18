@@ -13,6 +13,8 @@ on:
       - "models/**"
       - "julia/**"
       - "tools/leaderboard/**"
+      - "lean/CertifiedGaps/Models/**"
+      - "lean/scripts/check_seeds.jl"
       - "!**/*.md"
   push:
     branches:
@@ -21,6 +23,8 @@ on:
       - "models/**"
       - "julia/**"
       - "tools/leaderboard/**"
+      - "lean/CertifiedGaps/Models/**"
+      - "lean/scripts/check_seeds.jl"
       - "!**/*.md"
   schedule:
     - cron: "17 4 * * 1" # Mondays 04:17 UTC
@@ -53,6 +57,10 @@ jobs:
 
       - name: Test the core package
         run: julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+
+      # The seed defects hardcoded in the Lean model files against the certificates.
+      - name: Check the Lean seeds
+        run: julia --project=julia lean/scripts/check_seeds.jl
 
       - name: Test the leaderboard validator and check the records against the certificates
         run: |

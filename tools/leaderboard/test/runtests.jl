@@ -131,6 +131,14 @@ fails(report, re) = any(e -> occursin(re, e), report.errors)
         @test fails(check(record(seed = """{n0: 6, beta0: "24"}""")), "states no bound for seed")
         @test fails(check(record(seed = """{n0: 8, beta0: "97/4"}""")), "states no bound for seed")
         @test fails(check(record(params = """{g: "1/2"}""")), "states no bound for seed")
+        # a core-format certificate states its parameter point in its params record
+        core = Dict{String,Any}("format" => "CertifiedGaps ring gap certificate v1",
+            "seed" => Dict("n0" => "6", "beta0" => "97//4", "eps_s" => "1//100",
+                "eps_t" => "1//100"), "interval_bound_decimal" => 0.5,
+            "params" => Dict("g" => "1//4"))
+        c = only(LeaderboardCheck.certificate_candidates(core))
+        @test LeaderboardCheck.params_agree(c.scope, Dict("g" => "1/4"))
+        @test !LeaderboardCheck.params_agree(c.scope, Dict("g" => "1/2"))
         # a conditional Lean record must assume defects at least the certified ones
         seeds(s, t) = """, "n0": 6, "s": "$s", "t": "$t\""""
         @test passed(check(record(); json = lean_json(seeds = seeds("1/100", "1/50"))))

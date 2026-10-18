@@ -6,19 +6,19 @@ using CertifiedGaps, CertifiedGaps.Results, CertifiedGaps.Seeds, JSON3, LinearAl
 BLAS.set_num_threads(1)
 const MODEL_DIR = normpath(joinpath(@__DIR__, ".."))
 
-"Summarise every stored numerical scan into results/numerical_summary.json."
+"Summarize every stored numerical scan into results/numerical_summary.json."
 function summarize()
     rows=Any[]
     paths=sort(filter(p->startswith(basename(p),"numerical_delta_")&&endswith(p,".json"),
         readdir(joinpath(MODEL_DIR,"results");join=true)))
     for path in paths
         data=JSON3.read(read(path,String)); diag=data.diagnostics
-        n3=only(filter(r->r.n0_cells==3,diag)); n4=only(filter(r->r.n0_cells==4,diag))
+        n3=only(filter(r->r.n0==3,diag)); n4=only(filter(r->r.n0==4,diag))
         xi=1/log(n3.energy_difference/n4.energy_difference)
         amplitude=n4.energy_difference*exp(4/xi)
         gap=data.reference_gap
-        probe=only(filter(r->r.n0_cells==4&&r.beta0==8.0,data.scan))
-        target=1-probe.epsilon_t
+        probe=only(filter(r->r.n0==4&&r.beta0==8.0,data.scan))
+        target=1-probe.eps_t
         # Fit a per-cell independent-excitation prefactor to the actual 16-spin purity.
         purity(a)=exp(8*(log1p(a*exp(-16gap))-2log1p(a*exp(-8gap))))
         lo=0.0; hi=100.0
