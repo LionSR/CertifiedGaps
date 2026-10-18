@@ -1,13 +1,13 @@
 name: Take on a challenge
-description: Say that you are working on an open challenge or on improving a leaderboard result.
+description: Coordinate work on an open challenge or on improving a leaderboard record.
 title: "Challenge: "
 labels: ["challenge"]
 body:
   - type: markdown
     attributes:
       value: |
-        This issue lets others see who is working on what. The leaderboard's "Take this on" and
-        "Improve this record" buttons fill in the challenge below.
+        This issue coordinates work on open challenges and record improvements. The leaderboard's
+        "Take this on" and "Improve this record" buttons pre-fill the identifier below.
   - type: input
     id: challenge
     attributes:
@@ -19,11 +19,11 @@ body:
     id: plan
     attributes:
       label: Plan
-      description: How you intend to get the result, for example a larger starting ring, a sharper computation, or a Lean proof.
+      description: Your planned approach (for example, a larger seed length n0, a sharper spectral enclosure, or a Lean 4 formalization).
     validations:
       required: true
   - type: textarea
     id: help
     attributes:
       label: Questions
-      description: Anything you would like help with.
+      description: Any questions or context where feedback would help.

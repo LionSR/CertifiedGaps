@@ -1,37 +1,42 @@
 # Contributing
 
-Anyone can add a result to the leaderboard of proven gaps. A result can be a proven gap for a new
-model, a larger proven gap for a known point, or a Lean theorem for a bound that so far has a
-computer proof. The [contribute page](https://sirui-lu.com/CertifiedGaps/contribute.html)
-of the website explains each case (source: [`home_page/contribute.md`](home_page/contribute.md)).
-The [leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) lists the results
-and the open challenges.
+Contributions to the [leaderboard of certified spectral gaps](https://sirui-lu.com/CertifiedGaps/leaderboard.html)
+are submitted via pull request:
 
-## In short
+* a computer-certified gap bound for a new model or parameter point,
+* a tighter certified bound or smaller threshold length $L_0$ for an existing record, or
+* a Lean 4 formalization (seeded or unconditional) of a certified bound.
 
-1. A computer proof goes in `models/<name>/` and follows [`AGENTS.md`](AGENTS.md). It needs an
-   exact reflection-positivity identity, rigorous bounds at the starting scale, the gap bound
-   from the repository's recurrence, and a checker program `check.jl`. Add a row to the summary
-   table of the root [`README.md`](README.md).
-2. A Lean theorem goes in the library `Leaderboard`, as described in
-   [`leaderboard/README.md`](leaderboard/README.md). It may use only Lean's standard axioms.
-3. Every result has a row in [`home_page/_data/records.yml`](home_page/_data/records.yml), whose
-   header documents the fields. Check the file with
+See the [contribution guide](https://sirui-lu.com/CertifiedGaps/contribute.html)
+(source: [`home_page/contribute.md`](home_page/contribute.md)) for full details and the
+[open challenges](https://sirui-lu.com/CertifiedGaps/leaderboard.html#challenges) for concrete
+targets.
+
+## Summary of requirements
+
+1. **Computer certificate (`models/<slug>/`):** Follow [`AGENTS.md`](AGENTS.md). Provide an exact
+   reflection-positivity factorization, rigorous enclosures of the seed purity defects at
+   $(n_0, \beta_0)$, the gap bound from the doubling recurrence, and a standalone checker
+   `check.jl`. Update the summary table in the root [`README.md`](README.md).
+2. **Lean 4 theorem (`leaderboard/`):** Follow [`leaderboard/README.md`](leaderboard/README.md).
+   Proofs may depend only on Lean's standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
+3. **Leaderboard entry (`home_page/_data/records.yml`):** Add or update the row in
+   [`home_page/_data/records.yml`](home_page/_data/records.yml) and run the validator locally:
 
    ```sh
    julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
    julia --project=tools/leaderboard tools/leaderboard/check_records.jl
    ```
 
-4. To claim an open challenge, use the "Take this on" button on the leaderboard. To propose a
-   new model, use the "Propose a target model" issue form. To report an error, use the "Report a
-   problem with a record" form.
+4. **Issues:** Use the "Take this on" button on the leaderboard to coordinate work on an open
+   challenge, the "Propose a target model" issue form to suggest a new model, or the "Report a
+   problem with a record" form to report a discrepancy.
 
-## Checks
+## CI and review
 
-Automatic checks run on every pull request. They build the Lean library and list the axioms of
-every theorem. When Lean code changes, and every week, a separate check replays every proof in
-the Lean kernel. The checks also compare every leaderboard row with
-its certificate and its Lean theorem in exact arithmetic, and they run the checker program of
-each changed model. A reviewer then checks that each row describes the model its certificate and
-its Lean theorem are about, and that its badge is right.
+Every pull request runs automated CI checks that build the Lean library, audit all theorem axioms
+and parameters (`leaderboard_audit`), replay proofs in the Lean kernel (`leanchecker` when Lean
+files change and weekly), cross-check every `records.yml` entry against its certificate and Lean 4
+theorem (`check_records.jl`), and run `check.jl` for each modified model. A maintainer then
+verifies that the Hamiltonian, unit-cell convention, trusted arithmetic base, and verification tier
+match across the model directory, the Lean 4 theorem, and the leaderboard entry.

@@ -44,14 +44,14 @@
 #                 [{date, decimal, display (optional), lengths, tier, pr, method}]
 
 tiers:
-  - {key: lean-unconditional, glyph: '◆', label: 'Proved in Lean, no assumptions',
-     meaning: 'A theorem checked by the Lean proof assistant with no hypotheses; the finite computation is checked inside Lean too.'}
-  - {key: lean-conditional, glyph: '◇', label: 'Proved in Lean from computer-checked inequalities',
-     meaning: 'A Lean theorem whose only hypotheses are the purity inequalities at its starting scale (two, or four for a proof with two starting rings); a computer certificate in the repository proves those.'}
-  - {key: certified, glyph: '✓', label: 'Computer-checked proof',
-     meaning: 'A rigorous computer proof in exact or interval arithmetic, rerun by a standalone checker. A Lean theorem for the same point proves a bound smaller by about one part in 10⁵: Lean follows the doubling for 14 steps, the computer for 48.'}
-  - {key: target, glyph: '◌', label: 'Open target (estimate only)',
-     meaning: 'Only floating-point estimates exist; there is no proof yet.'}
+  - {key: lean-unconditional, glyph: '◆', label: 'Lean 4 (unconditional)',
+     meaning: 'Formalized in Lean 4 with no external hypotheses; both the finite seed bounds at (n₀, β₀) and the doubling recurrence are checked inside the Lean kernel.'}
+  - {key: lean-conditional, glyph: '◇', label: 'Lean 4 (certified seed)',
+     meaning: 'Formalized in Lean 4 conditional only on the computer-certified seed purity inequalities at (n₀, β₀).'}
+  - {key: certified, glyph: '✓', label: 'Computer-certified',
+     meaning: 'Headline bound computed by 48 interval-arithmetic doubling steps from verified seed spectra and checked by check.jl. Most rows also have a companion 14-step rational chain in Lean 4 (◇) proving a slightly smaller lower bound (typically within 10⁻⁵ when starting from the same seed).'}
+  - {key: target, glyph: '◌', label: 'Open target',
+     meaning: 'Floating-point survey estimate only; not yet certified.'}
 
 
 families:
@@ -156,29 +156,29 @@ families:
 challenges:
   - id: open-chain-boundary-field
     family: spin1-open
-    title: 'Reproduce the four finite estimates of the boundary-field paper'
+    title: 'Certify the four finite seed estimates for the open spin-1 chain'
     need: >-
-      Certify in this repository the four finite estimates that the OpenAI boundary-field
-      preprint computes for the open spin-1 chain with end fields $h = 3/5$. This would make
-      $\Delta_n > \log(10)/392$ for every odd $n \ge 1921$ (Appendices A–C of the main note) a
-      computer-checked record.
+      Certify in this repository the four finite seed bounds at $\beta_2 = 49$ from the OpenAI
+      boundary-field preprint for the open spin-1 chain with endpoint fields $h = 3/5$. Combined
+      with the Lean 4 recurrence theorem (#74), this would complete a computer-certified record
+      $\Delta_n > (\log 10)/392$ for every odd $n \ge 1921$.
     link: 'https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf'
   - id: spin1-small-seed
     family: spin1-heisenberg
-    title: 'Certify the small-seed trace tables'
+    title: 'Certify the small-seed twisted trace tables'
     need: >-
-      Certify the twisted traces of the spin-1 chain at $n \le 12$ with trace error $10^{-3}$.
-      This would make $\Delta_L > 0.039$ for every even $L \ge 60$ a computer-checked record
-      and give a starting scale small enough to check inside Lean (design C).
+      Certify the twisted traces of the spin-1 chain at $n \le 12$ to trace error $10^{-3}$.
+      This yields a computer-certified bound $\Delta_L > 0.039$ for every even $L \ge 60$ from a
+      seed small enough to check inside the Lean kernel.
     link: models/lean_seeds/README.md
   - id: lean-odd-seed
     family: spin1-dimerized
-    title: 'Lean for an odd starting ring'
+    title: 'Formalize the odd-seed criterion in Lean 4'
     need: >-
-      The proof at $\delta = 7/10$ starts from a ring of 3 cells. An odd start needs one more
-      fact: the transfer operator has no negative eigenvalues, because it factors as $K K^*$.
-      The Lean criterion covers even starts only. Proving the factorization in Lean would give
-      this point a Lean theorem like the others.
+      The certificate at $\delta = 7/10$ uses an odd seed length $n_0 = 3$ cells, which requires
+      transfer-operator positive semidefiniteness ($X_\beta = K K^* \succeq 0$). The current
+      Lean 4 criterion covers even seeds only; formalizing the $K K^*$ factorization in Lean 4
+      would cover this record.
     link: models/spin1_dimerized/README.md
 
 
@@ -189,7 +189,7 @@ records:
     parameter: 'periodic ring'
     lengths: {L0: 36}
     bound: {r: "16689019/2500000", beta: "833/32", decimal: "0.072930044", display: '\log(6.6756076)/(833/32)'}
-    seed: {n0: 60, beta0: "833/32", text: 'a ring of 60 sites; a ring of 36 sites at $\beta_0 = 49/4$ covers the lengths from 36 to 72'}
+    seed: {n0: 60, beta0: "833/32", text: 'two-seed certificate: $(60, 833/32)$ for $L \ge 60$ and $(36, 49/4)$ for $36 \le L \le 72$'}
     numerical_gap: "0.41048"
     tier: lean-conditional
     lean: {name: Leaderboard.Records.SpinOneHeisenberg.temperature_lifting, r: "16689019/2500000", beta: "833/32", decimal: "0.072930044"}
@@ -199,20 +199,20 @@ records:
     pr: null
     contributors: ['LionSR']
     notes: >-
-      The starting inequalities are computed in exact rational arithmetic from the finite inputs
-      of the OpenAI preprint, reproduced here (18 thermal traces of rings up to 12 sites and one
-      matrix-product trial state of 120 sites). Independently reviewed in #49, by re-deriving
-      every inequality and by a separate computation in Arb ball arithmetic that shares no code
-      with the original. The Lean theorem assumes the two inequalities at each starting ring: 60
-      sites at $\beta_0 = 833/32$ and 36 sites at $\beta_0 = 49/4$. Lean follows the doubling for
-      14 steps where the computer proof follows it for 10, so its bound is slightly larger.
+      The seed inequalities are certified in exact rational arithmetic from the finite inputs of
+      the OpenAI periodic preprint, reproduced here (18 thermal traces on rings of $n \le 12$
+      sites and one 120-site matrix-product trial state). Independently audited in #49 both by
+      re-deriving every step in exact rationals and by a separate Arb ball-arithmetic
+      implementation sharing no code with the original. The Lean 4 theorem assumes the two
+      purity inequalities at each seed, $(60, 833/32)$ and $(36, 49/4)$, and runs 14 rational
+      doubling steps (versus 10 in the original script), yielding a slightly larger bound.
     history:
       - {date: "2026-10-10", decimal: "0.072901771", lengths: 'even L ≥ 36', tier: certified, pr: null,
-         method: 'the computer proof from the same two starting rings'}
+         method: '10-step rational chain from the same two seeds'}
       - {date: "2026-10-10", decimal: "0.070450002", lengths: 'even L ≥ 36', tier: certified, pr: null,
-         method: 'the same computation with simpler parameters'}
+         method: 'earlier rational chain with simpler filter parameters'}
       - {date: "2026-10-10", decimal: "0.016978269", lengths: 'even L ≥ 36', tier: certified, pr: null,
-         method: 'a sharper analysis of the same preprint inputs'}
+         method: 'initial degree-12 filter sharpening of the preprint inputs'}
   - id: spin1-source1
     family: spin1-heisenberg
     parameter: 'periodic ring'
@@ -227,15 +227,16 @@ records:
     pr: null
     contributors: ['LionSR']
     notes: >-
-      The two inequalities are $P_{\mathrm{s}}(2304, 784) \ge 1 - 0.0084513$ and
-      $P_\tau(4608, 784) \ge 1 - 0.0054986$. The OpenAI preprint proves them by computer, and
-      this repository reproduces that computation in exact integer arithmetic. The preprint
-      rounds both to $\ge 0.99$, which gives the smaller $\log(20)/784$.
+      Certified from the seed inequalities $P_{\mathrm{s}}(2304, 784) \ge 1 - 0.0084513$ and
+      $P_\tau(4608, 784) \ge 1 - 0.0054986$, propagated in 6 doubling steps from the
+      $(36, 49/4)$ seed of the OpenAI preprint and reproduced here in exact integer arithmetic.
+      Rounding both purities to $\ge 0.99$ gives the preprint bound $(\log 20)/784$, which is
+      also formalized in Lean 4 from the $(36, 49/4)$ seed (#74).
     history:
-      - {date: "2026-09-24", decimal: "0.00382", display: '\log(20)/784', lengths: 'even L ≥ 2304', tier: lean-conditional, pr: null,
-         method: 'the first computation of the OpenAI preprint, with both inequalities rounded to 0.99'}
-      - {date: "2026-09-24", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: 'even L ≥ 60', tier: certified, pr: null,
-         method: 'the second computation of the OpenAI preprint, starting from 60 sites at 105/4'}
+      - {date: "2026-10-06", decimal: "0.00382", display: '\log(20)/784', lengths: 'even L ≥ 2304', tier: lean-conditional, pr: null,
+         method: 'OpenAI preprint bound with both purities rounded to 0.99 (formalized in Lean 4 from seed (36, 49/4) in #74)'}
+      - {date: "2026-10-06", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: 'even L ≥ 60', tier: certified, pr: null,
+         method: 'second OpenAI preprint bound from seed (60, 105/4) (formalized in Lean 4 in #74)'}
   # ---------------------------------------------------------------- heisenberg-staggered-field
   - id: staggered-h-1
     family: heisenberg-staggered-field
@@ -252,7 +253,7 @@ records:
     pr: 2
     contributors: ['LionSR']
     notes: >-
-      A second, independent computation gives 1.147699.
+      An independent certified-MPO computation gives 1.147699.
   - id: staggered-h-3-4
     family: heisenberg-staggered-field
     parameter: '$h = 3/4$'
@@ -325,10 +326,10 @@ records:
     pr: 23
     contributors: ['LionSR']
     notes: >-
-      The starting temperature 25/4 of an earlier survey also works and gives 0.533681.
+      Seed inverse temperature $\beta_0 = 25/4$ is also admissible and certifies 0.533681.
     history:
       - {date: "2026-10-12", decimal: "0.532658", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
-         method: 'an earlier, less precise computation at the same starting scale'}
+         method: 'earlier certificate with wider eigenvalue enclosures at the same seed'}
   - id: dimerized-delta-3-10
     family: dimerized-heisenberg
     parameter: '$\delta = 3/10$'
@@ -345,7 +346,7 @@ records:
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.172916", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
-         method: 'an earlier, less precise computation at the same starting scale'}
+         method: 'earlier certificate with wider eigenvalue enclosures at the same seed'}
   - id: dimerized-delta-1-4
     family: dimerized-heisenberg
     parameter: '$\delta = 1/4$'
@@ -361,11 +362,12 @@ records:
     pr: 23
     contributors: ['LionSR']
     notes: >-
-      This is the smallest dimerization reachable with rings of at most 16 spins: for $\delta =
-      1/5, 3/20, 1/10$, rings of 2 and 4 cells provably fail at every temperature.
+      Smallest dimerization certified from rings of at most 16 spins; for $\delta \in \{1/5,
+      3/20, 1/10\}$, seeds of $n_0 = 2$ and $4$ cells are provably inadmissible at every
+      $\beta_0$.
     history:
       - {date: "2026-10-12", decimal: "0.057967", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
-         method: 'an earlier, less precise computation at the same starting scale'}
+         method: 'earlier certificate with wider eigenvalue enclosures at the same seed'}
   # ---------------------------------------------------------------- spin1-dimerized
   - id: spin1-dimerized-delta-9-10
     family: spin1-dimerized
@@ -387,7 +389,7 @@ records:
     params: {delta: "7/10"}
     lengths: {L0: 4}
     bound: {value: "3941427372025601/18014398509481984", decimal: "0.218793170915"}
-    seed: {n0: 3, beta0: "17/4", text: 'an odd starting ring is allowed here because the transfer operator of this chain is positive'}
+    seed: {n0: 3, beta0: "17/4", text: 'odd seed length $n_0 = 3$ cells, justified by the positive semidefinite factorization $X_\beta = K K^* \succeq 0$'}
     numerical_gap: "1.2659"
     tier: certified
     certificate: models/spin1_dimerized/results/certificate_d7.json
@@ -395,9 +397,8 @@ records:
     pr: 3
     contributors: ['LionSR']
     notes: >-
-      Recomputed with the shared verified-spectra pipeline, which has no lattice-reflection
-      reduction yet: its complex 6-cell blocks give eigenvalue radii up to twice those of the
-      former model-specific real blocks, so the bound is 1.0e-6 below the earlier 0.218794169.
+      Certified from the odd seed length $n_0 = 3$ cells (6 and 12 spin-1 sites) using complex
+      translation blocks; a real-block reduction with lattice reflection gives 0.218794169.
   # ---------------------------------------------------------------- spin1-largeD
   - id: spin1-largeD-D-4
     family: spin1-largeD
@@ -405,7 +406,7 @@ records:
     params: {D: "4"}
     lengths: {L0: 6}
     bound: {value: "8098763755702597/9007199254740992", decimal: "0.899143399"}
-    seed: {n0: 12, beta0: "29/10", text: 'a ring of 12 sites; separate verified spectra cover the rings of 6, 8 and 10 sites'}
+    seed: {n0: 12, beta0: "29/10", text: 'seed $(12, 29/10)$ for $L \ge 12$, combined with direct verified spectral gap enclosures for $L = 6, 8, 10$'}
     numerical_gap: "2.26946"
     tier: certified
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_4, r: "47731477/10000000", beta: "9/4", decimal: "0.694669325", certificate: models/spin1_largeD/results/certificate_D4_1.json}
@@ -414,13 +415,13 @@ records:
     pr: 12
     contributors: ['LionSR']
     notes: >-
-      The Lean theorem starts from a ring of 6 sites at $\beta_0 = 9/4$, where the computer
-      proof gives 0.694694192.
+      The companion Lean 4 theorem uses the smaller seed $(6, 9/4)$, where the computer
+      certificate gives 0.694694192.
     history:
       - {date: "2026-10-12", decimal: "0.694694192", lengths: 'even L ≥ 6', tier: certified, pr: 7,
-         method: 'a ring of 6 sites at 9/4, from verified spectra of 6 and 12 sites'}
+         method: 'seed (6, 9/4) from verified spectra of 6- and 12-site rings'}
       - {date: "2026-10-12", decimal: "0.543812926", lengths: 'even L ≥ 6', tier: certified, pr: 7,
-         method: 'a ring of 6 sites at 3, from an earlier survey'}
+         method: 'seed (6, 3) from initial parameter scan'}
   - id: spin1-largeD-D-1603-500
     family: spin1-largeD
     parameter: '$D = 1603/500$'
@@ -441,7 +442,7 @@ records:
     params: {D_min: "16029999/5000000", D_max: "1603/500"}
     lengths: {L0: 6}
     bound: {value: "2309592850505369/2305843009213693952", decimal: "0.001001626"}
-    seed: {n0: 6, beta0: "381/125", text: 'the proof at $D = 3.206$ extends to the interval by a perturbation bound; the numerical gap is the one at $D = 3.206$'}
+    seed: {n0: 6, beta0: "381/125", text: 'certified across the interval via a Weyl–Duhamel perturbation bound around $D = 1603/500$ (numerical benchmark shown at $D = 1603/500$)'}
     numerical_gap: "1.54533"
     tier: certified
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_interval_3206, r: "5014989/5000000", beta: "381/125", decimal: "0.000982058"}
@@ -455,7 +456,7 @@ records:
     params: {D_min: "39979773/10000000", D_max: "4"}
     lengths: {L0: 6}
     bound: {value: "6654130513332347/4611686018427387904", decimal: "0.001442884"}
-    seed: {n0: 6, beta0: "23/10", text: 'the proof at $D = 4$ extends to the interval by a perturbation bound; the numerical gap is the one at $D = 4$'}
+    seed: {n0: 6, beta0: "23/10", text: 'certified across the interval via a Weyl–Duhamel perturbation bound around $D = 4$ (numerical benchmark shown at $D = 4$)'}
     numerical_gap: "2.26946"
     tier: certified
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_interval_4, r: "5016317/5000000", beta: "23/10", decimal: "0.001416559"}
@@ -479,8 +480,8 @@ records:
     pr: 6
     contributors: ['LionSR']
     notes: >-
-      The same proof covers every $J_\perp$ within $10^{-4}$ of 4, with gap at least
-      1.063075969.
+      A perturbation certificate around $J_\perp = 4$ covers the interval
+      $[4 - 10^{-4}, 4 + 10^{-4}]$ with $\Delta_L \ge 1.063075969$.
   - id: ladder-Jperp-7-2
     family: heisenberg-ladder
     parameter: '$J_\perp = 7/2$'
@@ -496,8 +497,8 @@ records:
     pr: 13
     contributors: ['LionSR']
     notes: >-
-      The same proof covers every $J_\perp$ within $10^{-4}$ of 7/2, with gap at least
-      0.751905791.
+      A perturbation certificate around $J_\perp = 7/2$ covers the interval
+      $[7/2 - 10^{-4}, 7/2 + 10^{-4}]$ with $\Delta_L \ge 0.751905791$.
   - id: ladder-Jperp-3
     family: heisenberg-ladder
     parameter: '$J_\perp = 3$'
@@ -513,8 +514,8 @@ records:
     pr: 13
     contributors: ['LionSR']
     notes: >-
-      The same proof covers every $J_\perp$ within $10^{-4}$ of 3, with gap at least
-      0.435856503.
+      A perturbation certificate around $J_\perp = 3$ covers the interval
+      $[3 - 10^{-4}, 3 + 10^{-4}]$ with $\Delta_L \ge 0.435856503$.
   - id: ladder-Jperp-5-2
     family: heisenberg-ladder
     parameter: '$J_\perp = 5/2$'
@@ -543,8 +544,8 @@ records:
     pr: 13
     contributors: ['LionSR']
     notes: >-
-      The smallest coupling reachable with rings of at most 4 rungs: at $J_\perp =
-      326133/131072$ every starting temperature provably fails.
+      Smallest rung coupling reachable with $n_0 = 4$ rungs; at $J_\perp = 326133/131072$,
+      $n_0 = 4$ is provably inadmissible at every $\beta_0$.
   # ---------------------------------------------------------------- two-leg-tfim
   - id: two-leg-tfim-g-3
     family: two-leg-tfim
@@ -576,15 +577,16 @@ records:
     pr: null
     contributors: ['LionSR']
     notes: >-
-      Lean also checks the finite computation, so the theorem has no assumptions. The computer
-      proof alone gives the slightly larger 0.392289.
+      Both the finite seed bounds at $(6, 97/4)$ and the 14-step rational doubling chain are
+      checked inside the Lean kernel (<code>SeedKernel.Ising</code>). The 48-step
+      interval-arithmetic recurrence from the same certificate gives 0.392289.
     history:
       - {date: "2026-10-15", decimal: "0.3921", lengths: 'even L ≥ 6', tier: lean-unconditional, pr: 34,
-         method: 'the same Lean theorem with a shorter chain'}
+         method: 'unconditional Lean 4 theorem with a shorter rational doubling chain'}
       - {date: "2026-10-12", decimal: "0.3922", lengths: 'even L ≥ 6', tier: certified, pr: 5,
-         method: 'computer proof from verified spectra of the 6- and 12-site rings'}
+         method: 'interval-arithmetic certificate from verified spectra of 6- and 12-site rings'}
       - {date: "2026-10-12", decimal: "0.3921", lengths: 'even L ≥ 6', tier: lean-conditional, pr: 9,
-         method: 'Lean theorem from the two computer-checked inequalities'}
+         method: 'seeded Lean 4 theorem from the certified seed inequalities'}
   - id: ising-g-1-4-h-1-10
     family: ising-longitudinal
     parameter: '$g = 1/4,\ h = 1/10$'
@@ -1032,32 +1034,32 @@ records:
     family: spin1-blbq
     parameter: '$\theta = -0.1$'
     params: {theta: "-1/10"}
-    estimate: {n0: "34", beta0: "31", float_bound: "0.107", text: 'Reflection positive in the Cartesian basis; rings up to 6 sites are too small, and the starting scale is extrapolated'}
+    estimate: {n0: "34", beta0: "31", float_bound: "0.107", text: 'Reflection positive in the Cartesian basis; seeds up to $n_0 = 6$ fail, and $(34, 31)$ is extrapolated from finite-size scaling'}
     numerical_gap: "0.338"
     tier: target
   - id: target-spin2
     family: spin2-heisenberg
     parameter: 'periodic ring'
-    estimate: {n0: "256", beta0: "64", float_bound: "0.003019921", text: 'Needs one certified bound on a partition function, $\widehat{Z}_{256}(64) \le 1.08$'}
+    estimate: {n0: "256", beta0: "64", float_bound: "0.003019921", text: 'Requires certifying one remaining trace bound, $\widehat{Z}_{256}(64) \le 1.08$'}
     numerical_gap: "0.08917"
     tier: target
   - id: target-dimerized-delta-1-5
     family: dimerized-heisenberg
     parameter: '$\delta = 1/5$'
     params: {delta: "1/5"}
-    estimate: {n0: "5", beta0: "17/2", float_bound: "0.086", text: 'Rings of 2 and 4 cells provably fail at every temperature; a ring of 5 cells (10 and 20 spins) might work'}
+    estimate: {n0: "5", beta0: "17/2", float_bound: "0.086", text: 'Seeds of $n_0 = 2$ and $4$ cells provably fail at every $\beta_0$; an odd seed of $n_0 = 5$ cells (10 and 20 spins) is estimated to work'}
     numerical_gap: "0.599819"
     tier: target
   - id: target-ladder-Jperp-2
     family: heisenberg-ladder
     parameter: '$J_\perp = 2$'
     params: {Jperp: "2"}
-    estimate: {n0: "6", text: 'Rings of 2 and 4 rungs provably fail at every temperature; by extrapolation, 6 rungs (24 spins) are needed'}
+    estimate: {n0: "6", text: 'Seeds of $n_0 = 2$ and $4$ rungs provably fail at every $\beta_0$; extrapolation estimates $n_0 = 6$ rungs (12 and 24 spins)'}
     numerical_gap: "1.2820"
     tier: target
   - id: target-aklt-honeycomb
     family: aklt-honeycomb
     parameter: 'honeycomb tori'
-    estimate: {text: 'A two-dimensional lattice; a numerical pilot of the method found no starting scale yet'}
+    estimate: {text: 'Two-dimensional honeycomb torus; finite-torus pilot study found no admissible seed at accessible sizes'}
     numerical_gap: "0.09203"
     tier: target

@@ -1,23 +1,29 @@
 \chapter{The spin-1 Heisenberg ring}
 \label{chap:heisenberg}
 
-Haldane's conjecture states that integer-spin antiferromagnetic Heisenberg chains have a unique
-ground state and a nonzero spectral gap in the thermodynamic limit. In
-\texttt{CertifiedGaps/Heisenberg/*.lean}, the two-purity doubling criterion is applied to the
-periodic spin-1 antiferromagnetic Heisenberg ring to show that for every even \(L \ge 2304\) the
-ground state is unique and the spectral gap satisfies
-\(\Delta_L > (\log 20)/784 \approx 0.003821\), and for every even \(L \ge 60\) it satisfies
-\(\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79}\), the two bounds of Theorem~1.1
-of~\cite{OpenAIHaldane}. Each is conditional on two finite seed inequalities from its
-Propositions~5.4 and~5.5, which are reproduced in exact arithmetic in \texttt{models/spin1/}.
+Haldane's conjecture~\cite{Haldane1983Continuum, Haldane1983Nonlinear} states that integer-spin
+antiferromagnetic Heisenberg chains have a unique ground state and a nonzero spectral gap in the
+thermodynamic limit (originally established rigorously for the valence-bond-solid parent
+Hamiltonian in~\cite{Affleck1987Rigorous}). Applying the spacetime-bootstrap criterion of
+Chapters~\ref{chap:criterion}--\ref{chap:rings} to the periodic spin-1 antiferromagnetic Heisenberg
+ring~\eqref{eq:heisenberg-ham} (Definition~\ref{def:heisenberg}) shows that for every even
+\(L \ge 2304\) the ground state is unique and the spectral gap satisfies
+\(\Delta_L > (\log 20)/784 \approx 0.003821\) (Theorem~\ref{thm:haldane-gap}), and that for every
+even \(L \ge 60\) it satisfies \(\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79}\)
+(Theorem~\ref{thm:haldane-gap-sixty}), reproducing the two bounds of Theorem~1.1
+of~\cite{OpenAIHaldane}. Each bound is conditional on two finite-size seed inequalities from
+Propositions~5.4 and~5.5 of~\cite{OpenAIHaldane} (Lemmas~\ref{lem:heisenberg-seed36}
+and~\ref{lem:heisenberg-seed60}), which are certified in exact arithmetic.
 
-\section{The Hamiltonian}
+\section{The spin-1 Heisenberg Hamiltonian}
 
 In the Cartesian basis, the spin-1 operators are purely imaginary antisymmetric matrices defined
-directly from the Levi-Civita symbol, so the main theorem statement refers only to standard spin-1
-exchange matrices without introducing the reflection-positive ring machinery.
+directly from the Levi-Civita symbol (Definition~\ref{def:heisenberg}), so the main theorem
+statements (Theorems~\ref{thm:haldane-gap} and~\ref{thm:haldane-gap-sixty}) refer only to standard
+spin-1 exchange matrices without introducing the reflection-positive ring formalism of
+Definition~\ref{def:rpring}.
 
-\begin{definition}[Spin-1 Heisenberg ring]
+\begin{definition}[Spin-1 Heisenberg ring Hamiltonian]
   \label{def:heisenberg}
   \lean{CertifiedGaps.SpinOneHeisenberg.leviCivita, CertifiedGaps.SpinOneHeisenberg.spinOne,
     CertifiedGaps.SpinOneHeisenberg.exchange, CertifiedGaps.SpinOneHeisenberg.hamiltonian}
@@ -26,88 +32,104 @@ exchange matrices without introducing the reflection-positive ring machinery.
   In the Cartesian basis, the spin-1 matrices have entries \((S^\alpha)_{ss'} = -i\,\epsilon_{\alpha
   s s'}\)
   given by the Levi-Civita symbol \(\epsilon\). The two-site exchange operator is
-  \(\mathbf S \cdot \mathbf S = \sum_\alpha S^\alpha \otimes S^\alpha\), and the ring Hamiltonian
-  is \(H_L = \sum_{j} \mathbf S_j \cdot \mathbf S_{j+1}\) on \((\C^3)^{\otimes L}\) with periodic
-  boundary conditions.
+  \(\mathbf S \cdot \mathbf S = \sum_\alpha S^\alpha \otimes S^\alpha\), and the ring Hamiltonian on
+  \((\C^3)^{\otimes L}\) with periodic boundary conditions (Definition~\ref{def:ring-operators}) is
+  \begin{equation}
+    \label{eq:heisenberg-ham}
+    H_L = \sum_{j=0}^{L-1} \mathbf S_j \cdot \mathbf S_{j+1}.
+  \end{equation}
 \end{definition}
 
-\begin{definition}[Spectrum, partition function and purities]
+\begin{definition}[Eigenvalue spectrum, partition function, and purities]
   \label{def:heisenberg-spectrum}
   \lean{CertifiedGaps.SpinOneHeisenberg.hamiltonian_isHermitian,
     CertifiedGaps.SpinOneHeisenberg.spectrum, CertifiedGaps.SpinOneHeisenberg.partitionFunction,
     CertifiedGaps.SpinOneHeisenberg.spatialPurity, CertifiedGaps.SpinOneHeisenberg.thermalPurity}
   \leanok
   \uses{def:heisenberg}
-  The Hamiltonian \(H_L\) is Hermitian with eigenvalue family \(E_L\), partition function
-  \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), and purities \(\Ps\) and
+  The Hamiltonian \(H_L\) in~\eqref{eq:heisenberg-ham} is Hermitian with eigenvalue family \(E_L\),
+  partition function \(Z_L(\beta) = \operatorname{Re}\Tr e^{-\beta H_L}\), and purities \(\Ps\) and
   \(\Pt\) formed from these traces as in Definition~\ref{def:purities}.
 \end{definition}
 
-\begin{lemma}
+\begin{lemma}[Boltzmann expansion of the partition function]
   \label{lem:heisenberg-trace}
   \lean{CertifiedGaps.SpinOneHeisenberg.trace_exp_hamiltonian,
     CertifiedGaps.SpinOneHeisenberg.partitionFunction_eq_sum,
     CertifiedGaps.SpinOneHeisenberg.partitionFunction_spectrum}
   \leanok
   \uses{def:heisenberg-spectrum, lem:ring-trace-exp}
-  The matrix trace satisfies \(Z_L(\beta) = \sum_m e^{-\beta E_L(m)}\), matching the partition
-  function of the abstract criterion.
+  The matrix trace in Definition~\ref{def:heisenberg-spectrum} satisfies
+  \(Z_L(\beta) = \sum_m e^{-\beta E_L(m)}\), matching the Boltzmann partition function of
+  Definition~\ref{def:partition-function}.
 \end{lemma}
 \begin{proof}
   \leanok
-  Apply Lemma~\ref{lem:ring-trace-exp} to the Hermitian matrix \(H_L\).
+  Apply Lemma~\ref{lem:ring-trace-exp} to the Hermitian matrix \(H_L\) of
+  Definition~\ref{def:heisenberg-spectrum}.
 \end{proof}
 
-\section{The Heisenberg ring is reflection positive}
+\section{Reflection positivity in the Cartesian spin-1 basis}
 
-Because \(iS^\alpha\) is real and antisymmetric in the Cartesian basis, the negated exchange bond is
-a sum of tensor squares of real matrices, so the Heisenberg chain and its single-ion anisotropic
-extension are instances of the \texttt{RPRing} structure of Chapter~\ref{chap:rings}.
+Because \(G_\alpha = iS^\alpha\) is real and antisymmetric in the Cartesian basis
+(Definition~\ref{def:spin-one-generators}), the negated exchange interaction~\eqref{eq:spin-one-rp}
+is a sum of tensor squares of real matrices, so the Heisenberg chain and its single-ion anisotropic
+extension (Definition~\ref{def:spin-one-large-d} and Lemma~\ref{lem:large-d-heisenberg}) are
+reflection-positive rings in the sense of Definition~\ref{def:rpring}
+(Theorem~\ref{thm:heisenberg-moments}).
 
-\begin{definition}[Real spin-1 generators]
+\begin{definition}[Cartesian spin-1 generators]
   \label{def:spin-one-generators}
   \lean{CertifiedGaps.SpinOne.G, CertifiedGaps.SpinOne.G_transpose}
   \leanok
   \uses{def:heisenberg}
   Each generator \(G_\alpha = i S^\alpha\) has real antisymmetric entries \((G_\alpha)_{ss'} =
-  \epsilon_{\alpha s s'}\), and \(-\mathbf S \cdot \mathbf S = \sum_\alpha G_\alpha \otimes
-  G_\alpha\).
+  \epsilon_{\alpha s s'}\), and
+  \begin{equation}
+    \label{eq:spin-one-rp}
+    -\mathbf S \cdot \mathbf S = \sum_\alpha G_\alpha \otimes G_\alpha.
+  \end{equation}
 \end{definition}
 
-\begin{definition}[The anisotropic spin-1 ring]
+\begin{definition}[Spin-1 ring with single-ion anisotropy]
   \label{def:spin-one-large-d}
   \lean{CertifiedGaps.SpinOneLargeD.Sz2, CertifiedGaps.SpinOneLargeD.model}
   \leanok
   \uses{def:rpring, def:spin-one-generators}
-  For \(D \in \R\), the anisotropic spin-1 ring is the reflection-positive ring with bond factors
-  \(C_\alpha = G_\alpha\), on-site term \(o = D\,(S^z)^2 = D \operatorname{diag}(1, 1, 0)\), and
-  internal reflection \(F = 1\).
+  For single-ion anisotropy \(D \in \R\), the anisotropic spin-1 ring is the reflection-positive
+  ring (Definition~\ref{def:rpring}) with bond operators \(C_\alpha = G_\alpha\) from
+  Definition~\ref{def:spin-one-generators}, on-site term
+  \(o = D\,(S^z)^2 = D \operatorname{diag}(1, 1, 0)\), and internal cell reflection \(F = 1\).
 \end{definition}
 
-\begin{lemma}
+\begin{lemma}[Isotropic limit of the single-ion anisotropic ring]
   \label{lem:large-d-heisenberg}
   \lean{CertifiedGaps.SpinOneLargeD.bondMatrix_eq, CertifiedGaps.SpinOneLargeD.oc_eq,
     CertifiedGaps.SpinOneLargeD.hamiltonian_eq, CertifiedGaps.SpinOneLargeD.partitionFunction_zero}
   \leanok
   \uses{def:spin-one-large-d, def:heisenberg-spectrum}
-  The bond operator of this ring equals \(\mathbf S \cdot \mathbf S\) and its Hamiltonian is
+  The bond operator~\eqref{eq:rp-bond} of the ring in Definition~\ref{def:spin-one-large-d} equals
+  \(\mathbf S \cdot \mathbf S\) and its Hamiltonian~\eqref{eq:rp-hamiltonian} is
   \(\sum_j \mathbf S_j \cdot \mathbf S_{j+1} + D \sum_j (S^z_j)^2\). At \(D = 0\), its partition
-  functions coincide with those of the Heisenberg ring.
+  functions coincide with those of the isotropic spin-1 Heisenberg ring
+  (Definition~\ref{def:heisenberg-spectrum}).
 \end{lemma}
 \begin{proof}
   \leanok
-  The bond identity \(-\sum_\alpha G_\alpha \otimes G_\alpha = -\sum_\alpha (iS^\alpha) \otimes
-  (iS^\alpha) = \sum_\alpha S^\alpha \otimes S^\alpha\) holds entrywise from \(i^2 = -1\). At
-  \(D = 0\) the on-site terms vanish.
+  The bond identity~\eqref{eq:spin-one-rp}, namely
+  \(-\sum_\alpha G_\alpha \otimes G_\alpha = -\sum_\alpha (iS^\alpha) \otimes (iS^\alpha) =
+  \sum_\alpha S^\alpha \otimes S^\alpha\), holds entrywise from \(i^2 = -1\). At \(D = 0\) the
+  on-site anisotropy terms vanish, reducing~\eqref{eq:rp-hamiltonian} to~\eqref{eq:heisenberg-ham}.
 \end{proof}
 
-\begin{theorem}[Spatial moment inequalities for the Heisenberg ring]
+\begin{theorem}[Transfer-operator moment inequalities for the Heisenberg ring]
   \label{thm:heisenberg-moments}
   \lean{CertifiedGaps.SpinOneHeisenberg.spatialMomentBounds}
   \leanok
   \uses{lem:large-d-heisenberg, thm:rp-moment-bounds}
-  For every \(\beta > 0\), \(L \mapsto Z_L(\beta)\) satisfies the spatial moment inequalities
-  above \(2\).
+  For every \(\beta > 0\), the partition function \(L \mapsto Z_L(\beta)\) of the spin-1 Heisenberg
+  ring (Definition~\ref{def:heisenberg-spectrum}) satisfies the transfer-operator moment
+  inequalities (1)--(3) of Definition~\ref{def:moment-bounds} above length \(2\).
 \end{theorem}
 \begin{proof}
   \leanok
@@ -116,34 +138,37 @@ extension are instances of the \texttt{RPRing} structure of Chapter~\ref{chap:ri
   the Heisenberg ring by Lemma~\ref{lem:large-d-heisenberg}.
 \end{proof}
 
-\section{The gap from thermal-MPO inputs}
+\section{Uniform gap at the asymptotic seed scale}
 
-The hypothesis structure \texttt{ThermalMPOInputs} combines the spatial moment inequalities with
-the two seed purity bounds at a general scale; applying the symmetric doubling criterion
-(Theorem~\ref{thm:gap-of-seeds}) to this structure yields the uniform gap bound
-\(\log(1/(5\varepsilon_0))/\beta_0\).
+We combine the transfer-operator moment inequalities (Definition~\ref{def:moment-bounds}) with
+symmetric seed purity bounds at a general scale \((n_0, \beta_0)\)
+(Definition~\ref{def:thermal-mpo-inputs}); applying the symmetric spacetime-bootstrap criterion
+(Theorem~\ref{thm:gap-of-seeds}) then yields the uniform spectral gap bound~\eqref{eq:sym-gap-bound}
+(Theorem~\ref{thm:heisenberg-gap-of-inputs}).
 
-\begin{definition}[Thermal-MPO inputs]
+\begin{definition}[Seed and moment hypotheses at scale \((n_0, \beta_0)\)]
   \label{def:thermal-mpo-inputs}
   \lean{CertifiedGaps.SpinOneHeisenberg.ThermalMPOInputs}
   \leanok
   \uses{def:heisenberg-spectrum, def:moment-bounds}
-  The structure \(\mathrm{Inputs}(n_0, \beta_0, \varepsilon_0)\) packages the spatial moment
-  inequalities above \(n_0\) at every \(\beta > 0\) together with the seeds
+  The \emph{seed and moment hypotheses} at scale \((n_0, \beta_0)\) with defect \(\varepsilon_0\)
+  consist of the transfer-operator moment inequalities of Definition~\ref{def:moment-bounds} above
+  length \(n_0\) at every \(\beta > 0\) together with the symmetric seed purity bounds
   \(\Ps(n_0, \beta_0) \ge 1 - \varepsilon_0\) and \(\Pt(2n_0, \beta_0) \ge 1 - \varepsilon_0\).
 \end{definition}
 
-\begin{theorem}[Gap from inputs]
+\begin{theorem}[Uniform spectral gap from symmetric seed purities]
   \label{thm:heisenberg-gap-of-inputs}
   \lean{CertifiedGaps.SpinOneHeisenberg.gapGT_of_inputs,
     CertifiedGaps.SpinOneHeisenberg.gapGT_log_twenty}
   \leanok
   \uses{def:thermal-mpo-inputs, thm:gap-of-seeds, lem:heisenberg-trace}
-  Let \(n_0 > 0\) be even, \(\beta_0 > 0\), and \(0 < \varepsilon_0 \le 1/100\). Under
-  \(\mathrm{Inputs}(n_0, \beta_0, \varepsilon_0)\), every even \(L \ge n_0\) satisfies
-  \(\GapGT\bigl(E_L, \log(1/(5\varepsilon_0))/\beta_0\bigr)\). In particular,
-  \(\mathrm{Inputs}(2304, 784, 1/100)\) gives \(\GapGT(E_L, \log 20 / 784)\) for every even
-  \(L \ge 2304\).
+  Let \(n_0 > 0\) be even, \(\beta_0 > 0\), and \(0 < \varepsilon_0 \le 1/100\). Under the seed and
+  moment hypotheses of Definition~\ref{def:thermal-mpo-inputs} at \((n_0, \beta_0)\) with defect
+  \(\varepsilon_0\), every even \(L \ge n_0\) has a unique ground state and a spectral gap greater
+  than \(\log(1/(5\varepsilon_0))/\beta_0\). In particular, at
+  \((n_0, \beta_0, \varepsilon_0) = (2304, 784, 1/100)\), every even \(L \ge 2304\) has a spectral
+  gap greater than \(\log 20 / 784\).
 \end{theorem}
 \begin{proof}
   \leanok
@@ -151,45 +176,56 @@ the two seed purity bounds at a general scale; applying the symmetric doubling c
   Boltzmann sums by Lemma~\ref{lem:heisenberg-trace}.
 \end{proof}
 
-\section{The seeds and the main theorem}
+\section{Scale doubling from length 36 and the Haldane gap}
 
-Combining the unconditional spatial moment inequalities (Theorem~\ref{thm:heisenberg-moments}) with
-the two seed inequalities at \((n_0, \beta_0) = (2304, 784)\) yields the uniform Haldane gap bound.
-As in the proof of Proposition~5.5 of~\cite{OpenAIHaldane}, these seeds follow from two defect
-bounds on the rings of \(36\) and \(72\) sites at \(\beta = 49/4\) by six exact doubling steps.
+Combining the unconditional transfer-operator moment inequalities
+(Theorem~\ref{thm:heisenberg-moments}) with the two seed inequalities at
+\((n_0, \beta_0) = (2304, 784)\) (Lemmas~\ref{lem:heisenberg-seed-spatial}
+and~\ref{lem:heisenberg-seed-thermal}) yields the uniform Haldane gap bound~\eqref{eq:haldane-gap}
+(Theorem~\ref{thm:haldane-gap}). As in the proof of Proposition~5.5 of~\cite{OpenAIHaldane}, these
+asymptotic seeds follow from two finite-size defect bounds on the rings of \(36\) and \(72\) sites
+at \(\beta = 49/4\) (Lemma~\ref{lem:heisenberg-seed36}) by six asymmetric scale-doubling steps
+(Lemma~\ref{lem:heisenberg-chain36}).
 
-\begin{lemma}[Seeds at length 36]
+\begin{lemma}[Initial defect bounds at \(L = 36\)]
   \label{lem:heisenberg-seed36}
   \lean{CertifiedGaps.SpinOneHeisenberg.seed36_spatial,
     CertifiedGaps.SpinOneHeisenberg.seed36_thermal}
   \leanok
   \uses{def:heisenberg-spectrum}
-  At \(\beta = 49/4\), \(1 - \Ps(36, \beta) \le 0.047916\) and \(1 - \Pt(72, \beta) \le 0.181521\).
+  At \(\beta = 49/4\),
+  \begin{equation}
+    \label{eq:heisenberg-seed36}
+    1 - \Ps(36, \beta) \le 0.047916, \qquad 1 - \Pt(72, \beta) \le 0.181521.
+  \end{equation}
 \end{lemma}
 \begin{proof}
-  These are the starting defects \(p_0, q_0\) in the proof of Proposition~5.5
-  of~\cite{OpenAIHaldane}, from thermal traces of twisted rings of at most \(12\) sites and a
-  variational trial state. They are left as open numerical hypotheses in Lean.
+  These are the initial defects \(p_0, q_0\) in the proof of Proposition~5.5
+  of~\cite{OpenAIHaldane}, obtained from thermal traces of twisted rings of at most \(12\) sites
+  and a matrix-product-state variational bound, and enter the formalization
+  as explicit numerical hypotheses.
 \end{proof}
 
-\begin{lemma}[Six doubling steps]
+\begin{lemma}[Six scale-doubling steps from \(L = 36\) to \(L = 2304\)]
   \label{lem:heisenberg-chain36}
   \lean{CertifiedGaps.SpinOneHeisenberg.chain36, CertifiedGaps.SpinOneHeisenberg.chain36_stepsValid,
     CertifiedGaps.SpinOneHeisenberg.seeds2304_of_seeds36,
     CertifiedGaps.purities_ge_chainCertificate, CertifiedGaps.ChainCertificate.StepsValid}
   \leanok
   \uses{lem:chain-purities, def:chain-certificate}
-  The bounds of Lemma~\ref{lem:heisenberg-seed36} give \(\Ps(2304, 784) \ge 0.99\) and
-  \(\Pt(4608, 784) \ge 0.99\).
+  The initial defect bounds~\eqref{eq:heisenberg-seed36} of Lemma~\ref{lem:heisenberg-seed36} imply
+  \(\Ps(2304, 784) \ge 0.99\) and \(\Pt(4608, 784) \ge 0.99\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Six steps of the exact doubling recurrence, each rounded up to a multiple of \(10^{-7}\), reach
-  the defects \((0.0084709, 0.0055149)\) at \((36 \cdot 2^6, \tfrac{49}{4} \cdot 2^6) = (2304, 784)\).
-  The kernel checks the rational step conditions by \texttt{decide}.
+  Six steps of the asymmetric doubling recurrence (Lemma~\ref{lem:chain-purities}), each rounded up
+  to a multiple of \(10^{-7}\), reach the defects \((0.0084709, 0.0055149)\) at
+  \((36 \cdot 2^6, \tfrac{49}{4} \cdot 2^6) = (2304, 784)\). The rational step
+  inequalities~\eqref{eq:asym-step} of Definition~\ref{def:chain-certificate} hold by exact rational
+  arithmetic.
 \end{proof}
 
-\begin{lemma}[Spatial seed]
+\begin{lemma}[Spatial purity bound at \((2304, 784)\)]
   \label{lem:heisenberg-seed-spatial}
   \lean{CertifiedGaps.SpinOneHeisenberg.seed_spatial}
   \leanok
@@ -198,10 +234,10 @@ bounds on the rings of \(36\) and \(72\) sites at \(\beta = 49/4\) by six exact 
 \end{lemma}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:heisenberg-chain36} applied to Lemma~\ref{lem:heisenberg-seed36}.
+  Apply Lemma~\ref{lem:heisenberg-chain36} to Lemma~\ref{lem:heisenberg-seed36}.
 \end{proof}
 
-\begin{lemma}[Thermal seed]
+\begin{lemma}[Thermal purity bound at \((4608, 784)\)]
   \label{lem:heisenberg-seed-thermal}
   \lean{CertifiedGaps.SpinOneHeisenberg.seed_thermal}
   \leanok
@@ -210,41 +246,47 @@ bounds on the rings of \(36\) and \(72\) sites at \(\beta = 49/4\) by six exact 
 \end{lemma}
 \begin{proof}
   \leanok
-  Lemma~\ref{lem:heisenberg-chain36} applied to Lemma~\ref{lem:heisenberg-seed36}.
+  Apply Lemma~\ref{lem:heisenberg-chain36} to Lemma~\ref{lem:heisenberg-seed36}.
 \end{proof}
 
-\begin{theorem}[The spin-1 Heisenberg gap]
+\begin{theorem}[Haldane gap of the spin-1 Heisenberg ring for \(L \ge 2304\)]
   \label{thm:haldane-gap}
   \lean{CertifiedGaps.SpinOneHeisenberg.thermalMPOInputs,
     CertifiedGaps.SpinOneHeisenberg.spin_one_heisenberg_gap}
   \leanok
   \uses{thm:heisenberg-moments, lem:heisenberg-seed-spatial, lem:heisenberg-seed-thermal,
     thm:heisenberg-gap-of-inputs}
-  For every even \(L \ge 2304\), the periodic spin-1 Heisenberg ring has a unique ground state,
-  and every other eigenvalue lies more than \((\log 20)/784 \approx 0.003821\) above the ground
-  energy.
+  For every even \(L \ge 2304\), the periodic spin-1 Heisenberg ring~\eqref{eq:heisenberg-ham} has a
+  unique ground state, and every excited eigenvalue satisfies
+  \begin{equation}
+    \label{eq:haldane-gap}
+    \Delta_L = E_1(L) - E_0(L) > \frac{\log 20}{784} \approx 0.003821.
+  \end{equation}
 \end{theorem}
 \begin{proof}
   \leanok
-  Combining Theorem~\ref{thm:heisenberg-moments} with the two seed bounds establishes
-  \(\mathrm{Inputs}(2304, 784, 1/100)\), and Theorem~\ref{thm:heisenberg-gap-of-inputs} then gives
-  the gap bound.
+  Combining Theorem~\ref{thm:heisenberg-moments} with the two purity bounds of
+  Lemmas~\ref{lem:heisenberg-seed-spatial} and~\ref{lem:heisenberg-seed-thermal} verifies the seed
+  and moment hypotheses of Definition~\ref{def:thermal-mpo-inputs} at \((2304, 784)\) with defect
+  \(1/100\), and Theorem~\ref{thm:heisenberg-gap-of-inputs} then gives~\eqref{eq:haldane-gap}.
 \end{proof}
 
 \begin{remark}
-  In Lean, \texttt{\#print axioms spin\_one\_heisenberg\_gap} reports \texttt{sorryAx} only through
-  the seed lemmas. Candidate routes toward a kernel-checked proof of the spin-1 seed at smaller
-  ring sizes are studied in \texttt{models/lean\_seeds/} and described in
+  Theorem~\ref{thm:haldane-gap} requires only the two finite-size defect
+  bounds~\eqref{eq:heisenberg-seed36} of Lemma~\ref{lem:heisenberg-seed36}. Candidate routes toward
+  discharging the spin-1 seed by exact integer arithmetic on smaller rings are discussed in
   Chapter~\ref{chap:seedkernel}.
 \end{remark}
 
-\section{The bound for every even length from 60}
+\section{Uniform gap bound from length 60}
 
-The first bound of Theorem~1.1 of~\cite{OpenAIHaldane} covers shorter rings with a weaker gap,
-from a seed with defect \(1/8\), well above \(1/100\). It uses the criterion with a coefficient
-(Theorem~\ref{thm:gap-of-coefficient}) with \(u_0 = 1/8\) and \(C = 79/10\).
+The first bound of Theorem~1.1 of~\cite{OpenAIHaldane} covers shorter rings (\(L \ge 60\)) with a
+smaller gap prefactor, starting from a seed with defect \(1/8\) (Lemma~\ref{lem:heisenberg-seed60}),
+well above \(1/100\). It follows from the general symmetric spacetime-bootstrap criterion
+(Theorem~\ref{thm:gap-of-coefficient}) with \(u_0 = 1/8\) and quadratic prefactor \(C = 79/10\)
+(Theorem~\ref{thm:haldane-gap-sixty}).
 
-\begin{lemma}[Seeds at length 60]
+\begin{lemma}[Initial purity bounds at \(L = 60\)]
   \label{lem:heisenberg-seed60}
   \lean{CertifiedGaps.SpinOneHeisenberg.seed60_spatial,
     CertifiedGaps.SpinOneHeisenberg.seed60_thermal}
@@ -253,23 +295,25 @@ from a seed with defect \(1/8\), well above \(1/100\). It uses the criterion wit
   At \(\beta = 105/4\), \(\Ps(60, \beta) \ge 7/8\) and \(\Pt(120, \beta) \ge 7/8\).
 \end{lemma}
 \begin{proof}
-  This is Proposition~5.4 of~\cite{OpenAIHaldane}. It is left as an open numerical hypothesis in
-  Lean.
+  This is Proposition~5.4 of~\cite{OpenAIHaldane}, which enters the formalization as an explicit
+  numerical hypothesis.
 \end{proof}
 
-\begin{theorem}[The gap from length 60]
+\begin{theorem}[Haldane gap of the spin-1 Heisenberg ring for \(L \ge 60\)]
   \label{thm:haldane-gap-sixty}
   \lean{CertifiedGaps.SpinOneHeisenberg.gapGT_sixty_of_seeds,
     CertifiedGaps.SpinOneHeisenberg.spin_one_heisenberg_gap_sixty}
   \leanok
   \uses{thm:heisenberg-moments, lem:heisenberg-seed60, thm:gap-of-coefficient}
-  For every even \(L \ge 60\), the periodic spin-1 Heisenberg ring has a unique ground state,
-  and every other eigenvalue lies more than \(\tfrac{4}{105}\log\tfrac{80}{79}\) above the ground
-  energy.
+  For every even \(L \ge 60\), the periodic spin-1 Heisenberg ring~\eqref{eq:heisenberg-ham} has a
+  unique ground state, and every excited eigenvalue lies more than
+  \(\tfrac{4}{105}\log\tfrac{80}{79}\) above the ground energy.
 \end{theorem}
 \begin{proof}
   \leanok
-  Apply Theorem~\ref{thm:gap-of-coefficient} with \(u_0 = 1/8\) and \(C = 79/10\): here
-  \(G(1/8) = 913952/117649 \le 79/10\), \(r = 79/80\) and \(C(1 - 3u_0) = 79/16 > 3\), and
-  \(\log(1/r)/\beta_0 = \tfrac{4}{105}\log\tfrac{80}{79}\).
+  Apply Theorem~\ref{thm:gap-of-coefficient} with \(u_0 = 1/8\) and \(C = 79/10\) using
+  Theorem~\ref{thm:heisenberg-moments} and Lemma~\ref{lem:heisenberg-seed60}: here
+  \(G(1/8) = 913952/117649 \le 79/10\) in~\eqref{eq:doubling-coeff}, \(r = 79/80\) and
+  \(C(1 - 3u_0) = 79/16 > 3\), and \(\log(1/r)/\beta_0 = \tfrac{4}{105}\log\tfrac{80}{79}\).
 \end{proof}
+

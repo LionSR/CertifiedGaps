@@ -1,11 +1,10 @@
 name: Check certificates
 
-# Run the fast checker (check.jl, default mode) of model directories. A pull request that changes
-# only models/ checks the changed directories. A pull request that changes the leaderboard rows
-# (home_page/_data/records.yml) or the core package (julia/), a push to main, the weekly schedule
-# and a manual run check every model directory that records.yml references, so every number on
-# the site is rechecked. The core package's tests and the leaderboard validator (without the Lean
-# records, which need the Lean build in blueprint.yml) run on every trigger.
+# Run the fast checker (check.jl, default mode) of model directories. A pull request or push to main
+# that changes models/ (excluding documentation) checks the changed model directories; a change to
+# the core package (julia/, excluding documentation), the weekly schedule, or a manual run checks
+# every model directory that records.yml references. Leaderboard data in home_page/_data/records.yml
+# is validated against both the certificates and the Lean audit in blueprint.yml.
 on:
   pull_request:
     branches:
@@ -14,10 +13,15 @@ on:
       - "models/**"
       - "julia/**"
       - "tools/leaderboard/**"
-      - "home_page/_data/records.yml"
+      - "!**/*.md"
   push:
     branches:
       - main
+    paths:
+      - "models/**"
+      - "julia/**"
+      - "tools/leaderboard/**"
+      - "!**/*.md"
   schedule:
     - cron: "17 4 * * 1" # Mondays 04:17 UTC
   workflow_dispatch:
@@ -64,12 +68,15 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      # The base commit of a pull request, for the diff; the shallow checkout lacks it.
+      # The base commit of a pull request or push, for the diff; the shallow checkout lacks it.
       - name: Fetch the base commit
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' || github.event_name == 'push'
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: git fetch --depth=1 origin "$BASE_SHA"
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          if [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            git fetch --depth=1 origin "$BASE_SHA"
+          fi
 
       # Model directories with a check.jl, as a JSON list. lean_seeds is left out: its checker
       # drives the Lean toolchain (lake build SeedKernel), which blueprint.yml already covers.
@@ -77,13 +84,20 @@ jobs:
         id: list
         env:
           EVENT: ${{ github.event_name }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: |
           records=home_page/_data/records.yml
-          # Checkers rerun the core arithmetic, so a change to julia/ rechecks every model.
-          if [ "$EVENT" = pull_request ] && \
-             ! git diff --name-only "$BASE_SHA" HEAD | grep -qE "^($records|julia/)"; then
-            slugs=$(git diff --name-only "$BASE_SHA" HEAD -- models/ | cut -d/ -f2)
+          # Checkers rerun the core arithmetic, so a non-doc change to julia/ rechecks every model;
+          # otherwise on PRs and pushes, only check models with non-doc changes under models/<slug>/.
+          if ( [ "$EVENT" = pull_request ] || [ "$EVENT" = push ] ) && \
+             [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ]; then
+            changed_nondoc=$(git diff --name-only "$BASE_SHA" HEAD | grep -vE '\.md$' || true)
+            if echo "$changed_nondoc" | grep -qE '^julia/'; then
+              slugs=$( (grep -oE 'models/[A-Za-z0-9_]+/' "$records" | cut -d/ -f2;
+                        sed -nE 's/^[[:space:]]*slug:[[:space:]]*([A-Za-z0-9_]+).*/\1/p' "$records") )
+            else
+              slugs=$(echo "$changed_nondoc" | grep -E '^models/' | cut -d/ -f2 || true)
+            fi
           else
             # Every directory referenced by a slug, certificate or check field.
             slugs=$( (grep -oE 'models/[A-Za-z0-9_]+/' "$records" | cut -d/ -f2;
