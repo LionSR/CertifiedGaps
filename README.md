@@ -37,7 +37,8 @@ The **spacetime bootstrap** combines two components:
    when ring length $n$ and inverse temperature $\beta$ are doubled together. Rigorous upper bounds
    on the seed purity defects $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$ and
    $\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$ at a single even seed scale $(n_0, \beta_0)$ in
-   the admissible region ($\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$) propagate
+   the admissible region (a sufficient condition is
+   $\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$) propagate
    across all dyadic scales to prove that every even ring length $L \ge n_0$ has a unique ground state
    and an explicit lower bound on $\Delta_L$.
 2. **Computer-certified finite seeds.** The seed purity inequalities at $(n_0, \beta_0)$ are certified

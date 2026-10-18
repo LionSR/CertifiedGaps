@@ -18,20 +18,20 @@ applies the method to certify uniform spectral gaps across eight families of one
 quantum spin chains and ladders.
 
 For a periodic ring Hamiltonian $$H_L$$ of $$L$$ unit cells with partition function
-$$Z_L(\beta) = \operatorname{Tr} e^{-\beta H_L}$$, define the **spatial purity**
+$$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$, define the **spatial purity**
 $$P_{\mathrm{s}}(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2$$ and the **thermal purity**
 $$P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$$. When the nearest-neighbor bond interaction is
 reflection positive [[6](#ref-6)], the spatial transfer operator $$X_\beta$$
-($$Z_L(\beta) = \operatorname{Tr} X_\beta^L$$) is self-adjoint, so $$P_{\mathrm{s}}$$ and
+($$Z_L(\beta) = \mathrm{Tr}\, X_\beta^L$$) is self-adjoint, so $$P_{\mathrm{s}}$$ and
 $$P_\tau$$ place symmetric constraints on the transfer spectrum in space and the energy spectrum
 in imaginary time. If the seed purity defects $$\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$$
-and $$\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$$ lie in the admissible region
-($$\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$$) at a single even seed length
-$$n_0$$ and inverse temperature $$\beta_0$$, a doubling recurrence simultaneously doubles $$n$$
-and $$\beta$$ across all dyadic scales, proving that every even ring $$L \ge n_0$$ has a unique
-ground state and an explicit lower bound on $$\Delta_L$$. Each record pairs a computer-checked seed
-certificate at $$(n_0, \beta_0)$$ with a Lean 4 theorem covering the step from the seed to all
-lengths $$L \ge n_0$$.
+and $$\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$$ lie in the admissible region (a sufficient
+condition is $$\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$$) at a single even seed
+length $$n_0$$ and inverse temperature $$\beta_0$$, a doubling recurrence simultaneously doubles
+$$n$$ and $$\beta$$ across all dyadic scales, proving that every even ring $$L \ge n_0$$ has a
+unique ground state and an explicit lower bound on $$\Delta_L$$. All but one record (an odd-seed
+dimerized point) pair a computer-checked seed certificate at $$(n_0, \beta_0)$$ with a Lean 4
+theorem covering the step from the seed to all lengths $$L \ge n_0$$ of the stated parity.
 
 ## Headline results
 
