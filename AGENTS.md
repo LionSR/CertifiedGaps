@@ -196,7 +196,10 @@ core environment. Set `OPENBLAS_NUM_THREADS=1` unless multi-threaded BLAS is spe
 
 A gap certificate for a model that is a `RingModel` goes through the shared pipeline:
 `GapCertificates.certify_gap` (exact RP check, `VerifiedSpectra` block spectra with
-`verified_eigen` enclosures, seed defects, exact chain) and `check_certificate` in `check.jl`.
+`verified_eigen` enclosures, seed defects, exact chain) and `check_certificate` in `check.jl`,
+driven per parameter point by `certify_point` and `check_point` (which also pins the stored
+model, RP data, seed, blocking, `params` and source hashes, and compares the seeds with the
+model's Lean theorem via `lean_points`).
 Symmetry reductions (charge, `flip`, on-site `symmetries`, lattice `reflection`, cell
 `blocking`), reuse and storage of spectra (`seed_bounds(...; spectra)`, `write_spectrum`), and gap
 enclosures (`spectral_gap_enclosure`) are core features; do not reimplement them in a model.

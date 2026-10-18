@@ -262,3 +262,55 @@ end
     m = dimer(; reflection = swap)
     @test decode_model(parse_exact_json(JSON3.write(encode_model(m)))).reflection == m.reflection
 end
+
+@testset "model drivers: certify_point, check_point, certificate_row, lean_points" begin
+    mktempdir() do repo
+        mkpath(joinpath(repo, "julia", "src"))
+        write(joinpath(repo, "julia", "src", "Core.jl"), "k = 1\n")
+        foreach(f -> write(joinpath(repo, "julia", f), ""), ("Project.toml", "Manifest.toml"))
+        dir = joinpath(repo, "models", "demo")
+        mkpath(joinpath(dir, "src"))
+        foreach(f -> write(joinpath(dir, f), "# $f\n"), ("src/a.jl", "certify.jl", "check.jl"))
+        m = rotated_staggered(6)
+        rp = rp_certificate(m; factors = [SX, ISY, SZ])
+        blocking = (; cell = 2, charge = [0, 1, -1, 0])
+        point = (; n0 = 4, β0 = 1, params = Dict("h" => 6), model_dir = dir, rp, blocking)
+        path = joinpath(dir, "results", "certificate_h6.json")
+        cert = certify_point(path, m; point..., record = Dict("note" => "demo"))
+        @test cert["params"] == Dict("h" => "6") && cert["note"] == "demo"
+        @test cert["metadata"]["config"]["h"] == "6" && isfile(path)
+        @test check_point(path, m; point...)["gap_lower_bound"] == cert["gap_lower_bound"]
+        @test check_point(path, m; point..., lean = (s = 1 // 10, t = 1 // 10)) isa Dict
+        row = certificate_row(read_result(path))
+        @test row["h"] == "6" && row["eps_s"] == cert["seed"]["eps_s"]
+        # Every part of the point definition is enforced.
+        for wrong in ((; params = Dict("h" => 5)), (; β0 = 2), (; blocking = nothing),
+                      (; lean = (s = 1 // 10^9, t = 1)),
+                      (; rp = rp_certificate(m)))
+            @test_throws ErrorException check_point(path, m; point..., wrong...)
+        end
+        @test_throws ErrorException check_point(path, rotated_staggered(5); point...)
+        write(joinpath(dir, "src", "a.jl"), "# edited\n")
+        @test_throws ErrorException check_point(path, m; point...)
+    end
+    # The point list of a Lean model file.
+    lean = tempname() * ".lean"
+    write(lean, """
+        def points : List Point := [
+          -- g = 1/4
+          ⟨1 / 4, 1 / 20, 97 / 4, {
+            s := [9064e-9, 1228e-12]
+            t := [3141e-8, 1974e-12] }⟩,
+          ⟨3, 13 / 2, {
+            s := [1125e-4, 5736e-5]
+            t := [5162e-5, 1611e-5] }⟩]
+        """)
+    points = lean_points(lean)
+    @test points[1].params == [1 // 4, 1 // 20, 97 // 4] && points[1].s == 9064 // 10^9
+    @test points[2].params == [3, 13 // 2] && points[2].t == 5162 // 10^5
+    models = joinpath(@__DIR__, "..", "..", "lean", "CertifiedGaps", "Models")
+    if isdir(models)
+        @test length(lean_points(joinpath(models, "IsingLongitudinal.lean"))) == 30
+        @test length(lean_points(joinpath(models, "DimerizedHeisenberg.lean"))) == 3
+    end
+end
