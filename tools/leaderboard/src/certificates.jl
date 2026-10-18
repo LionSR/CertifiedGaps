@@ -41,7 +41,8 @@ function core_candidate(data)
     format isa AbstractString && startswith(format, "CertifiedGaps ring gap certificate") ||
         return nothing
     s = data["seed"]
-    scope = Dict(k => v for (k, v) in data if k in SCOPE_FIELDS)
+    # The parameter point: top-level fields of older certificates, or the `params` record.
+    scope = Dict(k => v for (k, v) in merge(data, get(data, "params", Dict())) if k in SCOPE_FIELDS)
     return (; n0 = s["n0"], beta = s["beta0"], bound = data["interval_bound_decimal"],
         s = s["eps_s"], t = s["eps_t"], scope)
 end
