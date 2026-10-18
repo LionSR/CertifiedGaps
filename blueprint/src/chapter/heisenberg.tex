@@ -6,9 +6,10 @@ ground state and a nonzero spectral gap in the thermodynamic limit. In
 \texttt{CertifiedGaps/Heisenberg/*.lean}, the two-purity doubling criterion is applied to the
 periodic spin-1 antiferromagnetic Heisenberg ring to show that for every even \(L \ge 2304\) the
 ground state is unique and the spectral gap satisfies
-\(\Delta_L > (\log 20)/784 \approx 0.003821\), conditional on two finite seed inequalities from
-Proposition~5.5 of~\cite{OpenAIHaldane}, which are reproduced in exact arithmetic in
-\texttt{models/spin1/}.
+\(\Delta_L > (\log 20)/784 \approx 0.003821\), and for every even \(L \ge 60\) it satisfies
+\(\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79}\), the two bounds of Theorem~1.1
+of~\cite{OpenAIHaldane}. Each is conditional on two finite seed inequalities from its
+Propositions~5.4 and~5.5, which are reproduced in exact arithmetic in \texttt{models/spin1/}.
 
 \section{The Hamiltonian}
 
@@ -154,30 +155,62 @@ the two seed purity bounds at a general scale; applying the symmetric doubling c
 
 Combining the unconditional spatial moment inequalities (Theorem~\ref{thm:heisenberg-moments}) with
 the two seed inequalities at \((n_0, \beta_0) = (2304, 784)\) yields the uniform Haldane gap bound.
+As in the proof of Proposition~5.5 of~\cite{OpenAIHaldane}, these seeds follow from two defect
+bounds on the rings of \(36\) and \(72\) sites at \(\beta = 49/4\) by six exact doubling steps.
+
+\begin{lemma}[Seeds at length 36]
+  \label{lem:heisenberg-seed36}
+  \lean{CertifiedGaps.SpinOneHeisenberg.seed36_spatial,
+    CertifiedGaps.SpinOneHeisenberg.seed36_thermal}
+  \leanok
+  \uses{def:heisenberg-spectrum}
+  At \(\beta = 49/4\), \(1 - \Ps(36, \beta) \le 0.047916\) and \(1 - \Pt(72, \beta) \le 0.181521\).
+\end{lemma}
+\begin{proof}
+  These are the starting defects \(p_0, q_0\) in the proof of Proposition~5.5
+  of~\cite{OpenAIHaldane}, from thermal traces of twisted rings of at most \(12\) sites and a
+  variational trial state. They are left as open numerical hypotheses in Lean.
+\end{proof}
+
+\begin{lemma}[Six doubling steps]
+  \label{lem:heisenberg-chain36}
+  \lean{CertifiedGaps.SpinOneHeisenberg.chain36, CertifiedGaps.SpinOneHeisenberg.chain36_stepsValid,
+    CertifiedGaps.SpinOneHeisenberg.seeds2304_of_seeds36,
+    CertifiedGaps.purities_ge_chainCertificate, CertifiedGaps.ChainCertificate.StepsValid}
+  \leanok
+  \uses{lem:chain-purities, def:chain-certificate}
+  The bounds of Lemma~\ref{lem:heisenberg-seed36} give \(\Ps(2304, 784) \ge 0.99\) and
+  \(\Pt(4608, 784) \ge 0.99\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Six steps of the exact doubling recurrence, each rounded up to a multiple of \(10^{-7}\), reach
+  the defects \((0.0084709, 0.0055149)\) at \((36 \cdot 2^6, \tfrac{49}{4} \cdot 2^6) = (2304, 784)\).
+  The kernel checks the rational step conditions by \texttt{decide}.
+\end{proof}
 
 \begin{lemma}[Spatial seed]
   \label{lem:heisenberg-seed-spatial}
   \lean{CertifiedGaps.SpinOneHeisenberg.seed_spatial}
   \leanok
-  \uses{def:heisenberg-spectrum}
+  \uses{lem:heisenberg-chain36, lem:heisenberg-seed36}
   The spatial purity at \((2304, 784)\) satisfies \(\Ps(2304, 784) \ge 99/100\).
 \end{lemma}
 \begin{proof}
-  This bound is Proposition~5.5 of~\cite{OpenAIHaldane}, reproduced in exact integer and rational
-  arithmetic in \texttt{models/spin1/} and documented in~\cite{CertificateNote}. It is left as an
-  open numerical hypothesis in Lean concerning finite rings of \(2304\) and \(4608\) sites.
+  \leanok
+  Lemma~\ref{lem:heisenberg-chain36} applied to Lemma~\ref{lem:heisenberg-seed36}.
 \end{proof}
 
 \begin{lemma}[Thermal seed]
   \label{lem:heisenberg-seed-thermal}
   \lean{CertifiedGaps.SpinOneHeisenberg.seed_thermal}
   \leanok
-  \uses{def:heisenberg-spectrum}
+  \uses{lem:heisenberg-chain36, lem:heisenberg-seed36}
   The thermal purity at \((4608, 784)\) satisfies \(\Pt(4608, 784) \ge 99/100\).
 \end{lemma}
 \begin{proof}
-  This bound is certified in exact arithmetic alongside Lemma~\ref{lem:heisenberg-seed-spatial} and
-  is left as an open numerical hypothesis in Lean.
+  \leanok
+  Lemma~\ref{lem:heisenberg-chain36} applied to Lemma~\ref{lem:heisenberg-seed36}.
 \end{proof}
 
 \begin{theorem}[The spin-1 Heisenberg gap]
@@ -200,7 +233,43 @@ the two seed inequalities at \((n_0, \beta_0) = (2304, 784)\) yields the uniform
 
 \begin{remark}
   In Lean, \texttt{\#print axioms spin\_one\_heisenberg\_gap} reports \texttt{sorryAx} only through
-  the two seed lemmas. Candidate routes toward a kernel-checked proof of the spin-1 seed at smaller
+  the seed lemmas. Candidate routes toward a kernel-checked proof of the spin-1 seed at smaller
   ring sizes are studied in \texttt{models/lean\_seeds/} and described in
   Chapter~\ref{chap:seedkernel}.
 \end{remark}
+
+\section{The bound for every even length from 60}
+
+The first bound of Theorem~1.1 of~\cite{OpenAIHaldane} covers shorter rings with a weaker gap,
+from a seed with defect \(1/8\), well above \(1/100\). It uses the criterion with a coefficient
+(Theorem~\ref{thm:gap-of-coefficient}) with \(u_0 = 1/8\) and \(C = 79/10\).
+
+\begin{lemma}[Seeds at length 60]
+  \label{lem:heisenberg-seed60}
+  \lean{CertifiedGaps.SpinOneHeisenberg.seed60_spatial,
+    CertifiedGaps.SpinOneHeisenberg.seed60_thermal}
+  \leanok
+  \uses{def:heisenberg-spectrum}
+  At \(\beta = 105/4\), \(\Ps(60, \beta) \ge 7/8\) and \(\Pt(120, \beta) \ge 7/8\).
+\end{lemma}
+\begin{proof}
+  This is Proposition~5.4 of~\cite{OpenAIHaldane}. It is left as an open numerical hypothesis in
+  Lean.
+\end{proof}
+
+\begin{theorem}[The gap from length 60]
+  \label{thm:haldane-gap-sixty}
+  \lean{CertifiedGaps.SpinOneHeisenberg.gapGT_sixty_of_seeds,
+    CertifiedGaps.SpinOneHeisenberg.spin_one_heisenberg_gap_sixty}
+  \leanok
+  \uses{thm:heisenberg-moments, lem:heisenberg-seed60, thm:gap-of-coefficient}
+  For every even \(L \ge 60\), the periodic spin-1 Heisenberg ring has a unique ground state,
+  and every other eigenvalue lies more than \(\tfrac{4}{105}\log\tfrac{80}{79}\) above the ground
+  energy.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Apply Theorem~\ref{thm:gap-of-coefficient} with \(u_0 = 1/8\) and \(C = 79/10\): here
+  \(G(1/8) = 913952/117649 \le 79/10\), \(r = 79/80\) and \(C(1 - 3u_0) = 79/16 > 3\), and
+  \(\log(1/r)/\beta_0 = \tfrac{4}{105}\log\tfrac{80}{79}\).
+\end{proof}

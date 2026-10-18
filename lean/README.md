@@ -8,7 +8,8 @@ algebraic step is proved from standard axioms except the finite numerical seed i
 inequalities per model at the seed scale $(n_0, \beta_0)$). Those finite seed bounds appear as explicit
 named `sorry` lemmas whose values come from the computer certificates in [`../models/`](../models/).
 One seed is now proved outright in the kernel: `SeedKernel.Ising.ising_gap` is an unconditional gap
-theorem (below).
+theorem (below). The open-chain argument of the note (Appendices A–C) is formalized as well: it
+gives a uniform gap for odd open chains with boundary fields from four finite inputs.
 
 ## Overview
 
@@ -24,12 +25,52 @@ For every even ring length `L ≥ 2304`, the periodic spin-1 Heisenberg Hamilton
 $H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ acting on `(Fin L → Fin 3)` has a unique ground
 state, and every excited eigenvalue lies strictly more than `log 20 / 784 ≈ 0.00382` above the ground
 energy (`GapGT e c` asserts that some basis index `m₀` has `e m₀ + c < e m` for all `m ≠ m₀`). The proof
-is complete modulo two finite seed hypotheses:
-- `seed_spatial : P_s(2304, 784) ≥ 0.99`, and
-- `seed_thermal : P_τ(4608, 784) ≥ 0.99`,
+follows OpenAI's Proposition 5.5. The seeds `seed_spatial : P_s(2304, 784) ≥ 0.99` and
+`seed_thermal : P_τ(4608, 784) ≥ 0.99` are proved from two finite seed hypotheses at the ring of
+36 sites by six kernel-checked doubling steps (`chain36`):
+- `seed36_spatial : 1 - P_s(36, 49/4) ≤ 0.047916`, and
+- `seed36_thermal : 1 - P_τ(72, 49/4) ≤ 0.181521`.
 
-which correspond to Proposition 5.5 of the OpenAI preprint and are reproduced in exact integer and
-rational arithmetic in [`../models/spin1/`](../models/spin1/).
+The first bound of OpenAI's Theorem 1.1 is formalized too:
+
+```lean
+theorem SpinOneHeisenberg.spin_one_heisenberg_gap_sixty {L : ℕ} (hL : 60 ≤ L) (hLe : Even L) :
+    GapGT (spectrum L) (4 / 105 * log (80 / 79))
+```
+
+It uses OpenAI's general criterion (their Proposition 4.3, `gapGT_of_coefficient`: seed defect
+`u₀ < 1/6`, coefficient `C ≥ G(u₀)` with `C u₀ < 1` and `C (1 - 3u₀) > 3`), here with `u₀ = 1/8` and
+`C = 79/10`, and the seeds `seed60_spatial : P_s(60, 105/4) ≥ 7/8` and
+`seed60_thermal : P_τ(120, 105/4) ≥ 7/8` (their Proposition 5.4). All four periodic seeds are
+reproduced in exact integer and rational arithmetic in [`../models/spin1/`](../models/spin1/).
+
+### The open chain with boundary fields
+
+```lean
+-- CertifiedGaps/Heisenberg/OpenChain.lean
+theorem SpinOneHeisenberg.spin_one_boundary_field_gap {n : ℕ} (hn : 1921 ≤ n) (hno : Odd n) :
+    GapGT (equalFieldSpectrum (3 / 5) n) (Real.log 10 / 392)
+```
+
+For every odd `n ≥ 1921`, the open spin-1 Heisenberg chain with equal end fields
+$`H_n = \sum_{i=0}^{n-2} \mathbf{S}_i \cdot \mathbf{S}_{i+1} - \tfrac35 (S_0^z + S_{n-1}^z)`$ has a
+unique ground state and a gap `> log 10 / 392 ≈ 0.005874` (Theorem 2 of the main note, Appendices
+A–C; the theorem and its inputs are from OpenAI's boundary-field preprint). The proof is complete
+modulo four finite inputs at `β = 49` (the note's eq. (C1)):
+- `seed_ring_spatial : P_s(120, 49) ≥ 0.948` and `seed_ring_thermal : P_τ(240, 49) ≥ 0.948` for the
+  periodic ring;
+- `seed_boundary`: the boundary defect `e₁₄₂ ≤ 0.14` of the opposite-field chain, a statement about
+  traces through `boundaryDefect` (the leading eigenvalue is `inf_N Z_{2N}^{1/(2N)}` and the leading
+  boundary weight is `inf_N G_{2N} / μ^{2N}`);
+- `seed_open_thermal`: the opposite-field thermal purity `P_τ(240, 49) ≥ 0.79`.
+
+`gapGT_of_boundaryFieldInputs` proves the same gap from these four inputs as hypotheses, with no
+`sorry`. The open-chain layer follows the ring layer. At every finite Trotter depth, the ring
+traces and the open-chain traces are moments of one real symmetric transfer matrix `X = F J` (`J`
+reverses imaginary time): `Z_{2N} = Tr X^{2N}` and `G_n = ⟨v, Xⁿ v⟩`. The opposite-field chain at
+even `n` and the equal-field chain at odd `n` are both of this form. The closed inequalities
+`OpenMomentBounds` pass to the limit by compactness. The sign of the leading eigenvalue at odd
+lengths is fixed by positivity of the trace, so the note's `U_P` symmetry argument is not needed.
 
 ### The first unconditional gap
 
@@ -105,7 +146,7 @@ lake build SeedKernel       # opt-in: kernel-checked seed arithmetic (≈80 s)
 lake build SeedKernelBench  # opt-in: kernel benchmarks up to n = 12 (≈2 min, up to 4 GB RAM per file)
 ```
 
-Lean and Mathlib are pinned at `v4.35.0-rc3`. `CertifiedGaps` comprises roughly 4,300 lines of Lean
+Lean and Mathlib are pinned at `v4.35.0-rc3`. `CertifiedGaps` comprises roughly 6,800 lines of Lean
 and `SeedKernel` roughly 1,200 lines (excluding generated witness files). All declarations live in
 the `CertifiedGaps` namespace; declaration names below omit that prefix.
 
@@ -131,7 +172,8 @@ lengths `L ≥ n₀` (where `L` counts unit cells).
 
 | Theorem | Model | Certified bound | Open seed hypotheses (the only `sorry`s) |
 |---|---|---|---|
-| `SpinOneHeisenberg.spin_one_heisenberg_gap` | spin-1 Heisenberg ring | `Δ_L > log 20 / 784` for `L ≥ 2304` | `seed_spatial`: `P_s(2304, 784) ≥ 0.99`; `seed_thermal`: `P_τ(4608, 784) ≥ 0.99` |
+| `SpinOneHeisenberg.spin_one_heisenberg_gap` | spin-1 Heisenberg ring | `Δ_L > log 20 / 784` for `L ≥ 2304` | `seed36_spatial`: `1 − P_s(36, 49/4) ≤ 0.047916`; `seed36_thermal`: `1 − P_τ(72, 49/4) ≤ 0.181521` (then six doubling steps) |
+| `SpinOneHeisenberg.spin_one_heisenberg_gap_sixty` | spin-1 Heisenberg ring | `Δ_L > (4/105) log (80/79) ≈ 0.000479` for `L ≥ 60` | `seed60_spatial`: `P_s(60, 105/4) ≥ 7/8`; `seed60_thermal`: `P_τ(120, 105/4) ≥ 7/8` |
 | `SpinOneLargeD.gap` | spin-1 Heisenberg `+ D ∑ (Sᶻ)²`, `D = 4, 1603/500` | `log 4.755 / (9/4) ≈ 0.693`, `log 1.0065429 / (381/125) ≈ 0.00214`; `L ≥ 6` | `seeds` at `(6, β₀)`: `P_s ≥ 1 − 0.06411`, `P_τ ≥ 1 − 0.04053` at `D = 4` |
 | `SpinOneDimerized.gap` | spin-1 dimerized chain, `δ = 9/10` (cells = weak pairs) | `log 6.339 / (7/2) ≈ 0.528`, `L ≥ 2` | `seeds`: `P_s(2, 7/2) ≥ 1 − 0.04972`, `P_τ(4, 7/2) ≥ 1 − 0.03206` |
 | `HeisenbergLadder.physical_gap` (rotated: `gap`) | spin-½ ladder `∑_{legs} S·S + 4 ∑_{rungs} S·S` | `log 9.033 / 2 ≈ 1.100`, `L ≥ 4` rungs | `seeds`: `P_s(4, 2) ≥ 1 − 0.03509`, `P_τ(8, 2) ≥ 1 − 0.02463` |
@@ -139,6 +181,7 @@ lengths `L ≥ n₀` (where `L` counts unit cells).
 | `DimerizedHeisenberg.physical_gap` (rotated: `gap`) | spin-½ dimerized chain, `δ = 1/2, 3/10, 1/4` (cells = strong pairs) | `0.532, 0.172, 0.057`, `L ≥ 4` | `seeds` at `(4, β₀)` |
 | `TwoLegIsing.gap` | two-leg TFIM ladder, `g = 3` | `log 2.585 / (3/2) ≈ 0.633`, `L ≥ 4` rungs | `seeds`: `P_s(4, 3/2) ≥ 1 − 0.1125`, `P_τ(8, 3/2) ≥ 1 − 0.05162` |
 | `IsingLongitudinal.gap` | Ising chain `−ZZ − gX − hZ`, 30 points `g ∈ {1/4, …, 2}`, `h ∈ {1/20, …, 1}` | `log r / β₀` per point (`0.075` at `g = 1, h = 1/20` up to `3.70`), `L ≥ 6` | `seeds` (single lemma covering all 30 points) |
+| `SpinOneHeisenberg.spin_one_boundary_field_gap` | open spin-1 Heisenberg chain, equal end fields `h = 3/5`, odd `n` sites | `Δ_n > log 10 / 392 ≈ 0.005874` for odd `n ≥ 1921` | four inputs at `β = 49`: `P_s(120) ≥ 0.948`, `P_τ(240) ≥ 0.948` (ring), `e₁₄₂ ≤ 0.14`, `P_τ^{opp}(240) ≥ 0.79` (open chain) |
 
 Every model except the spin-1 Heisenberg ring lists its parameter points in `points`; `gap hp` (for
 `hp : p ∈ points`) gives `Δ_L > log r / β₀` with `r = p.cert.r`, and the model's single `sorry`,
@@ -162,12 +205,17 @@ Every theorem in the table below is completely proved using only `propext`, `Cla
 | Theorem | Statement |
 |---|---|
 | `gapGT_of_purities` | Proposition 1 of the main note: spatial moment form and purities `P_s(n₀, β₀), P_τ(2n₀, β₀) ≥ 0.99` imply `Δ_L > log 20 / β₀` for all even `L ≥ n₀` |
+| `gapGT_of_coefficient` | OpenAI's Proposition 4.3: seed defects `≤ u₀ < 1/6`, `G(u₀) ≤ C`, `r = C u₀ < 1`, `C (1 - 3u₀) > 3` imply `Δ_L > log (1/r) / β₀`; `gapGT_of_seeds` is the case `C = 5` |
 | `gapGT_of_seeds` | general equal-defect criterion under `SpatialMomentBounds`: seed defects `≤ ε₀ ≤ 1/100` imply `Δ_L > log (1/(5ε₀)) / β₀` |
 | `gapGT_of_chain`, `gapGT_of_chainCertificate` | unequal-defect criterion via the exact asymmetric doubling recurrence; `ChainCertificate` validity is decided in the kernel |
 | `RPRing.spatialMomentBounds` | every reflection-positive ring (`RPRing`) satisfies `SpatialMomentBounds` (proved via Trotter transfer matrices and the product formula) |
 | `RPRing.gapGT_of_chainCertificate` | end-to-end criterion for an `RPRing`: seed bounds plus a valid `ChainCertificate` imply `Δ_L > log r / β₀` |
+| `gapGT_of_openSeeds` | the boundary-field criterion of Appendices A–C for abstract ring and open-chain spectra under `OpenMomentBounds`: four seeds imply `Δ_n > log 10 / 392` for odd `n ≥ 1921` |
+| `RPRing.openMomentBounds`, `RPRing.openGapGT_of_seeds` | every reflection-positive ring without internal reflection and every boundary term `b = -∑ w_α C_α` satisfy `OpenMomentBounds` (Trotter transfer matrix `X = F J` and the product formula); the end-to-end open-chain criterion |
+| `SpinOneHeisenberg.gapGT_of_boundaryFieldInputs` | the spin-1 boundary-field gap from the four packaged inputs `BoundaryFieldInputs` |
 | `RPRing.eigenvalues_eq_spectrum` | any Hamiltonian conjugate to `R.hamiltonian L` by a sitewise unitary has the exact same eigenvalue spectrum |
 | `SpinOneHeisenberg.gapGT_log_twenty` | Theorem 1 of the main note deduced from packaged `ThermalMPOInputs`: `Δ_L > log 20 / 784` |
+| `SpinOneHeisenberg.gapGT_sixty_of_seeds`, `SpinOneHeisenberg.seeds2304_of_seeds36` | the `L ≥ 60` bound from its two seeds; the seeds at `(2304, 784)` from those at `(36, 49/4)` via `chain36` (`ChainCertificate.StepsValid`, decided in the kernel) |
 | `*.physicalSpectrum_eq` | equality of spectra between each physical Hamiltonian and its rotated reflection-positive counterpart |
 | `*.points_valid` | kernel verification (`decide +kernel`) of every model's rational `ChainCertificate` |
 
@@ -302,10 +350,10 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 
 | File | Role |
 |---|---|
-| `PurityCriterion.lean` | Abstract two-purity criterion: squaring inequality, thermal-spatial coupling, one exact doubling step for arbitrary defects, $\beta$-interpolation, the purity-to-gap bound, and their equal-defect case (seed defects $\le 1/100$) |
+| `PurityCriterion.lean` | Abstract two-purity criterion: squaring inequality, thermal-spatial coupling, one exact doubling step for arbitrary defects, $`\beta`$-interpolation, the purity-to-gap bound, the criterion with a coefficient `C ≥ G(u₀)` (`gapGT_of_coefficient`) and its equal-defect case (seed defects $\le 1/100$, `C = 5`) |
 | `Chain.lean` | Exact asymmetric doubling recurrence for unequal seed defects and `gapGT_of_chain` with bound `log r / β₀` |
-| `ChainCheck.lean` | Decidable rational `ChainCertificate` structure discharging the hypotheses of `gapGT_of_chain` |
-| `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`) and expansion of $\operatorname{Tr} T^N$ as a sum over closed label paths |
+| `ChainCheck.lean` | Decidable rational `ChainCertificate` structure discharging the hypotheses of `gapGT_of_chain`, and `StepsValid` for the purities along a chain alone |
+| `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`), expansion of $`\mathrm{Tr}\, T^N`$ as a sum over closed label paths and of matrix elements of ordered products as sums over open paths |
 | `Transfer/MomentForm.lean` | Proof that traces of even powers of a real matrix factorization $B^T B \succeq 0$ satisfy the spatial moment form |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
 | `Ring/Model.lean` | Periodic ring geometry, `bondOp`/`siteOp`, `RPRing` structure, Hermiticity of $H_L$, and $\operatorname{Re} \operatorname{Tr} e^{-\beta H_L} = \sum_m e^{-\beta E_m}$ |
@@ -313,7 +361,13 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Ring/Gap.lean` | Proof of `RPRing.spatialMomentBounds` and `RPRing.gapGT_of_chainCertificate` |
 | `Ring/Conjugation.lean` | Sitewise unitary conjugation of ring Hamiltonians and spectral invariance |
 | `Heisenberg/Hamiltonian.lean` | The spin-1 Heisenberg ring $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ in the real Cartesian basis |
-| `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Theorem 1 of the main note (`spin_one_heisenberg_gap`) from the two seed hypotheses |
+| `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Both bounds of OpenAI's Theorem 1.1: `spin_one_heisenberg_gap` (`L ≥ 2304`, from the seeds at 36 sites and `chain36`) and `spin_one_heisenberg_gap_sixty` (`L ≥ 60`) |
+| `Heisenberg/OpenChain.lean` | Theorem 2 of the main note (`spin_one_boundary_field_gap`): the equal- and opposite-field open chains as open chains of the Heisenberg ring, and the four inputs |
+| `Open/MomentBounds.lean` | `OpenMomentBounds`: closed inequalities of the boundary moment form, from a finite Hermitian transfer matrix and through limits; `leadingRoot`, `leadingOverlap`, `boundaryDefect` |
+| `Open/Criterion.lean` | The boundary-field criterion `gapGT_of_openSeeds`: ring doubling with prefactor 6, the three moves of Appendix A, the base steps and the uniform phase |
+| `Open/Model.lean` | Open chains of an `RPRing` with boundary terms (`Boundary`, `openHamiltonian`, `openSpectrum`) |
+| `Open/Transfer.lean` | Open-chain Trotter slices, time reversal `J`, and `Tr (slice)^M = ⟨v, Xⁿ v⟩` with `X = F J` |
+| `Open/Bounds.lean`, `Open/Gap.lean` | `RPRing.openMomentBounds` and the end-to-end `RPRing.openGapGT_of_seeds` |
 | `Local/Pauli.lean`, `Local/SpinHalf.lean` | Real Pauli matrices $X, Z$ and real spin-½ factors $S^x, iS^y, S^z$ (`SpinHalf.P`) |
 | `Local/SpinHalfRotation.lean` | Sublattice rotation $e^{i\pi S^y}$ and complex spin-½ operators |
 | `Local/SpinOne.lean` | Real antisymmetric spin-1 generators `SpinOne.G α` $= G_\alpha = i S^\alpha$ |

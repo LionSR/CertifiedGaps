@@ -344,11 +344,39 @@ Iterating this step produces doubly exponential defect decay along dyadic scales
 \((n_0 2^j, \beta_0 2^j)\), and interpolating across each dyadic window \([n_j, 2n_j]\) yields a
 uniform gap for all even \(L \ge n_0\).
 
+\begin{definition}[Doubling coefficient]
+  \label{def:doubling-coefficient}
+  \lean{CertifiedGaps.doublingCoefficient, CertifiedGaps.squaringDefect_couplingDefect_self,
+    CertifiedGaps.doublingCoefficient_mono}
+  \leanok
+  \uses{def:squaring-defect}
+  For \(u < 1\) let
+  \(G(u) = \tfrac12\bigl((1-u)^{-1} + (1-u)^{-2} + (1-u)^{-3}\bigr)^2\). Then
+  \(f\bigl(1 - (1-u)^3\bigr) = G(u)\,u^2\), and \(G\) is increasing.
+\end{definition}
+
+\begin{lemma}[Doubling with a coefficient]
+  \label{lem:doubling-coefficient}
+  \lean{CertifiedGaps.doubling_of_coefficient}
+  \leanok
+  \uses{def:doubling-coefficient, lem:doubling-step}
+  Assume the spatial moment inequalities above \(n_0\). Let \(n \ge n_0\) be even, \(\beta > 0\),
+  \(0 \le u < 1\), \(G(u) \le C\) and \(Cu \le 1\). If \(\Ps(n, \beta) \ge 1 - u\) and
+  \(\Pt(2n, \beta) \ge 1 - u\), then \(\Ps(2n, 2\beta) \ge 1 - Cu^2\) and
+  \(\Pt(4n, 2\beta) \ge 1 - Cu^2\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Apply the exact doubling step (Lemma~\ref{lem:doubling-step}) with \(s = t = u\) and
+  \(s' = t' = Cu^2\): the first output is \(f(1 - (1-u)^3) = G(u) u^2 \le Cu^2\), and since
+  \(Cu^2 \le u\) the second input is at most the first, so \(f\) is at most \(Cu^2\) there too.
+\end{proof}
+
 \begin{lemma}[Doubling]
   \label{lem:doubling}
   \lean{CertifiedGaps.doubling}
   \leanok
-  \uses{lem:coupling, lem:purity-squaring, lem:purity-basic}
+  \uses{lem:doubling-coefficient}
   Assume the spatial moment inequalities above \(n_0\). Let \(n \ge n_0\) be even, \(\beta > 0\),
   and \(0 \le \varepsilon \le 1/100\). If \(\Ps(n, \beta) \ge 1 - \varepsilon\) and
   \(\Pt(2n, \beta) \ge 1 - \varepsilon\), then
@@ -356,7 +384,8 @@ uniform gap for all even \(L \ge n_0\).
 \end{lemma}
 \begin{proof}
   \leanok
-  Combining the first coupling identity with \(\Pt(n, \beta) \le 1\) gives
+  This is Lemma~\ref{lem:doubling-coefficient} with \(C = 5\), since \(G\) is increasing and
+  \(G(1/100) \le 5\). Directly: combining the first coupling identity with \(\Pt(n, \beta) \le 1\) gives
   \(\Ps(n, 2\beta) \ge (1-\varepsilon)^2 (1-\varepsilon)\), and spatial squaring
   (Lemma~\ref{lem:purity-squaring}) yields \(\Ps(2n, 2\beta) \ge 1 - 5\varepsilon^2\). Combining
   the second coupling identity with \(\Ps(2n, \beta) \le 1\) gives
@@ -401,12 +430,33 @@ uniform gap for all even \(L \ge n_0\).
   Take \(j = \lfloor \log_2 (L / n_0) \rfloor\) using integer division.
 \end{proof}
 
+\begin{theorem}[Two-purity criterion with a coefficient]
+  \label{thm:gap-of-coefficient}
+  \lean{CertifiedGaps.gapGT_of_coefficient, CertifiedGaps.coefficientDefect,
+    CertifiedGaps.purities_ge_coefficientDefect}
+  \leanok
+  \uses{lem:doubling-coefficient, lem:dyadic-window, lem:purity-to-gap, def:moment-bounds,
+    def:gapgt}
+  This is Proposition~4.3 of~\cite{OpenAIHaldane}. Assume the spatial moment inequalities above an
+  even \(n_0 > 0\), and let \(\beta_0 > 0\), \(0 < u_0 < 1/6\), \(G(u_0) \le C\),
+  \(r = Cu_0 < 1\) and \(C(1 - 3u_0) > 3\). If \(\Ps(n_0, \beta_0) \ge 1 - u_0\) and
+  \(\Pt(2n_0, \beta_0) \ge 1 - u_0\), then \(\GapGT\bigl(E_L, \log(1/r)/\beta_0\bigr)\) for every
+  even \(L \ge n_0\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  With \(u_j = r^{2^j}/C\), so that \(u_{j+1} = Cu_j^2 \le u_j \le u_0\), induction on \(j\) by
+  Lemma~\ref{lem:doubling-coefficient} gives \(\Ps(n_j, \beta_j), \Pt(2n_j, \beta_j) \ge 1 - u_j\).
+  Interpolation across the dyadic window of \(L\) gives \(\Pt(L, \beta_j) \ge (1-u_j)^3\), and
+  Lemma~\ref{lem:purity-to-gap} bounds \(e^{-\beta_j \Delta_L}\) by
+  \(3u_j / (1 - 3u_j) \le (3/C(1-3u_0))\, r^{2^j} < r^{2^j}\).
+\end{proof}
+
 \begin{theorem}[Two-purity criterion]
   \label{thm:gap-of-seeds}
   \lean{CertifiedGaps.gapGT_of_seeds}
   \leanok
-  \uses{lem:induction-on-scale, lem:dyadic-window, lem:purity-to-gap, def:moment-bounds,
-    def:gapgt}
+  \uses{thm:gap-of-coefficient, lem:induction-on-scale}
   Assume the spatial moment inequalities above an even \(n_0 > 0\). Let \(\beta_0 > 0\) and
   \(0 < \varepsilon_0 \le 1/100\), with \(\Ps(n_0, \beta_0) \ge 1 - \varepsilon_0\) and
   \(\Pt(2n_0, \beta_0) \ge 1 - \varepsilon_0\). Then for every even \(L \ge n_0\),
@@ -416,7 +466,8 @@ uniform gap for all even \(L \ge n_0\).
 \end{theorem}
 \begin{proof}
   \leanok
-  Choose the dyadic window \(n_j \le L \le 2n_j\) from Lemma~\ref{lem:dyadic-window} and set
+  This is Theorem~\ref{thm:gap-of-coefficient} with \(u_0 = \varepsilon_0\) and \(C = 5\), so that
+  \(r = 5\varepsilon_0\). In detail: choose the dyadic window \(n_j \le L \le 2n_j\) from Lemma~\ref{lem:dyadic-window} and set
   \(\beta = \beta_j\) and \(\varepsilon = \varepsilon_j\). To interpolate across the window, let
   \(r = L/(2n_j) \in (0, 1]\); inequality (3) of Definition~\ref{def:moment-bounds} at \(\beta\)
   and at \(2\beta\) gives \(Z_L(\beta)^2 \le Z_{n_j}(\beta)^{4r}\) and
