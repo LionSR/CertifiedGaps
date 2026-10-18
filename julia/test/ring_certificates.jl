@@ -1,6 +1,7 @@
 # Generic ring models, verified spectra and end-to-end gap certificates.
 
 using CertifiedGaps.RingModels, CertifiedGaps.VerifiedSpectra, CertifiedGaps.GapCertificates
+using CertifiedGaps.Exclusions
 const JSON3 = CertifiedGaps.Results.JSON3          # not a test dependency of its own
 
 const HALF = 1 // 2
@@ -313,4 +314,33 @@ end
         @test length(lean_points(joinpath(models, "IsingLongitudinal.lean"))) == 30
         @test length(lean_points(joinpath(models, "DimerizedHeisenberg.lean"))) == 3
     end
+end
+
+@testset "all-β exclusions of a seed length" begin
+    # The gapless Heisenberg ring (rotated frame) fails at every β for n = 2 and 4 sites.
+    m = rotated_staggered(0)
+    spec = Dict(L => verified_ring_spectrum(m, L) for L in (2, 4, 8))
+    for n in (2, 4)
+        r = exclude_all_beta(spec[n], spec[2n], n)
+        @test check_exclusion(r) && check_exclusion(r; small = spec[n], large = spec[2n])
+        stored = parse_exact_json(JSON3.write(r))
+        @test check_exclusion(stored; small = spec[n], large = spec[2n])
+        # A raised lower defect, a gap in the β cover and a weakened witness are refused.
+        bad = deepcopy(stored)
+        bad["windows"][1]["eps_s_lower"] = "1"
+        @test_throws ErrorException check_exclusion(bad; small = spec[n], large = spec[2n])
+        bad = deepcopy(stored)
+        bad["tail"]["beta_from"] = string(2 * parse_rational(bad["tail"]["beta_from"]))
+        @test_throws ErrorException check_exclusion(bad)
+        bad = deepcopy(stored)
+        bad["windows"][1]["eps_t_lower"] = "0"
+        bad["windows"][1]["eps_s_lower"] = "0"
+        @test_throws ErrorException check_exclusion(bad)
+    end
+    # A rejection needs z ≥ 1/2 along the lower orbit; small defects have none.
+    @test rejection(1 // 2, 0) !== nothing && rejection(1 // 1000, 1 // 1000) === nothing
+    # The certified seed of the staggered chain at h = 6 is not excluded.
+    big6 = rotated_staggered(6)
+    @test_throws ErrorException exclude_all_beta(verified_ring_spectrum(big6, 4),
+        verified_ring_spectrum(big6, 8), 4; max_depth = 4)
 end
