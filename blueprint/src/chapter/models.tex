@@ -75,21 +75,25 @@ reflection on dimerized rings (Definition~\ref{def:cell-swap}).
 
 Adding a positive single-ion anisotropy \(D \sum_j (S_j^z)^2\) to the spin-1 Heisenberg chain
 \eqref{eq:heisenberg-ham} favors the \(S^z = 0\) projection on each site. Beyond a quantum phase
-transition near \(D \approx 1\), the chain leaves the Haldane phase of \(D = 0\) and enters the
-gapped large-\(D\) phase, which contains both certified parameter points of
-Definition~\ref{def:large-d-points}. Because the anisotropy is a real symmetric on-site operator,
-reflection positivity in the Cartesian basis (Definition~\ref{def:spin-one-large-d}) is preserved,
-yielding Theorem~\ref{thm:large-d-gap}.
+transition near \(D \approx 1\), the chain~\eqref{eq:large-d-ham} leaves the Haldane phase of
+\(D = 0\) and enters the gapped large-\(D\) phase, which contains both certified parameter points
+of Definition~\ref{def:large-d-points}. Because the anisotropy is a real symmetric on-site
+operator, reflection positivity in the Cartesian basis (Definition~\ref{def:spin-one-large-d}) is
+preserved, yielding Theorem~\ref{thm:large-d-gap}.
 
 \begin{definition}[Certified couplings for the single-ion anisotropic spin-1 chain]
   \label{def:large-d-points}
   \lean{CertifiedGaps.SpinOneLargeD.Point, CertifiedGaps.SpinOneLargeD.points}
   \leanok
   \uses{def:spin-one-large-d, def:chain-certificate}
-  The anisotropic spin-1 chain \(\sum_j \mathbf S_j \cdot \mathbf S_{j+1} + D \sum_j (S^z_j)^2\) of
-  Definition~\ref{def:spin-one-large-d} is certified at the two couplings \(D = 4\)
-  (\(\beta_0 = 9/4\), \(r = 4.755\)) and \(D = 1603/500\) (\(\beta_0 = 381/125\),
-  \(r = 1.0065429\)), each with seed length \(n_0 = 6\) sites.
+  The single-ion anisotropic spin-1 chain of Definition~\ref{def:spin-one-large-d} with Hamiltonian
+  \begin{equation}
+    \label{eq:large-d-ham}
+    H_L = \sum_{j=0}^{L-1} \mathbf S_j \cdot \mathbf S_{j+1} + D \sum_{j=0}^{L-1} (S^z_j)^2
+  \end{equation}
+  is certified at the two couplings \(D = 4\) (\(\beta_0 = 9/4\), \(r = 4.755\)) and
+  \(D = 1603/500\) (\(\beta_0 = 381/125\), \(r = 1.0065429\)), each with seed length \(n_0 = 6\)
+  sites.
 \end{definition}
 
 \begin{lemma}[Admissibility of the large-\(D\) doubling certificates]
@@ -268,10 +272,10 @@ Theorem~\ref{thm:two-leg-ising-gap}).
 
 \section{Mixed-field Ising chain}
 
-Adding a longitudinal field to the ferromagnetic transverse-field Ising chain breaks the global
-\(\mathbb{Z}_2\) spin-flip symmetry, lifting the ground-state degeneracy of the ordered phase and
-making the chain~\eqref{eq:mixed-ising-ham} non-integrable while keeping the ferromagnetic bond
-interaction reflection positive in the computational \(Z\)-basis
+Adding a longitudinal field to the ferromagnetic transverse-field Ising chain~\cite{Pfeuty1970One}
+breaks the global \(\mathbb{Z}_2\) spin-flip symmetry, lifting the ground-state degeneracy of the
+ordered phase and making the chain~\eqref{eq:mixed-ising-ham} non-integrable while keeping the
+ferromagnetic bond interaction reflection positive in the computational \(Z\)-basis
 (Definition~\ref{def:ising-longitudinal} and Theorem~\ref{thm:ising-longitudinal-gap}).
 
 \begin{definition}[Mixed-field Ising ring Hamiltonian]
@@ -572,11 +576,11 @@ Theorem~\ref{thm:dimerized-physical-gap}).
 
 \section{Two-leg spin-1/2 Heisenberg ladder}
 
-On a two-leg antiferromagnetic spin-\(\tfrac12\) Heisenberg ladder~\eqref{eq:heisenberg-ladder-ham},
-a checkerboard sublattice rotation acts on one spin of every leg bond and one spin of every rung
-bond, making the rotated ladder a reflection-positive ring of two-site rungs
-(Definition~\ref{def:ladder}, Lemma~\ref{lem:ladder-physical-eq}, and
-Theorem~\ref{thm:ladder-physical-gap}).
+On a two-leg antiferromagnetic spin-\(\tfrac12\) Heisenberg
+ladder~\eqref{eq:heisenberg-ladder-ham}~\cite{Dagotto1996Surprises}, a checkerboard sublattice
+rotation acts on one spin of every leg bond and one spin of every rung bond, making the rotated
+ladder a reflection-positive ring of two-site rungs (Definition~\ref{def:ladder},
+Lemma~\ref{lem:ladder-physical-eq}, and Theorem~\ref{thm:ladder-physical-gap}).
 
 \begin{definition}[Heisenberg ladder in the reflection-positive frame]
   \label{def:ladder}
