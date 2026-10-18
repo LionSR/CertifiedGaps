@@ -1,10 +1,12 @@
-# Fast tests (about 1 min): the fast checker (check.jl), the exact frame and RP identities, the
-# verified spectra of small rings against the closed-form 4-spin spectrum and the Float64 sector
-# solver, the Lean seed constants, the dimer perturbation bound, the recurrence rejection and the
-# checker's rejection of corrupted certificates.
+# Fast tests: the fast checker (check.jl), the exact frame and RP identities, the lattice
+# reflection, the verified spectra of small rings against the closed-form 4-spin spectrum and the
+# physical-frame Float64 spectrum, the sparse 20-spin diagnostic blocks, the Lean points, the
+# dimer perturbation bound and the checker's rejection of corrupted certificates.
 include(joinpath(@__DIR__, "..", "check.jl"))
 include(joinpath(@__DIR__, "..", "src", "reflection_conventions.jl"))
+include(joinpath(@__DIR__, "..", "src", "Diagnostics.jl"))
 using CertifiedGaps.Recurrence: to_interval
+using CertifiedGaps.Exclusions: rejection
 const Q = Rational{BigInt}
 
 @testset "Stored certificates (fast check)" begin
@@ -12,7 +14,7 @@ const Q = Rational{BigInt}
     @test check_summary()
 end
 
-@testset "Exact rotated frame and reflected RP" begin
+@testset "Exact rotated frame, lattice reflection and reflected RP" begin
     for δ in DELTAS
         model = rotated_model(δ)
         # U = (1 ⊗ J)^{⊗L} maps the physical Hamiltonian onto the certified one, exactly.
@@ -24,8 +26,11 @@ end
         @test verify_rp(model, rp_certificate(model; reflection = rotated_rp(δ).reflection))
         @test_throws ArgumentError rp_certificate(model)
         # A wrong frame (no rotation) does not give the certified bond.
-        onsite, bond = physical_terms(δ)
-        @test exact_matrix(bond) != model.bond
+        @test !is_frame_change(physical_model(δ), model, Matrix{Q}(I, 4, 4))
+        # The bare cell swap reverses the rotated charge z_a − z_b, so it is no reflection of
+        # the charged model; composed with the spin flip it is.
+        @test_throws ArgumentError RingModel(4, model.bond, model.onsite;
+            charge = model.charge, flip = model.flip, reflection = swap_matrix(2))
     end
 end
 
@@ -64,20 +69,18 @@ end
     end
 end
 
-include("numerical_blocks.jl")      # also defines the Float64 `dense_spectrum` of sectors.jl
-@testset "Verified 8-spin spectra against the physical-frame Float64 solver" begin
+@testset "Verified 8-spin spectra against the physical-frame Float64 spectrum" begin
     for δ in (1 // big(2), 1 // big(10))
         spectrum = verified_ring_spectrum(rotated_model(δ), 4)
         levels = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spectrum]))
-        reference, _ = dense_spectrum(Float64(δ), 8)
+        reference = float_ring_spectrum(physical_model(δ), 4)
         @test maximum(abs, levels - reference.E) < 1e-12
     end
 end
 
-include(joinpath(@__DIR__, "..", "src", "Diagnostics.jl"))
 @testset "Sparse momentum/parity blocks against complete spectra" begin
     for L in (4, 6, 8, 10)
-        reference, _ = dense_spectrum(0.3, L)
+        reference = float_ring_spectrum(rotated_model(3 // big(10)), L ÷ 2)
         sparse, records = Diagnostics.low_spectrum(0.3, L; dense_max = 2000)
         @test sparse.exact
         @test maximum(abs, sparse.E - reference.E) < 1e-11
@@ -86,25 +89,13 @@ include(joinpath(@__DIR__, "..", "src", "Diagnostics.jl"))
     end
 end
 
-@testset "Lean seed constants dominate the certified defects" begin
-    # lean/CertifiedGaps/Models/DimerizedHeisenberg.lean takes 1 − Pₛ ≤ s[0], 1 − P_τ ≤ t[0]
-    # at (n₀, β₀) = (4, β₀) as hypotheses; the certificates must supply them.
-    lean = read(joinpath(REPO, "lean", "CertifiedGaps", "Models", "DimerizedHeisenberg.lean"),
-        String)
-    decimal(m, e) = parse(BigInt, m) // big(10)^parse(Int, e)
-    fraction(s) = (p = parse.(BigInt, split(s, "/")); length(p) == 1 ? p[1] // 1 : p[1] // p[2])
-    points = [(fraction(m[1]), fraction(replace(m[2], " " => "")), decimal(m[3], m[4]),
-        decimal(m[5], m[6])) for m in eachmatch(
-        r"⟨(\d+ / \d+), ([\d /]+), \{\s*s := \[(\d+)e-(\d+),[^⟩]*?t := \[(\d+)e-(\d+),", lean)]
-    @test length(points) == 3
-    summary = read_result(joinpath(RESULTS_DIR, "summary.json"))
-    for (δ, β0, s0, t0) in points
-        row = only(r for r in summary["parameters"] if parse_rational(r["delta"]) == δ)
-        c = only(c for c in row["certificates"] if parse_rational(c["beta0"]) == β0)
-        @test asint(c["n0"]) == 4
-        @test parse_rational(c["eps_s"]) <= s0
-        @test parse_rational(c["eps_t"]) <= t0
-    end
+@testset "Lean points are certified seeds" begin
+    # lean/CertifiedGaps/Models/DimerizedHeisenberg.lean takes 1 − Pₛ ≤ s, 1 − P_τ ≤ t at
+    # (n₀, β₀) = (4, β₀) as hypotheses; check_point compares them with the certificates.
+    @test length(lean_points(LEAN)) == 3
+    @test check_lean_points()
+    @test all(p -> lean_seed(p.params...) == p, lean_points(LEAN))
+    @test lean_seed(1 // big(2), 25 // big(4)) === nothing
 end
 
 @testset "Scalable dimer perturbation and recurrence rejection" begin
@@ -115,10 +106,8 @@ end
     for δ in DELTAS
         bad = dimer_bounds(δ, 4, 6 // big(1))
         @test inf(bad.s) > 1 // 2
-        @test rejects(Q(inf(bad.s)), Q(inf(bad.t))) !== nothing
+        @test rejection(Q(inf(bad.s)), Q(inf(bad.t))) !== nothing
     end
-    @test rejects(1 // big(2), 0 // big(1)) == 0
-    @test rejects(1 // big(100), 1 // big(100)) === nothing
 end
 
 @testset "Checker rejects corrupted records" begin
@@ -130,11 +119,11 @@ end
         r -> r["certificates"][1]["gap_lower_bound"] = "1//1",
         r -> r["certificates"][1]["n0"] = "2",
         r -> r["certificates"][1]["sha256"] = "0"^64,
-        r -> popfirst!(r["negative_results"][1]["cover"]),
-        r -> merge!(r["negative_results"][1]["cover"][1], Dict("s_lower" => "0//1",
-            "t_lower" => "0//1")),
-        r -> r["negative_results"][1]["tail_beta"] = "2//1",
-        r -> r["negative_results"][1]["thermal_defect_lower_at_beta_1"] = "1//4",
+        r -> popfirst!(r["negative_results"][1]["windows"]),
+        r -> merge!(r["negative_results"][1]["windows"][1], Dict("eps_s_lower" => "0",
+            "eps_t_lower" => "0")),
+        r -> r["negative_results"][1]["tail"]["beta_from"] = "1",
+        r -> r["negative_results"][1]["tail"]["eps_s_lower"] = "0",
         r -> empty!(r["negative_results"]),
         r -> r["bound_to_gap16_interval"][2] = "0//1",
         r -> r["dimer_perturbation"]["norm_small"] = "0//1")

@@ -1,6 +1,7 @@
 module DimerizedRP
 using LinearAlgebra
 using CertifiedGaps.Spins: exact_spin_half, exact_pauli
+using CertifiedGaps.RingModels: swap_matrix
 export audit_rp
 const Q = Rational{BigInt}
 const CQ = Complex{Q}
@@ -16,17 +17,14 @@ function audit_rp(delta::Q)
     weak, strong = 1-delta, 1+delta
     bond = weak * sum(kron(B[k], A[k]) for k in 1:3)
     onsite = strong * sum(A[k]*B[k] for k in 1:3)
-    swap = zeros(CQ, 16, 16)
-    for a in 1:4, b in 1:4
-        swap[4*(b-1)+a, 4*(a-1)+b] = 1
-    end
+    swap = CQ.(swap_matrix(4))   # exchanges the two cells of a bond
     defect = bond - swap*bond*swap
     defect_norm2 = sum(abs2, defect)
     @assert defect_norm2 == 6*weak^2
     # A cellwise pi rotation about y on the second spin.
     J = CQ.(exact_pauli(Q).iy)
     rotation = kron(ident, J)
-    internal_swap = CQ[1 0 0 0; 0 0 1 0; 0 1 0 0; 0 0 0 1]
+    internal_swap = CQ.(swap_matrix(2))
     Drot = rotation'*onsite*rotation
     R2 = kron(rotation,rotation)
     hrot = R2'*bond*R2

@@ -2,7 +2,7 @@
 
 This document details the exact frame in which the dimerized chain is a reflection-positive core
 `RingModel`, how the shared pipeline `CertifiedGaps.GapCertificates` certifies its seeds, the
-continuous-$`\beta`$ exclusion covers, and the arbitrary-$`n`$ dimer perturbation bound. The
+continuous-$`\beta`$ exclusions, and the arbitrary-$`n`$ dimer perturbation bound. The
 model-specific code is `src/DimerizedHeisenberg.jl`; everything else is the core.
 
 ## The rotated cell frame
@@ -26,17 +26,23 @@ h = w\, I \otimes (-S^xS^x + S^yS^y - S^zS^z) \otimes I.
 Because $U$ is a product of cell unitaries, the two local identities
 $W^\top o_{\mathrm{phys}} W = o$ and $(W \otimes W)^\top h_{\mathrm{phys}} (W \otimes W) = h$
 imply unitary equivalence for every $L$; `frame_identity` checks both exactly in
-`Rational{BigInt}`, and the tests also compare the verified 8-spin spectrum with an independent
-`Float64` solver of the physical chain. All entries of $o$ and $h$ are real rationals.
+`Rational{BigInt}` with the core `is_frame_change(physical_model(δ), rotated_model(δ), W)`, and
+the tests also compare the verified 8-spin spectrum with the `Float64` spectrum
+(`float_ring_spectrum`) of the physical chain. All entries of $o$ and $h$ are real rationals.
 
 **Conserved charge and flip.** The rotated exchange
 $-S^xS^x + S^yS^y = -\tfrac12(S^+S^+ + S^-S^-)$ raises or lowers both spins of a bond together, and every bond joins an $a$ spin with
 a $b$ spin, so the cell charge $z_a - z_b$ ($[0, 1, -1, 0]$ on
 $|{\uparrow\uparrow}\rangle, |{\uparrow\downarrow}\rangle, |{\downarrow\uparrow}\rangle, |{\downarrow\downarrow}\rangle$) is
 conserved. The cell spin flip $\sigma^x \otimes \sigma^x$ commutes with $o$ and $h$ and
-reverses it. The core `RingModel(…; charge, flip)` checks both exactly; `verified_ring_spectrum`
-then splits every ring by charge and cell momentum and diagonalizes the sectors $q$ and $-q$
-once.
+reverses it. The lattice reflection $x \mapsto -x$ exchanges the two spins of every cell, which
+also reverses the charge, so its on-site part is the cell swap composed with the spin flip,
+$`P = F\,(\sigma^x \otimes \sigma^x)`$ (fixing $|{\uparrow\downarrow}\rangle$ and $|{\downarrow\uparrow}\rangle$, exchanging
+$|{\uparrow\uparrow}\rangle$ and $|{\downarrow\downarrow}\rangle$): it preserves the charge, commutes with the flip, fixes $o$,
+and maps $h$ to its mirror image. The core `RingModel(…; charge, flip, reflection)` checks all
+of this exactly; `verified_ring_spectrum` then splits every ring by charge and cell momentum,
+diagonalizes the sectors $q$ and $-q$ once and the momenta $\pm k$ once, and, the model being
+real, builds every block at $0 < k < \pi$ as a real symmetric matrix (smaller rounding radii).
 
 ## Reflected reflection positivity
 
@@ -91,29 +97,26 @@ and $2n_0$ cells once with `VerifiedSpectra.verified_ring_spectrum` and passes t
 seed (and, with `spectra = true`, the defects from fresh spectra). The 16-spin gap interval is
 `spectral_gap_enclosure` of the 8-cell spectrum, rounded outward to $10^{-6}$.
 
-## Rigorous all-$`\beta`$ exclusion covers (`negative_cover`)
+## Rigorous all-$`\beta`$ exclusions (core `Exclusions`)
 
 To prove that no $\beta_0 > 0$ satisfies the doubling recurrence at a given $(n_0, \delta)$,
-`negative_cover` partitions $(0, \infty)$ into three regimes, using only core enclosures of the
-verified spectra of the rings $n_0$ and $2n_0$:
-1. **High temperature $(0, 1]$:**
-   $\frac{d}{d\beta}\log P_\tau(2n_0, \beta) = 2(\langle H \rangle_\beta - \langle H \rangle_{2\beta}) \ge 0$, so $P_\tau(2n_0, \beta)$ is
-   nondecreasing; $P_\tau(2n_0, 1) \le 1/2$ (`log_partition_enclosure` at $\beta = 1$) gives
-   $\varepsilon_\tau \ge 1/2$, hence $z \ge 1/2$, for all $\beta_0 \le 1$.
-2. **Low temperature $[B, \infty)$:** with
-   $`d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0`$ from `ground_energy_enclosure`,
-   $P_{\mathrm{s}}(n_0, \beta) \le 2^{4n_0} e^{-\beta d_E} \le 1/2$ for all $\beta \ge B$, with $B$
-   the smallest power of two $\ge 32$ that works.
-3. **Intermediate $[1, B]$:** $[1, B]$ is bisected into closed boxes. On each box, interval
-   evaluation of `shifted_log_partition` (one exact shift per ring, so the box width does not
-   multiply the ground energies) gives rational lower bounds on $\varepsilon_{\mathrm{s}}(\beta)$
-   and $\varepsilon_\tau(\beta)$; these are propagated through the monotone map
-   $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) \mapsto (\varepsilon_{\mathrm{s}}', \varepsilon_\tau')$,
-   rounding down to $10^{-15}$ at each step, until $z \ge 1/2$.
+`certify.jl` calls the core `Exclusions.exclude_all_beta` on the verified spectra of the rings
+$n_0$ and $2n_0$:
+1. **Tail $[B, \infty)$:** with
+   $`d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0`$ from `ground_energy_enclosure`
+   and $`F_L(\beta) = \log \mathrm{Tr}\, e^{-\beta (H_L - a_L)}`$ ($a_L$ the lower end of
+   $E_0(L)$, so $F_L$ decreases), $\log P_{\mathrm{s}}(n_0, \beta) \le F_{2n_0}(B) - B d_E$ for all
+   $\beta \ge B$, with $B$ the smallest power of two whose lower spatial defect is rejected.
+2. **Windows covering $[0, B]$:** $[0, B]$ is bisected into dyadic windows. On each, monotonicity of
+   $F_L$ gives a rational lower bound on $1 - P_{\mathrm{s}}$, and
+   $\frac{d}{d\beta}\log P_\tau(2n_0, \beta) = 2(\langle H \rangle_\beta - \langle H \rangle_{2\beta}) \ge 0$ gives
+   $1 - P_\tau(2n_0, \beta) \ge 1 - P_\tau(2n_0, \beta_{\mathrm{hi}})$; these lower defects are pushed
+   through the monotone doubling map (`Exclusions.rejection`, rounding down) until an argument
+   $z$ reaches $1/2$, after which the recurrence cannot converge.
 
-The summary stores every box with its lower bounds; the fast check reruns the recurrence on them
-and checks that the boxes tile $[1, B]$, and `check.jl --full` recomputes every bound from fresh
-spectra.
+The summary stores every window with its lower bounds and rejection witness and the tail; the fast
+check (`check_exclusion`) reruns the recurrence on them and checks that the windows tile
+$[0, B]$, and `check.jl --full` recomputes every bound from fresh spectra.
 
 ## Arbitrary-$`n`$ dimer perturbation bound (`dimer_bounds`)
 
