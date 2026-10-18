@@ -10,41 +10,34 @@
 [![Lean 4](https://img.shields.io/badge/Lean_4-v4.35.0--rc3-blue)](https://github.com/leanprover/lean4)
 [![Julia](https://img.shields.io/badge/Julia-1.12-9558B2)](https://julialang.org/)
 
-In 1983, Haldane conjectured that the spin-1 antiferromagnetic Heisenberg chain
-$`H_L = \sum_{j=1}^L \mathbf{S}_j \cdot \mathbf{S}_{j+1}`$ has a uniform spectral gap
-$\Delta_L = E_1(L) - E_0(L) > 0$ in the thermodynamic limit (numerically $\Delta \approx 0.4105$).
-In October 2026, OpenAI released two preprints proving uniform gap bounds for the
-[periodic spin-1 ring](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026)
-and for
-[open spin-1 chains with endpoint fields](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026)
-by combining finite-scale numerical certificates with a coupled spatial-and-thermal doubling
-argument. This repository reformulates that mechanism as a general **spacetime bootstrap** (*two-purity
-doubling criterion*) using continuous-time tensor networks, reproduces the spin-1 finite certificates
-in exact integer and rational arithmetic, formalizes the analytic proofs in Lean 4, and applies the
-method to certify uniform spectral gaps across eight families of one-dimensional quantum spin chains
-and ladders.
+Haldane (1983) conjectured that the spin-1 antiferromagnetic Heisenberg chain has a uniform spectral
+gap $\Delta_L = E_1(L) - E_0(L) > 0$ as the chain length $L \to \infty$ (numerically
+$\Delta \approx 0.4105$). In October 2026, OpenAI released two preprints proving uniform gap bounds for
+[periodic](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026)
+and
+[open](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026)
+spin-1 chains by combining finite-size numerical bounds with a scale-doubling argument.
 
-The **spacetime bootstrap** combines two components:
+This repository formulates that argument as a general criterion—the **spacetime bootstrap**
+(*two-purity doubling criterion*)—formalizes the analytic proof in **Lean 4**, and certifies the
+finite numerical inputs in exact or interval arithmetic across **eight families** of quantum spin
+chains and ladders:
 
-1. **An analytic criterion (formalized in Lean 4).** Write the partition function
-   $`Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}`$ of a periodic ring of $L$ unit cells as
-   $`\mathrm{Tr}\, X_\beta^L`$, where $X_\beta$ is the spatial transfer operator of an exact
-   continuous-time thermal matrix product operator (MPO). When the nearest-neighbor bond interaction
-   is reflection positive, $X_\beta$ is self-adjoint, so $Z_L(\beta)$ is a sum of $L$-th powers of
-   real transfer eigenvalues just as it is a sum of exponentials of energy eigenvalues. Consequently,
-   both the **spatial purity** $P_{\mathrm{s}}(n, \beta) = Z_{2n}(\beta)/Z_n(\beta)^2$ and the
-   **thermal purity** $P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$ contract quadratically toward $1$
-   when ring length $n$ and inverse temperature $\beta$ are doubled together. Rigorous upper bounds
-   on the seed purity defects $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$ and
-   $\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$ at a single even seed scale $(n_0, \beta_0)$ in
-   the admissible region ($\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$) propagate
-   across all dyadic scales to prove that every even ring length $L \ge n_0$ has a unique ground state
-   and an explicit lower bound on $\Delta_L$.
-2. **Computer-certified finite seeds.** The seed purity inequalities at $(n_0, \beta_0)$ are certified
-   by computer: for the spin-1 Heisenberg chain in exact integer and rational arithmetic (reproducing
-   and sharpening the finite certificates of the OpenAI periodic preprint), and for the remaining
-   models via verified eigenvalue enclosures of complete symmetry-reduced seed-ring spectra (with one
-   seed proved outright inside the Lean 4 kernel).
+- **Two purities:** For a periodic ring $H_L$ of $L$ unit cells with partition function
+  $`Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}`$, define the spatial and thermal purities
+```math
+P_{\mathrm{s}}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
+P_\tau(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
+```
+- **Doubling criterion (Lean 4):** When the nearest-neighbor interaction is reflection positive,
+  both purities contract quadratically toward $1$ as $(n, \beta) \mapsto (2n, 2\beta)$. Upper bounds
+  $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$ and
+  $\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$ at a single even seed scale $(n_0, \beta_0)$ in
+  the admissible region (for example, $\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$)
+  imply a unique ground state and an explicit lower bound on $\Delta_L$ for every even $L \ge n_0$.
+- **Certified seeds (Julia / Lean kernel):** We certify the finite seed bounds at $(n_0, \beta_0)$ in
+  exact rational arithmetic (spin-1 Heisenberg) or verified interval arithmetic on complete
+  symmetry-reduced spectra (with one Ising seed proved inside the Lean 4 kernel).
 
 **Website & resources:** [Home page](https://sirui-lu.com/CertifiedGaps/) ·
 [Leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) ·
