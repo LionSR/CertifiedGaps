@@ -68,7 +68,7 @@ The best certified seed is passed to `certify_gap`, which runs the exact rationa
 
 ### Finite-grid threshold and negative rows
 
-On the grid $`n_0 \in \{2, 4\}`$, $\beta_0 = k/4$ ($k = 1, \dots, 64$), every seed is rigorously rejected at $J_\perp = 326133/131072$ and a seed is certified at $J_\perp = 163069/65536$, locating the grid transition within $(2.48819732666015625, 2.4882354736328125)$. This brackets the threshold of the $(n_0 \le 4)$ seed grid rather than the physical gap-closing coupling (the Heisenberg ladder is gapped for all $J_\perp > 0$). Similarly, the all-$\beta$ rejections at $J_\perp = 2$ and $3/2$ show only that $`n_0 \in \{2, 4\}`$ is too small at those couplings; the heuristic fit in `results/scans/extrapolation.json` estimates that $n_0 = 6$ ($J_\perp = 2$) and $n_0 = 8$ ($J_\perp = 3/2$) would be required, corresponding to $24$- and $32$-spin rings.
+On the grid $`n_0 \in \{2, 4\}`$, $\beta_0 = k/4$ ($k = 1, \dots, 64$), every seed is rigorously rejected at $J_\perp = 326133/131072$ and a seed is certified at $J_\perp = 163069/65536$, locating the grid transition within $(2.48819732666015625, 2.4882354736328125)$. This brackets the threshold of the $(n_0 \le 4)$ seed grid rather than the physical gap-closing coupling (the Heisenberg ladder is gapped for all $J_\perp > 0$). Similarly, the all-$`\beta`$ rejections at $J_\perp = 2$ and $3/2$ show only that $`n_0 \in \{2, 4\}`$ is too small at those couplings; the heuristic fit in `results/scans/extrapolation.json` estimates that $n_0 = 6$ ($J_\perp = 2$) and $n_0 = 8$ ($J_\perp = 3/2$) would be required, corresponding to $24$- and $32$-spin rings.
 
 ## Reproduce
 
@@ -90,7 +90,7 @@ julia --project=julia models/heisenberg_ladder/scripts/replay_scans.jl
   certificate with `check_certificate(cert; spectra = false)` (RP and the exact chain), the
   continuations, and the README claims (`CLAIMED_GAPS`), without spectra.
 - `check.jl --full`: also recomputes every verified spectrum, all 1,024 grid defect enclosures,
-  each certificate's seed (`check_certificate` with the fresh spectra), and the all-$\beta$
+  each certificate's seed (`check_certificate` with the fresh spectra), and the all-$`\beta`$
   exclusions.
 - `certify.jl`: writes the five core certificates and `results/suite.json`.
 - `scripts/audit.jl` and `scripts/replay_scans.jl`: the independent MPFR audit of the
@@ -113,7 +113,7 @@ stored scans were produced by the earlier local block builder and were not rerun
   exact symmetry blocks and multiplicities (`ring_blocks`), all eigenvalue and $\log Z$
   enclosures, all 1,024 grid decisions with their upper/lower defect bounds and rejection
   witnesses, each core certificate's seed and exact rational chain, the core interval bounds, the
-  all-$\beta$ exclusions, the coupling continuations, the README claims (`CLAIMED_GAPS`), and the
+  all-$`\beta`$ exclusions, the coupling continuations, the README claims (`CLAIMED_GAPS`), and the
   SHA-256 hashes of the model-local sources `src/`, `certify.jl`, and `check.jl` (tests and
   `scripts/` are not hashed; the core and its environment are recorded as provenance only, since
   the checker reruns the core). No stored spectrum or scan is an input. The fast `check.jl`
@@ -169,7 +169,7 @@ later, the source-hash policy change and the move of duplicated helpers into the
 the results with every certified number identical.
 
 The certificate pipeline then moved entirely into the core: the local block builder, eigenvalue
-enclosure ($\gamma_{8n+32}$ with $\|H\|_F$), $\log Z$ sums, and the single-file
+enclosure ($\gamma_{8n+32}$ with $`\|H\|_F`$), $\log Z$ sums, and the single-file
 `results/certificate.json` were replaced by `verified_ring_spectrum`, `seed_bounds`, and
 `certify_gap` in the uniform leg-rotated frame (cell reflection $\sigma^y \otimes \sigma^y$,
 conserved $S^z$, flip and leg-exchange parities), with one core certificate per coupling and the

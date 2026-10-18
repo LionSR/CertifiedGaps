@@ -8,7 +8,7 @@ $\Delta_L > 0.534267, 0.173082, 0.058177$). Each certificate is a core `GapCerti
 sublattice-rotated frame (exact RP identity, verified spectra, both bounds). On the grid
 $`\delta \in \{1/2, 3/10, 1/4, 1/5, 3/20, 1/10\}`$, $\delta = 1/4$ is the smallest dimerization
 certifiable from rings of at most $16$ spins: at $`\delta \in \{1/5, 3/20, 1/10\}`$,
-continuous-$\beta$ interval covers prove that **every** $\beta_0 > 0$ fails the doubling
+continuous-$`\beta`$ interval covers prove that **every** $\beta_0 > 0$ fails the doubling
 recurrence at both even seed lengths $n_0 = 2$ and $n_0 = 4$ cells.
 
 | Dimerization $\delta$ | Seed $(n_0, \beta_0)$ | Certified gap $\Delta_L \ge$ | Lengths covered |
@@ -57,7 +57,7 @@ the reflected form of `notes/thermal-mpo-gap-scope.tex` (Appendix E) and of the 
 `rotated_rp(δ)` builds it with the core `rp_certificate(...; reflection = F)`; every certificate
 stores factors, weights, and $F$, and `RingModels.verify_rp` checks the identity exactly. Without
 $F$ the bond is not RP in any common cell basis (
-$\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \frac{3}{8}(1 - \delta)^2 > 0$ for the swap of two whole cells,
+$`\|h - F_{\mathrm{outer}} h F_{\mathrm{outer}}\|_F^2 = \frac{3}{8}(1 - \delta)^2 > 0`$ for the swap of two whole cells,
 `src/reflection_conventions.jl`). `src/rp.jl` audits an equivalent conjugate form in the
 singlet/triplet basis exactly (`results/rp_audit.json`); see [`METHOD.md`](METHOD.md).
 
@@ -85,7 +85,7 @@ but the unequal-defect recurrence closes thanks to the smaller thermal defect. T
 $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) \le (0.01133, 0.01224), (0.09516, 0.0518), (0.1658, 0.05123)$ at the same $(4, \beta_0)$ as hypotheses; the certified defects satisfy them
 (checked exactly in `test/runtests.jl`).
 
-### Rigorous all-$\beta$ exclusions at $n_0 = 2, 4$ for smaller $\delta$
+### Rigorous all-$`\beta`$ exclusions at $n_0 = 2, 4$ for smaller $\delta$
 
 With the largest ring capped at $16$ spins, the only even seed lengths are $n_0 = 2$ and
 $n_0 = 4$ cells. For $n_0 = 2$ at all six $\delta$ values and for $n_0 = 4$ at
@@ -96,7 +96,7 @@ the doubling recurrence fails for **every** $\beta_0 > 0$:
 2. a positive ground-energy defect $`d_E = \underline{E_0(2n_0)} - 2\,\overline{E_0(n_0)} > 0`$
    implies $P_{\mathrm{s}}(n_0, \beta) \le 2^{4n_0} e^{-\beta d_E} \le 1/2$ for all $\beta_0 \ge B$;
 3. the interval $[1, B]$ is covered by $6\text{--}12$ rigorous boxes (core
-   `shifted_log_partition` with an interval $\beta$), on each of which lower bounds on both
+   `shifted_log_partition` with an interval $`\beta`$), on each of which lower bounds on both
    defects leave the admissible region of the monotone doubling map.
 
 Certifying $\delta \le 1/5$ therefore requires larger seed rings ($n_0 \ge 6$ cells, i.e.,
@@ -173,7 +173,7 @@ julia --project=julia models/dimerized_heisenberg/scripts/summarize_numerics.jl
   (core `VerifiedSpectra`: exact charge, momentum, and charge-flip reduction; every block
   enclosed by `verified_eigen`); outward-rounded $\log Z$ enclosures, rational seed defects, and
   the exact rational gap chain (core `GapCertificates`); the 16-spin gap enclosures; the
-  continuous-$\beta$ exclusion covers; and the dimer perturbation bounds.
+  continuous-$`\beta`$ exclusion covers; and the dimer perturbation bounds.
 - **Trusted base:** exact rational arithmetic, `IntervalArithmetic` outward rounding, and the IEEE
   binary64 + BLAS rounding model of `CertifiedGaps.VerifiedSpectra.verified_eigen`
   (round-to-nearest, gradual underflow, the $\gamma_{N+8}$ / $\gamma_{2N+8}$ dot-product bounds
@@ -188,7 +188,7 @@ julia --project=julia models/dimerized_heisenberg/scripts/summarize_numerics.jl
 |---|---|
 | `certify.jl` | Generates `results/rp_audit.json`, the core certificates, and `results/summary.json` |
 | `check.jl` | Certificate verifier (also loaded by the tests; `--full` recomputes every spectrum) |
-| `src/DimerizedHeisenberg.jl` | `rotated_model`, `rotated_rp`, `frame_identity`, `SEEDS`, all-$\beta$ exclusions, dimer bound, hashed `SOURCES` |
+| `src/DimerizedHeisenberg.jl` | `rotated_model`, `rotated_rp`, `frame_identity`, `SEEDS`, all-$`\beta`$ exclusions, dimer bound, hashed `SOURCES` |
 | `src/rp.jl`, `src/reflection_conventions.jl` | Exact RP audit (conjugate form) and basis-obstruction checks |
 | `src/sectors.jl`, `src/Diagnostics.jl` | `Float64` sector solver and 20-spin Krylov diagnostics (numerical only) |
 | `scripts/` | 20-spin scan, numerical scan, and summary |
@@ -210,7 +210,7 @@ are no hash-pinned layout exceptions.
 ## History
 
 PR #23 re-certified the six-point $\delta$ grid (exact RP factors, a local two-pass rounding
-bound, continuous-$\beta$ exclusion covers establishing the grid minimum $\delta = 1/4$, the dimer
+bound, continuous-$`\beta`$ exclusion covers establishing the grid minimum $\delta = 1/4$, the dimer
 perturbation bound, 20-spin diagnostics), superseding the first pass whose bounds
 `0.532658, 0.172916, 0.057967` the Lean statements still reflect. Earlier results were produced
 under the core's former name `ThermalMPOGap` from `certificates/dimerized_heisenberg/`; later,

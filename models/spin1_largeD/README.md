@@ -1,4 +1,4 @@
-# Spin-1 large-$D$ chain: uniform-gap certificates
+# Spin-1 large-$`D`$ chain: uniform-gap certificates
 
 We certify uniform spectral gaps for the periodic spin-1 Heisenberg chain with single-ion
 anisotropy $D(S^z)^2$ in two stages. Stage 1 runs the shared core pipeline
@@ -200,7 +200,7 @@ by path beyond these sources and the stored spectra.
 
 Until this revision the model had its own pipeline: a local block builder (`model.jl`) with spin
 inversion, a local residual/polar enclosure with a priori $\gamma_{8m+32}$ constants and
-$\|H\|_2 \le L(|D| + 2)$, run-length-encoded $L = 12$ spectra (`src/spectra.jl`), a local
+$`\|H\|_2 \le L(|D| + 2)`$, run-length-encoded $L = 12$ spectra (`src/spectra.jl`), a local
 $\log Z$ with a truncated tail, a per-model environment, and hash-pinned top-level scripts. It was
 replaced by the shared core. The model is now a `RingModel` in the $S^z$ frame (with the Cartesian
 frame checked exactly). Stage 1 is `certify_gap` with `flip`, which gives the same 92 blocks; the
@@ -225,7 +225,7 @@ stage-2 case ids `transport-threshold-*` became `transport-*`.
 those of the earlier floating-point scan, which used momentum-resolved Lanczos with the removed
 local code. `scripts/scan.jl` now uses the core charge-sector exact diagonalization and reproduces
 the stored $L \le 10$ levels to $10^{-13}$. It was not rerun over the full grid, because its
-$L = 12$ Lanczos takes over 15 min per $D$. `scripts/report.jl --certified-only` refreshed the
+$L = 12$ Lanczos takes over 15 min per $`D`$. `scripts/report.jl --certified-only` refreshed the
 certified curve points and the plot, and `results/feasibility.json` was regenerated on the current
 host.
 

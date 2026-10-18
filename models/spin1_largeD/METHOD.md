@@ -1,7 +1,7 @@
 # Method: model, enclosures, transfer squaring, and Weyl transport
 
 This document presents the mathematical derivations for both certification stages of the spin-1
-large-$D$ chain. Stage 1 (`certify.jl`) runs the shared core pipeline
+large-$`D`$ chain. Stage 1 (`certify.jl`) runs the shared core pipeline
 `CertifiedGaps.GapCertificates.certify_gap` on the exact model of `src/model.jl` at $n_0 = 6$ and
 stores the verified spectra of the rings $L = 6, 12$. Stage 2 (`src/TransferCertificate.jl`,
 `scripts/transfer_certify.jl`) reuses those stored spectra to certify lifted seeds at
@@ -59,9 +59,9 @@ checks that the blocks cover all $3^L$ states.
 
 Each block is enclosed by `CertifiedGaps.VerifiedSpectra.verified_eigen`: its interval entries
 (exact couplings times enclosed phases and orbit-norm ratios) give an exactly Hermitian Float64
-center $M$ (real for $m = 0, L/2$) and an exact bound on $\|A - M\|_2$ by the Frobenius norm of
+center $M$ (real for $m = 0, L/2$) and an exact bound on $`\|A - M\|_2`$ by the Frobenius norm of
 the entrywise radii. With the LAPACK eigenpairs $(\Lambda, X)$ of $M$, the residual
-$\|MX - X\Lambda\|_2$ and orthogonality $\|X^\dagger X - I\|_2$ are bounded by their computed
+$`\|MX - X\Lambda\|_2`$ and orthogonality $`\|X^\dagger X - I\|_2`$ are bounded by their computed
 Frobenius norms plus a priori IEEE binary64 rounding bounds ($`\gamma_{N+8}`$ for real blocks,
 $`\gamma_{2N+8}`$ for complex blocks evaluated with four real matrix products, valid for any
 summation order and FMA, with an additive underflow term). The radius is the smaller of the
@@ -115,7 +115,7 @@ space-and-temperature doubling recurrence `certified_gap_bound`.
 
 Writing $`H_L(D) = H_L(D^*) + \delta D \cdot V`$ with $`V = \sum_{j=1}^L (S_j^z)^2`$ and
 $`0 \le V \le L I`$, centering $`V`$ by $`\frac{L}{2}I`$ gives
-$\|\delta D (V - \frac{L}{2}I)\|_2 \le \frac{1}{2}L|\delta D|$. By Weyl's inequality, every ordered
+$`\|\delta D (V - \frac{L}{2}I)\|_2 \le \frac{1}{2}L|\delta D|`$. By Weyl's inequality, every ordered
 eigenvalue of $`H_L(D) - \frac{L\,\delta D}{2}I`$ lies within $`\frac{1}{2}L|\delta D|`$ of the
 corresponding eigenvalue of $`H_L(D^*)`$, so $\log Z_L(\beta)$ of the shifted Hamiltonian lies within
 $\frac{1}{2}\beta L |\delta D|$ of the reference enclosure at $`D^*`$ (and the constant energy shift
@@ -129,5 +129,5 @@ we replace $`|\delta D|`$ by $`\max_{D \in [D_{\mathrm{lo}}, D_{\mathrm{hi}}]} |
 Stage 2 sums $\log Z$ over the complete stored spectra (no truncation). The finite-ring gap
 $\Delta_L = E_1(L) - E_0(L)$ is enclosed by the core `spectral_gap_enclosure` (second-smallest
 lower endpoint minus smallest upper endpoint, with multiplicities), widened by $L|\delta D|$ when
-transported in $D$. At $D = 4$, verified finite-ring gaps at $L = 6, 8, 10$ (`bridge_certificate`)
+transported in $`D`$. At $D = 4$, verified finite-ring gaps at $L = 6, 8, 10$ (`bridge_certificate`)
 exceed the $n_0 = 12$ uniform bound, extending that certificate to all even $L \ge 6$.

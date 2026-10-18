@@ -35,7 +35,7 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
 4. **Operator-norm perturbation around decoupled dimers ($\delta = 1$):** At $\delta = 1$ ($w = 0$),
    the partition function factors exactly into independent dimers,
    $Z_n^{\mathrm{dimer}}(\beta) = (e^{3\beta s/4} + 3e^{-\beta s/4})^n$. Writing $H_n = H_n^{\mathrm{dimer}} + V_n$
-   with $\|V_n\| \le \frac{3}{4} n (1 - \delta)$ and applying Weyl's inequality bounds
+   with $`\|V_n\| \le \frac{3}{4} n (1 - \delta)`$ and applying Weyl's inequality bounds
    $|\log Z_n - \log Z_n^{\mathrm{dimer}}| \le \frac{3}{4}\beta n (1 - \delta)$ at arbitrary $n$ in
    $O(\log n)$ operations. However, because unlinked norm bounds lose the extensive bulk free-energy
    cancellation between $\log Z_{2n}$ and $2\log Z_n$, the resulting error grows with $n$ and only
@@ -66,7 +66,7 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
   prove that no $\beta_0 > 0$ yields an admissible seed for this recurrence at $n_0 = 2$ (for any of
   the six $\delta$ values) or at $n_0 = 4$ for $`\delta \in \{1/5, 3/20, 1/10\}`$, establishing
   $\delta = 1/4$ as the exact certifiability threshold on rings of at most 16 spins.
-- **Beyond-ED and 20-spin diagnostics:** The arbitrary-$n$ dimer perturbation bound certifies a
+- **Beyond-ED and 20-spin diagnostics:** The arbitrary-$`n`$ dimer perturbation bound certifies a
   512-spin seed at $\delta = 0.999999$ in the unit tests while quantifying why unlinked norm bounds
   fail at $\delta \le 1/2$. The 20-spin Krylov diagnostics identify a numerical odd-seed candidate
   at $(\delta, n_0, \beta_0) = (1/5, 5, 8.5)$ and confirm that the next even seeds for
