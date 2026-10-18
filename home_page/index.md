@@ -128,6 +128,8 @@ See the [open challenges]({{ '/leaderboard.html' | relative_url }}#challenges) f
 
 ## Documentation and resources
 
+* **Two-page note:** [The spin-1 Haldane gap proof in tensor-network diagrams]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }})
+  (S. Lu and GPT-6-Astra, PDF)
 * **Interactive explainers:** [periodic ring proof]({{ '/explainer/' | relative_url }}) ·
   [open-chain extension]({{ '/explainer/open.html' | relative_url }})
 * **Lean 4 formalization:** [blueprint]({{ '/blueprint/' | relative_url }})
