@@ -16,23 +16,25 @@ the boundary-field gap of OpenAI's *A boundary-field gap for the spin-one Heisen
 
 ## Setting
 
-The ring spectra are `Er L`, the open-chain spectra `Eo n`. The scales are
-`βᵢ = 49 · 2^i`, `nᵢ = 120 · 2^i` (ring lengths) and `Mᵢ = 2 nᵢ` (open-chain lengths); the
-note's scale `j` is `i + 2`. At each `βᵢ` we fix a witness `(μᵢ, cᵢ, ρᵢ, sᵢ)` of the boundary
-moment inequalities. The three claims of the note are, in multiplicative form,
-* (R) ring purities `P_s(nᵢ, βᵢ), P_τ(Mᵢ, βᵢ) ≥ 1 - εᵢ` with `ε₀ = 0.052`, `εᵢ₊₁ = 6 εᵢ²`;
-* (E) the boundary defect `e_{kᵢ}(i) ≤ Eᵢ`, written `(1 - Eᵢ) G(kᵢ) ≤ cᵢ μᵢ^{kᵢ}`, with
-  `k₀ = 142` and `kᵢ₊₁ = Mᵢ`;
+The ring spectra are `Er L`, the open-chain spectra `Eo n`. The scales are `βᵢ = β₀ 2^i` and
+`Nᵢ = N₀ 2^i`, with ring lengths `2Nᵢ` and open-chain lengths `Mᵢ = 4Nᵢ`; for the note's seeds
+(`β₀ = 49`, `N₀ = 60`) the note's scale `j` is `i + 2`. At each `βᵢ` we fix a witness
+`(μᵢ, cᵢ, ρᵢ, sᵢ)` of the boundary moment inequalities. The three claims of the note are, in
+multiplicative form,
+* (R) ring purities `P_s(2Nᵢ, βᵢ), P_τ(Mᵢ, βᵢ) ≥ 1 - εᵢ` with `εᵢ = (C u₀)^{2^i} / C`;
+* (E) the boundary defect `e_{2Kᵢ}(βᵢ) ≤ Eᵢ`, written `(1 - Eᵢ) G(2Kᵢ) ≤ cᵢ μᵢ^{2Kᵢ}`, with the
+  seed's `K₀` and `Kᵢ = Nᵢ` for `i ≥ 1` (`boundaryHalf`);
 * (T) the open-chain thermal purity `P_τ(Mᵢ, βᵢ) ≥ 1 - ηᵢ`.
 
 ## Main results
 
-* `ring_doubling_six`: the ring doubling step with prefactor `6` for defects `≤ 0.052`.
 * `OpenMomentWitness.tail_le`, `mu_le_sq`, `mu_pow_ge`: claim (R) as transfer bounds.
 * `move_one`, `move_two`, `oddChain_purity`: the overlap recurrence, the length doubling and
   the equal-field purity of Appendix A, all in multiplicative form.
-* `gapGT_of_openSeeds`: the boundary-field gap `Δ_n > (log 10)/392` for every odd `n ≥ 1921`,
-  from the four inputs of the note's eq. (C1).
+* `open_step`: one step of the boundary induction.
+* `gapGT_of_openChain`: the boundary-field gap `Δ_n > log(1/(10x)) / (β₀ 2^m)` for every odd
+  `n ≥ 4 N₀ 2^m`, from general seeds, `m` base steps (`OpenStep`) and the hand-over `x`.
+  `Open/Certificate.lean` checks the base steps in rational arithmetic.
 -/
 
 open Filter Finset Real
@@ -82,75 +84,6 @@ theorem sub_le_tailBound_mul {a Z Y ε : ℝ} (ha : 0 < a) (haZ : a ≤ Z) (hY�
   unfold tailBound
   rw [div_mul_eq_mul_div, le_div_iff₀ (by linarith)]
   linarith
-
-/-- The coefficient of the ring doubling at defect `ε ≤ 0.052`, the note's eq. (B3):
-`G(ε) ≤ 6`, so `f(1 - (1 - ε)³) ≤ 6 ε²`. -/
-theorem doublingCoefficient_le_six {ε : ℝ} (h1 : ε ≤ 13 / 250) : doublingCoefficient ε ≤ 6 :=
-  (doublingCoefficient_mono h1 (by norm_num)).trans (by unfold doublingCoefficient; norm_num)
-
-/-! ### Claim (R): the ring at the open-chain scales -/
-
-section Ring
-
-variable {ι : ℕ → Type*} [∀ L, Fintype (ι L)] [∀ L, Nonempty (ι L)] (E : (L : ℕ) → ι L → ℝ)
-
-/-- **Ring doubling with prefactor 6** (Appendix B). For a defect `ε ≤ 0.052` (above the
-threshold `1/100` of `doubling`), `P_s(n, β), P_τ(2n, β) ≥ 1 - ε` give
-`P_s(2n, 2β), P_τ(4n, 2β) ≥ 1 - 6ε²`. -/
-theorem ring_doubling_six {n₀ : ℕ} (hZ : HasSpatialMomentBounds E n₀) {n : ℕ} (hn : n₀ ≤ n)
-    (hne : Even n) {β : ℝ} (hβ : 0 < β) {ε : ℝ} (h0 : 0 ≤ ε) (h1 : ε ≤ 13 / 250)
-    (hs : 1 - ε ≤ spatialPurity E n β) (ht : 1 - ε ≤ thermalPurity E (2 * n) β) :
-    1 - 6 * ε ^ 2 ≤ spatialPurity E (2 * n) (2 * β) ∧
-      1 - 6 * ε ^ 2 ≤ thermalPurity E (4 * n) (2 * β) :=
-  doubling_of_coefficient E hZ hn hne hβ h0 (by linarith) (doublingCoefficient_le_six h1)
-    (by linarith) hs ht
-
-end Ring
-
-/-- The ring defects `ε₀ = 0.052`, `εᵢ₊₁ = 6 εᵢ²` (the note's `ε_{i+2}`). -/
-noncomputable def ringDefect : ℕ → ℝ
-  | 0 => 13 / 250
-  | i + 1 => 6 * ringDefect i ^ 2
-
-/-- `εᵢ ≥ 0`. -/
-theorem ringDefect_nonneg (i : ℕ) : 0 ≤ ringDefect i := by
-  cases i <;> simp only [ringDefect] <;> positivity
-
-/-- `εᵢ ≤ 0.052`, since `6 εᵢ² ≤ εᵢ`. -/
-theorem ringDefect_le (i : ℕ) : ringDefect i ≤ 13 / 250 := by
-  induction i with
-  | zero => simp [ringDefect]
-  | succ i ih =>
-    have := ringDefect_nonneg i
-    simp only [ringDefect]
-    nlinarith
-
-section Ring
-
-variable {ι : ℕ → Type*} [∀ L, Fintype (ι L)] [∀ L, Nonempty (ι L)] (E : (L : ℕ) → ι L → ℝ)
-
-/-- **Claim (R).** From `P_s(120, 49), P_τ(240, 49) ≥ 0.948`, induction on the scale gives
-`P_s(120 · 2^i, 49 · 2^i), P_τ(240 · 2^i, 49 · 2^i) ≥ 1 - εᵢ`. -/
-theorem ring_scales (hZ : HasSpatialMomentBounds E 2)
-    (hs : 1 - 13 / 250 ≤ spatialPurity E 120 49) (ht : 1 - 13 / 250 ≤ thermalPurity E 240 49)
-    (i : ℕ) :
-    1 - ringDefect i ≤ spatialPurity E (120 * 2 ^ i) (49 * 2 ^ i) ∧
-      1 - ringDefect i ≤ thermalPurity E (240 * 2 ^ i) (49 * 2 ^ i) := by
-  induction i with
-  | zero => simp only [ringDefect, pow_zero, mul_one]; exact ⟨hs, ht⟩
-  | succ i ih =>
-    have h := ring_doubling_six E hZ (n := 120 * 2 ^ i)
-      (by have := Nat.one_le_two_pow (n := i); omega) ⟨60 * 2 ^ i, by ring⟩
-      (by positivity : (0 : ℝ) < 49 * 2 ^ i) (ringDefect_nonneg i) (ringDefect_le i) ih.1
-      (by simpa [show 2 * (120 * 2 ^ i) = 240 * 2 ^ i by ring] using ih.2)
-    simp only [ringDefect]
-    have e1 : 2 * (120 * 2 ^ i) = 120 * 2 ^ (i + 1) := by ring
-    have e2 : 4 * (120 * 2 ^ i) = 240 * 2 ^ (i + 1) := by ring
-    have e3 : (2 : ℝ) * (49 * 2 ^ i) = 49 * 2 ^ (i + 1) := by ring
-    rw [e1, e2, e3] at h
-    exact h
-
-end Ring
 
 /-! ### Transfer bounds from one witness -/
 
@@ -562,7 +495,40 @@ theorem pow_le_of_pow_two_mul_le {ρ q d : ℝ} (hρ : 0 ≤ ρ) (hq : 0 ≤ q) 
   rw [← pow_mul, mul_comm]
   exact h.trans hd
 
+/-- From `ρ^b ≤ d` and `d^{a/g} ≤ q^{b/g}` with `g = gcd(a, b)` to `ρ^a ≤ q`: the exponents are
+reduced by their common divisor before the rational comparison. -/
+theorem pow_le_of_pow_le_gcd {ρ d q : ℝ} (hρ : 0 ≤ ρ) (hq : 0 ≤ q) {a b : ℕ} (hb : 0 < b)
+    (h : ρ ^ b ≤ d) (hd : d ^ (a / a.gcd b) ≤ q ^ (b / a.gcd b)) : ρ ^ a ≤ q := by
+  have hg : 0 < a.gcd b := Nat.gcd_pos_of_pos_right a hb
+  have hbg : b / a.gcd b ≠ 0 := (Nat.div_pos (Nat.gcd_le_right a hb) hg).ne'
+  refine (pow_le_pow_iff_left₀ (pow_nonneg hρ a) hq hbg).1 ?_
+  have e : a * (b / a.gcd b) = b * (a / a.gcd b) := by
+    rw [← Nat.mul_div_assoc a (Nat.gcd_dvd_right a b),
+      ← Nat.mul_div_assoc b (Nat.gcd_dvd_left a b), mul_comm]
+  calc (ρ ^ a) ^ (b / a.gcd b) = (ρ ^ b) ^ (a / a.gcd b) := by rw [← pow_mul, ← pow_mul, e]
+    _ ≤ d ^ (a / a.gcd b) := pow_le_pow_left₀ (pow_nonneg hρ b) h _
+    _ ≤ q ^ (b / a.gcd b) := hd
+
 /-! ### The boundary-field gap -/
+
+/-- The half-length `Kᵢ` of the boundary defect at scale `i`: the seed's `K₀` at `i = 0`, and the
+ring length `N₀ 2^i` of that scale afterwards. -/
+def boundaryHalf (N₀ K₀ i : ℕ) : ℕ := if i = 0 then K₀ else N₀ * 2 ^ i
+
+/-- The scalar conditions of one base step of the boundary induction (the note, eqs.
+(C3)–(C5)). The ring defects are `ε` and `ε'` at the two scales, the suppression `q` bounds
+`ρ'^a` through `d(ε')^{a/g} ≤ q^{b/g}`, and `(E, η) ↦ (E', η')` follows the overlap update and the
+squaring bound. -/
+structure OpenStep (ε ε' q E η E' η' : ℝ) (a b : ℕ) : Prop where
+  q_nonneg : 0 ≤ q
+  q_lt_one : q < 1
+  tail : tailBound ε' ^ (a / a.gcd b) ≤ q ^ (b / a.gcd b)
+  E_lt_one : E < 1
+  η_lt_one : η < 1
+  overlap : overlapUpdate q E (1 - η) ≤ E'
+  E'_le_one : E' ≤ 1
+  prod_pos : 0 < (1 - η) * ((1 - ε) * (1 - ε')) * (1 - E')
+  squaring : squaringDefect (1 - (1 - η) * ((1 - ε) * (1 - ε')) * (1 - E')) ≤ η'
 
 section Main
 
@@ -570,37 +536,52 @@ variable {ιr ιo : ℕ → Type*} [∀ L, Fintype (ιr L)] [∀ L, Nonempty (ι
   [∀ n, Fintype (ιo n)] [∀ n, Nonempty (ιo n)] (Er : (L : ℕ) → ιr L → ℝ)
   (Eo : (n : ℕ) → ιo n → ℝ)
 
-/-- **The boundary-field gap criterion** (Theorem 2 of the note). Let the ring spectra `Er`
-satisfy the spatial moment inequalities and the ring and open-chain traces the boundary moment
-inequalities at every `β > 0`. If
+/-- **The boundary-field gap criterion** (Theorem 2 of the note, with general seeds). Let the ring
+spectra `Er` satisfy the spatial moment inequalities and the ring and open-chain traces the
+boundary moment inequalities at every `β > 0`. The scales are `βᵢ = β₀ 2^i` and
+`Nᵢ = N₀ 2^i`, with ring lengths `2Nᵢ` and open-chain lengths `Mᵢ = 4Nᵢ`. Assume
 
-* `P_s(120, 49) ≥ 0.948` and `P_τ(240, 49) ≥ 0.948` for the ring,
-* the boundary defect `e₁₄₂ ≤ 0.14` at `β = 49`, and
-* the open-chain thermal purity `P_τ(240, 49) ≥ 0.79`,
+* the ring seeds `P_s(2N₀, β₀), P_τ(4N₀, β₀) ≥ 1 - u₀`, with `G(u₀) ≤ C ≤ 6` and `C u₀ ≤ 1`, so
+  that the ring defects are `εᵢ = (C u₀)^{2^i} / C`;
+* the boundary seed `e_{2K₀}(β₀) ≤ E₀` and the open-chain seed `P_τ(M₀, β₀) ≥ 1 - η₀`;
+* `m ≥ 1` base steps `OpenStep` from `(Eᵢ, ηᵢ)` to `(Eᵢ₊₁, ηᵢ₊₁)`, with boundary length
+  `2Kᵢ` (`boundaryHalf`);
+* the hand-over `Eₘ, ηₘ, εₘ ≤ x ≤ 1/100`.
 
-then every odd open chain of `n ≥ 1921` sites has a nondegenerate ground level and gap
-`Δ_n > (log 10)/392 ≈ 0.005874`. -/
-theorem gapGT_of_openSeeds (hring : HasSpatialMomentBounds Er 2)
+Then every odd open chain of `n ≥ 4 N₀ 2^m` sites has a nondegenerate ground level and gap
+`Δ_n > log(1/(10x)) / (β₀ 2^m)`. -/
+theorem gapGT_of_openChain {N₀ K₀ m : ℕ} (hN₀ : 1 ≤ N₀) (hK₀ : 1 ≤ K₀) (hK₀N : K₀ ≤ 2 * N₀)
+    (hm : 1 ≤ m) (hring : HasSpatialMomentBounds Er (2 * N₀))
     (hopen : ∀ β : ℝ, 0 < β → OpenMomentBounds (fun L ↦ partitionFunction Er L β)
       (fun n ↦ partitionFunction Eo n β))
-    (hs : 948 / 1000 ≤ spatialPurity Er 120 49) (ht : 948 / 1000 ≤ thermalPurity Er 240 49)
-    (he : boundaryDefect (fun L ↦ partitionFunction Er L 49) (fun n ↦ partitionFunction Eo n 49)
-      142 ≤ 14 / 100)
-    (hη : 79 / 100 ≤ thermalPurity Eo 240 49) {n : ℕ} (hn : 1921 ≤ n) (hno : Odd n) :
-    GapGT (Eo n) (log 10 / 392) := by
-  /- The scales `βᵢ = 49 · 2^i` and `Nᵢ = 60 · 2^i`: ring length `nᵢ = 2Nᵢ`, open-chain length
-  `Mᵢ = 2nᵢ`, boundary-defect length `kᵢ = nᵢ` for `i ≥ 1` (and `k₀ = 142`). -/
-  set β : ℕ → ℝ := fun i ↦ 49 * 2 ^ i with hβdef
+    {β₀ u₀ C x : ℝ} (hβ₀ : 0 < β₀) (hu₀ : 0 < u₀) (hu₁ : u₀ ≤ 1 / 10)
+    (hCoef : doublingCoefficient u₀ ≤ C) (hC : C ≤ 6) (hCu : C * u₀ ≤ 1) (E η q : ℕ → ℝ)
+    (hstep : ∀ i < m, OpenStep (coefficientDefect C u₀ i) (coefficientDefect C u₀ (i + 1))
+      (q i) (E i) (η i) (E (i + 1)) (η (i + 1))
+      (2 * (2 * (N₀ * 2 ^ i)) - 2 * boundaryHalf N₀ K₀ i) (2 * (2 * (N₀ * 2 ^ i))))
+    (hx0 : 0 < x) (hx : x ≤ 1 / 100) (hEm : E m ≤ x) (hηm : η m ≤ x)
+    (hεm : coefficientDefect C u₀ m ≤ x)
+    (hs : 1 - u₀ ≤ spatialPurity Er (2 * N₀) β₀)
+    (ht : 1 - u₀ ≤ thermalPurity Er (2 * (2 * N₀)) β₀)
+    (he : boundaryDefect (fun L ↦ partitionFunction Er L β₀) (fun n ↦ partitionFunction Eo n β₀)
+      (2 * K₀) ≤ E 0)
+    (hη : 1 - η 0 ≤ thermalPurity Eo (2 * (2 * N₀)) β₀) {n : ℕ} (hn : 4 * N₀ * 2 ^ m ≤ n)
+    (hno : Odd n) : GapGT (Eo n) (log (1 / (10 * x)) / (β₀ * 2 ^ m)) := by
+  set β : ℕ → ℝ := fun i ↦ β₀ * 2 ^ i with hβdef
   have hβpos : ∀ i, 0 < β i := fun i ↦ by simp only [β]; positivity
   have hβs : ∀ i, β (i + 1) = 2 * β i := fun i ↦ by simp only [β]; ring
-  have hβ0 : β 0 = 49 := by simp [β]
-  set Nn : ℕ → ℕ := fun i ↦ 60 * 2 ^ i with hNndef
+  have hβ0 : β 0 = β₀ := by simp [β]
+  set Nn : ℕ → ℕ := fun i ↦ N₀ * 2 ^ i with hNndef
   have hNn1 : ∀ i, 1 ≤ Nn i := fun i ↦ by
-    simp only [Nn]; have := Nat.one_le_two_pow (n := i); omega
+    simp only [Nn]; exact Nat.one_le_iff_ne_zero.2 (by positivity)
   have hNns : ∀ i, Nn (i + 1) = 2 * Nn i := fun i ↦ by simp only [Nn]; ring
-  set ε := ringDefect
-  have hε0 : ∀ i, 0 ≤ ε i := ringDefect_nonneg
-  have hε1 : ∀ i, ε i ≤ 13 / 250 := ringDefect_le
+  have hNn0 : Nn 0 = N₀ := by simp [Nn]
+  set ε : ℕ → ℝ := coefficientDefect C u₀ with hεdef
+  have hCpos : 0 < C := (doublingCoefficient_pos (by linarith)).trans_le hCoef
+  have hε0 : ∀ i, 0 ≤ ε i := fun i ↦ (coefficientDefect_mem hCpos hu₀ hCu i).1.le
+  have hεu : ∀ i, ε i ≤ u₀ := fun i ↦ (coefficientDefect_mem hCpos hu₀ hCu i).2
+  have hε10 : ∀ i, ε i ≤ 1 / 10 := fun i ↦ (hεu i).trans hu₁
+  have hεs : ∀ i, ε (i + 1) = C * ε i ^ 2 := coefficientDefect_succ hCpos.ne' u₀
   -- The witnesses at every scale.
   choose μ c ρ s hw using fun i ↦ hopen (β i) (hβpos i)
   have hw' : ∀ i, OpenMomentWitness (fun L ↦ partitionFunction Er L (2 * β i))
@@ -610,19 +591,19 @@ theorem gapGT_of_openSeeds (hring : HasSpatialMomentBounds Er 2)
   have hμ : ∀ i, 0 < μ i := fun i ↦ (hw i).mu_pos (partitionFunction_pos Er 4 _)
   have hZ : ∀ L β', 0 < partitionFunction Er L β' := partitionFunction_pos Er
   have hG : ∀ m β', 0 < partitionFunction Eo m β' := partitionFunction_pos Eo
-  /- Claim (R): the ring purities, the residual ratios `ρᵢ^{nᵢ} ≤ d(εᵢ)`, the growth bound
-  `μᵢ₊₁ ≤ μᵢ²` and the bulk factor `R_i = (1 - εᵢ)(1 - εᵢ₊₁)`. -/
-  have hR := ring_scales Er hring (by linarith) (by linarith)
+  /- The ring: the purities at every scale, the residual ratios `ρᵢ^{2Nᵢ} ≤ d(εᵢ)`, the growth
+  bound `μᵢ₊₁ ≤ μᵢ²` and the bulk factor `Rᵢ = (1 - εᵢ)(1 - εᵢ₊₁)`. -/
+  have hR := purities_ge_coefficientDefect Er (n₀ := 2 * N₀) ⟨N₀, by ring⟩ hβ₀ hring hu₀
+    (by linarith) hCoef hCu hs ht
   have hRs : ∀ i, 1 - ε i ≤ partitionFunction Er (2 * (2 * Nn i)) (β i) /
       partitionFunction Er (2 * Nn i) (β i) ^ 2 := fun i ↦ by
     have := (hR i).1
-    rwa [spatialPurity, show 120 * 2 ^ i = 2 * Nn i by simp only [Nn]; ring] at this
+    rwa [spatialPurity, show 2 * N₀ * 2 ^ i = 2 * Nn i by simp only [Nn]; ring] at this
   have hRt : ∀ i, (1 - ε i) * partitionFunction Er (2 * (2 * Nn i)) (β i) ^ 2 ≤
       partitionFunction Er (2 * (2 * Nn i)) (2 * β i) := fun i ↦ by
     have := (hR i).2
-    rwa [thermalPurity, show 240 * 2 ^ i = 2 * (2 * Nn i) by simp only [Nn]; ring,
+    rwa [thermalPurity, show 2 * N₀ * 2 ^ i = 2 * Nn i by simp only [Nn]; ring,
       le_div_iff₀ (pow_pos (hZ _ _) 2)] at this
-  have hε10 : ∀ i, ε i ≤ 1 / 10 := fun i ↦ (hε1 i).trans (by norm_num)
   have htail : ∀ i, ρ i ^ (2 * Nn i) ≤ tailBound (ε i) := fun i ↦
     (hw i).tail_le (hμ i) (hNn1 i) (hZ _ _) (hε10 i) (hRs i)
   have hr : ∀ i, μ (i + 1) ≤ μ i ^ 2 := fun i ↦
@@ -634,116 +615,110 @@ theorem gapGT_of_openSeeds (hring : HasSpatialMomentBounds Er 2)
     have hP' := hRs (i + 1)
     rw [hNns, hβs] at hP'
     exact (hw i).mu_pow_ge (hw' i) (N := 2 * Nn i) (by have := hNn1 i; omega) (hZ _ _)
-      ((hε1 i).trans (by norm_num)) ((hε1 _).trans (by norm_num)) (hRt i) hP'
+      ((hε10 i).trans (by norm_num)) ((hε10 _).trans (by norm_num)) (hRt i) hP'
   have hR0 : ∀ i, 0 ≤ (1 - ε i) * (1 - ε (i + 1)) := fun i ↦
-    mul_nonneg (by linarith [hε1 i]) (by linarith [hε1 (i + 1)])
-  /- Claims (E) and (T) at scale `i ≥ 1`: `(1 - E) G(nᵢ) ≤ cᵢ μᵢ^{nᵢ}` and
-  `P_τ^{open}(Mᵢ, βᵢ) ≥ 1 - η`. -/
-  have step : ∀ i, 1 ≤ i → ∀ {q E η E' η' : ℝ}, 0 ≤ q → q < 1 →
-      tailBound (ε (i + 1)) ≤ q ^ 2 → E < 1 → η < 1 → overlapUpdate q E (1 - η) ≤ E' →
-      E' ≤ 1 → 0 < (1 - η) * ((1 - ε i) * (1 - ε (i + 1))) * (1 - E') →
+    mul_nonneg (by linarith [hε10 i]) (by linarith [hε10 (i + 1)])
+  -- The boundary lengths `2Kᵢ`.
+  have hK1 : ∀ i, 1 ≤ boundaryHalf N₀ K₀ i := fun i ↦ by
+    unfold boundaryHalf; split_ifs
+    · exact hK₀
+    · exact hNn1 i
+  have hKN : ∀ i, boundaryHalf N₀ K₀ i ≤ 2 * Nn i := fun i ↦ by
+    unfold boundaryHalf; split_ifs with h
+    · subst h; rw [hNn0]; exact hK₀N
+    · have := hNn1 i; simp only [Nn] at this ⊢; omega
+  have hKs : ∀ i, i ≠ 0 → boundaryHalf N₀ K₀ i = Nn i := fun i hi ↦ by
+    simp only [boundaryHalf, hi, ite_false, Nn]
+  /- One step from scale `i` to `i + 1`: the boundary defect at length `2Kᵢ` and the open-chain
+  thermal purity at length `4Nᵢ` at `βᵢ` give both at `βᵢ₊₁`, at lengths `2Nᵢ₊₁` and `4Nᵢ₊₁`. -/
+  have step : ∀ i {q E η E' η' : ℝ}, 0 ≤ q → q < 1 →
+      ρ (i + 1) ^ (2 * (2 * Nn i) - 2 * boundaryHalf N₀ K₀ i) ≤ q → E < 1 → η < 1 →
+      overlapUpdate q E (1 - η) ≤ E' → E' ≤ 1 →
+      0 < (1 - η) * ((1 - ε i) * (1 - ε (i + 1))) * (1 - E') →
       squaringDefect (1 - (1 - η) * ((1 - ε i) * (1 - ε (i + 1))) * (1 - E')) ≤ η' →
-      (1 - E) * partitionFunction Eo (2 * Nn i) (β i) ≤ c i * μ i ^ (2 * Nn i) →
+      (1 - E) * partitionFunction Eo (2 * boundaryHalf N₀ K₀ i) (β i) ≤
+        c i * μ i ^ (2 * boundaryHalf N₀ K₀ i) →
       1 - η ≤ thermalPurity Eo (2 * (2 * Nn i)) (β i) →
       (1 - E') * partitionFunction Eo (2 * Nn (i + 1)) (β (i + 1)) ≤
           c (i + 1) * μ (i + 1) ^ (2 * Nn (i + 1)) ∧
         1 - η' ≤ thermalPurity Eo (2 * (2 * Nn (i + 1))) (β (i + 1)) := by
-    intro i _ q E η E' η' hq0 hq1 hqd hE hη hE' hE'1 hprod hη' he hA
-    have hq : ρ (i + 1) ^ (2 * (2 * Nn i) - 2 * Nn i) ≤ q := by
-      have := htail (i + 1)
-      rw [hNns] at this
-      rw [show 2 * (2 * Nn i) - 2 * Nn i = 2 * Nn i by omega]
-      exact pow_le_of_pow_two_mul_le (hw (i + 1)).rho_nonneg hq0 this hqd
-    have h := open_step Eo (hw i) (hw' i) (hμ i) (hμ _) (hr i) (K := Nn i) (N := 2 * Nn i)
-      (hNn1 i) (by omega) (hR0 i) (hRbulk i) hq0 hq1 hq hE he hA hη hE' hE'1 hprod hη'
+    intro i q E η E' η' hq0 hq1 hq hE hη hE' hE'1 hprod hη' he hA
+    have h := open_step Eo (hw i) (hw' i) (hμ i) (hμ _) (hr i) (K := boundaryHalf N₀ K₀ i)
+      (N := 2 * Nn i) (hK1 i) (hKN i) (hR0 i) (hRbulk i) hq0 hq1 hq hE he hA hη hE' hE'1 hprod
+      hη'
     rw [hNns, hβs]
     exact h
-  -- The base case from the seeds: `e₁₄₂ ≤ 0.14` and `P_τ^{open}(240, 49) ≥ 0.79`.
-  have w0 := hw 0
-  rw [hβ0] at w0
-  have hρ0 : ρ 0 < 1 := by
-    have := hRs 0
-    rw [hβ0] at this
-    exact w0.rho_lt_one (hμ 0) (hNn1 0) (hZ _ _) (hε10 0) this
-  have hS0e : (1 - 14 / 100) * partitionFunction Eo (2 * 71) (β 0) ≤ c 0 * μ 0 ^ (2 * 71) := by
-    have hZ4 := hZ 4 49
-    rw [boundaryDefect, w0.leadingRoot_eq hZ4, w0.leadingOverlap_eq hZ4 hρ0] at he
-    have hG142 := hG 142 49
-    rw [hβ0, show 2 * 71 = 142 from rfl]
-    have : 86 / 100 ≤ c 0 * μ 0 ^ 142 / partitionFunction Eo 142 49 := by linarith
-    rw [le_div_iff₀ hG142] at this
-    linarith
-  have hS0t : 1 - 21 / 100 ≤ thermalPurity Eo (2 * (2 * Nn 0)) (β 0) := by
-    rw [show 2 * (2 * Nn 0) = 240 by simp [Nn], hβ0]; linarith
-  -- Step `0 → 1`, with `k₀ = 142`, `q₀ = 0.142`.
-  have hS1 : (1 - 12 / 100) * partitionFunction Eo (2 * Nn 1) (β 1) ≤ c 1 * μ 1 ^ (2 * Nn 1) ∧
-      1 - 155 / 1000 ≤ thermalPurity Eo (2 * (2 * Nn 1)) (β 1) := by
-    have hq : ρ 1 ^ (2 * (2 * Nn 0) - 2 * 71) ≤ 71 / 500 := by
-      have h240 := htail 1
-      rw [show 2 * Nn 1 = 240 by simp [Nn]] at h240
-      rw [show 2 * (2 * Nn 0) - 2 * 71 = 98 by simp [Nn]]
-      have hρ1 := (hw 1).rho_nonneg
-      refine (pow_le_pow_iff_left₀ (pow_nonneg hρ1 _) (by norm_num) (by norm_num : 120 ≠ 0)).1 ?_
-      calc (ρ 1 ^ 98) ^ 120 = (ρ 1 ^ 240) ^ 49 := by ring
-        _ ≤ tailBound (ε 1) ^ 49 := pow_le_pow_left₀ (pow_nonneg hρ1 _) h240 49
-        _ ≤ (71 / 500) ^ 120 := by simp only [ε, ringDefect, tailBound]; norm_num
-    have h := open_step Eo (hw 0) (hw' 0) (hμ 0) (hμ _) (hr 0) (K := 71) (N := 2 * Nn 0)
-      (by norm_num) (by simp [Nn]) (hR0 0) (hRbulk 0) (by norm_num) (by norm_num) hq
-      (by norm_num) hS0e hS0t (by norm_num) (E' := 12 / 100) (η' := 155 / 1000)
-      (by simp only [overlapUpdate]; norm_num) (by norm_num)
-      (by simp only [ε, ringDefect]; norm_num)
-      (by simp only [ε, ringDefect, squaringDefect]; norm_num)
-    rw [← hβs, show 2 * (2 * Nn 0) = 2 * Nn 1 by simp [Nn]] at h
-    exact h
-  -- Steps `1 → 2 → 3`, with `q₁ = 0.0282`, `q₂ = 0.0028`.
-  have hS2 := step 1 le_rfl (q := 141 / 5000) (E' := 16 / 1000) (η' := 26 / 1000) (by norm_num)
-    (by norm_num) (by simp only [ε, ringDefect, tailBound]; norm_num) (by norm_num) (by norm_num)
-    (by simp only [overlapUpdate]; norm_num) (by norm_num) (by simp only [ε, ringDefect]; norm_num)
-    (by simp only [ε, ringDefect, squaringDefect]; norm_num) hS1.1 hS1.2
-  have hS3 := step 2 (by norm_num) (q := 7 / 2500) (E' := 1 / 1000) (η' := 1 / 1000)
-    (by norm_num) (by norm_num) (by simp only [ε, ringDefect, tailBound]; norm_num)
-    (by norm_num) (by norm_num) (by simp only [overlapUpdate]; norm_num) (by norm_num)
-    (by simp only [ε, ringDefect]; norm_num)
-    (by simp only [ε, ringDefect, squaringDefect]; norm_num) hS2.1 hS2.2
-  /- The uniform phase: with `x_j = 10^{-(2^j + 1)}`, all three defects at scale `3 + j` are at
+  -- The base phase: the seeds and `m` certified steps.
+  have hbase : ∀ i ≤ m, (1 - E i) * partitionFunction Eo (2 * boundaryHalf N₀ K₀ i) (β i) ≤
+      c i * μ i ^ (2 * boundaryHalf N₀ K₀ i) ∧
+        1 - η i ≤ thermalPurity Eo (2 * (2 * Nn i)) (β i) := by
+    intro i hi
+    induction i with
+    | zero =>
+      have w0 := hw 0
+      rw [hβ0] at w0
+      have hρ0 : ρ 0 < 1 := by
+        have := hRs 0
+        rw [hβ0] at this
+        exact w0.rho_lt_one (hμ 0) (hNn1 0) (hZ _ _) (hε10 0) this
+      rw [boundaryDefect, w0.leadingRoot_eq (hZ 4 β₀), w0.leadingOverlap_eq (hZ 4 β₀) hρ0] at he
+      have hK0 : boundaryHalf N₀ K₀ 0 = K₀ := rfl
+      rw [hK0, hNn0, hβ0]
+      refine ⟨?_, hη⟩
+      have : 1 - E 0 ≤ c 0 * μ 0 ^ (2 * K₀) / partitionFunction Eo (2 * K₀) β₀ := by linarith
+      rw [le_div_iff₀ (hG _ _)] at this
+      exact this
+    | succ i ih =>
+      obtain ⟨he, hA⟩ := ih (by omega)
+      have hi' := hstep i (by omega)
+      have hq : ρ (i + 1) ^ (2 * (2 * Nn i) - 2 * boundaryHalf N₀ K₀ i) ≤ q i := by
+        have := htail (i + 1)
+        rw [hNns] at this
+        exact pow_le_of_pow_le_gcd (hw _).rho_nonneg hi'.q_nonneg
+          (by have := hNn1 i; omega) this hi'.tail
+      have h := step i hi'.q_nonneg hi'.q_lt_one hq hi'.E_lt_one hi'.η_lt_one hi'.overlap
+        hi'.E'_le_one hi'.prod_pos hi'.squaring he hA
+      rw [hKs (i + 1) (Nat.succ_ne_zero i)]
+      exact h
+  /- The uniform phase: with `x_j = (10x)^{2^j} / 10`, all three defects at scale `m + j` are at
   most `x_j`, and `x_{j+1} = 10 x_j²`. -/
-  set x : ℕ → ℝ := fun j ↦ (1 / 10) ^ (2 ^ j + 1) with hxdef
-  have hx0 : ∀ j, 0 < x j := fun j ↦ by simp only [x]; positivity
-  have hxle : ∀ j, x j ≤ 1 / 100 := fun j ↦ by
-    simp only [x]
-    calc ((1 : ℝ) / 10) ^ (2 ^ j + 1) ≤ (1 / 10) ^ 2 :=
-          pow_le_pow_of_le_one (by norm_num) (by norm_num)
-            (by have := Nat.one_le_two_pow (n := j); omega)
-      _ = 1 / 100 := by norm_num
-  have hxs : ∀ j, x (j + 1) = 10 * x j ^ 2 := fun j ↦ by
-    simp only [x]; rw [pow_succ 2 j, ← pow_mul]; ring
-  have hunif : ∀ j, ((1 - x j) * partitionFunction Eo (2 * Nn (3 + j)) (β (3 + j)) ≤
-      c (3 + j) * μ (3 + j) ^ (2 * Nn (3 + j)) ∧
-        1 - x j ≤ thermalPurity Eo (2 * (2 * Nn (3 + j))) (β (3 + j))) ∧ ε (3 + j) ≤ x j := by
+  set xs : ℕ → ℝ := coefficientDefect 10 x with hxsdef
+  have hxs0 : ∀ j, 0 < xs j := fun j ↦
+    (coefficientDefect_mem (by norm_num) hx0 (by linarith) j).1
+  have hxsle : ∀ j, xs j ≤ 1 / 100 := fun j ↦
+    (coefficientDefect_mem (by norm_num) hx0 (by linarith) j).2.trans hx
+  have hxss : ∀ j, xs (j + 1) = 10 * xs j ^ 2 := coefficientDefect_succ (by norm_num) x
+  have hεsq : ∀ i {y : ℝ}, ε i ≤ y → ε (i + 1) ≤ 6 * y ^ 2 := fun i y hy ↦ by
+    rw [hεs]
+    have := pow_le_pow_left₀ (hε0 i) hy 2
+    nlinarith [mul_le_mul_of_nonneg_right hC (sq_nonneg (ε i))]
+  have hunif : ∀ j, ((1 - xs j) * partitionFunction Eo (2 * Nn (m + j)) (β (m + j)) ≤
+      c (m + j) * μ (m + j) ^ (2 * Nn (m + j)) ∧
+        1 - xs j ≤ thermalPurity Eo (2 * (2 * Nn (m + j))) (β (m + j))) ∧ ε (m + j) ≤ xs j := by
     intro j
     induction j with
     | zero =>
-      have hx : x 0 = 1 / 100 := by simp [x]; norm_num
-      refine ⟨⟨le_trans (mul_le_mul_of_nonneg_right (by rw [hx]; norm_num) (hG _ _).le)
-        hS3.1, le_trans (by rw [hx]; norm_num) hS3.2⟩, ?_⟩
-      rw [hx]; simp only [ε, ringDefect]; norm_num
+      have hx' : xs 0 = x := by simp [xs, coefficientDefect]
+      obtain ⟨he, hA⟩ := hbase m le_rfl
+      rw [hKs m (by omega)] at he
+      simp only [add_zero, hx']
+      exact ⟨⟨le_trans (mul_le_mul_of_nonneg_right (by linarith) (hG _ _).le) he,
+        le_trans (by linarith) hA⟩, hεm⟩
     | succ j ih =>
       obtain ⟨⟨he, hA⟩, hεj⟩ := ih
-      set y := x j
-      have hy0 := (hx0 j).le
-      have hy := hxle j
+      set y := xs j
+      have hy0 := (hxs0 j).le
+      have hy := hxsle j
       have hysq : y ^ 2 ≤ 1 / 10000 := by
         have := pow_le_pow_left₀ hy0 hy 2; norm_num at this ⊢; linarith
       have hysq0 : 0 ≤ y ^ 2 := sq_nonneg y
-      have hεs : ε (3 + j + 1) ≤ 6 * y ^ 2 := by
-        change 6 * ε (3 + j) ^ 2 ≤ 6 * y ^ 2
-        have := pow_le_pow_left₀ (hε0 _) hεj 2
-        linarith
-      set Ri := (1 - ε (3 + j)) * (1 - ε (3 + j + 1)) with hRi
+      have hεs' := hεsq (m + j) hεj
+      set Ri := (1 - ε (m + j)) * (1 - ε (m + j + 1)) with hRi
       have hRlow : (1 - y) * (1 - 6 * y ^ 2) ≤ Ri :=
-        mul_le_mul (by linarith) (by linarith) (by linarith) (by linarith [hε1 (3 + j)])
-      have hRle : Ri ≤ 1 := (mul_le_mul (by linarith [hε0 (3 + j)]) (by linarith [hε0 (3 + j + 1)])
-        (by linarith [hε1 (3 + j + 1)]) zero_le_one).trans_eq (mul_one 1)
+        mul_le_mul (by linarith) (by linarith) (by linarith) (by linarith [hε10 (m + j)])
+      have hRle : Ri ≤ 1 := (mul_le_mul (by linarith [hε0 (m + j)])
+        (by linarith [hε0 (m + j + 1)]) (by linarith [hε10 (m + j + 1)]) zero_le_one).trans_eq
+        (mul_one 1)
       have h10 : 0 ≤ 1 - 10 * y ^ 2 := by linarith
       have hlow : (1 - y) * ((1 - y) * (1 - 6 * y ^ 2)) * (1 - 10 * y ^ 2) ≤
           (1 - y) * Ri * (1 - 10 * y ^ 2) :=
@@ -753,62 +728,76 @@ theorem gapGT_of_openSeeds (hring : HasSpatialMomentBounds Er 2)
       have hle1 : (1 - y) * Ri * (1 - 10 * y ^ 2) ≤ 1 :=
         (mul_le_mul ((mul_le_mul (by linarith) hRle (hR0 _) zero_le_one).trans_eq (mul_one 1))
           (by linarith) h10 zero_le_one).trans_eq (mul_one 1)
-      have h := step (3 + j) (by omega) (q := 2 * y) (E := y) (η := y) (E' := 10 * y ^ 2)
-        (η' := 10 * y ^ 2) (by linarith) (by linarith)
-        ((tailBound_mono hεs (by linarith)).trans (uniform_tail hy0 hy)) (by linarith)
-        (by linarith) (uniform_overlap hy0 hy) (by linarith) (hpos.trans_le hlow)
+      have hKj := hKs (m + j) (by omega)
+      have hq : ρ (m + j + 1) ^ (2 * (2 * Nn (m + j)) - 2 * boundaryHalf N₀ K₀ (m + j)) ≤
+          2 * y := by
+        rw [hKj, show 2 * (2 * Nn (m + j)) - 2 * Nn (m + j) = 2 * Nn (m + j) by omega]
+        have := htail (m + j + 1)
+        rw [hNns] at this
+        exact pow_le_of_pow_two_mul_le (hw _).rho_nonneg (by linarith) this
+          ((tailBound_mono hεs' (by linarith)).trans (uniform_tail hy0 hy))
+      rw [← hKj] at he
+      have h := step (m + j) (q := 2 * y) (E := y) (η := y) (E' := 10 * y ^ 2)
+        (η' := 10 * y ^ 2) (by linarith) (by linarith) hq (by linarith) (by linarith)
+        (uniform_overlap hy0 hy) (by linarith) (hpos.trans_le hlow)
         (le_trans (squaringDefect_mono (by linarith)
           (by linarith [uniform_product hy0 hy]) (by linarith)) (uniform_squaring hy0 hy))
         he hA
-      rw [hxs]
-      exact ⟨h, hεs.trans (by linarith)⟩
-  -- The final scale: `Mᵢ ≤ n ≤ 2 Mᵢ` with `i = 3 + j`.
-  obtain ⟨j, hj1, hj2⟩ := exists_dyadic_window (n₀ := 1920) (by norm_num) (by omega : 1920 ≤ n)
+      rw [hxss]
+      exact ⟨h, hεs'.trans (by linarith)⟩
+  -- The final scale: `Mᵢ ≤ n ≤ 2 Mᵢ` with `i = m + j`.
+  obtain ⟨j, hj1, hj2⟩ := exists_dyadic_window (n₀ := 2 * (2 * Nn m))
+    (by have := hNn1 m; omega) ((le_of_eq (by simp only [Nn]; ring)).trans hn)
+  have hM : 2 * (2 * Nn m) * 2 ^ j = 2 * (2 * Nn (m + j)) := by
+    simp only [Nn]; rw [pow_add]; ring
+  rw [hM] at hj1 hj2
   obtain ⟨N, rfl⟩ := hno
-  have hM : 2 * (2 * Nn (3 + j)) = 1920 * 2 ^ j := by simp only [Nn]; rw [pow_add]; ring
   obtain ⟨⟨-, hA⟩, hεj⟩ := hunif j
   obtain ⟨⟨he', -⟩, -⟩ := hunif (j + 1)
-  set y := x j
-  have hy0 := (hx0 j).le
-  have hy := hxle j
+  set y := xs j
+  have hy0 := (hxs0 j).le
+  have hy := hxsle j
   have hysq : y ^ 2 ≤ 1 / 10000 := by
     have := pow_le_pow_left₀ hy0 hy 2; norm_num at this ⊢; linarith
   have hysq0 : 0 ≤ y ^ 2 := sq_nonneg y
-  rw [show 3 + (j + 1) = 3 + j + 1 by omega, hNns, hβs] at he'
+  rw [show m + (j + 1) = m + j + 1 by omega, hNns, hβs] at he'
   rw [thermalPurity, le_div_iff₀ (pow_pos (hG _ _) 2)] at hA
-  have hpur := (hw (3 + j)).oddChain_purity (hw' (3 + j)) (hμ _) (hr _) (K := 2 * Nn (3 + j))
-    (N := N) (by have := hNn1 (3 + j); omega) (by omega) (by omega) (hG _ _)
-    (E' := x (j + 1)) (by rw [hxs]; linarith) he' (η := y) (by linarith) hA (hR0 _)
+  have hpur := (hw (m + j)).oddChain_purity (hw' (m + j)) (hμ _) (hr _) (K := 2 * Nn (m + j))
+    (N := N) (by have := hNn1 (m + j); omega) (by omega) (by omega) (hG _ _)
+    (E' := xs (j + 1)) (by rw [hxss]; linarith) he' (η := y) (by linarith) hA (hR0 _)
     (hRbulk _)
   -- `P_τ(n, βᵢ) ≥ (1 - 2x')(1 - x) Rᵢ ≥ 1 - 4x`.
-  have hP : 1 - 4 * y ≤ thermalPurity Eo (2 * N + 1) (β (3 + j)) := by
+  have hP : 1 - 4 * y ≤ thermalPurity Eo (2 * N + 1) (β (m + j)) := by
     rw [thermalPurity, le_div_iff₀ (pow_pos (hG _ _) 2)]
-    have hεs : ε (3 + j + 1) ≤ 6 * y ^ 2 := by
-      change 6 * ε (3 + j) ^ 2 ≤ 6 * y ^ 2
-      have := pow_le_pow_left₀ (hε0 _) hεj 2
-      linarith
-    have hRlow : (1 - y) * (1 - 6 * y ^ 2) ≤ (1 - ε (3 + j)) * (1 - ε (3 + j + 1)) :=
-      mul_le_mul (by linarith) (by linarith) (by linarith) (by linarith [hε1 (3 + j)])
+    have hεs' := hεsq (m + j) hεj
+    have hRlow : (1 - y) * (1 - 6 * y ^ 2) ≤ (1 - ε (m + j)) * (1 - ε (m + j + 1)) :=
+      mul_le_mul (by linarith) (by linarith) (by linarith) (by linarith [hε10 (m + j)])
     have hfin := uniform_final hy0 hy
     have hlow : (1 - 2 * (10 * y ^ 2)) * (1 - y) * ((1 - y) * (1 - 6 * y ^ 2)) ≤
-        (1 - 2 * x (j + 1)) * (1 - y) * ((1 - ε (3 + j)) * (1 - ε (3 + j + 1))) := by
-      rw [hxs]
+        (1 - 2 * xs (j + 1)) * (1 - y) * ((1 - ε (m + j)) * (1 - ε (m + j + 1))) := by
+      rw [hxss]
       exact mul_le_mul_of_nonneg_left hRlow (mul_nonneg (by linarith) (by linarith))
-    have hG2 := pow_pos (hG (2 * N + 1) (β (3 + j))) 2
-    calc (1 - 4 * y) * partitionFunction Eo (2 * N + 1) (β (3 + j)) ^ 2
-        ≤ (1 - 2 * x (j + 1)) * (1 - y) * ((1 - ε (3 + j)) * (1 - ε (3 + j + 1))) *
-            partitionFunction Eo (2 * N + 1) (β (3 + j)) ^ 2 :=
+    have hG2 := pow_pos (hG (2 * N + 1) (β (m + j))) 2
+    calc (1 - 4 * y) * partitionFunction Eo (2 * N + 1) (β (m + j)) ^ 2
+        ≤ (1 - 2 * xs (j + 1)) * (1 - y) * ((1 - ε (m + j)) * (1 - ε (m + j + 1))) *
+            partitionFunction Eo (2 * N + 1) (β (m + j)) ^ 2 :=
           mul_le_mul_of_nonneg_right (hfin.trans hlow) hG2.le
-      _ ≤ partitionFunction Eo (2 * N + 1) (2 * β (3 + j)) := hpur
-  -- From the purity to the gap: `e^{βᵢ (log 10)/392} · 4x = 10^{2^j} · 4 · 10^{-(2^j + 1)}`.
+      _ ≤ partitionFunction Eo (2 * N + 1) (2 * β (m + j)) := hpur
+  /- From the purity to the gap:
+  `e^{β_{m+j} log(1/(10x)) / β_m} · 4x_j = (10x)^{-2^j} · 4 (10x)^{2^j} / 10`. -/
   refine gapGT_of_thermalPurity Eo (2 * N + 1) (hβpos _) (by linarith) hP ?_
-  have hexp : exp (β (3 + j) * (log 10 / 392)) = 10 ^ (2 ^ j) := by
-    have : β (3 + j) * (log 10 / 392) = ((2 ^ j : ℕ) : ℝ) * log 10 := by
-      simp only [β]; push_cast; rw [pow_add]; ring
-    rw [this, exp_nat_mul, exp_log (by norm_num)]
-  have hx10 : (10 : ℝ) ^ (2 ^ j) * y = 1 / 10 := by
-    simp only [y, x]; rw [pow_succ, ← mul_assoc, ← mul_pow]; norm_num
-  rw [hexp, show (10 : ℝ) ^ 2 ^ j * (4 * y) = 4 * (10 ^ 2 ^ j * y) by ring, hx10]
+  have h10x : 0 < 10 * x := by positivity
+  have hexp : exp (β (m + j) * (log (1 / (10 * x)) / (β₀ * 2 ^ m))) =
+      (1 / (10 * x)) ^ (2 ^ j) := by
+    have : β (m + j) * (log (1 / (10 * x)) / (β₀ * 2 ^ m)) =
+        ((2 ^ j : ℕ) : ℝ) * log (1 / (10 * x)) := by
+      simp only [β]; push_cast; rw [pow_add]; field_simp
+    rw [this, exp_nat_mul, exp_log (by positivity)]
+  have hx10 : (1 / (10 * x)) ^ (2 ^ j) * y = 1 / 10 := by
+    simp only [y, xs, coefficientDefect]
+    rw [mul_div_assoc', ← mul_pow, one_div_mul_cancel h10x.ne', one_pow]
+  rw [hexp, show (1 / (10 * x)) ^ 2 ^ j * (4 * y) = 4 * ((1 / (10 * x)) ^ 2 ^ j * y) by ring,
+    hx10]
   linarith
 
 end Main
