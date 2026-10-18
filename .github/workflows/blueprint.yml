@@ -55,6 +55,9 @@ jobs:
           build: true
           lint: false # no lint driver is configured
           mk_all-check: false # mk_all does not follow srcDir = "lean"
+          # Each cached run saves a 2 GB .lake cache keyed by commit. Keep that to deploys, so
+          # pull requests do not push docgen's API-docs cache out of the 10 GB limit.
+          use-github-cache: ${{ github.event_name != 'pull_request' }}
 
       # The leaderboard (home_page/leaderboard.html): list every Lean record with its numbers and
       # axioms in home_page/_data/lean_records.json (read by the page, never committed). Fails on
