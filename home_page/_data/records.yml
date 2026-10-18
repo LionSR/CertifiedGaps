@@ -250,7 +250,7 @@ records:
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1, r: "41501591/100000", beta: "21/4", decimal: "1.148250"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_1.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       An independent certified-MPO computation gives 1.147699.
@@ -269,7 +269,7 @@ records:
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_3_4, r: "10739897/100000", beta: "21/4", decimal: "0.890771"}
     certificate: models/heisenberg_staggered_field/results/certificate_3_4.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.890782", lengths: 'even L ≥ 8', tier: certified, pr: 2,
@@ -286,7 +286,7 @@ records:
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_2, r: "26344587/1000000", beta: "11/2", decimal: "0.594775"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_2.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.594785", lengths: 'even L ≥ 8', tier: certified, pr: 2,
@@ -303,7 +303,7 @@ records:
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_7_20, r: "90713109/10000000", beta: "23/4", decimal: "0.383498"}
     certificate: models/heisenberg_staggered_field/results/certificate_7_20.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.383508", lengths: 'even L ≥ 8', tier: certified, pr: 2,
@@ -320,7 +320,7 @@ records:
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_4, r: "19104427/5000000", beta: "25/4", decimal: "0.214477"}
     certificate: models/heisenberg_staggered_field/results/certificate_1_4.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.214486", lengths: 'even L ≥ 8', tier: certified, pr: 2,
@@ -338,7 +338,7 @@ records:
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "12370753/500000", beta: "6", decimal: "0.534747"}
     certificate: models/dimerized_heisenberg/results/certificate_delta_1_2_beta_6.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       Seed inverse temperature $\beta_0 = 25/4$ is also admissible and certifies 0.533681.
@@ -359,7 +359,7 @@ records:
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "6164911/2000000", beta: "13/2", decimal: "0.173188"}
     certificate: models/dimerized_heisenberg/results/certificate_delta_3_10_beta_13_2.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-15", decimal: "0.173197", lengths: 'even L ≥ 4 cells', tier: certified, pr: 23,
@@ -378,7 +378,7 @@ records:
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "15251257/10000000", beta: "29/4", decimal: "0.058217"}
     certificate: models/dimerized_heisenberg/results/certificate_delta_1_4_beta_29_4.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       Smallest dimerization certified from rings of at most 16 spins; for $\delta \in \{1/5,
@@ -402,7 +402,7 @@ records:
     lean: {name: Leaderboard.Records.SpinOneDimerized.delta_9_10, r: "12729193/2000000", beta: "7/2", decimal: "0.528785953268"}
     certificate: models/spin1_dimerized/results/certificate_d9.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.528801949327", lengths: 'even L ≥ 2 cells', tier: certified, pr: 3,
@@ -418,7 +418,7 @@ records:
     tier: certified
     certificate: models/spin1_dimerized/results/certificate_d7.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       Certified from the odd seed length $n_0 = 3$ cells (6 and 12 spin-1 sites) with real
@@ -440,7 +440,7 @@ records:
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_4, r: "47731477/10000000", beta: "9/4", decimal: "0.694669325", certificate: models/spin1_largeD/results/certificate_D4_1.json}
     certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       The companion Lean 4 theorem uses the smaller seed $(6, 9/4)$, where the computer
@@ -464,7 +464,7 @@ records:
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_1603_500, r: "5033559/5000000", beta: "381/125", decimal: "0.002194677"}
     certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.002213465", lengths: 'even L ≥ 6', tier: certified, pr: 7,
@@ -481,7 +481,7 @@ records:
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_interval_3206, r: "5014989/5000000", beta: "381/125", decimal: "0.000982058"}
     certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-15", decimal: "0.001001626", lengths: 'even L ≥ 6', tier: certified, pr: 12,
@@ -498,7 +498,7 @@ records:
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_interval_4, r: "5016317/5000000", beta: "23/10", decimal: "0.001416559"}
     certificate: models/spin1_largeD/results/certificate.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-15", decimal: "0.001442884", lengths: 'even L ≥ 6', tier: certified, pr: 12,
@@ -516,7 +516,7 @@ records:
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_4, r: "11334983/1250000", beta: "2", decimal: "1.102375116"}
     certificate: models/heisenberg_ladder/results/certificate_J4.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       A perturbation certificate around $J_\perp = 4$ covers the interval
@@ -536,7 +536,7 @@ records:
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_7_2, r: "5765561/1000000", beta: "9/4", decimal: "0.778623315"}
     certificate: models/heisenberg_ladder/results/certificate_J7_2.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       A perturbation certificate around $J_\perp = 7/2$ covers the interval
@@ -556,7 +556,7 @@ records:
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_3, r: "31124723/10000000", beta: "5/2", decimal: "0.454166944"}
     certificate: models/heisenberg_ladder/results/certificate_J3.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       A perturbation certificate around $J_\perp = 3$ covers the interval
@@ -576,7 +576,7 @@ records:
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_5_2, r: "11356953/10000000", beta: "3", decimal: "0.042415020"}
     certificate: models/heisenberg_ladder/results/certificate_J5_2.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-15", decimal: "0.042433721", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 13,
@@ -592,7 +592,7 @@ records:
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_163069_65536, r: "1004547/1000000", beta: "3", decimal: "0.001512231"}
     certificate: models/heisenberg_ladder/results/certificate_J163069_65536.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     notes: >-
       Smallest rung coupling reachable with $n_0 = 4$ rungs; at $J_\perp = 326133/131072$,
@@ -613,7 +613,7 @@ records:
     lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "25974347/10000000", beta: "3/2", decimal: "0.636349536"}
     certificate: models/two_leg_tfim/results/certificate_g3_1.json
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.636386863", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 1,
@@ -656,7 +656,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_10, r: "11954821/500", beta: "55/4", decimal: "0.733239"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_10.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.733243", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -673,7 +673,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_4, r: "6090116/125", beta: "13/2", decimal: "1.660594"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_4.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "1.660603", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -690,7 +690,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_2, r: "26187609/500", beta: "11/2", decimal: "1.975670"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_2.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "1.975680", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -707,7 +707,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1, r: "43323337/1000", beta: "21/4", decimal: "2.033608"}
     certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_1.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "2.033619", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -724,7 +724,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_20, r: "3771579/10000", beta: "13", decimal: "0.456358"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_20.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.456363", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -741,7 +741,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_10, r: "21500127/10000", beta: "8", decimal: "0.959153"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_10.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.959160", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -758,7 +758,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_4, r: "5154939/125", beta: "9/2", decimal: "2.361589"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_4.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "2.361601", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -775,7 +775,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_2, r: "16566669/250", beta: "4", decimal: "2.775360"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_2.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "2.775374", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -792,7 +792,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1, r: "13686553/250", beta: "4", decimal: "2.727615"}
     certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_1.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "2.727629", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -809,7 +809,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_20, r: "6315629/500000", beta: "8", decimal: "0.317021"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_20.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.317028", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -826,7 +826,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_10, r: "28665237/500000", beta: "21/4", decimal: "0.771206"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_10.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.771216", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -843,7 +843,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_4, r: "1566019/1000", beta: "7/2", decimal: "2.101797"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_4.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "2.101813", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -860,7 +860,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_2, r: "9458843/250", beta: "7/2", decimal: "3.011714"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_2.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "3.011730", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -877,7 +877,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1, r: "29371647/500", beta: "7/2", decimal: "3.137409"}
     certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_1.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "3.137425", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -894,7 +894,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_20, r: "656893/400000", beta: "13/2", decimal: "0.076316"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_20.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.076325", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -911,7 +911,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_10, r: "85257569/10000000", beta: "17/4", decimal: "0.504256"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_10.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.504270", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -928,7 +928,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_4, r: "390352/3125", beta: "3", decimal: "1.609204"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_4.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "1.609223", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -945,7 +945,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_2, r: "38538963/10000", beta: "3", decimal: "2.752279"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_2.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "2.752298", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -962,7 +962,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1, r: "27659233/500", beta: "3", decimal: "3.640287"}
     certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_1.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "3.640306", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -979,7 +979,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_20, r: "723049/400000", beta: "7/2", decimal: "0.169146"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_20.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.169162", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -996,7 +996,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_10, r: "6445599/2000000", beta: "13/4", decimal: "0.360077"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_10.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.360094", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -1013,7 +1013,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_4, r: "729083/40000", beta: "11/4", decimal: "1.055602"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_4.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "1.055623", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -1030,7 +1030,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_2, r: "820097/4000", beta: "5/2", decimal: "2.129251"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_2.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "2.129273", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -1047,7 +1047,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1, r: "10534123/1000", beta: "5/2", decimal: "3.704950"}
     certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_1.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "3.704972", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -1064,7 +1064,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_20, r: "4865291/625000", beta: "9/4", decimal: "0.912057"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_20.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.912082", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -1081,7 +1081,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_10, r: "17508041/2000000", beta: "9/4", decimal: "0.964228"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_10.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "0.964252", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -1098,7 +1098,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_4, r: "17526371/1000000", beta: "9/4", decimal: "1.272758"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_4.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "1.272783", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -1115,7 +1115,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_2, r: "45057249/500000", beta: "9/4", decimal: "2.000480"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_2.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "2.000505", lengths: 'even L ≥ 6', tier: certified, pr: 5,
@@ -1132,7 +1132,7 @@ records:
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1, r: "2154751/2000", beta: "2", decimal: "3.491141"}
     certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_1.json.gz
     date: "2026-10-18"
-    pr: null
+    pr: 81
     contributors: ['LionSR']
     history:
       - {date: "2026-10-12", decimal: "3.491169", lengths: 'even L ≥ 6', tier: certified, pr: 5,
