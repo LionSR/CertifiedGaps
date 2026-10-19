@@ -31,16 +31,17 @@ usemathjax: true
   {%- endfor -%}
 {%- endfor -%}
 {%- assign events = events | split: "␞" | sort %}
-<figure id="progress-chart" aria-hidden="true"></figure>
+<figure id="progress-chart" aria-hidden="true"><div class="tip" hidden></div></figure>
 <p class="caption">The line shows the best proved bound for large rings, in the order the bounds
   appeared. A hollow point is a bound that did not make the best bound larger.</p>
 <div class="table-wrap"><table class="history" id="progress-table">
   <thead><tr><th>Date</th><th class="num">$\Delta_L \ge$</th><th class="num">Even $L \ge$</th><th>Method</th><th>Proof</th></tr></thead>
   <tbody>
   {%- for e in events %}{% assign c = e | split: "|" %}
-    <tr data-date="{{ c[0] }}" data-value="{{ c[1] }}" data-l0="{{ c[2] }}">
+    {%- if c[4] contains "lean" %}{% assign proof = "Lean 4, from seed" %}{% else %}{% assign proof = "computer" %}{% endif %}
+    <tr data-date="{{ c[0] }}" data-value="{{ c[1] }}" data-l0="{{ c[2] }}" data-method="{{ c[3] | escape }}" data-proof="{{ proof }}">
       <td class="num">{{ c[0] }}</td><td class="num">{{ c[1] | slice: 0, 8 }}</td><td class="num">{{ c[2] }}</td>
-      <td>{{ c[3] }}</td><td>{% if c[4] contains "lean" %}Lean 4, from seed{% else %}computer{% endif %}</td>
+      <td>{{ c[3] }}</td><td>{{ proof }}</td>
     </tr>
   {%- endfor %}
   </tbody>

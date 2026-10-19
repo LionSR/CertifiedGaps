@@ -19,14 +19,15 @@ Let $$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$ be the partition function of a
 unit cells. The method uses two ratios:
 
 $$
-P_{\mathrm{s}}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
-P_\tau(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
+P_{\mathrm S}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
+P_{\mathrm T}(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
 $$
 
 1. Show that the interaction between neighboring cells is reflection positive [[6](#ref-6)].
-2. At one seed $$(n_0, \beta_0)$$, calculate upper bounds on $$1 - P_{\mathrm{s}}(n_0, \beta_0)$$
-   and $$1 - P_\tau(2n_0, \beta_0)$$. The method works if both bounds are less than $$0.127$$.
-3. Double $$n$$ and $$\beta$$ together. Each doubling makes the two defects smaller. The result is
+2. At one seed $$(n_0, \beta_0)$$, calculate upper bounds on the defects
+   $$p = 1 - P_{\mathrm S}(n_0, \beta_0)$$ and $$q = 1 - P_{\mathrm T}(2n_0, \beta_0)$$. The method
+   works if $$p$$ and $$q$$ are both less than $$\varepsilon_* \approx 0.127$$.
+3. Double $$n$$ and $$\beta$$ together. Each doubling makes $$p$$ and $$q$$ smaller. The result is
    a lower bound on the gap for all even $$L \ge n_0$$.
 
 Only step 2 uses a numerical calculation. Lean 4 [[7](#ref-7)] proves step 3.

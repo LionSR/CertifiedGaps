@@ -27,15 +27,14 @@ Put each model in its own directory `models/<slug>/`. Obey the rules in
    $$-h = \sum_\alpha C_\alpha \otimes F \overline{C_\alpha} F$$ for a cell with an internal
    reflection $$F$$. Check this identity exactly. The on-site term $$o$$ must be real and
    symmetric.
-2. Seed bounds. Calculate rigorous upper bounds
-   $$\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$$ and
-   $$\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$$. Use exact arithmetic, ball or interval
-   arithmetic, or verified enclosures of ring spectra (`CertifiedGaps.VerifiedSpectra`) with
-   explicit bounds on rounding errors. Floating-point values without error bounds, Lanczos runs
-   and DMRG are not sufficient.
+2. Seed bounds. Calculate rigorous upper bounds on the defects
+   $$p = 1 - P_{\mathrm S}(n_0, \beta_0)$$ and $$q = 1 - P_{\mathrm T}(2n_0, \beta_0)$$. Use exact
+   arithmetic, ball or interval arithmetic, or verified enclosures of ring spectra
+   (`CertifiedGaps.VerifiedSpectra`) with explicit bounds on rounding errors. Floating-point
+   values without error bounds, Lanczos runs and DMRG are not sufficient.
 3. Gap bound. Apply `CertifiedGaps.certified_gap_bound` (interval arithmetic) or
-   `CertifiedGaps.Recurrence.rational_gap_chain` (exact rationals) to
-   $$(\varepsilon_{\mathrm{s}}, \varepsilon_\tau, \beta_0)$$.
+   `CertifiedGaps.Recurrence.rational_gap_chain` (exact rationals) to the bounds on $$p$$ and
+   $$q$$ and to $$\beta_0$$.
 4. Checker. Write `check.jl`. It must calculate parts 1 to 3 again from the stored certificate in
    a few minutes. With `--full`, it must also replay the full spectra. It must stop with an error
    at each mismatch.

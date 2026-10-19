@@ -59,49 +59,48 @@ tiers:
 families:
   - key: spin1-heisenberg
     name: 'Spin-1 Heisenberg chain'
-    hamiltonian: '$H_L = \sum_{j=1}^{L} \mathbf{S}_j \cdot \mathbf{S}_{j+1}$'
+    hamiltonian: '$H_L = \sum_{j=1}^{L} \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1}$'
     slug: spin1
     cells: 'sites'
     gap_source: >-
       <a href="https://arxiv.org/abs/cond-mat/9911047">Todo and Kato</a>, quantum Monte Carlo
   - key: spin1-open
     name: 'Spin-1 Heisenberg open chain with endpoint fields'
-    hamiltonian: '$H_n = \sum_{i=1}^{n-1} \mathbf{S}_i \cdot \mathbf{S}_{i+1} - h\,(S_1^z + S_n^z)$'
+    hamiltonian: '$H_n = \sum_{i=1}^{n-1} \boldsymbol{S}_i \cdot \boldsymbol{S}_{i+1} - h\,(S_1^z + S_n^z)$'
     cells: 'sites'
     gap_source: >-
       bulk value of the periodic chain (<a href="https://arxiv.org/abs/cond-mat/9911047">Todo
       and Kato</a>, quantum Monte Carlo); the open-chain gap is not estimated separately
   - key: heisenberg-staggered-field
     name: 'Spin-1/2 Heisenberg chain in a staggered field'
-    hamiltonian: '$H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1} - h \sum_j (-1)^j S_j^z$'
+    hamiltonian: '$H_L = \sum_j \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1} - h \sum_j (-1)^j S_j^z$'
     slug: heisenberg_staggered_field
     cells: 'sites'
     gap_source: '16-site ring, exact diagonalization (floating point)'
   - key: dimerized-heisenberg
     name: 'Dimerized spin-1/2 Heisenberg chain'
     hamiltonian: >-
-      $H_L = (1+\delta) \sum_j \mathbf{S}_{2j-1} \cdot \mathbf{S}_{2j} + (1-\delta) \sum_j
-      \mathbf{S}_{2j} \cdot \mathbf{S}_{2j+1}$
+      $H_L = \sum_{j=1}^{2L} [1 + (-1)^j \delta]\, \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1}$
     slug: dimerized_heisenberg
     cells: 'two-spin cells ($N = 2L$ spins)'
     gap_source: '20-spin ring, Krylov method (floating point)'
   - key: spin1-dimerized
     name: 'Dimerized spin-1 Heisenberg chain'
-    hamiltonian: '$H_L = \sum_{j=1}^{2L} [1 + (-1)^j \delta]\, \mathbf{S}_j \cdot \mathbf{S}_{j+1}$'
+    hamiltonian: '$H_L = \sum_{j=1}^{2L} [1 + (-1)^j \delta]\, \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1}$'
     slug: spin1_dimerized
     cells: 'two-spin cells ($N = 2L$ spins)'
     gap_source: '12-spin ring, exact diagonalization (floating point)'
   - key: spin1-largeD
     name: 'Spin-1 chain with single-ion anisotropy'
-    hamiltonian: '$H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum_j (S_j^z)^2$'
+    hamiltonian: '$H_L = \sum_j \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1} + D \sum_j (S_j^z)^2$'
     slug: spin1_largeD
     cells: 'sites'
     gap_source: '12-site ring, exact diagonalization (floating point)'
   - key: heisenberg-ladder
     name: 'Two-leg spin-1/2 Heisenberg ladder'
     hamiltonian: >-
-      $H_L = \sum_{j} \sum_{a=1,2} \mathbf{S}_{a,j} \cdot \mathbf{S}_{a,j+1} + J_\perp \sum_j
-      \mathbf{S}_{1,j} \cdot \mathbf{S}_{2,j}$
+      $H_L = \sum_{j} \sum_{a=1,2} \boldsymbol{S}_{a,j} \cdot \boldsymbol{S}_{a,j+1} + J_\perp \sum_j
+      \boldsymbol{S}_{1,j} \cdot \boldsymbol{S}_{2,j}$
     slug: heisenberg_ladder
     cells: 'rungs ($N = 2L$ spins)'
     gap_source: '10-rung ring, exact diagonalization (floating point)'
@@ -133,14 +132,14 @@ families:
   - key: spin1-blbq
     name: 'Spin-1 bilinear–biquadratic chain'
     hamiltonian: >-
-      $H_L = \sum_j \left[\cos\theta\, \mathbf{S}_j \cdot \mathbf{S}_{j+1} + \sin\theta\,
-      (\mathbf{S}_j \cdot \mathbf{S}_{j+1})^2\right]$
+      $H_L = \sum_j \left[\cos\theta\, \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1} + \sin\theta\,
+      (\boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1})^2\right]$
     slug: blbq_haldane
     cells: 'sites'
     gap_source: 'floating-point estimate'
   - key: spin2-heisenberg
     name: 'Spin-2 Heisenberg chain'
-    hamiltonian: '$H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$'
+    hamiltonian: '$H_L = \sum_j \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1}$'
     slug: spin2
     cells: 'sites'
     gap_source: >-
@@ -227,7 +226,7 @@ records:
     pr: null
     contributors: ['LionSR']
     notes: >-
-      The seed inequalities are $P_{\mathrm{s}}(2304, 784) \ge 1 - 0.0084513$ and $P_\tau(4608, 784)
+      The seed inequalities are $P_{\mathrm S}(2304, 784) \ge 1 - 0.0084513$ and $P_{\mathrm T}(4608, 784)
       \ge 1 - 0.0054986$. They come from the preprint seed $(36, 49/4)$ after 6 doubling steps. If
       both purities are rounded down to $0.99$, the bound is $(\log 20)/784$, as in the preprint.
       Lean 4 also proves this bound (#74).

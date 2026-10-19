@@ -121,7 +121,16 @@ ol.references li { margin: 0.45em 0; max-width: none; }
 details.notes > summary { font-size: 0.9rem; }
 dl.checks dt { font-style: italic; margin-top: 0.8rem; }
 dl.checks dd { margin: 0.2rem 0 0 1.5rem; }
-#progress-chart { margin: 0.5rem 0 1rem; }
+#progress-chart { position: relative; margin: 0.5rem 0 1rem; max-width: 40rem; }
+svg.chart .hit { fill: transparent; outline: none; }
+#progress-chart .tip {
+  position: absolute; z-index: 1; max-width: 17rem; padding: 0.4rem 0.6rem; pointer-events: none;
+  background: var(--bg); border: 1px solid var(--line); font-size: 0.8rem; line-height: 1.35;
+  font-variant-numeric: lining-nums;
+}
+#progress-chart .tip-head { color: var(--ink); }
+#progress-chart .tip-body, #progress-chart .tip-foot { color: var(--mute); }
+table.history tr.hl td { background: var(--wash); }
 svg.chart { width: 100%; max-width: 40rem; height: auto; font-family: var(--serif); }
 svg.chart .grid { stroke: var(--line); stroke-width: 1; }
 svg.chart .tick { font-size: 12px; fill: var(--mute); font-variant-numeric: lining-nums; }
