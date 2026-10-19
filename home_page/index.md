@@ -10,8 +10,12 @@ Lean 4 proves the doubling step to all larger even lengths.
 
 Haldane predicted in 1983 that the spin-1 Heisenberg chain has a gap that stays open as the chain
 grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026, as
-[result 268](https://github.com/openai/math/blob/1581d4cbdd69a0faf34b2089614fe2a814316a6a/CONTENTS.md?plain=1#L6747) of its math release [[3](#ref-3), [4](#ref-4)]. We use the same method for more models. We call the method the
+[result 268](https://github.com/openai/math/blob/1581d4cbdd69a0faf34b2089614fe2a814316a6a/CONTENTS.md?plain=1#L6747) of its math release [[3](#ref-3), [4](#ref-4)]. We call the method of this proof the
 *spacetime bootstrap*.
+
+The method is not specific to the spin-1 chain. It applies to many other spin chains, and the
+[leaderboard]({{ '/leaderboard.html' | relative_url }}) lists the bounds that we have so far. It can do more.
+Better seeds give larger bounds, and an extension to two-dimensional lattices is in progress.
 
 ## Method
 
