@@ -32,8 +32,8 @@ usemathjax: true
 {%- endfor -%}
 {%- assign events = events | split: "␞" | sort %}
 <figure id="progress-chart" aria-hidden="true"><div class="tip" hidden></div></figure>
-<p class="caption">The line shows the best proved bound for large rings, in the order the bounds
-  appeared. A hollow point is a bound that did not make the best bound larger.</p>
+<p class="caption">The step line shows the best proved bound for large rings, in the order the
+  bounds appeared. A hollow point marks a bound below the running best.</p>
 <div class="table-wrap"><table class="history" id="progress-table">
   <thead><tr><th>Date</th><th class="num">$\Delta_L \ge$</th><th class="num">Even $L \ge$</th><th>Method</th><th>Proof</th></tr></thead>
   <tbody>
@@ -55,10 +55,9 @@ usemathjax: true
   {%- for f in data.families %}
     {%- assign rows = data.records | where: "family", f.key | where_exp: "r", "r.tier != 'target'" -%}
     {%- if rows.size == 0 %}{% continue %}{% endif -%}
-    {%- assign lo = rows[0] -%}{%- assign hi = rows[0] -%}{%- assign L0 = rows[0].lengths.L0 -%}{%- assign nlean = 0 -%}{%- assign nfree = 0 -%}
+    {%- assign hi = rows[0] -%}{%- assign L0 = rows[0].lengths.L0 -%}{%- assign nlean = 0 -%}{%- assign nfree = 0 -%}
     {%- for r in rows -%}
       {%- assign v = r.bound.decimal | times: 1.0 -%}
-      {%- assign a = lo.bound.decimal | times: 1.0 %}{% if v < a %}{% assign lo = r %}{% endif -%}
       {%- assign b = hi.bound.decimal | times: 1.0 %}{% if v > b %}{% assign hi = r %}{% endif -%}
       {%- if r.lengths.L0 < L0 %}{% assign L0 = r.lengths.L0 %}{% endif -%}
       {%- if r.lean -%}
@@ -155,8 +154,8 @@ usemathjax: true
 
 <section id="challenges">
 <h2>Open problems</h2>
-<p>These problems are open. To work on one, open an issue on GitHub. The
-  <a href="{{ '/contribute.html' | relative_url }}">contribution guide</a> gives the rules.</p>
+<p>To work on an open problem, open an issue on GitHub. The
+  <a href="{{ '/contribute.html' | relative_url }}">contribution guide</a> gives the requirements.</p>
 <ul class="problems">
 {%- for c in data.challenges %}
   <li id="{{ c.id }}"><em>{{ c.title }}.</em> {{ c.need }}{% if c.link %} (<a href="{% if c.link contains "http" %}{{ c.link }}{% else %}{{ repo_blob }}{{ c.link }}{% endif %}">background</a>){% endif %}</li>
@@ -167,17 +166,19 @@ usemathjax: true
 <section id="tiers">
 <h2>How the bounds are checked</h2>
 <dl class="checks">
-  <dt>Certified gap</dt>
-  <dd>The bound after 48 doubling steps in interval arithmetic. The seed comes from verified
-    enclosures of ring spectra or from exact rational arithmetic. The checker of each model
-    calculates all values again from the stored certificate.</dd>
-  <dt>Lean 4</dt>
-  <dd>The bound of a Lean 4 theorem. The theorem uses the two seed inequalities as hypotheses and
-    does 14 exact doubling steps. This bound is usually smaller by approximately $10^{-5}$. An
-    unconditional theorem also proves the seed inequalities in the Lean kernel.</dd>
+  <dt>Certificate checker (Certified gap ≥)</dt>
+  <dd>Each model's <code>check.jl</code> verifies the exact reflection-positivity identity,
+    bounds the seed defects at $(n_0, \beta_0)$ from verified ring spectra or exact rationals, and
+    runs 48 doubling steps in interval arithmetic.</dd>
+  <dt>Lean 4 kernel (Lean 4 ≥)</dt>
+  <dd>A Lean 4 theorem takes the two seed inequalities at $(n_0, \beta_0)$ as hypotheses and
+    checks 14 exact rational doubling steps in the kernel (typically within $10^{-5}$ of the
+    48-step bound). Theorems marked <em>unconditional</em> also prove the seed inequalities in the
+    kernel.</dd>
   <dt>Continuous integration</dt>
-  <dd>For each change, CI builds the Lean theorems and checks them again in the Lean kernel with
-    <code>leanchecker</code>. It also runs the checkers of the changed models.</dd>
+  <dd>Every pull request and push to <code>main</code> builds the Lean theorems, replays them in a
+    fresh process with <code>leanchecker</code>, and runs <code>check.jl</code> on changed
+    models.</dd>
 </dl>
 </section>
 

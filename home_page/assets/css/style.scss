@@ -81,25 +81,22 @@ thead th { font-weight: 400; font-style: italic; color: var(--mute); border-bott
 .num { text-align: right; white-space: nowrap; }
 table.summary { width: 100%; }
 table.summary td:first-child { padding-right: 1.5rem; min-width: 11em; }
-table.points td:first-child { white-space: nowrap; }
+table.points td:first-child, table.points td:last-child { white-space: nowrap; }
 table.grid tbody th { font-weight: 400; color: var(--mute); padding-right: 1.2rem; }
 table.grid td { padding-left: 1.2rem; }
-td:target, tr:target td { background: var(--wash); }
+table.history td:nth-child(4) { white-space: normal; min-width: 16em; }
+table.history tr.hl td, td:target, tr:target td { background: var(--wash); }
 
 details { margin: 0 0 1.2rem; }
 details > summary { cursor: pointer; font-style: italic; margin-bottom: 0.6rem; }
 details > summary::marker { color: var(--mute); }
 
-.hamiltonian { text-align: center; margin: 0.2rem 0 0.8rem; max-width: none !important; overflow-x: auto; overflow-y: hidden; }
-table.points td:last-child { white-space: nowrap; }
-table.targets { width: 100%; }
-table.targets td:first-child { min-width: 12em; }
-table.targets td:last-child { min-width: 14em; }
-.notes p { font-size: 0.9rem; line-height: 1.45; color: var(--mute); }
-.notes .param { color: var(--ink); }
-ul.problems li { margin: 0.6em 0; }
+.site-footer {
+  border-top: 1px solid var(--line); padding-top: 0.9rem; padding-bottom: 2rem;
+  font-size: 0.85rem; color: var(--mute);
+}
 
-/* Home page. */
+/* Home page: news, references, and figures (time blue, space red, admissible region green). */
 ul.news { list-style: none; padding-left: 0; }
 ul.news li { display: grid; grid-template-columns: 6.5em 1fr; gap: 0 0.6em; margin: 0.35em 0; max-width: 42em; }
 ul.news a { text-decoration: none; }
@@ -108,47 +105,6 @@ ul.news .date { color: var(--mute); font-variant-numeric: lining-nums tabular-nu
 ol.references { font-size: 0.9rem; line-height: 1.45; padding-left: 1.6em; }
 ol.references li { margin: 0.45em 0; max-width: none; }
 
-.site-footer {
-  border-top: 1px solid var(--line); padding-top: 0.9rem; padding-bottom: 2rem;
-  font-size: 0.85rem; color: var(--mute);
-}
-
-@media (max-width: 600px) {
-  body { font-size: 17px; }
-  ul.news li { grid-template-columns: 1fr; }
-}
-
-/* Leaderboard additions: model sections are subordinate to "All models"; the chart is drawn in
-   ink on faint grid lines with direct labels, like a figure in a paper. */
-.family h3 { font-size: 1.3rem; margin-top: 2.2rem; }
-.caption { font-size: 0.9rem; color: var(--mute); }
-details.notes > summary { font-size: 0.9rem; }
-dl.checks dt { font-style: italic; margin-top: 0.8rem; }
-dl.checks dd { margin: 0.2rem 0 0 1.5rem; }
-#progress-chart { position: relative; margin: 0.5rem 0 1rem; max-width: 40rem; }
-svg.chart .hit { fill: transparent; outline: none; }
-#progress-chart .tip {
-  position: absolute; z-index: 1; max-width: 17rem; padding: 0.4rem 0.6rem; pointer-events: none;
-  background: var(--bg); border: 1px solid var(--line); font-size: 0.8rem; line-height: 1.35;
-  font-variant-numeric: lining-nums;
-}
-#progress-chart .tip-head { color: var(--ink); }
-#progress-chart .tip-body, #progress-chart .tip-foot { color: var(--mute); }
-table.history tr.hl td { background: var(--wash); }
-svg.chart { width: 100%; max-width: 40rem; height: auto; font-family: var(--serif); }
-svg.chart .grid { stroke: var(--line); stroke-width: 1; }
-svg.chart .tick { font-size: 12px; fill: var(--mute); font-variant-numeric: lining-nums; }
-svg.chart .step { fill: none; stroke: var(--mute); stroke-width: 1.2; }
-svg.chart .step.main { stroke: var(--ink); stroke-width: 1.8; }
-svg.chart .pt { fill: var(--bg); stroke: var(--mute); stroke-width: 1.2; }
-svg.chart .pt.main { stroke: var(--ink); }
-svg.chart .pt.filled { fill: var(--ink); }
-svg.chart .end { font-size: 12px; fill: var(--mute); font-variant-numeric: lining-nums; }
-svg.chart .end.main { fill: var(--ink); }
-table.history td:nth-child(4) { white-space: normal; min-width: 16em; }
-
-/* Home page figures, in the colors of the slides and the explainer: time blue, space red, the
-   admissible region green. */
 .purities { margin: 1rem 0 1.4rem; }
 .purity { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.8rem; margin: 0.6rem 0; }
 .purity .t { color: var(--time); }
@@ -168,7 +124,6 @@ svg.torus .edge { fill: none; stroke: currentColor; stroke-width: 1; }
 .method ol { margin-top: 0; }
 .method figure { margin: 0; }
 .method figcaption { font-size: 0.85rem; line-height: 1.4; color: var(--mute); margin-top: 0.3rem; }
-@media (max-width: 760px) { .method { grid-template-columns: minmax(0, 1fr); } .method figure { max-width: 320px; } }
 svg.region { width: 100%; height: auto; font-family: var(--serif); }
 svg.region .ok { fill: var(--ok-f); stroke: var(--ok); stroke-width: 1; }
 svg.region .axis { stroke: var(--mute); stroke-width: 1; }
@@ -179,3 +134,36 @@ svg.region .orbit { fill: none; stroke: var(--space); stroke-width: 1.2; }
 svg.region .orbit-pt { fill: var(--space); }
 svg.region .seed { font-size: 11px; fill: var(--space); }
 svg.region .step { font-size: 10px; fill: var(--mute); font-variant-numeric: lining-nums; }
+
+/* Leaderboard: model sections, chart, and check definitions. */
+.family h3 { font-size: 1.3rem; margin-top: 2.2rem; }
+.hamiltonian { text-align: center; margin: 0.2rem 0 0.8rem; max-width: none !important; overflow-x: auto; overflow-y: hidden; }
+.caption { font-size: 0.9rem; color: var(--mute); }
+details.notes > summary { font-size: 0.9rem; }
+.notes p { font-size: 0.9rem; line-height: 1.45; color: var(--mute); }
+.notes .param { color: var(--ink); }
+ul.problems li { margin: 0.6em 0; }
+dl.checks dt { font-style: italic; margin-top: 0.8rem; }
+dl.checks dd { margin: 0.2rem 0 0 1.5rem; }
+
+#progress-chart { position: relative; margin: 0.5rem 0 1rem; max-width: 40rem; }
+#progress-chart .tip {
+  position: absolute; z-index: 1; max-width: 17rem; padding: 0.4rem 0.6rem; pointer-events: none;
+  background: var(--bg); border: 1px solid var(--line); font-size: 0.8rem; line-height: 1.35;
+  font-variant-numeric: lining-nums;
+}
+#progress-chart .tip-head { color: var(--ink); }
+#progress-chart .tip-body, #progress-chart .tip-foot { color: var(--mute); }
+svg.chart { width: 100%; max-width: 40rem; height: auto; font-family: var(--serif); }
+svg.chart .grid { stroke: var(--line); stroke-width: 1; }
+svg.chart .tick, svg.chart .end { font-size: 12px; fill: var(--mute); font-variant-numeric: lining-nums; }
+svg.chart .end.main { fill: var(--ink); }
+svg.chart .step { fill: none; stroke: var(--mute); stroke-width: 1.2; }
+svg.chart .step.main { stroke: var(--ink); stroke-width: 1.8; }
+svg.chart .pt { fill: var(--bg); stroke: var(--mute); stroke-width: 1.2; }
+svg.chart .pt.main { stroke: var(--ink); }
+svg.chart .pt.filled { fill: var(--ink); }
+svg.chart .hit { fill: transparent; outline: none; }
+
+@media (max-width: 760px) { .method { grid-template-columns: minmax(0, 1fr); } .method figure { max-width: 320px; } }
+@media (max-width: 600px) { body { font-size: 17px; } ul.news li { grid-template-columns: 1fr; } }

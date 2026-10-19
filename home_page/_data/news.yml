@@ -8,7 +8,7 @@
   text: 'OpenAI publishes two preprints with a proof of the spin-1 Haldane gap, for periodic rings and for open chains with boundary fields.'
   link: 'https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026'
 - date: "2026-10-10"
-  text: 'This repository calculates the finite data of the periodic preprint again, in exact integer arithmetic.'
+  text: 'This repository reproduces the finite data of the periodic preprint in exact integer arithmetic.'
   link: '/leaderboard.html#family-spin1-heisenberg'
 - date: "2026-10-12"
   text: 'Certified gap bounds for seven more models, for example spin ladders, dimerized chains and the Ising chain in two fields.'

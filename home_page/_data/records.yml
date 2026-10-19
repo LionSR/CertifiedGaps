@@ -201,9 +201,9 @@ records:
     notes: >-
       The seed inequalities come from the finite data of the OpenAI periodic preprint: 18 thermal
       traces on rings of at most 12 sites and one matrix-product state on 120 sites. This repository
-      calculates them again in exact rational arithmetic. An audit (#49) did all steps again two
-      times, in exact rationals and in Arb ball arithmetic, with no shared code. The Lean 4 theorem
-      uses the purity inequalities at the two seeds as hypotheses.
+      reproduces them in exact rational arithmetic. An independent audit (#49) recomputes all steps
+      in exact rationals and in Arb ball arithmetic, with no shared code. The Lean 4 theorem uses
+      the purity inequalities at the two seeds as hypotheses.
     history:
       - {date: "2026-10-10", decimal: "0.072901771", lengths: 'even L ≥ 36', tier: certified, pr: null,
          method: 'temperature lifting, two seeds, 10 exact doubling steps'}
