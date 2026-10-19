@@ -34,7 +34,9 @@ theorem foldl_add_eq_sum {β : Type*} [AddCommMonoid β] (f : ℕ → β) (b : �
     (List.range N).foldl (fun a s ↦ a + f s) b = b + ∑ s ∈ Finset.range N, f s := by
   induction N generalizing b with
   | zero => simp
-  | succ N ih => rw [List.range_succ, List.foldl_append, ih, Finset.sum_range_succ]; simp [add_assoc]
+  | succ N ih =>
+    rw [List.range_succ, List.foldl_append, ih, Finset.sum_range_succ]
+    simp [add_assoc]
 
 /-! ### Encoding configurations as integers -/
 
@@ -95,9 +97,9 @@ theorem z_encode (σ : Fin L → Fin 2) (j : Fin L) : (z (encode σ) j : ℝ) = 
 theorem finRotate_val (j : Fin L) : (finRotate L j : ℕ) = ((j : ℕ) + 1) % L := by
   rcases L with _ | L
   · exact j.elim0
-  rw [finRotate_succ_apply, Fin.val_add]
+  rw [finRotate_apply, Fin.val_add]
   rcases L with _ | L
-  · simp [Fin.val_zero]
+  · simp
   · simp
 
 theorem diagonal_encode (σ : Fin L → Fin 2) :

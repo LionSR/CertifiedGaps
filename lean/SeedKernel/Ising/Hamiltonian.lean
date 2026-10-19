@@ -61,19 +61,19 @@ theorem siteOp_apply (j : Fin L) (A : Matrix d d ℂ) (σ τ : Fin L → d) :
   rw [hrest]
   split_ifs with hag
   · rw [mul_one, Finset.sum_eq_single (τ j)]
-    · rw [if_pos]
+    · rw [ite_eq_left]
       ext i
       by_cases hi : i = j
       · subst hi; simp
       · simp [hi, hag i hi]
     · intro b _ hb
-      rw [if_neg]
+      rw [ite_eq_right]
       intro h
       exact hb (by simpa using (congrFun h j).symm)
     · simp
   · rw [mul_zero]
     refine (Finset.sum_eq_zero fun b _ ↦ ?_).symm
-    rw [if_neg]
+    rw [ite_eq_right]
     rintro rfl
     exact hag fun i hi ↦ by simp [hi]
 
@@ -92,7 +92,7 @@ theorem bondOp_diag_apply (j k : Fin L) (B : Matrix (d × d) (d × d) ℂ) (f : 
   simp only [bondOp, of_apply, hB]
   by_cases hst : σ = τ
   · subst hst; simp
-  · rw [if_neg hst]
+  · rw [ite_eq_right hst]
     split_ifs with hag hp
     · exact absurd (funext fun i ↦ by
         by_cases hj : i = j
@@ -150,7 +150,7 @@ theorem hamiltonian_mulVec_apply (x : (Fin L → Fin 2) → ℂ) (σ : Fin L →
   have hbond (j : Fin L) : ((IsingLongitudinal.model g h).bond L j *ᵥ x) σ =
       -((zR (σ j) * zR (σ (finRotate L j)) : ℝ) : ℂ) * x σ := by
     simp only [mulVec, dotProduct, model_bond_apply, ite_mul, zero_mul,
-      Finset.sum_ite_eq, Finset.mem_univ, if_true]
+      Finset.sum_ite_eq, Finset.mem_univ, ite_true]
   simp only [hbond, Finset.sum_sub_distrib, ← Finset.sum_mul, ← Finset.mul_sum, diagE]
   push_cast
   simp only [Finset.sum_neg_distrib, ← Finset.mul_sum]
@@ -179,7 +179,7 @@ theorem re_quadratic_ge (hg : 0 ≤ g) (x : (Fin L → Fin 2) → ℂ) :
         diagE h σ * normSq (x σ) - g * ∑ j, (star (x σ) * x (flipAt j σ)).re := by
     rw [hamiltonian_mulVec_apply, mul_sub, sub_re, Finset.mul_sum, Finset.mul_sum, re_sum]
     simp only [normSq_apply, mul_re, mul_im, star_def, conj_re, conj_im, ofReal_re, ofReal_im,
-      Finset.mul_sum, re_sum]
+      Finset.mul_sum]
     ring
   have hexp : (star x ⬝ᵥ ((IsingLongitudinal.model g h).hamiltonian L *ᵥ x)).re =
       ∑ σ, diagE h σ * normSq (x σ) - g * ∑ j, ∑ σ, (star (x σ) * x (flipAt j σ)).re := by
