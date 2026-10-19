@@ -102,9 +102,9 @@
     rows.forEach(r => r.classList.remove('hl'));
   };
   pts.forEach((p, i) => {
-    const hit = el('circle', {cx: X(i), cy: Y(p.value), r: 11, class: 'hit'});
-    for (const ev of ['mouseenter', 'click']) hit.addEventListener(ev, () => show(p, i));
-    hit.addEventListener('mouseleave', hide);
+    const hit = el('circle', {cx: X(i), cy: Y(p.value), r: 11, class: 'hit', tabindex: 0});
+    for (const ev of ['mouseenter', 'focus', 'click']) hit.addEventListener(ev, () => show(p, i));
+    for (const ev of ['mouseleave', 'blur']) hit.addEventListener(ev, hide);
     svg.append(hit);
   });
 })();

@@ -5,7 +5,7 @@
 # Validated by tools/leaderboard/check_records.jl.
 
 - date: "2026-10-06"
-  text: 'OpenAI publishes two preprints with a proof of the spin-1 Haldane gap, for periodic rings and for open chains with boundary fields.'
+  text: 'OpenAI publishes a proof of the spin-1 Haldane gap (result 268 of its math release), for periodic rings and for open chains with boundary fields.'
   link: 'https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026'
 - date: "2026-10-10"
   text: 'This repository reproduces the finite data of the periodic preprint in exact integer arithmetic.'

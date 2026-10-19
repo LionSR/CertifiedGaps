@@ -16,7 +16,8 @@ spin chains. A computer certifies a finite seed calculation in Julia, and Lean 4
 doubling step to all larger even lengths.
 
 The method, the **spacetime bootstrap**, generalizes the two-purity doubling argument from OpenAI's
-October 2026 spin-1 Haldane gap preprints for
+October 2026 spin-1 Haldane gap preprints
+([result 268](https://github.com/openai/math/blob/1581d4cbdd69a0faf34b2089614fe2a814316a6a/CONTENTS.md?plain=1#L6747) of the OpenAI Math Release) for
 [periodic rings](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026)
 and
 [open chains](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026).
@@ -30,15 +31,15 @@ and each model's `README.md` list every parameter point, seed, and Lean 4 theore
 
 | Model | Points | Largest certified gap | Lengths | Directory |
 |---|---:|---|---|---|
-| Spin-1 Heisenberg chain | 6 | $0.3350$ | even $L \ge 12$ | [`models/spin1`](models/spin1/) |
+| Spin-1 Heisenberg chain | 2 | $0.0729$ | even $L \ge 36$ | [`models/spin1`](models/spin1/) |
 | Spin-1 Heisenberg open chain | 1 | $0.0058$, at $h = 3/5$ | odd $n \ge 1921$ | [`lean/.../OpenChain.lean`](lean/CertifiedGaps/Heisenberg/OpenChain.lean) |
-| Transverse- and longitudinal-field Ising chain | 30 | $4.5206$, at $g = 2, h = 1$ | even $L \ge 6$ | [`models/tfim_longitudinal`](models/tfim_longitudinal/) |
+| Transverse- and longitudinal-field Ising chain | 30 | $4.5202$, at $g = 3/4, h = 1$ | even $L \ge 6$ | [`models/tfim_longitudinal`](models/tfim_longitudinal/) |
 | Spin-½ Heisenberg chain in a staggered field | 5 | $1.1489$, at $h = 1$ | even $L \ge 8$ | [`models/heisenberg_staggered_field`](models/heisenberg_staggered_field/) |
-| Spin-½ dimerized Heisenberg chain | 3 | $0.5349$, at $\delta = 1/2$ | even $L \ge 4$ | [`models/dimerized_heisenberg`](models/dimerized_heisenberg/) |
-| Spin-1 dimerized Heisenberg chain | 2 | $0.5284$, at $\delta = 9/10$ | even $L \ge 2$ | [`models/spin1_dimerized`](models/spin1_dimerized/) |
-| Spin-1 Heisenberg chain with single-ion anisotropy | 4 | $0.8995$, at $D = 4$ | even $L \ge 12$ | [`models/spin1_largeD`](models/spin1_largeD/) |
-| Two-leg spin-½ Heisenberg ladder | 5 | $1.1027$, at $J_\perp = 4$ | even $L \ge 4$ | [`models/heisenberg_ladder`](models/heisenberg_ladder/) |
-| Two-leg transverse-field Ising ladder | 1 | $0.6366$, at $g = 3$ | even $L \ge 4$ | [`models/two_leg_tfim`](models/two_leg_tfim/) |
+| Spin-½ dimerized Heisenberg chain | 3 | $0.5347$, at $\delta = 1/2$ | even $L \ge 4$ | [`models/dimerized_heisenberg`](models/dimerized_heisenberg/) |
+| Spin-1 dimerized Heisenberg chain | 2 | $0.5288$, at $\delta = 9/10$ | even $L \ge 2$ | [`models/spin1_dimerized`](models/spin1_dimerized/) |
+| Spin-1 Heisenberg chain with single-ion anisotropy | 4 | $0.8994$, at $D = 4$ | even $L \ge 6$ | [`models/spin1_largeD`](models/spin1_largeD/) |
+| Two-leg spin-½ Heisenberg ladder | 5 | $1.1024$, at $J_\perp = 4$ | even $L \ge 4$ | [`models/heisenberg_ladder`](models/heisenberg_ladder/) |
+| Two-leg transverse-field Ising ladder | 1 | $0.6368$, at $g = 3$ | even $L \ge 4$ | [`models/two_leg_tfim`](models/two_leg_tfim/) |
 
 Pilot studies without a gap certificate: [`models/blbq_haldane`](models/blbq_haldane/)
 (bilinear–biquadratic chain), [`models/spin2`](models/spin2/) (spin-2 chain), and
