@@ -17,8 +17,10 @@ continue the appendix numbering of `thermal-mpo-gap-note.tex` (Appendices A–C)
 ## References
 
 [`references.bib`](references.bib) is the concise reference list for the arXiv version of the paper
-(26 BibTeX entries). Every entry was checked against its Crossref DOI record or arXiv page on
-2026-10-16. The notes above do not use it yet; they keep their own bibliographies.
+(31 BibTeX entries). Every entry was checked against its Crossref DOI record or arXiv page on
+2026-10-16; the five transfer-operator and partition-function-ratio entries (Tang–Tu–Wang,
+Göhmann et al., Gu–Wen, Morita–Kawashima, Akiyama et al.) were added and checked on 2026-10-18.
+The notes above do not use it yet; they keep their own bibliographies.
 [`references.html`](references.html) shows the same list with a small figure per entry of what that
 paper did, a line on why to cite it, a suggested disclaimer, and the papers left out; open it in a
 browser.
