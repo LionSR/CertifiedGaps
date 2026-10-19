@@ -102,18 +102,20 @@ Lemma~\ref{lem:open-moment-bounds-limit}).
 
 Propagating the ring purities and the open-chain boundary defect across doubled inverse
 temperatures via~\eqref{eq:open-moment-ineq} yields a uniform lower bound on the spectral gap for
-all sufficiently long odd open chains (Theorem~\ref{thm:open-criterion}). The criterion is stated
-for general seeds: a seed inverse temperature \(\beta_0\), ring seeds at lengths \(2N_0\) and
-\(4N_0\), a boundary seed at length \(2K_0\), and an open-chain seed at length \(4N_0\). The
-scales are \(\beta_i = \beta_0 2^i\) and \(N_i = N_0 2^i\); at scale \(i\) the boundary defect is
-tracked at length \(2K_i\), with \(K_i = N_i\) for \(i \ge 1\), and the open-chain thermal purity
-at length \(4N_i\).
+all sufficiently long open chains, odd or even (Theorem~\ref{thm:open-criterion}). The criterion
+is stated for general seeds: a seed inverse temperature \(\beta_0\), ring seeds at lengths
+\(2N_0\) and \(4N_0\), a boundary seed at length \(2K_0\), and an open-chain seed at length
+\(4N_0\). The scales are \(\beta_i = \beta_0 2^i\) and \(N_i = N_0 2^i\); at scale \(i\) the
+boundary defect is tracked at length \(2K_i\), with \(K_i = N_i\) for \(i \ge 1\), and the
+open-chain thermal purity at length \(4N_i\).
 
 \begin{theorem}[Open-chain spacetime-bootstrap criterion]
   \label{thm:open-criterion}
   \lean{CertifiedGaps.OpenMomentWitness.move_one, CertifiedGaps.OpenMomentWitness.move_two,
-    CertifiedGaps.OpenMomentWitness.oddChain_purity, CertifiedGaps.open_step,
-    CertifiedGaps.boundaryHalf, CertifiedGaps.OpenStep, CertifiedGaps.gapGT_of_openChain}
+    CertifiedGaps.OpenMomentWitness.oddChain_purity,
+    CertifiedGaps.OpenMomentWitness.evenChain_purity, CertifiedGaps.bulk_pow_le,
+    CertifiedGaps.open_step, CertifiedGaps.boundaryHalf, CertifiedGaps.OpenStep,
+    CertifiedGaps.gapGT_of_openChain}
   \leanok
   \uses{def:open-moment-bounds, lem:doubling-coefficient, lem:purity-squaring, lem:purity-to-gap}
   Assume the transfer-operator moment inequalities of Definition~\ref{def:moment-bounds} for the
@@ -133,8 +135,8 @@ at length \(4N_i\).
       \le \eta_{i+1}\);
     \item the hand-over defect \(x\) satisfies \(E_m, \eta_m, \varepsilon_m \le x \le 1/100\).
   \end{enumerate}
-  Then every odd open chain of \(n \ge 4N_0 2^m\) sites has a unique ground state and a spectral
-  gap greater than \(\log(1/(10x))/(\beta_0 2^m)\).
+  Then every open chain of \(n \ge 4N_0 2^m\) sites, odd or even, has a unique ground state and a
+  spectral gap greater than \(\log(1/(10x))/(\beta_0 2^m)\).
 \end{theorem}
 \begin{proof}
   \leanok
@@ -146,21 +148,43 @@ at length \(4N_i\).
   overlap recurrence, length doubling, and thermal squaring. The base steps reach scale \(m\), after
   which all defects at scale \(m + j\) lie below \(x_j = (10x)^{2^j}/10\) with
   \(x_{j+1} = 10x_j^2\). At odd lengths the leading parity sign in~\eqref{eq:open-moment-ineq} is
-  \(s = +1\) because the partition function is positive, giving \(\Pt(n, \beta_{m+j}) \ge 1 - 4x_j\)
+  \(s = +1\) because the partition function is positive; at even lengths there is no sign, and the
+  decay inequality alone bounds the trace. Either way \(\Pt(n, \beta_{m+j}) \ge 1 - 4x_j\)
   on the window \(4N_{m+j} \le n \le 8N_{m+j}\) and hence the uniform gap bound
   via~\eqref{eq:purity-to-gap} in Lemma~\ref{lem:purity-to-gap}.
+\end{proof}
+
+\begin{lemma}[The boundary seed from finite traces]
+  \label{lem:boundary-seed-traces}
+  \lean{CertifiedGaps.boundaryDefect_le_of_traces}
+  \leanok
+  \uses{def:open-moment-bounds}
+  Assume the boundary moment inequalities at \(\beta\) and \(\Ps(2N_0, \beta) \ge 1 - \varepsilon\)
+  with \(\varepsilon \le 1/10\). If \(N_0 r < K\) and
+  \(G_{2K - 2N_0 r}\,\bigl(d(\varepsilon) Z_{2N_0}\bigr)^r \le E\, G_{2K}\), then
+  \(e_{2K} \le E\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The decay inequality~\eqref{eq:open-moment-ineq} at \(2K' = 2K - 2N_0 r\) gives
+  \(G_{2K} - c\mu^{2K} \le (\rho\mu)^{2N_0 r} G_{2K'}\), and the ring purity gives
+  \(\rho^{2N_0} \le d(\varepsilon)\) and \(\mu^{2N_0} \le Z_{2N_0}\). So the boundary seed, which
+  involves the leading eigenvalue and overlap, follows from three finite partition functions.
 \end{proof}
 
 \begin{definition}[Open-chain certificate]
   \label{def:open-certificate}
   \lean{CertifiedGaps.OpenCertificate, CertifiedGaps.OpenCertificate.Valid,
-    CertifiedGaps.OpenCertificate.StepValid.openStep, CertifiedGaps.gapGT_of_openCertificate}
+    CertifiedGaps.OpenCertificate.StepValid.openStep, CertifiedGaps.gapGT_of_openCertificate,
+    CertifiedGaps.gapGT_of_openCertificate_traces}
   \leanok
-  \uses{thm:open-criterion}
+  \uses{thm:open-criterion, lem:boundary-seed-traces}
   An open-chain certificate is the rational data \((N_0, K_0, u_0, C, q_i, E_i, \eta_i, x)\) of
   Theorem~\ref{thm:open-criterion}. Its conditions are finitely many rational inequalities, which
   are decidable and checked by \texttt{decide +kernel}; a valid certificate and the four seeds give
-  the gap bound of Theorem~\ref{thm:open-criterion}. The script
+  the gap bound of Theorem~\ref{thm:open-criterion}. By Lemma~\ref{lem:boundary-seed-traces} the
+  boundary seed may be replaced by an inequality between finite traces, so that all four seeds
+  concern finite rings and open chains. The script
   \texttt{lean/scripts/open\_certificate.jl} searches for the data, and Lean re-checks it.
 \end{definition}
 
@@ -173,13 +197,35 @@ at length \(4N_i\).
   \uses{def:open-certificate, thm:open-moment-bounds}
   If \(\Ps(120, 49) \ge 0.948\) and \(\Pt(240, 49) \ge 0.948\) for the ring, the boundary defect
   satisfies \(e_{142} \le 0.14\) at \(\beta = 49\), and the opposite-field open-chain thermal
-  purity satisfies \(\Pt(240, 49) \ge 0.79\), then every odd open chain of \(n \ge 1921\) sites has
-  a unique ground state and a spectral gap greater than \((\log 10)/392\).
+  purity satisfies \(\Pt(240, 49) \ge 0.79\), then every open chain of \(n \ge 1920\) sites has a
+  unique ground state and a spectral gap greater than \((\log 10)/392\).
 \end{corollary}
 \begin{proof}
   \leanok
   The certificate of~\cite{HaldaneNote}, eqs.~(C1)--(C6), has \(N_0 = 60\), \(K_0 = 71\),
   \(u_0 = 0.052\), \(C = 6\), and three base steps, and hands over at \(x = 1/100\).
+\end{proof}
+
+\begin{theorem}[Open boundary conditions]
+  \label{thm:free-ends}
+  \lean{CertifiedGaps.RPRing.freeBoundary, CertifiedGaps.RPRing.freeBoundary_mat,
+    CertifiedGaps.RPRing.freeBoundary_endMat, CertifiedGaps.RPRing.Boundary.endMat_of_transpose_eq,
+    CertifiedGaps.RPRing.openHamiltonian_free, CertifiedGaps.RPRing.openGapGT_of_traces,
+    CertifiedGaps.RPRing.freeGapGT_of_traces}
+  \leanok
+  \uses{def:open-certificate, lem:boundary-seed-traces, thm:open-moment-bounds}
+  Let a reflection-positive ring have trivial internal reflection. Then the free open chains
+  \(H_n = \sum_{j=0}^{n-2} h_{j,j+1} + \sum_{j=0}^{n-1} o_j\) have a unique ground state and a
+  spectral gap greater than \(\log(1/(10x))/(\beta_0 2^m)\) at every length \(n \ge 4N_0 2^m\),
+  given a valid certificate and the four seeds, with the boundary seed in the finite-trace form of
+  Lemma~\ref{lem:boundary-seed-traces}.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Every bond factor \(C_\alpha\) is symmetric or antisymmetric (Definition~\ref{def:rpring}), so the
+  zero weights \(w = 0\) are admissible end terms, with \(b = b^{\mathsf T} = 0\), and the open
+  chain of Theorem~\ref{thm:open-moment-bounds} is the free chain at every length. Apply
+  Definition~\ref{def:open-certificate}.
 \end{proof}
 
 \section{The open spin-1 Heisenberg chain with boundary fields}
@@ -251,3 +297,27 @@ Haldane gap bound (Theorem~\ref{thm:boundary-field-gap}) from four finite-size s
   \(1/100\), Definition~\ref{def:open-certificate} gives the bound \(\log(1/(10x))/392\).
 \end{proof}
 
+
+\begin{theorem}[The opposite-field chain at even lengths]
+  \label{thm:opposite-field-gap}
+  \lean{CertifiedGaps.SpinOneHeisenberg.oppositeFieldSpectrum,
+    CertifiedGaps.SpinOneHeisenberg.openSpectrum_even,
+    CertifiedGaps.SpinOneHeisenberg.openGapGT_of_boundaryFieldInputs_certificate,
+    CertifiedGaps.SpinOneHeisenberg.oppositeFieldGapGT_of_boundaryFieldInputs_certificate,
+    CertifiedGaps.SpinOneHeisenberg.oppositeFieldGapGT_of_boundaryFieldInputs,
+    CertifiedGaps.SpinOneHeisenberg.oppositeFieldGapGT_of_boundaryFieldInputs_sharp,
+    CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap,
+    CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_sharp}
+  \leanok
+  \uses{thm:boundary-field-gap, thm:boundary-field-gap-sharp}
+  From the inputs of Lemma~\ref{lem:open-seeds}, for every even \(n \ge 1920\) the open spin-1
+  Heisenberg chain with opposite boundary fields,
+  \(\sum_{i=0}^{n-2} \mathbf S_i \cdot \mathbf S_{i+1} - h\,(S_0^z - S_{n-1}^z)\) with \(h = 3/5\),
+  has a unique ground state and a spectral gap greater than \((\log 10)/392\), and greater than
+  \(\log(10^6/2241)/392\) with the certificate of Theorem~\ref{thm:boundary-field-gap-sharp}.
+\end{theorem}
+\begin{proof}
+  \leanok
+  At even length the open chain of Theorem~\ref{thm:boundary-field-gap} is the opposite-field chain,
+  and Theorem~\ref{thm:open-criterion} covers even lengths.
+\end{proof}

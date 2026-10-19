@@ -9,7 +9,7 @@
 #     ηᵢ₊₁ ≥ f(1 - (1 - ηᵢ)(1 - εᵢ)(1 - εᵢ₊₁)(1 - Eᵢ₊₁)),   f(z) = z² / (2(1 - z)²),
 # with aᵢ = 4Nᵢ - 2Kᵢ, bᵢ = 4Nᵢ, g = gcd(aᵢ, bᵢ), Nᵢ = N₀ 2^i, K₀ given and Kᵢ = Nᵢ for i ≥ 1.
 # For each number of steps m it hands over at x = max(Eₘ, ηₘ, εₘ) ≤ 1/100, which gives
-#     Δ_n > log(1/(10x)) / (β₀ 2^m)   for every odd n ≥ 4 N₀ 2^m,
+#     Δ_n > log(1/(10x)) / (β₀ 2^m)   for every n ≥ 4 N₀ 2^m (odd or even),
 # and prints every m with its bound and the certificate with the best bound. Lean re-checks every
 # inequality by `decide +kernel`; this script only searches, in exact `Rational{BigInt}`
 # arithmetic (the root d^{a/b} is taken in `BigFloat` and then checked exactly).
@@ -68,7 +68,7 @@ function open_main(args)
         error("ring seed u₀ = $(Float64(u₀)) is too large: G(u₀) ≈ $(Float64(C))")
     q, E, η, ε = steps(N₀, K₀, u₀, C, round_up(E₀, digits), round_up(η₀, digits), mmax, digits)
     best = nothing
-    println("-- m   x            gap bound        odd n ≥")
+    println("-- m   x            gap bound        n ≥")
     for m in 1:length(q)
         x = round_up(max(E[m + 1], η[m + 1], ε(m)), digits)
         x <= 1 // 100 || continue

@@ -83,7 +83,28 @@ theorem endMat_isHermitian (b : R.Boundary) (n : ℕ) : (b.endMat n).IsHermitian
   · exact b.transpose_mat_isHermitian
   · exact b.mat_isHermitian
 
+/-- If `bᵀ = b`, the end term at the last site is `b` at every length. -/
+theorem endMat_of_transpose_eq (b : R.Boundary) (h : b.matᵀ = b.mat) (n : ℕ) :
+    b.endMat n = b.mat := by
+  unfold endMat; split_ifs <;> simp [h]
+
 end Boundary
+
+/-- Free ends, `b = 0`: the zero weights, which are admissible because every bond factor is
+symmetric or antisymmetric (`C_symm`). Its open chains are the chains with open boundary
+conditions. -/
+def freeBoundary : R.Boundary where
+  w _ := 0
+  w_symm α := (R.C_symm α).imp (fun h ↦ ⟨h, by simp⟩) (fun h ↦ ⟨h, by simp⟩)
+
+/-- The free end term is zero. -/
+theorem freeBoundary_mat : R.freeBoundary.mat = 0 := by
+  simp [Boundary.mat, freeBoundary]
+
+/-- The free end terms vanish at every length. -/
+theorem freeBoundary_endMat (n : ℕ) : R.freeBoundary.endMat n = 0 := by
+  rw [Boundary.endMat_of_transpose_eq _ (by rw [freeBoundary_mat, transpose_zero]),
+    freeBoundary_mat]
 
 /-- The open chain Hamiltonian on `n` sites `0, …, n - 1`: the bonds `(j, j + 1)`, the on-site
 terms, the end term `b` at site `0`, and the end term `b.endMat n` at site `n - 1`. The empty
@@ -103,6 +124,13 @@ theorem openHamiltonian_isHermitian (b : R.Boundary) (n : ℕ) :
       (isSelfAdjoint_sum _ fun i _ ↦ siteOp_isHermitian i R.oc_isHermitian)).add
       (siteOp_isHermitian _ b.mat_isHermitian)).add
       (siteOp_isHermitian _ (b.endMat_isHermitian _))
+
+/-- With free ends the open chain is the chain with open boundary conditions: the bonds and the
+on-site terms only. -/
+theorem openHamiltonian_free (n : ℕ) :
+    R.openHamiltonian R.freeBoundary (n + 1) =
+      ∑ j : Fin n, bondOp j.castSucc j.succ R.bondMatrix + ∑ i, siteOp i R.oc := by
+  simp only [openHamiltonian, freeBoundary_mat, freeBoundary_endMat, siteOp_zero, add_zero]
 
 /-- The spectrum of `H_n` with multiplicity, indexed by configurations. -/
 noncomputable def openSpectrum (b : R.Boundary) (n : ℕ) : (Fin n → d) → ℝ :=
