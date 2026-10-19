@@ -380,8 +380,7 @@ records:
     contributors: ['LionSR']
     notes: >-
       This is the smallest dimerization that rings of at most 16 spins can certify. For $\delta =
-      1/5$, $3/20$ and $1/10$, seeds of 2 or 4 cells fail at all $\beta_0$; there is a proof of
-      this.
+      1/5$, $3/20$ and $1/10$, seeds of 2 or 4 cells provably fail at all $\beta_0$.
     history:
       - {date: "2026-10-15", decimal: "0.058225", lengths: 'even L ≥ 4 cells', tier: certified, pr: 23,
          method: 'an earlier computation from the same seed'}
@@ -419,8 +418,7 @@ records:
     pr: 81
     contributors: ['LionSR']
     notes: >-
-      The seed rings have 6 and 12 sites. This point has no Lean 4 theorem, because the Lean
-      criterion accepts only even seeds.
+      The seed rings have 6 and 12 sites.
     history:
       - {date: "2026-10-12", decimal: "0.218793170915", lengths: 'even L ≥ 4 cells', tier: certified, pr: 3,
          method: 'an earlier computation from the same seed'}
@@ -440,8 +438,8 @@ records:
     pr: 81
     contributors: ['LionSR']
     notes: >-
-      The Lean 4 theorem starts from the smaller seed $(6, 9/4)$. From that seed, the computer bound
-      is 0.694694192.
+      The Lean 4 theorem starts from the smaller seed $(6, 9/4)$. From that seed, the 48-step
+      interval bound is 0.694694192.
     history:
       - {date: "2026-10-15", decimal: "0.899143399", lengths: 'even L ≥ 6', tier: certified, pr: 12,
          method: 'an earlier computation from the same seed'}
@@ -593,7 +591,7 @@ records:
     contributors: ['LionSR']
     notes: >-
       This is the smallest rung coupling that seeds of 4 rungs can certify. At $J_\perp =
-      326133/131072$, a seed of 4 rungs fails at all $\beta_0$; there is a proof of this.
+      326133/131072$, a seed of 4 rungs provably fails at all $\beta_0$.
     history:
       - {date: "2026-10-15", decimal: "0.001531165", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 13,
          method: 'an earlier computation from the same seed'}

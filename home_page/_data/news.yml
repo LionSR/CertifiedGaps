@@ -11,7 +11,7 @@
   text: 'This repository calculates the finite data of the periodic preprint again, in exact integer arithmetic.'
   link: '/leaderboard.html#family-spin1-heisenberg'
 - date: "2026-10-12"
-  text: 'Seven more models get gap bounds, for example spin ladders, dimerized chains and the Ising chain in two fields.'
+  text: 'Certified gap bounds for seven more models, for example spin ladders, dimerized chains and the Ising chain in two fields.'
   link: '/leaderboard.html'
   prs: [1, 2, 3, 4, 5, 6, 7]
 - date: "2026-10-12"

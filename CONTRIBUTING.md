@@ -28,9 +28,9 @@ targets.
    julia --project=tools/leaderboard tools/leaderboard/check_records.jl
    ```
 
-4. **Issues:** Use the "Take this on" button on the leaderboard to coordinate work on an open
-   challenge, the "Propose a target model" issue form to suggest a new model, or the "Report a
-   problem with a record" form to report a discrepancy.
+4. **Issues:** Open an issue to coordinate work on an open problem or use the
+   [target model form](https://github.com/LionSR/CertifiedGaps/issues/new?template=target.yml) to
+   propose a new model.
 
 ## CI and review
 
