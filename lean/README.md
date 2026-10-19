@@ -373,6 +373,9 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `ChainCheck.lean` | Decidable rational `ChainCertificate` structure discharging the hypotheses of `gapGT_of_chain`, and `StepsValid` for the purities along a chain alone |
 | `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`), expansion of $`\mathrm{Tr}\, T^N`$ as a sum over closed label paths and of matrix elements of ordered products as sums over open paths |
 | `Transfer/MomentForm.lean` | Proof that traces of even powers of a real matrix factorization $B^T B \succeq 0$ satisfy the spatial moment form |
+| `Transfer/ContinuousKernel/Basic.lean` | Actual bounded measurable kernel integral operator on `L²`, operator-norm bound, and Hermitian-kernel self-adjointness |
+| `Transfer/ContinuousKernel/HilbertSchmidt.lean` | Basis-free Hilbert–Schmidt criterion; operator-norm convergence of finite-rank approximations and compactness |
+| `Transfer/ContinuousKernel/Compact.lean`, `Audit.lean` | Integrated Bessel bound, Hilbert–Schmidt and compact kernel operators, axiom audit and degenerate/complex regression examples |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
 | `Ring/Model.lean` | Periodic ring geometry, `bondOp`/`siteOp`, `RPRing` structure, Hermiticity of $H_L$, and $\operatorname{Re} \operatorname{Tr} e^{-\beta H_L} = \sum_m e^{-\beta E_m}$ |
 | `Ring/Transfer.lean` | Even-bond, on-site, and odd-bond Trotter slices and the reflection-positivity identity $\operatorname{Tr} S^M = \operatorname{Tr} (B^T B)^{L/2}$ with real $B$ |
@@ -407,11 +410,23 @@ On paper, the main note obtains the spatial moment representation in a single co
 constructs an exact continuous-time thermal MPO on Poisson bond histories whose spatial transfer operator
 $X_\beta$ is a compact self-adjoint integral operator on $L^2(\mu_\beta)$, giving
 $Z_n(\beta) = \operatorname{Tr} X_\beta^n = \sum_i |\lambda_i|^n$. Formalizing that infinite-dimensional
-path-space construction directly in Lean still needs Poisson history measures and the bridge from
-integral kernels to Hilbert–Schmidt operators and their cycle-trace identities. Mathlib already has
-$L^2$ integration tools and the compact self-adjoint spectral theorem, but not this ready-to-use
-path-space and trace infrastructure. Instead, the Lean formalization uses a finite-dimensional
-Trotterization route that needs only finite matrix algebra and the matrix exponential limit. Each module below addresses a specific distinction between the paper proof and the formal proof:
+path-space construction directly in Lean still needs Poisson history measures, the concrete
+chronologically merged history kernel, and the later cycle-trace identification. The generic
+bounded-kernel operator bridge is now proved in `Transfer/ContinuousKernel/`: from joint strong
+measurability, a pointwise bound $`|k(x,y)| \le B`$, and a finite measure, it constructs the actual
+integral operator $`Kf(x)=\int k(x,y)f(y)\,d\mu(y)`$ on real or complex $L^2$. It proves
+$`\|K\| \le B\mu(\Omega)`$, the squared Hilbert–Schmidt bound
+$`B^2\mu(\Omega)^2`$, and compactness; Hermitian symmetry of the kernel implies self-adjointness.
+The Hilbert–Schmidt property is expressed by a uniform bound on squared image norms of finite
+orthonormal families, and compactness is derived from operator-norm convergence of rank-one
+truncations. No separability, positive total mass, or pre-existing compactness assumption is needed.
+For the paper's bound $B=3$, this gives $`9\mu(\Omega)^2`$; identifying the physical history kernel
+and applying its scalar normalization remain separate steps. This layer asserts no cycle-trace,
+partition-function, moment, twist, or sector identity.
+
+The current end-to-end gap formalization continues to use the finite-dimensional Trotterization
+route, which needs only finite matrix algebra and the matrix exponential limit. Each module below
+addresses a specific distinction between the paper proof and the formal proof:
 
 **Spectral gap as a predicate on unordered levels (`GapGT`).** The paper writes $\Delta_L = E_1 - E_0$
 with eigenvalues sorted in nondecreasing order. In Mathlib, the eigenvalues of a Hermitian matrix are

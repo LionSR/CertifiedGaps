@@ -6,6 +6,8 @@ import CertifiedGaps.ChainCheck
 import CertifiedGaps.Transfer.PiTensor
 import CertifiedGaps.Transfer.MomentForm
 import CertifiedGaps.Transfer.ProductLimit
+-- Infinite-dimensional bounded-kernel prerequisites
+import CertifiedGaps.Transfer.ContinuousKernel.Compact
 -- Reflection-positive rings
 import CertifiedGaps.Ring.Model
 import CertifiedGaps.Ring.Transfer
