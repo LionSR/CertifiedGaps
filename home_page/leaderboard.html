@@ -50,7 +50,7 @@ usemathjax: true
 
 <h2>All models</h2>
 <div class="table-wrap"><table class="summary">
-  <thead><tr><th>Model</th><th class="num">Points</th><th class="num">Certified gap ≥</th><th class="num">Even $L \ge$</th><th>Lean 4</th></tr></thead>
+  <thead><tr><th>Model</th><th class="num">Points</th><th>Largest certified gap</th><th class="num">Even $L \ge$</th><th>Lean 4</th></tr></thead>
   <tbody>
   {%- for f in data.families %}
     {%- assign rows = data.records | where: "family", f.key | where_exp: "r", "r.tier != 'target'" -%}
@@ -69,7 +69,7 @@ usemathjax: true
     <tr>
       <td><a href="#family-{{ f.key }}">{{ f.name }}</a></td>
       <td class="num">{{ rows.size }}</td>
-      <td class="num">{% if rows.size == 1 or rows[0].params == nil %}{{ hi.bound.decimal | slice: 0, 6 }}{% else %}{{ lo.bound.decimal | slice: 0, 6 }} – {{ hi.bound.decimal | slice: 0, 6 }}{% endif %}</td>
+      <td>{{ hi.bound.decimal | slice: 0, 6 }}{% unless rows[0].params == nil %}, at {{ hi.parameter }}{% endunless %}</td>
       <td class="num">{% if rows[0].params == nil %}{{ hi.lengths.L0 }}{% else %}{{ L0 }}{% endif %}</td>
       <td>{% if nlean == rows.size %}{% if rows.size == 1 %}yes{% else %}all points{% endif %}{% elsif nlean == 0 %}—{% else %}{{ nlean }} of {{ rows.size }}{% endif %}{% if nfree > 0 %}, {{ nfree }} unconditional{% endif %}</td>
     </tr>
@@ -85,7 +85,7 @@ usemathjax: true
 {%- assign plain = false %}{% if rows[0].params == nil %}{% assign plain = true %}{% endif %}
 <h3>{{ f.name }}</h3>
 <p class="hamiltonian">{{ f.hamiltonian }}</p>
-<p class="caption">$L$ counts {{ f.cells }}. Estimates: {{ f.gap_source }}.</p>
+<p class="caption">$L$ counts {{ f.cells }}. Numerical gap: {{ f.gap_source }}.</p>
 
 {%- if f.grid %}
   {%- assign gr = "" -%}{%- assign gc = "" -%}
@@ -119,7 +119,7 @@ usemathjax: true
 <div class="table-wrap"><table class="points">
   <thead><tr>
     {% unless plain %}<th>Parameters</th>{% endunless %}<th class="num">Certified gap ≥</th><th class="num">Lean 4 ≥</th>
-    <th class="num">Estimate</th><th class="num">Seed $(n_0, \beta_0)$</th><th class="num">Even $L \ge$</th><th>Files</th>
+    <th class="num">Numerical gap</th><th class="num">Seed $(n_0, \beta_0)$</th><th class="num">Even $L \ge$</th><th>Files</th>
   </tr></thead>
   <tbody>
   {%- for r in rows %}
@@ -162,24 +162,6 @@ usemathjax: true
   <li id="{{ c.id }}"><em>{{ c.title }}.</em> {{ c.need }}{% if c.link %} (<a href="{% if c.link contains "http" %}{{ c.link }}{% else %}{{ repo_blob }}{{ c.link }}{% endif %}">background</a>){% endif %}</li>
 {%- endfor %}
 </ul>
-
-<p>These models do not have a certificate yet. The estimates come from floating-point
-  calculations.</p>
-<div class="table-wrap"><table class="targets">
-  <thead><tr><th>Model</th><th class="num">Estimate $\Delta \ge$</th><th class="num">Seed $(n_0, \beta_0)$</th><th>Remark</th></tr></thead>
-  <tbody>
-  {%- assign targets = data.records | where: "tier", "target" -%}
-  {%- for r in targets %}
-    {%- assign fam = data.families | where: "key", r.family | first %}
-    <tr id="{{ r.id }}">
-      <td>{{ fam.name }}, {{ r.parameter }}</td>
-      <td class="num">{% if r.estimate.float_bound %}{{ r.estimate.float_bound | slice: 0, 5 }}{% else %}—{% endif %}</td>
-      <td class="num">{% if r.estimate.n0 %}({{ r.estimate.n0 }}{% if r.estimate.beta0 %}, {{ r.estimate.beta0 }}{% endif %}){% else %}—{% endif %}</td>
-      <td>{{ r.estimate.text }}</td>
-    </tr>
-  {%- endfor %}
-  </tbody>
-</table></div>
 </section>
 
 <section id="tiers">

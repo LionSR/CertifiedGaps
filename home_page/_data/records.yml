@@ -76,26 +76,26 @@ families:
     hamiltonian: '$H_L = \sum_j \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1} - h \sum_j (-1)^j S_j^z$'
     slug: heisenberg_staggered_field
     cells: 'sites'
-    gap_source: '16-site ring, exact diagonalization (floating point)'
+    gap_source: '16-site ring, exact diagonalization'
   - key: dimerized-heisenberg
     name: 'Dimerized spin-1/2 Heisenberg chain'
     hamiltonian: >-
       $H_L = \sum_{j=1}^{2L} [1 + (-1)^j \delta]\, \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1}$
     slug: dimerized_heisenberg
     cells: 'two-spin cells ($N = 2L$ spins)'
-    gap_source: '20-spin ring, Krylov method (floating point)'
+    gap_source: '20-spin ring, Krylov method'
   - key: spin1-dimerized
     name: 'Dimerized spin-1 Heisenberg chain'
     hamiltonian: '$H_L = \sum_{j=1}^{2L} [1 + (-1)^j \delta]\, \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1}$'
     slug: spin1_dimerized
     cells: 'two-spin cells ($N = 2L$ spins)'
-    gap_source: '12-spin ring, exact diagonalization (floating point)'
+    gap_source: '12-spin ring, exact diagonalization'
   - key: spin1-largeD
     name: 'Spin-1 chain with single-ion anisotropy'
     hamiltonian: '$H_L = \sum_j \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1} + D \sum_j (S_j^z)^2$'
     slug: spin1_largeD
     cells: 'sites'
-    gap_source: '12-site ring, exact diagonalization (floating point)'
+    gap_source: '12-site ring, exact diagonalization'
   - key: heisenberg-ladder
     name: 'Two-leg spin-1/2 Heisenberg ladder'
     hamiltonian: >-
@@ -103,7 +103,7 @@ families:
       \boldsymbol{S}_{1,j} \cdot \boldsymbol{S}_{2,j}$
     slug: heisenberg_ladder
     cells: 'rungs ($N = 2L$ spins)'
-    gap_source: '10-rung ring, exact diagonalization (floating point)'
+    gap_source: '10-rung ring, exact diagonalization'
   - key: two-leg-tfim
     name: 'Two-leg transverse-field Ising ladder'
     hamiltonian: >-
@@ -111,13 +111,13 @@ families:
       (X_{j,a} + X_{j,b})$
     slug: two_leg_tfim
     cells: 'rungs ($N = 2L$ spins)'
-    gap_source: '8-rung ring, exact diagonalization (floating point)'
+    gap_source: '8-rung ring, exact diagonalization'
   - key: ising-longitudinal
     name: 'Ising chain in transverse and longitudinal fields'
     hamiltonian: '$H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j$'
     slug: tfim_longitudinal
     cells: 'sites'
-    gap_source: '12-site ring, exact diagonalization (floating point)'
+    gap_source: '12-site ring, exact diagonalization'
     grid: {rows: g, cols: h}
   - key: cluster
     name: 'Cluster chain in a transverse field'
@@ -136,7 +136,7 @@ families:
       (\boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1})^2\right]$
     slug: blbq_haldane
     cells: 'sites'
-    gap_source: 'floating-point estimate'
+    gap_source: 'numerical estimate'
   - key: spin2-heisenberg
     name: 'Spin-2 Heisenberg chain'
     hamiltonian: '$H_L = \sum_j \boldsymbol{S}_j \cdot \boldsymbol{S}_{j+1}$'
@@ -151,7 +151,7 @@ families:
       bond
     slug: aklt
     cells: 'tori'
-    gap_source: '8-spin torus, exact diagonalization (floating point; not a bulk value)'
+    gap_source: '8-spin torus, exact diagonalization (not a bulk value)'
 
 # Open problems shown on the leaderboard, above the uncertified targets.
 challenges:
