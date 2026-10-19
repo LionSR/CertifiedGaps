@@ -9,6 +9,8 @@ import CertifiedGaps.Transfer.ProductLimit
 -- Continuous-time history prerequisites
 import CertifiedGaps.Transfer.TimeOrdering
 import CertifiedGaps.Transfer.PoissonHistory
+import CertifiedGaps.Transfer.HistoryShuffle
+import CertifiedGaps.Transfer.ProductPoissonHistory
 -- Reflection-positive rings
 import CertifiedGaps.Ring.Model
 import CertifiedGaps.Ring.Transfer
