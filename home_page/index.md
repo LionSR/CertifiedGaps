@@ -48,7 +48,7 @@ and the history of each bound.
 
 * Explainer: [periodic rings]({{ '/explainer/' | relative_url }}),
   [open chains]({{ '/explainer/open.html' | relative_url }})
-* Two-page note: [the spin-1 proof in tensor-network diagrams]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }}),
+* Two-page note: [a short diagrammatic explanation of the spin-1 Haldane gap proof]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }}),
   by S. Lu and GPT-6-Astra
 * Lean 4: [blueprint]({{ '/blueprint/' | relative_url }}),
   [blueprint PDF]({{ '/blueprint.pdf' | relative_url }}),

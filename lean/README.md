@@ -160,7 +160,9 @@ lake build SeedKernel       # opt-in: kernel-checked seed arithmetic (≈80 s)
 lake build SeedKernelBench  # opt-in: kernel benchmarks up to n = 12 (≈2 min, up to 4 GB RAM per file)
 ```
 
-Lean and Mathlib are pinned at `v4.35.0-rc3`. `CertifiedGaps` comprises roughly 6,800 lines of Lean
+Lean is pinned at `v4.36.0-rc1` and Mathlib at commit
+`807d3836b165983210ee2ecf3cd28f239436949c` (October 19, 2026). `CertifiedGaps` comprises
+roughly 6,800 lines of Lean
 and `SeedKernel` roughly 1,200 lines (excluding generated witness files). All declarations live in
 the `CertifiedGaps` namespace; declaration names below omit that prefix.
 
@@ -405,10 +407,11 @@ On paper, the main note obtains the spatial moment representation in a single co
 constructs an exact continuous-time thermal MPO on Poisson bond histories whose spatial transfer operator
 $X_\beta$ is a compact self-adjoint integral operator on $L^2(\mu_\beta)$, giving
 $Z_n(\beta) = \operatorname{Tr} X_\beta^n = \sum_i |\lambda_i|^n$. Formalizing that infinite-dimensional
-path-space construction directly in Lean would require measure theory on Poisson configuration spaces
-and the spectral theorem for compact trace-class operators, neither of which is available out of the box
-in Mathlib. Instead, the Lean formalization uses a finite-dimensional Trotterization route that needs
-only finite matrix algebra and the matrix exponential limit. Each module below addresses a specific distinction between the paper proof and the formal proof:
+path-space construction directly in Lean still needs Poisson history measures and the bridge from
+integral kernels to Hilbert–Schmidt operators and their cycle-trace identities. Mathlib already has
+$L^2$ integration tools and the compact self-adjoint spectral theorem, but not this ready-to-use
+path-space and trace infrastructure. Instead, the Lean formalization uses a finite-dimensional
+Trotterization route that needs only finite matrix algebra and the matrix exponential limit. Each module below addresses a specific distinction between the paper proof and the formal proof:
 
 **Spectral gap as a predicate on unordered levels (`GapGT`).** The paper writes $\Delta_L = E_1 - E_0$
 with eigenvalues sorted in nondecreasing order. In Mathlib, the eigenvalues of a Hermitian matrix are
