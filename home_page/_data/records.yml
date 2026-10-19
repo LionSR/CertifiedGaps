@@ -59,7 +59,7 @@ tiers:
 families:
   - key: spin1-heisenberg
     name: 'Spin-1 Heisenberg chain'
-    hamiltonian: '$H_L = \sum_{j=1}^{L} \mathbf{S}_j \cdot \mathbf{S}_{j+1}$, $\mathbf{S}_j^2 = 2$'
+    hamiltonian: '$H_L = \sum_{j=1}^{L} \mathbf{S}_j \cdot \mathbf{S}_{j+1}$'
     slug: spin1
     cells: 'sites'
     gap_source: >-
@@ -140,7 +140,7 @@ families:
     gap_source: 'floating-point estimate'
   - key: spin2-heisenberg
     name: 'Spin-2 Heisenberg chain'
-    hamiltonian: '$H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$, $\mathbf{S}_j^2 = 6$'
+    hamiltonian: '$H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$'
     slug: spin2
     cells: 'sites'
     gap_source: >-

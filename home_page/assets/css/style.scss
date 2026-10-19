@@ -129,6 +129,7 @@ svg.chart .step { fill: none; stroke: var(--mute); stroke-width: 1.2; }
 svg.chart .step.main { stroke: var(--ink); stroke-width: 1.8; }
 svg.chart .pt { fill: var(--bg); stroke: var(--mute); stroke-width: 1.2; }
 svg.chart .pt.main { stroke: var(--ink); }
-svg.chart .end { font-size: 13px; fill: var(--mute); }
+svg.chart .pt.filled { fill: var(--ink); }
+svg.chart .end { font-size: 12px; fill: var(--mute); font-variant-numeric: lining-nums; }
 svg.chart .end.main { fill: var(--ink); }
 table.history td:nth-child(4) { white-space: normal; min-width: 16em; }

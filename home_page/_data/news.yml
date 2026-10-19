@@ -30,14 +30,6 @@
   prs: [49]
   records: [spin1-temperature-lifting]
 - date: "2026-10-17"
-  text: 'The Lean blueprint and this website are online.'
-  link: '/blueprint/'
-  prs: [45]
-- date: "2026-10-17"
-  text: 'The explainer has narrated films.'
-  link: '/explainer/'
-  prs: [46]
-- date: "2026-10-17"
   text: 'The leaderboard accepts outside contributions.'
   link: '/leaderboard.html'
   prs: [53]
