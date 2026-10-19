@@ -53,6 +53,12 @@ After re-rendering, replace the release assets; the next deploy (any push to `ma
 gh release upload films film.mp4 open-chains.mp4 --clobber
 ```
 
+## AI use
+
+Claude Opus 5.5 (Anthropic), run in Claude Code, wrote the text, figures, and code of both pages
+and the films, from prompts by Sirui Lu. The Kokoro-82M speech model reads the narration. The proofs
+are from the OpenAI preprints. Each page states this below its title.
+
 ## What is rigorous
 
 Nothing. All numbers on the page are floating-point illustrations. The spin-1 seed numbers
