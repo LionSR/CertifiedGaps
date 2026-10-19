@@ -88,22 +88,23 @@ theorem endMat_of_transpose_eq (b : R.Boundary) (h : b.matᵀ = b.mat) (n : ℕ)
     b.endMat n = b.mat := by
   unfold endMat; split_ifs <;> simp [h]
 
-/-- Free ends, `b = 0`: the zero weights, for a ring whose bond factors are each symmetric or
-antisymmetric. Its open chains are the chains with open boundary conditions. -/
-def free (hC : ∀ α, (R.C α)ᵀ = R.C α ∨ (R.C α)ᵀ = -R.C α) : R.Boundary where
+end Boundary
+
+/-- Free ends, `b = 0`: the zero weights, which are admissible because every bond factor is
+symmetric or antisymmetric (`C_symm`). Its open chains are the chains with open boundary
+conditions. -/
+def freeBoundary : R.Boundary where
   w _ := 0
-  w_symm α := (hC α).imp (fun h ↦ ⟨h, by simp⟩) (fun h ↦ ⟨h, by simp⟩)
+  w_symm α := (R.C_symm α).imp (fun h ↦ ⟨h, by simp⟩) (fun h ↦ ⟨h, by simp⟩)
 
 /-- The free end term is zero. -/
-theorem free_mat (hC : ∀ α, (R.C α)ᵀ = R.C α ∨ (R.C α)ᵀ = -R.C α) : (free hC).mat = 0 := by
-  simp [mat, free]
+theorem freeBoundary_mat : R.freeBoundary.mat = 0 := by
+  simp [Boundary.mat, freeBoundary]
 
 /-- The free end terms vanish at every length. -/
-theorem free_endMat (hC : ∀ α, (R.C α)ᵀ = R.C α ∨ (R.C α)ᵀ = -R.C α) (n : ℕ) :
-    (free hC).endMat n = 0 := by
-  rw [endMat_of_transpose_eq _ (by rw [free_mat, transpose_zero]), free_mat]
-
-end Boundary
+theorem freeBoundary_endMat (n : ℕ) : R.freeBoundary.endMat n = 0 := by
+  rw [Boundary.endMat_of_transpose_eq _ (by rw [freeBoundary_mat, transpose_zero]),
+    freeBoundary_mat]
 
 /-- The open chain Hamiltonian on `n` sites `0, …, n - 1`: the bonds `(j, j + 1)`, the on-site
 terms, the end term `b` at site `0`, and the end term `b.endMat n` at site `n - 1`. The empty
@@ -126,10 +127,10 @@ theorem openHamiltonian_isHermitian (b : R.Boundary) (n : ℕ) :
 
 /-- With free ends the open chain is the chain with open boundary conditions: the bonds and the
 on-site terms only. -/
-theorem openHamiltonian_free (hC : ∀ α, (R.C α)ᵀ = R.C α ∨ (R.C α)ᵀ = -R.C α) (n : ℕ) :
-    R.openHamiltonian (Boundary.free hC) (n + 1) =
+theorem openHamiltonian_free (n : ℕ) :
+    R.openHamiltonian R.freeBoundary (n + 1) =
       ∑ j : Fin n, bondOp j.castSucc j.succ R.bondMatrix + ∑ i, siteOp i R.oc := by
-  simp only [openHamiltonian, Boundary.free_mat, Boundary.free_endMat, siteOp_zero, add_zero]
+  simp only [openHamiltonian, freeBoundary_mat, freeBoundary_endMat, siteOp_zero, add_zero]
 
 /-- The spectrum of `H_n` with multiplicity, indexed by configurations. -/
 noncomputable def openSpectrum (b : R.Boundary) (n : ℕ) : (Fin n → d) → ℝ :=

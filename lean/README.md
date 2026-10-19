@@ -87,9 +87,8 @@ leading eigenvalue and overlap of the transfer operator, but `boundaryDefect_le_
 it by three finite traces: `G(2K - 2N₀ r) (d(u₀) Z(2N₀))^r ≤ E G(2K)` implies `e_{2K} ≤ E`.
 `gapGT_of_openCertificate_traces` and `RPRing.openGapGT_of_traces` use this form.
 
-Open boundary conditions are the case `b = 0`. When every bond factor `C_α` is symmetric or
-antisymmetric (the condition the time reversal `J` needs), `RPRing.Boundary.free` is an admissible
-end term, its open chain is the chain with free ends at every length (`openHamiltonian_free`), and
+Open boundary conditions are the case `b = 0`. Every bond factor `C_α` of an `RPRing` is symmetric
+or antisymmetric (`C_symm`), so `RPRing.freeBoundary` is always an admissible end term, its open chain is the chain with free ends at every length (`openHamiltonian_free`), and
 `RPRing.freeGapGT_of_traces` gives its gap at every `n ≥ 4 N₀ 2^m` from a certificate and four
 finite seeds. No model instance with free ends is formalized yet: the free spin-1 Heisenberg chain
 has spin-½ edge states whose splitting closes exponentially in `n`, so it has no uniform gap; that
@@ -402,7 +401,7 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Open/MomentBounds.lean` | `OpenMomentBounds`: closed inequalities of the boundary moment form, from a finite Hermitian transfer matrix and through limits; `leadingRoot`, `leadingOverlap`, `boundaryDefect` |
 | `Open/Criterion.lean` | The boundary-field criterion `gapGT_of_openChain` for general seeds: the ring at the open-chain scales, the three moves of Appendix A with the even-length purity, the boundary seed from finite traces (`boundaryDefect_le_of_traces`), the base steps (`OpenStep`) and the uniform phase |
 | `Open/Certificate.lean` | Rational certificates `OpenCertificate` checked by `decide +kernel`, `gapGT_of_openCertificate`, the note's `boundaryFieldCertificate` with `gapGT_of_openSeeds`, and `sharpBoundaryFieldCertificate` |
-| `Open/Model.lean` | Open chains of an `RPRing` with boundary terms (`Boundary`, `openHamiltonian`, `openSpectrum`), and free ends (`Boundary.free`, `openHamiltonian_free`) |
+| `Open/Model.lean` | Open chains of an `RPRing` with boundary terms (`Boundary`, `openHamiltonian`, `openSpectrum`), and free ends (`freeBoundary`, `openHamiltonian_free`) |
 | `Open/Transfer.lean` | Open-chain Trotter slices, time reversal `J`, and `Tr (slice)^M = ⟨v, Xⁿ v⟩` with `X = F J` |
 | `Open/Bounds.lean`, `Open/Gap.lean` | `RPRing.openMomentBounds` and the end-to-end `RPRing.openGapGT_of_certificate`, `RPRing.openGapGT_of_traces`, `RPRing.freeGapGT_of_traces` and `RPRing.openGapGT_of_seeds` |
 | `Local/Pauli.lean`, `Local/SpinHalf.lean` | Real Pauli matrices $X, Z$ and real spin-½ factors $S^x, iS^y, S^z$ (`SpinHalf.P`) |

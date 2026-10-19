@@ -104,10 +104,10 @@ Propagating the ring purities and the open-chain boundary defect across doubled 
 temperatures via~\eqref{eq:open-moment-ineq} yields a uniform lower bound on the spectral gap for
 all sufficiently long open chains, odd or even (Theorem~\ref{thm:open-criterion}). The criterion
 is stated for general seeds: a seed inverse temperature \(\beta_0\), ring seeds at lengths
-\(2N_0\) and \(4N_0\), a boundary seed at length \(2K_0\), and an open-chain seed at length \(4N_0\). The
-scales are \(\beta_i = \beta_0 2^i\) and \(N_i = N_0 2^i\); at scale \(i\) the boundary defect is
-tracked at length \(2K_i\), with \(K_i = N_i\) for \(i \ge 1\), and the open-chain thermal purity
-at length \(4N_i\).
+\(2N_0\) and \(4N_0\), a boundary seed at length \(2K_0\), and an open-chain seed at length
+\(4N_0\). The scales are \(\beta_i = \beta_0 2^i\) and \(N_i = N_0 2^i\); at scale \(i\) the
+boundary defect is tracked at length \(2K_i\), with \(K_i = N_i\) for \(i \ge 1\), and the
+open-chain thermal purity at length \(4N_i\).
 
 \begin{theorem}[Open-chain spacetime-bootstrap criterion]
   \label{thm:open-criterion}
@@ -208,14 +208,13 @@ at length \(4N_i\).
 
 \begin{theorem}[Open boundary conditions]
   \label{thm:free-ends}
-  \lean{CertifiedGaps.RPRing.Boundary.free, CertifiedGaps.RPRing.Boundary.free_mat,
-    CertifiedGaps.RPRing.Boundary.free_endMat, CertifiedGaps.RPRing.Boundary.endMat_of_transpose_eq,
+  \lean{CertifiedGaps.RPRing.freeBoundary, CertifiedGaps.RPRing.freeBoundary_mat,
+    CertifiedGaps.RPRing.freeBoundary_endMat, CertifiedGaps.RPRing.Boundary.endMat_of_transpose_eq,
     CertifiedGaps.RPRing.openHamiltonian_free, CertifiedGaps.RPRing.openGapGT_of_traces,
     CertifiedGaps.RPRing.freeGapGT_of_traces}
   \leanok
   \uses{def:open-certificate, lem:boundary-seed-traces, thm:open-moment-bounds}
-  Let a reflection-positive ring have trivial internal reflection and bond factors \(C_\alpha\) that
-  are each symmetric or antisymmetric. Then the free open chains
+  Let a reflection-positive ring have trivial internal reflection. Then the free open chains
   \(H_n = \sum_{j=0}^{n-2} h_{j,j+1} + \sum_{j=0}^{n-1} o_j\) have a unique ground state and a
   spectral gap greater than \(\log(1/(10x))/(\beta_0 2^m)\) at every length \(n \ge 4N_0 2^m\),
   given a valid certificate and the four seeds, with the boundary seed in the finite-trace form of
@@ -223,7 +222,8 @@ at length \(4N_i\).
 \end{theorem}
 \begin{proof}
   \leanok
-  The zero weights \(w = 0\) are admissible end terms, with \(b = b^{\mathsf T} = 0\), so the open
+  Every bond factor \(C_\alpha\) is symmetric or antisymmetric (Definition~\ref{def:rpring}), so the
+  zero weights \(w = 0\) are admissible end terms, with \(b = b^{\mathsf T} = 0\), and the open
   chain of Theorem~\ref{thm:open-moment-bounds} is the free chain at every length. Apply
   Definition~\ref{def:open-certificate}.
 \end{proof}

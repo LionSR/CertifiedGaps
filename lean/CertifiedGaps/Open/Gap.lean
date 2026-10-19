@@ -98,21 +98,20 @@ theorem openGapGT_of_traces [Nonempty d] (hrefl : R.refl = 1) (b : R.Boundary)
   · rw [CertifiedGaps.thermalPurity, hG]; exact hη
 
 /-- **The gap with open boundary conditions.** For a reflection-positive ring without internal
-reflection whose bond factors are each symmetric or antisymmetric, the open chains with free ends
-(`Boundary.free`, `openHamiltonian_free`) have a gap `Δ_n > log(1/(10x)) / (β₀ 2^m)` at every
-length `n ≥ 4 N₀ 2^m` from a valid certificate and four seeds on finite rings and free chains. -/
-theorem freeGapGT_of_traces [Nonempty d] (hrefl : R.refl = 1)
-    (hC : ∀ α, (R.C α)ᵀ = R.C α ∨ (R.C α)ᵀ = -R.C α)
-    (c : OpenCertificate) (hc : c.Valid) {β₀ : ℝ} (hβ₀ : 0 < β₀)
+reflection, the open chains with free ends (`freeBoundary`, `openHamiltonian_free`) have a gap
+`Δ_n > log(1/(10x)) / (β₀ 2^m)` at every length `n ≥ 4 N₀ 2^m` from a valid certificate and four
+seeds on finite rings and free chains. -/
+theorem freeGapGT_of_traces [Nonempty d] (hrefl : R.refl = 1) (c : OpenCertificate)
+    (hc : c.Valid) {β₀ : ℝ} (hβ₀ : 0 < β₀)
     (hs : 1 - (c.u₀ : ℝ) ≤ R.spatialPurity (2 * c.N₀) β₀)
     (ht : 1 - (c.u₀ : ℝ) ≤ R.thermalPurity (2 * (2 * c.N₀)) β₀) {r : ℕ}
     (hr : c.N₀ * r + 1 ≤ c.K₀)
-    (he : R.openPartitionFunction (Boundary.free hC) (2 * (c.K₀ - c.N₀ * r)) β₀ *
+    (he : R.openPartitionFunction R.freeBoundary (2 * (c.K₀ - c.N₀ * r)) β₀ *
         (tailBound c.u₀ * R.partitionFunction (2 * c.N₀) β₀) ^ r ≤
-      c.EAt 0 * R.openPartitionFunction (Boundary.free hC) (2 * c.K₀) β₀)
-    (hη : 1 - (c.ηAt 0 : ℝ) ≤ R.openThermalPurity (Boundary.free hC) (2 * (2 * c.N₀)) β₀)
+      c.EAt 0 * R.openPartitionFunction R.freeBoundary (2 * c.K₀) β₀)
+    (hη : 1 - (c.ηAt 0 : ℝ) ≤ R.openThermalPurity R.freeBoundary (2 * (2 * c.N₀)) β₀)
     {n : ℕ} (hn : 4 * c.N₀ * 2 ^ c.m ≤ n) :
-    GapGT (R.openSpectrum (Boundary.free hC) n)
+    GapGT (R.openSpectrum R.freeBoundary n)
       (log (1 / (10 * (c.x : ℝ))) / (β₀ * 2 ^ c.m)) :=
   R.openGapGT_of_traces hrefl _ c hc hβ₀ hs ht hr he hη hn
 
