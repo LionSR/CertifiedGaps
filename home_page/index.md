@@ -4,79 +4,68 @@ usemathjax: true
 
 {% assign repo_url = 'https://github.com/' | append: site.repository %}
 
-<p>In 1983 Haldane predicted that the antiferromagnetic spin-1 Heisenberg chain has a
-spectral gap that stays open however long the chain becomes [<a href="#ref-1">1</a>,
-<a href="#ref-2">2</a>]. In October 2026 OpenAI released two preprints that prove it, for periodic
-rings [<a href="#ref-3">3</a>] and for open chains with fields at the ends
-[<a href="#ref-4">4</a>]. Both proofs combine one finite computation, at a fixed ring length and
-temperature, with an argument that doubles the length and the inverse temperature together, step by
-step, out to every length.</p>
+This project proves lower bounds on the spectral gap of quantum spin chains. Each bound holds for
+all even ring lengths above a stated length. A computer checks one finite calculation for each
+bound. Lean 4 checks the remaining proof.
 
-We state that argument as a criterion for general spin chains and ladders, which we call the
-*spacetime bootstrap*, prove the criterion in Lean 4 [[7](#ref-7)], and carry out the finite
-computation, in exact or interval arithmetic, for several further models. Each result is a theorem
-that holds for every even ring length beyond a stated one.
+Haldane predicted in 1983 that the spin-1 Heisenberg chain has a gap that stays open as the chain
+grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026
+[[3](#ref-3), [4](#ref-4)]. We use the same method for more models. We call the method the
+*spacetime bootstrap*.
 
-## The criterion
+## Method
 
-Take a ring of $$L$$ unit cells with Hamiltonian $$H_L$$ and partition function
-$$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$. The spacetime bootstrap compares a ring with one
-twice as long, and a temperature with one half as high, through two ratios:
+Let $$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$ be the partition function of a ring of $$L$$
+unit cells. The method uses two ratios:
 
 $$
 P_{\mathrm{s}}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
 P_\tau(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
 $$
 
-When the interaction between neighboring cells is reflection positive [[6](#ref-6)], the defects
-$$1 - P_{\mathrm{s}}$$ and $$1 - P_\tau$$ shrink quadratically each time $$n$$ and $$\beta$$ are
-doubled together. It is therefore enough to know them at a single seed $$(n_0, \beta_0)$$: if
-$$1 - P_{\mathrm{s}}(n_0, \beta_0)$$ and $$1 - P_\tau(2n_0, \beta_0)$$ are both below $$0.127$$,
-every even ring with $$L \ge n_0$$ has a unique ground state and a gap bounded below by an explicit
-number. The seed is the only numerical input to the proof.
+1. Show that the interaction between neighboring cells is reflection positive [[6](#ref-6)].
+2. At one seed $$(n_0, \beta_0)$$, calculate upper bounds on $$1 - P_{\mathrm{s}}(n_0, \beta_0)$$
+   and $$1 - P_\tau(2n_0, \beta_0)$$. The method works if both bounds are less than $$0.127$$.
+3. Double $$n$$ and $$\beta$$ together. Each doubling makes the two defects smaller. The result is
+   a lower bound on the gap for all even $$L \ge n_0$$.
 
-## Results
+Only step 2 uses a numerical calculation. Lean 4 [[7](#ref-7)] proves step 3. One bound, with
+an odd seed, does not have a Lean proof yet.
 
-For the spin-1 Heisenberg chain we prove $$\Delta_L > 0.0729$$ for every even $$L \ge 36$$; the
-numerical value of the gap is about $$0.4105$$ [[5](#ref-5)]. The finite inputs are those of the
-periodic preprint [[3](#ref-3)]. We reproduce them in exact integer arithmetic, combine them more
-efficiently, and prove in Lean 4 that the bound follows from them; an independent audit in exact
-rational and in ball arithmetic confirms it. The main bounds stated in the preprints,
-$$\Delta_L > (\log 20)/784$$ for even $$L \ge 2304$$ on rings and $$\Delta_n > (\log 10)/392$$ for
-odd $$n \ge 1921$$ on open chains [[4](#ref-4)], are likewise proved in Lean 4 from their finite
-inputs.
+## Main results
 
-For the Ising chain $$H_L = -\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j$$,
-Lean 4 proves $$\Delta_L > 0.392$$ for every even $$L \ge 6$$ with no hypotheses at all: the finite
-computation at the seed $$(n_0, \beta_0) = (6, 97/4)$$ is itself checked inside the Lean kernel.
+| Model | Gap bound | Ring lengths | Proof |
+|---|---|---|---|
+| Spin-1 Heisenberg chain | $$\Delta_L > 0.0729$$ | even $$L \ge 36$$ | Lean 4, from a computer-checked seed (data of [[3](#ref-3)]) |
+| Ising chain, $$g = 1/4$$, $$h = 1/20$$ | $$\Delta_L > 0.392$$ | even $$L \ge 6$$ | Lean 4, no hypotheses |
 
-The [leaderboard]({{ '/leaderboard.html' | relative_url }}) lists the other models, each at
-several couplings: spin-1/2 chains with a staggered field or with alternating bonds, the dimerized
-spin-1 chain, the spin-1 chain with single-ion anisotropy, and two-leg Heisenberg and Ising ladders.
-It also lists the [open problems]({{ '/leaderboard.html#challenges' | relative_url }}).
+The numerical value of the spin-1 gap is approximately $$0.4105$$ [[5](#ref-5)]. For the Ising
+chain $$H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j$$, the Lean kernel also checks the
+seed calculation. The [leaderboard]({{ '/leaderboard.html' | relative_url }}) shows all models
+and the history of each bound.
 
-## Reading
+## Links
 
-The [explainer]({{ '/explainer/' | relative_url }}) walks through the proof for periodic rings
-with pictures and short films, and a [second part]({{ '/explainer/open.html' | relative_url }})
-treats open chains. A [two-page note]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }}) by
-S. Lu and GPT-6-Astra writes the spin-1 proof in tensor-network diagrams. The Lean 4 formalization
-has a [blueprint]({{ '/blueprint/' | relative_url }}) (also as a
-[PDF]({{ '/blueprint.pdf' | relative_url }})), a
-[dependency graph]({{ '/blueprint/dep_graph_document.html' | relative_url }}), and
-[API documentation]({{ '/docs/' | relative_url }}). To add or improve a bound, see the
-[contribution guide]({{ '/contribute.html' | relative_url }}); code, certificates and proofs are on
-[GitHub]({{ repo_url }}).
+* Explainer: [periodic rings]({{ '/explainer/' | relative_url }}),
+  [open chains]({{ '/explainer/open.html' | relative_url }})
+* Two-page note: [the spin-1 proof in tensor-network diagrams]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }}),
+  by S. Lu and GPT-6-Astra
+* Lean 4: [blueprint]({{ '/blueprint/' | relative_url }}),
+  [blueprint PDF]({{ '/blueprint.pdf' | relative_url }}),
+  [dependency graph]({{ '/blueprint/dep_graph_document.html' | relative_url }}),
+  [API documentation]({{ '/docs/' | relative_url }})
+* Contributions: [contribution guide]({{ '/contribute.html' | relative_url }}),
+  [source on GitHub]({{ repo_url }})
 
 ## News
 
 {%- assign news = site.data.news | sort: "date" | reverse %}
 <ul class="news">
-{%- for n in news limit: 5 %}{% include news-item.html item=n %}{% endfor %}
+{%- for n in news limit: 3 %}{% include news-item.html item=n %}{% endfor %}
 </ul>
-<details><summary>Earlier</summary>
+<details><summary>Earlier news</summary>
 <ul class="news">
-{%- for n in news offset: 5 %}{% include news-item.html item=n %}{% endfor %}
+{%- for n in news offset: 3 %}{% include news-item.html item=n %}{% endfor %}
 </ul>
 </details>
 

@@ -113,3 +113,22 @@ ol.references li { margin: 0.45em 0; max-width: none; }
   body { font-size: 17px; }
   ul.news li { grid-template-columns: 1fr; }
 }
+
+/* Leaderboard additions: model sections are subordinate to "All models"; the chart is drawn in
+   ink on faint grid lines with direct labels, like a figure in a paper. */
+.family h3 { font-size: 1.3rem; margin-top: 2.2rem; }
+.caption { font-size: 0.9rem; color: var(--mute); }
+details.notes > summary { font-size: 0.9rem; }
+dl.checks dt { font-style: italic; margin-top: 0.8rem; }
+dl.checks dd { margin: 0.2rem 0 0 1.5rem; }
+#progress-chart { margin: 0.5rem 0 1rem; }
+svg.chart { width: 100%; max-width: 40rem; height: auto; font-family: var(--serif); }
+svg.chart .grid { stroke: var(--line); stroke-width: 1; }
+svg.chart .tick { font-size: 12px; fill: var(--mute); font-variant-numeric: lining-nums; }
+svg.chart .step { fill: none; stroke: var(--mute); stroke-width: 1.2; }
+svg.chart .step.main { stroke: var(--ink); stroke-width: 1.8; }
+svg.chart .pt { fill: var(--bg); stroke: var(--mute); stroke-width: 1.2; }
+svg.chart .pt.main { stroke: var(--ink); }
+svg.chart .end { font-size: 13px; fill: var(--mute); }
+svg.chart .end.main { fill: var(--ink); }
+table.history td:nth-child(4) { white-space: normal; min-width: 16em; }

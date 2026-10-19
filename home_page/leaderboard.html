@@ -4,23 +4,48 @@ description: Rigorous lower bounds on the spectral gap of quantum spin chains ac
 usemathjax: true
 ---
 {%- comment -%}
-  Rendered entirely from _data/records.yml and the generated _data/lean_records.json; no
-  JavaScript besides MathJax. Every displayed decimal is a prefix of a stored decimal, and the
-  stored decimals are rounded down, so truncating keeps every shown bound a lower bound.
+  Rendered from _data/records.yml and the generated _data/lean_records.json. The only script
+  draws the spin-1 chart from the table above it. Every displayed decimal is a prefix of a stored
+  decimal, and the stored decimals are rounded down, so truncating keeps every shown bound a
+  lower bound.
 {%- endcomment -%}
 {%- assign data = site.data.records -%}
 {%- assign docs = '/docs/find/' | relative_url -%}
 {%- assign repo_blob = 'https://github.com/' | append: site.repository | append: '/blob/' | append: site.branch | append: '/' -%}
 
-<p>
-  Each entry is a theorem about a periodic chain or ladder: for every even ring length
-  $L \ge L_0$, the Hamiltonian $H_L$ has a unique ground state, and its gap
-  $\Delta_L = E_1(L) - E_0(L)$ is at least the number shown. The proof needs one finite
-  computation, at a seed ring length $n_0$ and inverse temperature $\beta_0$, carried out in exact
-  or interval arithmetic and re-run by the model's checker; the doubling recurrence then covers
-  every larger ring. The last section explains the two columns of bounds.
-</p>
+<p>Each bound is a lower bound on the spectral gap $\Delta_L = E_1(L) - E_0(L)$. It holds for all
+  even ring lengths $L \ge L_0$. A computer checks the seed calculation at $(n_0, \beta_0)$. A Lean 4
+  theorem proves the bound from the seed.</p>
 
+<section id="progress">
+<h2>Spin-1 Heisenberg chain: record over time</h2>
+{%- assign events = "" -%}
+{%- assign spin1 = data.records | where: "family", "spin1-heisenberg" -%}
+{%- for r in spin1 -%}
+  {%- capture e %}{{ r.date }}|{{ r.bound.decimal }}|{{ r.lengths.L0 }}|{{ r.method }}|{{ r.tier }}{% endcapture -%}
+  {%- assign events = events | append: e | append: "␞" -%}
+  {%- for h in r.history -%}
+    {%- assign L0 = h.lengths | remove: "even L ≥ " -%}
+    {%- capture e %}{{ h.date }}|{{ h.decimal }}|{{ L0 }}|{{ h.method }}|{{ h.tier }}{% endcapture -%}
+    {%- assign events = events | append: e | append: "␞" -%}
+  {%- endfor -%}
+{%- endfor -%}
+{%- assign events = events | split: "␞" | sort %}
+<figure id="progress-chart" aria-hidden="true"></figure>
+<div class="table-wrap"><table class="history" id="progress-table">
+  <thead><tr><th>Date</th><th class="num">$\Delta_L \ge$</th><th class="num">Even $L \ge$</th><th>Method</th><th>Proof</th></tr></thead>
+  <tbody>
+  {%- for e in events %}{% assign c = e | split: "|" %}
+    <tr data-date="{{ c[0] }}" data-value="{{ c[1] }}" data-l0="{{ c[2] }}">
+      <td class="num">{{ c[0] }}</td><td class="num">{{ c[1] | slice: 0, 8 }}</td><td class="num">{{ c[2] }}</td>
+      <td>{{ c[3] }}</td><td>{% if c[4] contains "lean" %}Lean 4, from seed{% else %}computer{% endif %}</td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+</table></div>
+</section>
+
+<h2>All models</h2>
 <div class="table-wrap"><table class="summary">
   <thead><tr><th>Model</th><th class="num">Points</th><th class="num">Certified gap ≥</th><th class="num">Even $L \ge$</th><th>Lean 4</th></tr></thead>
   <tbody>
@@ -55,9 +80,9 @@ usemathjax: true
 
 <section id="family-{{ f.key }}" class="family">
 {%- assign plain = false %}{% if rows[0].params == nil %}{% assign plain = true %}{% endif %}
-<h2>{{ f.name }}</h2>
+<h3>{{ f.name }}</h3>
 <p class="hamiltonian">{{ f.hamiltonian }}</p>
-<p>The ring length $L$ counts {{ f.cells }}. Estimated gaps: {{ f.gap_source }}.</p>
+<p class="caption">$L$ counts {{ f.cells }}. Estimates: {{ f.gap_source }}.</p>
 
 {%- if f.grid %}
   {%- assign gr = "" -%}{%- assign gc = "" -%}
@@ -69,9 +94,9 @@ usemathjax: true
     {%- unless gcs contains ys %}{% assign gc = gc | append: y | append: "|" %}{% endunless -%}
   {%- endfor -%}
   {%- assign gr = gr | split: "|" -%}{%- assign gc = gc | split: "|" %}
-<p>Certified gap bounds by ${{ f.grid.rows }}$ (rows) and ${{ f.grid.cols }}$ (columns), for every
-  even $L \ge {{ rows[0].lengths.L0 }}$. Every point also has a Lean 4 theorem; the starred point is
-  proved in Lean with no hypotheses at all, the finite seed included.</p>
+<p>The table gives the certified gap bound for each ${{ f.grid.rows }}$ (rows) and
+  ${{ f.grid.cols }}$ (columns), for all even $L \ge {{ rows[0].lengths.L0 }}$. All points have a
+  Lean 4 theorem. At the point with a star, Lean proves the bound with no hypotheses.</p>
 <div class="table-wrap"><table class="grid">
   <thead><tr><th>${{ f.grid.rows }} \backslash {{ f.grid.cols }}$</th>{% for y in gc %}<th class="num">${{ y }}$</th>{% endfor %}</tr></thead>
   <tbody>
@@ -85,7 +110,7 @@ usemathjax: true
   {%- endfor %}
   </tbody>
 </table></div>
-<details><summary>All {{ rows.size }} points with seeds, Lean 4 bounds and certificates</summary>
+<details><summary>All {{ rows.size }} points</summary>
 {%- endif %}
 
 <div class="table-wrap"><table class="points">
@@ -119,24 +144,24 @@ usemathjax: true
 {%- endif %}{% endfor -%}
 {%- endcapture -%}
 {%- if notes != "" %}
-<div class="notes">{{ notes }}
-</div>
+<details class="notes"><summary>Notes</summary>{{ notes }}
+</details>
 {%- endif %}
 </section>
 {%- endfor %}
 
 <section id="challenges">
 <h2>Open problems</h2>
-<p>These are the next things to prove. To take one on, open an issue on GitHub or read the
-  <a href="{{ '/contribute.html' | relative_url }}">contribution guide</a>.</p>
+<p>These problems are open. To work on one, open an issue on GitHub. The
+  <a href="{{ '/contribute.html' | relative_url }}">contribution guide</a> gives the rules.</p>
 <ul class="problems">
 {%- for c in data.challenges %}
   <li id="{{ c.id }}"><em>{{ c.title }}.</em> {{ c.need }}{% if c.link %} (<a href="{% if c.link contains "http" %}{{ c.link }}{% else %}{{ repo_blob }}{{ c.link }}{% endif %}">background</a>){% endif %}</li>
 {%- endfor %}
 </ul>
 
-<p>The models below have no certificate yet. The estimates come from a floating-point survey and
-  prove nothing; they indicate how large a seed is likely to be needed.</p>
+<p>These models do not have a certificate yet. The estimates come from floating-point
+  calculations. They are not proofs.</p>
 <div class="table-wrap"><table class="targets">
   <thead><tr><th>Model</th><th class="num">Estimate $\Delta \ge$</th><th class="num">Seed $(n_0, \beta_0)$</th><th>Remark</th></tr></thead>
   <tbody>
@@ -156,14 +181,19 @@ usemathjax: true
 
 <section id="tiers">
 <h2>How the bounds are checked</h2>
-<p>The column <em>certified gap</em> is computed from the seed by 48 doubling steps in interval
-  arithmetic. The seed itself comes from verified enclosures of the ring spectra, or from exact
-  rational arithmetic, and the model's checker recomputes everything from the stored certificate.
-  The column <em>Lean 4</em> is the bound proved by a Lean 4 theorem that takes the two seed
-  inequalities at $(n_0, \beta_0)$ as hypotheses and runs 14 exact rational doubling steps; it is
-  a little smaller, typically by about $10^{-5}$. A theorem marked <em>unconditional</em> also
-  proves the seed inequalities inside the Lean kernel, so it rests on nothing outside Lean.</p>
-<p>On every change, continuous integration rebuilds the Lean theorems, replays them in the Lean
-  kernel with <code>leanchecker</code>, confirms that they use only Lean's standard axioms, and
-  re-runs the checkers of the models that changed.</p>
+<dl class="checks">
+  <dt>Certified gap</dt>
+  <dd>The bound after 48 doubling steps in interval arithmetic. The seed comes from verified
+    enclosures of ring spectra or from exact rational arithmetic. The checker of each model
+    calculates all values again from the stored certificate.</dd>
+  <dt>Lean 4</dt>
+  <dd>The bound of a Lean 4 theorem. The theorem uses the two seed inequalities as hypotheses and
+    does 14 exact doubling steps. This bound is usually smaller by approximately $10^{-5}$. An
+    unconditional theorem also proves the seed inequalities in the Lean kernel.</dd>
+  <dt>Continuous integration</dt>
+  <dd>For each change, CI builds the Lean theorems and checks them again in the Lean kernel with
+    <code>leanchecker</code>. It also runs the checkers of the changed models.</dd>
+</dl>
 </section>
+
+<script src="{{ '/assets/js/progress.js' | relative_url }}"></script>
