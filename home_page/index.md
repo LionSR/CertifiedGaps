@@ -29,8 +29,7 @@ $$
 3. Double $$n$$ and $$\beta$$ together. Each doubling makes the two defects smaller. The result is
    a lower bound on the gap for all even $$L \ge n_0$$.
 
-Only step 2 uses a numerical calculation. Lean 4 [[7](#ref-7)] proves step 3. One bound, with
-an odd seed, does not have a Lean proof yet.
+Only step 2 uses a numerical calculation. Lean 4 [[7](#ref-7)] proves step 3.
 
 ## Main results
 
