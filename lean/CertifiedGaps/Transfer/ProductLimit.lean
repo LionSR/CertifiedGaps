@@ -3,7 +3,19 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import Mathlib
+import Mathlib.Analysis.Calculus.Deriv.Comp
+import Mathlib.Analysis.Calculus.Deriv.Mul
+import Mathlib.Analysis.Calculus.Deriv.Slope
+import Mathlib.Analysis.Matrix.Normed
+import Mathlib.Analysis.SpecialFunctions.Exponential
+import Mathlib.Analysis.SpecificLimits.Basic
+import Mathlib.Tactic.Abel
+import Mathlib.Tactic.FieldSimp
+import Mathlib.Tactic.GCongr
+import Mathlib.Tactic.Linarith
+import Mathlib.Tactic.NoncommRing
+import Mathlib.Tactic.Positivity
+import Mathlib.Tactic.Ring
 
 /-!
 # A first-order Lie–Trotter (Chernoff) product formula

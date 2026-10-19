@@ -61,15 +61,19 @@ jobs:
       - name: Build the Leaderboard library
         run: ~/.elan/bin/lake build Leaderboard
 
-      # One leanchecker process over the exact module list, with one thread: it replays the
-      # modules one after another and frees each environment, so the peak memory is that of the
-      # largest module (SeedKernel.Ising.Seed, about 9 GB) instead of the sum of parallel imports.
+      # One exact module per process avoids the observed 4.36.0-rc1 repeated-replay crash.
+      # The CLI also expands namespace prefixes; the driver calls the unchanged replay routine.
+      # This also avoids rescanning the dependency .olean tree for every module argument.
       - name: Re-check every built module in the kernel
         env:
           LEAN_NUM_THREADS: "1"
         run: |
           mods=$(cd .lake/build/lib/lean && find . -name '*.olean' \
             | sed -e 's|^\./||' -e 's|\.olean$||' -e 's|/|.|g' | sort)
-          echo "Modules: $(echo "$mods" | wc -l)"
-          # shellcheck disable=SC2086 # one argument per module
-          ~/.elan/bin/lake env leanchecker -v $mods
+          test -n "$mods"
+          echo "Modules: $(printf '%s\n' "$mods" | wc -l)"
+          ~/.elan/bin/lake env bash -euo pipefail -c '
+            while IFS= read -r module; do
+              KERNEL_CHECK_MODULE="$module" lean lean/scripts/KernelCheck.lean
+            done
+          ' <<< "$mods"

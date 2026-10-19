@@ -253,7 +253,7 @@ theorem OpenMomentBounds.of_hermitian {D : Type*} [Fintype D] [DecidableEq D] [N
 
 /-- A compact box containing every witness for traces close to `Z 2`, `Z 4`, `G 2`: the bounds
 `μ² ≤ Z 2`, `Z 4 ≤ μ² Z 2` and `c μ² ≤ G 2` confine `μ` and `c`, and `ρ, s ∈ [-1, 1]`. -/
-private def witnessBox (z₂ z₄ g₂ : ℝ) : Set (ℝ × ℝ × ℝ × ℝ) :=
+private noncomputable def witnessBox (z₂ z₄ g₂ : ℝ) : Set (ℝ × ℝ × ℝ × ℝ) :=
   Set.Icc 0 (1 + 2 * z₂) ×ˢ Set.Icc 0 ((g₂ + 1) / (z₄ / (4 * z₂))) ×ˢ Set.Icc 0 1 ×ˢ
     Set.Icc (-1) 1
 

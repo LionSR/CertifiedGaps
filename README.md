@@ -7,7 +7,7 @@
 [![Leaderboard](https://img.shields.io/badge/Leaderboard-52_records-1f7a3f)](https://sirui-lu.com/CertifiedGaps/leaderboard.html)
 [![Blueprint](https://img.shields.io/badge/Blueprint-HTML_%7C_PDF-2b5b84)](https://sirui-lu.com/CertifiedGaps/blueprint/)
 [![Explainer](https://img.shields.io/badge/Explainer-Interactive-b84a1b)](https://sirui-lu.com/CertifiedGaps/explainer/)
-[![Lean 4](https://img.shields.io/badge/Lean_4-v4.35.0--rc3-blue)](https://github.com/leanprover/lean4)
+[![Lean 4](https://img.shields.io/badge/Lean_4-v4.36.0--rc1-blue)](https://github.com/leanprover/lean4)
 [![Julia](https://img.shields.io/badge/Julia-1.12-9558B2)](https://julialang.org/)
 
 Haldane (1983) conjectured that the spin-1 antiferromagnetic Heisenberg chain has a uniform spectral
