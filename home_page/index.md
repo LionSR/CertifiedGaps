@@ -15,20 +15,40 @@ grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026
 
 ## Method
 
-Let $$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$ be the partition function of a ring of $$L$$
-unit cells. The method uses two ratios:
+Let $$Z_n(\beta) = \mathrm{Tr}\, e^{-\beta H_n}$$ be the partition function of a ring of $$n$$
+unit cells. Draw it as a torus: $$n$$ cells around the ring in space, and a circle of length
+$$\beta$$ in imaginary time. The method compares tori through two ratios:
 
-$$
-P_{\mathrm S}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
-P_{\mathrm T}(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
-$$
+<div class="purities">
+  <div class="purity time">
+    <span class="def">\(\class{t}{P_{\mathrm T}}(n, \beta) = \dfrac{Z_n(2\beta)}{Z_n(\beta)^2} =\)</span>
+    <span class="frac"><span>{% include torus.html w=2 h=2 %}</span><span>{% include torus.html w=2 h=1 %}<sup>2</sup></span></span>
+    <span class="gloss">thermal purity: two tori glued in time</span>
+  </div>
+  <div class="purity space">
+    <span class="def">\(\class{s}{P_{\mathrm S}}(n, \beta) = \dfrac{Z_{2n}(\beta)}{Z_n(\beta)^2} =\)</span>
+    <span class="frac"><span>{% include torus.html w=4 h=1 %}</span><span>{% include torus.html w=2 h=1 %}<sup>2</sup></span></span>
+    <span class="gloss">spatial purity: two tori glued in space</span>
+  </div>
+</div>
 
-1. Show that the interaction between neighboring cells is reflection positive [[6](#ref-6)].
-2. At one seed $$(n_0, \beta_0)$$, calculate upper bounds on the defects
-   $$p = 1 - P_{\mathrm S}(n_0, \beta_0)$$ and $$q = 1 - P_{\mathrm T}(2n_0, \beta_0)$$. The method
-   works if $$p$$ and $$q$$ are both less than $$\varepsilon_* \approx 0.127$$.
-3. Double $$n$$ and $$\beta$$ together. Each doubling makes $$p$$ and $$q$$ smaller. The result is
-   a lower bound on the gap for all even $$L \ge n_0$$.
+<div class="method">
+<ol>
+  <li>Show that the interaction between neighboring cells is reflection positive
+    [<a href="#ref-6">6</a>].</li>
+  <li>At one seed \((n_0, \beta_0)\), calculate upper bounds on the defects
+    \(p = 1 - P_{\mathrm S}(n_0, \beta_0)\) and \(q = 1 - P_{\mathrm T}(2n_0, \beta_0)\). The
+    method works if \((p, q)\) is in the green region. Both values below \(0.127\) are
+    sufficient.</li>
+  <li>Double \(n\) and \(\beta\) together. Each doubling moves \((p, q)\) closer to 0. The result
+    is a lower bound on the gap for all even \(L \ge n_0\).</li>
+</ol>
+<figure>
+  {% include seed-region.svg %}
+  <figcaption>Each red dot is one doubling, from the spin-1 seed \((36, 49/4)\) to
+    \((2304, 784)\).</figcaption>
+</figure>
+</div>
 
 Only step 2 uses a numerical calculation. Lean 4 [[7](#ref-7)] proves step 3.
 

@@ -6,11 +6,15 @@
 
 :root {
   --bg: #fffff8; --ink: #111111; --mute: #6b6b66; --line: #d9d6c6; --wash: #f4f2e6;
+  --space: #a2322e; --time: #34628f; --ok: #2f6b3d;
+  --space-f: rgba(162,50,46,.10); --time-f: rgba(52,98,143,.10); --ok-f: rgba(47,107,61,.13);
   --serif: "EB Garamond", Palatino, "Palatino Linotype", "Book Antiqua", Georgia, serif;
   --mono: ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 @mixin dark {
   --bg: #151515; --ink: #dddddd; --mute: #9a9a94; --line: #3a3a37; --wash: #1f1f1d;
+  --space: #e0786c; --time: #84aad4; --ok: #7fbf8f;
+  --space-f: rgba(224,120,108,.14); --time-f: rgba(132,170,212,.14); --ok-f: rgba(127,191,143,.16);
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { @include dark; } }
@@ -142,3 +146,36 @@ svg.chart .pt.filled { fill: var(--ink); }
 svg.chart .end { font-size: 12px; fill: var(--mute); font-variant-numeric: lining-nums; }
 svg.chart .end.main { fill: var(--ink); }
 table.history td:nth-child(4) { white-space: normal; min-width: 16em; }
+
+/* Home page figures, in the colors of the slides and the explainer: time blue, space red, the
+   admissible region green. */
+.purities { margin: 1rem 0 1.4rem; }
+.purity { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.8rem; margin: 0.6rem 0; }
+.purity .t { color: var(--time); }
+.purity .s { color: var(--space); }
+.purity .gloss { font-size: 0.9rem; font-style: italic; color: var(--mute); }
+.frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; }
+.frac > span { display: flex; align-items: flex-end; padding: 2px 4px; }
+.frac > span:first-child { border-bottom: 1px solid var(--ink); }
+.frac sup { font-size: 0.7rem; margin-left: 1px; }
+svg.torus line { stroke: currentColor; stroke-width: 0.6; opacity: 0.45; }
+svg.torus .edge { fill: none; stroke: currentColor; stroke-width: 1; }
+.time svg.torus { color: var(--time); }
+.space svg.torus { color: var(--space); }
+.time svg.torus .cell-bg { fill: var(--time-f); }
+.space svg.torus .cell-bg { fill: var(--space-f); }
+.method { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 0 2rem; align-items: start; }
+.method ol { margin-top: 0; }
+.method figure { margin: 0; }
+.method figcaption { font-size: 0.85rem; line-height: 1.4; color: var(--mute); margin-top: 0.3rem; }
+@media (max-width: 760px) { .method { grid-template-columns: minmax(0, 1fr); } .method figure { max-width: 320px; } }
+svg.region { width: 100%; height: auto; font-family: var(--serif); }
+svg.region .ok { fill: var(--ok-f); stroke: var(--ok); stroke-width: 1; }
+svg.region .axis { stroke: var(--mute); stroke-width: 1; }
+svg.region .tick { font-size: 11px; fill: var(--mute); font-variant-numeric: lining-nums; }
+svg.region .label { font-size: 12px; fill: var(--ink); font-style: italic; }
+svg.region .ok-label { font-size: 12px; fill: var(--ok); font-style: italic; }
+svg.region .orbit { fill: none; stroke: var(--space); stroke-width: 1.2; }
+svg.region .orbit-pt { fill: var(--space); }
+svg.region .seed { font-size: 11px; fill: var(--space); }
+svg.region .step { font-size: 10px; fill: var(--mute); font-variant-numeric: lining-nums; }
