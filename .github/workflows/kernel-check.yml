@@ -59,7 +59,11 @@ jobs:
       # Include the continuous-history audit explicitly: these prerequisites are independent
       # of Leaderboard. Keep the expensive SeedKernel spin-1 benchmarks out of this build.
       - name: Build the Leaderboard and continuous-history audit
-        run: ~/.elan/bin/lake build Leaderboard CertifiedGaps.Transfer.PoissonHistoryAudit
+        run: >-
+          ~/.elan/bin/lake build Leaderboard
+          CertifiedGaps.Transfer.PoissonHistoryAudit
+          CertifiedGaps.Transfer.HistoryShuffleAudit
+          CertifiedGaps.Transfer.ProductPoissonHistoryAudit
 
       # One exact module per process avoids the observed 4.36.0-rc1 repeated-replay crash.
       # The CLI also expands namespace prefixes; the driver calls the unchanged replay routine.
