@@ -159,25 +159,25 @@ challenges:
     family: spin1-open
     title: 'The open spin-1 chain'
     need: >-
-      The Lean 4 proof of $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ (#74) uses four finite
-      bounds at $\beta_2 = 49$ from the boundary-field preprint as hypotheses. The endpoint fields
-      are $h = 3/5$. Certify these four bounds by computer.
+      Lean 4 proves the open-chain bound $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ (#74).
+      The proof assumes four finite bounds from the boundary-field preprint. Certify these four
+      bounds by computer.
     link: 'https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf'
   - id: spin1-small-seed
     family: spin1-heisenberg
     title: 'A small seed for spin-1'
     need: >-
-      Certify the twisted traces of the spin-1 chain for $n \le 12$ to an error of $10^{-3}$. This
-      gives $\Delta_L > 0.039$ for all even $L \ge 60$. The seed is small enough for the Lean
-      kernel.
+      Certify the spin-1 seed calculation on rings of at most 12 sites, to an error of $10^{-3}$.
+      This gives $\Delta_L > 0.039$ for all even $L \ge 60$, and the calculation is small enough
+      for Lean 4 to check.
     link: models/lean_seeds/README.md
   - id: lean-odd-seed
     family: spin1-dimerized
     title: 'Odd seeds in Lean'
     need: >-
-      The bound for the dimerized spin-1 chain at $\delta = 7/10$ uses a seed of 3 cells. An odd
-      seed needs the factorization $X_\beta = K K^* \succeq 0$ of the transfer operator. Formalize
-      this factorization in Lean 4.
+      One bound, for the dimerized spin-1 chain at $\delta = 7/10$, uses a seed of 3 cells. Its
+      Lean 4 proof needs one more lemma: the transfer operator factors as $X_\beta = K K^*$.
+      Prove this lemma in Lean 4.
     link: models/spin1_dimerized/README.md
 
 
@@ -191,7 +191,7 @@ records:
     seed: {n0: 60, beta0: "833/32", text: 'Two seeds: $(60, 833/32)$ for $L \ge 60$ and $(36, 49/4)$ for $36 \le L \le 72$'}
     numerical_gap: "0.41048"
     tier: lean-conditional
-    method: 'temperature lifting, two seeds, 14 exact doubling steps'
+    method: 'temperature lifting, two seeds'
     lean: {name: Leaderboard.Records.SpinOneHeisenberg.temperature_lifting, r: "16689019/2500000", beta: "833/32", decimal: "0.072930044"}
     certificate: models/spin1/experiments/temperature-lift.json
     check: models/spin1/experiments/test_temperature_lift.jl
@@ -206,11 +206,11 @@ records:
       the purity inequalities at the two seeds as hypotheses.
     history:
       - {date: "2026-10-10", decimal: "0.072901771", lengths: 'even L ≥ 36', tier: certified, pr: null,
-         method: 'temperature lifting, two seeds, 10 exact doubling steps'}
+         method: 'temperature lifting, two seeds'}
       - {date: "2026-10-10", decimal: "0.070450002", lengths: 'even L ≥ 36', tier: certified, pr: null,
-         method: 'temperature lifting with simpler filters'}
+         method: 'temperature lifting, simpler estimate'}
       - {date: "2026-10-10", decimal: "0.016978269", lengths: 'even L ≥ 36', tier: certified, pr: null,
-         method: 'preprint data with a sharper degree-12 filter'}
+         method: 'OpenAI data, sharper estimate'}
   - id: spin1-source1
     family: spin1-heisenberg
     parameter: 'periodic ring'
@@ -219,7 +219,7 @@ records:
     seed: {n0: 2304, beta0: "784"}
     numerical_gap: "0.41048"
     tier: lean-conditional
-    method: 'preprint seed (36, 49/4), 6 doubling steps to the seed (2304, 784)'
+    method: 'OpenAI data, exact purities'
     lean: {name: Leaderboard.Records.SpinOneHeisenberg.heisenberg, r: "41196029/1000000", beta: "784", decimal: "0.004742"}
     certificate: models/spin1/results/scalars.json
     date: "2026-10-17"
@@ -232,9 +232,9 @@ records:
       Lean 4 also proves this bound (#74).
     history:
       - {date: "2026-10-06", decimal: "0.00382", display: '\log(20)/784', lengths: 'even L ≥ 2304', tier: lean-conditional, pr: null,
-         method: 'OpenAI preprint, both purities rounded down to 0.99'}
-      - {date: "2026-10-06", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: 'even L ≥ 60', tier: certified, pr: null,
-         method: 'OpenAI preprint, seed (60, 105/4); Lean 4 proof from this seed in lean/ (#74)'}
+         method: 'OpenAI preprint, rounded purities'}
+      - {date: "2026-10-06", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: 'even L ≥ 60', tier: lean-conditional, pr: null,
+         method: 'OpenAI preprint, smaller seed'}
   # ---------------------------------------------------------------- heisenberg-staggered-field
   - id: staggered-h-1
     family: heisenberg-staggered-field
