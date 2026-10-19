@@ -14,8 +14,8 @@ four seeds: the seed half-lengths `N₀` (ring) and `K₀` (boundary defect), th
 with its doubling coefficient `C`, the base steps `(qᵢ, Eᵢ, ηᵢ)` and the hand-over `x`.
 `OpenCertificate.Valid` is the list of rational inequalities, which is decidable, so a concrete
 certificate is checked by `decide +kernel`. `gapGT_of_openCertificate` turns a valid certificate
-and the four seed inequalities into the gap bound `log(1/(10x)) / (β₀ 2^m)` for every odd chain
-of at least `4 N₀ 2^m` sites.
+and the four seed inequalities into the gap bound `log(1/(10x)) / (β₀ 2^m)` for every chain of
+at least `4 N₀ 2^m` sites, odd or even.
 
 The data are produced by `lean/scripts/open_certificate.jl` from the seeds; that script only
 searches, and Lean re-checks every inequality.
@@ -23,8 +23,9 @@ searches, and Lean re-checks every inequality.
 ## Main results
 
 * `gapGT_of_openCertificate`: the boundary-field gap from a valid certificate and four seeds.
+* `gapGT_of_openCertificate_traces`: the same, with the boundary seed stated for finite traces.
 * `boundaryFieldCertificate`: the certificate of the note's eqs. (C1)–(C6).
-* `gapGT_of_openSeeds`: the boundary-field gap `Δ_n > (log 10)/392` for every odd `n ≥ 1921`
+* `gapGT_of_openSeeds`: the boundary-field gap `Δ_n > (log 10)/392` for every `n ≥ 1920`
   from the four seeds of the note's eq. (C1).
 -/
 
@@ -160,7 +161,7 @@ inequalities at every `β > 0`. A valid certificate `c` and the four seeds
 * the boundary defect `e_{2K₀}(β₀) ≤ E₀`, and
 * the open-chain thermal purity `P_τ(4N₀, β₀) ≥ 1 - η₀`
 
-give `Δ_n > log(1/(10x)) / (β₀ 2^m)` for every odd open chain of `n ≥ 4 N₀ 2^m` sites. -/
+give `Δ_n > log(1/(10x)) / (β₀ 2^m)` for every open chain of `n ≥ 4 N₀ 2^m` sites. -/
 theorem gapGT_of_openCertificate (hring : HasSpatialMomentBounds Er 2)
     (hopen : ∀ β : ℝ, 0 < β → OpenMomentBounds (fun L ↦ partitionFunction Er L β)
       (fun n ↦ partitionFunction Eo n β))
@@ -170,7 +171,7 @@ theorem gapGT_of_openCertificate (hring : HasSpatialMomentBounds Er 2)
     (he : boundaryDefect (fun L ↦ partitionFunction Er L β₀) (fun n ↦ partitionFunction Eo n β₀)
       (2 * c.K₀) ≤ c.EAt 0)
     (hη : 1 - (c.ηAt 0 : ℝ) ≤ thermalPurity Eo (2 * (2 * c.N₀)) β₀) {n : ℕ}
-    (hn : 4 * c.N₀ * 2 ^ c.m ≤ n) (hno : Odd n) :
+    (hn : 4 * c.N₀ * 2 ^ c.m ≤ n) :
     GapGT (Eo n) (log (1 / (10 * (c.x : ℝ))) / (β₀ * 2 ^ c.m)) := by
   obtain ⟨hN₀, hK₀, hK₀N, hm, hu₀, hu₁, hG, hC, hCu, hx0, hx, hEm, hηm, hεm, hstep⟩ := hc
   refine gapGT_of_openChain Er Eo hN₀ hK₀ hK₀N hm (fun β hβ ↦ (hring β hβ).mono (by omega))
@@ -181,7 +182,32 @@ theorem gapGT_of_openCertificate (hring : HasSpatialMomentBounds Er 2)
     (fun i hi ↦ (hstep i hi).openStep) (by exact_mod_cast hx0)
     (by rw [show (1 / 100 : ℝ) = ((1 / 100 : ℚ) : ℝ) by norm_num]; exact_mod_cast hx)
     (by exact_mod_cast hEm) (by exact_mod_cast hηm) (by rw [cast_εAt]; exact_mod_cast hεm)
-    hs ht he hη hn hno
+    hs ht he hη hn
+
+/-- **The boundary-field gap from a certificate and finite traces.** As
+`gapGT_of_openCertificate`, with the boundary seed replaced by a statement about three finite
+traces (`boundaryDefect_le_of_traces`): for some `r` with `N₀ r < K₀`,
+`G(2K₀ - 2N₀ r) (d(u₀) Z(2N₀))^r ≤ E₀ G(2K₀)` at `β₀`. All four seeds are then inequalities
+between finite partition functions. -/
+theorem gapGT_of_openCertificate_traces (hring : HasSpatialMomentBounds Er 2)
+    (hopen : ∀ β : ℝ, 0 < β → OpenMomentBounds (fun L ↦ partitionFunction Er L β)
+      (fun n ↦ partitionFunction Eo n β))
+    (c : OpenCertificate) (hc : c.Valid) {β₀ : ℝ} (hβ₀ : 0 < β₀)
+    (hs : 1 - (c.u₀ : ℝ) ≤ spatialPurity Er (2 * c.N₀) β₀)
+    (ht : 1 - (c.u₀ : ℝ) ≤ thermalPurity Er (2 * (2 * c.N₀)) β₀) {r : ℕ}
+    (hr : c.N₀ * r + 1 ≤ c.K₀)
+    (he : partitionFunction Eo (2 * (c.K₀ - c.N₀ * r)) β₀ *
+        (tailBound c.u₀ * partitionFunction Er (2 * c.N₀) β₀) ^ r ≤
+      c.EAt 0 * partitionFunction Eo (2 * c.K₀) β₀)
+    (hη : 1 - (c.ηAt 0 : ℝ) ≤ thermalPurity Eo (2 * (2 * c.N₀)) β₀) {n : ℕ}
+    (hn : 4 * c.N₀ * 2 ^ c.m ≤ n) :
+    GapGT (Eo n) (log (1 / (10 * (c.x : ℝ))) / (β₀ * 2 ^ c.m)) := by
+  have hN₀ := hc.1
+  have hu₁ : (c.u₀ : ℝ) ≤ 1 / 10 := by
+    rw [show (1 / 10 : ℝ) = ((1 / 10 : ℚ) : ℝ) by norm_num]; exact_mod_cast hc.2.2.2.2.2.1
+  exact gapGT_of_openCertificate Er Eo hring hopen c hc hβ₀ hs ht
+    (boundaryDefect_le_of_traces (hopen β₀ hβ₀) (partitionFunction_pos Er · β₀)
+      (partitionFunction_pos Eo · β₀) hN₀ hr hu₁ hs he) hη hn
 
 end Main
 
@@ -234,7 +260,7 @@ inequalities at every `β > 0`. If
 * the boundary defect `e₁₄₂ ≤ 0.14` at `β = 49`, and
 * the open-chain thermal purity `P_τ(240, 49) ≥ 0.79`,
 
-then every odd open chain of `n ≥ 1921` sites has a nondegenerate ground level and gap
+then every open chain of `n ≥ 1920` sites has a nondegenerate ground level and gap
 `Δ_n > (log 10)/392 ≈ 0.005874`. -/
 theorem gapGT_of_openSeeds (hring : HasSpatialMomentBounds Er 2)
     (hopen : ∀ β : ℝ, 0 < β → OpenMomentBounds (fun L ↦ partitionFunction Er L β)
@@ -242,7 +268,7 @@ theorem gapGT_of_openSeeds (hring : HasSpatialMomentBounds Er 2)
     (hs : 948 / 1000 ≤ spatialPurity Er 120 49) (ht : 948 / 1000 ≤ thermalPurity Er 240 49)
     (he : boundaryDefect (fun L ↦ partitionFunction Er L 49) (fun n ↦ partitionFunction Eo n 49)
       142 ≤ 14 / 100)
-    (hη : 79 / 100 ≤ thermalPurity Eo 240 49) {n : ℕ} (hn : 1921 ≤ n) (hno : Odd n) :
+    (hη : 79 / 100 ≤ thermalPurity Eo 240 49) {n : ℕ} (hn : 1920 ≤ n) :
     GapGT (Eo n) (log 10 / 392) := by
   have h := gapGT_of_openCertificate Er Eo hring hopen boundaryFieldCertificate
     boundaryFieldCertificate_valid (β₀ := 49) (by norm_num)
@@ -250,7 +276,7 @@ theorem gapGT_of_openSeeds (hring : HasSpatialMomentBounds Er 2)
     (by norm_num [boundaryFieldCertificate]; linarith)
     (by norm_num [boundaryFieldCertificate, OpenCertificate.EAt]; linarith)
     (by norm_num [boundaryFieldCertificate, OpenCertificate.ηAt]; linarith)
-    (n := n) (by simp [boundaryFieldCertificate, OpenCertificate.m]; omega) hno
+    (n := n) (by simp [boundaryFieldCertificate, OpenCertificate.m]; omega)
   rw [show boundaryFieldCertificate.m = 3 from rfl,
     show (boundaryFieldCertificate.x : ℝ) = 1 / 100 by norm_num [boundaryFieldCertificate]] at h
   convert h using 2 <;> norm_num

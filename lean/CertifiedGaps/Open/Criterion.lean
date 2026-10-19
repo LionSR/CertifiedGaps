@@ -30,11 +30,13 @@ multiplicative form,
 
 * `OpenMomentWitness.tail_le`, `mu_le_sq`, `mu_pow_ge`: claim (R) as transfer bounds.
 * `move_one`, `move_two`, `oddChain_purity`: the overlap recurrence, the length doubling and
-  the equal-field purity of Appendix A, all in multiplicative form.
+  the equal-field purity of Appendix A, all in multiplicative form; `evenChain_purity` is the
+  purity at even lengths.
+* `boundaryDefect_le_of_traces`: the boundary seed from three finite traces.
 * `open_step`: one step of the boundary induction.
-* `gapGT_of_openChain`: the boundary-field gap `Δ_n > log(1/(10x)) / (β₀ 2^m)` for every odd
-  `n ≥ 4 N₀ 2^m`, from general seeds, `m` base steps (`OpenStep`) and the hand-over `x`.
-  `Open/Certificate.lean` checks the base steps in rational arithmetic.
+* `gapGT_of_openChain`: the boundary-field gap `Δ_n > log(1/(10x)) / (β₀ 2^m)` for every
+  `n ≥ 4 N₀ 2^m`, odd or even, from general seeds, `m` base steps (`OpenStep`) and the
+  hand-over `x`. `Open/Certificate.lean` checks the base steps in rational arithmetic.
 -/
 
 open Filter Finset Real
@@ -84,6 +86,25 @@ theorem sub_le_tailBound_mul {a Z Y ε : ℝ} (ha : 0 < a) (haZ : a ≤ Z) (hY�
   unfold tailBound
   rw [div_mul_eq_mul_div, le_div_iff₀ (by linarith)]
   linarith
+
+/-- **The bulk factor on a shorter length.** If `R μ^{2(2K)} ≤ μ'^{2K}` and `μ' ≤ μ²`, then
+`R μ^{2a} ≤ μ'^a` for every `a ≤ 2K`. -/
+theorem bulk_pow_le {μ μ' R : ℝ} (hμ' : 0 < μ') (hr : μ' ≤ μ ^ 2) (hR0 : 0 ≤ R) {a K : ℕ}
+    (ha : a ≤ 2 * K)
+    (hR : R * μ ^ (2 * (2 * K)) ≤ μ' ^ (2 * K)) : R * (μ ^ a) ^ 2 ≤ μ' ^ a := by
+  set b := 2 * K - a
+  have hab : 2 * K = a + b := by omega
+  have hμb : μ' ^ b ≤ (μ ^ b) ^ 2 := by
+    rw [← pow_mul, mul_comm, pow_mul]; exact pow_le_pow_left₀ hμ'.le hr _
+  have h4 : μ ^ (2 * (2 * K)) = (μ ^ a) ^ 2 * (μ ^ b) ^ 2 := by
+    rw [hab, ← mul_pow, ← pow_add, ← pow_mul, mul_comm]
+  rw [h4, hab, pow_add] at hR
+  have hμb0 : 0 < μ' ^ b := pow_pos hμ' _
+  have : R * (μ ^ a) ^ 2 * μ' ^ b ≤ μ' ^ a * μ' ^ b := by
+    calc R * (μ ^ a) ^ 2 * μ' ^ b ≤ R * (μ ^ a) ^ 2 * (μ ^ b) ^ 2 := by gcongr
+      _ = R * ((μ ^ a) ^ 2 * (μ ^ b) ^ 2) := by ring
+      _ ≤ μ' ^ a * μ' ^ b := hR
+  exact le_of_mul_le_mul_right this hμb0
 
 /-! ### Transfer bounds from one witness -/
 
@@ -348,20 +369,7 @@ theorem oddChain_purity (h : OpenMomentWitness Z G μ c ρ s)
     have := (abs_le.1 hodd').1
     nlinarith [mul_le_mul_of_nonneg_left hc' hμa'.le]
   -- The bulk factor: `R μ^{2a} ≤ μ'^a`, from `R μ^{4K} ≤ μ'^{2K}`, `a ≤ 2K` and `μ' ≤ μ²`.
-  have hbulk : R * (μ ^ a) ^ 2 ≤ μ' ^ a := by
-    set b := 2 * K - a
-    have hab : 2 * K = a + b := by omega
-    have hμb : μ' ^ b ≤ (μ ^ b) ^ 2 := by
-      rw [← pow_mul, mul_comm, pow_mul]; exact pow_le_pow_left₀ hμ'.le hr _
-    have h4 : μ ^ (2 * (2 * K)) = (μ ^ a) ^ 2 * (μ ^ b) ^ 2 := by
-      rw [hab, ← mul_pow, ← pow_add, ← pow_mul, mul_comm]
-    rw [h4, hab, pow_add] at hR
-    have hμb0 : 0 < μ' ^ b := pow_pos hμ' _
-    have : R * (μ ^ a) ^ 2 * μ' ^ b ≤ μ' ^ a * μ' ^ b := by
-      calc R * (μ ^ a) ^ 2 * μ' ^ b ≤ R * (μ ^ a) ^ 2 * (μ ^ b) ^ 2 := by gcongr
-        _ = R * ((μ ^ a) ^ 2 * (μ ^ b) ^ 2) := by ring
-        _ ≤ μ' ^ a * μ' ^ b := hR
-    exact le_of_mul_le_mul_right this hμb0
+  have hbulk := bulk_pow_le hμ' hr hR0 (by omega : a ≤ 2 * K) hR
   have h12 : 0 ≤ 1 - 2 * E' := by linarith
   have h1η : 0 ≤ 1 - η := by linarith
   calc (1 - 2 * E') * (1 - η) * R * G (2 * N + 1) ^ 2
@@ -371,7 +379,113 @@ theorem oddChain_purity (h : OpenMomentWitness Z G μ c ρ s)
     _ = (1 - 2 * E') * (μ' ^ a * G' (2 * K)) := by ring
     _ ≤ G' (2 * N + 1) := hlow
 
+/-- **The open-chain purity at even lengths**, the even analogue of `oddChain_purity`. Let
+`M = 2K` and let `n = 2N` with `M ≤ n ≤ 2M`. If `e'_M ≤ E' ≤ 1` at `2β`, `A(M) ≥ 1 - η` and
+`R μ^{2M} ≤ μ'^M`, then `A(n) ≥ (1 - E')(1 - η) R`. At even lengths the leading weight has no
+sign, so the factor is `1 - E'` rather than `1 - 2E'`. -/
+theorem evenChain_purity (h : OpenMomentWitness Z G μ c ρ s)
+    (h' : OpenMomentWitness Z' G' μ' c' ρ' s') (hμ' : 0 < μ') (hr : μ' ≤ μ ^ 2) {K N : ℕ}
+    (hK : 1 ≤ K) (hKN : K ≤ N) (hN2 : N ≤ 2 * K) {E' : ℝ} (hE' : E' ≤ 1)
+    (he' : (1 - E') * G' (2 * K) ≤ c' * μ' ^ (2 * K)) {η : ℝ} (hη1 : η ≤ 1)
+    (hη : (1 - η) * G (2 * K) ^ 2 ≤ G' (2 * K)) {R : ℝ} (hR0 : 0 ≤ R)
+    (hR : R * μ ^ (2 * (2 * K)) ≤ μ' ^ (2 * K)) :
+    (1 - E') * (1 - η) * R * G (2 * N) ^ 2 ≤ G' (2 * N) := by
+  set a := 2 * N - 2 * K with ha
+  have hμ := h.mu_nonneg
+  have hsplit : ∀ x : ℝ, x ^ (2 * N) = x ^ a * x ^ (2 * K) := fun x ↦ by
+    rw [← pow_add]; congr 1; omega
+  have hμpos : 0 < μ := by
+    rcases hμ.lt_or_eq with h0 | h0
+    · exact h0
+    · rw [← h0] at hr; nlinarith
+  have hGk : 0 ≤ G (2 * K) := (mul_nonneg h.c_nonneg (pow_nonneg hμ _)).trans (h.le_G K hK)
+  have hG'k : 0 ≤ G' (2 * K) :=
+    (mul_nonneg h'.c_nonneg (pow_nonneg hμ'.le _)).trans (h'.le_G K hK)
+  -- `G(2N) ≤ μ^a G(2K)` at `β`: the residual part decays, since `ρ ≤ 1`.
+  have hdec : G (2 * N) ≤ μ ^ a * G (2 * K) := by
+    have hd := h.G_decay K N hK hKN
+    have hρ : ρ ^ (2 * N - 2 * K) ≤ 1 := pow_le_one₀ h.rho_nonneg h.rho_le_one
+    have hD : 0 ≤ G (2 * K) - c * μ ^ (2 * K) := by linarith [h.le_G K hK]
+    have h1 : μ ^ (2 * K) * (G (2 * N) - c * μ ^ (2 * N)) ≤
+        μ ^ (2 * K) * (μ ^ a * (G (2 * K) - c * μ ^ (2 * K))) := by
+      refine hd.trans ?_
+      rw [hsplit μ]
+      have := mul_le_mul_of_nonneg_right hρ (mul_nonneg (mul_nonneg (pow_nonneg hμ a)
+        (pow_nonneg hμ (2 * K))) hD)
+      nlinarith [this]
+    have h2 := le_of_mul_le_mul_left h1 (pow_pos hμpos _)
+    rw [hsplit μ] at h2
+    nlinarith [h.c_nonneg]
+  have hGn2 : G (2 * N) ^ 2 ≤ (μ ^ a) ^ 2 * G (2 * K) ^ 2 := by
+    have hGn : 0 ≤ G (2 * N) :=
+      (mul_nonneg h.c_nonneg (pow_nonneg hμ _)).trans (h.le_G N (hK.trans hKN))
+    rw [← mul_pow]; exact pow_le_pow_left₀ hGn hdec 2
+  -- `G'(2N) ≥ c' μ'^{2N} ≥ (1 - E') μ'^a G'(2K)` at `2β`.
+  have hlow : (1 - E') * (μ' ^ a * G' (2 * K)) ≤ G' (2 * N) := by
+    have := h'.le_G N (hK.trans hKN)
+    rw [hsplit] at this
+    nlinarith [mul_le_mul_of_nonneg_left he' (pow_nonneg hμ'.le a)]
+  have hbulk := bulk_pow_le hμ' hr hR0 (by omega : a ≤ 2 * K) hR
+  have h1E : 0 ≤ 1 - E' := by linarith
+  have h1η : 0 ≤ 1 - η := by linarith
+  calc (1 - E') * (1 - η) * R * G (2 * N) ^ 2
+      ≤ (1 - E') * (1 - η) * R * ((μ ^ a) ^ 2 * G (2 * K) ^ 2) := by gcongr
+    _ = (1 - E') * (R * (μ ^ a) ^ 2) * ((1 - η) * G (2 * K) ^ 2) := by ring
+    _ ≤ (1 - E') * μ' ^ a * G' (2 * K) := by gcongr
+    _ = (1 - E') * (μ' ^ a * G' (2 * K)) := by ring
+    _ ≤ G' (2 * N) := hlow
+
 end OpenMomentWitness
+
+/-! ### The boundary seed from finite traces -/
+
+/-- **The boundary defect from finite traces.** The boundary defect `e_{2K}` involves the
+leading modulus and weight of the transfer operator, but it is bounded by finitely many traces:
+the decay inequality at `2K' = 2K - 2N₀ r` gives `e_{2K} ≤ (ρμ)^{2N₀ r} G(2K') / G(2K)`, and a ring
+purity `P_s(2N₀) ≥ 1 - ε` gives `ρ^{2N₀} ≤ d(ε)` and `μ^{2N₀} ≤ Z(2N₀)`. So
+`G(2K') (d(ε) Z(2N₀))^r ≤ E G(2K)` implies `e_{2K} ≤ E`. -/
+theorem boundaryDefect_le_of_traces {Z G : ℕ → ℝ} (hb : OpenMomentBounds Z G)
+    (hZ : ∀ L, 0 < Z L) (hG : ∀ n, 0 < G n) {N₀ K r : ℕ} (hN₀ : 1 ≤ N₀)
+    (hK : N₀ * r + 1 ≤ K) {ε E : ℝ} (hε : ε ≤ 1 / 10)
+    (hP : 1 - ε ≤ Z (2 * (2 * N₀)) / Z (2 * N₀) ^ 2)
+    (hE : G (2 * (K - N₀ * r)) * (tailBound ε * Z (2 * N₀)) ^ r ≤ E * G (2 * K)) :
+    boundaryDefect Z G (2 * K) ≤ E := by
+  obtain ⟨μ, c, ρ, s, w⟩ := hb
+  have hμ := w.mu_pos (hZ 4)
+  have hρ1 := w.rho_lt_one hμ hN₀ (hZ _) hε hP
+  have htail := w.tail_le hμ hN₀ (hZ _) hε hP
+  have hμN := w.pow_le_Z N₀ hN₀
+  rw [boundaryDefect, w.leadingRoot_eq (hZ 4), w.leadingOverlap_eq (hZ 4) hρ1]
+  set K' := K - N₀ * r with hK'def
+  have hK' : 1 ≤ K' := by omega
+  have h2 : 2 * N₀ * r = 2 * (N₀ * r) := by ring
+  have ha : 2 * K - 2 * K' = 2 * N₀ * r := by omega
+  have hsplit : μ ^ (2 * K) = μ ^ (2 * K') * μ ^ (2 * N₀ * r) := by
+    rw [← pow_add]; congr 1; omega
+  have hρ0 := w.rho_nonneg
+  -- The decay at `β`: `G(2K) - cμ^{2K} ≤ (ρμ)^{2N₀ r} G(2K')`.
+  have hdec : G (2 * K) - c * μ ^ (2 * K) ≤ (ρ * μ) ^ (2 * N₀ * r) * G (2 * K') := by
+    have hd := w.G_decay K' K hK' (by omega)
+    rw [ha] at hd
+    have hc0 : 0 ≤ c * μ ^ (2 * K') := mul_nonneg w.c_nonneg (pow_nonneg hμ.le _)
+    have hρa : 0 ≤ ρ ^ (2 * N₀ * r) := pow_nonneg hρ0 _
+    have h1 : μ ^ (2 * K') * (G (2 * K) - c * μ ^ (2 * K)) ≤
+        μ ^ (2 * K') * ((ρ * μ) ^ (2 * N₀ * r) * G (2 * K')) := by
+      refine hd.trans ?_
+      rw [hsplit, mul_pow]
+      have := mul_le_mul_of_nonneg_left (by linarith : G (2 * K') - c * μ ^ (2 * K') ≤
+        G (2 * K')) (mul_nonneg hρa (mul_nonneg (pow_nonneg hμ.le (2 * K'))
+          (pow_nonneg hμ.le (2 * N₀ * r))))
+      linarith
+    exact le_of_mul_le_mul_left h1 (pow_pos hμ _)
+  -- `(ρμ)^{2N₀ r} ≤ (d(ε) Z(2N₀))^r`.
+  have hρμ : (ρ * μ) ^ (2 * N₀ * r) ≤ (tailBound ε * Z (2 * N₀)) ^ r := by
+    rw [pow_mul, mul_pow]
+    exact pow_le_pow_left₀ (mul_nonneg (pow_nonneg hρ0 _) (pow_nonneg hμ.le _))
+      (mul_le_mul htail hμN (pow_nonneg hμ.le _) ((pow_nonneg hρ0 _).trans htail)) r
+  have hG2K := hG (2 * K)
+  rw [sub_le_iff_le_add, ← sub_le_iff_le_add', le_div_iff₀ hG2K]
+  nlinarith [mul_le_mul_of_nonneg_right hρμ (hG (2 * K')).le]
 
 /-! ### One step of the boundary induction -/
 
@@ -548,8 +662,8 @@ boundary moment inequalities at every `β > 0`. The scales are `βᵢ = β₀ 2^
   `2Kᵢ` (`boundaryHalf`);
 * the hand-over `Eₘ, ηₘ, εₘ ≤ x ≤ 1/100`.
 
-Then every odd open chain of `n ≥ 4 N₀ 2^m` sites has a nondegenerate ground level and gap
-`Δ_n > log(1/(10x)) / (β₀ 2^m)`. -/
+Then every open chain of `n ≥ 4 N₀ 2^m` sites, odd or even, has a nondegenerate ground level
+and gap `Δ_n > log(1/(10x)) / (β₀ 2^m)`. -/
 theorem gapGT_of_openChain {N₀ K₀ m : ℕ} (hN₀ : 1 ≤ N₀) (hK₀ : 1 ≤ K₀) (hK₀N : K₀ ≤ 2 * N₀)
     (hm : 1 ≤ m) (hring : HasSpatialMomentBounds Er (2 * N₀))
     (hopen : ∀ β : ℝ, 0 < β → OpenMomentBounds (fun L ↦ partitionFunction Er L β)
@@ -565,8 +679,8 @@ theorem gapGT_of_openChain {N₀ K₀ m : ℕ} (hN₀ : 1 ≤ N₀) (hK₀ : 1 �
     (ht : 1 - u₀ ≤ thermalPurity Er (2 * (2 * N₀)) β₀)
     (he : boundaryDefect (fun L ↦ partitionFunction Er L β₀) (fun n ↦ partitionFunction Eo n β₀)
       (2 * K₀) ≤ E 0)
-    (hη : 1 - η 0 ≤ thermalPurity Eo (2 * (2 * N₀)) β₀) {n : ℕ} (hn : 4 * N₀ * 2 ^ m ≤ n)
-    (hno : Odd n) : GapGT (Eo n) (log (1 / (10 * x)) / (β₀ * 2 ^ m)) := by
+    (hη : 1 - η 0 ≤ thermalPurity Eo (2 * (2 * N₀)) β₀) {n : ℕ} (hn : 4 * N₀ * 2 ^ m ≤ n) :
+    GapGT (Eo n) (log (1 / (10 * x)) / (β₀ * 2 ^ m)) := by
   set β : ℕ → ℝ := fun i ↦ β₀ * 2 ^ i with hβdef
   have hβpos : ∀ i, 0 < β i := fun i ↦ by simp only [β]; positivity
   have hβs : ∀ i, β (i + 1) = 2 * β i := fun i ↦ by simp only [β]; ring
@@ -745,13 +859,12 @@ theorem gapGT_of_openChain {N₀ K₀ m : ℕ} (hN₀ : 1 ≤ N₀) (hK₀ : 1 �
         he hA
       rw [hxss]
       exact ⟨h, hεs'.trans (by linarith)⟩
-  -- The final scale: `Mᵢ ≤ n ≤ 2 Mᵢ` with `i = m + j`.
+  -- The final scale: `Mᵢ ≤ n ≤ 2 Mᵢ` with `i = m + j`, at either parity of `n`.
   obtain ⟨j, hj1, hj2⟩ := exists_dyadic_window (n₀ := 2 * (2 * Nn m))
     (by have := hNn1 m; omega) ((le_of_eq (by simp only [Nn]; ring)).trans hn)
   have hM : 2 * (2 * Nn m) * 2 ^ j = 2 * (2 * Nn (m + j)) := by
     simp only [Nn]; rw [pow_add]; ring
   rw [hM] at hj1 hj2
-  obtain ⟨N, rfl⟩ := hno
   obtain ⟨⟨-, hA⟩, hεj⟩ := hunif j
   obtain ⟨⟨he', -⟩, -⟩ := hunif (j + 1)
   set y := xs j
@@ -762,30 +875,37 @@ theorem gapGT_of_openChain {N₀ K₀ m : ℕ} (hN₀ : 1 ≤ N₀) (hK₀ : 1 �
   have hysq0 : 0 ≤ y ^ 2 := sq_nonneg y
   rw [show m + (j + 1) = m + j + 1 by omega, hNns, hβs] at he'
   rw [thermalPurity, le_div_iff₀ (pow_pos (hG _ _) 2)] at hA
-  have hpur := (hw (m + j)).oddChain_purity (hw' (m + j)) (hμ _) (hr _) (K := 2 * Nn (m + j))
-    (N := N) (by have := hNn1 (m + j); omega) (by omega) (by omega) (hG _ _)
-    (E' := xs (j + 1)) (by rw [hxss]; linarith) he' (η := y) (by linarith) hA (hR0 _)
-    (hRbulk _)
-  -- `P_τ(n, βᵢ) ≥ (1 - 2x')(1 - x) Rᵢ ≥ 1 - 4x`.
-  have hP : 1 - 4 * y ≤ thermalPurity Eo (2 * N + 1) (β (m + j)) := by
-    rw [thermalPurity, le_div_iff₀ (pow_pos (hG _ _) 2)]
+  -- `(1 - 2x')(1 - x) Rᵢ ≥ 1 - 4x`, with `x' = 10x²` the boundary defect at `2βᵢ`.
+  have hlow : 1 - 4 * y ≤
+      (1 - 2 * xs (j + 1)) * (1 - y) * ((1 - ε (m + j)) * (1 - ε (m + j + 1))) := by
     have hεs' := hεsq (m + j) hεj
     have hRlow : (1 - y) * (1 - 6 * y ^ 2) ≤ (1 - ε (m + j)) * (1 - ε (m + j + 1)) :=
       mul_le_mul (by linarith) (by linarith) (by linarith) (by linarith [hε10 (m + j)])
-    have hfin := uniform_final hy0 hy
-    have hlow : (1 - 2 * (10 * y ^ 2)) * (1 - y) * ((1 - y) * (1 - 6 * y ^ 2)) ≤
-        (1 - 2 * xs (j + 1)) * (1 - y) * ((1 - ε (m + j)) * (1 - ε (m + j + 1))) := by
-      rw [hxss]
-      exact mul_le_mul_of_nonneg_left hRlow (mul_nonneg (by linarith) (by linarith))
-    have hG2 := pow_pos (hG (2 * N + 1) (β (m + j))) 2
-    calc (1 - 4 * y) * partitionFunction Eo (2 * N + 1) (β (m + j)) ^ 2
-        ≤ (1 - 2 * xs (j + 1)) * (1 - y) * ((1 - ε (m + j)) * (1 - ε (m + j + 1))) *
-            partitionFunction Eo (2 * N + 1) (β (m + j)) ^ 2 :=
-          mul_le_mul_of_nonneg_right (hfin.trans hlow) hG2.le
-      _ ≤ partitionFunction Eo (2 * N + 1) (2 * β (m + j)) := hpur
+    rw [hxss]
+    exact (uniform_final hy0 hy).trans
+      (mul_le_mul_of_nonneg_left hRlow (mul_nonneg (by linarith) (by linarith)))
+  have hK1 : 1 ≤ 2 * Nn (m + j) := by have := hNn1 (m + j); omega
+  -- `P_τ(n, βᵢ) ≥ 1 - 4x` at both parities.
+  have hP : 1 - 4 * y ≤ thermalPurity Eo n (β (m + j)) := by
+    rw [thermalPurity, le_div_iff₀ (pow_pos (hG _ _) 2)]
+    have hG2 := pow_pos (hG n (β (m + j))) 2
+    obtain ⟨N, hN | hN⟩ := Nat.even_or_odd' n <;> subst hN
+    · have hpur := (hw (m + j)).evenChain_purity (hw' (m + j)) (hμ _) (hr _)
+        (K := 2 * Nn (m + j)) (N := N) hK1 (by omega) (by omega) (E' := xs (j + 1))
+        (by rw [hxss]; linarith) he' (η := y) (by linarith) hA (hR0 _) (hRbulk _)
+      have hle : (1 - 2 * xs (j + 1)) * (1 - y) * ((1 - ε (m + j)) * (1 - ε (m + j + 1))) ≤
+          (1 - xs (j + 1)) * (1 - y) * ((1 - ε (m + j)) * (1 - ε (m + j + 1))) :=
+        mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right
+          (by linarith [hxs0 (j + 1)]) (by linarith)) (hR0 _)
+      exact (mul_le_mul_of_nonneg_right (hlow.trans hle) hG2.le).trans hpur
+    · have hpur := (hw (m + j)).oddChain_purity (hw' (m + j)) (hμ _) (hr _)
+        (K := 2 * Nn (m + j)) (N := N) hK1 (by omega) (by omega) (hG _ _)
+        (E' := xs (j + 1)) (by rw [hxss]; linarith) he' (η := y) (by linarith) hA (hR0 _)
+        (hRbulk _)
+      exact (mul_le_mul_of_nonneg_right hlow hG2.le).trans hpur
   /- From the purity to the gap:
   `e^{β_{m+j} log(1/(10x)) / β_m} · 4x_j = (10x)^{-2^j} · 4 (10x)^{2^j} / 10`. -/
-  refine gapGT_of_thermalPurity Eo (2 * N + 1) (hβpos _) (by linarith) hP ?_
+  refine gapGT_of_thermalPurity Eo n (hβpos _) (by linarith) hP ?_
   have h10x : 0 < 10 * x := by positivity
   have hexp : exp (β (m + j) * (log (1 / (10 * x)) / (β₀ * 2 ^ m))) =
       (1 / (10 * x)) ^ (2 ^ j) := by

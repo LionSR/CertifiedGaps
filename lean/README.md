@@ -9,7 +9,7 @@ inequalities per model at the seed scale $(n_0, \beta_0)$). Those finite seed bo
 named `sorry` lemmas whose values come from the computer certificates in [`../models/`](../models/).
 One seed is now proved outright in the kernel: `SeedKernel.Ising.ising_gap` is an unconditional gap
 theorem (below). The open-chain argument of the note (Appendices A–C) is formalized as well: it
-gives a uniform gap for odd open chains with boundary fields from four finite inputs.
+gives a uniform gap for open chains, with boundary fields or free ends, from four finite inputs.
 
 ## Overview
 
@@ -69,7 +69,8 @@ modulo four finite inputs at `β = 49` (the note's eq. (C1)):
 
 The criterion itself is general. `gapGT_of_openChain` takes any seed scale `β₀`, ring seeds at
 lengths `2N₀` and `4N₀`, a boundary seed at length `2K₀`, an open-chain seed at length `4N₀`, and
-`m` base steps, and gives `Δ_n > log(1/(10x)) / (β₀ 2^m)` for odd `n ≥ 4 N₀ 2^m`. Its finite data
+`m` base steps, and gives `Δ_n > log(1/(10x)) / (β₀ 2^m)` for every `n ≥ 4 N₀ 2^m`, odd or even
+(`oddChain_purity`, `evenChain_purity`). Its finite data
 form an `OpenCertificate`, whose rational conditions `OpenCertificate.Valid` are checked by
 `decide +kernel`; `gapGT_of_openCertificate` applies one. The script
 [`scripts/open_certificate.jl`](scripts/open_certificate.jl) searches for the data from the seeds,
@@ -77,7 +78,22 @@ and Lean re-checks it. The note's numbers are `boundaryFieldCertificate`. From t
 inputs, the script finds `sharpBoundaryFieldCertificate`, which hands over at the defect actually
 reached (`x = 2.241 · 10⁻⁴` in place of `1/100`). The resulting
 `spin_one_boundary_field_gap_sharp` gives `Δ_n > log(10⁶/2241)/392 ≈ 0.01556` for every odd
-`n ≥ 1921`, 2.65 times the note's bound.
+`n ≥ 1921`, 2.65 times the note's bound. At even lengths the same open chain is the opposite-field
+chain, and `spin_one_opposite_field_gap(_sharp)` gives the same two bounds for every even
+`n ≥ 1920`.
+
+All four seeds can be stated for finite partition functions. The boundary defect involves the
+leading eigenvalue and overlap of the transfer operator, but `boundaryDefect_le_of_traces` bounds
+it by three finite traces: `G(2K - 2N₀ r) (d(u₀) Z(2N₀))^r ≤ E G(2K)` implies `e_{2K} ≤ E`.
+`gapGT_of_openCertificate_traces` and `RPRing.openGapGT_of_traces` use this form.
+
+Open boundary conditions are the case `b = 0`. When every bond factor `C_α` is symmetric or
+antisymmetric (the condition the time reversal `J` needs), `RPRing.Boundary.free` is an admissible
+end term, its open chain is the chain with free ends at every length (`openHamiltonian_free`), and
+`RPRing.freeGapGT_of_traces` gives its gap at every `n ≥ 4 N₀ 2^m` from a certificate and four
+finite seeds. No model instance with free ends is formalized yet: the free spin-1 Heisenberg chain
+has spin-½ edge states whose splitting closes exponentially in `n`, so it has no uniform gap; that
+is why the boundary fields are there.
 
 The open-chain layer follows the ring layer. At every finite Trotter depth, the ring
 traces and the open-chain traces are moments of one real symmetric transfer matrix `X = F J` (`J`
@@ -199,6 +215,7 @@ lengths `L ≥ n₀` (where `L` counts unit cells).
 | `IsingLongitudinal.gap` | Ising chain `−ZZ − gX − hZ`, 30 points `g ∈ {1/4, …, 2}`, `h ∈ {1/20, …, 1}` | `log r / β₀` per point (`0.075` at `g = 1, h = 1/20` up to `3.70`), `L ≥ 6` | `seeds` (single lemma covering all 30 points) |
 | `SpinOneHeisenberg.spin_one_boundary_field_gap` | open spin-1 Heisenberg chain, equal end fields `h = 3/5`, odd `n` sites | `Δ_n > log 10 / 392 ≈ 0.005874` for odd `n ≥ 1921` | four inputs at `β = 49`: `P_s(120) ≥ 0.948`, `P_τ(240) ≥ 0.948` (ring), `e₁₄₂ ≤ 0.14`, `P_τ^{opp}(240) ≥ 0.79` (open chain) |
 | `SpinOneHeisenberg.spin_one_boundary_field_gap_sharp` | the same chain | `Δ_n > log(10⁶/2241) / 392 ≈ 0.01556` for odd `n ≥ 1921` | the same four inputs (`sharpBoundaryFieldCertificate`) |
+| `SpinOneHeisenberg.spin_one_opposite_field_gap`, `spin_one_opposite_field_gap_sharp` | open spin-1 Heisenberg chain, opposite end fields `±3/5`, even `n` sites | `Δ_n > log 10 / 392` and `Δ_n > log(10⁶/2241) / 392` for even `n ≥ 1920` | the same four inputs |
 
 Every model except the spin-1 Heisenberg ring lists its parameter points in `points`; `gap hp` (for
 `hp : p ∈ points`) gives `Δ_L > log r / β₀` with `r = p.cert.r`, and the model's single `sorry`,
@@ -227,9 +244,10 @@ Every theorem in the table below is completely proved using only `propext`, `Cla
 | `gapGT_of_chain`, `gapGT_of_chainCertificate` | unequal-defect criterion via the exact asymmetric doubling recurrence; `ChainCertificate` validity is decided in the kernel |
 | `RPRing.spatialMomentBounds` | every reflection-positive ring (`RPRing`) satisfies `SpatialMomentBounds` (proved via Trotter transfer matrices and the product formula) |
 | `RPRing.gapGT_of_chainCertificate` | end-to-end criterion for an `RPRing`: seed bounds plus a valid `ChainCertificate` imply `Δ_L > log r / β₀` |
-| `gapGT_of_openChain`, `gapGT_of_openCertificate` | the boundary-field criterion of Appendices A–C for abstract ring and open-chain spectra under `OpenMomentBounds`, with general seeds at `(2N₀, 4N₀, 2K₀, β₀)` and `m` base steps: `Δ_n > log(1/(10x)) / (β₀ 2^m)` for odd `n ≥ 4 N₀ 2^m`; the certificate form checks the rational data by `decide +kernel` |
-| `gapGT_of_openSeeds` | the case of the note's eq. (C1) (`boundaryFieldCertificate`): four seeds imply `Δ_n > log 10 / 392` for odd `n ≥ 1921` |
-| `RPRing.openMomentBounds`, `RPRing.openGapGT_of_certificate`, `RPRing.openGapGT_of_seeds` | every reflection-positive ring without internal reflection and every boundary term `b = -∑ w_α C_α` satisfy `OpenMomentBounds` (Trotter transfer matrix `X = F J` and the product formula); the end-to-end open-chain criterion |
+| `gapGT_of_openChain`, `gapGT_of_openCertificate` | the boundary-field criterion of Appendices A–C for abstract ring and open-chain spectra under `OpenMomentBounds`, with general seeds at `(2N₀, 4N₀, 2K₀, β₀)` and `m` base steps: `Δ_n > log(1/(10x)) / (β₀ 2^m)` for every `n ≥ 4 N₀ 2^m`, odd or even; the certificate form checks the rational data by `decide +kernel` |
+| `boundaryDefect_le_of_traces`, `gapGT_of_openCertificate_traces` | the boundary seed from three finite traces, `G(2K - 2N₀ r) (d(u₀) Z(2N₀))^r ≤ E G(2K)`, so that all four seeds concern finite partition functions |
+| `gapGT_of_openSeeds` | the case of the note's eq. (C1) (`boundaryFieldCertificate`): four seeds imply `Δ_n > log 10 / 392` for every `n ≥ 1920` |
+| `RPRing.openMomentBounds`, `RPRing.openGapGT_of_certificate`, `RPRing.openGapGT_of_traces`, `RPRing.freeGapGT_of_traces`, `RPRing.openGapGT_of_seeds` | every reflection-positive ring without internal reflection and every boundary term `b = -∑ w_α C_α` satisfy `OpenMomentBounds` (Trotter transfer matrix `X = F J` and the product formula); the end-to-end open-chain criterion |
 | `SpinOneHeisenberg.gapGT_of_boundaryFieldInputs_certificate` | the spin-1 boundary-field gap from the four packaged inputs `BoundaryFieldInputs` and any valid certificate for those seeds; `gapGT_of_boundaryFieldInputs` (note's certificate) and `gapGT_of_boundaryFieldInputs_sharp` (`sharpBoundaryFieldCertificate`) are its cases |
 | `RPRing.eigenvalues_eq_spectrum` | any Hamiltonian conjugate to `R.hamiltonian L` by a sitewise unitary has the exact same eigenvalue spectrum |
 | `SpinOneHeisenberg.gapGT_log_twenty` | Theorem 1 of the main note deduced from packaged `ThermalMPOInputs`: `Δ_L > log 20 / 784` |
@@ -380,13 +398,13 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Ring/Conjugation.lean` | Sitewise unitary conjugation of ring Hamiltonians and spectral invariance |
 | `Heisenberg/Hamiltonian.lean` | The spin-1 Heisenberg ring $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ in the real Cartesian basis |
 | `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Both bounds of OpenAI's Theorem 1.1: `spin_one_heisenberg_gap` (`L ≥ 2304`, from the seeds at 36 sites and `chain36`) and `spin_one_heisenberg_gap_sixty` (`L ≥ 60`) |
-| `Heisenberg/OpenChain.lean` | Theorem 2 of the main note (`spin_one_boundary_field_gap`) and its sharper form (`spin_one_boundary_field_gap_sharp`): the equal- and opposite-field open chains as open chains of the Heisenberg ring, and the four inputs |
+| `Heisenberg/OpenChain.lean` | Theorem 2 of the main note (`spin_one_boundary_field_gap`) and its sharper form (`spin_one_boundary_field_gap_sharp`): the equal- and opposite-field open chains as open chains of the Heisenberg ring, the four inputs, and the opposite-field gap at even lengths (`spin_one_opposite_field_gap`) |
 | `Open/MomentBounds.lean` | `OpenMomentBounds`: closed inequalities of the boundary moment form, from a finite Hermitian transfer matrix and through limits; `leadingRoot`, `leadingOverlap`, `boundaryDefect` |
-| `Open/Criterion.lean` | The boundary-field criterion `gapGT_of_openChain` for general seeds: the ring at the open-chain scales, the three moves of Appendix A, the base steps (`OpenStep`) and the uniform phase |
+| `Open/Criterion.lean` | The boundary-field criterion `gapGT_of_openChain` for general seeds: the ring at the open-chain scales, the three moves of Appendix A with the even-length purity, the boundary seed from finite traces (`boundaryDefect_le_of_traces`), the base steps (`OpenStep`) and the uniform phase |
 | `Open/Certificate.lean` | Rational certificates `OpenCertificate` checked by `decide +kernel`, `gapGT_of_openCertificate`, the note's `boundaryFieldCertificate` with `gapGT_of_openSeeds`, and `sharpBoundaryFieldCertificate` |
-| `Open/Model.lean` | Open chains of an `RPRing` with boundary terms (`Boundary`, `openHamiltonian`, `openSpectrum`) |
+| `Open/Model.lean` | Open chains of an `RPRing` with boundary terms (`Boundary`, `openHamiltonian`, `openSpectrum`), and free ends (`Boundary.free`, `openHamiltonian_free`) |
 | `Open/Transfer.lean` | Open-chain Trotter slices, time reversal `J`, and `Tr (slice)^M = ⟨v, Xⁿ v⟩` with `X = F J` |
-| `Open/Bounds.lean`, `Open/Gap.lean` | `RPRing.openMomentBounds` and the end-to-end `RPRing.openGapGT_of_certificate` and `RPRing.openGapGT_of_seeds` |
+| `Open/Bounds.lean`, `Open/Gap.lean` | `RPRing.openMomentBounds` and the end-to-end `RPRing.openGapGT_of_certificate`, `RPRing.openGapGT_of_traces`, `RPRing.freeGapGT_of_traces` and `RPRing.openGapGT_of_seeds` |
 | `Local/Pauli.lean`, `Local/SpinHalf.lean` | Real Pauli matrices $X, Z$ and real spin-½ factors $S^x, iS^y, S^z$ (`SpinHalf.P`) |
 | `Local/SpinHalfRotation.lean` | Sublattice rotation $e^{i\pi S^y}$ and complex spin-½ operators |
 | `Local/SpinOne.lean` | Real antisymmetric spin-1 generators `SpinOne.G α` $= G_\alpha = i S^\alpha$ |
