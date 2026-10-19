@@ -86,6 +86,91 @@ even `n` and the equal-field chain at odd `n` are both of this form. The closed 
 `OpenMomentBounds` pass to the limit by compactness. The sign of the leading eigenvalue at odd
 lengths is fixed by positivity of the trace, so the note's `U_P` symmetry argument is not needed.
 
+### Continuous-time history prerequisites
+
+`Transfer/TimeOrdering.lean`, `Transfer/HistoryShuffle.lean`,
+`Transfer/PoissonHistory.lean`, and `Transfer/ProductPoissonHistory.lean` formalize the untwisted
+history-space prerequisites from the [spatial-transfer proof in the September 24, 2026
+preprint](https://github.com/openai/math/blob/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/build/transfer.tex).
+These are independent analytic results, with no additional axioms or seed hypotheses:
+
+- The finite time cube is partitioned by chronological permutation chambers outside the
+  Lebesgue-null collision hyperplanes. For any integrable Banach-valued integrand, its cube
+  integral equals the finite sum of its integrals over the increasing-time simplex with permuted
+  arguments. No permutation symmetry of the integrand is assumed.
+- For arbitrary fixed event counts on a finite family of bonds, the product of the individual
+  ordered-time simplexes is partitioned, up to null collisions, by exactly the global
+  chronological shuffles preserving every bond's internal order. The Banach-valued product
+  integral equals the finite sum over the single global ordered simplex, with the inverse
+  shuffle restoring the original event slots. Explicit two-bond product and iterated-integral
+  formulas are included. No commutation of event operators is needed.
+- The increasing simplex has volume $`b^k/k!`$. The zero-event simplex has mass one.
+- `PoissonHistory.History b m` is the actual disjoint union of the increasing-time simplexes with
+  label words in `Fin m`. Its Lebesgue history measure has total mass $`e^{mb}`$; multiplying by
+  $`e^{-mb}`$ gives a probability measure whose event count has distribution `poissonMeasure (m * b)`.
+- An almost-everywhere strongly measurable observable bounded in norm by $`C R^k`$, with
+  $`R \ge 0`$, is absolutely integrable, with integral of its norm
+  at most $`C e^{mbR}`$. Integrals can then be regrouped by event count and finite label word.
+  The spin-one case has `m = 3`.
+- The actual finite product of history measures is proved equal to the countable sum of its
+  product-simplex components. `hasSum_shuffledIntegral` gives the fully ungrouped chronological
+  expansion indexed by count vectors, label-word families, and admissible shuffles. Every
+  individual term is absolutely summable; the sum of the individual norm integrals is the
+  original L¹ norm. No cancellation or rearrangement assumption is used.
+- Bondwise domination by $`C\prod_i R_i^{k_i}`$, with nonnegative $`R_i`$, implies integrability
+  and bounds the absolute chronological series by $`C\prod_i e^{m_i b R_i}`$. The measure
+  identities and convergence statements include empty families, zero times, and zero label counts.
+
+The route uses equal-volume coordinate-permutation chambers to prove the factorial normalization
+before constructing the history measure. It avoids assuming a Poisson law or a simplex-volume
+formula. `HistoryShuffle` proves the finite-family Lebesgue coordinate change and the
+within-bond order constraints, rather than assuming a partition or a measure identity.
+`ProductPoissonHistory` then proves the actual history-product decomposition and the absolutely
+convergent count/label/shuffle sum. The merged-history matrix kernel and the operator construction
+are a separate component. This history layer makes no physical partition-function or
+transfer-operator trace claim.
+
+Run `lake build CertifiedGaps.Transfer.PoissonHistoryAudit`,
+`lake build CertifiedGaps.Transfer.HistoryShuffleAudit`, and
+`lake build CertifiedGaps.Transfer.ProductPoissonHistoryAudit` for edge-case regressions and a
+dependency-axiom audit that fails on any axiom outside `propext`,
+`Classical.choice`, and `Quot.sound`. The existing kernel-replay driver can recheck each new module
+by setting `KERNEL_CHECK_MODULE=CertifiedGaps.Transfer.TimeOrdering` or
+`KERNEL_CHECK_MODULE=CertifiedGaps.Transfer.PoissonHistory`; the same driver checks
+`CertifiedGaps.Transfer.HistoryShuffle`, `CertifiedGaps.Transfer.ProductPoissonHistory`, and their
+audit modules.
+
+### Continuous spin-one history operator
+
+`Transfer/SpinOneKernel.lean` constructs the actual operator from the history measure above.
+For two histories it merges their event times in increasing order and takes the matrix trace of
+that word in the existing Cartesian `SpinOne.G` factors. Joint measurability, the bound three,
+null collisions, the empty-history value three, and real symmetry are proved from these definitions.
+Swapping histories only relabels events; no matrix word is reversed or commuted.
+
+On the complex Hilbert space `Lp ℂ 2 (historyMeasure b 3)`, the operators `SpinOneKernel.K b` and
+`SpinOneKernel.X a b = (exp(-a*b) : ℂ) • K b` are Hilbert–Schmidt, compact, and self-adjoint.
+`K_apply` and `X_apply` state their actual integral formulas. Their squared Hilbert–Schmidt bounds
+are $`9e^{6b}`$ and $`9e^{(6-2a)b}`$, respectively, for every real `a` and nonnegative `b`.
+
+The general bridge in `Transfer/ContinuousKernel/` constructs the bounded integral operator of a
+jointly strongly measurable, bounded real or complex kernel on any finite measure space. It proves
+$`\|K\| \le B\mu(\Omega)`$, the squared Hilbert–Schmidt bound $`B^2\mu(\Omega)^2`$,
+and compactness; Hermitian symmetry implies self-adjointness. The Hilbert–Schmidt criterion uses
+finite orthonormal families. Compactness follows from operator-norm convergence of rank-one
+truncations, without a separability or positive-mass assumption.
+
+Run the generic and concrete regressions with:
+
+```sh
+lake build CertifiedGaps.Transfer.ContinuousKernel.Audit \
+  CertifiedGaps.Transfer.SpinOneKernelAudit
+```
+
+The concrete audit enforces the standard-axiom whitelist on all declarations in the construction and its analytic
+dependencies. The noncommuting three-event regression distinguishes chronological order from its
+reversal. These modules do not assert an operator-trace or physical partition-function identity.
+
 ### The first unconditional gap
 
 ```lean
@@ -162,7 +247,7 @@ lake build SeedKernelBench  # opt-in: kernel benchmarks up to n = 12 (≈2 min, 
 
 Lean is pinned at `v4.36.0-rc1` and Mathlib at commit
 `807d3836b165983210ee2ecf3cd28f239436949c` (October 19, 2026). `CertifiedGaps` comprises
-roughly 6,800 lines of Lean
+roughly 10,400 lines of Lean
 and `SeedKernel` roughly 1,200 lines (excluding generated witness files). All declarations live in
 the `CertifiedGaps` namespace; declaration names below omit that prefix.
 
@@ -373,9 +458,17 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `ChainCheck.lean` | Decidable rational `ChainCertificate` structure discharging the hypotheses of `gapGT_of_chain`, and `StepsValid` for the purities along a chain alone |
 | `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`), expansion of $`\mathrm{Tr}\, T^N`$ as a sum over closed label paths and of matrix elements of ordered products as sums over open paths |
 | `Transfer/MomentForm.lean` | Proof that traces of even powers of a real matrix factorization $B^T B \succeq 0$ satisfy the spatial moment form |
-| `Transfer/ContinuousKernel/Basic.lean` | Actual bounded measurable kernel integral operator on `L²`, operator-norm bound, and Hermitian-kernel self-adjointness |
-| `Transfer/ContinuousKernel/HilbertSchmidt.lean` | Basis-free Hilbert–Schmidt criterion; operator-norm convergence of finite-rank approximations and compactness |
-| `Transfer/ContinuousKernel/Compact.lean`, `Audit.lean` | Integrated Bessel bound, Hilbert–Schmidt and compact kernel operators, axiom audit and degenerate/complex regression examples |
+| `Transfer/TimeOrdering.lean` | Null time collisions, chronological chamber decomposition, and exact ordered-simplex volume |
+| `Transfer/HistoryShuffle.lean` | Finite-family ordered-simplex shuffle identities |
+| `Transfer/PoissonHistory.lean` | Labeled history measure, Poisson event count, and absolutely convergent ordered-time integrals |
+| `Transfer/ProductPoissonHistory.lean` | Actual finite product history measure, count/label/shuffle series, absolute convergence, and exponential bounds |
+| `Transfer/ContinuousKernel/Basic.lean` | Actual bounded-kernel integral operator on `L²`, operator-norm bound, and Hermitian-kernel self-adjointness |
+| `Transfer/ContinuousKernel/HilbertSchmidt.lean` | Basis-free Hilbert–Schmidt criterion, rank-one convergence, and compactness |
+| `Transfer/ContinuousKernel/Compact.lean`, `Audit.lean` | Integrated Bessel bound, compact kernel operators, and generic real/complex regressions |
+| `Transfer/ContinuousKernel/MatrixBounds.lean` | Submultiplicative matrix-norm bounds for chronological spin-one words |
+| `Transfer/SigmaProductMeasurable.lean`, `HistoryCollision.lean` | Joint measurability on countable history components and null cross-history collisions |
+| `Transfer/MergedHistory.lean` | Actual merged chronological kernel, measurability, bound, symmetry, and empty/collision values |
+| `Transfer/SpinOneKernel.lean`, `SpinOneKernelAudit.lean` | Concrete complex-L² `K` and normalized `X`, Hilbert–Schmidt bounds, compactness, self-adjointness, and audits |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
 | `Ring/Model.lean` | Periodic ring geometry, `bondOp`/`siteOp`, `RPRing` structure, Hermiticity of $H_L$, and $\operatorname{Re} \operatorname{Tr} e^{-\beta H_L} = \sum_m e^{-\beta E_m}$ |
 | `Ring/Transfer.lean` | Even-bond, on-site, and odd-bond Trotter slices and the reflection-positivity identity $\operatorname{Tr} S^M = \operatorname{Tr} (B^T B)^{L/2}$ with real $B$ |
@@ -406,23 +499,11 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 
 ## Why each piece is needed in Lean
 
-On paper, the main note obtains the spatial moment representation in a single conceptual step: it
-constructs an exact continuous-time thermal MPO on Poisson bond histories whose spatial transfer operator
-$X_\beta$ is a compact self-adjoint integral operator on $L^2(\mu_\beta)$, giving
-$Z_n(\beta) = \operatorname{Tr} X_\beta^n = \sum_i |\lambda_i|^n$. Formalizing that infinite-dimensional
-path-space construction directly in Lean still needs Poisson history measures, the concrete
-chronologically merged history kernel, and the later cycle-trace identification. The generic
-bounded-kernel operator bridge is now proved in `Transfer/ContinuousKernel/`: from joint strong
-measurability, a pointwise bound $`|k(x,y)| \le B`$, and a finite measure, it constructs the actual
-integral operator $`Kf(x)=\int k(x,y)f(y)\,d\mu(y)`$ on real or complex $L^2$. It proves
-$`\|K\| \le B\mu(\Omega)`$, the squared Hilbert–Schmidt bound
-$`B^2\mu(\Omega)^2`$, and compactness; Hermitian symmetry of the kernel implies self-adjointness.
-The Hilbert–Schmidt property is expressed by a uniform bound on squared image norms of finite
-orthonormal families, and compactness is derived from operator-norm convergence of rank-one
-truncations. No separability, positive total mass, or pre-existing compactness assumption is needed.
-For the paper's bound $B=3$, this gives $`9\mu(\Omega)^2`$; identifying the physical history kernel
-and applying its scalar normalization remain separate steps. This layer asserts no cycle-trace,
-partition-function, moment, twist, or sector identity.
+The continuous-time route now has independently proved history measures, chronological-time
+reorganization, and the concrete spin-one kernel operator. The history and kernel modules are
+described above. They establish the actual compact self-adjoint Hilbert–Schmidt operator, while the
+cycle-trace and physical partition-function identification remain separate obligations. No
+spectral-moment, rotation, twist, or sector identity is asserted by this prerequisite layer.
 
 The current end-to-end gap formalization continues to use the finite-dimensional Trotterization
 route, which needs only finite matrix algebra and the matrix exponential limit. Each module below

@@ -6,8 +6,12 @@ import CertifiedGaps.ChainCheck
 import CertifiedGaps.Transfer.PiTensor
 import CertifiedGaps.Transfer.MomentForm
 import CertifiedGaps.Transfer.ProductLimit
--- Infinite-dimensional bounded-kernel prerequisites
-import CertifiedGaps.Transfer.ContinuousKernel.Compact
+-- Continuous-time histories and the concrete spin-one integral operator
+import CertifiedGaps.Transfer.TimeOrdering
+import CertifiedGaps.Transfer.PoissonHistory
+import CertifiedGaps.Transfer.HistoryShuffle
+import CertifiedGaps.Transfer.ProductPoissonHistory
+import CertifiedGaps.Transfer.SpinOneKernel
 -- Reflection-positive rings
 import CertifiedGaps.Ring.Model
 import CertifiedGaps.Ring.Transfer
