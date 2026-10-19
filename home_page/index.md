@@ -94,6 +94,11 @@ spin-1 record.
 </ul>
 </details>
 
+## Acknowledgments
+
+We thank Xiao-Liang Qi for discussions. Sirui Lu did this work while visiting Xiao-Liang Qi at
+Stanford University.
+
 ## References
 
 <ol class="references">
