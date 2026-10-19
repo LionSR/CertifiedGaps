@@ -55,11 +55,10 @@ usemathjax: true
   {%- for f in data.families %}
     {%- assign rows = data.records | where: "family", f.key | where_exp: "r", "r.tier != 'target'" -%}
     {%- if rows.size == 0 %}{% continue %}{% endif -%}
-    {%- assign hi = rows[0] -%}{%- assign L0 = rows[0].lengths.L0 -%}{%- assign nlean = 0 -%}{%- assign nfree = 0 -%}
+    {%- assign hi = rows[0] -%}{%- assign nlean = 0 -%}{%- assign nfree = 0 -%}
     {%- for r in rows -%}
       {%- assign v = r.bound.decimal | times: 1.0 -%}
       {%- assign b = hi.bound.decimal | times: 1.0 %}{% if v > b %}{% assign hi = r %}{% endif -%}
-      {%- if r.lengths.L0 < L0 %}{% assign L0 = r.lengths.L0 %}{% endif -%}
       {%- if r.lean -%}
         {%- assign lr = site.data.lean_records | where: "name", r.lean.name | first -%}
         {%- if lr %}{% assign nlean = nlean | plus: 1 %}{% if lr.kind == "unconditional" %}{% assign nfree = nfree | plus: 1 %}{% endif %}{% endif -%}
@@ -69,7 +68,7 @@ usemathjax: true
       <td><a href="#family-{{ f.key }}">{{ f.name }}</a></td>
       <td class="num">{{ rows.size }}</td>
       <td>{{ hi.bound.decimal | slice: 0, 6 }}{% unless rows[0].params == nil %}, at {{ hi.parameter }}{% endunless %}</td>
-      <td class="num">{% if rows[0].params == nil %}{{ hi.lengths.L0 }}{% else %}{{ L0 }}{% endif %}</td>
+      <td class="num">{{ hi.lengths.L0 }}</td>
       <td>{% if nlean == rows.size %}{% if rows.size == 1 %}yes{% else %}all points{% endif %}{% elsif nlean == 0 %}—{% else %}{{ nlean }} of {{ rows.size }}{% endif %}{% if nfree > 0 %}, {{ nfree }} unconditional{% endif %}</td>
     </tr>
   {%- endfor %}
@@ -171,14 +170,13 @@ usemathjax: true
     bounds the seed defects at $(n_0, \beta_0)$ from verified ring spectra or exact rationals, and
     runs 48 doubling steps in interval arithmetic.</dd>
   <dt>Lean 4 kernel (Lean 4 ≥)</dt>
-  <dd>A Lean 4 theorem takes the two seed inequalities at $(n_0, \beta_0)$ as hypotheses and
-    checks 14 exact rational doubling steps in the kernel (typically within $10^{-5}$ of the
-    48-step bound). Theorems marked <em>unconditional</em> also prove the seed inequalities in the
-    kernel.</dd>
+  <dd>A Lean 4 theorem takes the certified seed inequalities as hypotheses and checks 14 exact
+    rational doubling steps in the kernel (typically within $10^{-5}$ of the 48-step bound).
+    Theorems marked <em>unconditional</em> also prove the seed inequalities in the kernel.</dd>
   <dt>Continuous integration</dt>
-  <dd>Every pull request and push to <code>main</code> builds the Lean theorems, replays them in a
-    fresh process with <code>leanchecker</code>, and runs <code>check.jl</code> on changed
-    models.</dd>
+  <dd>Changes to proofs or models trigger CI to build the Lean theorems, replay them in a fresh
+    process with <code>leanchecker</code>, and run <code>check.jl</code>; scheduled workflows
+    recheck all proofs and models weekly.</dd>
 </dl>
 </section>
 

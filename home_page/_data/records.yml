@@ -12,7 +12,7 @@
 #   gap_source (where the numerical gaps of its records come from),
 #   grid {rows, cols} (optional: show the family as a grid of params[rows] x params[cols])
 #
-# challenges: open problems listed on the leaderboard, above the uncertified targets.
+# challenges: open problems listed on the leaderboard.
 #   id, title, need (what is needed and what it would establish), family (optional),
 #   link (a URL or a repository path, optional)
 #
@@ -153,7 +153,7 @@ families:
     cells: 'tori'
     gap_source: '8-spin torus, exact diagonalization (not a bulk value)'
 
-# Open problems shown on the leaderboard, above the uncertified targets.
+# Open problems shown on the leaderboard.
 challenges:
   - id: open-chain-boundary-field
     family: spin1-open
