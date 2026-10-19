@@ -1,119 +1,169 @@
 ---
-title: Leaderboard of certified spectral gaps
+title: Leaderboard
 description: Rigorous lower bounds on the spectral gap of quantum spin chains across all ring lengths, certified by computer and formalized in Lean 4
 usemathjax: true
-wide: true
 ---
 {%- comment -%}
-  One data pipeline: Jekyll embeds records.yml and the generated lean_records.json as one JSON
-  blob, and assets/js/leaderboard.js renders every interactive view from it. Without JavaScript
-  the page shows the static table in <noscript> and the tier legend.
+  Rendered entirely from _data/records.yml and the generated _data/lean_records.json; no
+  JavaScript besides MathJax. Every displayed decimal is a prefix of a stored decimal, and the
+  stored decimals are rounded down, so truncating keeps every shown bound a lower bound.
 {%- endcomment -%}
 {%- assign data = site.data.records -%}
-{%- assign shown = "lean-unconditional,lean-conditional,certified" | split: "," -%}
-<script>document.documentElement.classList.add('js');</script>
+{%- assign docs = '/docs/find/' | relative_url -%}
+{%- assign repo_blob = 'https://github.com/' | append: site.repository | append: '/blob/' | append: site.branch | append: '/' -%}
 
 <p>
-  Each record below certifies that for every chain or ring length $L \ge L_0$ (in unit cells) of
-  the stated parity (even $L$ on periodic rings; odd $L$ on open spin-1 chains with equal endpoint
-  fields), the Hamiltonian $H_L$ has a unique ground state and a spectral gap
-  $\Delta_L = E_1(L) - E_0(L)$ at least the stated lower bound. Every bound is obtained from the
-  spacetime bootstrap: a computer-certified finite seed at $(n_0, \beta_0)$ paired with the
-  analytic two-purity doubling recurrence across all covered lengths $L \ge L_0$. In CI, every
-  Lean 4 theorem is re-checked in the Lean kernel (<code>leanchecker</code>) and every finite
-  certificate is re-verified by its standalone <code>check.jl</code> program.
-</p>
-<p class="key">
-  {% for t in data.tiers %}{% if shown contains t.key %}<span class="tier tier-{{ t.key }}" title="{{ t.meaning }}">{{ t.glyph }} {{ t.label }}</span> {% endif %}{% endfor %}
-  <a href="#tiers">Verification tiers</a>
+  Each entry is a theorem about a periodic chain or ladder: for every even ring length
+  $L \ge L_0$, the Hamiltonian $H_L$ has a unique ground state, and its gap
+  $\Delta_L = E_1(L) - E_0(L)$ is at least the number shown. The proof needs one finite
+  computation, at a seed ring length $n_0$ and inverse temperature $\beta_0$, carried out in exact
+  or interval arithmetic and re-run by the model's checker; the doubling recurrence then covers
+  every larger ring. The last section explains the two columns of bounds.
 </p>
 
-<nav class="tabs" aria-label="Sections">
-  <a href="#highlights">Highlights</a> <a href="#board">Leaderboard</a>
-  <a href="#challenges">Open challenges</a> <a href="#contributors">Contributors</a>
-  <a href="#timeline">Progress over time</a> <a href="#tiers">Verification tiers</a>
-</nav>
+<div class="table-wrap"><table class="summary">
+  <thead><tr><th>Model</th><th class="num">Points</th><th class="num">Certified gap ≥</th><th class="num">Even $L \ge$</th><th>Lean 4</th></tr></thead>
+  <tbody>
+  {%- for f in data.families %}
+    {%- assign rows = data.records | where: "family", f.key | where_exp: "r", "r.tier != 'target'" -%}
+    {%- if rows.size == 0 %}{% continue %}{% endif -%}
+    {%- assign lo = rows[0] -%}{%- assign hi = rows[0] -%}{%- assign L0 = rows[0].lengths.L0 -%}{%- assign nlean = 0 -%}{%- assign nfree = 0 -%}
+    {%- for r in rows -%}
+      {%- assign v = r.bound.decimal | times: 1.0 -%}
+      {%- assign a = lo.bound.decimal | times: 1.0 %}{% if v < a %}{% assign lo = r %}{% endif -%}
+      {%- assign b = hi.bound.decimal | times: 1.0 %}{% if v > b %}{% assign hi = r %}{% endif -%}
+      {%- if r.lengths.L0 < L0 %}{% assign L0 = r.lengths.L0 %}{% endif -%}
+      {%- if r.lean -%}
+        {%- assign lr = site.data.lean_records | where: "name", r.lean.name | first -%}
+        {%- if lr %}{% assign nlean = nlean | plus: 1 %}{% if lr.kind == "unconditional" %}{% assign nfree = nfree | plus: 1 %}{% endif %}{% endif -%}
+      {%- endif -%}
+    {%- endfor %}
+    <tr>
+      <td><a href="#family-{{ f.key }}">{{ f.name }}</a></td>
+      <td class="num">{{ rows.size }}</td>
+      <td class="num">{% if rows.size == 1 or rows[0].params == nil %}{{ hi.bound.decimal | slice: 0, 6 }}{% else %}{{ lo.bound.decimal | slice: 0, 6 }} – {{ hi.bound.decimal | slice: 0, 6 }}{% endif %}</td>
+      <td class="num">{% if rows[0].params == nil %}{{ hi.lengths.L0 }}{% else %}{{ L0 }}{% endif %}</td>
+      <td>{% if nlean == rows.size %}{% if rows.size == 1 %}yes{% else %}all points{% endif %}{% elsif nlean == 0 %}—{% else %}{{ nlean }} of {{ rows.size }}{% endif %}{% if nfree > 0 %}, {{ nfree }} unconditional{% endif %}</td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+</table></div>
 
-<section id="highlights" class="jsonly panels" aria-label="Highlights"></section>
+{%- for f in data.families %}
+{%- assign rows = data.records | where: "family", f.key | where_exp: "r", "r.tier != 'target'" -%}
+{%- if rows.size == 0 %}{% continue %}{% endif %}
 
-<section id="board">
-  <h2>Leaderboard</h2>
-  <p class="jsonly muted">Select any column header to sort, filter by verification tier or model
-    family, or expand a row for its exact rational bound, Lean 4 theorem, seed $(n_0, \beta_0)$,
-    certificate data, and checker script.</p>
-  <div id="board-controls" class="jsonly"></div>
-  <p id="board-count" class="jsonly muted"></p>
-  <div id="board-family" class="jsonly"></div>
-  <div class="table-wrap jsonly"><table id="board-table" class="board"></table></div>
-  <noscript>
-    <div class="table-wrap"><table class="board">
-      <thead><tr><th>Model</th><th>Parameters</th><th>Certified gap ≥</th><th>Verification</th><th>Lengths covered</th><th>Date</th></tr></thead>
-      <tbody>
-      {%- for r in data.records %}{% if r.tier == "target" %}{% continue %}{% endif %}
-        {%- assign fam = data.families | where: "key", r.family | first -%}
-        {%- assign t = r.tier -%}
-        {%- if r.lean and t contains "lean-" -%}
-          {%- assign lr = site.data.lean_records | where: "name", r.lean.name | first -%}
-          {%- if lr %}{% assign t = "lean-" | append: lr.kind %}{% endif -%}
-        {%- endif -%}
-        {%- assign tt = data.tiers | where: "key", t | first %}
-        <tr id="{{ r.id }}"><td>{{ fam.name }}</td><td>{{ r.parameter }}</td><td class="num">{{ r.bound.decimal }}</td>
-          <td>{% if tt %}{{ tt.glyph }} {{ tt.label }}{% endif %}</td>
-          <td>{% if r.lengths.parity == "odd" %}odd{% else %}even{% endif %} $L \ge {{ r.lengths.L0 }}$ {{ fam.cells }}</td><td>{{ r.date }}</td></tr>
-      {%- endfor %}
-      </tbody>
-    </table></div>
-  </noscript>
+<section id="family-{{ f.key }}" class="family">
+{%- assign plain = false %}{% if rows[0].params == nil %}{% assign plain = true %}{% endif %}
+<h2>{{ f.name }}</h2>
+<p class="hamiltonian">{{ f.hamiltonian }}</p>
+<p>The ring length $L$ counts {{ f.cells }}. Estimated gaps: {{ f.gap_source }}.</p>
+
+{%- if f.grid %}
+  {%- assign gr = "" -%}{%- assign gc = "" -%}
+  {%- for r in rows -%}
+    {%- assign x = r.params[f.grid.rows] -%}{%- assign y = r.params[f.grid.cols] -%}
+    {%- assign xs = "|" | append: x | append: "|" %}{% assign ys = "|" | append: y | append: "|" -%}
+    {%- assign grs = "|" | append: gr -%}{%- assign gcs = "|" | append: gc -%}
+    {%- unless grs contains xs %}{% assign gr = gr | append: x | append: "|" %}{% endunless -%}
+    {%- unless gcs contains ys %}{% assign gc = gc | append: y | append: "|" %}{% endunless -%}
+  {%- endfor -%}
+  {%- assign gr = gr | split: "|" -%}{%- assign gc = gc | split: "|" %}
+<p>Certified gap bounds by ${{ f.grid.rows }}$ (rows) and ${{ f.grid.cols }}$ (columns), for every
+  even $L \ge {{ rows[0].lengths.L0 }}$. Every point also has a Lean 4 theorem; the starred point is
+  proved in Lean with no hypotheses at all, the finite seed included.</p>
+<div class="table-wrap"><table class="grid">
+  <thead><tr><th>${{ f.grid.rows }} \backslash {{ f.grid.cols }}$</th>{% for y in gc %}<th class="num">${{ y }}$</th>{% endfor %}</tr></thead>
+  <tbody>
+  {%- for x in gr %}
+    <tr><th class="num">${{ x }}$</th>
+    {%- for y in gc -%}
+      {%- assign cell = nil -%}
+      {%- for r in rows %}{% if r.params[f.grid.rows] == x and r.params[f.grid.cols] == y %}{% assign cell = r %}{% endif %}{% endfor -%}
+      <td class="num"{% if cell %} id="{{ cell.id }}"{% endif %}>{% if cell %}{{ cell.bound.decimal | slice: 0, 5 }}{% if cell.tier == "lean-unconditional" %}*{% endif %}{% else %}—{% endif %}</td>
+    {%- endfor %}</tr>
+  {%- endfor %}
+  </tbody>
+</table></div>
+<details><summary>All {{ rows.size }} points with seeds, Lean 4 bounds and certificates</summary>
+{%- endif %}
+
+<div class="table-wrap"><table class="points">
+  <thead><tr>
+    {% unless plain %}<th>Parameters</th>{% endunless %}<th class="num">Certified gap ≥</th><th class="num">Lean 4 ≥</th>
+    <th class="num">Estimate</th><th class="num">Seed $(n_0, \beta_0)$</th><th class="num">Even $L \ge$</th><th>Files</th>
+  </tr></thead>
+  <tbody>
+  {%- for r in rows %}
+    {%- assign lr = nil -%}
+    {%- if r.lean %}{% assign lr = site.data.lean_records | where: "name", r.lean.name | first %}{% endif %}
+    <tr{% unless f.grid %} id="{{ r.id }}"{% endunless %}>
+      {% unless plain %}<td>{{ r.parameter }}</td>{% endunless %}
+      <td class="num">{{ r.bound.decimal | slice: 0, 8 }}</td>
+      <td class="num">{% if lr %}<a href="{{ docs }}?pattern={{ r.lean.name | url_encode }}#doc" title="{{ r.lean.name }}">{{ r.lean.decimal | slice: 0, 8 }}</a>{% if lr.kind == "unconditional" %} (unconditional){% endif %}{% else %}—{% endif %}</td>
+      <td class="num">{% if r.numerical_gap %}{{ r.numerical_gap | slice: 0, 6 }}{% else %}—{% endif %}</td>
+      <td class="num">({{ r.seed.n0 }}, {{ r.seed.beta0 }})</td>
+      <td class="num">{{ r.lengths.L0 }}</td>
+      <td><a href="{{ repo_blob }}{{ r.certificate }}">data</a>, <a href="{{ repo_blob }}{% if r.check %}{{ r.check }}{% else %}models/{{ f.slug }}/check.jl{% endif %}">checker</a></td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+</table></div>
+{%- if f.grid %}
+</details>
+{%- endif %}
+
+{%- capture notes -%}
+{%- for r in rows %}{% if r.notes or r.seed.text %}
+  <p>{% if plain %}<span class="param">$L \ge {{ r.lengths.L0 }}$.</span> {% elsif rows.size > 1 %}<span class="param">{{ r.parameter }}.</span> {% endif %}{% if r.seed.text %}{{ r.seed.text }}. {% endif %}{{ r.notes }}</p>
+{%- endif %}{% endfor -%}
+{%- endcapture -%}
+{%- if notes != "" %}
+<div class="notes">{{ notes }}
+</div>
+{%- endif %}
 </section>
+{%- endfor %}
 
-<section id="challenges" class="jsonly">
-  <h2>Open challenges (<span id="challenge-count"></span>)</h2>
-  <p>Concrete targets for new or tighter gap bounds and Lean 4 formalizations. Select “Take this on”
-    to open a pre-filled GitHub issue; see the
-    <a href="{{ '/contribute.html' | relative_url }}">contribution guide</a> for submission
-    requirements.</p>
-  <div id="challenge-cards"></div>
-</section>
+<section id="challenges">
+<h2>Open problems</h2>
+<p>These are the next things to prove. To take one on, open an issue on GitHub or read the
+  <a href="{{ '/contribute.html' | relative_url }}">contribution guide</a>.</p>
+<ul class="problems">
+{%- for c in data.challenges %}
+  <li id="{{ c.id }}"><em>{{ c.title }}.</em> {{ c.need }}{% if c.link %} (<a href="{% if c.link contains "http" %}{{ c.link }}{% else %}{{ repo_blob }}{{ c.link }}{% endif %}">background</a>){% endif %}</li>
+{%- endfor %}
+</ul>
 
-<section id="contributors" class="jsonly">
-  <h2>Contributors</h2>
-  <p class="muted">Contributors credited with the current records, from the pull requests or
-    preprints that established them.</p>
-  <div class="table-wrap"><table id="contributor-table"></table></div>
-</section>
-
-<section id="timeline" class="jsonly">
-  <h2>Progress over time</h2>
-  <p class="muted">Each point marks a certified lower bound; the step curve tracks the best bound
-    to date. Hover over a point for its covered lengths, verification tier, and method.</p>
-  <div id="timeline-pick"></div>
-  <figure id="timeline-chart"></figure>
-  <details><summary>Data table</summary><div class="table-wrap"><table id="timeline-table"></table></div></details>
+<p>The models below have no certificate yet. The estimates come from a floating-point survey and
+  prove nothing; they indicate how large a seed is likely to be needed.</p>
+<div class="table-wrap"><table class="targets">
+  <thead><tr><th>Model</th><th class="num">Estimate $\Delta \ge$</th><th class="num">Seed $(n_0, \beta_0)$</th><th>Remark</th></tr></thead>
+  <tbody>
+  {%- assign targets = data.records | where: "tier", "target" -%}
+  {%- for r in targets %}
+    {%- assign fam = data.families | where: "key", r.family | first %}
+    <tr id="{{ r.id }}">
+      <td>{{ fam.name }}, {{ r.parameter }}</td>
+      <td class="num">{% if r.estimate.float_bound %}{{ r.estimate.float_bound | slice: 0, 5 }}{% else %}—{% endif %}</td>
+      <td class="num">{% if r.estimate.n0 %}({{ r.estimate.n0 }}{% if r.estimate.beta0 %}, {{ r.estimate.beta0 }}{% endif %}){% else %}—{% endif %}</td>
+      <td>{{ r.estimate.text }}</td>
+    </tr>
+  {%- endfor %}
+  </tbody>
+</table></div>
 </section>
 
 <section id="tiers">
-  <h2>Verification tiers</h2>
-  <dl class="tiers">
-    {%- for t in data.tiers %}{% if shown contains t.key %}
-    <dt><span class="tier tier-{{ t.key }}">{{ t.glyph }} {{ t.label }}</span></dt>
-    <dd>{{ t.meaning }}</dd>
-    {%- endif %}{% endfor %}
-  </dl>
-  <p>Each badge indicates the verification tier of the displayed bound. When a parameter point has
-    both a computer-certified bound (48 doubling steps) and a companion Lean 4 theorem (14
-    rational doubling steps, typically smaller by ${\sim}10^{-5}$ when starting from the same
-    seed), the table row displays the larger computer-certified bound alongside a
-    <code>◇ Lean 4</code> badge whose tooltip and expanded details show the exact Lean bound.</p>
+<h2>How the bounds are checked</h2>
+<p>The column <em>certified gap</em> is computed from the seed by 48 doubling steps in interval
+  arithmetic. The seed itself comes from verified enclosures of the ring spectra, or from exact
+  rational arithmetic, and the model's checker recomputes everything from the stored certificate.
+  The column <em>Lean 4</em> is the bound proved by a Lean 4 theorem that takes the two seed
+  inequalities at $(n_0, \beta_0)$ as hypotheses and runs 14 exact rational doubling steps; it is
+  a little smaller, typically by about $10^{-5}$. A theorem marked <em>unconditional</em> also
+  proves the seed inequalities inside the Lean kernel, so it rests on nothing outside Lean.</p>
+<p>On every change, continuous integration rebuilds the Lean theorems, replays them in the Lean
+  kernel with <code>leanchecker</code>, confirms that they use only Lean's standard axioms, and
+  re-runs the checkers of the models that changed.</p>
 </section>
-
-<script type="application/json" id="lb-data">
-{"tiers": {{ data.tiers | jsonify }},
- "families": {{ data.families | jsonify }},
- "records": {{ data.records | jsonify }},
- "challenges": {{ data.challenges | jsonify }},
- "lean": {{ site.data.lean_records | jsonify }},
- "repo": {{ site.repository | jsonify }},
- "branch": {{ site.branch | jsonify }},
- "docs": {{ '/docs/find/' | relative_url | jsonify }}}
-</script>
-<script src="{{ '/assets/js/leaderboard.js' | relative_url }}"></script>

@@ -1,51 +1,50 @@
-# Project news for the home page, newest first or in any order (the page sorts by date).
-# Each item: date, text (plain, one line), and a link (an http(s) URL or a site path starting
-# with /), or prs (pull request numbers; the first one becomes the link). records lists the
-# leaderboard rows the item already announces. Rows whose pull request or id appears here are
-# not announced a second time; every other leaderboard row appears automatically as a new
-# record on its date. Validated by tools/leaderboard/check_records.jl.
+# News for the home page, in any order (the page sorts by date, newest first). Each item: date,
+# text (one plain sentence), and a link (an http(s) URL or a site path starting with /), or prs
+# (pull request numbers; the first becomes the link). records lists the leaderboard rows the item
+# is about. Only these hand-written items appear; leaderboard rows are not announced one by one.
+# Validated by tools/leaderboard/check_records.jl.
 
 - date: "2026-10-06"
-  text: 'OpenAI releases two preprints proving the spin-1 Haldane gap on periodic rings and on open chains with endpoint fields.'
+  text: 'OpenAI posts two preprints proving the spin-1 Haldane gap, on periodic rings and on open chains with boundary fields.'
   link: 'https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026'
 - date: "2026-10-10"
-  text: 'Exact-integer reproduction of all finite trace and variational certificates from the periodic spin-1 preprint.'
-  link: '/leaderboard.html#spin1-source1'
+  text: 'The finite inputs of the periodic preprint, its thermal traces and its variational state, are reproduced in exact integer arithmetic.'
+  link: '/leaderboard.html#family-spin1-heisenberg'
 - date: "2026-10-12"
-  text: 'Computer-certified gap bounds added for seven model families, including spin ladders, dimerized chains, and the Ising chain in transverse and longitudinal fields.'
+  text: 'Gap bounds for seven further models, among them spin ladders, dimerized chains and the Ising chain in two fields.'
   link: '/leaderboard.html'
   prs: [1, 2, 3, 4, 5, 6, 7]
 - date: "2026-10-12"
-  text: 'Lean 4 formalization of the two-purity doubling criterion and seeded gap theorems across the certified models.'
+  text: 'The doubling criterion is proved in Lean 4.'
   prs: [9]
 - date: "2026-10-15"
-  text: 'First unconditional Lean 4 gap theorem (seed and recurrence both kernel-checked): the Ising chain at g = 1/4, h = 1/20.'
+  text: 'The first gap proved entirely inside Lean, seed included: the Ising chain at g = 1/4, h = 1/20.'
   prs: [34]
   records: [ising-g-1-4-h-1-20]
 - date: "2026-10-16"
-  text: 'Interactive visual explainer for the periodic ring and open-chain proofs.'
+  text: 'An illustrated explainer of the proof goes online, for periodic rings and for open chains.'
   link: '/explainer/'
   prs: [40]
 - date: "2026-10-17"
-  text: 'Independent audit in exact rational and Arb ball arithmetic confirms the temperature-lifted spin-1 bound Δ_L > 0.0729 for even L ≥ 36.'
+  text: 'An independent audit, in exact rational and in ball arithmetic, confirms the spin-1 bound 0.0729 for every even ring length L ≥ 36.'
   prs: [49]
   records: [spin1-temperature-lifting]
 - date: "2026-10-17"
-  text: 'Lean 4 blueprint and project website launched.'
+  text: 'The Lean blueprint and this website go online.'
   link: '/blueprint/'
   prs: [45]
 - date: "2026-10-17"
-  text: 'Narrated video walkthroughs added to the interactive explainer.'
+  text: 'Narrated films are added to the explainer.'
   link: '/explainer/'
   prs: [46]
 - date: "2026-10-17"
-  text: 'Leaderboard of certified spectral gaps opened for community contributions.'
+  text: 'The leaderboard opens to outside contributions.'
   link: '/leaderboard.html'
   prs: [53]
 - date: "2026-10-17"
-  text: 'Rational doubling chains in Lean 4 cover 51 of the 52 certified records (including Δ_L > 0.0729 for spin-1, even L ≥ 36) and tighten the L ≥ 2304 spin-1 bound from 0.00382 to 0.00474.'
-  link: '/leaderboard.html#spin1-source1'
+  text: 'Lean 4 theorems now accompany all but one of the certified bounds, and the spin-1 bound for L ≥ 2304 rises from 0.00382 to 0.00474.'
+  link: '/leaderboard.html#family-spin1-heisenberg'
   records: [spin1-source1, ising-g-1-4-h-1-20]
 - date: "2026-10-18"
-  text: 'Lean 4 formalization of the open spin-1 chain with endpoint fields (Δ_n > log(10)/392 for odd n ≥ 1921) and both periodic bounds from the OpenAI preprint.'
+  text: 'The open-chain bound (log 10)/392 for odd lengths n ≥ 1921 and both periodic bounds of the OpenAI preprints are proved in Lean 4 from their finite inputs.'
   prs: [74]
