@@ -60,6 +60,8 @@ Use consistent terminology and notation across all documentation and comments:
   and *thermal purity* $P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$ (`P_τ(n, β)`; never "Gibbs purity" or
   "temporal purity"). Their complements $1 - P_{\mathrm{s}}$ and $1 - P_\tau$ are the *spatial defect* and
   *thermal defect*, bounded at the seed scale $(n_0, \beta_0)$ by $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ (`εₛ`, `εₜ`).
+  On the public website (`home_page/`), the overview follows the talk notation $P_{\mathrm S}, P_{\mathrm T}$ and
+  seed defects $(p, q)$.
 - **Hamiltonian and transfer operator:** $H_L = \sum_j h_{j,j+1} + \sum_j o_j$ on a ring of $L$ unit cells
   ($N = cL$ spins for a $c$-site cell), with bond term $h$, on-site term $o$, internal cell reflection $F$,
   and spatial transfer operator $X_\beta$ ($`\mathrm{Tr}\, X_\beta^L = Z_L(\beta)`$). For spin-$`S`$ chains in the

@@ -3,138 +3,91 @@ usemathjax: true
 ---
 
 {% assign repo_url = 'https://github.com/' | append: site.repository %}
-{% assign data = site.data.records %}
 
-Haldane (1983) conjectured that the spin-1 antiferromagnetic Heisenberg chain has a uniform spectral
-gap $$\Delta_L = E_1(L) - E_0(L) > 0$$ as the chain length $$L \to \infty$$ [[1](#ref-1), [2](#ref-2)].
-In October 2026, OpenAI released two preprints proving uniform gap bounds for periodic [[3](#ref-3)]
-and open [[4](#ref-4)] spin-1 chains by combining finite-size numerical bounds with a scale-doubling
-argument.
+This project proves lower bounds on the spectral gap of quantum spin chains. Each bound holds for
+all even ring lengths above a stated length. A computer certifies one finite seed calculation, and
+Lean 4 proves the doubling step to all larger even lengths.
 
-This project formulates that argument as a general criterion—the **spacetime bootstrap**
-(*two-purity doubling criterion*)—formalizes the analytic proof in **Lean 4** [[7](#ref-7)], and
-certifies the finite numerical inputs in exact or interval arithmetic across **eight families** of
-quantum spin chains and ladders:
+Haldane predicted in 1983 that the spin-1 Heisenberg chain has a gap that stays open as the chain
+grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026
+[[3](#ref-3), [4](#ref-4)]. We use the same method for more models. We call the method the
+*spacetime bootstrap*.
 
-* **Two purities:** For a periodic ring $$H_L$$ of $$L$$ unit cells with partition function
-  $$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$, define the spatial and thermal purities
-  $$P_{\mathrm{s}}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad P_\tau(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.$$
-* **Doubling criterion (Lean 4):** When the nearest-neighbor interaction is reflection positive
-  [[6](#ref-6)], both purities contract quadratically toward $$1$$ as $$(n, \beta) \mapsto (2n, 2\beta)$$.
-  Upper bounds $$\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$$ and
-  $$\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$$ at one even seed scale $$(n_0, \beta_0)$$ in the
-  admissible region (for example, $$\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$$)
-  imply a unique ground state and an explicit lower bound on $$\Delta_L$$ for every even $$L \ge n_0$$.
-* **Certified seeds (Julia / Lean kernel):** All but one record (an odd-seed dimerized point) pair a
-  computer-checked seed certificate at $$(n_0, \beta_0)$$ with a Lean 4 theorem covering the step
-  from the seed to all lengths $$L \ge n_0$$ of the stated parity.
+## Method
 
-## Headline results
+Let $$Z_n(\beta) = \mathrm{Tr}\, e^{-\beta H_n}$$ be the partition function of a ring of $$n$$
+unit cells. Draw it as a torus: $$n$$ cells around the ring in space, and a circle of length
+$$\beta$$ in imaginary time. The method compares tori through two ratios:
 
-* **Spin-1 Heisenberg chain** (Haldane gap [[1](#ref-1), [2](#ref-2)]): $$\Delta_L > 0.0729$$ for
-  every even ring length $$L \ge 36$$ (numerical bulk gap $$\approx 0.4105$$ [[5](#ref-5)]). The
-  seed inequalities at $$(n_0, \beta_0) = (60, 833/32)$$ and $$(36, 49/4)$$ are certified in
-  exact rational arithmetic from the finite trace and variational inputs of the OpenAI periodic
-  preprint [[3](#ref-3)], reproduced here and independently audited; Lean 4 proves the bound from
-  those two seeds. We also formalize in Lean 4 both periodic bounds from the preprint
-  ($$\Delta_L > (\log 20)/784 \approx 0.00382$$ for even $$L \ge 2304$$ and
-  $$\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79} \approx 0.000479$$ for even $$L \ge 60$$) and the
-  open spin-1 chain with endpoint fields $$h = 3/5$$ [[4](#ref-4)]
-  ($$\Delta_n > (\log 10)/392 \approx 0.00587$$ for odd $$n \ge 1921$$).
-* **Unconditional Lean 4 theorem:** For the Ising chain in transverse and longitudinal fields,
-  $$H_L = -\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j$$, Lean 4 proves
-  $$\Delta_L > 0.3922$$ for every even $$L \ge 6$$ with no external hypotheses; both the finite
-  seed bounds at $$(n_0, \beta_0) = (6, 97/4)$$ and the doubling recurrence are checked inside
-  the Lean kernel.
-* **{{ data.records | where_exp: "r", "r.tier != 'target'" | size }} certified gap records**
-  across eight model families—including spin-1 and spin-1/2 dimerized chains, two-leg Heisenberg
-  and Ising ladders, single-ion anisotropy, and staggered fields—all except one accompanied by a
-  Lean 4 theorem from the certified seed. Browse the full table on the
-  [leaderboard]({{ '/leaderboard.html' | relative_url }}).
+<div class="purities">
+  <div class="purity time">
+    <span class="def">\(\class{t}{P_{\mathrm T}}(n, \beta) = \dfrac{Z_n(2\beta)}{Z_n(\beta)^2} =\)</span>
+    <span class="frac"><span>{% include torus.html w=2 h=2 %}</span><span>{% include torus.html w=2 h=1 %}<sup>2</sup></span></span>
+    <span class="gloss">thermal purity: two tori glued in time</span>
+  </div>
+  <div class="purity space">
+    <span class="def">\(\class{s}{P_{\mathrm S}}(n, \beta) = \dfrac{Z_{2n}(\beta)}{Z_n(\beta)^2} =\)</span>
+    <span class="frac"><span>{% include torus.html w=4 h=1 %}</span><span>{% include torus.html w=2 h=1 %}<sup>2</sup></span></span>
+    <span class="gloss">spatial purity: two tori glued in space</span>
+  </div>
+</div>
+
+<div class="method">
+<ol>
+  <li>Show that the interaction between neighboring cells is reflection positive
+    [<a href="#ref-6">6</a>].</li>
+  <li>At one seed \((n_0, \beta_0)\), calculate upper bounds on the defects
+    \(p = 1 - P_{\mathrm S}(n_0, \beta_0)\) and \(q = 1 - P_{\mathrm T}(2n_0, \beta_0)\). The
+    method works if \((p, q)\) is in the green region. Both values below \(0.127\) are
+    sufficient.</li>
+  <li>Double \(n\) and \(\beta\) together. Each doubling moves \((p, q)\) closer to 0. The result
+    is a lower bound on the gap for all even \(L \ge n_0\).</li>
+</ol>
+<figure>
+  {% include seed-region.svg %}
+  <figcaption>Each red dot is one doubling, from the spin-1 seed \((36, 49/4)\) to
+    \((2304, 784)\).</figcaption>
+</figure>
+</div>
+
+Only step 2 uses a numerical calculation. Lean 4 [[7](#ref-7)] proves step 3.
+
+## Main results
+
+| Model | Gap bound | Ring lengths | Proof |
+|---|---|---|---|
+| Spin-1 Heisenberg chain | $$\Delta_L > 0.0729$$ | even $$L \ge 36$$ | Lean 4, from a computer-checked seed (data of [[3](#ref-3)]) |
+| Ising chain, $$g = 1/4$$, $$h = 1/20$$ | $$\Delta_L > 0.392$$ | even $$L \ge 6$$ | Lean 4, no hypotheses |
+
+The numerical value of the spin-1 gap is approximately $$0.4105$$ [[5](#ref-5)]. For the Ising
+chain $$H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j$$, the Lean kernel also checks the
+seed calculation. The [leaderboard]({{ '/leaderboard.html' | relative_url }}) lists all certified
+bounds and the progression of the spin-1 record.
+
+## Links
+
+* Explainer: [periodic rings]({{ '/explainer/' | relative_url }}),
+  [open chains]({{ '/explainer/open.html' | relative_url }})
+* Two-page note: [a short diagrammatic explanation of the spin-1 Haldane gap proof]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }}),
+  by S. Lu and GPT-6-Astra
+* Lean 4: [blueprint]({{ '/blueprint/' | relative_url }}),
+  [blueprint PDF]({{ '/blueprint.pdf' | relative_url }}),
+  [dependency graph]({{ '/blueprint/dep_graph_document.html' | relative_url }}),
+  [API documentation]({{ '/docs/' | relative_url }})
+* Contributions: [contribution guide]({{ '/contribute.html' | relative_url }}),
+  [source on GitHub]({{ repo_url }})
 
 ## News
 
-{%- comment -%}
-  Hand-written items from _data/news.yml, merged with the leaderboard rows that no item already
-  announces (by pull request or row id); rows set in one pull request form one item. Items are
-  sorted as "date|html" strings joined by ␞, a character that does not occur in the data.
-{%- endcomment -%}
-{%- assign news = site.data.news -%}
-{%- assign seen_prs = "," -%}{%- assign seen_ids = "," -%}
-{%- for n in news -%}
-  {%- for p in n.prs %}{% assign seen_prs = seen_prs | append: p | append: "," %}{% endfor -%}
-  {%- for i in n.records %}{% assign seen_ids = seen_ids | append: i | append: "," %}{% endfor -%}
-{%- endfor -%}
-{%- assign items = "" -%}
-{%- for n in news -%}
-  {%- if n.link -%}
-    {%- assign first = n.link | slice: 0 -%}
-    {%- if first == "/" %}{% assign href = n.link | relative_url %}{% else %}{% assign href = n.link %}{% endif -%}
-  {%- else -%}
-    {%- assign href = repo_url | append: "/pull/" | append: n.prs[0] -%}
-  {%- endif -%}
-  {%- capture item %}{{ n.date }}|<a href="{{ href }}">{{ n.text }}</a>{% endcapture -%}
-  {%- assign items = items | append: item | append: "␞" -%}
-{%- endfor -%}
-{%- assign groups = data.records | where_exp: "r", "r.tier != 'target'" | group_by: "pr" -%}
-{%- for g in groups -%}
-  {%- for r in g.items -%}
-    {%- capture id_key %},{{ r.id }},{% endcapture %}{% capture pr_key %},{{ r.pr }},{% endcapture -%}
-    {%- if seen_ids contains id_key or r.pr and seen_prs contains pr_key %}{% continue %}{% endif -%}
-    {%- if g.name != "" and forloop.index > 1 %}{% continue %}{% endif -%}
-    {%- assign best = r -%}
-    {%- if g.name != "" -%}
-      {%- for x in g.items %}{% assign a = x.bound.decimal | times: 1.0 %}{% assign b = best.bound.decimal | times: 1.0 %}{% if a > b %}{% assign best = x %}{% endif %}{% endfor -%}
-    {%- endif -%}
-    {%- assign fam = data.families | where: "key", best.family | first -%}
-    {%- assign tkey = best.tier -%}
-    {%- if best.lean and tkey contains "lean-" -%}
-      {%- assign lr = site.data.lean_records | where: "name", best.lean.name | first -%}
-      {%- if lr %}{% assign tkey = "lean-" | append: lr.kind %}{% else %}{% assign tkey = "" %}{% endif -%}
-    {%- endif -%}
-    {%- assign t = data.tiers | where: "key", tkey | first -%}
-    {%- capture href %}{{ '/leaderboard.html' | relative_url }}#{{ best.id }}{% endcapture -%}
-    {%- capture item -%}
-      {{ best.date }}|<a href="{{ href }}">{% if g.name != "" and g.items.size > 1 %}New records: {{ fam.name }} ({{ g.items.size }} parameter points, best bound Δ ≥ {{ best.bound.decimal }}){% else %}New record: {{ fam.name }}, {{ best.parameter }}, Δ ≥ {{ best.bound.decimal }}{% endif %}</a>{% if t %} ({{ t.label }}){% endif %}
-    {%- endcapture -%}
-    {%- assign items = items | append: item | append: "␞" -%}
-  {%- endfor -%}
-{%- endfor -%}
-{%- assign items = items | split: "␞" | sort | reverse -%}
-{%- assign cutoff = site.time | date: "%s" | minus: 1209600 | date: "%Y-%m-%d" -%}
-{%- capture list -%}
-{%- for it in items -%}
-  {%- assign d = it | split: "|" | first -%}
-  <li><span class="date">{{ d }}</span>{{ it | remove_first: d | remove_first: "|" }}{% if d >= cutoff %} <span class="new">new</span>{% endif %}</li>␞
-{%- endfor -%}
-{%- endcapture -%}
-{%- assign lines = list | split: "␞" %}
+{%- assign news = site.data.news | sort: "date" | reverse %}
 <ul class="news">
-{%- for l in lines limit: 5 %}{{ l }}{% endfor %}
+{%- for n in news limit: 3 %}{% include news-item.html item=n %}{% endfor %}
 </ul>
-{%- if lines.size > 5 %}
-<details><summary>More news</summary>
+<details><summary>Earlier news</summary>
 <ul class="news">
-{%- for l in lines offset: 5 %}{{ l }}{% endfor %}
+{%- for n in news offset: 3 %}{% include news-item.html item=n %}{% endfor %}
 </ul>
 </details>
-{%- endif %}
-
-See the [open challenges]({{ '/leaderboard.html' | relative_url }}#challenges) for concrete targets and next steps.
-
-## Documentation and resources
-
-* **Two-page note:** [A short diagrammatic explanation of the spin-1 Haldane gap proof]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }})
-  (S. Lu and GPT-6-Astra, PDF)
-* **Interactive explainers:** [periodic ring proof]({{ '/explainer/' | relative_url }}) ·
-  [open-chain extension]({{ '/explainer/open.html' | relative_url }})
-* **Lean 4 formalization:** [blueprint]({{ '/blueprint/' | relative_url }})
-  ([PDF]({{ '/blueprint.pdf' | relative_url }})) ·
-  [dependency graph]({{ '/blueprint/dep_graph_document.html' | relative_url }}) ·
-  [API documentation]({{ '/docs/' | relative_url }})
-* **Contribute:** [leaderboard]({{ '/leaderboard.html' | relative_url }}) ·
-  [contribution guide]({{ '/contribute.html' | relative_url }}) ·
-  [GitHub repository]({{ repo_url }})
 
 ## References
 

@@ -1,0 +1,8 @@
+{%- assign n = include.item -%}
+{%- if n.link -%}
+  {%- assign first = n.link | slice: 0 -%}
+  {%- if first == "/" %}{% assign href = n.link | relative_url %}{% else %}{% assign href = n.link %}{% endif -%}
+{%- else -%}
+  {%- assign href = 'https://github.com/' | append: site.repository | append: '/pull/' | append: n.prs[0] -%}
+{%- endif %}
+<li><span class="date">{{ n.date | date: "%-d %b %Y" }}</span><a href="{{ href }}">{{ n.text }}</a></li>
