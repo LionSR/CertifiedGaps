@@ -13,9 +13,9 @@ usemathjax: true
 {%- assign docs = '/docs/find/' | relative_url -%}
 {%- assign repo_blob = 'https://github.com/' | append: site.repository | append: '/blob/' | append: site.branch | append: '/' -%}
 
-<p>Each bound is a lower bound on the spectral gap $\Delta_L = E_1(L) - E_0(L)$. It holds for all
-  even ring lengths $L \ge L_0$. A computer checks the seed calculation at $(n_0, \beta_0)$. A Lean 4
-  theorem proves the bound from the seed.</p>
+<p>Each number is a lower bound on the spectral gap $\Delta_L = E_1(L) - E_0(L)$ for all even ring
+  lengths $L \ge L_0$. A computer checks one finite calculation, the
+  <a href="{{ '/#method' | relative_url }}">seed</a>. Lean 4 checks the rest of the proof.</p>
 
 <section id="progress">
 <h2>Spin-1 Heisenberg chain: record over time</h2>
@@ -40,7 +40,7 @@ usemathjax: true
   {%- for e in events %}{% assign c = e | split: "|" %}
     {%- if c[4] contains "lean" %}{% assign proof = "Lean 4, from seed" %}{% else %}{% assign proof = "computer" %}{% endif %}
     <tr data-date="{{ c[0] }}" data-value="{{ c[1] }}" data-l0="{{ c[2] }}" data-method="{{ c[3] | escape }}" data-proof="{{ proof }}">
-      <td class="num">{{ c[0] }}</td><td class="num">{{ c[1] | slice: 0, 8 }}</td><td class="num">{{ c[2] }}</td>
+      <td class="num">{{ c[0] }}</td><td class="num">{% assign v = c[1] %}{% include sig4.html x=v %}</td><td class="num">{{ c[2] }}</td>
       <td>{{ c[3] }}</td><td>{{ proof }}</td>
     </tr>
   {%- endfor %}
@@ -67,9 +67,9 @@ usemathjax: true
     <tr>
       <td><a href="#family-{{ f.key }}">{{ f.name }}</a></td>
       <td class="num">{{ rows.size }}</td>
-      <td>{{ hi.bound.decimal | slice: 0, 6 }}{% unless rows[0].params == nil %}, at {{ hi.parameter }}{% endunless %}</td>
+      <td>{% include sig4.html x=hi.bound.decimal %}{% unless rows[0].params == nil %}, at {{ hi.parameter }}{% endunless %}</td>
       <td class="num">{{ hi.lengths.L0 }}</td>
-      <td>{% if nlean == rows.size %}{% if rows.size == 1 %}yes{% else %}all points{% endif %}{% elsif nlean == 0 %}—{% else %}{{ nlean }} of {{ rows.size }}{% endif %}{% if nfree > 0 %}, {{ nfree }} unconditional{% endif %}</td>
+      <td>{% if nlean == rows.size %}{% if rows.size == 1 %}yes{% else %}all points{% endif %}{% elsif nlean == 0 %}—{% else %}{{ nlean }} of {{ rows.size }}{% endif %}{% if nfree > 0 %}; {{ nfree }} with its seed{% endif %}</td>
     </tr>
   {%- endfor %}
   </tbody>
@@ -96,8 +96,8 @@ usemathjax: true
   {%- endfor -%}
   {%- assign gr = gr | split: "|" -%}{%- assign gc = gc | split: "|" %}
 <p>The table gives the certified gap bound for each ${{ f.grid.rows }}$ (rows) and
-  ${{ f.grid.cols }}$ (columns), for all even $L \ge {{ rows[0].lengths.L0 }}$. All points have a
-  Lean 4 theorem. At the point with a star, Lean proves the bound with no hypotheses.</p>
+  ${{ f.grid.cols }}$ (columns), for all even $L \ge {{ rows[0].lengths.L0 }}$. Lean 4 proves all
+  points. At the starred point, Lean 4 also checks the seed.</p>
 <div class="table-wrap"><table class="grid">
   <thead><tr><th>${{ f.grid.rows }} \backslash {{ f.grid.cols }}$</th>{% for y in gc %}<th class="num">${{ y }}$</th>{% endfor %}</tr></thead>
   <tbody>
@@ -116,7 +116,7 @@ usemathjax: true
 
 <div class="table-wrap"><table class="points">
   <thead><tr>
-    {% unless plain %}<th>Parameters</th>{% endunless %}<th class="num">Certified gap ≥</th><th class="num">Lean 4 ≥</th>
+    {% unless plain %}<th>Parameters</th>{% endunless %}<th class="num">Gap ≥</th><th class="num">Lean 4 ≥</th>
     <th class="num">Numerical gap</th><th class="num">Seed $(n_0, \beta_0)$</th><th class="num">Even $L \ge$</th><th>Files</th>
   </tr></thead>
   <tbody>
@@ -125,8 +125,8 @@ usemathjax: true
     {%- if r.lean %}{% assign lr = site.data.lean_records | where: "name", r.lean.name | first %}{% endif %}
     <tr{% unless f.grid %} id="{{ r.id }}"{% endunless %}>
       {% unless plain %}<td>{{ r.parameter }}</td>{% endunless %}
-      <td class="num">{{ r.bound.decimal | slice: 0, 8 }}</td>
-      <td class="num">{% if lr %}<a href="{{ docs }}?pattern={{ r.lean.name | url_encode }}#doc" title="{{ r.lean.name }}">{{ r.lean.decimal | slice: 0, 8 }}</a>{% if lr.kind == "unconditional" %} (unconditional){% endif %}{% else %}—{% endif %}</td>
+      <td class="num">{% include sig4.html x=r.bound.decimal %}</td>
+      <td class="num">{% if lr %}<a href="{{ docs }}?pattern={{ r.lean.name | url_encode }}#doc" title="{{ r.lean.name }}">{% include sig4.html x=r.lean.decimal %}</a>{% if lr.kind == "unconditional" %}*{% endif %}{% else %}—{% endif %}</td>
       <td class="num">{% if r.numerical_gap %}{{ r.numerical_gap | slice: 0, 6 }}{% else %}—{% endif %}</td>
       <td class="num">({{ r.seed.n0 }}, {{ r.seed.beta0 }})</td>
       <td class="num">{{ r.lengths.L0 }}</td>
@@ -165,18 +165,16 @@ usemathjax: true
 <section id="tiers">
 <h2>How the bounds are checked</h2>
 <dl class="checks">
-  <dt>Certificate checker (Certified gap ≥)</dt>
-  <dd>Each model's <code>check.jl</code> verifies the exact reflection-positivity identity,
-    bounds the seed defects at $(n_0, \beta_0)$ from verified ring spectra or exact rationals, and
-    runs 48 doubling steps in interval arithmetic.</dd>
-  <dt>Lean 4 kernel (Lean 4 ≥)</dt>
-  <dd>A Lean 4 theorem takes the certified seed inequalities as hypotheses and checks 14 exact
-    rational doubling steps in the kernel (typically within $10^{-5}$ of the 48-step bound).
-    Theorems marked <em>unconditional</em> also prove the seed inequalities in the kernel.</dd>
-  <dt>Continuous integration</dt>
-  <dd>Changes to proofs or models trigger CI to build the Lean theorems, replay them in a fresh
-    process with <code>leanchecker</code>, and run <code>check.jl</code>; scheduled workflows
-    recheck all proofs and models weekly.</dd>
+  <dt>Gap ≥</dt>
+  <dd>Each model has a checker, <code>check.jl</code>. It checks reflection positivity exactly,
+    bounds the seed defects $p$ and $q$ rigorously, and does the doubling steps in interval
+    arithmetic.</dd>
+  <dt>Lean 4 ≥</dt>
+  <dd>A Lean 4 theorem assumes the seed bounds and proves the rest. Its bound can be
+    smaller. At a starred point, Lean 4 also proves the seed bounds.</dd>
+  <dt>Automatic checks</dt>
+  <dd>Each change to a proof or a model runs these checks again. All checks also run each
+    week.</dd>
 </dl>
 </section>
 

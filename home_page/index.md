@@ -5,13 +5,18 @@ usemathjax: true
 {% assign repo_url = 'https://github.com/' | append: site.repository %}
 
 This project proves lower bounds on the spectral gap of quantum spin chains. Each bound holds for
-all even ring lengths above a stated length. A computer certifies one finite seed calculation, and
-Lean 4 proves the doubling step to all larger even lengths.
+all even ring lengths above a stated length. A computer checks one finite calculation, and Lean 4
+checks the rest of the proof.
 
 Haldane predicted in 1983 that the spin-1 Heisenberg chain has a gap that stays open as the chain
 grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026, as
-[result 268](https://github.com/openai/math/blob/1581d4cbdd69a0faf34b2089614fe2a814316a6a/CONTENTS.md?plain=1#L6747) of its math release [[3](#ref-3), [4](#ref-4)]. We use the same method for more models. We call the method the
+[result 268](https://github.com/openai/math/blob/1581d4cbdd69a0faf34b2089614fe2a814316a6a/CONTENTS.md?plain=1#L6747) of its math release [[3](#ref-3), [4](#ref-4)]. We call the method of this proof the
 *spacetime bootstrap*.
+
+The method is not specific to the spin-1 chain. It applies to many other spin chains, and the
+[leaderboard]({{ '/leaderboard.html' | relative_url }}) lists the bounds that we have so far. It can do more.
+Sharper finite calculations give larger bounds, and an extension to two-dimensional lattices is in
+progress.
 
 ## Method
 
@@ -36,17 +41,17 @@ $$\beta$$ in imaginary time. The method compares tori through two ratios:
 <ol>
   <li>Show that the interaction between neighboring cells is reflection positive
     [<a href="#ref-6">6</a>].</li>
-  <li>At one seed \((n_0, \beta_0)\), calculate upper bounds on the defects
-    \(p = 1 - P_{\mathrm S}(n_0, \beta_0)\) and \(q = 1 - P_{\mathrm T}(2n_0, \beta_0)\). The
-    method works if \((p, q)\) is in the green region. Both values below \(0.127\) are
-    sufficient.</li>
+  <li>Pick one ring length \(n_0\) and one inverse temperature \(\beta_0\), the <em>seed</em>.
+    Calculate upper bounds on the defects \(p = 1 - P_{\mathrm S}(n_0, \beta_0)\) and
+    \(q = 1 - P_{\mathrm T}(2n_0, \beta_0)\). The method works if \((p, q)\) is in the green
+    region, for example if both are below \(0.127\).</li>
   <li>Double \(n\) and \(\beta\) together. Each doubling moves \((p, q)\) closer to 0. The result
     is a lower bound on the gap for all even \(L \ge n_0\).</li>
 </ol>
 <figure>
   {% include seed-region.svg %}
-  <figcaption>Each red dot is one doubling, from the spin-1 seed \((36, 49/4)\) to
-    \((2304, 784)\).</figcaption>
+  <figcaption>The spin-1 chain. The path starts at the seed, \(n = 36\). Each step doubles
+    \(n\) and \(\beta\).</figcaption>
 </figure>
 </div>
 
@@ -56,13 +61,13 @@ Only step 2 uses a numerical calculation. Lean 4 [[7](#ref-7)] proves step 3.
 
 | Model | Gap bound | Ring lengths | Proof |
 |---|---|---|---|
-| Spin-1 Heisenberg chain | $$\Delta_L > 0.0729$$ | even $$L \ge 36$$ | Lean 4, from a computer-checked seed (data of [[3](#ref-3)]) |
-| Ising chain, $$g = 1/4$$, $$h = 1/20$$ | $$\Delta_L > 0.392$$ | even $$L \ge 6$$ | Lean 4, no hypotheses |
+| Spin-1 Heisenberg chain | $$\Delta_L > 0.0729$$ | even $$L \ge 36$$ | Lean 4; seed checked by computer, from the data of [[3](#ref-3)] |
+| Ising chain, $$g = 1/4$$, $$h = 1/20$$ | $$\Delta_L > 0.392$$ | even $$L \ge 6$$ | Lean 4, seed included |
 
-The numerical value of the spin-1 gap is approximately $$0.4105$$ [[5](#ref-5)]. For the Ising
-chain $$H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j$$, the Lean kernel also checks the
-seed calculation. The [leaderboard]({{ '/leaderboard.html' | relative_url }}) lists all certified
-bounds and the progression of the spin-1 record.
+The numerical value of the spin-1 gap is approximately $$0.4105$$ [[5](#ref-5)]. The Ising chain
+is $$H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j$$. The
+[leaderboard]({{ '/leaderboard.html' | relative_url }}) lists all bounds and the history of the
+spin-1 record.
 
 ## Links
 
