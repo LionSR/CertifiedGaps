@@ -466,18 +466,18 @@ even \(L \ge n_0\) (Theorems~\ref{thm:gap-of-coefficient} and~\ref{thm:gap-of-se
   Take \(j = \lfloor \log_2 (L / n_0) \rfloor\) using integer division.
 \end{proof}
 
-\begin{theorem}[General symmetric spacetime-bootstrap criterion]
+\begin{theorem}[General symmetric spacetime-bootstrap criterion~\cite{OpenAIHaldane}]
   \label{thm:gap-of-coefficient}
   \lean{CertifiedGaps.gapGT_of_coefficient, CertifiedGaps.coefficientDefect,
     CertifiedGaps.purities_ge_coefficientDefect}
   \leanok
   \uses{lem:doubling-coefficient, lem:dyadic-window, lem:purity-to-gap, def:moment-bounds,
     def:gapgt}
-  This is Proposition~4.3 of~\cite{OpenAIHaldane}. Assume the spatial moment inequalities of
-  Definition~\ref{def:moment-bounds} above an even \(n_0 > 0\), and let \(\beta_0 > 0\),
-  \(0 < u_0 < 1/6\), \(G(u_0) \le C\), \(r = Cu_0 < 1\) and \(C(1 - 3u_0) > 3\). If
-  \(\Ps(n_0, \beta_0) \ge 1 - u_0\) and \(\Pt(2n_0, \beta_0) \ge 1 - u_0\), then \(E_L\) has a
-  spectral gap greater than \(\log(1/r)/\beta_0\) for every even \(L \ge n_0\).
+  Assume the spatial moment inequalities of Definition~\ref{def:moment-bounds} above an even
+  \(n_0 > 0\), and let \(\beta_0 > 0\), \(0 < u_0 < 1/6\), \(G(u_0) \le C\), \(r = Cu_0 < 1\) and
+  \(C(1 - 3u_0) > 3\). If \(\Ps(n_0, \beta_0) \ge 1 - u_0\) and
+  \(\Pt(2n_0, \beta_0) \ge 1 - u_0\), then \(E_L\) has a spectral gap greater than
+  \(\log(1/r)/\beta_0\) for every even \(L \ge n_0\).
 \end{theorem}
 \begin{proof}
   \leanok

@@ -38,12 +38,13 @@ We first record the two elementary spectral inequalities that turn finite-dimens
 and quadratic-form comparisons into rigorous enclosures of the low-energy spectrum. Given an
 approximate eigenvector \(x\) with Rayleigh quotient \(\theta\), the Euclidean norm of the residual
 \(Ax - \theta x\) bounds the distance from \(\theta\) to the nearest eigenvalue of \(A\) via
-\eqref{eq:rayleigh-residual} (Lemma~\ref{lem:residual}). Complementarily, if the quadratic form
+Weinstein's inequality~\eqref{eq:rayleigh-residual}~\cite{Weinstein1934Modified}
+(Lemma~\ref{lem:residual}). Complementarily, if the quadratic form
 \(\operatorname{Re}\langle x, Ax\rangle\) is bounded below by \(\rho\|x\|^2\) on the subspace of
 vectors vanishing on a finite set \(B\) of basis configurations, then at most \(|B|\) eigenvalues
 of \(A\) can lie below \(\rho\) (Lemma~\ref{lem:counting}).
 
-\begin{lemma}[Rayleigh--Ritz residual bound]
+\begin{lemma}[Rayleigh--Ritz residual bound~\cite{Weinstein1934Modified}]
   \label{lem:residual}
   \lean{SeedKernel.Ising.exists_eigenvalue_near}
   \leanok
@@ -82,11 +83,12 @@ of \(A\) can lie below \(\rho\) (Lemma~\ref{lem:counting}).
 
 In the computational \(Z\)-basis, the mixed-field Ising Hamiltonian~\eqref{eq:mixed-ising-ham} acts
 diagonally with the classical Ising energy \(E(\sigma)\) up to \(L\) single-spin flips of amplitude
-\(g\) (Lemma~\ref{lem:ising-action}). By Cauchy--Schwarz (equivalently, Gershgorin's circle theorem
-applied to the off-diagonal spin-flip graph), the transverse field shifts the quadratic form by at
-most \(gL\) in~\eqref{eq:ising-gershgorin} (Lemma~\ref{lem:ising-classical}), so any configuration
-cutoff on the classical Ising energy \(E(\sigma)\) immediately yields a variational lower bound on
-the quantum Hamiltonian via Lemma~\ref{lem:counting}.
+\(g\) (Lemma~\ref{lem:ising-action}). By Cauchy--Schwarz (equivalently, Gershgorin's circle
+theorem~\cite{Gershgorin1931Uber} applied to the off-diagonal spin-flip graph), the transverse
+field shifts the quadratic form by at most \(gL\) in~\eqref{eq:ising-gershgorin}
+(Lemma~\ref{lem:ising-classical}), so any configuration cutoff on the classical Ising energy
+\(E(\sigma)\) immediately yields a variational lower bound on the quantum Hamiltonian via
+Lemma~\ref{lem:counting}.
 
 \begin{lemma}[Matrix action in the computational \(Z\)-basis]
   \label{lem:ising-action}
