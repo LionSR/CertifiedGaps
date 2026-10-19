@@ -35,6 +35,8 @@ permissions:
 jobs:
   build_project:
     runs-on: ubuntu-latest
+    # Bound PR compute without skipping checks; preserve the six-hour deploy limit.
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 90 || 360 }}
     name: Build project
     steps:
       - name: Cleanup to free disk space

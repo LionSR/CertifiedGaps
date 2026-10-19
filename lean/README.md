@@ -431,6 +431,12 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Transfer/HistoryShuffle.lean` | Finite-family ordered-simplex shuffle identities |
 | `Transfer/PoissonHistory.lean` | Labeled history measure, Poisson event count, and absolutely convergent ordered-time integrals |
 | `Transfer/ProductPoissonHistory.lean` | Actual finite product history measure, count/label/shuffle series, absolute convergence, and exponential bounds |
+| `Transfer/AtomlessTimeOrdering.lean` | Atomless time laws and factorial chamber mass |
+| `Transfer/AtomlessHistoryShuffle.lean` | Finite-family chronological integrals |
+| `Transfer/WeightedPoissonHistory.lean` | Weighted measures, Poisson laws, and exponential bounds |
+| `Transfer/WeightedProductPoissonHistory.lean` | Absolutely convergent weighted shuffle expansion |
+| `Transfer/WeightedPoissonHistoryAudit.lean` | Degenerate, unequal-weight, and adapter regressions |
+| `Transfer/WeightedHistoryAudit.lean` | Independent shuffle, finite-domain, and axiom audits |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
 | `Ring/Model.lean` | Periodic ring geometry, `bondOp`/`siteOp`, `RPRing` structure, Hermiticity of $H_L$, and $\operatorname{Re} \operatorname{Tr} e^{-\beta H_L} = \sum_m e^{-\beta E_m}$ |
 | `Ring/Transfer.lean` | Even-bond, on-site, and odd-bond Trotter slices and the reflection-positivity identity $\operatorname{Tr} S^M = \operatorname{Tr} (B^T B)^{L/2}$ with real $B$ |

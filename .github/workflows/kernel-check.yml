@@ -41,6 +41,8 @@ jobs:
   leanchecker:
     name: leanchecker
     runs-on: ubuntu-latest
+    # Bound PR compute without skipping checks; preserve the six-hour deploy limit.
+    timeout-minutes: ${{ github.event_name == 'pull_request' && 90 || 360 }}
     steps:
       - name: Checkout project
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -64,6 +66,8 @@ jobs:
           CertifiedGaps.Transfer.PoissonHistoryAudit
           CertifiedGaps.Transfer.HistoryShuffleAudit
           CertifiedGaps.Transfer.ProductPoissonHistoryAudit
+          CertifiedGaps.Transfer.WeightedPoissonHistoryAudit
+          CertifiedGaps.Transfer.WeightedHistoryAudit
 
       # One exact module per process avoids the observed 4.36.0-rc1 repeated-replay crash.
       # The CLI also expands namespace prefixes; the driver calls the unchanged replay routine.

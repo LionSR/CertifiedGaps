@@ -11,6 +11,8 @@ import CertifiedGaps.Transfer.TimeOrdering
 import CertifiedGaps.Transfer.PoissonHistory
 import CertifiedGaps.Transfer.HistoryShuffle
 import CertifiedGaps.Transfer.ProductPoissonHistory
+-- Weighted histories for arbitrary atomless time laws
+import CertifiedGaps.Transfer.WeightedProductPoissonHistory
 -- Reflection-positive rings
 import CertifiedGaps.Ring.Model
 import CertifiedGaps.Ring.Transfer
