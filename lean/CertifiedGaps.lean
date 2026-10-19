@@ -6,6 +6,9 @@ import CertifiedGaps.ChainCheck
 import CertifiedGaps.Transfer.PiTensor
 import CertifiedGaps.Transfer.MomentForm
 import CertifiedGaps.Transfer.ProductLimit
+-- Continuous-time history prerequisites
+import CertifiedGaps.Transfer.TimeOrdering
+import CertifiedGaps.Transfer.PoissonHistory
 -- Reflection-positive rings
 import CertifiedGaps.Ring.Model
 import CertifiedGaps.Ring.Transfer

@@ -86,6 +86,38 @@ even `n` and the equal-field chain at odd `n` are both of this form. The closed 
 `OpenMomentBounds` pass to the limit by compactness. The sign of the leading eigenvalue at odd
 lengths is fixed by positivity of the trace, so the note's `U_P` symmetry argument is not needed.
 
+### Continuous-time history prerequisites
+
+`Transfer/TimeOrdering.lean` and `Transfer/PoissonHistory.lean` formalize the untwisted
+history-space prerequisites from the [spatial-transfer proof in the September 24, 2026
+preprint](https://github.com/openai/math/blob/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/build/transfer.tex).
+These are independent analytic results, with no additional axioms or seed hypotheses:
+
+- The finite time cube is partitioned by chronological permutation chambers outside the
+  Lebesgue-null collision hyperplanes. For any integrable Banach-valued integrand, its cube
+  integral equals the finite sum of its integrals over the increasing-time simplex with permuted
+  arguments. No permutation symmetry of the integrand is assumed.
+- The increasing simplex has volume $`b^k/k!`$. The zero-event simplex has mass one.
+- `PoissonHistory.History b m` is the actual disjoint union of the increasing-time simplexes with
+  label words in `Fin m`. Its Lebesgue history measure has total mass $`e^{mb}`$; multiplying by
+  $`e^{-mb}`$ gives a probability measure whose event count has distribution `poissonMeasure (m * b)`.
+- An almost-everywhere strongly measurable observable bounded in norm by $`C R^k`$, with
+  $`R \ge 0`$, is absolutely integrable, with integral of its norm
+  at most $`C e^{mbR}`$. Integrals can then be regrouped by event count and finite label word.
+  The spin-one case has `m = 3`.
+
+The route uses equal-volume coordinate-permutation chambers to prove the factorial normalization
+before constructing the history measure. It avoids assuming a Poisson law or a simplex-volume
+formula. This boundary does not yet construct the merged-history matrix kernel, identify products
+of bond-history integrals with the global ordered operator expansion, or prove a physical
+partition-function or transfer-operator trace identity.
+
+After building the two modules, run `lake build CertifiedGaps.Transfer.PoissonHistoryAudit` for
+edge-case regressions and a dependency-axiom audit that fails on any axiom outside `propext`,
+`Classical.choice`, and `Quot.sound`. The existing kernel-replay driver can recheck each new module
+by setting `KERNEL_CHECK_MODULE=CertifiedGaps.Transfer.TimeOrdering` or
+`KERNEL_CHECK_MODULE=CertifiedGaps.Transfer.PoissonHistory`.
+
 ### The first unconditional gap
 
 ```lean
@@ -373,6 +405,8 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `ChainCheck.lean` | Decidable rational `ChainCertificate` structure discharging the hypotheses of `gapGT_of_chain`, and `StepsValid` for the purities along a chain alone |
 | `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`), expansion of $`\mathrm{Tr}\, T^N`$ as a sum over closed label paths and of matrix elements of ordered products as sums over open paths |
 | `Transfer/MomentForm.lean` | Proof that traces of even powers of a real matrix factorization $B^T B \succeq 0$ satisfy the spatial moment form |
+| `Transfer/TimeOrdering.lean` | Null time collisions, chronological chamber decomposition, and exact ordered-simplex volume |
+| `Transfer/PoissonHistory.lean` | Labeled history measure, Poisson event count, and absolutely convergent ordered-time integrals |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
 | `Ring/Model.lean` | Periodic ring geometry, `bondOp`/`siteOp`, `RPRing` structure, Hermiticity of $H_L$, and $\operatorname{Re} \operatorname{Tr} e^{-\beta H_L} = \sum_m e^{-\beta E_m}$ |
 | `Ring/Transfer.lean` | Even-bond, on-site, and odd-bond Trotter slices and the reflection-positivity identity $\operatorname{Tr} S^M = \operatorname{Tr} (B^T B)^{L/2}$ with real $B$ |
@@ -407,10 +441,11 @@ On paper, the main note obtains the spatial moment representation in a single co
 constructs an exact continuous-time thermal MPO on Poisson bond histories whose spatial transfer operator
 $X_\beta$ is a compact self-adjoint integral operator on $L^2(\mu_\beta)$, giving
 $Z_n(\beta) = \operatorname{Tr} X_\beta^n = \sum_i |\lambda_i|^n$. Formalizing that infinite-dimensional
-path-space construction directly in Lean still needs Poisson history measures and the bridge from
-integral kernels to Hilbert–Schmidt operators and their cycle-trace identities. Mathlib already has
-$L^2$ integration tools and the compact self-adjoint spectral theorem, but not this ready-to-use
-path-space and trace infrastructure. Instead, the Lean formalization uses a finite-dimensional
+path-space construction now has independently proved Poisson history measures and finite-degree
+time-ordering identities (`Transfer/TimeOrdering.lean`, `Transfer/PoissonHistory.lean`). The remaining
+bridge needs the concrete merged-history kernel, global bond-history reorganization, and the integral
+operator and cycle-trace identities. Mathlib already has $L^2$ integration tools and the compact
+self-adjoint spectral theorem. The existing gap theorems instead use a finite-dimensional
 Trotterization route that needs only finite matrix algebra and the matrix exponential limit. Each module below addresses a specific distinction between the paper proof and the formal proof:
 
 **Spectral gap as a predicate on unordered levels (`GapGT`).** The paper writes $\Delta_L = E_1 - E_0$
