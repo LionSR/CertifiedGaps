@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
 import CertifiedGaps.Models.IsingLongitudinal
-import SeedKernel.Ising.Spectral
+import SeedKernel.Spectral
 
 /-!
 # The Ising ring Hamiltonian in the computational basis

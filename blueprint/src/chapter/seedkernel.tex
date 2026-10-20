@@ -46,7 +46,7 @@ of \(A\) can lie below \(\rho\) (Lemma~\ref{lem:counting}).
 
 \begin{lemma}[Rayleigh--Ritz residual bound~\cite{Weinstein1934Modified}]
   \label{lem:residual}
-  \lean{SeedKernel.Ising.exists_eigenvalue_near}
+  \lean{SeedKernel.exists_eigenvalue_near}
   \leanok
   For a Hermitian matrix \(A\), a vector \(x\), and \(\theta \in \R\), some eigenvalue \(\lambda_i\)
   of \(A\) satisfies
@@ -65,7 +65,7 @@ of \(A\) can lie below \(\rho\) (Lemma~\ref{lem:counting}).
 
 \begin{lemma}[Variational subspace eigenvalue bound]
   \label{lem:counting}
-  \lean{SeedKernel.Ising.card_eigenvalues_lt_le}
+  \lean{SeedKernel.card_eigenvalues_lt_le}
   \leanok
   Let \(A\) be Hermitian, \(B\) a set of basis vectors, and \(\rho \in \R\). If
   \(\operatorname{Re}\langle x, Ax \rangle \ge \rho \|x\|^2\) for every vector \(x\) vanishing on
@@ -157,7 +157,7 @@ gap~\eqref{eq:ising-uncond-gap} for all even ring lengths \(L \ge 6\) (Theorem~\
 
 \begin{definition}[Low-energy spectral enclosure]
   \label{def:low-spectrum}
-  \lean{SeedKernel.Ising.LowSpectrum}
+  \lean{SeedKernel.LowSpectrum}
   \leanok
   An eigenvalue family \(e\) admits a \emph{low-energy spectral enclosure} \((a_0, b_0, a_1, \rho)\)
   if its lowest eigenvalue lies in \([a_0, b_0]\), its second eigenvalue is at least \(a_1\), and
@@ -166,7 +166,7 @@ gap~\eqref{eq:ising-uncond-gap} for all even ring lengths \(L \ge 6\) (Theorem~\
 
 \begin{lemma}[Partition-function bounds from a spectral enclosure]
   \label{lem:low-spectrum-z}
-  \lean{SeedKernel.Ising.sum_exp_ge, SeedKernel.Ising.sum_exp_le}
+  \lean{SeedKernel.sum_exp_ge, SeedKernel.sum_exp_le}
   \leanok
   \uses{def:low-spectrum}
   For \(\beta \ge 0\) and a spectrum of \(N\) eigenvalues admitting the enclosure
@@ -252,6 +252,173 @@ gap~\eqref{eq:ising-uncond-gap} for all even ring lengths \(L \ge 6\) (Theorem~\
   the seed hypothesis of Lemma~\ref{lem:ising-longitudinal-seeds} at \((g, h) = (1/4, 1/20)\),
   establishing the spectral gap~\eqref{eq:ising-uncond-gap} of Theorem~\ref{thm:ising-longitudinal-gap}
   unconditionally.
+\end{proof}
+
+\section{Seeds from low spectra at any inverse temperature}
+
+The seed inequalities need only a few low-lying eigenvalues of small rings and chains. The
+enclosures of Lemma~\ref{lem:ising-low-spectra} do not depend on \(\beta\), and the passage from
+them to the purities is the same for every model. The following results are stated for any
+Hermitian matrix or any reflection-positive ring with any boundary; a model supplies the low
+spectra, and one decidable inequality between rationals checks each seed at a chosen rational
+\(\beta_0\).
+
+\begin{lemma}[Weighted comparison with the diagonal]
+  \label{lem:weighted-comparison}
+  \lean{SeedKernel.le_re_quadratic_of_weights, SeedKernel.neg_le_re_star_mul_mul}
+  \leanok
+  Let \(A\) be Hermitian, \(B\) a set of basis vectors, and \(w > 0\) weights off \(B\) with
+  \(\sum_{\tau \notin B, \tau \ne \sigma} |A_{\sigma\tau}|\, w_\tau \le w_\sigma
+  (\mathrm{Re}\, A_{\sigma\sigma} - \rho)\) for every \(\sigma \notin B\). Then
+  \(\mathrm{Re}\langle x, A x\rangle \ge \rho \|x\|^2\) for every \(x\) vanishing on \(B\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Bound each off-diagonal term by
+  \(2 |x_\sigma A_{\sigma\tau} x_\tau| \le |A_{\sigma\tau}| (w_\tau/w_\sigma |x_\sigma|^2 +
+  w_\sigma/w_\tau |x_\tau|^2)\) and use \(|A_{\tau\sigma}| = |A_{\sigma\tau}|\). This is the
+  Collatz--Wielandt bound for the compression of \(A\) to the complement of \(B\); with \(w = 1\)
+  it is the Gershgorin bound of Lemma~\ref{lem:ising-classical}.
+\end{proof}
+
+\begin{lemma}[Low spectra from residuals and a count]
+  \label{lem:low-spectrum-of-near}
+  \lean{SeedKernel.exists_near_of_residual, SeedKernel.lowSpectrum_of_near,
+    SeedKernel.near_of_lowSpectrum}
+  \leanok
+  \uses{lem:residual, lem:counting, def:low-spectrum}
+  If \(\|x\|^2 \ge N > 0\) and \(\|Ax - \theta x\|^2 \le r^2 N\), some eigenvalue lies within \(r\)
+  of \(\theta\). Two such eigenvalues near \(\theta_0 + 2r < \theta_1\), together with at most two
+  eigenvalues below \(\rho > \theta_1 + r\), give the low-energy enclosure
+  \((\theta_0 - r, \theta_0 + r, \theta_1 - r, \rho)\) of Definition~\ref{def:low-spectrum}.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Lemma~\ref{lem:residual} and Lemma~\ref{lem:counting}.
+\end{proof}
+
+\begin{lemma}[Rational bounds on the exponential]
+  \label{lem:exp-up}
+  \lean{SeedKernel.expTaylorQ, SeedKernel.expUpQ, SeedKernel.exp_le_expUpQ}
+  \leanok
+  For rational \(y < k\), \(e^y \le \mathtt{expUpQ}(k, y)\), where
+  \(\mathtt{expUpQ}(k, y) = 1/\sum_{i<k} (-y)^i/i!\) for \(y \le 0\) and \((1 - y/k)^{-k}\) for
+  \(y > 0\). Both are exact rationals.
+\end{lemma}
+\begin{proof}
+  \leanok
+  The Taylor sums of \(e^{-y}\) lie below it for \(y \le 0\), and \(1 - y/k \le e^{-y/k}\).
+\end{proof}
+
+\begin{theorem}[Seeds from low spectra]
+  \label{thm:seeds-from-low-spectra}
+  \lean{SeedKernel.thermal_ratio_ge, SeedKernel.spatial_ratio_ge, SeedKernel.trace_le,
+    SeedKernel.excitedQ, SeedKernel.ThermalCheck, SeedKernel.SpatialCheck, SeedKernel.TraceCheck,
+    SeedKernel.spatialPurity_ge_of_check, SeedKernel.thermalPurity_ge_of_check,
+    SeedKernel.openThermalPurity_ge_of_check, SeedKernel.openTrace_le_of_check}
+  \leanok
+  \uses{def:low-spectrum, lem:low-spectrum-z, lem:exp-up, def:rp-purities,
+    lem:boundary-seed-traces}
+  For any reflection-positive ring and any boundary, low-energy enclosures of radius \(r\) of the
+  ring of \(L\) sites (and an eigenvalue near \(\theta_2\) at \(2L\) sites) give, at every
+  rational \(\beta\) for which the corresponding rational inequality holds,
+  \[
+    \Ps(L, \beta),\ \Pt(L, \beta) \ge 1 - u, \qquad
+    \Pt^{\mathrm{open}}(n, \beta) \ge 1 - \eta, \qquad
+    G_{n_1}(\beta)\,(d(u) Z_L(\beta))^m \le E\, G_{n_2}(\beta).
+  \]
+  For instance the thermal seed holds when
+  \(1 - \eta \le (1 - 4\beta r)/(1 + t)^2\), with \(t\) the rational bound of
+  Lemma~\ref{lem:exp-up} on \(e^{-\beta(a_1 - a_0)} + d^L e^{-\beta(\rho - a_0)}\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Lemma~\ref{lem:low-spectrum-z} bounds each partition function from above and below; the ratio
+  step uses \(e^{-x} \ge 1 - x\), and Lemma~\ref{lem:exp-up} replaces each exponential by a
+  rational.
+\end{proof}
+
+\begin{theorem}[The Ising ring at any inverse temperature]
+  \label{thm:ising-ring-any-beta}
+  \lean{SeedKernel.Ising.RingCheck, SeedKernel.Ising.ring_seeds_of_check,
+    SeedKernel.Ising.ring_gap_of_check}
+  \leanok
+  \uses{lem:ising-low-spectra, thm:seeds-from-low-spectra, thm:rp-gap}
+  At \((g, h) = (1/4, 1/20)\), every valid chain certificate whose seeds pass the rational
+  condition at \(\beta_0 > 0\) gives \(\Delta_L > \log r / \beta_0\) for every even \(L \ge 6\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:seeds-from-low-spectra} with the enclosures of
+  Lemma~\ref{lem:ising-low-spectra}, then Theorem~\ref{thm:rp-gap}.
+\end{proof}
+
+\section{The free Ising chain}
+
+With free ends, flipping an end spin breaks one bond instead of two, and the Gershgorin bound of
+Lemma~\ref{lem:ising-classical} no longer separates the two lowest states from the rest. The
+weighted comparison of Lemma~\ref{lem:weighted-comparison} does, with integer weights close to
+the Perron vector of the compressed Hamiltonian.
+
+\begin{lemma}[The free chain in the computational basis]
+  \label{lem:ising-free-action}
+  \lean{SeedKernel.IsingOpen.openE, SeedKernel.IsingOpen.openHamiltonian_mulVec_apply,
+    SeedKernel.IsingOpen.freeH_apply, SeedKernel.IsingOpen.freeH_weights}
+  \leanok
+  \uses{thm:free-ends, lem:ising-action, lem:weighted-comparison}
+  The free chain acts as \((H x)(\sigma) = E(\sigma) x(\sigma) - g \sum_j x(\sigma^{(j)})\) with
+  \(E(\sigma) = -\sum_{j<n-1} z_j z_{j+1} - h \sum_j z_j\), and positive weights with
+  \(g \sum_j w(\sigma^{(j)}) \le w(\sigma) (E(\sigma) - \rho)\), summed over the flips that leave
+  \(B\), satisfy the hypothesis of Lemma~\ref{lem:weighted-comparison}.
+\end{lemma}
+\begin{proof}
+  \leanok
+  As Lemma~\ref{lem:ising-action}, with the open-chain bonds of Theorem~\ref{thm:free-ends}.
+\end{proof}
+
+\begin{lemma}[Spectral enclosures of the free chains of \(2\), \(8\) and \(12\) sites]
+  \label{lem:ising-free-low-spectra}
+  \lean{SeedKernel.IsingOpen.diagonal_encode, SeedKernel.IsingOpen.applyH_encode,
+    SeedKernel.IsingOpen.residualSq_eq, SeedKernel.IsingOpen.weights_spec,
+    SeedKernel.IsingOpen.lowSpectrum2, SeedKernel.IsingOpen.near8,
+    SeedKernel.IsingOpen.lowSpectrum12}
+  \leanok
+  \uses{lem:ising-free-action, lem:ising-bridge, lem:low-spectrum-of-near}
+  At \((g, h) = (1/4, 1/20)\) the free chains of \(2\) and \(12\) sites admit low-energy
+  enclosures of radius \(10^{-10}\), and the chain of \(8\) sites has an eigenvalue within
+  \(10^{-10}\) of its Ritz value.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Kernel-checked integer residuals, classical counts and weight conditions (the last two at
+  \(12\) sites in \(64\) blocks), identified with the free-chain Hamiltonian as in
+  Lemma~\ref{lem:ising-bridge}.
+\end{proof}
+
+\begin{theorem}[Unconditional gap of the free Ising chain]
+  \label{thm:ising-free-gap}
+  \lean{SeedKernel.IsingOpen.FreeCheck, SeedKernel.IsingOpen.free_gap_of_check,
+    SeedKernel.IsingOpen.isingFreeCertificate, SeedKernel.IsingOpen.isingFree_check,
+    SeedKernel.IsingOpen.ising_free_gap, SeedKernel.IsingOpen.ising_free_gap_long}
+  \leanok
+  \uses{lem:ising-free-low-spectra, thm:ising-ring-any-beta, thm:seeds-from-low-spectra,
+    def:open-certificate, thm:free-ends}
+  The Ising chain \(-\sum_{j<n-1} Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j\)
+  with free ends has a unique ground state and
+  \[
+    \Delta_n > \frac{\log(10^{12}/3801)}{97/2} \approx 0.3998 \quad (n \ge 24), \qquad
+    \Delta_n > \frac{\log(10^{43}/1609)}{194} \approx 0.4723 \quad (n \ge 96).
+  \]
+  More generally, every valid open-chain certificate with \(N_0 = 3\), \(K_0 = 4\) whose seeds
+  pass the rational condition at \(\beta_0 > 0\) gives
+  \(\Delta_n > \log(1/(10x))/(\beta_0 2^m)\) for \(n \ge 12 \cdot 2^m\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Theorem~\ref{thm:seeds-from-low-spectra} with the enclosures of
+  Lemmas~\ref{lem:ising-low-spectra} and~\ref{lem:ising-free-low-spectra} gives the four seeds of
+  Theorem~\ref{thm:free-ends}; at \(\beta_0 = 97/4\) the rational condition is decided by the
+  kernel for both certificates.
 \end{proof}
 
 \section{Exact integer arithmetic for spin-1 trial states}

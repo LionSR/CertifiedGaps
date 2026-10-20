@@ -21,7 +21,7 @@ Squared norms are written `∑ σ, normSq (x σ)`, so that they can be evaluated
 
 open Matrix Complex
 
-namespace SeedKernel.Ising
+namespace SeedKernel
 
 variable {n : Type*} [Fintype n]
 
@@ -141,4 +141,4 @@ theorem card_eigenvalues_lt_le (B : Finset n) (ρ : ℝ)
     · simp [hyS i hi]
   · exact mul_lt_mul_of_pos_right (Finset.mem_filter.1 j.2).2 (normSq_pos.2 hyj)
 
-end SeedKernel.Ising
+end SeedKernel

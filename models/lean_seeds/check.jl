@@ -35,6 +35,9 @@ function main(full)
     step("ising: exact replay and generated Lean files") do
         LeanSeeds.IsingSeed.check_ising()
     end
+    step("ising_open: exact replay and generated Lean files") do
+        LeanSeeds.IsingOpenSeed.check_ising_open()
+    end
     step("lean: lake build SeedKernel and axiom audit") do
         seconds, names = build_seed_kernel(; fresh=full)
         println("lake build SeedKernel", full ? " (clean)" : "", " took ", round(seconds; digits=1),

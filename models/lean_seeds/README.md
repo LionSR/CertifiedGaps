@@ -2,18 +2,20 @@
 
 The Lean 4 gap proofs in [`lean/`](../../lean) formalize the reflection-positivity transfer
 operator and the all-scale doubling criterion, leaving each model's finite seed inequality as an
-explicit `sorry` hypothesis in the model file. This directory contains five studies investigating
+explicit `sorry` hypothesis in the model file. This directory contains six studies investigating
 how to discharge those finite seed inequalities inside the Lean kernel using `decide +kernel`
 alone (with no `native_decide` and no additional axioms): four studies targeting the spin-1
-Heisenberg chain and one end-to-end pipeline on the computationally cheapest certified model,
-the longitudinal-field Ising chain. Throughout these studies, Julia serves as an untrusted
+Heisenberg chain and two end-to-end pipelines on the computationally cheapest certified model,
+the longitudinal-field Ising chain, on rings and on chains with free ends. Throughout these studies, Julia serves as an untrusted
 witness generator, while the verified Lean declarations live in the opt-in library `SeedKernel`
 of the repository's Lake package (`lake build SeedKernel`).
 
-**One unconditional gap.** The Ising study closes: `SeedKernel.Ising.ising_gap` proves, with no
+**Two unconditional gaps.** The Ising study closes: `SeedKernel.Ising.ising_gap` proves, with no
 hypothesis and no `sorry`, that the Ising ring at $g = 1/4$, $h = 1/20$ has spectral gap
-$\Delta_L > \log(13480)/(97/4) \approx 0.3921$ for every even $L \ge 6$. The spin-1 studies remain
-exact but conditional on open bridge lemmas or spectral counting anchors:
+$\Delta_L > \log(13480)/(97/4) \approx 0.3921$ for every even $L \ge 6$. The `ising_open` study
+does the same for the chain with free ends: `SeedKernel.IsingOpen.ising_free_gap` gives
+$`\Delta_n > \log(10^{12}/3801)/(97/2) \approx 0.3998`$ for every length $n \ge 24$, odd or
+even (and $`\Delta_n > 0.4723`$ for $n \ge 96$). The spin-1 studies remain exact but conditional on open bridge lemmas or spectral counting anchors:
 
 | Study | Core question | Best result and verification status |
 |---|---|---|
@@ -22,6 +24,7 @@ exact but conditional on open bridge lemmas or spectral counting anchors:
 | `anchor` | Can a local comparison operator anchor the low-energy eigenvalue count? | Exact local PSD comparison via rational $\mathrm{LDL}^\top$; reduces $S^z = 0$ comparison count at $n = 12$ from $191 \to 121 \to 49$ (binned tail) against $8$ physical levels (exact counts; one-shot anchor does not close without continuation) |
 | `spin1_kernel` | Does base-3 packed integer arithmetic fit within the Lean kernel? | Yes: $n = 12$ dense matvec + dot checks in $20\text{--}26\text{ s}$; power-filter Ritz and residual witnesses for $H_6, H_8, H_{10}$ kernel-checked (arithmetic inequalities only) |
 | `ising` | Can we run the complete pipeline on the cheapest certified model? | **Proved**: seed of `IsingLongitudinal` at $g = 1/4, h = 1/20, (n_0, \beta_0) = (6, 97/4)$ and $\Delta_L > \log(13480)/(97/4) \approx 0.3921$ for every even $L \ge 6$ (`ising_gap`; standard axioms only) |
+| `ising_open` | Does the pipeline extend to open boundary conditions? | **Proved**: the boundary seed and the open thermal seed of the free chain at $\beta_0 = 97/4$ from the chains of $2, 8, 12$ sites, and $\Delta_n > 0.3998$ for every $n \ge 24$ (`ising_free_gap`; standard axioms only); the seeds hold at any rational $\beta_0$ passing one decidable check (`free_gap_of_check`) |
 
 ## Model
 
@@ -45,6 +48,9 @@ exact but conditional on open bridge lemmas or spectral counting anchors:
   kernel checkers scale the Hamiltonian to the integer matrix $A = 20 H_L$ in the computational
   ($\sigma^z$) basis; `test/ising.jl` verifies that its periodic-bond convention at $L = 2$
   matches `RPRing.hamiltonian`.
+- **The same chain with free ends** (`ising_open`): the open chain of $n$ sites, with bonds
+  $j = 1, \dots, n - 1$ only, matching `RPRing.openHamiltonian RPRing.freeBoundary`
+  (`RPRing.openHamiltonian_free`); `test/ising_open.jl` checks the convention at $n = 2$.
 
 ## Reflection positivity
 
@@ -185,7 +191,7 @@ the thirty conjunctions of `IsingLongitudinal.seeds`
 ($`1 - 9064 \times 10^{-9} \le \mathrm{spatialPurity}\; 6\; (97/4)`$ and
 $`1 - 3141 \times 10^{-8} \le \mathrm{thermalPurity}\; 12\; (97/4)`$), with no hypothesis, and then
 `ising_gap`. The steps are:
-- a residual bound gives an eigenvalue within $10^{-10}$ of each candidate (`Ising/Spectral`);
+- a residual bound gives an eigenvalue within $10^{-10}$ of each candidate (`SeedKernel/Spectral`);
 - $`\mathrm{Re}\, \langle x, Hx \rangle \ge \sum_\sigma (E(\sigma) - L/4) |x(\sigma)|^2`$ and the
   classical count give at most two eigenvalues below the anchor (counting by comparison);
 - the checker's integer sums are identified with the matrix `IsingLongitudinal.model (1/4) (1/20)`
@@ -209,7 +215,9 @@ Closing an unconditional kernel-checked spin-1 seed requires completing five com
    Lehmann–Goerisch bounds with a priori input); this is the bottleneck of the whole route.
 2. **Ordered spectral linear algebra in Lean:** Lehmann bounds and ordered-eigenvalue statements
    (absent from Mathlib). The residual bound and counting by comparison are now proved
-   (`Ising/Spectral.lean`) and apply to any Hermitian matrix.
+   (`SeedKernel/Spectral.lean`), together with the weighted comparison and the seeds of any
+   `RPRing` from low spectra (`SeedKernel/Comparison.lean`, `LowSpectrum.lean`, `Seeds.lean`); they
+   apply to any Hermitian matrix and any reflection-positive ring.
 3. **Packing soundness:** proofs of the specification propositions (`DotCorrect`, `HApplyCorrect`,
    `FilterCorrect`, etc.) in `lean/SeedKernel/Obligations.lean` and `Spin1/Obligations.lean`, and
    the lane decoding of `Ising/Packed.lean`; nothing assumes them.
@@ -230,7 +238,7 @@ toolchain. Run from `models/lean_seeds/`; wall times below were measured on an A
 
 ```sh
 julia --project=. -e 'using Pkg; Pkg.instantiate()'
-julia --project=. test/runtests.jl         # 30 s: 1,582 unit tests across all five studies (Julia only)
+julia --project=. test/runtests.jl         # 30 s: 1,592 unit tests across all six studies (Julia only)
 julia --project=. check.jl                 # 1 min: exact rational replays + data checks, then
                                            #   `lake build SeedKernel` and the Lean axiom audit
 julia --project=. check.jl --full          # 4.7 min: also regenerate the spin-1 Lean witnesses,
@@ -238,8 +246,9 @@ julia --project=. check.jl --full          # 4.7 min: also regenerate the spin-1
 julia --project=. certify.jl [study ...]   # 75 s: regenerate exact JSON records and Lean witnesses
 ```
 
-Running `certify.jl` executes `seed_design` (5 s), `anchor` (3 s), `ising` (9 s), and
-`spin1_kernel` (55 s; run last because it records the SHA-256 hashes of shared driver files).
+Running `certify.jl` executes `seed_design` (5 s), `anchor` (3 s), `ising` (9 s), `ising_open`
+(20 s), and `spin1_kernel` (55 s; run last because it records the SHA-256 hashes of shared driver
+files).
 `check.jl` uses the Mathlib build cache in `../../lean/` (run `lake exe cache get` inside `lean/`
 if not yet initialized); with Mathlib cached, `lake build SeedKernel` from clean takes about 80 s,
 the axiom audit (`lake env lean SeedKernel/Audit.lean`) takes 5–30 s, and the `SeedKernelBench`
@@ -290,7 +299,7 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
 
 ## What is rigorous
 
-- **Lean 4 kernel (`decide +kernel`, standard axioms only):** All 40 declarations audited in
+- **Lean 4 kernel (`decide +kernel`, standard axioms only):** All 74 declarations audited in
   `lean/SeedKernel/Audit.lean` (verified automatically by `check.jl`) depend at most on standard
   Lean axioms (`propext`, `Classical.choice`, `Quot.sound`), with no `sorryAx` and no
   `Lean.ofReduceBool` (`native_decide`). The computational witness checks (spin-1 $H_6, H_8, H_{10}$
@@ -299,7 +308,8 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
   declaration contains a `sorry`), the axiom audit confirms that no audited declaration depends on
   it.
 - **Unconditional (Ising):** `seed_spatial`, `seed_thermal`, `first_point_seed`, and `ising_gap`
-  have no hypotheses. **Conditional (spin-1):** the witnesses in `SeedKernel/Spin1/H*.lean`
+  have no hypotheses. So do `free_gap_of_check`, `ising_free_gap`, and `ising_free_gap_long` of
+  `SeedKernel.IsingOpen`. **Conditional (spin-1):** the witnesses in `SeedKernel/Spin1/H*.lean`
   establish exact integer inequalities on packed moments, which become physical eigenvalue bounds
   only once the packing and spectral obligations above are discharged.
 - **Exact rational arithmetic in Julia (not in Lean):**
@@ -313,7 +323,8 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
     counts, and degree-256 rational Taylor upper bounds on the binned tail.
 - **Untrusted generators:** `Float64` LAPACK proposes the Ising eigenvectors and the anchor
   eigenvectors; wrong proposals fail the exact checks. The Julia replays of kernel-checked facts
-  (`check_spin1_kernel`, `check_ising`) are diagnostics.
+  (`check_spin1_kernel`, `check_ising`, `check_ising_open`) are diagnostics. The `ising_open` generator
+  also proposes the comparison weights, from the Perron vector of the compressed Hamiltonian.
 - **Floating-point only:** all spectra, counts, cutoffs, filter residuals, searches, Pareto
   fronts, homotopy continuations, inventories, and cost/time forecasts.
 - **Platform:** LAPACK proposals differ across platforms; the stored Ising and anchor records were
@@ -332,6 +343,7 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
 | `src/anchor.jl` | `AnchorStudy`: integer bonds, boundary comparison matrices, exact $\mathrm{LDL}^\top$ and half-chain enclosures, `certify` and `check` |
 | `src/spin1_kernel.jl` | `Spin1Kernel`: witness generator, Lean source emitter, witness inventory, and checker |
 | `src/ising.jl` | `IsingSeed`: eigenvector proposal generator, `Generated*.lean` emitter, exact Julia replay, and checker |
+| `src/ising_open.jl` | `IsingOpenSeed`: the same for the free chains, with comparison weights |
 | `scripts/<study>/` | Exploratory, benchmark, and table-generation drivers listed under "Reproduce" |
 | `scripts/fetch_paper.jl` | Shared: runs `tools/fetch_upstream.jl --paper` (paper sources into `upstream/`) |
 | `scripts/audit_mathlib.jl` | `spin1_kernel` Mathlib audit; kept outside `scripts/spin1_kernel/`, whose `.jl` files are hash-pinned by `results/spin1_kernel/witnesses.json` |
@@ -341,13 +353,15 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
 | `results/anchor/` | `certificate.json` (exact); `optimized.json`, `count_optimized.json`, `binned_tails.json`, `sectors.csv`, `homotopy_summary.csv` |
 | `results/spin1_kernel/` | `witnesses.json`, `exact_witnesses.tsv`, `axioms.txt`, `benchmarks*.tsv`, `mathlib-audit.txt`, `paper-source-sha256.txt` |
 | `results/ising/` | `certificate.json` (integer proposals); `feasibility.json`, `inventory.{json,tsv}`, `costs.json` |
+| `results/ising_open/` | `certificate.json` (integer proposals, cutoffs and weights for the free chains of 2, 8, 12 sites) |
 | `../../lean/SeedKernel/` | Lean 4 `SeedKernel` and `SeedKernelBench` libraries (file map in [`lean/README.md`](../../lean/README.md)) |
 
 **Hash-pinning notes:** `check.jl` verifies the source hashes recorded in
 `results/spin1_kernel/witnesses.json` against the current `lean/SeedKernel/Spin1/` files, Lake
 configuration, and shared Julia drivers (`certify.jl`, `check.jl`, `src/Common.jl`,
-`src/spin1_kernel.jl`), and checks `results/ising/certificate.json` against `src/ising.jl`. If you
-modify any of those code files, rerun `certify.jl spin1_kernel` (and `certify.jl ising`). No
+`src/spin1_kernel.jl`), and checks `results/ising/certificate.json` against `src/ising.jl` and
+`results/ising_open/certificate.json` against `src/ising_open.jl`. If you modify any of those code
+files, rerun `certify.jl spin1_kernel` (and `certify.jl ising` or `certify.jl ising_open`). No
 Markdown file (`.md`) is hash-pinned. The script `scripts/ising/inventory.jl` reads stored spectrum
 files across other `models/` directories; two large spectrum archives
 (`heisenberg_ladder/results/verified_L8.json.gz` and `spin1_dimerized/results/spectrum_d9_c4.json`)
@@ -367,3 +381,5 @@ are gitignored and must be regenerated in their respective model directories bef
 - In `SeedKernel/Ising/`, `Spectral.lean`, `Hamiltonian.lean`, `Bridge.lean`, and `Seed.lean`
   completed the end-to-end proof of `first_point_seed` and the unconditional `ising_gap` theorem
   from the kernel-checked 6- and 12-site witnesses.
+- `ising_open` and `SeedKernel/IsingOpen/` added the free chain: integer checks with comparison
+  weights on the chains of 2, 8 and 12 sites, the open-chain seeds, and `ising_free_gap`.
