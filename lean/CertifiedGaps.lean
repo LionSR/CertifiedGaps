@@ -45,12 +45,16 @@ import CertifiedGaps.Ring.Conjugation
 import CertifiedGaps.Ring.Variational
 import CertifiedGaps.Ring.EnergyBound
 import CertifiedGaps.Ring.Symmetry
+import CertifiedGaps.Ring.SymmetryPhase
 -- Rigorous Gibbs-trace enclosures: Poisson truncation, integer Horner columns, Frobenius form,
 -- representative columns
 import CertifiedGaps.Trace.Poisson
 import CertifiedGaps.Trace.Horner
 import CertifiedGaps.Trace.Frobenius
 import CertifiedGaps.Trace.Orbit
+import CertifiedGaps.Trace.OrbitConj
+import CertifiedGaps.Trace.Eisenstein
+import CertifiedGaps.Trace.HornerEisenstein
 -- The spin-one Heisenberg ring (Theorem 1 of the note)
 import CertifiedGaps.Heisenberg.Hamiltonian
 import CertifiedGaps.Heisenberg.Gap
@@ -64,6 +68,7 @@ import CertifiedGaps.Heisenberg.Seed36
 import CertifiedGaps.Heisenberg.Seed60
 import CertifiedGaps.Heisenberg.EnergyBound
 import CertifiedGaps.Heisenberg.ThermalTable
+import CertifiedGaps.Heisenberg.ThermalTable60
 import CertifiedGaps.Heisenberg.Reseed120
 -- Open chains with boundary fields (Appendices A–C of the note)
 import CertifiedGaps.Open.MomentBounds
