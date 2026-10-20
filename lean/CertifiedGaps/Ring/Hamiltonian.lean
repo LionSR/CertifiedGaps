@@ -84,9 +84,10 @@ theorem odd_finRotate_iff {L : ℕ} (hL : Even L) (j : Fin L) :
 /-! ### Operators on the ring -/
 
 /-- The operator `B` on two sites `j, k` of a ring of `L` sites, acting as the identity on all
-other sites. -/
-def bondOp {L : ℕ} (j k : Fin L) (B : Matrix (d × d) (d × d) ℂ) :
-    Matrix (Fin L → d) (Fin L → d) ℂ :=
+other sites. The entries may lie in any type with a zero (`ℂ` for Hamiltonians, `ℤ` for the
+integer matrices of the seed computations). -/
+def bondOp {R : Type*} [Zero R] {L : ℕ} (j k : Fin L) (B : Matrix (d × d) (d × d) R) :
+    Matrix (Fin L → d) (Fin L → d) R :=
   of fun σ τ ↦ if ∀ i, i ≠ j → i ≠ k → σ i = τ i then B (σ j, σ k) (τ j, τ k) else 0
 
 /-- The operator `A` on the site `j` of a ring of `L` sites, acting as the identity elsewhere. -/
@@ -339,14 +340,14 @@ end Gibbs
 /-- The ring Hamiltonian `∑ⱼ Bⱼ,ⱼ₊₁` on `L` sites whose closing bond `L - 1 → 0` carries `Bc`
 in place of `B`. With `Bc` the bond conjugated by an on-site symmetry on one end, its Gibbs
 trace is the twisted partition function `Tr (P e^{-βH_L})` of the untwisted ring. -/
-def twistedRingHamiltonian (B Bc : Matrix (d × d) (d × d) ℂ) (L : ℕ) :
-    Matrix (Fin L → d) (Fin L → d) ℂ :=
+def twistedRingHamiltonian {R : Type*} [AddCommMonoid R] (B Bc : Matrix (d × d) (d × d) R)
+    (L : ℕ) : Matrix (Fin L → d) (Fin L → d) R :=
   ∑ j : Fin L, bondOp j (finRotate L j) (if j.val + 1 = L then Bc else B)
 
 /-- The `j`-th bond `B_{j,j+1}` of the twisted ring `twistedRingHamiltonian B Bc L`: `Bc` on the
 closing bond `L - 1 → 0` and `B` elsewhere. -/
-def twistedBond {L : ℕ} (B Bc : Matrix (d × d) (d × d) ℂ) (j : Fin L) :
-    Matrix (Fin L → d) (Fin L → d) ℂ :=
+def twistedBond {R : Type*} [Zero R] {L : ℕ} (B Bc : Matrix (d × d) (d × d) R) (j : Fin L) :
+    Matrix (Fin L → d) (Fin L → d) R :=
   bondOp j (finRotate L j) (if j.val + 1 = L then Bc else B)
 
 omit [Fintype d] in
@@ -357,8 +358,8 @@ theorem twistedRingHamiltonian_eq_sum (B Bc : Matrix (d × d) (d × d) ℂ) (L :
 /-- The translation-invariant ring Hamiltonian `∑ⱼ Bⱼ,ⱼ₊₁` of a two-site operator `B` on `L`
 sites, with the cyclic successor `finRotate L j = j + 1`. For `L = 2` both bonds join the sites
 `0` and `1`. -/
-def ringHamiltonian (B : Matrix (d × d) (d × d) ℂ) (L : ℕ) :
-    Matrix (Fin L → d) (Fin L → d) ℂ :=
+def ringHamiltonian {R : Type*} [AddCommMonoid R] (B : Matrix (d × d) (d × d) R) (L : ℕ) :
+    Matrix (Fin L → d) (Fin L → d) R :=
   ∑ j : Fin L, bondOp j (finRotate L j) B
 
 omit [Fintype d] in
@@ -366,6 +367,27 @@ omit [Fintype d] in
 theorem twistedRingHamiltonian_self (B : Matrix (d × d) (d × d) ℂ) (L : ℕ) :
     twistedRingHamiltonian B B L = ringHamiltonian B L := by
   simp only [twistedRingHamiltonian, ite_self, ringHamiltonian]
+
+omit [Fintype d] in
+/-- A zero-preserving map of entries commutes with embedding a bond: an integer bond embeds to
+the cast of its integer embedding. -/
+theorem bondOp_map {R S : Type*} [Zero R] [Zero S] {L : ℕ} (j k : Fin L)
+    (B : Matrix (d × d) (d × d) R) (f : R → S) (hf : f 0 = 0) :
+    (bondOp j k B).map f = bondOp j k (B.map f) := by
+  ext σ τ
+  simp only [bondOp, map_apply, of_apply]
+  split_ifs <;> simp [hf]
+
+omit [Fintype d] in
+/-- An additive map of entries commutes with the twisted ring Hamiltonian. -/
+theorem twistedRingHamiltonian_map {R S : Type*} [AddCommMonoid R] [AddCommMonoid S]
+    (B Bc : Matrix (d × d) (d × d) R) (L : ℕ) (f : R →+ S) :
+    (twistedRingHamiltonian B Bc L).map f = twistedRingHamiltonian (B.map f) (Bc.map f) L := by
+  rw [twistedRingHamiltonian, ← AddMonoidHom.mapMatrix_apply, map_sum,
+    twistedRingHamiltonian]
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  rw [AddMonoidHom.mapMatrix_apply, bondOp_map _ _ _ _ f.map_zero]
+  split_ifs <;> rfl
 
 /-- The sum `∑ⱼ Aⱼ` of a one-site operator over the `L` sites of a ring. -/
 def siteSum (A : Matrix d d ℂ) (L : ℕ) : Matrix (Fin L → d) (Fin L → d) ℂ :=
