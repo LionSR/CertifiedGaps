@@ -263,7 +263,7 @@ julia --project=. -e 'using Pkg; Pkg.instantiate()'
 julia --project=. test/runtests.jl         # 30 s: 1,582 unit tests across all five studies (Julia only)
 julia --project=. check.jl                 # 1 min: exact rational replays + data checks, then
                                            #   `lake build SeedKernel` and the Lean axiom audit
-julia --project=. check.jl --full          # 11 min: also regenerate the spin-1 Lean witnesses,
+julia --project=. check.jl --full          # 15 min: also regenerate the spin-1 Lean witnesses,
                                            #   rebuild SeedKernel from clean, run the compiled
                                            #   evaluations in `SeedKernel/Eval` (about 7 min, not a
                                            #   proof), and run all benchmarks
@@ -273,10 +273,10 @@ julia --project=. certify.jl [study ...]   # 75 s: regenerate exact JSON records
 Running `certify.jl` executes `seed_design` (5 s), `anchor` (3 s), `ising` (9 s), and
 `spin1_kernel` (55 s; run last because it records the SHA-256 hashes of shared driver files).
 `check.jl` uses the Mathlib build cache in `../../lean/` (run `lake exe cache get` inside `lean/`
-if not yet initialized); with Mathlib cached, `lake build SeedKernel` from clean takes about
-3 min (peak about 7 GB, in `SeedKernel/Heisenberg/ThermalTraces.lean` and
+if not yet initialized); with Mathlib cached, `lake build SeedKernel` from clean takes 3 to
+5 min (peak about 7 GB, in `SeedKernel/Heisenberg/ThermalTraces.lean` and
 `BoundaryTraces.lean`), the axiom audit (`lake env lean SeedKernel/Audit.lean`) takes 5–30 s,
-and the `SeedKernelBench` files take about 1 min.
+and the `SeedKernelBench` files take about 1.5 min.
 
 Exploratory and table-generation scripts by study (writing to `results/<study>/`, with temporary
 caches in the gitignored `cache/`, `upstream/`, `.cache/`, and `runtime/` directories):

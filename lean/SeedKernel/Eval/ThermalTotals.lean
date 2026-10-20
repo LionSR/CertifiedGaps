@@ -31,7 +31,8 @@ Run with `lake env lean lean/SeedKernel/Eval/ThermalTotals.lean` from the reposi
 
 namespace CertifiedGaps.SpinOneHeisenberg.ThermalPacked
 
--- The four entries that `SeedKernel/Heisenberg/ThermalTraces.lean` also proves in the kernel.
+-- The two entries with `n = 4`, which `SeedKernel/Heisenberg/ThermalTraces.lean` also proves in
+-- the kernel.
 #guard packedHornerTotal 4 0 = some (paperTotal 4 0)
 #guard packedHornerTotal 4 1 = some (paperTotal 4 1)
 

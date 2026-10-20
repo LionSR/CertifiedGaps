@@ -28,9 +28,11 @@ namespace CertifiedGaps.SpinOneHeisenberg
 
 open ThermalPacked
 
+/-- The packed run for `n = 4` on the untwisted ring returns the printed total `W_{4,I}`. -/
 theorem packedHornerTotal_four_zero : packedHornerTotal 4 0 = some (paperTotal 4 0) := by
   decide +kernel
 
+/-- The packed run for `n = 4` on the twisted ring returns the printed total `W_{4,P}`. -/
 theorem packedHornerTotal_four_one : packedHornerTotal 4 1 = some (paperTotal 4 1) := by
   decide +kernel
 
