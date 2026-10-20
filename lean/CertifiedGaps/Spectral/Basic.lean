@@ -14,9 +14,15 @@ stated for matrices over a field `𝕜` with `[RCLike 𝕜]`, so it applies verb
 (`𝕜 = ℝ`) and complex Hermitian (`𝕜 = ℂ`) matrices on a finite index type.
 
 * `qform A x = Re ⟪x, A x⟫` and `nsq x = ‖x‖² = Re ⟪x, x⟫`, both real and computed with the
-  plain dot product of `n → 𝕜` (no `EuclideanSpace` coercions);
+  plain dot product of `n → 𝕜` (no `EuclideanSpace` coercions), with their algebra: linearity of
+  the form in the matrix (`qform_add_left`, `qform_sum`, `qform_smul_one_sub`, ...), compression
+  `qform_mulVec` and conjugation `qform_conj`, and `nsq_smul`;
+* squared norms of real and integer vectors (`nsq_real`, `nsq_ofReal`, `nsq_intCast`);
+* unitaries preserve squared norms (`nsq_mulVec_of_unitary`, `nsq_conjTranspose_mulVec`), and the
+  squared column norms of a matrix add up to its squared Frobenius norm
+  (`sum_nsq_mulVec_single`);
 * `eigU hA`: the unitary of eigenvectors, with `qform_eigU`: in the eigenbasis the form is
-  `∑ λᵢ ‖yᵢ‖²`;
+  `∑ λᵢ ‖yᵢ‖²`, and `mulVec_eigU_single`: its columns are eigenvectors;
 * `countBelow s a t = #{i ∈ s : a i < t}` and `eigCount hA t = #{i : λᵢ < t}`, the eigenvalue
   counting function. Sorted-eigenvalue statements (Weyl monotonicity, Courant–Fischer) are
   phrased through counting functions, which avoids choosing a sorting of `hA.eigenvalues`.
@@ -53,6 +59,26 @@ theorem nsq_pos {x : n → 𝕜} (hx : x ≠ 0) : 0 < nsq x :=
 
 @[simp] theorem nsq_zero : nsq (0 : n → 𝕜) = 0 := nsq_eq_zero_iff.2 rfl
 
+/-- `‖u • x‖² = |u|² ‖x‖²`. -/
+theorem nsq_smul (u : 𝕜) (x : n → 𝕜) : nsq (u • x) = ‖u‖ ^ 2 * nsq x := by
+  simp only [nsq_eq_sum, Pi.smul_apply, smul_eq_mul, norm_mul, mul_pow, Finset.mul_sum]
+
+/-- On real vectors, `nsq` is the plain sum of squares. -/
+theorem nsq_real (v : n → ℝ) : nsq v = ∑ i, v i ^ 2 := by
+  simp [nsq_eq_sum, sq_abs]
+
+/-- A real vector viewed in `𝕜ⁿ` has the same squared norm. -/
+theorem nsq_ofReal (v : n → ℝ) : nsq (fun i ↦ (v i : 𝕜)) = ∑ i, v i ^ 2 := by
+  simp [nsq_eq_sum, sq_abs]
+
+/-- The squared norm of an integer vector, viewed in `𝕜ⁿ`, is the integer `∑ᵢ xᵢ²`. -/
+theorem nsq_intCast (x : n → ℤ) : nsq (fun i ↦ (x i : 𝕜)) = ((∑ i, x i ^ 2 : ℤ) : ℝ) := by
+  have h := nsq_ofReal (𝕜 := 𝕜) fun i ↦ (x i : ℝ)
+  simp only [RCLike.ofReal_intCast] at h
+  rw [h]
+  push_cast
+  rfl
+
 theorem qform_one [DecidableEq n] (x : n → 𝕜) : qform (1 : Matrix n n 𝕜) x = nsq x := by
   simp [qform, nsq]
 
@@ -60,9 +86,21 @@ theorem qform_add_left (A B : Matrix n n 𝕜) (x : n → 𝕜) :
     qform (A + B) x = qform A x + qform B x := by
   simp [qform, add_mulVec, dotProduct_add]
 
+/-- The quadratic form is additive in the matrix. -/
+theorem qform_sum {ι : Type*} (s : Finset ι) (A : ι → Matrix n n 𝕜) (x : n → 𝕜) :
+    qform (∑ i ∈ s, A i) x = ∑ i ∈ s, qform (A i) x := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [qform]
+  | insert i s hi ih => rw [Finset.sum_insert hi, Finset.sum_insert hi, qform_add_left, ih]
+
 theorem qform_sub_left (A B : Matrix n n 𝕜) (x : n → 𝕜) :
     qform (A - B) x = qform A x - qform B x := by
   simp [qform, sub_mulVec, dotProduct_sub]
+
+/-- The quadratic form of `-A` is minus that of `A`. -/
+theorem qform_neg_left (A : Matrix n n 𝕜) (x : n → 𝕜) : qform (-A) x = -qform A x := by
+  simp [qform, neg_mulVec]
 
 theorem qform_smul_left (r : ℝ) (A : Matrix n n 𝕜) (x : n → 𝕜) :
     qform ((r : 𝕜) • A) x = r * qform A x := by
@@ -71,6 +109,11 @@ theorem qform_smul_left (r : ℝ) (A : Matrix n n 𝕜) (x : n → 𝕜) :
 /-- The form of `A - t • 1` is the form of `A` shifted by `t ‖x‖²`. -/
 theorem qform_sub_smul_one [DecidableEq n] (A : Matrix n n 𝕜) (t : ℝ) (x : n → 𝕜) :
     qform (A - (t : 𝕜) • 1) x = qform A x - t * nsq x := by
+  rw [qform_sub_left, qform_smul_left, qform_one]
+
+/-- The form of `t - A` is `t ‖x‖²` minus the form of `A`. -/
+theorem qform_smul_one_sub [DecidableEq n] (t : ℝ) (A : Matrix n n 𝕜) (x : n → 𝕜) :
+    qform ((t : 𝕜) • 1 - A) x = t * nsq x - qform A x := by
   rw [qform_sub_left, qform_smul_left, qform_one]
 
 theorem qform_zero_right (A : Matrix n n 𝕜) : qform A 0 = 0 := by simp [qform]
@@ -86,6 +129,11 @@ theorem qform_mulVec {m : Type*} [Fintype m] (A : Matrix n n 𝕜) (M : Matrix n
   simp only [qform]
   rw [star_mulVec, ← dotProduct_mulVec, mulVec_mulVec, mulVec_mulVec, Matrix.mul_assoc]
 
+/-- The form of a conjugate `M A Mᴴ` at `x` is the form of `A` at `Mᴴ x`. -/
+theorem qform_conj (M A : Matrix n n 𝕜) (x : n → 𝕜) :
+    qform (M * A * Mᴴ) x = qform A (Mᴴ *ᵥ x) := by
+  rw [qform_mulVec, conjTranspose_conjTranspose]
+
 /-- The squared norm of `M y` is the form of the Gram matrix `Mᴴ M` at `y`. -/
 theorem nsq_mulVec {m : Type*} [Fintype m] (M : Matrix n m 𝕜) (y : m → 𝕜) :
     nsq (M *ᵥ y) = qform (Mᴴ * M) y := by
@@ -99,6 +147,26 @@ theorem qform_add (A : Matrix n n 𝕜) (hA : A.IsHermitian) (x y : n → 𝕜) 
       RCLike.conj_re]
   simp only [qform, mulVec_add, dotProduct_add, add_dotProduct, star_add, map_add]
   rw [hsym]; ring
+
+/-! ### Unitaries and columns -/
+
+/-- A unitary matrix preserves squared norms. -/
+theorem nsq_mulVec_of_unitary [DecidableEq n] {U : Matrix n n 𝕜} (hU : Uᴴ * U = 1)
+    (v : n → 𝕜) : nsq (U *ᵥ v) = nsq v := by
+  rw [nsq_mulVec, hU, qform_one]
+
+/-- A co-isometry `M Mᴴ = 1` makes `Mᴴ` an isometry. -/
+theorem nsq_conjTranspose_mulVec [DecidableEq n] {M : Matrix n n 𝕜} (hM : M * Mᴴ = 1)
+    (x : n → 𝕜) : nsq (Mᴴ *ᵥ x) = nsq x :=
+  nsq_mulVec_of_unitary (by rwa [conjTranspose_conjTranspose]) x
+
+/-- The sum of the squared column norms is the squared Frobenius norm `Re Tr (Mᴴ M)`. -/
+theorem sum_nsq_mulVec_single {m : Type*} [Fintype m] [DecidableEq n] (M : Matrix m n 𝕜) :
+    ∑ r, nsq (M *ᵥ Pi.single r 1) = RCLike.re (trace (Mᴴ * M)) := by
+  simp only [nsq_eq_sum, mulVec_single_one, col_apply, trace, diag_apply, mul_apply,
+    conjTranspose_apply, map_sum]
+  refine Finset.sum_congr rfl fun r _ ↦ Finset.sum_congr rfl fun i _ ↦ ?_
+  rw [RCLike.star_def, RCLike.conj_mul, ← RCLike.ofReal_pow, RCLike.ofReal_re]
 
 /-! ### The eigenbasis -/
 
@@ -124,8 +192,8 @@ theorem eigU_conj :
   rw [h1, Matrix.mul_one, ← Matrix.mul_assoc, h1, Matrix.one_mul]
 
 /-- A unitary preserves the squared norm. -/
-theorem nsq_eigU (y : n → 𝕜) : nsq (eigU hA *ᵥ y) = nsq y := by
-  rw [nsq_mulVec, eigU_star_mul, qform_one]
+theorem nsq_eigU (y : n → 𝕜) : nsq (eigU hA *ᵥ y) = nsq y :=
+  nsq_mulVec_of_unitary (eigU_star_mul hA) y
 
 /-- In the eigenbasis the quadratic form is `∑ λᵢ ‖yᵢ‖²`. -/
 theorem qform_eigU (y : n → 𝕜) :
@@ -139,6 +207,20 @@ theorem qform_eigU (y : n → 𝕜) :
 /-- Every vector is `U y` for `y = Uᴴ x`. -/
 theorem eigU_mulVec_star (x : n → 𝕜) : eigU hA *ᵥ ((eigU hA)ᴴ *ᵥ x) = x := by
   rw [mulVec_mulVec, eigU_mul_star, one_mulVec]
+
+/-- The `i`-th column of the eigenvector unitary is an eigenvector with eigenvalue `λᵢ`. -/
+theorem mulVec_eigU_single (i : n) :
+    A *ᵥ (eigU hA *ᵥ Pi.single i 1) = (hA.eigenvalues i : 𝕜) • (eigU hA *ᵥ Pi.single i 1) := by
+  have hAU : A * eigU hA = eigU hA * diagonal (fun i ↦ (hA.eigenvalues i : 𝕜)) := by
+    rw [← eigU_conj hA, ← Matrix.mul_assoc, ← Matrix.mul_assoc, eigU_mul_star, Matrix.one_mul]
+  have hD : diagonal (fun i ↦ (hA.eigenvalues i : 𝕜)) *ᵥ Pi.single i 1 =
+      (hA.eigenvalues i : 𝕜) • Pi.single i 1 := by
+    ext k
+    rw [mulVec_diagonal, Pi.smul_apply, smul_eq_mul]
+    by_cases hk : k = i
+    · subst hk; simp
+    · simp [hk]
+  rw [mulVec_mulVec, hAU, ← mulVec_mulVec, hD, mulVec_smul]
 
 /-! ### Counting functions -/
 

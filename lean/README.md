@@ -454,6 +454,8 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Transfer/MatrixProduct.lean` | Integer matrix-product states for any ring Hamiltonian: norm and energy as transfer-matrix traces, and the trial-state bound `MPS.exp_lt_gibbsTrace` |
 | `Ring/Variational.lean` | Rayleigh-quotient bound on the Gibbs trace `gibbsTrace H β` for Hermitian `H` |
 | `Spectral/*.lean` | Eigenvalue counting (`eigCount`), rational `LDLᵀ` inertia certificates, the Schur compression bound, Weyl monotonicity, Ritz bounds and binned trace bounds |
+| `Spectral/OperatorBounds.lean` | Operator inequalities `a ≤ A ≤ b` through quadratic forms: sums, unitary conjugates, the weighted Schur test `abs_qform_le_of_schur`, bounds from an annihilating polynomial, and the Gram factorization of a nonnegative Hermitian matrix |
+| `Spectral/FunctionalCalculus.lean` | Real functions `hA.cfc f = U diag(f(λᵢ)) Uᴴ` of a Hermitian matrix (Mathlib's `Matrix.IsHermitian.cfc`) without continuity side conditions: algebra, `exp`, and the norm bound `‖f(A) v‖ ≤ (max_i ‖f(λᵢ)‖) ‖v‖` |
 | `Seed/Scheme.lean` | Sector schemes (`plain`, `d2`, `ion`), the sector representation `SectorApprox`, trace tables `TraceBounds` and the sector moment bounds |
 | `Seed/CappedMass.lean`, `Seed/Dominant.lean` | Capped-mass bounds and the dominant-sector seed `SectorSeed` |
 | `Seed/Limits.lean` | The limit `δ → 0` of a seed, shifted traces, and shift invariance of the purities |
@@ -461,11 +463,16 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Heisenberg/SzBridge.lean` | Spin-1 twisted ring and `S^z`-basis definitions, their identification with the generic `twistedRingHamiltonian`, and the Cartesian ↔ `S^z` bridge for partition functions |
 | `Heisenberg/SectorTransfer.lean`, `Heisenberg/TrialBound.lean` | Spin-1 instances: the `D₂` symmetry of the Heisenberg ring and the trial-state bound |
 | `Heisenberg/TraceTable.lean`, `Heisenberg/Seed36.lean` | The spin-1 trace table and the seed at `(36, 49/4)` (`seed36_of_table_mps`: from the table and one integer MPS inequality) |
-| `Ring/Hamiltonian.lean` | The one Hamiltonian API: ring geometry, `bondOp`/`siteOp`, `twistedRingHamiltonian B Bc L` (closing bond `Bc`), `ringHamiltonian B L`, `siteSum A L`, and the Gibbs trace `gibbsTrace H β` $= \mathrm{Re}\,\mathrm{Tr}\, e^{-\beta H}$ (eigenvalue sum, positivity, unitary invariance) |
+| `Heisenberg/EnergyBound.lean` | The Lemma "Energy bounds" of the spin-1 paper: `-(3L/2) ≤ H_L(R) ≤ L` for every rotation `R` of the closing bond, and the untwisted, `P`- and `C`-twisted cases |
+| `Ring/Hamiltonian.lean` | The one Hamiltonian API: ring geometry, `bondOp`/`siteOp` (`bondOp j k` a `*`-algebra embedding for `j ≠ k`), `twistedRingHamiltonian B Bc L` (closing bond `Bc`), `ringHamiltonian B L`, `siteSum A L`, and the Gibbs trace `gibbsTrace H β` $= \mathrm{Re}\,\mathrm{Tr}\, e^{-\beta H}$ (eigenvalue sum, positivity, unitary invariance) |
 | `Ring/Model.lean` | `RPRing` structure, `H_L = ringHamiltonian h L + siteSum o L`, Hermiticity of $H_L$, and $Z_L = \sum_m e^{-\beta E_m}$ |
 | `Ring/Transfer.lean` | Even-bond, on-site, and odd-bond Trotter slices and the reflection-positivity identity $\operatorname{Tr} S^M = \operatorname{Tr} (B^T B)^{L/2}$ with real $B$ |
 | `Ring/Gap.lean` | Proof of `RPRing.spatialMomentBounds` and `RPRing.gapGT_of_chainCertificate` |
 | `Ring/Conjugation.lean` | Sitewise unitary conjugation of ring Hamiltonians (twisted or not, `conj_twistedRingHamiltonian`), invariance of Gibbs traces and spectra |
+| `Ring/EnergyBound.lean` | Uniform energy bounds `a L ≤ H_L ≤ b L` of twisted and untwisted rings from bounds on one bond or on pairs of consecutive bonds, and row sums of `bondOp` for local Schur tests |
+| `Trace/Poisson.lean` | Conditioned Poisson weights, the Fox–Glynn truncation bound for `e^{m(R - 1)}` of a Hermitian contraction (`nsq_exp_sub_poisson_mulVec_le`, instances `(98, 280)` and `(84, 256)`), and the Taylor enclosure of `e^x` |
+| `Trace/Horner.lean` | Integer Horner columns `X ← ⌊D X / s⌋ + cⱼ e_r` (`hornerFloor`) and their rounding error against `(∑ aⱼ Rʲ) e_r` for a contraction `R = D / s` |
+| `Trace/Frobenius.lean` | Gibbs traces from representative columns: `Z = e^{bc} ∑_r ‖F e_r‖²` with `F = e^{-(b/2)(H + c)}`, symmetric columns, weighted Minkowski, and the rational enclosure `gibbsTrace_enclosure` |
 | `Heisenberg/Hamiltonian.lean` | The spin-1 Heisenberg ring $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ (`ringHamiltonian SpinOne.exchange L`) in the Cartesian basis |
 | `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Both bounds of OpenAI's Theorem 1.1: `spin_one_heisenberg_gap` (`L ≥ 2304`, from the seeds at 36 sites and `chain36`) and `spin_one_heisenberg_gap_sixty` (`L ≥ 60`) |
 | `Heisenberg/OpenChain.lean` | Theorem 2 of the main note (`spin_one_boundary_field_gap`) and its sharper form (`spin_one_boundary_field_gap_sharp`): the equal- and opposite-field open chains as open chains of the Heisenberg ring, the four inputs, and the opposite-field gap at even lengths (`spin_one_opposite_field_gap`) |

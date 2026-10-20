@@ -16,8 +16,10 @@ import CertifiedGaps.Transfer.SingleSiteD2
 import CertifiedGaps.Transfer.CyclicSectors
 import CertifiedGaps.Transfer.SingleSiteA4
 import CertifiedGaps.Transfer.SpectralForm
--- Spectral counting: eigenvalue counts, inertia, Schur bounds, trace bounds
+-- Spectral counting: eigenvalue counts, inertia, Schur bounds, trace bounds, operator bounds
 import CertifiedGaps.Spectral.Basic
+import CertifiedGaps.Spectral.OperatorBounds
+import CertifiedGaps.Spectral.FunctionalCalculus
 import CertifiedGaps.Spectral.Counting
 import CertifiedGaps.Spectral.Inertia
 import CertifiedGaps.Spectral.Schur
@@ -38,6 +40,11 @@ import CertifiedGaps.Ring.Transfer
 import CertifiedGaps.Ring.Gap
 import CertifiedGaps.Ring.Conjugation
 import CertifiedGaps.Ring.Variational
+import CertifiedGaps.Ring.EnergyBound
+-- Rigorous Gibbs-trace enclosures: Poisson truncation, integer Horner columns, Frobenius form
+import CertifiedGaps.Trace.Poisson
+import CertifiedGaps.Trace.Horner
+import CertifiedGaps.Trace.Frobenius
 -- The spin-one Heisenberg ring (Theorem 1 of the note)
 import CertifiedGaps.Heisenberg.Hamiltonian
 import CertifiedGaps.Heisenberg.Gap
@@ -49,6 +56,7 @@ import CertifiedGaps.Heisenberg.SectorTransferC
 import CertifiedGaps.Heisenberg.TrialBound
 import CertifiedGaps.Heisenberg.Seed36
 import CertifiedGaps.Heisenberg.Seed60
+import CertifiedGaps.Heisenberg.EnergyBound
 -- Open chains with boundary fields (Appendices A–C of the note)
 import CertifiedGaps.Open.MomentBounds
 import CertifiedGaps.Open.Criterion
