@@ -5,8 +5,8 @@ usemathjax: true
 {% assign repo_url = 'https://github.com/' | append: site.repository %}
 
 This project proves lower bounds on the spectral gap of quantum spin chains. Each bound holds for
-all even ring lengths above a stated length. A computer checks one finite calculation, and Lean 4
-checks the rest of the proof.
+all even ring lengths above a stated length. The proofs combine certified finite calculations with
+a Lean 4 formalization.
 
 Haldane predicted in 1983 that the spin-1 Heisenberg chain has a gap that stays open as the chain
 grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026, as
@@ -15,8 +15,7 @@ grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026, as
 
 The method is not specific to the spin-1 chain. It applies to many other spin chains, and the
 [leaderboard]({{ '/leaderboard.html' | relative_url }}) lists the bounds that we have so far. It can do more.
-Sharper finite calculations give larger bounds, and an extension to two-dimensional lattices is in
-progress.
+Sharper finite calculations give larger bounds.
 
 ## Method
 
@@ -55,7 +54,9 @@ $$\beta$$ in imaginary time. The method compares tori through two ratios:
 </figure>
 </div>
 
-Only step 2 uses a numerical calculation. Lean 4 [[7](#ref-7)] proves step 3.
+Lean 4 [[7](#ref-7)] verifies reflection positivity (step 1) and the bootstrap argument (step 3).
+The finite seed bounds in step 2 are certified by computation, either within Lean or with external
+certificate checkers.
 
 ## Main results
 
