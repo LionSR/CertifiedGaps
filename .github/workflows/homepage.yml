@@ -32,9 +32,9 @@ concurrency:
 
 permissions:
   contents: read
-  actions: read           # Find and download the full deploy's `site` artifact
-  pages: write            # Write access to GitHub Pages
-  id-token: write         # Write access to ID tokens
+  actions: read # Find and download the full deploy's `site` artifact
+  pages: write # Write access to GitHub Pages
+  id-token: write # Write access to ID tokens
 
 jobs:
   deploy:
@@ -65,7 +65,15 @@ jobs:
 
       - name: Use the leaderboard data of that deploy
         if: steps.site.outputs.found == 'true'
-        run: cp full/_data/records.yml full/_data/lean_records.json home_page/_data/
+        run: |
+          cp full/_data/lean_records.json home_page/_data/
+          # Older full deploys predate the APP folders. Relocate only their paths;
+          # keep every validated record and certified value from the artifact.
+          sed -E \
+            -e 's@(certificate:[[:space:]]+)models/([^/]+)/results/@\1data/models/\2/@g' \
+            -e 's@(certificate:[[:space:]]+)models/spin1/experiments/@\1data/models/spin1/experiments/@g' \
+            -e 's@((check|link):[[:space:]]+)models/@\1code/models/@g' \
+            full/_data/records.yml > home_page/_data/records.yml
 
       # The same copy as in blueprint.yml.
       - name: Copy the explainer and the notes into the site
