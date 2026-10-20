@@ -28,6 +28,7 @@ import SeedKernel.Heisenberg.Seed60
 import SeedKernel.Heisenberg.Reseed120
 import SeedKernel.Heisenberg.OpenTrial
 import SeedKernel.Heisenberg.BoundaryTraces
+import SeedKernel.Heisenberg.Integers
 import SeedKernel.Ising.Generated
 import SeedKernel.Ising.GeneratedChunks
 import SeedKernel.Ising.ChunkCoverage

@@ -66,3 +66,8 @@ import SeedKernel
 #print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.boundaryTraceTable_of_large
 #print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.sixth_of_large
 #print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.moment_polynomial_lt_of_large
+#print axioms CertifiedGaps.SpinOneHeisenberg.gap_of_hornerTotals
+#print axioms CertifiedGaps.SpinOneHeisenberg.gap_sixty_of_hornerTotals60
+#print axioms CertifiedGaps.SpinOneHeisenberg.boundaryFieldInputs_of_integers
+#print axioms CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_integers
+#print axioms CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_of_integers
