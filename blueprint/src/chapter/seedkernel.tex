@@ -32,6 +32,19 @@ discharging the finite-size seed hypothesis (Lemma~\ref{lem:ising-longitudinal-s
 Theorem~\ref{thm:ising-longitudinal-gap} at that point and yielding a fully unconditional spectral
 gap theorem (Theorem~\ref{thm:ising-gap}).
 
+The last three sections treat the spin-1 chain of~\cite{OpenAIHaldane, OpenAIBoundary}. The
+kernel checks the trial bounds: periodic at lengths \(72, 120\) and open at four lengths.
+What remains are integer equalities: an integer recurrence must reproduce the printed values.
+The gap from length \(36\) assumes eighteen such totals (\texttt{HornerTotals},
+Theorem~\ref{thm:kernel-gap36-integers}); the gap from length \(60\) assumes nine
+(\texttt{HornerTotals60}, Theorem~\ref{thm:kernel-gap60-integers}). The boundary-field
+gap assumes \texttt{HornerTotals} and six of the fifteen boundary integers
+(\texttt{BoundaryTotalsLarge}, Theorem~\ref{thm:kernel-boundary-integers}); the kernel checks
+the other nine. These theorems contain no \texttt{sorry}, but they are conditional on the
+integer hypotheses. The file \texttt{SeedKernel/Eval/BoundaryTotals.lean} evaluates all fifteen
+boundary integers with compiled code and finds the printed values. That run trusts the compiler,
+so it is evidence, not a proof.
+
 \section{Perturbative and variational eigenvalue bounds}
 
 We first record the two elementary spectral inequalities that turn finite-dimensional trial vectors
@@ -256,17 +269,310 @@ gap~\eqref{eq:ising-uncond-gap} for all even ring lengths \(L \ge 6\) (Theorem~\
 
 \section{Exact integer arithmetic for spin-1 trial states}
 
-\begin{remark}[Rayleigh--Ritz residuals for filtered spin-1 trial states]
+The periodic and open trial vectors of \cite[Appendix C]{OpenAIHaldane} and
+\cite[Appendix B]{OpenAIBoundary} use the same integer tensors of bond dimension \(26\).
+Their contractions are proved in the kernel by reducing the doubled virtual space to small blocks.
+
+\begin{definition}[The spin-1 trial tensors]
+  \label{def:kernel-spin1-trial}
+  \lean{CertifiedGaps.SpinOneHeisenberg.trialA,
+    CertifiedGaps.SpinOneHeisenberg.toMat_trialRows,
+    CertifiedGaps.SpinOneHeisenberg.trialA_eq_code}
+  \leanok
+  \uses{lem:spin1-trial-bridge}
+  The tensors \(A_s\in M_{26}(\mathbb Z)\) are defined from the \(23\) integer parameters
+  in \cite[Appendix C.2]{OpenAIHaldane}.
+  The virtual space has four spin-\(1/2\), three spin-\(3/2\), and one spin-\(5/2\) multiplets.
+  The recipe matrices equal the decoded matrices used by the arithmetic checker.
+\end{definition}
+
+\begin{lemma}[Exact list-matrix and block arithmetic]
+  \label{lem:kernel-trial-arithmetic}
+  \lean{SeedKernel.Trial.toMat_lmul, SeedKernel.Trial.lmulB_spec,
+    SeedKernel.Trial.toMatB_lmulB, SeedKernel.Trial.blockTraces_spec,
+    SeedKernel.Trial.blockCheck_all}
+  \leanok
+  Integer list multiplication agrees with matrix multiplication.
+  For offset-coded natural matrices with the specified shapes and entry bounds,
+  the packed multiplication \texttt{lmulB} agrees with the decoded integer product.
+  For each of the eleven stored blocks, the shape, offset, and trace checks hold.
+  The checked repeated-squaring computation gives exactly
+  \[
+    \Tr t^{72},\quad \Tr(t^{70}o),\quad
+    \Tr t^{120},\quad \Tr(t^{118}o).
+  \]
+\end{lemma}
+\begin{proof}
+  \leanok
+  The middle digit of a radix product is the dot product when the radix exceeds its bound.
+  Prove this specification once, then evaluate each stored block with \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[Reducing the doubled virtual space]
+  \label{lem:kernel-trial-reduction}
+  \lean{SeedKernel.Trial.trace_eq_of_intertwiner,
+    SeedKernel.Trial.T_mul_Wm, SeedKernel.Trial.O_mul_Wm, SeedKernel.Trial.Vm_mul_Wm,
+    SeedKernel.Trial.checkT, SeedKernel.Trial.checkV,
+    SeedKernel.Trial.checkO1, SeedKernel.Trial.checkO2,
+    SeedKernel.Trial.checkO3, SeedKernel.Trial.checkO4,
+    CertifiedGaps.SpinOneHeisenberg.trace_trial_blocks}
+  \leanok
+  \uses{def:kernel-spin1-trial, lem:kernel-trial-arithmetic}
+  For \(T=\texttt{mpsTransfer}(A)\) and \(O=\texttt{mpsInsertion}(A)\), the stored integer
+  matrices satisfy \(TW=WB\), \(OW=WC\), and \(VW=cI\), with \(c\ne0\).
+  The source and target dimensions are both \(676\).
+  The matrices \(B,C\) consist of blocks \(t_b,o_b\) repeated \(d_b=2J_b+1\) times.
+  Consequently, for every \(k\ge0\),
+  \[
+    \Tr T^k=\sum_{b=0}^{10}d_b\Tr t_b^k,\qquad
+    \Tr(T^kO)=\sum_{b=0}^{10}d_b\Tr(t_b^ko_b).
+  \]
+\end{lemma}
+\begin{proof}
+  \leanok
+  Entry bounds and radix injectivity turn the packed comparisons into matrix identities.
+  Over \(\Q\), \(c^{-1}V\) is the inverse of \(W\); conjugate the powers and take traces.
+  The four insertion checks split the columns to limit the memory of each kernel computation.
+\end{proof}
+
+\begin{lemma}[The two periodic trial bounds]
+  \label{lem:kernel-spin1-trials}
+  \lean{CertifiedGaps.SpinOneHeisenberg.trace_block,
+    CertifiedGaps.SpinOneHeisenberg.trial_check_72,
+    CertifiedGaps.SpinOneHeisenberg.trial_check_120,
+    CertifiedGaps.SpinOneHeisenberg.one_lt_shiftedZ_seventytwo,
+    CertifiedGaps.SpinOneHeisenberg.exists_spectrum_lt_onetwenty}
+  \leanok
+  \uses{lem:kernel-trial-reduction, lem:kernel-trial-arithmetic, lem:spin1-trial-bridge}
+  For the recipe tensors, at both \(N=72\) and \(N=120\),
+  \[
+    0<\Tr T^N,\qquad
+    500000\Tr(T^{N-2}O)<-700741\Tr T^N.
+  \]
+  Hence \(\widetilde Z_{72}(\beta)>1\) for every \(\beta>0\), and some energy of the
+  length-\(120\) ring is below \(-120\kappa\).
+  These conclusions have no numerical hypotheses.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Sum the kernel-checked block traces with their exact multiplicities.
+  The final integer comparisons hold by \texttt{decide +kernel}.
+\end{proof}
+
+\begin{remark}[What remains after the trial computations]
   \label{rem:spin1-trial}
-  The Rayleigh--Ritz residual strategy of Lemma~\ref{lem:residual} extends to integer trial states
-  of the spin-1 Heisenberg chain~\eqref{eq:heisenberg-ham}. Applying a shifted polynomial filter
-  \(p(H_n)\) to a N\'eel product state in exact \(3^n\)-dimensional integer arithmetic yields
-  certified ground-state energy upper bounds and residual enclosures~\eqref{eq:rayleigh-residual}
-  on rings of \(n = 6, 8, 10\) sites. Unlike the weakly perturbed Ising chain of
-  Theorem~\ref{thm:ising-gap}, however, the isotropic spin-1 Heisenberg chain is strongly coupled
-  and requires a larger seed ring (\(n_0 = 36\) in Lemma~\ref{lem:heisenberg-seed36}), where a
-  simple diagonal Gershgorin cutoff such as~\eqref{eq:ising-gershgorin} does not suffice to bound
-  the remaining excited spectrum; see~\cite{OpenAIHaldane} for the twisted-ring trace recursion
-  and polynomial-filter method used to certify the spin-1 seeds~\eqref{eq:heisenberg-seed36}.
+  \uses{lem:kernel-spin1-trials, def:spin1-horner36, def:spin1-horner60}
+  The trial states are fully checked. The two periodic gap results below still assume equality
+  of the short-ring Horner totals to the printed integers.
+  A conditional theorem proved without \texttt{sorry} does not prove that integer hypothesis.
+  The generated trial data are inputs to verified computations, rather than trusted equalities.
 \end{remark}
 
+\section{Periodic gaps from the printed integers}
+
+The same seeds give stronger bounds when the asymmetric recurrence runs for ten steps.
+The hypotheses remain finite equalities of integers.
+
+\begin{theorem}[The sharper length-\(36\) gap from the table]
+  \label{thm:kernel-gap36-table}
+  \lean{CertifiedGaps.SpinOneHeisenberg.chain36Gap,
+    CertifiedGaps.SpinOneHeisenberg.chain36Gap_valid,
+    CertifiedGaps.SpinOneHeisenberg.gap_of_table}
+  \leanok
+  \uses{lem:heisenberg-seed36, thm:gap-of-chain-certificate, thm:heisenberg-moments}
+  Assume \texttt{TraceTable}. Every even \(L\ge36\) has a unique ground state and
+  \[
+    \Delta_L>\frac{\log(105882/100000)}{49/4}.
+  \]
+  This strengthens both the length range and the gap constant in
+  \cite[equation (1.4)]{OpenAIHaldane}.
+\end{theorem}
+\begin{proof}
+  \leanok
+  The valid certificate \texttt{chain36Gap} tracks ten asymmetric steps from the two
+  defects of Lemma~\ref{lem:heisenberg-seed36}.
+\end{proof}
+
+\begin{theorem}[The first periodic gap from eighteen integers]
+  \label{thm:kernel-gap36-integers}
+  \lean{CertifiedGaps.SpinOneHeisenberg.gap_of_hornerTotals,
+    CertifiedGaps.SpinOneHeisenberg.gap_log_twenty_of_hornerTotals}
+  \leanok
+  \uses{thm:spin1-table36, thm:kernel-gap36-table, thm:haldane-gap}
+  Assume \texttt{HornerTotals}. For every even \(L\ge36\),
+  \(\Delta_L>\log(105882/100000)/(49/4)\), with a unique ground state.
+  For every even \(L\ge2304\), also \(\Delta_L>(\log20)/784\).
+  No trial-state or trace-table hypothesis remains besides the eighteen integer equalities.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Convert the totals to \texttt{TraceTable} and apply the two table-based theorems.
+\end{proof}
+
+\begin{theorem}[The sharper length-\(60\) gap from the table]
+  \label{thm:kernel-gap60-table}
+  \lean{CertifiedGaps.SpinOneHeisenberg.chain60,
+    CertifiedGaps.SpinOneHeisenberg.chain60_valid,
+    CertifiedGaps.SpinOneHeisenberg.gap_sixty_chain_of_table}
+  \leanok
+  \uses{lem:heisenberg-seed60, thm:gap-of-chain-certificate, thm:heisenberg-moments}
+  Assume \texttt{TraceTable60} for the cyclic-twist partition function.
+  Every even \(L\ge60\) has a unique ground state and
+  \[
+    \Delta_L>\frac{\log(116321/100000)}{105/4}.
+  \]
+  Ten asymmetric steps replace the fixed symmetric coefficient used in
+  \cite[equation (1.3)]{OpenAIHaldane}, giving the stronger constant above.
+\end{theorem}
+\begin{proof}
+  \leanok
+  The certificate \texttt{chain60} is valid by exact rational kernel computation.
+  Apply it to the two \(1/8\) defects.
+\end{proof}
+
+\begin{theorem}[The second periodic gap from nine integers]
+  \label{thm:kernel-gap60-integers}
+  \lean{CertifiedGaps.SpinOneHeisenberg.gap_sixty_of_hornerTotals60}
+  \leanok
+  \uses{thm:spin1-table60, lem:kernel-spin1-trials, lem:spin1-certificate60,
+    thm:kernel-gap60-table}
+  Assume \texttt{HornerTotals60}. Every even \(L\ge60\) has a unique ground state and
+  \(\Delta_L>\log(116321/100000)/(105/4)\).
+  The only numerical hypotheses are the nine equalities in the second periodic integer table.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Supply the length-\(120\) trial inequality to the theorem that converts
+  \texttt{HornerTotals60} to the lifted seed and applies \texttt{chain60}.
+\end{proof}
+
+\section{Boundary computations and the final open-chain gap}
+
+The boundary calculation reuses the periodic trial tensors and their block reduction.
+Nine of the fifteen short-chain integer totals are also small enough to evaluate in the kernel.
+
+\begin{lemma}[Checked open trial contractions]
+  \label{lem:kernel-open-trial-computation}
+  \lean{SeedKernel.OpenTrial.openLeft, SeedKernel.OpenTrial.openRight,
+    SeedKernel.OpenTrial.Params.run_spec, SeedKernel.OpenTrial.openBlockCheck_all,
+    SeedKernel.OpenTrial.norm_reduce, SeedKernel.OpenTrial.energy_reduce,
+    SeedKernel.OpenTrial.outputs_eq, SeedKernel.OpenTrial.totals_lt,
+    SeedKernel.OpenTrial.totals_pos}
+  \leanok
+  \uses{lem:kernel-trial-reduction, lem:kernel-trial-arithmetic, lem:open-mps-variational}
+  Use the endpoint vectors of \cite[Appendix B]{OpenAIBoundary} with the periodic tensors.
+  The open norm and energy contractions reduce to the stored eleven blocks, with the common
+  nonzero scale \(c\) from the intertwiner.
+  The checked outputs at lengths \(34,78,142,240\) equal these contractions.
+  At each length their scaled norm \(V\) is positive and their scaled shifted energy
+  satisfies \(H<202100V\), where \(H=c\,500000\langle\psi,(H^{\mathrm{opp}}+amI)\psi\rangle\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The endpoint rows vanish outside one weight copy of each block.
+  The recurrence specification identifies the stored outputs with the remaining contractions;
+  all block and final integer comparisons are checked by \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[The four open trial bounds in the kernel]
+  \label{lem:kernel-open-trials}
+  \lean{SeedKernel.OpenTrial.oppositeField_trial_34,
+    SeedKernel.OpenTrial.oppositeField_trial_78,
+    SeedKernel.OpenTrial.oppositeField_trial_142,
+    SeedKernel.OpenTrial.oppositeField_trial_240,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.trialData}
+  \leanok
+  \uses{lem:kernel-open-trial-computation, lem:boundary-trial-bridge, def:boundary-init-data}
+  At each \(m\in\{34,78,142,240\}\), the opposite-field chain with \(h=3/5\) has an eigenvalue
+  below \(-700741m/500000+2021/5000\).
+  Thus \texttt{TrialData} holds without numerical hypotheses.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Cancel the positive intertwiner scale and use Lemma~\ref{lem:boundary-trial-bridge}.
+\end{proof}
+
+\begin{lemma}[Nine boundary totals checked, six assumed]
+  \label{lem:kernel-boundary-totals}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_two_one,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_two_neg_one,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_two_zero,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_three_one,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_three_neg_one,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_three_zero,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_four_one,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_four_neg_one,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_four_zero,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.BoundaryTotalsLarge,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.boundaryTotals_of_large,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.boundaryTraceTable_of_large}
+  \leanok
+  \uses{def:boundary-totals, thm:boundary-table}
+  For \(n=2,3,4\) and \(g=1,-1,0\), the packed recurrence succeeds and returns the printed
+  integer \(k_{n,g}\).
+  Define \texttt{BoundaryTotalsLarge} to assert the same equalities for \(n=5,6\).
+  This six-entry hypothesis implies \texttt{BoundaryTotals}, and hence
+  \texttt{BoundaryTraceTable}.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Evaluate the nine smaller recurrences with \texttt{decide +kernel}.
+  Combine them with the six assumed equalities and apply Theorem~\ref{thm:boundary-table}.
+\end{proof}
+
+\begin{lemma}[Reseeded ring inputs from the first trace table]
+  \label{lem:kernel-reseed120}
+  \lean{CertifiedGaps.SpinOneHeisenberg.ringPurities120_of_traceTable,
+    CertifiedGaps.SpinOneHeisenberg.seed_ring_spatial_of_table,
+    CertifiedGaps.SpinOneHeisenberg.seed_ring_thermal_of_table}
+  \leanok
+  \uses{lem:boundary-reseed120, lem:kernel-spin1-trials}
+  Assume \texttt{TraceTable}. Then
+  \(\Ps(120,49)\ge0.953\) and \(\Pt(240,49)\ge0.9821\).
+  In particular, the two \(0.948\) ring inputs of the boundary criterion hold.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Supply the two kernel-checked periodic trial bounds to Lemma~\ref{lem:boundary-reseed120}.
+\end{proof}
+
+\begin{theorem}[All four boundary inputs from the printed integers]
+  \label{thm:kernel-boundary-inputs}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryInit.thermalCore_of_integers,
+    CertifiedGaps.SpinOneHeisenberg.boundaryFieldInputs_of_integers}
+  \leanok
+  \uses{thm:spin1-table36, lem:kernel-boundary-totals, lem:kernel-spin1-trials,
+    thm:boundary-leading, lem:kernel-open-trials, lem:kernel-reseed120, lem:open-seeds}
+  Assume \texttt{HornerTotals} and \texttt{BoundaryTotalsLarge}.
+  Then \texttt{ThermalCore} and \(\texttt{BoundaryFieldInputs}(3/5)\) hold.
+  Explicitly, at \(\beta=49\), the ring purities at lengths \(120,240\) are at least \(0.948\),
+  the opposite-field boundary defect at length \(142\) is at most \(0.14\), and the
+  opposite-field thermal purity at length \(240\) is at least \(0.79\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Build both trace tables, construct the leading witness, and insert the kernel-checked periodic
+  and open trial bounds into the initialization theorems.
+\end{proof}
+
+\begin{theorem}[The boundary-field gaps from the remaining integers]
+  \label{thm:kernel-boundary-integers}
+  \lean{CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_integers,
+    CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_of_integers}
+  \leanok
+  \uses{thm:kernel-boundary-inputs, thm:boundary-field-gap-sharp, thm:opposite-field-gap}
+  Assume \texttt{HornerTotals} and \texttt{BoundaryTotalsLarge}.
+  The equal-field chain with \(h=3/5\) at every odd \(n\ge1921\), and the opposite-field chain
+  at every even \(n\ge1920\), have unique ground states and
+  \[
+    \Delta_n>\frac{\log(1000000/2241)}{392}.
+  \]
+  These theorems have no \texttt{sorry}; the eighteen periodic totals and six boundary integers
+  remain explicit hypotheses.
+  The sharper constant and even-length conclusion extend
+  \cite[Theorem 1.1]{OpenAIBoundary}.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Apply the sharp open-chain certificate to Theorem~\ref{thm:kernel-boundary-inputs}.
+\end{proof}

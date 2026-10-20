@@ -10,10 +10,16 @@ ring~\eqref{eq:heisenberg-ham} (Definition~\ref{def:heisenberg}) shows that for 
 \(L \ge 2304\) the ground state is unique and the spectral gap satisfies
 \(\Delta_L > (\log 20)/784 \approx 0.003821\) (Theorem~\ref{thm:haldane-gap}), and that for every
 even \(L \ge 60\) it satisfies \(\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79}\)
-(Theorem~\ref{thm:haldane-gap-sixty}), reproducing the two bounds of Theorem~1.1
-of~\cite{OpenAIHaldane}. Each bound is conditional on two finite-size seed inequalities from
-Propositions~5.4 and~5.5 of~\cite{OpenAIHaldane} (Lemmas~\ref{lem:heisenberg-seed36}
-and~\ref{lem:heisenberg-seed60}), which are certified in exact arithmetic.
+(Theorem~\ref{thm:haldane-gap-sixty}). These are the two bounds of Theorem~1.1
+of~\cite{OpenAIHaldane}. In this chapter each bound assumes one table of short-ring traces:
+\texttt{TraceTable} at \(\beta = 49/4\) or \texttt{TraceTable60} at \(\beta = 21/2\).
+The trial states are checked in the kernel (Lemma~\ref{lem:kernel-spin1-trials}).
+Each table follows from the hypothesis that an integer recurrence reproduces the totals printed
+in~\cite[Appendices A and B]{OpenAIHaldane}: eighteen integers (\texttt{HornerTotals}) and nine
+integers (\texttt{HornerTotals60}). The kernel does not recompute these integers. So both gaps
+hold given only the printed integers (Theorems~\ref{thm:kernel-gap36-integers}
+and~\ref{thm:kernel-gap60-integers}), which also give sharper constants. The older theorems of
+\texttt{Main.lean}, whose seeds are \texttt{sorry}, are not used.
 
 \section{The spin-1 Heisenberg Hamiltonian}
 
@@ -30,7 +36,7 @@ Definition~\ref{def:rpring}.
   \leanok
   \uses{def:ring-operators}
   In the Cartesian basis, the spin-1 matrices have entries \((S^\alpha)_{ss'} = -i\,\epsilon_{\alpha
-  s s'}\)
+    s s'}\)
   given by the Levi-Civita symbol \(\epsilon\). The two-site exchange operator is
   \(\mathbf S \cdot \mathbf S = \sum_\alpha S^\alpha \otimes S^\alpha\), and the ring Hamiltonian on
   \((\C^3)^{\otimes L}\) with periodic boundary conditions (Definition~\ref{def:ring-operators}) is
@@ -138,9 +144,273 @@ reflection-positive rings in the sense of Definition~\ref{def:rpring}
   the Heisenberg ring by Lemma~\ref{lem:large-d-heisenberg}.
 \end{proof}
 
+\section{Rotations, integer matrices, and short-ring spectra}
+
+The Cartesian basis proves reflection positivity, while the \(S^z\) basis makes the finite
+recurrence integral. The two descriptions are related by exact unitary identities.
+
+\begin{lemma}[Rotating a spin-1 bond]
+  \label{lem:spin1-rotations}
+  \lean{CertifiedGaps.SpinOne.PreservesCross, CertifiedGaps.SpinOne.rotExchange,
+    CertifiedGaps.SpinOne.conj_S_of_preservesCross, CertifiedGaps.SpinOne.conj_rotExchange}
+  \leanok
+  \uses{def:heisenberg}
+  Define \(h(R)=\sum_{\alpha,\gamma}R_{\alpha\gamma}S^\alpha\otimes S^\gamma\).
+  If a real matrix \(Q\) preserves the cross product, then
+  \(Q^*S^\alpha Q=\sum_\gamma Q_{\alpha\gamma}S^\gamma\) and
+  \((Q\otimes Q)^*h(R)(Q\otimes Q)=h(Q^{\mathsf T}RQ)\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Expand the Levi-Civita coefficients in the cross-product identity.
+\end{proof}
+
+\begin{lemma}[The integer \(S^z\) frame]
+  \label{lem:spin1-sz}
+  \lean{CertifiedGaps.SpinOneHeisenberg.exchangeZ,
+    CertifiedGaps.SpinOneHeisenberg.szFrame_conjTranspose_mul_self,
+    CertifiedGaps.SpinOneHeisenberg.conj_hamiltonian,
+    CertifiedGaps.SpinOneHeisenberg.conj_twistedHamiltonian,
+    CertifiedGaps.SpinOneHeisenberg.partitionFunction_eq_partitionFunctionZ,
+    CertifiedGaps.SpinOneHeisenberg.twistedPartitionFunction_eq_gibbsTrace_twistedHamiltonianZ}
+  \leanok
+  \uses{def:heisenberg}
+  The matrix \texttt{exchangeZ} has diagonal \(m_sm_t\), with \(m_s=s-1\), and entry \(1\)
+  for each allowed exchange \((m_s,m_t)\mapsto(m_s\pm1,m_t\mp1)\).
+  The tensor power of \texttt{szBasis} is unitary.
+  For \(L\ne1\), it conjugates the Cartesian ring and its \(\pi\)-twisted ring to the corresponding
+  integer \(S^z\) Hamiltonians. Their Gibbs traces agree at every inverse temperature.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Check the two-site identities and lift the change of basis to each bond of the ring.
+\end{proof}
+
+\begin{lemma}[Energy bounds for twisted rings]
+  \label{lem:spin1-energy}
+  \lean{CertifiedGaps.SpinOneHeisenberg.exchangeInt_poly,
+    CertifiedGaps.SpinOneHeisenberg.abs_qform_triad,
+    CertifiedGaps.SpinOneHeisenberg.le_qform_rotTwistedHamiltonian,
+    CertifiedGaps.SpinOneHeisenberg.qform_rotTwistedHamiltonian_le}
+  \leanok
+  \uses{lem:spin1-rotations, lem:spectral-calculus}
+  The exchange satisfies \((h-I)(h+I)(h+2I)=0\).
+  Two adjacent bonds on three distinct sites have quadratic form bounded in modulus by
+  \(3\|x\|^2\).
+  If \(R^{\mathsf T}R=I\) and \(R\) preserves the cross product, the ring with closing bond
+  \(h(R)\) obeys \(H_L(R)\ge-3L/2\) for \(L\ge3\) and \(H_L(R)\le L\) for \(L\ge2\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  A weighted Schur bound proves the three-site estimate. Rotate pairs touching the seam,
+  sum the lower bounds over all adjacent pairs, and use the exchange polynomial for the upper
+  bound. This supplies the contraction used in \cite[Appendices A and B]{OpenAIHaldane}.
+\end{proof}
+
+\begin{lemma}[The two spin-1 sector representations]
+  \label{lem:spin1-sectors}
+  \lean{CertifiedGaps.SpinOneHeisenberg.exists_sector_approx,
+    CertifiedGaps.SpinOneHeisenberg.cTwistedHamiltonian,
+    CertifiedGaps.SpinOneHeisenberg.cTwistedHamiltonian_isHermitian,
+    CertifiedGaps.SpinOneHeisenberg.exists_ion_approx,
+    CertifiedGaps.SpinOneHeisenberg.gibbsTrace_rotTwisted_cRot_transpose}
+  \leanok
+  \uses{lem:single-site-sectors, lem:spin1-rotations, def:heisenberg-spectrum}
+  For \(\beta>0\) and any finite set of lengths \(L\ge2\), the untwisted and \(\pi\)-twisted
+  spin-1 traces admit the \(D_2\) approximation.
+  Adding the \(2\pi/3\)-twisted trace gives the three-sector approximation.
+  The cyclic-twist Hamiltonian is Hermitian. For \(L\ne1\), reversing the cyclic twist leaves
+  its Gibbs trace unchanged.
+\end{lemma}
+\begin{proof}
+  \leanok
+  The Cartesian \(\pi\) rotations and cyclic permutation of axes realize the required \(A_4\)
+  symmetry. A real rotation conjugates the cyclic twist to its inverse.
+  These are finite Trotter approximations to the sector traces of
+  \cite[Sections 3 and 5.1]{OpenAIHaldane}.
+\end{proof}
+
+\section{The table at inverse temperature 49/4}
+
+The eighteen short-ring traces in \cite[Appendix B]{OpenAIHaldane} determine the seed at
+length \(36\). Only the equality of the large integer totals remains a hypothesis.
+
+\begin{definition}[Shifted traces and the first table]
+  \label{def:spin1-table36}
+  \lean{CertifiedGaps.SpinOneHeisenberg.kappa, CertifiedGaps.SpinOneHeisenberg.shiftedZ,
+    CertifiedGaps.SpinOneHeisenberg.shiftedZP, CertifiedGaps.SpinOneHeisenberg.traceCenter,
+    CertifiedGaps.SpinOneHeisenberg.twistedCenter, CertifiedGaps.SpinOneHeisenberg.TraceTable}
+  \leanok
+  \uses{def:heisenberg-spectrum, lem:spin1-sectors}
+  Set \(\kappa=700741/500000\) and \(\widetilde Z_{n,g}(\beta)=e^{-\beta\kappa n}Z_{n,g}(\beta)\).
+  The proposition \texttt{TraceTable} says that at \(\beta=49/4\), for \(n=4,\ldots,12\) and
+  \(g=1,P\), the shifted trace lies within \(3/100000\), inclusively, of the corresponding
+  rational center \texttt{traceCenter} or \texttt{twistedCenter}.
+  The centers are the table of \cite[Lemma 5.1]{OpenAIHaldane}.
+\end{definition}
+
+\begin{definition}[The eighteen integer totals]
+  \label{def:spin1-horner36}
+  \lean{CertifiedGaps.SpinOneHeisenberg.thermalMatrix,
+    CertifiedGaps.SpinOneHeisenberg.thermalColumn,
+    CertifiedGaps.SpinOneHeisenberg.thermalRep,
+    CertifiedGaps.SpinOneHeisenberg.hornerTotal,
+    CertifiedGaps.SpinOneHeisenberg.paperTotal,
+    CertifiedGaps.SpinOneHeisenberg.HornerTotals}
+  \leanok
+  \uses{lem:spin1-sz, lem:trace-horner, lem:trace-poisson}
+  On each short ring let \(D=(32-3n)I-2H_{n,g}\), \(Q=2^{55}\), and
+  \(c_j=\lfloor Qp_j(98,280)\rfloor\).
+  Compute the Horner columns with divisor \(32\) and degree \(280\).
+  Representatives are chosen among rotations, reversals, and spin-negated words, in the
+  nonnegative-magnetization half.
+  Set \(W_{n,g}=\sum_\rho\nu_\rho\sum_w X_\rho(w)^2\), with \(\nu_\rho\) the number of words
+  mapped to \(\rho\).
+  The hypothesis \texttt{HornerTotals} asserts that these integers equal \texttt{paperTotal}
+  for all eighteen entries of \cite[Appendix B.4]{OpenAIHaldane}.
+\end{definition}
+
+\begin{theorem}[The first trace table from its printed integers]
+  \label{thm:spin1-table36}
+  \lean{CertifiedGaps.SpinOneHeisenberg.shiftedTrace_mem,
+    CertifiedGaps.SpinOneHeisenberg.thermalChecks,
+    CertifiedGaps.SpinOneHeisenberg.thermalMargins,
+    CertifiedGaps.SpinOneHeisenberg.traceTable_of_hornerTotals}
+  \leanok
+  \uses{def:spin1-horner36, def:spin1-table36, lem:spin1-energy, lem:trace-orbits,
+    lem:trace-frobenius}
+  If \texttt{HornerTotals} holds, then \texttt{TraceTable} holds.
+  The rational lower and upper bounds computed from each printed integer lie within
+  \(3/100000\) of its center.
+  Lean states the trace table with \(\le\); it also checks that these bounds have
+  margin greater than \(13/10^6\) inside the strict bounds of
+  \cite[Appendix B.4]{OpenAIHaldane}.
+\end{theorem}
+\begin{proof}
+  \leanok
+  The energy bounds make \(D/32\) a contraction.
+  Combine the Poisson and Horner errors, identify representative column norms by exact
+  symmetries, and use \(r^2 \le W < (r+1)^2\) for the integer square root \(r\).
+  The endpoint comparisons are checked by \texttt{decide +kernel}.
+\end{proof}
+
+\begin{lemma}[The rational certificate at length \(36\)]
+  \label{lem:spin1-certificate36}
+  \lean{CertifiedGaps.SpinOneHeisenberg.seed36,
+    CertifiedGaps.SpinOneHeisenberg.seed36_valid,
+    CertifiedGaps.SpinOneHeisenberg.sectorInput_seed,
+    CertifiedGaps.SpinOneHeisenberg.seed36_of_table_mps}
+  \leanok
+  \uses{thm:seed-table, def:spin1-table36, lem:spin1-sectors, lem:spin1-trial-bridge}
+  The certificate \texttt{seed36} is valid.
+  It uses \(q=12\), \(a=3\), multiplicities \((1,3)\), dominance threshold \(0.999\),
+  caps \((1.0013641597,0.8712468086)\), and masses \((1.0657405,0.2783105)\).
+  Assume \texttt{TraceTable} and integer tensors with
+  \[
+    500000\Tr(T^{70}O)<-700741\Tr T^{72}.
+  \]
+  Then \(\Ps(36,49/4)\ge1-0.047916\) and \(\Pt(72,49/4)\ge1-0.181521\).
+  Lean uses different degree-12 filters and a wider table radius \(5\cdot10^{-5}\) than
+  \cite[Section 5.3]{OpenAIHaldane}, with the caps and masses stated here.
+\end{lemma}
+\begin{proof}
+  \leanok
+  The rational filter, mass, and seed checks hold in the kernel.
+  The trial inequality supplies both shifted lower bounds required by the table certificate.
+\end{proof}
+
+\begin{lemma}[The spin-1 variational bridge]
+  \label{lem:spin1-trial-bridge}
+  \lean{CertifiedGaps.SpinOneHeisenberg.exists_spectrum_lt_of_mps,
+    CertifiedGaps.SpinOneHeisenberg.exp_lt_partitionFunctionZ_of_mps_700741,
+    CertifiedGaps.SpinOneHeisenberg.one_lt_shiftedZ_of_mps}
+  \leanok
+  \uses{lem:mps-variational, lem:spin1-sz}
+  For integer tensors and \(N\ge2\), the inequality
+  \(500000\Tr(T^{N-2}O)<-700741\Tr T^N\) gives an eigenvalue of the spin-1 ring below
+  \(-\kappa N\).
+  At \(N=72\), it implies \(\widetilde Z_{72}(\beta)>1\) for every \(\beta>0\).
+  The tensors and both required contractions are checked in
+  Lemma~\ref{lem:kernel-spin1-trials}, following \cite[Appendix C]{OpenAIHaldane}.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Apply the periodic matrix-product variational bound in the integer frame and conjugate back.
+\end{proof}
+
+\section{The table at inverse temperature 21/2}
+
+The second periodic seed uses the three twists and then changes inverse temperature by \(5/2\).
+The cyclic seam requires Eisenstein integers.
+
+\begin{definition}[The nine-entry table and its integer hypothesis]
+  \label{def:spin1-horner60}
+  \lean{CertifiedGaps.SpinOneHeisenberg.TraceTable60,
+    CertifiedGaps.SpinOneHeisenberg.center60,
+    CertifiedGaps.SpinOneHeisenberg.thermalMatrix60,
+    CertifiedGaps.SpinOneHeisenberg.hornerTotal60,
+    CertifiedGaps.SpinOneHeisenberg.paperTotal60,
+    CertifiedGaps.SpinOneHeisenberg.HornerTotals60}
+  \leanok
+  \uses{lem:trace-eisenstein, lem:spin1-sectors, lem:spin1-sz}
+  At \(b=21/2\), \texttt{TraceTable60} bounds each shifted trace at \(n=6,8,10\),
+  \(g=1,P,C\), within \(10^{-5}\) of \texttt{center60}.
+  Its integer recurrence uses \(B=(16-3n/2)I-H_{n,g}\), divisor \(16\),
+  coefficients \(\lfloor2^{56}p_j(84,256)\rfloor\), and degree \(256\).
+  Squared Eisenstein column norms are summed with representative multiplicities.
+  The hypothesis \texttt{HornerTotals60} equates these nine sums to \texttt{paperTotal60},
+  the integers of \cite[Appendix A.4]{OpenAIHaldane}.
+\end{definition}
+
+\begin{theorem}[The second trace table from its printed integers]
+  \label{thm:spin1-table60}
+  \lean{CertifiedGaps.SpinOneHeisenberg.columnNorm_wordGens60,
+    CertifiedGaps.SpinOneHeisenberg.shiftedTrace_mem60,
+    CertifiedGaps.SpinOneHeisenberg.thermalChecks60,
+    CertifiedGaps.SpinOneHeisenberg.paperEnclosure60,
+    CertifiedGaps.SpinOneHeisenberg.traceTable60_of_hornerTotals60}
+  \leanok
+  \uses{def:spin1-horner60, lem:spin1-energy, lem:trace-poisson, lem:trace-orbits,
+    lem:trace-frobenius}
+  If \texttt{HornerTotals60} holds, then
+  \(\texttt{TraceTable60}(\texttt{cTwistedPartitionFunction})\) holds.
+  Lean combines the Horner and Poisson errors into the column bound \(125160\);
+  \cite[Appendix A.2]{OpenAIHaldane} keeps \(125159\) and the scaled Poisson tail separate.
+  Both versions of the bounds give the same table radius \(10^{-5}\), stated inclusively in Lean.
+\end{theorem}
+\begin{proof}
+  \leanok
+  The phase-gauged translation is unitary; reversal and spin negation give conjugate-column
+  symmetries. Apply the Frobenius bound and the nine kernel-checked endpoint comparisons.
+  The inverse cyclic twist in the integer frame has the same Gibbs trace by
+  Lemma~\ref{lem:spin1-sectors}.
+\end{proof}
+
+\begin{lemma}[The rational lifted certificate at length \(60\)]
+  \label{lem:spin1-certificate60}
+  \lean{CertifiedGaps.SpinOneHeisenberg.seed60, CertifiedGaps.SpinOneHeisenberg.seed60_valid,
+    CertifiedGaps.SpinOneHeisenberg.seed60_of_inputs}
+  \leanok
+  \uses{thm:seed-lifted, def:spin1-horner60}
+  The certificate \texttt{seed60} is valid, with \(q=10\), \(r=3\), \(j=2\), \(l=5\),
+  \(\beta=21/2\), and both defects \(1/8\).
+  Its dominance steps are \(0.88,0.99,0.998\).
+  Assume the three-sector approximations at every positive inverse temperature, a Boltzmann
+  representation of the cyclic trace at length \(30\), \texttt{TraceTable60}, and some
+  ring energy at length \(120\) below \(-120\kappa\).
+  Then \(\Ps(60,105/4),\Pt(120,105/4)\ge7/8\).
+  The internal table radius is \(101/10^7\), slightly larger than the \(10^{-5}\) radius in
+  \cite[Section 5.2]{OpenAIHaldane}, to retain a strict margin for finite approximations.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Check the rational filters and lifting inequalities, then apply
+  Theorem~\ref{thm:seed-lifted}.
+\end{proof}
+
 \section{Uniform gap at the asymptotic seed scale}
 
-We combine the transfer-operator moment inequalities (Definition~\ref{def:moment-bounds}) with
+The transfer-operator moment inequalities (Definition~\ref{def:moment-bounds}) combine with
 symmetric seed purity bounds at a general scale \((n_0, \beta_0)\)
 (Definition~\ref{def:thermal-mpo-inputs}); applying the symmetric spacetime-bootstrap criterion
 (Theorem~\ref{thm:gap-of-seeds}) then yields the uniform spectral gap bound~\eqref{eq:sym-gap-bound}
@@ -178,32 +448,34 @@ symmetric seed purity bounds at a general scale \((n_0, \beta_0)\)
 
 \section{Scale doubling from length 36 and the Haldane gap}
 
-Combining the unconditional transfer-operator moment inequalities
-(Theorem~\ref{thm:heisenberg-moments}) with the two seed inequalities at
-\((n_0, \beta_0) = (2304, 784)\) (Lemmas~\ref{lem:heisenberg-seed-spatial}
-and~\ref{lem:heisenberg-seed-thermal}) yields the uniform Haldane gap bound~\eqref{eq:haldane-gap}
-(Theorem~\ref{thm:haldane-gap}). As in the proof of Proposition~5.5 of~\cite{OpenAIHaldane}, these
-asymptotic seeds follow from two finite-size defect bounds on the rings of \(36\) and \(72\) sites
-at \(\beta = 49/4\) (Lemma~\ref{lem:heisenberg-seed36}) by six asymmetric scale-doubling steps
-(Lemma~\ref{lem:heisenberg-chain36}).
+The proof of Proposition~5.5 of~\cite{OpenAIHaldane} starts from two defect bounds on the rings
+of \(36\) and \(72\) sites at \(\beta = 49/4\) (Lemma~\ref{lem:heisenberg-seed36}). Six asymmetric
+scale-doubling steps carry them to seeds at \((n_0, \beta_0) = (2304, 784)\)
+(Lemma~\ref{lem:heisenberg-chain36}). With the moment inequalities
+(Theorem~\ref{thm:heisenberg-moments}), these seeds give the bound~\eqref{eq:haldane-gap}.
+The Lean theorem behind Theorem~\ref{thm:haldane-gap} takes another path from the same two
+defect bounds: ten steps give a larger gap for every even \(L \ge 36\)
+(Theorem~\ref{thm:kernel-gap36-table}), and that gap exceeds \((\log 20)/784\).
 
 \begin{lemma}[Initial defect bounds at \(L = 36\)]
   \label{lem:heisenberg-seed36}
-  \lean{CertifiedGaps.SpinOneHeisenberg.seed36_spatial,
-    CertifiedGaps.SpinOneHeisenberg.seed36_thermal}
+  \lean{CertifiedGaps.SpinOneHeisenberg.seed36_of_table}
   \leanok
-  \uses{def:heisenberg-spectrum}
-  At \(\beta = 49/4\),
+  \uses{lem:spin1-certificate36, lem:kernel-spin1-trials, thm:spin1-table36}
+  Assume \texttt{TraceTable}. At \(\beta = 49/4\),
   \begin{equation}
     \label{eq:heisenberg-seed36}
     1 - \Ps(36, \beta) \le 0.047916, \qquad 1 - \Pt(72, \beta) \le 0.181521.
   \end{equation}
+  These rounded bounds are non-strict in Lean; \cite[Section 5.3]{OpenAIHaldane} obtains
+  strict bounds from its unrounded expressions.
 \end{lemma}
 \begin{proof}
-  These are the initial defects \(p_0, q_0\) in the proof of Proposition~5.5
-  of~\cite{OpenAIHaldane}, obtained from thermal traces of twisted rings of at most \(12\) sites
-  and a matrix-product-state variational bound, and enter the formalization
-  as explicit numerical hypotheses.
+  \leanok
+  Insert the kernel-checked trial tensors into Lemma~\ref{lem:spin1-certificate36}.
+  Theorem~\ref{thm:spin1-table36} reduces the remaining table hypothesis to
+  \texttt{HornerTotals}. The lemmas \texttt{seed36\_spatial} and \texttt{seed36\_thermal}
+  in \texttt{Main.lean} are still \texttt{sorry}; this theorem does not use them.
 \end{proof}
 
 \begin{lemma}[Six scale-doubling steps from \(L = 36\) to \(L = 2304\)]
@@ -222,41 +494,18 @@ at \(\beta = 49/4\) (Lemma~\ref{lem:heisenberg-seed36}) by six asymmetric scale-
   to a multiple of \(10^{-7}\), reach the defects \((0.0084709, 0.0055149)\) at
   \((36 \cdot 2^6, \tfrac{49}{4} \cdot 2^6) = (2304, 784)\). The rational step
   inequalities~\eqref{eq:asym-step} of Definition~\ref{def:chain-certificate} hold by exact rational
-  arithmetic.
-\end{proof}
-
-\begin{lemma}[Spatial purity bound at \((2304, 784)\)]
-  \label{lem:heisenberg-seed-spatial}
-  \lean{CertifiedGaps.SpinOneHeisenberg.seed_spatial}
-  \leanok
-  \uses{lem:heisenberg-chain36, lem:heisenberg-seed36}
-  The spatial purity at \((2304, 784)\) satisfies \(\Ps(2304, 784) \ge 99/100\).
-\end{lemma}
-\begin{proof}
-  \leanok
-  Apply Lemma~\ref{lem:heisenberg-chain36} to Lemma~\ref{lem:heisenberg-seed36}.
-\end{proof}
-
-\begin{lemma}[Thermal purity bound at \((4608, 784)\)]
-  \label{lem:heisenberg-seed-thermal}
-  \lean{CertifiedGaps.SpinOneHeisenberg.seed_thermal}
-  \leanok
-  \uses{lem:heisenberg-chain36, lem:heisenberg-seed36}
-  The thermal purity at \((4608, 784)\) satisfies \(\Pt(4608, 784) \ge 99/100\).
-\end{lemma}
-\begin{proof}
-  \leanok
-  Apply Lemma~\ref{lem:heisenberg-chain36} to Lemma~\ref{lem:heisenberg-seed36}.
+  arithmetic. The paper propagates its exact initial expressions and reaches
+  \((0.0084513,0.0054986)\); Lean starts from the rounded bounds in
+  Lemma~\ref{lem:heisenberg-seed36}, as opposed to the expressions in
+  \cite[Section 5.3]{OpenAIHaldane}.
 \end{proof}
 
 \begin{theorem}[Haldane gap of the spin-1 Heisenberg ring for \(L \ge 2304\)]
   \label{thm:haldane-gap}
-  \lean{CertifiedGaps.SpinOneHeisenberg.thermalMPOInputs,
-    CertifiedGaps.SpinOneHeisenberg.spin_one_heisenberg_gap}
+  \lean{CertifiedGaps.SpinOneHeisenberg.gap_log_twenty_of_table}
   \leanok
-  \uses{thm:heisenberg-moments, lem:heisenberg-seed-spatial, lem:heisenberg-seed-thermal,
-    thm:heisenberg-gap-of-inputs}
-  For every even \(L \ge 2304\), the periodic spin-1 Heisenberg ring~\eqref{eq:heisenberg-ham} has a
+  \uses{thm:kernel-gap36-table}
+  Assume \texttt{TraceTable}. For every even \(L \ge 2304\), the spin-1 ring has a
   unique ground state, and every excited eigenvalue satisfies
   \begin{equation}
     \label{eq:haldane-gap}
@@ -265,17 +514,16 @@ at \(\beta = 49/4\) (Lemma~\ref{lem:heisenberg-seed36}) by six asymmetric scale-
 \end{theorem}
 \begin{proof}
   \leanok
-  Combining Theorem~\ref{thm:heisenberg-moments} with the two purity bounds of
-  Lemmas~\ref{lem:heisenberg-seed-spatial} and~\ref{lem:heisenberg-seed-thermal} verifies the seed
-  and moment hypotheses of Definition~\ref{def:thermal-mpo-inputs} at \((2304, 784)\) with defect
-  \(1/100\), and Theorem~\ref{thm:heisenberg-gap-of-inputs} then gives~\eqref{eq:haldane-gap}.
+  The explicit-hypothesis Lean theorem weakens the sharper bound of
+  Theorem~\ref{thm:kernel-gap36-table} by a logarithm comparison.
+  This differs from the six-step proof of \cite[Proposition 5.5 and equation (1.4)]{OpenAIHaldane},
+  whose seed propagation is recorded in Lemma~\ref{lem:heisenberg-chain36}.
 \end{proof}
 
 \begin{remark}
-  Theorem~\ref{thm:haldane-gap} requires only the two finite-size defect
-  bounds~\eqref{eq:heisenberg-seed36} of Lemma~\ref{lem:heisenberg-seed36}. Candidate routes toward
-  discharging the spin-1 seed by exact integer arithmetic on smaller rings are discussed in
-  Chapter~\ref{chap:seedkernel}.
+  The theorem above uses a trace-table hypothesis. Theorem~\ref{thm:kernel-gap36-integers}
+  states it directly from the eighteen printed totals. The older theorem
+  \texttt{spin\_one\_heisenberg\_gap} of \texttt{Main.lean} still depends on \texttt{sorry} seeds.
 \end{remark}
 
 \section{Uniform gap bound from length 60}
@@ -288,23 +536,27 @@ well above \(1/100\). It follows from the general symmetric spacetime-bootstrap 
 
 \begin{lemma}[Initial purity bounds at \(L = 60\)]
   \label{lem:heisenberg-seed60}
-  \lean{CertifiedGaps.SpinOneHeisenberg.seed60_spatial,
-    CertifiedGaps.SpinOneHeisenberg.seed60_thermal}
+  \lean{CertifiedGaps.SpinOneHeisenberg.seed60_of_table}
   \leanok
-  \uses{def:heisenberg-spectrum}
+  \uses{lem:spin1-certificate60, lem:kernel-spin1-trials, thm:spin1-table60, lem:spin1-sectors}
+  Assume \texttt{TraceTable60} for the cyclic-twist partition function.
   At \(\beta = 105/4\), \(\Ps(60, \beta) \ge 7/8\) and \(\Pt(120, \beta) \ge 7/8\).
 \end{lemma}
 \begin{proof}
-  This is Proposition~5.4 of~\cite{OpenAIHaldane}, which enters the formalization as an explicit
-  numerical hypothesis.
+  \leanok
+  The sector and Boltzmann representations hold by Lemma~\ref{lem:spin1-sectors}.
+  The kernel-checked trial state supplies the energy input of
+  Lemma~\ref{lem:spin1-certificate60}. This proves the non-strict bounds needed from
+  \cite[Proposition 5.4]{OpenAIHaldane}; the paper's proof gives strict margins above \(7/8\).
 \end{proof}
 
 \begin{theorem}[Haldane gap of the spin-1 Heisenberg ring for \(L \ge 60\)]
   \label{thm:haldane-gap-sixty}
   \lean{CertifiedGaps.SpinOneHeisenberg.gapGT_sixty_of_seeds,
-    CertifiedGaps.SpinOneHeisenberg.spin_one_heisenberg_gap_sixty}
+    CertifiedGaps.SpinOneHeisenberg.gap_sixty_of_table}
   \leanok
   \uses{thm:heisenberg-moments, lem:heisenberg-seed60, thm:gap-of-coefficient}
+  Assume \texttt{TraceTable60} for the cyclic-twist partition function.
   For every even \(L \ge 60\), the periodic spin-1 Heisenberg ring~\eqref{eq:heisenberg-ham} has a
   unique ground state, and every excited eigenvalue lies more than
   \(\tfrac{4}{105}\log\tfrac{80}{79}\) above the ground energy.

@@ -4,7 +4,8 @@
 Proving that a quantum spin chain is gapped in the thermodynamic limit requires a lower bound on
 the energy difference between the first excited state and the ground state that is uniform in the
 system size. The \emph{spacetime bootstrap}, also called the \emph{two-purity doubling criterion},
-reduces this infinite-volume problem on periodic rings to two finite-size inequalities~\cite{OpenAIHaldane}.
+reduces this infinite-volume problem on periodic rings to two finite-size
+inequalities~\cite{OpenAIHaldane}.
 This document develops the complete mathematical proof of the criterion and its applications to
 concrete quantum spin chains and ladders.
 
@@ -13,7 +14,7 @@ concrete quantum spin chains and ladders.
 For a periodic ring Hamiltonian \(H_L = \sum_{j=0}^{L-1} h_{j,j+1} + \sum_{j=0}^{L-1} o_j\) of
 \(L\) unit cells, write \(Z_L(\beta) = \Tr e^{-\beta H_L}\) for the partition function
 (Definition~\ref{def:partition-function}) and define the \emph{spatial purity} and \emph{thermal
-purity} (Definition~\ref{def:purities}) by
+  purity} (Definition~\ref{def:purities}) by
 \begin{equation}
   \label{eq:intro-purities}
   \Ps(n,\beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
@@ -43,7 +44,7 @@ yield a uniform lower bound on \(\Delta_L\) for every even \(L \ge n_0\)
 
 \section{Organization of the document}
 
-The exposition is organized into seven chapters following this introduction.
+The exposition is organized into eight chapters following this introduction.
 \begin{enumerate}
   \item Chapter~\ref{chap:criterion} establishes the abstract spacetime-bootstrap criterion for any
     family of finite spectra whose partition functions satisfy three transfer-operator moment
@@ -58,9 +59,12 @@ The exposition is organized into seven chapters following this introduction.
     passing to the continuous-time limit via the Lie--Trotter product formula
     (Theorem~\ref{thm:lie-trotter} and Theorem~\ref{thm:rp-moment-bounds}), yielding the general
     spectral gap criterion for reflection-positive rings (Theorem~\ref{thm:rp-gap}).
+  \item Chapter~\ref{chap:traces} develops rational bounds on thermal traces, sector trace tables,
+    polynomial filters, and variational bounds. These tools turn finite integer computations
+    into periodic seeds and boundary initialization data.
   \item Chapter~\ref{chap:heisenberg} applies the ring criterion to the periodic spin-1
     antiferromagnetic Heisenberg chain (Definition~\ref{def:heisenberg}), establishing uniform
-    Haldane gap bounds conditional on two finite-size seed inequalities
+    Haldane gap bounds conditional on short-ring trace tables
     (Theorems~\ref{thm:haldane-gap} and~\ref{thm:haldane-gap-sixty}).
   \item Chapter~\ref{chap:open} extends the transfer-operator moment method to open spin-1
     Heisenberg chains with boundary magnetic fields (Theorem~\ref{thm:open-criterion} and
@@ -75,7 +79,10 @@ The exposition is organized into seven chapters following this introduction.
     comparison (Lemma~\ref{lem:ising-classical}) for the mixed-field Ising chain at
     \((g, h) = (1/4, 1/20)\), discharging Lemma~\ref{lem:ising-longitudinal-seeds} at that point
     (Theorem~\ref{thm:ising-seeds}) and yielding an unconditional spectral gap theorem
-    (Theorem~\ref{thm:ising-gap}).
+    (Theorem~\ref{thm:ising-gap}). It also checks the spin-1 trial states and reduces both
+    periodic gaps and the boundary-field gap to the remaining printed-integer hypotheses
+    (Theorems~\ref{thm:kernel-gap36-integers}, \ref{thm:kernel-gap60-integers}, and
+    \ref{thm:kernel-boundary-integers}).
 \end{enumerate}
 
 \section{Notations and conventions}

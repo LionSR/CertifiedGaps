@@ -6,10 +6,14 @@ The open spin-1 Heisenberg chain with equal boundary fields \(h = 3/5\),
   \label{eq:open-heisenberg-ham}
   H_n = \sum_{i=0}^{n-2} \mathbf S_i \cdot \mathbf S_{i+1} - h\,(S_0^z + S_{n-1}^z),
 \end{equation}
-has a unique ground state and a spectral gap \(\Delta_n > (\log 10)/392 \approx 0.005874\) for
-every odd \(n \ge 1921\) (Theorem~\ref{thm:boundary-field-gap}, establishing the theorem of~\cite{OpenAIBoundary}
-from its four finite-size seed inputs). This chapter proves the bound conditional on those four
-finite-size inputs (Lemma~\ref{lem:open-seeds}). The criterion is proved for general seeds and a
+has, under the finite integer hypotheses below, a unique ground state and a spectral gap
+\(\Delta_n > (\log 10)/392 \approx 0.005874\) for every odd \(n \ge 1921\)
+(Theorem~\ref{thm:boundary-field-gap}, establishing the theorem of~\cite{OpenAIBoundary}
+from its four finite-size seed inputs). Those inputs follow from the periodic trace table,
+the fifteen boundary traces, and kernel-checked trial vectors. The final theorem retains only
+the eighteen periodic integer totals and the six boundary integers at lengths \(5,6\) as
+hypotheses (Theorem~\ref{thm:kernel-boundary-integers}); the kernel checks the other nine boundary
+integers. The criterion is proved for general seeds and a
 rational certificate checked in the kernel (Theorem~\ref{thm:open-criterion},
 Definition~\ref{def:open-certificate}); from the same four inputs, a sharper certificate gives
 \(\Delta_n > 0.01556\) (Theorem~\ref{thm:boundary-field-gap-sharp}).
@@ -40,8 +44,8 @@ Lemma~\ref{lem:open-moment-bounds-limit}).
   \begin{equation}
     \label{eq:open-moment-ineq}
     \begin{aligned}
-      \mu^{2K}(G_{2N} - c\mu^{2N}) &\le \rho^{2N-2K}\mu^{2N}(G_{2K} - c\mu^{2K}), \\
-      |G_{2N+1} - sc\mu^{2N+1}| &\le \mu^{2N+1-2K}(G_{2K} - c\mu^{2K}).
+      \mu^{2K}(G_{2N} - c\mu^{2N}) & \le \rho^{2N-2K}\mu^{2N}(G_{2K} - c\mu^{2K}), \\
+      |G_{2N+1} - sc\mu^{2N+1}|    & \le \mu^{2N+1-2K}(G_{2K} - c\mu^{2K}).
     \end{aligned}
   \end{equation}
   The \emph{boundary defect} is \(e_k = 1 - c\mu^k/G_k\), where \(\mu = \inf_N Z_{2N}^{1/(2N)}\)
@@ -179,8 +183,12 @@ open-chain thermal purity at length \(4N_i\).
     CertifiedGaps.gapGT_of_openCertificate_traces}
   \leanok
   \uses{thm:open-criterion, lem:boundary-seed-traces}
-  An open-chain certificate is the rational data \((N_0, K_0, u_0, C, q_i, E_i, \eta_i, x)\) of
-  Theorem~\ref{thm:open-criterion}. Its conditions are finitely many rational inequalities, which
+  A certificate records the rational data
+  \[
+    (N_0, K_0, u_0, C, q_i, E_i, \eta_i, x)
+  \]
+  of Theorem~\ref{thm:open-criterion}.
+  Its conditions are finitely many rational inequalities, which
   are decidable and checked by \texttt{decide +kernel}; a valid certificate and the four seeds give
   the gap bound of Theorem~\ref{thm:open-criterion}. By Lemma~\ref{lem:boundary-seed-traces} the
   boundary seed may be replaced by an inequality between finite traces, so that all four seeds
@@ -195,15 +203,17 @@ open-chain thermal purity at length \(4N_i\).
     CertifiedGaps.RPRing.openGapGT_of_seeds}
   \leanok
   \uses{def:open-certificate, thm:open-moment-bounds}
-  If \(\Ps(120, 49) \ge 0.948\) and \(\Pt(240, 49) \ge 0.948\) for the ring, the boundary defect
+  Assume the ring bounds \(\Ps(120, 49) \ge 0.948\) and \(\Pt(240, 49) \ge 0.948\).
+  If the boundary defect
   satisfies \(e_{142} \le 0.14\) at \(\beta = 49\), and the opposite-field open-chain thermal
   purity satisfies \(\Pt(240, 49) \ge 0.79\), then every open chain of \(n \ge 1920\) sites has a
   unique ground state and a spectral gap greater than \((\log 10)/392\).
 \end{corollary}
 \begin{proof}
   \leanok
-  The certificate of~\cite{HaldaneNote}, eqs.~(C1)--(C6), has \(N_0 = 60\), \(K_0 = 71\),
+  The certificate \texttt{boundaryFieldCertificate} has \(N_0 = 60\), \(K_0 = 71\),
   \(u_0 = 0.052\), \(C = 6\), and three base steps, and hands over at \(x = 1/100\).
+  These steps implement the continuation in \cite[Sections 5.2--5.3]{OpenAIBoundary}.
 \end{proof}
 
 \begin{theorem}[Open boundary conditions]
@@ -228,6 +238,256 @@ open-chain thermal purity at length \(4N_i\).
   Definition~\ref{def:open-certificate}.
 \end{proof}
 
+\section{Ring reseeding and the short boundary traces}
+
+The boundary initialization starts at \(b_0=49/4\) and reaches \(b_2=49\).
+The ring data and the new boundary data have separate finite computations.
+
+\begin{lemma}[The ring seed at \((120,49)\)]
+  \label{lem:boundary-reseed120}
+  \lean{CertifiedGaps.SpinOneHeisenberg.ringPurities120_of_table,
+    CertifiedGaps.SpinOneHeisenberg.ringSpatial120_of_table,
+    CertifiedGaps.SpinOneHeisenberg.ringThermal120_of_table}
+  \leanok
+  \uses{thm:seed-reseed, lem:spin1-certificate36, lem:spin1-trial-bridge, lem:heisenberg-chain36}
+  Assume \texttt{TraceTable}, a periodic integer trial satisfying
+  \(500000\Tr(T^{70}O)<-700741\Tr T^{72}\), and some ring energy at length \(120\)
+  below \(-120\kappa\). Then
+  \[
+    \Ps(120,49)\ge1-0.047,\qquad \Pt(240,49)\ge1-0.0179.
+  \]
+  In particular, both purities are at least \(0.948\).
+  Lean uses tail length \(36\), rather than \(32\) in \cite[Section 3]{OpenAIBoundary},
+  and direct capped-mass trace bounds; the paper's intermediate defects are \(0.0502,0.0198\).
+  Lean's first doubled spatial defect is \(0.0605003\), compared with the paper's \(0.0604996\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Reseed to \((60,49/2)\) with defects \(0.0974,0.0604\), then take one coupled doubling step.
+  The corresponding bounds in \cite[Section 3]{OpenAIBoundary} are \(0.0998,0.0628\).
+  The tail length is a multiple of the twelfth-moment length, so no fractional powers are needed.
+\end{proof}
+
+\begin{definition}[The fifteen boundary traces]
+  \label{def:boundary-trace-table}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryTraces.hamiltonian,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryTraces.trace,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryTraces.moment,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryTraces.BoundaryTraceTable}
+  \leanok
+  \uses{def:heisenberg}
+  Set \(a=700741/500000\), \(b_0=49/4\), and \(h=3/5\).
+  For \(g=1,-1,0\), let
+  \[
+    H_{n,g}=\sum_{j<n-1}\mathbf S_j\cdot\mathbf S_{j+1}-hS_0^z+hR_g,\qquad
+    R_{\pm1}=\pm S_{n-1}^z,\quad R_0=S_{n-1}^x.
+  \]
+  Write
+  \[
+    Z_{n,g}=\Tr e^{-b_0(H_{n,g}+anI)},\qquad
+    I_n=(Z_{n,1}+Z_{n,-1}+4Z_{n,0})/6.
+  \]
+  The proposition \texttt{BoundaryTraceTable} puts each \(Z_{n,g}\), \(n=2,\ldots,6\), between
+  the rational endpoints \texttt{traceLo} and \texttt{traceHi}, inclusively.
+  Lean keeps closed endpoints where \cite[Appendix A.5]{OpenAIBoundary} gives strict intervals.
+\end{definition}
+
+\begin{definition}[The boundary integer recurrence]
+  \label{def:boundary-totals}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.band,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.runBoundary,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.paperK,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.BoundaryTotals}
+  \leanok
+  \uses{lem:trace-packed}
+  Number spin words by their base-three digits. Let \(p_w\in\{0,1\}\) be their magnetization
+  parity and \(J_w=\sqrt{1+p_w}\).
+  The banded integer matrix represents \(D=80JAJ^{-1}\), where
+  \(A=I-(H_{n,g}+C_nI)/8\) in the \(S^z\) frame and
+  \(C_n=3\lfloor(n-1)/2\rfloor+2((n-1)\bmod2)+6/5\).
+  Use \(Q=2^{50}\), degree \(192\), coefficients
+  \(c_j=\lfloor Qp_j(49,192)\rfloor\), and divisor \(80\).
+  The packed recurrence returns
+  \[
+    k_{n,g}=\left\lfloor
+    \frac{10^{16}}{2Q^2}\sum_{w,r}X_r(w)^2(2-p_w)(1+p_r)\right\rfloor.
+  \]
+  The hypothesis \texttt{BoundaryTotals} requires success and equality with the fifteen
+  printed integers \texttt{paperK} of \cite[equation (A.12)]{OpenAIBoundary}.
+\end{definition}
+
+\begin{theorem}[Boundary trace bounds from integers]
+  \label{thm:boundary-table}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.energy_bounds,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.trace_bounds_of_run,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.boundaryTraceTable_of_totals}
+  \leanok
+  \uses{def:boundary-totals, def:boundary-trace-table, lem:spin1-energy, lem:spin1-sz,
+    lem:trace-weighted}
+  The hypothesis \texttt{BoundaryTotals} implies \texttt{BoundaryTraceTable}.
+  For \(2\le n\le6\), the energy bounds
+  \(-C_nI\le H_{n,g}\le(n-1+6/5)I\) make \(A\) a contraction.
+  A successful run with a valid band check gives
+  \[
+    e^{b_0(C_n-an)}\max(0,\sqrt W-\epsilon)^2
+    \le Z_{n,g}\le
+    e^{b_0(C_n-an)}(\sqrt W+\epsilon)^2,
+    \qquad \epsilon=2\cdot10^{-10},
+  \]
+  where \(W=\sum_{w,r}X_r(w)^2(2-p_w)(1+p_r)/(2Q^2)\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Pair adjacent bonds for the lower energy bound, prove the diagonal similarity entrywise,
+  and apply weighted Horner and Poisson error bounds.
+  Bound the exponential above and below by rational Taylor sums and check all table endpoints.
+  Lean squares the norm interval directly; \cite[Appendix A.4]{OpenAIBoundary} first bounds
+  the absolute error in its square. Both use the same norm error \(\epsilon\).
+\end{proof}
+
+\begin{lemma}[Two consequences of the boundary table]
+  \label{lem:boundary-table-moments}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryTraces.trace_six_one_mem,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryTraces.sixth_of_table,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryTraces.moment_polynomial_lt_of_table}
+  \leanok
+  \uses{def:boundary-trace-table}
+  Assume \texttt{BoundaryTraceTable}. Then
+  \(0.0266319440<Z_{6,1}<0.0266319607<0.027\), and
+  \[
+    I_6-0.28I_5-0.3404I_4+0.0504I_3+0.0324I_2<0.003745.
+  \]
+  The latter polynomial is the moment evaluation of
+  \(P_*(x)^2\), where \(P_*(x)=x^3-0.14x^2-0.18x\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Substitute the rational endpoints, respecting the sign of each coefficient, as in
+  \cite[Appendix A, equations (A.19)--(A.20)]{OpenAIBoundary}.
+\end{proof}
+
+\section{The leading boundary weight}
+
+The short traces bound a polynomial of the leading eigenvalue weighted by its boundary overlap.
+This step needs the ring sectors and the boundary traces together.
+
+\begin{lemma}[Convergent pairings and an invariant leading line]
+  \label{lem:boundary-leading-line}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryLeading.ringM_tendsto,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryLeading.openM_tendsto,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryLeading.avgM_tendsto,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryLeading.eventually_leadingLine}
+  \leanok
+  \uses{lem:single-site-open, def:leading-line, lem:spin1-certificate36,
+    def:boundary-trace-table, lem:spin1-rotations}
+  The shifted single-site ring traces converge at every length at least \(2\).
+  The open and averaged pairings converge at every positive length, with averaged limit \(I_n\).
+  Assume \texttt{TraceTable} and \(\widetilde Z_{72}(b_0)>1\).
+  Eventually the shifted transfer matrix has a leading-line witness with
+  \(|e_0|>0.999\) and residual form bound \(r=0.873126\).
+  Its vector lies in the trivial \(D_2\) block and is fixed by the cyclic relabeling.
+\end{lemma}
+\begin{proof}
+  \leanok
+  The degree-12 filters isolate one eigenvalue in the trivial block.
+  The \(A_4\) average of the end fields gives the six-axis average \(I_n\).
+  In contrast to \cite[Proposition 3.4]{OpenAIBoundary}, the sector bounds here come directly
+  from Lean's seed certificate; the trivial block fixes \(D_2\), and the cycle acts by a
+  real cube root of \(1\).
+\end{proof}
+
+\begin{theorem}[The spectral witness from both tables]
+  \label{thm:boundary-leading}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryLeading.witness_of_tables,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.thermalCore_of_tables}
+  \leanok
+  \uses{lem:boundary-leading-line, lem:boundary-table-moments, lem:leading-polynomial,
+    lem:leading-limit}
+  Assume both trace tables and
+  \(\widetilde Z_{72}(b_0)>1\).
+  There is an open-moment witness for the shifted ring and open traces at \(b_0\) with
+  \[
+    \mu\ge0.999,\qquad \rho\le0.874,\qquad cP_*(\mu)^2\le0.003745.
+  \]
+  Together with \(Z_{6,1}<0.027\), this implies \texttt{ThermalCore}.
+  The bounds are non-strict in Lean, unlike the strict inequalities of
+  \cite[Proposition 3.4 and Proposition A.1]{OpenAIBoundary}.
+\end{theorem}
+\begin{proof}
+  \leanok
+  Apply the projected polynomial bound before taking the Trotter limit.
+  Compactness preserves the closed witness inequalities.
+  Positivity of the odd open traces removes the leading sign (or the overlap is zero);
+  the paper fixes the sign using ring traces.
+\end{proof}
+
+\section{Initializing the two open-chain seeds}
+
+The leading witness controls upper trace bounds; variational states give lower ground weights.
+Two boundary updates then reach length \(142\) and inverse temperature \(49\).
+
+\begin{definition}[Thermal data and four trial bounds]
+  \label{def:boundary-init-data}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryInit.ThermalCore,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.ThermalData,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.TrialBelow,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.TrialData,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.ThermalData.of_table}
+  \leanok
+  \uses{def:open-moment-bounds, def:spin1-table36}
+  \texttt{ThermalCore} asks for a shifted witness at \(b_0=49/4\) with
+  \(\mu\ge0.9\), \(\rho\le0.874\), \(cP_*(\mu)^2\le0.003745\), and \(Z_{6,1}\le0.027\).
+  \texttt{ThermalData} also asks that \(\mu\le U=1.00139\).
+  Under \texttt{TraceTable}, the core implies the full data.
+  \texttt{TrialData} requires an opposite-field eigenvalue below
+  \(-am+2021/5000\) at each \(m=34,78,142,240\).
+\end{definition}
+
+\begin{lemma}[The opposite-field variational bridge]
+  \label{lem:boundary-trial-bridge}
+  \lean{CertifiedGaps.SpinOneHeisenberg.conj_endFieldHamiltonian,
+    CertifiedGaps.SpinOneHeisenberg.exists_oppositeFieldSpectrum_lt_of_openMPS}
+  \leanok
+  \uses{lem:open-mps-variational, lem:spin1-sz}
+  For any integer open matrix-product state on \(m=n+1\) sites, write its norm contraction
+  as \(V\), bond energy as \(B\), and left and right \(S^z\) insertions as \(F_L,F_R\).
+  If
+  \[
+    500000B-300000F_L+300000F_R+700741mV<202100V,
+  \]
+  the opposite-field chain with \(h=3/5\) has an eigenvalue below \(-am+2021/5000\).
+  This is the exact integer form of \cite[Proposition B.1]{OpenAIBoundary}.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Conjugate to the integer \(S^z\) frame and apply the open matrix-product variational bound.
+\end{proof}
+
+\begin{lemma}[The scalar boundary initialization]
+  \label{lem:boundary-initialized}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryInit.shifted_defect34,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.boundaryDefect_le_of_data,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.oppositeFieldThermalPurity_ge_of_data}
+  \leanok
+  \uses{def:boundary-init-data, lem:open-initialization, thm:open-criterion}
+  Assume \texttt{ThermalData} and \texttt{TrialData}.
+  The shifted witness at \(b_0\) satisfies
+  \((1-0.0915)\widetilde G_{34}(b_0)\le c\mu^{34}\).
+  If also \(\Ps(72,49/2)\ge1-0.0605003\) and \(\Ps(120,49)\ge0.948\), then
+  the opposite-field boundary defect at \((142,49)\) is at most \(0.14\).
+  Independently of these two ring purity assumptions, the data imply
+  \(\Pt^{\mathrm{opp}}(240,49)\ge0.79\).
+  Lean uses intermediate defect \(0.1335\), rather than \(0.133\) in
+  \cite[Section 5.1]{OpenAIBoundary}, and keeps non-strict final inequalities.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Use the six-site residual bound and the trial weight at length \(34\).
+  Apply the boundary move at lengths \(78\) and \(142\), with suppressions \(0.1250,0.1491\).
+  At length \(240\), the thermal lower bound \((1+0.5817^4)^{-2}\) exceeds \(0.79\).
+\end{proof}
+
 \section{The open spin-1 Heisenberg chain with boundary fields}
 
 Specializing Corollary~\ref{cor:open-seeds-note} to the Cartesian spin-1 generators of
@@ -237,31 +497,38 @@ Haldane gap bound (Theorem~\ref{thm:boundary-field-gap}) from four finite-size s
 
 \begin{lemma}[Finite-size seed bounds for the boundary-field chain]
   \label{lem:open-seeds}
-  \lean{CertifiedGaps.SpinOneHeisenberg.seed_ring_spatial,
-    CertifiedGaps.SpinOneHeisenberg.seed_ring_thermal,
-    CertifiedGaps.SpinOneHeisenberg.seed_boundary,
-    CertifiedGaps.SpinOneHeisenberg.seed_open_thermal}
+  \lean{CertifiedGaps.SpinOneHeisenberg.BoundaryFieldInputs,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.boundaryDefect_le_of_table,
+    CertifiedGaps.SpinOneHeisenberg.BoundaryInit.oppositeFieldThermalPurity_ge_of_table}
   \leanok
-  \uses{def:heisenberg-spectrum, def:open-moment-bounds}
+  \uses{lem:boundary-reseed120, lem:boundary-initialized, def:boundary-init-data}
+  Assume \texttt{ThermalCore}, \texttt{TrialData}, \texttt{TraceTable}, and the two periodic
+  trial hypotheses of Lemma~\ref{lem:boundary-reseed120}.
   At \(\beta = 49\), the periodic spin-1 Heisenberg ring (Definition~\ref{def:heisenberg-spectrum})
   satisfies \(\Ps(120, 49) \ge 0.948\) and \(\Pt(240, 49) \ge 0.948\), and the opposite-field open
   chain with \(h = 3/5\) satisfies \(e_{142} \le 0.14\) and \(\Pt(240, 49) \ge 0.79\).
 \end{lemma}
 \begin{proof}
-  These are the four finite-size numerical inputs of~\cite{OpenAIBoundary}, which enter the
-  formalization as explicit hypotheses.
+  \leanok
+  Reseed the ring by Lemma~\ref{lem:boundary-reseed120}, supply the upper spectral window from
+  the table, and apply Lemma~\ref{lem:boundary-initialized}.
+  These four inequalities form \(\texttt{BoundaryFieldInputs}(3/5)\).
+  Theorem~\ref{thm:kernel-boundary-inputs} supplies them from the remaining printed-integer
+  hypotheses. The four lemmas \texttt{seed\_*} in \texttt{OpenChain.lean} are still
+  \texttt{sorry}; this route does not use them.
 \end{proof}
 
-\begin{theorem}[Haldane gap of the open spin-1 chain with boundary fields]
+\begin{theorem}[Gap for equal boundary fields]
   \label{thm:boundary-field-gap}
   \lean{CertifiedGaps.SpinOneHeisenberg.endFieldHamiltonian,
     CertifiedGaps.SpinOneHeisenberg.openHamiltonian_odd,
     CertifiedGaps.SpinOneHeisenberg.openHamiltonian_even,
     CertifiedGaps.SpinOneHeisenberg.gapGT_of_boundaryFieldInputs,
-    CertifiedGaps.SpinOneHeisenberg.gapGT_of_boundaryFieldInputs_certificate,
-    CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap}
+    CertifiedGaps.SpinOneHeisenberg.gapGT_of_boundaryFieldInputs_certificate}
   \leanok
-  \uses{cor:open-seeds-note, lem:open-seeds, thm:heisenberg-moments}
+  \uses{cor:open-seeds-note, lem:open-seeds}
+  Assume the four inequalities in Lemma~\ref{lem:open-seeds},
+  bundled as \(\texttt{BoundaryFieldInputs}(3/5)\).
   For every odd \(n \ge 1921\), the open spin-1 Heisenberg chain~\eqref{eq:open-heisenberg-ham} with
   equal boundary fields \(h = 3/5\) has a unique ground state, and every excited eigenvalue lies
   more than \((\log 10)/392\) above the ground energy.
@@ -271,9 +538,9 @@ Haldane gap bound (Theorem~\ref{thm:boundary-field-gap}) from four finite-size s
   In the Cartesian basis (Definition~\ref{def:spin-one-generators}), taking the imaginary
   coefficient \(w_z = -ih\) on the antisymmetric generator \(G_z = i S^z\) produces the boundary
   operator \(b = -h S^z\), whose transpose is \(b^{\mathsf T} = +h S^z\); the open chain of
-  Theorem~\ref{thm:open-moment-bounds} therefore has equal boundary fields~\eqref{eq:open-heisenberg-ham}
-  at odd length and opposite boundary fields at even length. Combining
-  Theorem~\ref{thm:heisenberg-moments}, Theorem~\ref{thm:open-moment-bounds}, and
+  Theorem~\ref{thm:open-moment-bounds} therefore has equal boundary fields
+  \eqref{eq:open-heisenberg-ham} at odd length and opposite boundary fields at even length.
+  Combining Theorem~\ref{thm:rp-moment-bounds}, Theorem~\ref{thm:open-moment-bounds}, and
   Corollary~\ref{cor:open-seeds-note} with the inputs of Lemma~\ref{lem:open-seeds} gives the
   bound.
 \end{proof}
@@ -282,8 +549,7 @@ Haldane gap bound (Theorem~\ref{thm:boundary-field-gap}) from four finite-size s
   \label{thm:boundary-field-gap-sharp}
   \lean{CertifiedGaps.sharpBoundaryFieldCertificate,
     CertifiedGaps.sharpBoundaryFieldCertificate_valid,
-    CertifiedGaps.SpinOneHeisenberg.gapGT_of_boundaryFieldInputs_sharp,
-    CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_sharp}
+    CertifiedGaps.SpinOneHeisenberg.gapGT_of_boundaryFieldInputs_sharp}
   \leanok
   \uses{def:open-certificate, lem:open-seeds, thm:boundary-field-gap}
   From the inputs of Lemma~\ref{lem:open-seeds}, every odd \(n \ge 1921\) has a unique ground state
@@ -295,6 +561,8 @@ Haldane gap bound (Theorem~\ref{thm:boundary-field-gap}) from four finite-size s
   \(C = 5.583 \ge G(0.052)\) in place of \(6\), four-digit bounds along the same three base steps,
   and the hand-over at the defect reached at scale \(3\), \(x = 2.241 \cdot 10^{-4}\), in place of
   \(1/100\), Definition~\ref{def:open-certificate} gives the bound \(\log(1/(10x))/392\).
+  This sharpens the constant \((\log 10)/392\) of \cite[Theorem 1.1]{OpenAIBoundary}, which
+  hands over at \(x = 1/100\) \cite[Sections 5.3 and 6]{OpenAIBoundary}.
 \end{proof}
 
 
@@ -305,9 +573,7 @@ Haldane gap bound (Theorem~\ref{thm:boundary-field-gap}) from four finite-size s
     CertifiedGaps.SpinOneHeisenberg.openGapGT_of_boundaryFieldInputs_certificate,
     CertifiedGaps.SpinOneHeisenberg.oppositeFieldGapGT_of_boundaryFieldInputs_certificate,
     CertifiedGaps.SpinOneHeisenberg.oppositeFieldGapGT_of_boundaryFieldInputs,
-    CertifiedGaps.SpinOneHeisenberg.oppositeFieldGapGT_of_boundaryFieldInputs_sharp,
-    CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap,
-    CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_sharp}
+    CertifiedGaps.SpinOneHeisenberg.oppositeFieldGapGT_of_boundaryFieldInputs_sharp}
   \leanok
   \uses{thm:boundary-field-gap, thm:boundary-field-gap-sharp}
   From the inputs of Lemma~\ref{lem:open-seeds}, for every even \(n \ge 1920\) the open spin-1
@@ -320,4 +586,6 @@ Haldane gap bound (Theorem~\ref{thm:boundary-field-gap}) from four finite-size s
   \leanok
   At even length the open chain of Theorem~\ref{thm:boundary-field-gap} is the opposite-field chain,
   and Theorem~\ref{thm:open-criterion} covers even lengths.
+  This adds an even-length conclusion to the odd equal-field theorem of
+  \cite[Theorem 1.1]{OpenAIBoundary}.
 \end{proof}
