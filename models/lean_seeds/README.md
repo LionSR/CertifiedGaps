@@ -63,8 +63,13 @@ These studies focus on the finite seed inequalities rather than reflection posit
 already formalized in [`lean/`](../../lean):
 - For the spin-1 Heisenberg chain, reflection positivity is proved in the Cartesian basis in
   `lean/CertifiedGaps/Heisenberg/Main.lean` ($-h = \sum_\alpha C_\alpha \otimes \overline{C_\alpha}$
-  with $C_\alpha = i S^\alpha$); the unitary change-of-basis bridge from that Cartesian matrix to
-  the $S^z$-basis integer matrices used in `SeedKernel` remains an open formalization task.
+  with $C_\alpha = i S^\alpha$). The unitary change of basis from that Cartesian matrix to the
+  $S^z$-basis integer exchange `exchangeZ` is proved in
+  `lean/CertifiedGaps/Heisenberg/SzBridge.lean` (`conj_hamiltonian`), so the trial-state checks in
+  `lean/SeedKernel/Heisenberg` bound the Cartesian ring. The twisted rings are reduced to the
+  single-site transfer matrix in `Heisenberg/SectorTransfer.lean` and
+  `Heisenberg/SectorTransferC.lean`. The base-3 packed matrices of the `spin1_kernel` Ritz
+  witnesses (`lean/SeedKernel/Spin1`, Std only) are still not linked to `RPRing.hamiltonian`.
 - For the longitudinal-field Ising chain, reflection positivity holds in the standard Pauli-$`Z`$
   basis with single bond factor $C_1 = Z$ ($-h_{\mathrm{bond}} = Z \otimes Z$) and real diagonal
   on-site term $o = -g X - h Z$, checked directly in `lean/CertifiedGaps/Models/IsingLongitudinal.lean`.
