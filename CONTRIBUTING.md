@@ -14,18 +14,18 @@ targets.
 
 ## Summary of requirements
 
-1. **Computer certificate (`models/<slug>/`):** Follow [`AGENTS.md`](AGENTS.md). Provide an exact
+1. **Computer certificate (`code/models/<slug>/`):** Follow [`AGENTS.md`](AGENTS.md). Provide an exact
    reflection-positivity factorization, rigorous enclosures of the seed purity defects at
    $(n_0, \beta_0)$, the gap bound from the doubling recurrence, and a standalone checker
    `check.jl`. Update the summary table in the root [`README.md`](README.md).
-2. **Lean 4 theorem (`leaderboard/`):** Follow [`leaderboard/README.md`](leaderboard/README.md).
+2. **Lean 4 theorem (`code/leaderboard/`):** Follow [`code/leaderboard/README.md`](code/leaderboard/README.md).
    Proofs may depend only on Lean's standard axioms (`propext`, `Classical.choice`, `Quot.sound`).
 3. **Leaderboard entry (`home_page/_data/records.yml`):** Add or update the row in
    [`home_page/_data/records.yml`](home_page/_data/records.yml) and run the validator locally:
 
    ```sh
-   julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
-   julia --project=tools/leaderboard tools/leaderboard/check_records.jl
+   julia --project=code/tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
+   julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl
    ```
 
 4. **Issues:** Open an issue to coordinate work on an open problem or use the

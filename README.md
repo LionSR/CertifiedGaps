@@ -31,56 +31,65 @@ and each model's `README.md` list every parameter point, seed, and Lean 4 theore
 
 | Model | Points | Largest certified gap | Lengths | Directory |
 |---|---:|---|---|---|
-| Spin-1 Heisenberg chain | 2 | $0.0729$ | even $L \ge 36$ | [`models/spin1`](models/spin1/) |
-| Spin-1 Heisenberg open chain | 1 | $0.0058$, at $h = 3/5$ | odd $n \ge 1921$ | [`lean/.../OpenChain.lean`](lean/CertifiedGaps/Heisenberg/OpenChain.lean) |
-| Transverse- and longitudinal-field Ising chain | 30 | $4.5202$, at $g = 3/4, h = 1$ | even $L \ge 6$ | [`models/tfim_longitudinal`](models/tfim_longitudinal/) |
-| Spin-½ Heisenberg chain in a staggered field | 5 | $1.1489$, at $h = 1$ | even $L \ge 8$ | [`models/heisenberg_staggered_field`](models/heisenberg_staggered_field/) |
-| Spin-½ dimerized Heisenberg chain | 3 | $0.5347$, at $\delta = 1/2$ | even $L \ge 4$ | [`models/dimerized_heisenberg`](models/dimerized_heisenberg/) |
-| Spin-1 dimerized Heisenberg chain | 2 | $0.5288$, at $\delta = 9/10$ | even $L \ge 2$ | [`models/spin1_dimerized`](models/spin1_dimerized/) |
-| Spin-1 Heisenberg chain with single-ion anisotropy | 4 | $0.8994$, at $D = 4$ | even $L \ge 6$ | [`models/spin1_largeD`](models/spin1_largeD/) |
-| Two-leg spin-½ Heisenberg ladder | 5 | $1.1024$, at $J_\perp = 4$ | even $L \ge 4$ | [`models/heisenberg_ladder`](models/heisenberg_ladder/) |
-| Two-leg transverse-field Ising ladder | 1 | $0.6368$, at $g = 3$ | even $L \ge 4$ | [`models/two_leg_tfim`](models/two_leg_tfim/) |
+| Spin-1 Heisenberg chain | 2 | $0.0729$ | even $L \ge 36$ | [`code/models/spin1`](code/models/spin1/) |
+| Spin-1 Heisenberg open chain | 1 | $0.0058$, at $h = 3/5$ | odd $n \ge 1921$ | [`code/lean/.../OpenChain.lean`](code/lean/CertifiedGaps/Heisenberg/OpenChain.lean) |
+| Transverse- and longitudinal-field Ising chain | 30 | $4.5202$, at $g = 3/4, h = 1$ | even $L \ge 6$ | [`code/models/tfim_longitudinal`](code/models/tfim_longitudinal/) |
+| Spin-½ Heisenberg chain in a staggered field | 5 | $1.1489$, at $h = 1$ | even $L \ge 8$ | [`code/models/heisenberg_staggered_field`](code/models/heisenberg_staggered_field/) |
+| Spin-½ dimerized Heisenberg chain | 3 | $0.5347$, at $\delta = 1/2$ | even $L \ge 4$ | [`code/models/dimerized_heisenberg`](code/models/dimerized_heisenberg/) |
+| Spin-1 dimerized Heisenberg chain | 2 | $0.5288$, at $\delta = 9/10$ | even $L \ge 2$ | [`code/models/spin1_dimerized`](code/models/spin1_dimerized/) |
+| Spin-1 Heisenberg chain with single-ion anisotropy | 4 | $0.8994$, at $D = 4$ | even $L \ge 6$ | [`code/models/spin1_largeD`](code/models/spin1_largeD/) |
+| Two-leg spin-½ Heisenberg ladder | 5 | $1.1024$, at $J_\perp = 4$ | even $L \ge 4$ | [`code/models/heisenberg_ladder`](code/models/heisenberg_ladder/) |
+| Two-leg transverse-field Ising ladder | 1 | $0.6368$, at $g = 3$ | even $L \ge 4$ | [`code/models/two_leg_tfim`](code/models/two_leg_tfim/) |
 
-Pilot studies without a gap certificate: [`models/blbq_haldane`](models/blbq_haldane/)
-(bilinear–biquadratic chain), [`models/spin2`](models/spin2/) (spin-2 chain), and
-[`models/aklt`](models/aklt/) (honeycomb AKLT).
+Pilot studies without a gap certificate: [`code/models/blbq_haldane`](code/models/blbq_haldane/)
+(bilinear–biquadratic chain), [`code/models/spin2`](code/models/spin2/) (spin-2 chain), and
+[`code/models/aklt`](code/models/aklt/) (honeycomb AKLT).
 
 ## Layout
 
+The folders follow the
+[Agentic Publication Protocol](https://github.com/LionSR/AgenticPublicationProtocol/blob/main/PROTOCOL.md)
+layout. This is a repository organization change, not a validated APP release.
+
 | Directory | Content |
 |---|---|
-| [`julia/`](julia/) | `CertifiedGaps` core package (recurrence, exact/interval arithmetic, verified spectra) |
-| [`models/`](models/) | Model certificates (`certify.jl`, `check.jl`, `results/`) |
-| [`lean/`](lean/) | Lean 4 formalization (`CertifiedGaps`) and kernel-checked seeds (`SeedKernel`) |
-| [`leaderboard/`](leaderboard/) | Lean record table (`Leaderboard`) and `leaderboard_audit` |
+| [`paper/`](paper/) | Main diagrammatic Haldane-gap note, companion notes, and PDFs |
+| [`code/`](code/) | Julia package, model generators/checkers, Lean proofs, leaderboard, and tools |
+| [`data/`](data/) | Stored certificates, witnesses, numerical summaries, and external-data instructions |
+| [`environment/`](environment/) | Setup commands and canonical dependency specifications |
+| [`supplementary/`](supplementary/) | Interactive visual explainer and narrated-film instructions |
 | [`blueprint/`](blueprint/), [`home_page/`](home_page/) | Lean blueprint and Jekyll website |
-| [`explainer/`](explainer/) | Interactive visual explainer |
-| [`tools/`](tools/) | Upstream data fetcher and leaderboard validator |
-| [`notes/`](notes/) | LaTeX notes |
+
+The paper entry point is
+[*A Diagrammatic Proof of the Haldane Gap via Spacetime Tensor Networks*](paper/thermal-mpo-gap-note.pdf).
+The root Lake files, `blueprint/`, and `home_page/` remain where the Lean documentation build
+expects them. Each model's `results/` is a relative symlink to its canonical data directory;
+certificate bytes and model-local source hashes are preserved.
 
 See [`CONTRIBUTING.md`](CONTRIBUTING.md) to submit a record and [`AGENTS.md`](AGENTS.md) for the
 certificate specification.
 
 ## Reproduce
 
-Requirements: Julia 1.12 and `elan` (Lean 4).
+Requirements: Julia 1.12 and `elan` (Lean 4). See
+[`environment/README.md`](environment/README.md) for setup and dependency locations.
 
 ```sh
 # Julia core tests
-julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+julia --project=code/julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 
 # Check a model certificate (add --full to recompute spectra)
-OPENBLAS_NUM_THREADS=1 julia --project=julia models/heisenberg_ladder/check.jl
+OPENBLAS_NUM_THREADS=1 julia --project=code/julia code/models/heisenberg_ladder/check.jl
 
 # Check the spin-1 certificate
-julia tools/fetch_upstream.jl
-julia --project=models/spin1 -e 'using Pkg; Pkg.instantiate()'
-julia --project=models/spin1 models/spin1/check.jl
+julia code/tools/fetch_upstream.jl
+julia --project=code/models/spin1 -e 'using Pkg; Pkg.instantiate()'
+julia --project=code/models/spin1 code/models/spin1/check.jl
 
 # Build Lean 4 proofs and validate the leaderboard
 lake exe cache get && lake build
 lake exe leaderboard_audit home_page/_data/lean_records.json
-julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
-julia --project=tools/leaderboard tools/leaderboard/check_records.jl \
+julia --project=code/tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
+julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl \
   --lean-records home_page/_data/lean_records.json
 ```

@@ -19,7 +19,7 @@ good tasks to start with.
 
 ## Certify a bound by computer
 
-Put each model in its own directory `models/<slug>/` following
+Put each model in its own directory `code/models/<slug>/` following
 [`AGENTS.md`]({{ repo_blob }}AGENTS.md). A certificate has four parts.
 
 1. Reflection positivity. Give matrices $$C_\alpha$$ with exact rational or algebraic entries such
@@ -41,14 +41,14 @@ Put each model in its own directory `models/<slug>/` following
 
 ## Prove a bound in Lean 4
 
-Put the theorem in the library `Leaderboard` in `leaderboard/`. Its
-[README]({{ repo_blob }}leaderboard/README.md) gives the details.
+Put the theorem in the library `Leaderboard` in `code/leaderboard/`. Its
+[README]({{ repo_blob }}code/leaderboard/README.md) gives the details.
 
 * An unconditional record (`Record.Unconditional`) proves the seed bounds and the doubling steps
   in the Lean kernel.
 * A seeded record (`Record.Seeded`, `Record.SeededOn`, `Record.TwoSeeded`) uses the two seed
   inequalities at $$(n_0, \beta_0)$$ as hypotheses. The computer certificate supplies these
-  inequalities. Run `tools/leaderboard/lean_chains.jl` to generate the 14 exact doubling steps. The
+  inequalities. Run `code/tools/leaderboard/lean_chains.jl` to generate the 14 exact doubling steps. The
   kernel checks them with `decide +kernel`.
 
 Use only the standard axioms of Lean (`propext`, `Classical.choice`, `Quot.sound`). CI rejects
@@ -67,8 +67,8 @@ Add or change the entry in
 file describes the fields. Run the validator before you open the pull request:
 
 ```sh
-julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
-julia --project=tools/leaderboard tools/leaderboard/check_records.jl
+julia --project=code/tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
+julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl
 ```
 
 ## Automatic checks
@@ -78,7 +78,7 @@ julia --project=tools/leaderboard tools/leaderboard/check_records.jl
 | `lake build`, `leaderboard_audit` | each pull request and each push to `main` (`blueprint.yml`) | builds the Lean theorems, checks that they use only the standard axioms, and writes `lean_records.json` |
 | `leanchecker` | changes to Lean code, and each week (`kernel-check.yml`) | replays `Leaderboard` and all its imports in the Lean kernel, in a fresh process |
 | `check_records.jl` | each pull request and each push to `main`, and with certificate runs | compares each entry of `records.yml` with its certificate and its Lean theorem, and checks that each displayed decimal is rounded down |
-| `models/<slug>/check.jl` | changes to a model or to `julia/`, and each week for all models (`certificates.yml`) | reruns the checker of each changed model |
+| `code/models/<slug>/check.jl` | changes to a model or to `code/julia/`, and each week for all models (`certificates.yml`) | reruns the checker of each changed model |
 
 ## Human review
 
@@ -86,7 +86,7 @@ Programs cannot check all parts of a submission. A maintainer reads each pull re
 these items:
 
 * The Hamiltonian, couplings, boundary conditions and unit cell in `records.yml` agree with the
-  code in `models/<slug>/` and with the Lean definition of the spectrum.
+  code in `code/models/<slug>/` and with the Lean definition of the spectrum.
 * The reflection-positivity identity is exact.
 * The trusted arithmetic in the README of the model follows [`AGENTS.md`]({{ repo_blob }}AGENTS.md).
 * The numerical estimate of the gap has a source.
