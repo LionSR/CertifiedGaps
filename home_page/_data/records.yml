@@ -1,6 +1,6 @@
 # The leaderboard data: the single hand-edited source of the leaderboard page. Validate after
 # every edit:
-#     julia --project=tools/leaderboard tools/leaderboard/check_records.jl
+#     julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl
 # Exact numbers are strings: "13480", "97/4". Decimals are strings rounded down. LaTeX goes
 # between $...$. Text fields may hold inline HTML; they are not Markdown.
 #
@@ -8,7 +8,7 @@
 #   key, glyph, label (the one name used everywhere), meaning (one sentence for the legend)
 #
 # families: one per Hamiltonian with free parameters.
-#   key, name, hamiltonian (LaTeX), slug (models/<slug>/, optional), cells (what L counts),
+#   key, name, hamiltonian (LaTeX), slug (code/models/<slug>/, optional), cells (what L counts),
 #   gap_source (where the numerical gaps of its records come from),
 #   grid {rows, cols} (optional: show the family as a grid of params[rows] x params[cols])
 #
@@ -35,7 +35,7 @@
 #                 L >= lengths.L0; must match lean_records.json. When the theorem starts from
 #                 another seed than the row, lean.certificate names the certificate of that seed
 #   certificate   path of the certificate data; check: path of the checker (default
-#                 models/<slug>/check.jl)
+#                 code/models/<slug>/check.jl)
 #   date, pr      when and in which pull request the current bound was set (pr may be null)
 #   contributors  GitHub handles of the people who set the bound (linked to their profiles);
 #                 a group without a handle is written as a plain name, e.g. 'OpenAI (preprint)'
@@ -170,7 +170,7 @@ challenges:
       Certify the spin-1 seed calculation on rings of at most 12 sites, to an error of $10^{-3}$.
       This gives $\Delta_L > 0.039$ for all even $L \ge 60$, and the calculation is small enough
       for Lean 4 to check.
-    link: models/lean_seeds/README.md
+    link: code/models/lean_seeds/README.md
   - id: lean-odd-seed
     family: spin1-dimerized
     title: 'Odd seeds in Lean'
@@ -178,7 +178,7 @@ challenges:
       One bound, for the dimerized spin-1 chain at $\delta = 7/10$, uses a seed of 3 cells. Its
       Lean 4 proof needs one more lemma: the transfer operator factors as $X_\beta = K K^*$.
       Prove this lemma in Lean 4.
-    link: models/spin1_dimerized/README.md
+    link: code/models/spin1_dimerized/README.md
 
 
 records:
@@ -193,8 +193,8 @@ records:
     tier: lean-conditional
     method: 'temperature lifting, two seeds'
     lean: {name: Leaderboard.Records.SpinOneHeisenberg.temperature_lifting, r: "16689019/2500000", beta: "833/32", decimal: "0.072930044"}
-    certificate: models/spin1/experiments/temperature-lift.json
-    check: models/spin1/experiments/test_temperature_lift.jl
+    certificate: data/models/spin1/experiments/temperature-lift.json
+    check: code/models/spin1/experiments/test_temperature_lift.jl
     date: "2026-10-17"
     pr: null
     contributors: ['LionSR']
@@ -221,7 +221,7 @@ records:
     tier: lean-conditional
     method: 'OpenAI data, exact purities'
     lean: {name: Leaderboard.Records.SpinOneHeisenberg.heisenberg, r: "41196029/1000000", beta: "784", decimal: "0.004742"}
-    certificate: models/spin1/results/scalars.json
+    certificate: data/models/spin1/scalars.json
     date: "2026-10-17"
     pr: null
     contributors: ['LionSR']
@@ -246,7 +246,7 @@ records:
     numerical_gap: "1.87351193"
     tier: certified
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1, r: "41501591/100000", beta: "21/4", decimal: "1.148250"}
-    certificate: models/heisenberg_staggered_field/results/certificate_1_1.json
+    certificate: data/models/heisenberg_staggered_field/certificate_1_1.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -265,7 +265,7 @@ records:
     numerical_gap: "1.57089206"
     tier: certified
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_3_4, r: "10739897/100000", beta: "21/4", decimal: "0.890771"}
-    certificate: models/heisenberg_staggered_field/results/certificate_3_4.json
+    certificate: data/models/heisenberg_staggered_field/certificate_3_4.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -282,7 +282,7 @@ records:
     numerical_gap: "1.23131976"
     tier: certified
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_2, r: "26344587/1000000", beta: "11/2", decimal: "0.594775"}
-    certificate: models/heisenberg_staggered_field/results/certificate_1_2.json
+    certificate: data/models/heisenberg_staggered_field/certificate_1_2.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -299,7 +299,7 @@ records:
     numerical_gap: "0.994380622"
     tier: certified
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_7_20, r: "90713109/10000000", beta: "23/4", decimal: "0.383498"}
-    certificate: models/heisenberg_staggered_field/results/certificate_7_20.json
+    certificate: data/models/heisenberg_staggered_field/certificate_7_20.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -316,7 +316,7 @@ records:
     numerical_gap: "0.812031433"
     tier: certified
     lean: {name: Leaderboard.Records.StaggeredHeisenberg.h_1_4, r: "19104427/5000000", beta: "25/4", decimal: "0.214477"}
-    certificate: models/heisenberg_staggered_field/results/certificate_1_4.json
+    certificate: data/models/heisenberg_staggered_field/certificate_1_4.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -334,7 +334,7 @@ records:
     numerical_gap: "1.188631"
     tier: certified
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "12370753/500000", beta: "6", decimal: "0.534747"}
-    certificate: models/dimerized_heisenberg/results/certificate_delta_1_2_beta_6.json
+    certificate: data/models/dimerized_heisenberg/certificate_delta_1_2_beta_6.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -355,7 +355,7 @@ records:
     numerical_gap: "0.810214"
     tier: certified
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "6164911/2000000", beta: "13/2", decimal: "0.173188"}
-    certificate: models/dimerized_heisenberg/results/certificate_delta_3_10_beta_13_2.json
+    certificate: data/models/dimerized_heisenberg/certificate_delta_3_10_beta_13_2.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -374,7 +374,7 @@ records:
     numerical_gap: "0.707193"
     tier: certified
     lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "15251257/10000000", beta: "29/4", decimal: "0.058217"}
-    certificate: models/dimerized_heisenberg/results/certificate_delta_1_4_beta_29_4.json
+    certificate: data/models/dimerized_heisenberg/certificate_delta_1_4_beta_29_4.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -397,7 +397,7 @@ records:
     numerical_gap: "1.7627"
     tier: certified
     lean: {name: Leaderboard.Records.SpinOneDimerized.delta_9_10, r: "12729193/2000000", beta: "7/2", decimal: "0.528785953268"}
-    certificate: models/spin1_dimerized/results/certificate_d9.json
+    certificate: data/models/spin1_dimerized/certificate_d9.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -413,7 +413,7 @@ records:
     seed: {n0: 3, beta0: "17/4", text: 'The seed length $n_0 = 3$ is odd, which is allowed because the transfer operator factors as $X_\beta = K K^* \succeq 0$'}
     numerical_gap: "1.2659"
     tier: certified
-    certificate: models/spin1_dimerized/results/certificate_d7.json
+    certificate: data/models/spin1_dimerized/certificate_d7.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -432,8 +432,8 @@ records:
     seed: {n0: 12, beta0: "29/10", text: 'The seed $(12, 29/10)$ covers $L \ge 12$; the rings with $L = 6, 8, 10$ are covered by verified enclosures of their gaps'}
     numerical_gap: "2.26946"
     tier: certified
-    lean: {name: Leaderboard.Records.SpinOneLargeD.D_4, r: "47731477/10000000", beta: "9/4", decimal: "0.694669325", certificate: models/spin1_largeD/results/certificate_D4_1.json}
-    certificate: models/spin1_largeD/results/certificate.json
+    lean: {name: Leaderboard.Records.SpinOneLargeD.D_4, r: "47731477/10000000", beta: "9/4", decimal: "0.694669325", certificate: data/models/spin1_largeD/certificate_D4_1.json}
+    certificate: data/models/spin1_largeD/certificate.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -457,7 +457,7 @@ records:
     numerical_gap: "1.54533"
     tier: certified
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_1603_500, r: "5033559/5000000", beta: "381/125", decimal: "0.002194677"}
-    certificate: models/spin1_largeD/results/certificate.json
+    certificate: data/models/spin1_largeD/certificate.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -474,7 +474,7 @@ records:
     numerical_gap: "1.54533"
     tier: certified
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_interval_3206, r: "5014989/5000000", beta: "381/125", decimal: "0.000982058"}
-    certificate: models/spin1_largeD/results/certificate.json
+    certificate: data/models/spin1_largeD/certificate.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -491,7 +491,7 @@ records:
     numerical_gap: "2.26946"
     tier: certified
     lean: {name: Leaderboard.Records.SpinOneLargeD.D_interval_4, r: "5016317/5000000", beta: "23/10", decimal: "0.001416559"}
-    certificate: models/spin1_largeD/results/certificate.json
+    certificate: data/models/spin1_largeD/certificate.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -509,7 +509,7 @@ records:
     numerical_gap: "3.1375"
     tier: certified
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_4, r: "11334983/1250000", beta: "2", decimal: "1.102375116"}
-    certificate: models/heisenberg_ladder/results/certificate_J4.json
+    certificate: data/models/heisenberg_ladder/certificate_J4.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -529,7 +529,7 @@ records:
     numerical_gap: "2.6584"
     tier: certified
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_7_2, r: "5765561/1000000", beta: "9/4", decimal: "0.778623315"}
-    certificate: models/heisenberg_ladder/results/certificate_J7_2.json
+    certificate: data/models/heisenberg_ladder/certificate_J7_2.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -549,7 +549,7 @@ records:
     numerical_gap: "2.1864"
     tier: certified
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_3, r: "31124723/10000000", beta: "5/2", decimal: "0.454166944"}
-    certificate: models/heisenberg_ladder/results/certificate_J3.json
+    certificate: data/models/heisenberg_ladder/certificate_J3.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -569,7 +569,7 @@ records:
     numerical_gap: "1.7252"
     tier: certified
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_5_2, r: "11356953/10000000", beta: "3", decimal: "0.042415020"}
-    certificate: models/heisenberg_ladder/results/certificate_J5_2.json
+    certificate: data/models/heisenberg_ladder/certificate_J5_2.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -585,7 +585,7 @@ records:
     seed: {n0: 4, beta0: "3"}
     tier: certified
     lean: {name: Leaderboard.Records.HeisenbergLadder.Jperp_163069_65536, r: "1004547/1000000", beta: "3", decimal: "0.001512231"}
-    certificate: models/heisenberg_ladder/results/certificate_J163069_65536.json
+    certificate: data/models/heisenberg_ladder/certificate_J163069_65536.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -606,7 +606,7 @@ records:
     numerical_gap: "2.6618"
     tier: certified
     lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "25974347/10000000", beta: "3/2", decimal: "0.636349536"}
-    certificate: models/two_leg_tfim/results/certificate_g3_1.json
+    certificate: data/models/two_leg_tfim/certificate_g3_1.json
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -624,7 +624,7 @@ records:
     numerical_gap: "1.1904"
     tier: lean-unconditional
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_20, r: "2706387/200", beta: "97/4", decimal: "0.392280"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_20.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_4_h1_20.json.gz
     date: "2026-10-17"
     pr: null
     contributors: ['LionSR']
@@ -649,7 +649,7 @@ records:
     numerical_gap: "2.3807"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_10, r: "11954821/500", beta: "55/4", decimal: "0.733239"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_10.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_4_h1_10.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -666,7 +666,7 @@ records:
     numerical_gap: "4.1902"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_4, r: "6090116/125", beta: "13/2", decimal: "1.660594"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_4.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_4_h1_4.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -683,7 +683,7 @@ records:
     numerical_gap: "4.8428"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_2, r: "26187609/500", beta: "11/2", decimal: "1.975670"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_2.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_4_h1_2.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -700,7 +700,7 @@ records:
     numerical_gap: "5.9397"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_4_h_1, r: "43323337/1000", beta: "21/4", decimal: "2.033608"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_4_h1_1.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_4_h1_1.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -717,7 +717,7 @@ records:
     numerical_gap: "1.1575"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_20, r: "3771579/10000", beta: "13", decimal: "0.456358"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_20.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_2_h1_20.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -734,7 +734,7 @@ records:
     numerical_gap: "2.3145"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_10, r: "21500127/10000", beta: "8", decimal: "0.959153"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_10.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_2_h1_10.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -751,7 +751,7 @@ records:
     numerical_gap: "3.6417"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_4, r: "5154939/125", beta: "9/2", decimal: "2.361589"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_4.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_2_h1_4.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -768,7 +768,7 @@ records:
     numerical_gap: "4.4918"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1_2, r: "16566669/250", beta: "4", decimal: "2.775360"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_2.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_2_h1_2.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -785,7 +785,7 @@ records:
     numerical_gap: "5.7804"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_2_h_1, r: "13686553/250", beta: "4", decimal: "2.727615"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_2_h1_1.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_2_h1_1.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -802,7 +802,7 @@ records:
     numerical_gap: "1.0807"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_20, r: "6315629/500000", beta: "8", decimal: "0.317021"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_20.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_4_h1_20.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -819,7 +819,7 @@ records:
     numerical_gap: "2.1209"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_10, r: "28665237/500000", beta: "21/4", decimal: "0.771206"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_10.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_4_h1_10.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -836,7 +836,7 @@ records:
     numerical_gap: "3.0756"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_4, r: "1566019/1000", beta: "7/2", decimal: "2.101797"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_4.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_4_h1_4.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -853,7 +853,7 @@ records:
     numerical_gap: "4.0891"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1_2, r: "9458843/250", beta: "7/2", decimal: "3.011714"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_2.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_4_h1_2.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -870,7 +870,7 @@ records:
     numerical_gap: "5.5673"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_4_h_1, r: "29371647/500", beta: "7/2", decimal: "3.137409"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_4_h1_1.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_4_h1_1.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -887,7 +887,7 @@ records:
     numerical_gap: "0.8676"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_20, r: "656893/400000", beta: "13/2", decimal: "0.076316"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_20.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_1_h1_20.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -904,7 +904,7 @@ records:
     numerical_gap: "1.5324"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_10, r: "85257569/10000000", beta: "17/4", decimal: "0.504256"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_10.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_1_h1_10.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -921,7 +921,7 @@ records:
     numerical_gap: "2.573"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_4, r: "390352/3125", beta: "3", decimal: "1.609204"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_4.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_1_h1_4.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -938,7 +938,7 @@ records:
     numerical_gap: "3.7089"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1_2, r: "38538963/10000", beta: "3", decimal: "2.752279"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_2.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_1_h1_2.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -955,7 +955,7 @@ records:
     numerical_gap: "5.3425"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_1_h_1, r: "27659233/500", beta: "3", decimal: "3.640287"}
-    certificate: models/tfim_longitudinal/results/certificate_g1_1_h1_1.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g1_1_h1_1.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -972,7 +972,7 @@ records:
     numerical_gap: "1.0853"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_20, r: "723049/400000", beta: "7/2", decimal: "0.169146"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_20.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_2_h1_20.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -989,7 +989,7 @@ records:
     numerical_gap: "1.2881"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_10, r: "6445599/2000000", beta: "13/4", decimal: "0.360077"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_10.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_2_h1_10.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -1006,7 +1006,7 @@ records:
     numerical_gap: "2.0626"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_4, r: "729083/40000", beta: "11/4", decimal: "1.055602"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_4.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_2_h1_4.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -1023,7 +1023,7 @@ records:
     numerical_gap: "3.204"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1_2, r: "820097/4000", beta: "5/2", decimal: "2.129251"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_2.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_2_h1_2.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -1040,7 +1040,7 @@ records:
     numerical_gap: "4.9782"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_3_2_h_1, r: "10534123/1000", beta: "5/2", decimal: "3.704950"}
-    certificate: models/tfim_longitudinal/results/certificate_g3_2_h1_1.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g3_2_h1_1.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -1057,7 +1057,7 @@ records:
     numerical_gap: "2.0196"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_20, r: "4865291/625000", beta: "9/4", decimal: "0.912057"}
-    certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_20.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g2_1_h1_20.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -1074,7 +1074,7 @@ records:
     numerical_gap: "2.0763"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_10, r: "17508041/2000000", beta: "9/4", decimal: "0.964228"}
-    certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_10.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g2_1_h1_10.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -1091,7 +1091,7 @@ records:
     numerical_gap: "2.415"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_4, r: "17526371/1000000", beta: "9/4", decimal: "1.272758"}
-    certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_4.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g2_1_h1_4.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -1108,7 +1108,7 @@ records:
     numerical_gap: "3.222"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1_2, r: "45057249/500000", beta: "9/4", decimal: "2.000480"}
-    certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_2.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g2_1_h1_2.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']
@@ -1125,7 +1125,7 @@ records:
     numerical_gap: "4.8539"
     tier: certified
     lean: {name: Leaderboard.Records.IsingLongitudinal.g_2_h_1, r: "2154751/2000", beta: "2", decimal: "3.491141"}
-    certificate: models/tfim_longitudinal/results/certificate_g2_1_h1_1.json.gz
+    certificate: data/models/tfim_longitudinal/certificate_g2_1_h1_1.json.gz
     date: "2026-10-18"
     pr: 81
     contributors: ['LionSR']

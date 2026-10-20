@@ -1,0 +1,20 @@
+# Regenerable or downloaded data; see README "Reproduce". Committed results are listed there.
+
+# Shared: paper sources (tools/fetch_upstream.jl --paper), scratch caches, logs, temporaries
+/upstream/
+/cache/
+/.cache/
+/.runtime/
+/runtime/
+*.log
+*.tmp
+*.jls
+
+# seed_design: raw search rows (scripts/seed_design/search_*.jl, refine.jl)
+
+# spectrum: raw filter runs, the full eigenvalue dump, per-sector cost rows, and the
+# platform-dependent ARPACK comparison written by check.jl
+
+# anchor: NON-CERTIFYING Float64 scan rows, ring spectra, analysis and continuation stages
+
+# spin1_kernel: raw Lean output of scripts/spin1_kernel/benchmark.jl
