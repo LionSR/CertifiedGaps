@@ -49,3 +49,10 @@ import SeedKernel
 #print axioms SeedKernel.Ising.ising_gap
 #print axioms SeedKernel.Ising.wrong_eigenvalue_rejected
 #print axioms SeedKernel.Ising.wrong_vector_rejected
+#print axioms CertifiedGaps.SpinOneHeisenberg.trial_check_72
+#print axioms CertifiedGaps.SpinOneHeisenberg.trial_check_120
+#print axioms CertifiedGaps.SpinOneHeisenberg.gap_of_table
+#print axioms CertifiedGaps.SpinOneHeisenberg.gap_log_twenty_of_table
+#print axioms CertifiedGaps.SpinOneHeisenberg.seed60_of_table
+#print axioms CertifiedGaps.SpinOneHeisenberg.gap_sixty_of_table
+#print axioms CertifiedGaps.SpinOneHeisenberg.gap_sixty_chain_of_table

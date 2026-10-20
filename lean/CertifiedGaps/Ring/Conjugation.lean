@@ -14,9 +14,16 @@ and one-site operators sitewise (`conj_bondOp_kronecker`, `conj_siteOp`), hence 
 Hamiltonian bond by bond and site by site (`RPRing.conj_hamiltonian`), and unitary conjugation
 preserves the spectrum with multiplicity (`eigenvalues_eq_of_conj`). So a gap proved for the
 rotated Hamiltonian holds for the physical one (`RPRing.eigenvalues_eq_spectrum`).
+
+The same conjugation changes the local basis of a ring `∑ⱼ Bⱼ,ⱼ₊₁`, including a ring whose
+closing bond carries a twist `Bc`: a one-site unitary `V` on every site turns every bond `B` into
+`(V ⊗ V)ᴴ B (V ⊗ V)` (`conj_twistedRingHamiltonian`, `conj_ringHamiltonian`) and leaves the
+Gibbs trace unchanged (`gibbsTrace_twistedRingHamiltonian_conj`,
+`gibbsTrace_ringHamiltonian_conj`). This lets a model state its reflection-positivity
+factorization in one basis and compute its seeds in another.
 -/
 
-open Matrix
+open Matrix NormedSpace
 open scoped Kronecker
 
 namespace CertifiedGaps
@@ -66,6 +73,86 @@ theorem conj_siteOp (a : Fin L → Matrix d d ℂ) (ha : ∀ i, a i * (a i)ᴴ =
   by_cases h : i = j
   · subst h; simp
   · simp [h, ha i]
+
+omit [Fintype d] in
+/-- A matrix unit on a pair of sites is a tensor product of matrix units. -/
+theorem single_eq_kronecker (p q : d × d) (x : ℂ) :
+    single p q x = single p.1 q.1 x ⊗ₖ single p.2 q.2 1 := by
+  rw [single_kronecker_single, mul_one]
+
+/-- Sitewise conjugation of any two-site operator on distinct sites: the product `⨂ᵢ aᵢ` acts
+on the bond `j, k` as `aⱼ ⊗ aₖ`. Every two-site operator is a sum of tensor products of matrix
+units, which reduces this to `conj_bondOp_kronecker`. -/
+theorem conj_bondOp (a : Fin L → Matrix d d ℂ) (ha : ∀ i, a i * (a i)ᴴ = 1) {j k : Fin L}
+    (hjk : j ≠ k) (B : Matrix (d × d) (d × d) ℂ) :
+    piTensor a * bondOp j k B * piTensor (fun i ↦ (a i)ᴴ) =
+      bondOp j k ((a j ⊗ₖ a k) * B * (a j ⊗ₖ a k)ᴴ) := by
+  conv_lhs => rw [matrix_eq_sum_single B]
+  conv_rhs => rw [matrix_eq_sum_single B]
+  simp only [bondOp_sum, Finset.mul_sum, Finset.sum_mul, single_eq_kronecker,
+    conj_bondOp_kronecker a ha hjk, kronecker_conj]
+
+/-- The product `V^{⊗L}` of copies of one unitary is unitary. -/
+theorem piTensor_const_conjTranspose_mul_self (V : Matrix d d ℂ) (hV : Vᴴ * V = 1) :
+    (piTensor fun _ : Fin L ↦ V)ᴴ * piTensor (fun _ : Fin L ↦ V) = 1 := by
+  rw [conjTranspose_piTensor, piTensor_mul, hV, piTensor_one]
+
+/-- `conj_bondOp` for the same unitary `V` on every site, in the change-of-basis form
+`Uᴴ X U` (the columns of `V` are the new basis vectors). -/
+theorem conj_bondOp_const (V : Matrix d d ℂ) (hV : Vᴴ * V = 1) {j k : Fin L} (hjk : j ≠ k)
+    (B : Matrix (d × d) (d × d) ℂ) :
+    (piTensor fun _ : Fin L ↦ V)ᴴ * bondOp j k B * piTensor (fun _ : Fin L ↦ V) =
+      bondOp j k ((V ⊗ₖ V)ᴴ * B * (V ⊗ₖ V)) := by
+  have h := conj_bondOp (fun _ : Fin L ↦ Vᴴ) (fun _ ↦ by rw [conjTranspose_conjTranspose, hV])
+    hjk B
+  simp only [conjTranspose_conjTranspose] at h
+  rw [conjTranspose_piTensor, h, conjTranspose_kronecker, conjTranspose_kronecker,
+    conjTranspose_conjTranspose]
+
+/-! ### Changing the local basis of a ring -/
+
+/-- **Sitewise change of basis of a ring Hamiltonian**, with or without a twisted closing bond:
+the same unitary `V` on every site turns each bond `B` into `(V ⊗ V)ᴴ B (V ⊗ V)`. A ring of one
+site is excluded because its bond joins the site to itself. -/
+theorem conj_twistedRingHamiltonian (V : Matrix d d ℂ) (hV : Vᴴ * V = 1) (hL : L ≠ 1)
+    {B Bc B' Bc' : Matrix (d × d) (d × d) ℂ} (hB : (V ⊗ₖ V)ᴴ * B * (V ⊗ₖ V) = B')
+    (hBc : (V ⊗ₖ V)ᴴ * Bc * (V ⊗ₖ V) = Bc') :
+    (piTensor fun _ : Fin L ↦ V)ᴴ * twistedRingHamiltonian B Bc L *
+        piTensor (fun _ : Fin L ↦ V) = twistedRingHamiltonian B' Bc' L := by
+  rw [twistedRingHamiltonian, twistedRingHamiltonian, Finset.mul_sum, Finset.sum_mul]
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  have hL2 : 2 ≤ L := by have := j.isLt; omega
+  rw [conj_bondOp_const V hV (ne_finRotate hL2 j)]
+  split_ifs
+  · rw [hBc]
+  · rw [hB]
+
+/-- Sitewise change of basis of a translation-invariant ring: the bond `B` becomes
+`(V ⊗ V)ᴴ B (V ⊗ V)`. -/
+theorem conj_ringHamiltonian (V : Matrix d d ℂ) (hV : Vᴴ * V = 1) (hL : L ≠ 1)
+    (B : Matrix (d × d) (d × d) ℂ) :
+    (piTensor fun _ : Fin L ↦ V)ᴴ * ringHamiltonian B L * piTensor (fun _ : Fin L ↦ V) =
+      ringHamiltonian ((V ⊗ₖ V)ᴴ * B * (V ⊗ₖ V)) L := by
+  simp only [← twistedRingHamiltonian_self]
+  exact conj_twistedRingHamiltonian V hV hL rfl rfl
+
+/-- A sitewise change of basis leaves the Gibbs trace of a (twisted) ring unchanged: rings whose
+bonds are conjugate by `V ⊗ V` have the same partition function. -/
+theorem gibbsTrace_twistedRingHamiltonian_conj (V : Matrix d d ℂ) (hV : Vᴴ * V = 1)
+    (hL : L ≠ 1) {B Bc B' Bc' : Matrix (d × d) (d × d) ℂ}
+    (hB : (V ⊗ₖ V)ᴴ * B * (V ⊗ₖ V) = B') (hBc : (V ⊗ₖ V)ᴴ * Bc * (V ⊗ₖ V) = Bc') (β : ℝ) :
+    gibbsTrace (twistedRingHamiltonian B' Bc' L) β =
+      gibbsTrace (twistedRingHamiltonian B Bc L) β := by
+  rw [← conj_twistedRingHamiltonian V hV hL hB hBc,
+    gibbsTrace_conj _ _ (piTensor_const_conjTranspose_mul_self V hV)]
+
+/-- A sitewise change of basis of the bond leaves the Gibbs trace of a translation-invariant
+ring unchanged. -/
+theorem gibbsTrace_ringHamiltonian_conj (V : Matrix d d ℂ) (hV : Vᴴ * V = 1) (hL : L ≠ 1)
+    {B B' : Matrix (d × d) (d × d) ℂ} (hB : (V ⊗ₖ V)ᴴ * B * (V ⊗ₖ V) = B') (β : ℝ) :
+    gibbsTrace (ringHamiltonian B' L) β = gibbsTrace (ringHamiltonian B L) β := by
+  simp only [← twistedRingHamiltonian_self]
+  exact gibbsTrace_twistedRingHamiltonian_conj V hV hL hB hB β
 
 /-- Unitary conjugation preserves the eigenvalues with multiplicity. -/
 theorem eigenvalues_eq_of_conj {n : Type*} [Fintype n] [DecidableEq n] {A B U : Matrix n n ℂ}

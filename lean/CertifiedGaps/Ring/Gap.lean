@@ -98,6 +98,13 @@ noncomputable def spatialPurity (n : ℕ) (β : ℝ) : ℝ :=
 noncomputable def thermalPurity (L : ℕ) (β : ℝ) : ℝ :=
   R.partitionFunction L (2 * β) / R.partitionFunction L β ^ 2
 
+/-- The purities of the ring are those of its partition function. -/
+theorem spatialPurity_eq_spatialPurityOf (n : ℕ) (β : ℝ) :
+    R.spatialPurity n β = spatialPurityOf R.partitionFunction n β := rfl
+
+theorem thermalPurity_eq_thermalPurityOf (L : ℕ) (β : ℝ) :
+    R.thermalPurity L β = thermalPurityOf R.partitionFunction L β := rfl
+
 /-- **The two-purity criterion for a reflection-positive ring.** Let `n₀ ≥ 2` be even, `β₀ > 0`,
 and `c` a valid rational chain certificate with seed defects `s = c.sAt 0`, `t = c.tAt 0` and
 rate `r = c.r`. If `P_s(n₀, β₀) ≥ 1 - s` and `P_τ(2n₀, β₀) ≥ 1 - t`, then every even ring of

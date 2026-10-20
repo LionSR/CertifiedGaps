@@ -3,12 +3,7 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import Mathlib.Analysis.Matrix.Spectrum
-import Mathlib.Analysis.Normed.Algebra.MatrixExponential
-import Mathlib.Analysis.SpecialFunctions.Exponential
-import Mathlib.LinearAlgebra.Matrix.Kronecker
-import Mathlib.Logic.Equiv.Fin.Rotate
-import CertifiedGaps.Transfer.PiTensor
+import CertifiedGaps.Ring.Hamiltonian
 
 /-!
 # Reflection-positive rings
@@ -29,12 +24,14 @@ neighbouring cells and the intra-cell terms are part of `o`.
 
 * `RPRing d ι`: the data `C : ι → Matrix d d ℝ` and `o : Matrix d d ℝ` with the symmetry
   conditions.
-* `bondOp j k B`, `siteOp j A`: two-site and one-site operators on the ring.
-* `RPRing.hamiltonian L`, `RPRing.spectrum L`, `RPRing.partitionFunction L β`.
+* `RPRing.hamiltonian L`, `RPRing.spectrum L`, `RPRing.partitionFunction L β`, built from the
+  generic `bondOp`, `siteOp` and `gibbsTrace` of `Ring/Hamiltonian.lean`.
 
 ## Main results
 
 * `RPRing.hamiltonian_isHermitian`.
+* `RPRing.hamiltonian_eq_ringHamiltonian`: `H_L = ringHamiltonian h L + siteSum o L`.
+* `RPRing.partitionFunction_eq_gibbsTrace`: `Z_L(β) = gibbsTrace H_L β`.
 * `RPRing.partitionFunction_eq_sum`: `Re Tr e^{-βH_L} = ∑ₘ e^{-β Eₘ}`.
 -/
 
@@ -44,32 +41,6 @@ open scoped Kronecker
 namespace CertifiedGaps
 
 variable {d : Type} [Fintype d] [DecidableEq d]
-
-/-! ### Ring geometry -/
-
-/-- The cyclic successor in coordinates: `finRotate L j = j + 1`, wrapping `L - 1` to `0`. -/
-theorem val_finRotate {L : ℕ} (j : Fin L) :
-    (finRotate L j : ℕ) = if (j : ℕ) + 1 = L then 0 else (j : ℕ) + 1 := by
-  cases L with
-  | zero => exact j.elim0
-  | succ n =>
-    rw [coe_finRotate]
-    split_ifs with h₁ h₂ h₂ <;> simp_all [Fin.ext_iff]
-
-/-- On a ring of at least two sites, the two ends of a bond are distinct. -/
-theorem ne_finRotate {L : ℕ} (hL : 2 ≤ L) (j : Fin L) : j ≠ finRotate L j := by
-  intro h
-  have h' := congrArg Fin.val h
-  rw [val_finRotate] at h'
-  split_ifs at h' <;> omega
-
-/-- On an even ring the two ends of a bond have opposite parity. -/
-theorem odd_finRotate_iff {L : ℕ} (hL : Even L) (j : Fin L) :
-    Odd (finRotate L j : ℕ) ↔ ¬ Odd (j : ℕ) := by
-  rw [val_finRotate]
-  obtain ⟨k, hk⟩ := hL
-  have := j.isLt
-  split_ifs with h <;> simp only [Nat.odd_iff] <;> omega
 
 /-! ### Symmetric and antisymmetric real factors -/
 
@@ -100,123 +71,6 @@ theorem transpose_sum_kronecker_self {m κ : Type*} [Fintype κ] (A : κ → Mat
   rw [← kroneckerMap_transpose]
   rcases hA k with h | h <;> rw [h]
   ext; simp [kroneckerMap_apply]
-
-/-! ### Operators on the ring -/
-
-/-- The operator `B` on two sites `j, k` of a ring of `L` sites, acting as the identity on all
-other sites. -/
-def bondOp {L : ℕ} (j k : Fin L) (B : Matrix (d × d) (d × d) ℂ) :
-    Matrix (Fin L → d) (Fin L → d) ℂ :=
-  of fun σ τ ↦ if ∀ i, i ≠ j → i ≠ k → σ i = τ i then B (σ j, σ k) (τ j, τ k) else 0
-
-/-- The operator `A` on the site `j` of a ring of `L` sites, acting as the identity elsewhere. -/
-def siteOp {L : ℕ} (j : Fin L) (A : Matrix d d ℂ) : Matrix (Fin L → d) (Fin L → d) ℂ :=
-  piTensor fun i ↦ if i = j then A else 1
-
-omit [Fintype d] in
-/-- A Hermitian two-site operator embeds as a Hermitian operator on the ring. -/
-theorem bondOp_isHermitian {L : ℕ} (j k : Fin L) {B : Matrix (d × d) (d × d) ℂ}
-    (hB : B.IsHermitian) : (bondOp j k B).IsHermitian := by
-  ext σ τ
-  simp only [conjTranspose_apply, bondOp, of_apply]
-  split_ifs with h₁ h₂ h₂
-  · exact hB.apply _ _
-  · exact (h₂ fun i hj hk ↦ (h₁ i hj hk).symm).elim
-  · exact (h₁ fun i hj hk ↦ (h₂ i hj hk).symm).elim
-  · exact star_zero _
-
-omit [Fintype d] [DecidableEq d] in
-/-- The conjugate transpose of a tensor product is the tensor product of the conjugate
-transposes. -/
-theorem conjTranspose_piTensor {ι : Type*} [Fintype ι] (A : ι → Matrix d d ℂ) :
-    (piTensor A)ᴴ = piTensor fun i ↦ (A i)ᴴ := by
-  ext σ τ
-  simp [piTensor_apply, conjTranspose_apply, star_prod]
-
-omit [Fintype d] in
-/-- A Hermitian one-site operator embeds as a Hermitian operator on the ring. -/
-theorem siteOp_isHermitian {L : ℕ} (j : Fin L) {A : Matrix d d ℂ} (hA : A.IsHermitian) :
-    (siteOp j A).IsHermitian := by
-  change (siteOp j A)ᴴ = siteOp j A
-  rw [siteOp, conjTranspose_piTensor]
-  congr 1
-  ext1 i
-  split_ifs
-  · exact hA
-  · exact conjTranspose_one
-
-omit [Fintype d] in
-/-- The zero operator at one site is zero. -/
-theorem siteOp_zero {L : ℕ} (j : Fin L) : siteOp j (0 : Matrix d d ℂ) = 0 :=
-  piTensor_eq_zero (i₀ := j) (by simp)
-
-omit [Fintype d] in
-/-- `bondOp` is additive in the two-site operator. -/
-theorem bondOp_sum {L : ℕ} (j k : Fin L) {X : Type*} (s : Finset X)
-    (B : X → Matrix (d × d) (d × d) ℂ) :
-    bondOp j k (∑ x ∈ s, B x) = ∑ x ∈ s, bondOp j k (B x) := by
-  ext σ τ
-  simp only [bondOp, of_apply, Matrix.sum_apply]
-  split_ifs <;> simp
-
-omit [Fintype d] in
-/-- `bondOp` is homogeneous in the two-site operator. -/
-theorem bondOp_smul {L : ℕ} (j k : Fin L) (c : ℂ) (B : Matrix (d × d) (d × d) ℂ) :
-    bondOp j k (c • B) = c • bondOp j k B := by
-  ext σ τ
-  simp only [bondOp, of_apply, Matrix.smul_apply, smul_eq_mul]
-  split_ifs <;> simp
-
-omit [Fintype d] in
-/-- `bondOp` commutes with negation. -/
-theorem bondOp_neg {L : ℕ} (j k : Fin L) (B : Matrix (d × d) (d × d) ℂ) :
-    bondOp j k (-B) = -bondOp j k B := by
-  simpa using bondOp_smul j k (-1) B
-
-omit [Fintype d] in
-/-- A product operator `A ⊗ B` on two distinct sites is a tensor product over the ring. -/
-theorem bondOp_kronecker {L : ℕ} {j k : Fin L} (hjk : j ≠ k) (A B : Matrix d d ℂ) :
-    bondOp j k (A ⊗ₖ B) = piTensor fun i ↦ if i = j then A else if i = k then B else 1 := by
-  ext σ τ
-  have hk : k ∈ Finset.univ.erase j := Finset.mem_erase.2 ⟨hjk.symm, Finset.mem_univ _⟩
-  rw [piTensor_apply, ← Finset.mul_prod_erase _ _ (Finset.mem_univ j),
-    ← Finset.mul_prod_erase _ _ hk,
-    Finset.prod_congr rfl (g := fun i ↦ if σ i = τ i then (1 : ℂ) else 0) fun i hi ↦ ?_,
-    Finset.prod_ite_zero, Finset.prod_const_one]
-  · simp only [bondOp, of_apply, kroneckerMap_apply, ite_true, Ne.symm hjk, ite_false,
-      Finset.mem_erase, Finset.mem_univ, and_true]
-    split_ifs with h₁ h₂ h₂ <;> simp_all
-  · simp only [Finset.mem_erase, Finset.mem_univ, and_true] at hi
-    simp [hi.1, hi.2, one_apply]
-
-/-! ### The trace of a Gibbs operator -/
-
-/-- For a Hermitian matrix `A` and a real scalar `c`, `Tr exp (c A) = ∑ᵢ exp (c λᵢ)`. -/
-theorem trace_exp_smul_eq_sum_of_isHermitian {n : Type*} [Fintype n] [DecidableEq n]
-    {A : Matrix n n ℂ} (hA : A.IsHermitian) (c : ℝ) :
-    trace (exp ((c : ℂ) • A)) = ∑ i, (Real.exp (c * hA.eigenvalues i) : ℂ) := by
-  set U : Matrix n n ℂ := (hA.eigenvectorUnitary : Matrix n n ℂ)
-  have hU : star U * U = 1 := Unitary.coe_star_mul_self _
-  have hUinv : U⁻¹ = star U := inv_eq_left_inv hU
-  have hUunit : IsUnit U := (isUnit_iff_isUnit_det U).mpr
-    (isUnit_det_of_left_inverse hU)
-  have hA' : (c : ℂ) • A = U * diagonal (fun i ↦ ((c * hA.eigenvalues i : ℝ) : ℂ)) * U⁻¹ := by
-    conv_lhs => rw [hA.spectral_theorem]
-    rw [Unitary.conjStarAlgAut_apply, hUinv, ← smul_mul_assoc, ← mul_smul_comm, ← diagonal_smul]
-    congr
-    ext i
-    simp
-  rw [hA', exp_conj _ _ hUunit, exp_diagonal, trace_mul_cycle, hUinv, hU, one_mul,
-    trace_diagonal]
-  refine Finset.sum_congr rfl fun i _ ↦ ?_
-  rw [Pi.coe_exp, ← Complex.exp_eq_exp_ℂ, Complex.ofReal_exp]
-
-/-- Equal Hermitian matrices have equal eigenvalue families (the Hermiticity proofs are
-irrelevant). -/
-theorem IsHermitian.eigenvalues_eq_of_eq {n : Type*} [Fintype n] [DecidableEq n]
-    {A B : Matrix n n ℂ} (hA : A.IsHermitian) (hB : B.IsHermitian) (h : A = B) :
-    hA.eigenvalues = hB.eigenvalues := by
-  subst h; rfl
 
 /-! ### Reflection-positive rings -/
 
@@ -307,10 +161,15 @@ theorem oc_isHermitian : R.oc.IsHermitian := by
   simp only [conjTranspose_apply, oc, map_apply, Complex.star_def, Complex.conj_ofReal]
   rw [← transpose_apply R.o, R.o_symm]
 
+/-- The ring Hamiltonian is the generic ring of the bond `h` plus the site sum of `o`. -/
+theorem hamiltonian_eq_ringHamiltonian (L : ℕ) :
+    R.hamiltonian L = ringHamiltonian R.bondMatrix L + siteSum R.oc L := rfl
+
 /-- The ring Hamiltonian is Hermitian. -/
-theorem hamiltonian_isHermitian (L : ℕ) : (R.hamiltonian L).IsHermitian :=
-  (isSelfAdjoint_sum _ fun j _ ↦ bondOp_isHermitian j _ R.bondMatrix_isHermitian).add
-    (isSelfAdjoint_sum _ fun j _ ↦ siteOp_isHermitian j R.oc_isHermitian)
+theorem hamiltonian_isHermitian (L : ℕ) : (R.hamiltonian L).IsHermitian := by
+  rw [hamiltonian_eq_ringHamiltonian]
+  exact (ringHamiltonian_isHermitian R.bondMatrix_isHermitian L).add
+    (siteSum_isHermitian R.oc_isHermitian L)
 
 /-- The spectrum of `H_L` with multiplicity, indexed by configurations. -/
 noncomputable def spectrum (L : ℕ) : (Fin L → d) → ℝ :=
@@ -320,13 +179,19 @@ noncomputable def spectrum (L : ℕ) : (Fin L → d) → ℝ :=
 noncomputable def partitionFunction (L : ℕ) (β : ℝ) : ℝ :=
   (trace (exp ((-(β : ℂ)) • R.hamiltonian L))).re
 
+/-- The partition function is the Gibbs trace of the ring Hamiltonian. -/
+theorem partitionFunction_eq_gibbsTrace (L : ℕ) (β : ℝ) :
+    R.partitionFunction L β = gibbsTrace (R.hamiltonian L) β := rfl
+
 /-- `Re Tr e^{-βH_L} = ∑ₘ e^{-β Eₘ}`, the partition function of the abstract criterion. -/
 theorem partitionFunction_eq_sum (L : ℕ) (β : ℝ) :
     R.partitionFunction L β = ∑ m, Real.exp (-(β * R.spectrum L m)) := by
-  have h := trace_exp_smul_eq_sum_of_isHermitian (R.hamiltonian_isHermitian L) (-β)
-  rw [Complex.ofReal_neg] at h
-  rw [partitionFunction, h, ← Complex.ofReal_sum, Complex.ofReal_re]
-  simp [spectrum, neg_mul]
+  rw [partitionFunction_eq_gibbsTrace, gibbsTrace_eq_sum (R.hamiltonian_isHermitian L)]
+  rfl
+
+/-- The partition function of a ring with a nonempty local space is positive. -/
+theorem partitionFunction_pos [Nonempty d] (L : ℕ) (β : ℝ) : 0 < R.partitionFunction L β :=
+  gibbsTrace_pos (R.hamiltonian_isHermitian L) β
 
 end RPRing
 

@@ -288,6 +288,15 @@ theorem SpatialMomentBounds.of_tendsto_hasMomentForm {α : Type*} {l : Filter α
 
 /-! ### Thermal and spatial purities -/
 
+/-- The spatial purity `P_s(n, β) = Z_{2n}(β) / Z_n(β)²` of any family of partition functions
+`Z L β`. Every model's spatial purity is this one for its partition function. -/
+noncomputable def spatialPurityOf (Z : ℕ → ℝ → ℝ) (n : ℕ) (β : ℝ) : ℝ :=
+  Z (2 * n) β / Z n β ^ 2
+
+/-- The thermal purity `P_τ(L, β) = Z_L(2β) / Z_L(β)²` of any family of partition functions. -/
+noncomputable def thermalPurityOf (Z : ℕ → ℝ → ℝ) (L : ℕ) (β : ℝ) : ℝ :=
+  Z L (2 * β) / Z L β ^ 2
+
 variable {ι : ℕ → Type*} [∀ L, Fintype (ι L)] [∀ L, Nonempty (ι L)]
 
 /-- The partition function `Z_L(β) = Tr e^{-β H_L} = ∑ₘ e^{-β Eₘ(L)}` of a Hamiltonian with
@@ -303,6 +312,13 @@ noncomputable def thermalPurity (E : (L : ℕ) → ι L → ℝ) (L : ℕ) (β :
 /-- The spatial purity `P_s(n, β) = Z_{2n}(β) / Z_n(β)²` (the thermal-MPO note, eq. (6)). -/
 noncomputable def spatialPurity (E : (L : ℕ) → ι L → ℝ) (n : ℕ) (β : ℝ) : ℝ :=
   partitionFunction E (2 * n) β / partitionFunction E n β ^ 2
+
+/-- The purities of a spectrum are those of its partition function. -/
+theorem spatialPurity_eq_spatialPurityOf (E : (L : ℕ) → ι L → ℝ) (n : ℕ) (β : ℝ) :
+    spatialPurity E n β = spatialPurityOf (partitionFunction E) n β := rfl
+
+theorem thermalPurity_eq_thermalPurityOf (E : (L : ℕ) → ι L → ℝ) (L : ℕ) (β : ℝ) :
+    thermalPurity E L β = thermalPurityOf (partitionFunction E) L β := rfl
 
 /-- The moment form of the thermal-MPO note, eq. (5): for every `β > 0` there are nonnegative
 numbers `μᵢ = |λᵢ(β)|`, the moduli of the eigenvalues of the spatial transfer operator `X_β`,

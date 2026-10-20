@@ -230,6 +230,27 @@ now also certifies a sharper bound `0.899` at `D = 4` from an `n₀ = 12` seed, 
 `models/dimerized_heisenberg` has slightly tighter enclosures than the rounded decimals in
 `DimerizedHeisenberg.lean`), the weaker seed inequalities assumed in Lean remain a fortiori valid.
 
+### The spin-1 gap from its trace tables (no `sorry`)
+
+The four spin-1 seed `sorry`s of `Heisenberg/Main.lean` reduce to two tables of short-ring
+partition functions. Everything else in OpenAI's two initializations is proved: the transfer
+spectrum in the `D₂` and `I/O/N` sectors at every ring length (odd included), the polynomial
+filters, capped masses and dominant eigenvalue, the temperature lift of Proposition 5.4, and the
+integer matrix-product trial state on 72 and 120 sites, checked in the kernel
+(`SeedKernel/Heisenberg/Trial*.lean`). The theorems below take the table as their only hypothesis and
+use only `propext`, `Classical.choice`, `Quot.sound` (`SeedKernel/Audit.lean`).
+
+| Theorem (`SpinOneHeisenberg.`) | Hypothesis | Bound |
+|---|---|---|
+| `gap_of_table` | `TraceTable`: `Z_n(49/4)`, `Z_n(49/4, P)`, `n = 4, …, 12`, within `3 × 10⁻⁵` | `Δ_L > log(1.05882)/(49/4) ≈ 0.00467` for every even `L ≥ 36` |
+| `gap_log_twenty_of_table` | the same | OpenAI's eq. (1.4): `Δ_L > log 20 / 784` for `L ≥ 2304` |
+| `gap_sixty_chain_of_table` | `TraceTable60`: `Z_n(21/2, g)`, `g = 1, P, C`, `n = 6, 8, 10`, within `10⁻⁵` | `Δ_L > log(1.16321)/(105/4) ≈ 0.00576` for every even `L ≥ 60` |
+| `gap_sixty_of_table` | the same | OpenAI's eq. (1.3): `Δ_L > (4/105) log(80/79)` for `L ≥ 60` |
+
+The first and third bounds come from the exact unequal-defect recurrence (`chain36Gap`, `chain60`)
+applied to OpenAI's own seed values; their eq. (1.3) and (1.4) use a single coefficient and are
+weaker (`Main.lean`).
+
 ### Unconditional theorems (no `sorry`)
 
 Every theorem in the table below is completely proved using only `propext`, `Classical.choice`, and
@@ -312,6 +333,8 @@ spin-1 work is arithmetic only):
 | `SeedKernel/Spin1/Obligations.lean`, `Spin1/Tests.lean` | Row-wise specification, open semantic propositions (`HApplyCorrect`, `FilterCorrect`, ...), and small-ring checks |
 | `SeedKernel/Spin1/Counting.lean` | Conditional one-Ritz-value trace-counting lemma and formal counterexamples to naive two-value variants |
 | `SeedKernel/Spin1/H6.lean`, `H8.lean`, `H10.lean` | Generated Ritz/residual witnesses (`models/lean_seeds/certify.jl spin1_kernel`) |
+| `SeedKernel/Heisenberg/Trial*.lean` | The D = 26 integer trial state checked in the kernel (`trial_check_72`, `trial_check_120`): SU(2)-and-swap block reduction by an integer intertwiner, packed integer matrix powers with a correctness proof; data from `models/lean_seeds/scripts/trial/generate.jl` |
+| `SeedKernel/Heisenberg/Seed36.lean`, `Heisenberg/Seed60.lean` | The spin-1 seeds and gaps with the trace tables as the only hypotheses (`gap_of_table`, `gap_sixty_chain_of_table`) |
 | `SeedKernel/Ising/Checker.lean`, `Ising/Packed.lean`, `Ising/Chunked.lean` | Integer $20H$ action and direct, packed (on the shared lanes), and 64-chunk certificate checkers |
 | `SeedKernel/Ising/Generated.lean`, `Ising/GeneratedChunks.lean` | Generated eigenvector proposals and kernel checks (`models/lean_seeds/certify.jl ising`) |
 | `SeedKernel/Ising/ChunkCoverage.lean`, `Ising/NegativeChecks.lean` | Proof that the 64 chunks cover `{0, ..., 4095}` and rejection tests for corrupted witnesses |
@@ -353,6 +376,34 @@ A gap certificate enters `CertifiedGaps` in exactly this form:
 6. **Check the seeds against the certificate:** Add the model to `lean/scripts/check_seeds.jl` and
    run `julia --project=julia lean/scripts/check_seeds.jl` from the repository root. It checks that
    every Lean `s[0], t[0]` is at least the certified defect at the same `(n₀, β₀)`.
+7. **Discharge the seeds from a trace table (optional):** The `seeds` lemma can be proved instead
+   of assumed, from a table of short-ring partition functions and a trial state. The generic
+   layer is in `Seed/`, `Transfer/SingleSite*.lean` and `Transfer/MatrixProduct.lean`; a model
+   supplies only data and model-specific identities:
+   - **The scheme** (`Seed/Scheme.lean`): which twisted traces are tabulated and how they split
+     into symmetry sectors, $`Z_g = \sum_s c_{gs} M_s`$ with a rational left inverse. The
+     schemes `SectorScheme.plain` (untwisted traces, one sector), `SectorScheme.d2` (`D₂`
+     sectors, $`Z = J + 3N`$, $`Z(P) = J - N`$) and `SectorScheme.ion` (twists $`1, P, C`$) are
+     provided.
+   - **The sector representation** (`SectorApprox`): free for an `RPRing` with `refl = 1`, from
+     `RPRing.sectorApprox_plain` or, given the symmetry data `SingleSite.D2Symmetry` (two sign
+     symmetries and a label permutation of the bond factors, `Transfer/SingleSiteD2.lean`), from
+     `RPRing.sectorApprox_d2`.
+   - **The certificate** (`TableCertificate`, `Seed/Certificate.lean`): the table, one filter
+     per capped sector, the dominant-sector data `SectorSeed` and `(β, κ)`; `Valid` is checked by
+     `decide +kernel`. `RPRing.seeds_of_certificate` (`Seed/Ring.lean`) then gives the
+     conclusion of `seeds`. The data come from `julia lean/scripts/seed_certificate.jl
+     config.toml` (scheme, table, trace error, `(q, a, ℓ)`, `(β, κ)`; see the header of the
+     script), which searches the filters, checks every condition in exact rationals and prints
+     the Lean certificate; changing a parameter point means rerunning it.
+   - **The remaining hypotheses** are numerical: the table bounds (`TraceBounds.HoldsStrict` for
+     the shifted traces $`e^{-\beta\kappa n} Z_g(n, \beta)`$; a missing lower or upper bound is
+     `none`, and only the side that a filter coefficient uses is needed) and the trial-state
+     bounds at $\beta$ and $2\beta$. The lemmas for certifying tables by eigenvalue counting
+     are in `Spectral/`; for a trial state, `MPS.exp_lt_gibbsTrace_int`
+     (`Transfer/MatrixProduct.lean`) turns one integer inequality between two transfer-matrix
+     traces of an integer MPS into $`e^{\beta\kappa N} < Z_N(\beta)`$.
+   The spin-1 seed `Heisenberg/Seed36.lean` is the worked example.
 
 A certificate should therefore report its seeds as exact rationals together with `(n₀, β₀)` and the
 exact `C_α, o`. Building blocks shared by several models (one-site matrices, the cell swap) go in
@@ -391,11 +442,31 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`), expansion of $`\mathrm{Tr}\, T^N`$ as a sum over closed label paths and of matrix elements of ordered products as sums over open paths |
 | `Transfer/MomentForm.lean` | Proof that traces of even powers of a real matrix factorization $B^T B \succeq 0$ satisfy the spatial moment form |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
-| `Ring/Model.lean` | Periodic ring geometry, `bondOp`/`siteOp`, `RPRing` structure, Hermiticity of $H_L$, and $\operatorname{Re} \operatorname{Tr} e^{-\beta H_L} = \sum_m e^{-\beta E_m}$ |
+| `Transfer/PolynomialFilter.lean` | Polynomial filters: eigenvalue caps from finitely many moments (`CapCheck`, `momentBound`, one-sided `pairingBound`), checked by `decide` |
+| `Transfer/MatrixLemmas.lean` | Traces of powers, block matrices `blockOf` by a key, and reindexing invariance |
+| `Transfer/SingleSite.lean`, `Transfer/SingleSiteLimit.lean` | Single-site Trotter transfer matrix of any ring with $`-h = \sum_\alpha C_\alpha \otimes C_\alpha`$ and on-site `o`: exact trace identity at every length (odd included), Trotter limit, and `RPRing.exists_transfer_approx` |
+| `Transfer/SingleSiteSectors.lean`, `Transfer/SingleSiteD2.lean` | Sign and label symmetries of the transfer matrix, `D2Symmetry`, and the sector representation `D2Approx` (`RPRing.d2Approx`) |
+| `Transfer/SpectralForm.lean` | Partition functions and both purities as limits of power sums of transfer eigenvalues, at every length (`RPRing.tendsto_sum_transferEigenvalues_pow`, `RPRing.tendsto_spatialPurity`, `RPRing.tendsto_thermalPurity`) |
+| `Transfer/CyclicSectors.lean`, `Transfer/SingleSiteA4.lean` | ℤ₃ sectors of a symmetric matrix by projectors; `A4Symmetry` and the `I/O/N` sector representation `RPRing.sectorApprox_ion` |
+| `Local/SpinOneRotation.lean` | Rotated spin-1 exchanges `∑ R_{αβ} S^α ⊗ S^β` and their conjugation by rotations |
+| `Seed/Lift.lean`, `Seed/LiftedSeed.lean` | Temperature lifting of Boltzmann sums; the seed with a temperature lift and `I/O/N` multiplicities (OpenAI's Proposition 5.4 in generic form) |
+| `Heisenberg/SectorTransferC.lean`, `Heisenberg/Seed60.lean` | The `2π/3`-twisted spin-1 ring and `exists_ion_approx`; the seed at `(60, 105/4)` from its inputs |
+| `Transfer/MatrixProduct.lean` | Integer matrix-product states for any ring Hamiltonian: norm and energy as transfer-matrix traces, and the trial-state bound `MPS.exp_lt_gibbsTrace` |
+| `Ring/Variational.lean` | Rayleigh-quotient bound on the Gibbs trace `gibbsTrace H β` for Hermitian `H` |
+| `Spectral/*.lean` | Eigenvalue counting (`eigCount`), rational `LDLᵀ` inertia certificates, the Schur compression bound, Weyl monotonicity, Ritz bounds and binned trace bounds |
+| `Seed/Scheme.lean` | Sector schemes (`plain`, `d2`, `ion`), the sector representation `SectorApprox`, trace tables `TraceBounds` and the sector moment bounds |
+| `Seed/CappedMass.lean`, `Seed/Dominant.lean` | Capped-mass bounds and the dominant-sector seed `SectorSeed` |
+| `Seed/Limits.lean` | The limit `δ → 0` of a seed, shifted traces, and shift invariance of the purities |
+| `Seed/Certificate.lean`, `Seed/Ring.lean` | `TableCertificate` and its purities; `RPRing.seeds_of_certificate` and the plain and `D₂` sector representations of rings |
+| `Heisenberg/SzBridge.lean` | Spin-1 twisted ring and `S^z`-basis definitions, their identification with the generic `twistedRingHamiltonian`, and the Cartesian ↔ `S^z` bridge for partition functions |
+| `Heisenberg/SectorTransfer.lean`, `Heisenberg/TrialBound.lean` | Spin-1 instances: the `D₂` symmetry of the Heisenberg ring and the trial-state bound |
+| `Heisenberg/TraceTable.lean`, `Heisenberg/Seed36.lean` | The spin-1 trace table and the seed at `(36, 49/4)` (`seed36_of_table_mps`: from the table and one integer MPS inequality) |
+| `Ring/Hamiltonian.lean` | The one Hamiltonian API: ring geometry, `bondOp`/`siteOp`, `twistedRingHamiltonian B Bc L` (closing bond `Bc`), `ringHamiltonian B L`, `siteSum A L`, and the Gibbs trace `gibbsTrace H β` $= \mathrm{Re}\,\mathrm{Tr}\, e^{-\beta H}$ (eigenvalue sum, positivity, unitary invariance) |
+| `Ring/Model.lean` | `RPRing` structure, `H_L = ringHamiltonian h L + siteSum o L`, Hermiticity of $H_L$, and $Z_L = \sum_m e^{-\beta E_m}$ |
 | `Ring/Transfer.lean` | Even-bond, on-site, and odd-bond Trotter slices and the reflection-positivity identity $\operatorname{Tr} S^M = \operatorname{Tr} (B^T B)^{L/2}$ with real $B$ |
 | `Ring/Gap.lean` | Proof of `RPRing.spatialMomentBounds` and `RPRing.gapGT_of_chainCertificate` |
-| `Ring/Conjugation.lean` | Sitewise unitary conjugation of ring Hamiltonians and spectral invariance |
-| `Heisenberg/Hamiltonian.lean` | The spin-1 Heisenberg ring $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ in the real Cartesian basis |
+| `Ring/Conjugation.lean` | Sitewise unitary conjugation of ring Hamiltonians (twisted or not, `conj_twistedRingHamiltonian`), invariance of Gibbs traces and spectra |
+| `Heisenberg/Hamiltonian.lean` | The spin-1 Heisenberg ring $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ (`ringHamiltonian SpinOne.exchange L`) in the Cartesian basis |
 | `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Both bounds of OpenAI's Theorem 1.1: `spin_one_heisenberg_gap` (`L ≥ 2304`, from the seeds at 36 sites and `chain36`) and `spin_one_heisenberg_gap_sixty` (`L ≥ 60`) |
 | `Heisenberg/OpenChain.lean` | Theorem 2 of the main note (`spin_one_boundary_field_gap`) and its sharper form (`spin_one_boundary_field_gap_sharp`): the equal- and opposite-field open chains as open chains of the Heisenberg ring, the four inputs, and the opposite-field gap at even lengths (`spin_one_opposite_field_gap`) |
 | `Open/MomentBounds.lean` | `OpenMomentBounds`: closed inequalities of the boundary moment form, from a finite Hermitian transfer matrix and through limits; `leadingRoot`, `leadingOverlap`, `boundaryDefect` |
@@ -406,7 +477,7 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Open/Bounds.lean`, `Open/Gap.lean` | `RPRing.openMomentBounds` and the end-to-end `RPRing.openGapGT_of_certificate`, `RPRing.openGapGT_of_traces`, `RPRing.freeGapGT_of_traces` and `RPRing.openGapGT_of_seeds` |
 | `Local/Pauli.lean`, `Local/SpinHalf.lean` | Real Pauli matrices $X, Z$ and real spin-½ factors $S^x, iS^y, S^z$ (`SpinHalf.P`) |
 | `Local/SpinHalfRotation.lean` | Sublattice rotation $e^{i\pi S^y}$ and complex spin-½ operators |
-| `Local/SpinOne.lean` | Real antisymmetric spin-1 generators `SpinOne.G α` $= G_\alpha = i S^\alpha$ |
+| `Local/SpinOne.lean` | Spin-1 building blocks: Levi-Civita symbol, Cartesian `SpinOne.S α`, real antisymmetric generators `SpinOne.G α` $= i S^\alpha$, the exchange `SpinOne.exchange`, the $\pi$-rotation signs `rotX`, `rotY`, `rotZ`, and the $S^z$ basis `szBasis`, `spinZ` |
 | `Local/CellSwap.lean` | Two-site cell swap involution $F$ satisfying $F (A \otimes B) F = B \otimes A$ |
 | `Models/SpinOneLargeD.lean` | Spin-1 chain with single-ion anisotropy $\sum \mathbf{S}_j \cdot \mathbf{S}_{j+1} + D \sum (S_j^z)^2$ as an `RPRing` ($D = 0$ is the Heisenberg ring), at $D = 4$ and $D = 1603/500$ |
 | `Models/SpinOneDimerized.lean` | Dimerized spin-1 chain with internal cell reflection $F$ at $\delta = 9/10$ |
@@ -416,6 +487,7 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Models/*Physical.lean` | Physical spin-½ Hamiltonians, unitary sublattice rotations, and transferred gap theorems |
 | `scripts/chain_certificate.jl` | Julia generator that constructs an exact rational `ChainCertificate` from $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau, \beta_0)$ (exact literal parser; Lean re-checks) |
 | `scripts/open_certificate.jl` | Julia generator that searches an exact rational `OpenCertificate` from the four open-chain seeds (reuses the parser of `chain_certificate.jl`; Lean re-checks) |
+| `scripts/seed_certificate.jl` | Julia generator that searches the filters and prints an exact `TableCertificate` from a trace table, its sector scheme and the seed parameters (Lean re-checks) |
 | `scripts/check_seeds.jl` | Checks every Lean seed defect against the certificate JSON in `../models/*/results` |
 
 ## Why each piece is needed in Lean

@@ -62,13 +62,13 @@ namespace CertifiedGaps.SpinOneHeisenberg
 (`0` for `n = 0`). The equal-field chain is `h₁ = h₀`, the opposite-field chain `h₁ = -h₀`. -/
 def endFieldHamiltonian (h₀ h₁ : ℝ) : (n : ℕ) → Matrix (Fin n → Fin 3) (Fin n → Fin 3) ℂ
   | 0 => 0
-  | n + 1 => ∑ j : Fin n, bondOp j.castSucc j.succ exchange +
-      siteOp 0 (-(h₀ : ℂ) • spinOne 2) + siteOp (Fin.last n) (-(h₁ : ℂ) • spinOne 2)
+  | n + 1 => ∑ j : Fin n, bondOp j.castSucc j.succ SpinOne.exchange +
+      siteOp 0 (-(h₀ : ℂ) • SpinOne.S 2) + siteOp (Fin.last n) (-(h₁ : ℂ) • SpinOne.S 2)
 
 /-- A real multiple of `Sᶻ` is Hermitian. -/
-theorem smul_spinOne_isHermitian (h : ℝ) : ((h : ℂ) • spinOne 2).IsHermitian := by
-  change ((h : ℂ) • spinOne 2)ᴴ = (h : ℂ) • spinOne 2
-  rw [conjTranspose_smul, (spinOne_isHermitian 2).eq, Complex.star_def, Complex.conj_ofReal]
+theorem smul_spinOne_isHermitian (h : ℝ) : ((h : ℂ) • SpinOne.S 2).IsHermitian := by
+  change ((h : ℂ) • SpinOne.S 2)ᴴ = (h : ℂ) • SpinOne.S 2
+  rw [conjTranspose_smul, (SpinOne.S_isHermitian 2).eq, Complex.star_def, Complex.conj_ofReal]
 
 /-- The chain with end fields is Hermitian. -/
 theorem endFieldHamiltonian_isHermitian (h₀ h₁ : ℝ) (n : ℕ) :
@@ -76,9 +76,9 @@ theorem endFieldHamiltonian_isHermitian (h₀ h₁ : ℝ) (n : ℕ) :
   cases n with
   | zero => exact isHermitian_zero
   | succ n =>
-    have hz : ∀ h : ℝ, (-(h : ℂ) • spinOne 2).IsHermitian := fun h ↦ by
+    have hz : ∀ h : ℝ, (-(h : ℂ) • SpinOne.S 2).IsHermitian := fun h ↦ by
       rw [← Complex.ofReal_neg]; exact smul_spinOne_isHermitian _
-    exact ((isSelfAdjoint_sum _ fun j _ ↦ bondOp_isHermitian _ _ exchange_isHermitian).add
+    exact ((isSelfAdjoint_sum _ fun j _ ↦ bondOp_isHermitian _ _ SpinOne.exchange_isHermitian).add
       (siteOp_isHermitian _ (hz h₀))).add (siteOp_isHermitian _ (hz h₁))
 
 /-- The spectrum of the equal-field chain with multiplicity. -/
@@ -107,21 +107,21 @@ noncomputable def boundary (h : ℝ) : (SpinOneLargeD.model 0).Boundary where
     split_ifs <;> simp [Complex.conj_ofReal]⟩
 
 /-- The end term is `-h Sᶻ`. -/
-theorem boundary_mat (h : ℝ) : (boundary h).mat = -(h : ℂ) • spinOne 2 := by
+theorem boundary_mat (h : ℝ) : (boundary h).mat = -(h : ℂ) • SpinOne.S 2 := by
   ext a c
   simp only [RPRing.Boundary.mat, boundary, Fin.sum_univ_three, RPRing.Cc, SpinOneLargeD.model,
-    SpinOne.G, spinOne, Matrix.neg_apply, Matrix.add_apply, Matrix.smul_apply, map_apply,
+    SpinOne.G, SpinOne.S, Matrix.neg_apply, Matrix.add_apply, Matrix.smul_apply, map_apply,
     of_apply, smul_eq_mul]
   simp only [Fin.reduceEq, ite_false, ite_true, zero_mul, zero_add]
   push_cast
   ring_nf
 
 /-- The transposed end term is `h Sᶻ`. -/
-theorem boundary_mat_transpose (h : ℝ) : (boundary h).matᵀ = (h : ℂ) • spinOne 2 := by
+theorem boundary_mat_transpose (h : ℝ) : (boundary h).matᵀ = (h : ℂ) • SpinOne.S 2 := by
   rw [boundary_mat]
   ext a c
-  simp only [transpose_apply, Matrix.smul_apply, spinOne, of_apply, smul_eq_mul,
-    SpinOneHeisenberg.leviCivita_swap 2 c a]
+  simp only [transpose_apply, Matrix.smul_apply, SpinOne.S, of_apply, smul_eq_mul,
+    SpinOne.leviCivita_swap 2 c a]
   push_cast
   ring
 

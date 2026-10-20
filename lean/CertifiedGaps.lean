@@ -6,15 +6,49 @@ import CertifiedGaps.ChainCheck
 import CertifiedGaps.Transfer.PiTensor
 import CertifiedGaps.Transfer.MomentForm
 import CertifiedGaps.Transfer.ProductLimit
+import CertifiedGaps.Transfer.PolynomialFilter
+import CertifiedGaps.Transfer.MatrixProduct
+import CertifiedGaps.Transfer.MatrixLemmas
+import CertifiedGaps.Transfer.SingleSite
+import CertifiedGaps.Transfer.SingleSiteLimit
+import CertifiedGaps.Transfer.SingleSiteSectors
+import CertifiedGaps.Transfer.SingleSiteD2
+import CertifiedGaps.Transfer.CyclicSectors
+import CertifiedGaps.Transfer.SingleSiteA4
+import CertifiedGaps.Transfer.SpectralForm
+-- Spectral counting: eigenvalue counts, inertia, Schur bounds, trace bounds
+import CertifiedGaps.Spectral.Basic
+import CertifiedGaps.Spectral.Counting
+import CertifiedGaps.Spectral.Inertia
+import CertifiedGaps.Spectral.Schur
+import CertifiedGaps.Spectral.TraceBounds
+-- Seeds from short-ring trace tables and trial states
+import CertifiedGaps.Seed.CappedMass
+import CertifiedGaps.Seed.Scheme
+import CertifiedGaps.Seed.Limits
+import CertifiedGaps.Seed.Dominant
+import CertifiedGaps.Seed.Certificate
+import CertifiedGaps.Seed.Ring
+import CertifiedGaps.Seed.Lift
+import CertifiedGaps.Seed.LiftedSeed
 -- Reflection-positive rings
+import CertifiedGaps.Ring.Hamiltonian
 import CertifiedGaps.Ring.Model
 import CertifiedGaps.Ring.Transfer
 import CertifiedGaps.Ring.Gap
 import CertifiedGaps.Ring.Conjugation
+import CertifiedGaps.Ring.Variational
 -- The spin-one Heisenberg ring (Theorem 1 of the note)
 import CertifiedGaps.Heisenberg.Hamiltonian
 import CertifiedGaps.Heisenberg.Gap
 import CertifiedGaps.Heisenberg.Main
+import CertifiedGaps.Heisenberg.SzBridge
+import CertifiedGaps.Heisenberg.TraceTable
+import CertifiedGaps.Heisenberg.SectorTransfer
+import CertifiedGaps.Heisenberg.SectorTransferC
+import CertifiedGaps.Heisenberg.TrialBound
+import CertifiedGaps.Heisenberg.Seed36
+import CertifiedGaps.Heisenberg.Seed60
 -- Open chains with boundary fields (Appendices A–C of the note)
 import CertifiedGaps.Open.MomentBounds
 import CertifiedGaps.Open.Criterion
@@ -29,6 +63,7 @@ import CertifiedGaps.Local.Pauli
 import CertifiedGaps.Local.SpinHalf
 import CertifiedGaps.Local.SpinHalfRotation
 import CertifiedGaps.Local.SpinOne
+import CertifiedGaps.Local.SpinOneRotation
 import CertifiedGaps.Local.CellSwap
 -- Models (one file per directory `models/<slug>`; `*Physical` for rotated frames)
 import CertifiedGaps.Models.SpinOneLargeD
