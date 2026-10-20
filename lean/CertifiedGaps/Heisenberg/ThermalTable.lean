@@ -70,6 +70,9 @@ eighteen printed totals `W_{n,g}`.
 * `hornerTotal` is computable but not meant for compiled evaluation (`hornerFloor` represents
   vectors as functions, so `#eval` is exponential in the number of steps); the totals are
   computed by an external program (`models/spin1`) and enter as the hypothesis.
+  `Heisenberg/ThermalPacked.lean` gives a packed evaluator proved equal to `hornerTotal`
+  (`hornerTotal_eq_of_packed`); with it the kernel checks the two totals with `n = 4`
+  (`SeedKernel/Heisenberg/ThermalTraces.lean`).
 -/
 
 open Finset Matrix

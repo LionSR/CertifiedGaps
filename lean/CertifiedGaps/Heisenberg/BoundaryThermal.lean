@@ -342,78 +342,14 @@ theorem abs_qform_contraction {g : ℤ} (hg : g ∈ fields) {n : ℕ} (hn : n �
   unfold cShift at hC ⊢
   constructor <;> nlinarith
 
-/-! ### Word numbers -/
-
-/-- The word number `e σ = ∑ᵢ σᵢ 3ⁱ` (site `0` least significant). -/
-abbrev wordNum (n : ℕ) : (Fin n → Fin 3) ≃ Fin (3 ^ n) := finFunctionFinEquiv
-
-theorem wordNum_val {n : ℕ} (σ : Fin n → Fin 3) :
-    ((wordNum n σ : ℕ) : ℤ) = ∑ i, ((σ i : ℕ) : ℤ) * 3 ^ (i : ℕ) := by
-  rw [wordNum, finFunctionFinEquiv_apply]; push_cast; rfl
-
-/-- The digits of a word number are the letters. -/
-theorem digit_wordNum {n : ℕ} (σ : Fin n → Fin 3) (j : Fin n) :
-    digit (wordNum n σ) j = σ j := by
-  have := finFunctionFinEquiv_symm_apply_val (m := 3) (wordNum n σ) j
-  rw [wordNum, Equiv.symm_apply_apply] at this
-  exact this.symm
-
-/-- Changing two letters changes a weighted letter sum by the weighted differences. -/
-theorem sum_update₂ {n : ℕ} (w : Fin n → ℤ) (σ : Fin n → Fin 3) {j k : Fin n} (hjk : j ≠ k)
-    (a b : Fin 3) :
-    ∑ i, ((Function.update (Function.update σ j a) k b i : ℕ) : ℤ) * w i =
-      ∑ i, ((σ i : ℕ) : ℤ) * w i + ((a : ℤ) - σ j) * w j + ((b : ℤ) - σ k) * w k := by
-  have h : ∀ i, ((Function.update (Function.update σ j a) k b i : ℕ) : ℤ) * w i =
-      ((σ i : ℕ) : ℤ) * w i + (if i = j then ((a : ℤ) - σ j) * w j else 0) +
-        (if i = k then ((b : ℤ) - σ k) * w k else 0) := by
-    intro i
-    by_cases hk : i = k
-    · subst hk; simp [Ne.symm hjk]; ring
-    · by_cases hj : i = j
-      · subst hj; simp [hk]; ring
-      · simp [hk, hj]
-  simp only [h, Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, ite_true]
-
-/-- Changing one letter changes a weighted letter sum by the weighted difference. -/
-theorem sum_update {n : ℕ} (w : Fin n → ℤ) (σ : Fin n → Fin 3) (j : Fin n) (a : Fin 3) :
-    ∑ i, ((Function.update σ j a i : ℕ) : ℤ) * w i =
-      ∑ i, ((σ i : ℕ) : ℤ) * w i + ((a : ℤ) - σ j) * w j := by
-  have h : ∀ i, ((Function.update σ j a i : ℕ) : ℤ) * w i =
-      ((σ i : ℕ) : ℤ) * w i + (if i = j then ((a : ℤ) - σ j) * w j else 0) := by
-    intro i
-    by_cases hj : i = j
-    · subst hj; simp; ring
-    · simp [hj]
-  simp only [h, Finset.sum_add_distrib, Finset.sum_ite_eq', Finset.mem_univ, ite_true]
-
-/-- Changing two letters changes the word number by the differences of the place values. -/
-theorem wordNum_update₂ {n : ℕ} (σ : Fin n → Fin 3) {j k : Fin n} (hjk : j ≠ k) (a b : Fin 3) :
-    ((wordNum n (Function.update (Function.update σ j a) k b) : ℕ) : ℤ) =
-      wordNum n σ + ((a : ℤ) - σ j) * 3 ^ (j : ℕ) + ((b : ℤ) - σ k) * 3 ^ (k : ℕ) := by
-  rw [wordNum_val, wordNum_val, sum_update₂ (fun i ↦ 3 ^ (i : ℕ)) σ hjk]
-
-/-- Changing one letter changes the word number by the difference of the place value. -/
-theorem wordNum_update {n : ℕ} (σ : Fin n → Fin 3) (j : Fin n) (a : Fin 3) :
-    ((wordNum n (Function.update σ j a) : ℕ) : ℤ) =
-      wordNum n σ + ((a : ℤ) - σ j) * 3 ^ (j : ℕ) := by
-  rw [wordNum_val, wordNum_val, sum_update (fun i ↦ 3 ^ (i : ℕ)) σ j]
+/-! ### Parity of words -/
 
 /-- The parity `p_σ = (∑ᵢ σᵢ + n) mod 2` of the word, equal to `(∑ᵢ wᵢ) mod 2`. -/
 def parity {n : ℕ} (σ : Fin n → Fin 3) : ℕ := (∑ i, (σ i : ℕ) + n) % 2
 
-theorem list_sum_range {M : Type*} [AddCommMonoid M] (f : ℕ → M) (m : ℕ) :
-    ((List.range m).map f).sum = ∑ i ∈ Finset.range m, f i := by
-  induction m with
-  | zero => simp
-  | succ m ih => rw [List.sum_range_succ, ih, Finset.sum_range_succ]
-
 theorem par_wordNum {n : ℕ} (σ : Fin n → Fin 3) : par n (wordNum n σ) = parity σ := by
   rw [par, parity, list_sum_range, ← Fin.sum_univ_eq_sum_range]
   simp only [digit_wordNum]
-
-theorem letter_wordNum {n : ℕ} (σ : Fin n → Fin 3) (j : Fin n) :
-    letter (wordNum n σ) j = mz (σ j) := by
-  rw [letter, digit_wordNum, mz]
 
 theorem parity_lt_two {n : ℕ} (σ : Fin n → Fin 3) : parity σ < 2 := Nat.mod_lt _ (by norm_num)
 
@@ -456,13 +392,6 @@ theorem parity_update {n : ℕ} (σ : Fin n → Fin 3) (j : Fin n) (a : Fin 3)
 
 /-! ### Hops between words -/
 
-/-- The bond hop `σⱼ ↦ σⱼ - 1`, `σₖ ↦ σₖ + 1`, allowed when `σⱼ ≥ 1` and `σₖ ≤ 1`. -/
-def hopUp {n : ℕ} (j k : Fin n) (σ : Fin n → Fin 3) : Option (Fin n → Fin 3) :=
-  if h : 1 ≤ (σ j : ℕ) ∧ (σ k : ℕ) ≤ 1 then
-    some (Function.update (Function.update σ j ⟨σ j - 1, by have := (σ j).isLt; omega⟩) k
-      ⟨σ k + 1, by omega⟩)
-  else none
-
 /-- The end hop `σₗ ↦ σₗ + 1`, allowed when `σₗ ≤ 1`. -/
 def endUp' {n : ℕ} (l : Fin n) (σ : Fin n → Fin 3) : Option (Fin n → Fin 3) :=
   if h : (σ l : ℕ) ≤ 1 then some (Function.update σ l ⟨σ l + 1, by omega⟩) else none
@@ -471,29 +400,6 @@ def endUp' {n : ℕ} (l : Fin n) (σ : Fin n → Fin 3) : Option (Fin n → Fin 
 def endDown' {n : ℕ} (l : Fin n) (σ : Fin n → Fin 3) : Option (Fin n → Fin 3) :=
   if h : 1 ≤ (σ l : ℕ) then
     some (Function.update σ l ⟨σ l - 1, by have := (σ l).isLt; omega⟩) else none
-
-theorem hopUp_eq_some {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (σ τ : Fin n → Fin 3) :
-    hopUp j k σ = some τ ↔ (∀ i, i ≠ j → i ≠ k → σ i = τ i) ∧
-      (σ j : ℕ) = τ j + 1 ∧ (σ k : ℕ) + 1 = τ k := by
-  unfold hopUp
-  constructor
-  · intro h
-    split_ifs at h with hc
-    cases h
-    refine ⟨fun i hj hk ↦ by simp [Function.update_of_ne hk, Function.update_of_ne hj], ?_, ?_⟩
-    · rw [Function.update_of_ne hjk, Function.update_self]; dsimp only; omega
-    · simp
-  · rintro ⟨hag, h1, h2⟩
-    have hτk := (τ k).isLt
-    rw [dite_eq_left ⟨by omega, by omega⟩]
-    congr 1
-    funext i
-    by_cases hk : i = k
-    · subst hk; rw [Function.update_self]; exact Fin.ext (by dsimp only; omega)
-    · by_cases hj : i = j
-      · subst hj; rw [Function.update_of_ne hk, Function.update_self]
-        exact Fin.ext (by dsimp only; omega)
-      · simp [Function.update_of_ne hk, Function.update_of_ne hj, hag i hj hk]
 
 theorem endUp'_eq_some {n : ℕ} (l : Fin n) (σ τ : Fin n → Fin 3) :
     endUp' l σ = some τ ↔ (∀ i, i ≠ l → σ i = τ i) ∧ (σ l : ℕ) + 1 = τ l := by
@@ -528,59 +434,10 @@ theorem endDown'_eq_some {n : ℕ} (l : Fin n) (σ τ : Fin n → Fin 3) :
     · subst hi; rw [Function.update_self]; exact Fin.ext (by dsimp only; omega)
     · simp [Function.update_of_ne hi, hag i hi]
 
-/-- **The integer bond in the `S^z` basis, entry by entry**: the diagonal `mz mz` and one unit
-entry for each of the two bond hops. -/
-theorem bondOp_exchangeZ_apply {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (σ τ : Fin n → Fin 3) :
-    bondOp j k exchangeZ σ τ = (if σ = τ then mz (σ j) * mz (σ k) else 0) +
-      (if hopUp j k σ = some τ then 1 else 0) + (if hopUp k j σ = some τ then 1 else 0) := by
-  simp only [bondOp, of_apply, exchangeZ]
-  by_cases hag : ∀ i, i ≠ j → i ≠ k → σ i = τ i
-  · rw [ite_eq_left hag]
-    have e1 : (σ j, σ k) = (τ j, τ k) ↔ σ = τ := by
-      constructor
-      · intro h
-        simp only [Prod.mk.injEq] at h
-        funext i
-        by_cases hj : i = j
-        · subst hj; exact h.1
-        · by_cases hk : i = k
-          · subst hk; exact h.2
-          · exact hag i hj hk
-      · rintro rfl; rfl
-    have e2 : ((σ j : ℕ) = τ j + 1 ∧ (σ k : ℕ) + 1 = τ k) ↔ hopUp j k σ = some τ := by
-      rw [hopUp_eq_some hjk]; exact ⟨fun h ↦ ⟨hag, h⟩, fun h ↦ h.2⟩
-    have e3 : ((σ j : ℕ) + 1 = τ j ∧ (σ k : ℕ) = τ k + 1) ↔ hopUp k j σ = some τ := by
-      rw [hopUp_eq_some (Ne.symm hjk)]
-      exact ⟨fun h ↦ ⟨fun i hk hj ↦ hag i hj hk, h.2, h.1⟩, fun h ↦ ⟨h.2.2, h.2.1⟩⟩
-    simp only [e1, e2, e3]
-  · rw [ite_eq_right hag]
-    have h1 : σ ≠ τ := fun h ↦ hag fun i _ _ ↦ by rw [h]
-    have h2 : hopUp j k σ ≠ some τ := fun h ↦ hag ((hopUp_eq_some hjk σ τ).1 h).1
-    have h3 : hopUp k j σ ≠ some τ := fun h ↦
-      hag fun i hj hk ↦ ((hopUp_eq_some (Ne.symm hjk) σ τ).1 h).1 i hk hj
-    simp [h1, h2, h3]
-
-/-- Entries of a one-site operator. -/
-theorem siteOp_apply' {n : ℕ} (j : Fin n) (A : Matrix (Fin 3) (Fin 3) ℂ) (σ τ : Fin n → Fin 3) :
-    siteOp j A σ τ = if ∀ i, i ≠ j → σ i = τ i then A (σ j) (τ j) else 0 := by
-  rw [siteOp, piTensor_apply, Fintype.prod_eq_mul_prod_compl j]
-  simp only [ite_true]
-  have hp : ∏ i ∈ ({j}ᶜ : Finset (Fin n)), (if i = j then A else 1) (σ i) (τ i) =
-      ∏ i ∈ ({j}ᶜ : Finset (Fin n)), if σ i = τ i then (1 : ℂ) else 0 :=
-    Finset.prod_congr rfl fun i hi ↦ by
-      rw [Finset.mem_compl, Finset.mem_singleton] at hi
-      simp [hi, one_apply]
-  rw [hp, Finset.prod_ite_zero, Finset.prod_const_one]
-  have hiff : (∀ i ∈ ({j}ᶜ : Finset (Fin n)), σ i = τ i) ↔ ∀ i, i ≠ j → σ i = τ i := by
-    simp [Finset.mem_compl]
-  by_cases h : ∀ i, i ≠ j → σ i = τ i
-  · rw [ite_eq_left (hiff.2 h), ite_eq_left h, mul_one]
-  · rw [ite_eq_right (fun h' ↦ h (hiff.1 h')), ite_eq_right h, mul_zero]
-
 /-- The field `c Sᶻ` on one site, entry by entry. -/
 theorem siteOp_spinZ_two_apply {n : ℕ} (j : Fin n) (c : ℂ) (σ τ : Fin n → Fin 3) :
     siteOp j (c • spinZ 2) σ τ = if σ = τ then c * mz (σ j) else 0 := by
-  rw [siteOp_apply']
+  rw [siteOp_apply]
   by_cases h : σ = τ
   · subst h
     simp only [implies_true, ite_true, Matrix.smul_apply, smul_eq_mul]
@@ -604,7 +461,7 @@ theorem siteOp_spinZ_two_apply {n : ℕ} (j : Fin n) (c : ℂ) (σ τ : Fin n �
 theorem siteOp_spinZ_zero_apply {n : ℕ} (l : Fin n) (c : ℂ) (σ τ : Fin n → Fin 3) :
     siteOp l (c • spinZ 0) σ τ = c * invSqrtTwo *
       ((if endUp' l σ = some τ then 1 else 0) + (if endDown' l σ = some τ then 1 else 0)) := by
-  rw [siteOp_apply']
+  rw [siteOp_apply]
   by_cases hag : ∀ i, i ≠ l → σ i = τ i
   · rw [ite_eq_left hag]
     have e1 : endUp' l σ = some τ ↔ (σ l : ℕ) + 1 = τ l := by
@@ -622,80 +479,6 @@ theorem siteOp_spinZ_zero_apply {n : ℕ} (l : Fin n) (c : ℂ) (σ τ : Fin n �
     simp [h1, h2]
 
 /-! ### The band entries in terms of hops -/
-
-theorem getD_map_range {α : Type*} (f : ℕ → α) (d k : ℕ) (a : α) (hk : k < d) :
-    ((List.range d).map f).getD k a = f k := by
-  rw [List.getD_eq_getElem?_getD, List.getElem?_map, List.getElem?_range hk]; rfl
-
-theorem le_wordNum {n : ℕ} (σ : Fin n → Fin 3) (j : Fin n) (hj : 1 ≤ (σ j : ℕ)) :
-    3 ^ (j : ℕ) ≤ (wordNum n σ : ℕ) := by
-  have h := wordNum_val σ
-  have h1 : ((σ j : ℕ) : ℤ) * 3 ^ (j : ℕ) ≤ ∑ i, ((σ i : ℕ) : ℤ) * 3 ^ (i : ℕ) :=
-    Finset.single_le_sum (f := fun i ↦ ((σ i : ℕ) : ℤ) * 3 ^ (i : ℕ))
-      (fun i _ ↦ by positivity) (Finset.mem_univ j)
-  have h2 : (3 : ℤ) ^ (j : ℕ) ≤ ((σ j : ℕ) : ℤ) * 3 ^ (j : ℕ) :=
-    le_mul_of_one_le_left (by positivity) (by exact_mod_cast hj)
-  have : ((3 ^ (j : ℕ) : ℕ) : ℤ) ≤ ((wordNum n σ : ℕ) : ℤ) := by push_cast; linarith
-  exact_mod_cast this
-
-theorem wordNum_eq_iff {n : ℕ} {σ τ : Fin n → Fin 3} :
-    ((wordNum n σ : ℕ) : ℤ) = wordNum n τ ↔ σ = τ := by
-  constructor
-  · intro h; exact (wordNum n).injective (Fin.ext (by exact_mod_cast h))
-  · rintro rfl; rfl
-
-/-- The up band of a bond in terms of the hop. -/
-theorem bondUp_term {n : ℕ} {j k : Fin n} (hjk : (k : ℕ) = j + 1) (σ τ : Fin n → Fin 3)
-    (c : ℕ) : (if (wordNum n τ : ℕ) = wordNum n σ + 2 * 3 ^ (j : ℕ) then
-      (if 1 ≤ (σ j : ℕ) ∧ (σ k : ℕ) ≤ 1 then c else 0) else 0) =
-      if hopUp j k σ = some τ then c else 0 := by
-  have hne : j ≠ k := by intro h; rw [h] at hjk; omega
-  by_cases hc : 1 ≤ (σ j : ℕ) ∧ (σ k : ℕ) ≤ 1
-  · have hh : hopUp j k σ = some _ := dite_eq_left hc
-    rw [hh, ite_eq_left hc]
-    set τ' := Function.update (Function.update σ j ⟨σ j - 1, by have := (σ j).isLt; omega⟩) k
-      ⟨σ k + 1, by omega⟩
-    have he : ((wordNum n τ' : ℕ) : ℤ) = wordNum n σ + 2 * 3 ^ (j : ℕ) := by
-      rw [wordNum_update₂ σ hne, hjk]
-      push_cast [Nat.cast_sub hc.1]
-      ring
-    have : (wordNum n τ : ℕ) = wordNum n σ + 2 * 3 ^ (j : ℕ) ↔ some τ' = some τ := by
-      rw [Option.some_inj, ← wordNum_eq_iff (σ := τ') (τ := τ), he, ← Nat.cast_inj (R := ℤ)]
-      push_cast
-      constructor <;> intro h <;> linarith
-    simp only [this]
-  · have hh : hopUp j k σ = none := dite_eq_right hc
-    rw [hh, ite_eq_right hc]
-    simp
-
-/-- The down band of a bond in terms of the hop. -/
-theorem bondDown_term {n : ℕ} {j k : Fin n} (hjk : (k : ℕ) = j + 1) (σ τ : Fin n → Fin 3)
-    (c : ℕ) : (if (wordNum n τ : ℕ) = wordNum n σ - 2 * 3 ^ (j : ℕ) then
-      (if (σ j : ℕ) ≤ 1 ∧ 1 ≤ (σ k : ℕ) then c else 0) else 0) =
-      if hopUp k j σ = some τ then c else 0 := by
-  have hne : k ≠ j := by intro h; rw [h] at hjk; omega
-  by_cases hc : 1 ≤ (σ k : ℕ) ∧ (σ j : ℕ) ≤ 1
-  · have hh : hopUp k j σ = some _ := dite_eq_left hc
-    rw [hh, ite_eq_left (show (σ j : ℕ) ≤ 1 ∧ 1 ≤ (σ k : ℕ) from ⟨hc.2, hc.1⟩)]
-    set τ' := Function.update (Function.update σ k ⟨σ k - 1, by have := (σ k).isLt; omega⟩) j
-      ⟨σ j + 1, by omega⟩
-    have he : ((wordNum n τ' : ℕ) : ℤ) = wordNum n σ - 2 * 3 ^ (j : ℕ) := by
-      rw [wordNum_update₂ σ hne, hjk]
-      push_cast [Nat.cast_sub hc.1]
-      ring
-    have hle : 2 * 3 ^ (j : ℕ) ≤ (wordNum n σ : ℕ) := by
-      have := le_wordNum σ k hc.1
-      rw [hjk, pow_succ] at this
-      omega
-    have : (wordNum n τ : ℕ) = wordNum n σ - 2 * 3 ^ (j : ℕ) ↔ some τ' = some τ := by
-      rw [Option.some_inj, ← wordNum_eq_iff (σ := τ') (τ := τ), he, ← Nat.cast_inj (R := ℤ),
-        Nat.cast_sub hle]
-      push_cast
-      constructor <;> intro h <;> linarith
-    simp only [this]
-  · have hh : hopUp k j σ = none := dite_eq_right hc
-    rw [hh, ite_eq_right (show ¬((σ j : ℕ) ≤ 1 ∧ 1 ≤ (σ k : ℕ)) from fun h ↦ hc ⟨h.2, h.1⟩)]
-    simp
 
 /-- The up end band in terms of the hop. -/
 theorem endUp_term {n : ℕ} (l : Fin n) (σ τ : Fin n → Fin 3) (c : ℕ) :
@@ -737,12 +520,6 @@ theorem endDown_term {n : ℕ} (l : Fin n) (σ τ : Fin n → Fin 3) (c : ℕ) :
     rw [hh, ite_eq_right hc]
     simp
 
-theorem sum_map_flatMap {α β M : Type*} [AddCommMonoid M] (L : List α) (f : α → List β)
-    (g : β → M) : ((L.flatMap f).map g).sum = (L.map fun a ↦ ((f a).map g).sum).sum := by
-  induction L with
-  | nil => simp
-  | cons a L ih => simp [List.flatMap_cons, List.map_append, List.sum_append, ih]
-
 /-- **The entries of the integer matrix in terms of hops.** -/
 theorem band_entry (g : ℤ) (m : ℕ) (σ τ : Fin (m + 1) → Fin 3) :
     (band (m + 1) g).matrix (3 ^ (m + 1)) (wordNum (m + 1) σ) (wordNum (m + 1) τ) =
@@ -754,7 +531,7 @@ theorem band_entry (g : ℤ) (m : ℕ) (σ τ : Fin (m + 1) → Fin 3) :
           else 0) else 0) := by
   have hk := (wordNum (m + 1) σ).isLt
   simp only [Band.matrix, band, BoundaryThermal.hops, (wordNum (m + 1)).injective.eq_iff,
-    List.map_append, List.sum_append, sum_map_flatMap]
+    List.map_append, List.sum_append, sum_map_flatMap, List.map_nil, List.sum_nil, add_zero]
   rw [getD_map_range _ _ _ _ hk, getD_map_range _ _ _ _ hk, sub_sub]
   congr 1
   · split_ifs <;> simp
@@ -762,17 +539,13 @@ theorem band_entry (g : ℤ) (m : ℕ) (σ τ : Fin (m + 1) → Fin 3) :
   rw [hm, list_sum_range, ← Fin.sum_univ_eq_sum_range]
   congr 1
   · refine Finset.sum_congr rfl fun j _ ↦ ?_
-    simp only [List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, add_zero, bondUp,
-      bondDown, Hop.nb, ite_true, Bool.false_eq_true, ite_false]
-    rw [getD_map_range _ _ _ _ hk, getD_map_range _ _ _ _ hk]
-    have d1 : digit (wordNum (m + 1) σ) j = σ j.castSucc := digit_wordNum σ j.castSucc
-    have d2 : digit (wordNum (m + 1) σ) (j + 1) = σ j.succ := digit_wordNum σ j.succ
-    rw [d1, d2]
+    simp only [List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, add_zero]
     have h1 := congrArg (fun x : ℕ ↦ (x : ℤ))
-      (bondUp_term (j := j.castSucc) (k := j.succ) (by simp) σ τ 10)
+      (hopBand_term (j := j.castSucc) (k := j.succ) (by simp [Fin.ext_iff]) 10 σ τ)
     have h2 := congrArg (fun x : ℕ ↦ (x : ℤ))
-      (bondDown_term (j := j.castSucc) (k := j.succ) (by simp) σ τ 10)
-    simp only [Fin.val_castSucc, Nat.cast_ite, Nat.cast_zero, Nat.cast_ofNat] at h1 h2 ⊢
+      (hopBand_term (j := j.succ) (k := j.castSucc) (by simp [Fin.ext_iff]) 10 σ τ)
+    simp only [Fin.val_castSucc, Fin.val_succ, Nat.cast_ite, Nat.cast_zero,
+      Nat.cast_ofNat] at h1 h2 ⊢
     rw [h1, h2]
   · by_cases hg : g = 0
     · simp only [hg, ↓reduceIte, List.map_cons, List.map_nil, List.sum_cons, List.sum_nil,
@@ -875,9 +648,6 @@ theorem hamiltonianZ_apply (g : ℤ) (m : ℕ) (σ τ : Fin (m + 1) → Fin 3) :
       rw [siteOp_spinZ_zero_apply]
     · simp only [hg, ↓reduceIte]
       rw [smul_smul, siteOp_spinZ_two_apply, mul_assoc]
-
-theorem hopUp_ne_self {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (σ : Fin n → Fin 3) :
-    hopUp j k σ ≠ some σ := fun h ↦ by have := ((hopUp_eq_some hjk σ σ).1 h).2.1; omega
 
 theorem endUp'_ne_self {n : ℕ} (l : Fin n) (σ : Fin n → Fin 3) : endUp' l σ ≠ some σ :=
   fun h ↦ by have := ((endUp'_eq_some l σ σ).1 h).2; omega
@@ -1163,11 +933,6 @@ theorem hornerFloor_matrixD {n : ℕ} {g : ℤ} (hD : (band n g).InRange (3 ^ n)
       specCol (band n g) 80 (wordNum n r) (coeffs.map (↑)) (wordNum n w) := by
   unfold matrixD
   rw [hornerFloor_submatrix, hornerFloor_eq_specCol hD, coeffs_eq]
-
-/-- A sum over words is a sum over word numbers. -/
-theorem sum_words {n : ℕ} {M : Type*} [AddCommMonoid M] (f : ℕ → M) :
-    ∑ σ : Fin n → Fin 3, f (wordNum n σ) = ∑ k ∈ Finset.range (3 ^ n), f k := by
-  rw [(wordNum n).sum_comp (fun k ↦ f k), Fin.sum_univ_eq_sum_range]
 
 /-- **`2 W = N`**: the weighted Frobenius norm of the computed columns is half the integer
 numerator of eq. (appth:quotient). -/

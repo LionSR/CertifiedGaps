@@ -37,8 +37,8 @@ import SeedKernel
 #print axioms SeedKernel.Ising.coverage12
 #print axioms SeedKernel.Ising.anchor6
 #print axioms SeedKernel.Ising.anchor12
-#print axioms SeedKernel.Ising.exists_eigenvalue_near
-#print axioms SeedKernel.Ising.card_eigenvalues_lt_le
+#print axioms CertifiedGaps.Spectral.exists_eigenvalue_near
+#print axioms CertifiedGaps.Spectral.eigCount_le_card_of_vanishing
 #print axioms SeedKernel.Ising.hamiltonian_mulVec_apply
 #print axioms SeedKernel.Ising.residualSq_eq
 #print axioms SeedKernel.Ising.lowSpectrum6
@@ -71,5 +71,13 @@ import SeedKernel
 #print axioms CertifiedGaps.SpinOneHeisenberg.boundaryFieldInputs_of_integers
 #print axioms CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_integers
 #print axioms CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_of_integers
+#print axioms CertifiedGaps.SpinOneHeisenberg.ThermalPacked.hornerTotal_eq_of_packed
+#print axioms CertifiedGaps.SpinOneHeisenberg.packedHornerTotal_four_zero
+#print axioms CertifiedGaps.SpinOneHeisenberg.packedHornerTotal_four_one
+#print axioms CertifiedGaps.SpinOneHeisenberg.hornerTotals_of_large
+#print axioms CertifiedGaps.SpinOneHeisenberg.gap_of_hornerTotalsLarge
+#print axioms CertifiedGaps.SpinOneHeisenberg.gap_log_twenty_of_hornerTotalsLarge
+#print axioms CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_hornerTotalsLarge
+#print axioms CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_of_hornerTotalsLarge
 #print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryInit.thermalCore_of_tables
 #print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryInit.thermalCore_of_integers

@@ -38,6 +38,14 @@ srcDir = "lean"
 roots = []
 globs = ["SeedKernel.Bench.+"]
 
+# Compiled evaluation of the integer hypotheses (`#guard`, not a proof), opt-in:
+# `lake build SeedKernelEval`. No roots, for the same reason as SeedKernelBench.
+[[lean_lib]]
+name = "SeedKernelEval"
+srcDir = "lean"
+roots = []
+globs = ["SeedKernel.Eval.+"]
+
 # Leaderboard of certified spectral-gap records (leaderboard/README.md): record statements and
 # the records proved so far.
 [[lean_lib]]

@@ -3,7 +3,7 @@ Copyright (c) 2026 thermal-mpo-gap contributors. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
-import CertifiedGaps.Trace.PackedHorner
+import CertifiedGaps.Heisenberg.WordBand
 
 /-!
 # The integer recurrence of the boundary-field thermal appendix
@@ -23,8 +23,8 @@ Words `w ∈ {-1, 0, 1}ⁿ` are numbered `k = ∑ⱼ (wⱼ + 1) 3ʲ` (site `0` l
 `D = 80 J A J⁻¹` has
 
 * the diagonal `η(w) = 80 - 10 C_n - 10 ∑ⱼ wⱼ wⱼ₊₁ + 6 w₀ - 6 g w_{n-1}` (`eta`);
-* the entries `-10` of the bond hops `w ↔ w + σ(eⱼ - eⱼ₊₁)` (`bondUp`, `bondDown`; in the
-  numbering, offsets `∓ 2·3ʲ`);
+* the entries `-10` of the bond hops `w ↔ w + σ(eⱼ - eⱼ₊₁)` (`hopBand n j (j + 1) 10`,
+  `hopBand n (j + 1) j 10` of `Heisenberg/WordBand.lean`; in the numbering, offsets `∓ 2·3ʲ`);
 * for `g = 0`, the entries `-3(1 + p_w)` of the end hops `w ↔ w + σ e_{n-1}` (`endUp`,
   `endDown`; offsets `± 3^{n-1}`).
 
@@ -47,12 +47,6 @@ def lengths : List ℕ := [2, 3, 4, 5, 6]
 /-- The right fields of the table. -/
 def fields : List ℤ := [1, -1, 0]
 
-/-- Digit `j` of the word number `k`: the letter `wⱼ + 1 ∈ {0, 1, 2}`. -/
-def digit (k j : ℕ) : ℕ := k / 3 ^ j % 3
-
-/-- The letter `wⱼ = digit k j - 1 ∈ {-1, 0, 1}`. -/
-def letter (k j : ℕ) : ℤ := (digit k j : ℤ) - 1
-
 /-- `10 C_n = 30⌊(n-1)/2⌋ + 20((n-1) mod 2) + 12`. -/
 def c10 (n : ℕ) : ℕ := 30 * ((n - 1) / 2) + 20 * ((n - 1) % 2) + 12
 
@@ -65,16 +59,6 @@ def eta (n : ℕ) (g : ℤ) (k : ℕ) : ℤ :=
   80 - (c10 n : ℤ) - 10 * ((List.range (n - 1)).map fun j ↦ letter k j * letter k (j + 1)).sum +
     6 * letter k 0 - (if g = 0 then 0 else 6 * g * letter k (n - 1))
 
-/-- The bond hop `wⱼ ↦ wⱼ - 1`, `wⱼ₊₁ ↦ wⱼ₊₁ + 1`: column `k + 2·3ʲ`, entry `-10`. -/
-def bondUp (n j : ℕ) : Hop :=
-  ⟨true, 2 * 3 ^ j, (List.range (3 ^ n)).map fun k ↦
-    if 1 ≤ digit k j ∧ digit k (j + 1) ≤ 1 then 10 else 0⟩
-
-/-- The bond hop `wⱼ ↦ wⱼ + 1`, `wⱼ₊₁ ↦ wⱼ₊₁ - 1`: column `k - 2·3ʲ`, entry `-10`. -/
-def bondDown (n j : ℕ) : Hop :=
-  ⟨false, 2 * 3 ^ j, (List.range (3 ^ n)).map fun k ↦
-    if digit k j ≤ 1 ∧ 1 ≤ digit k (j + 1) then 10 else 0⟩
-
 /-- The end hop `w_{n-1} ↦ w_{n-1} + 1`: column `k + 3^{n-1}`, entry `-3(1 + p_w)`. -/
 def endUp (n : ℕ) : Hop :=
   ⟨true, 3 ^ (n - 1), (List.range (3 ^ n)).map fun k ↦
@@ -85,9 +69,10 @@ def endDown (n : ℕ) : Hop :=
   ⟨false, 3 ^ (n - 1), (List.range (3 ^ n)).map fun k ↦
     if 1 ≤ digit k (n - 1) then 3 * (1 + par n k) else 0⟩
 
-/-- The off-diagonal bands of `D`. -/
+/-- The off-diagonal bands of `D`: the two hops of every bond with entry `-10`, and the end
+hops. -/
 def hops (n : ℕ) (g : ℤ) : List Hop :=
-  (List.range (n - 1)).flatMap (fun j ↦ [bondUp n j, bondDown n j]) ++
+  (List.range (n - 1)).flatMap (fun j ↦ [hopBand n j (j + 1) 10, hopBand n (j + 1) j 10]) ++
     (if g = 0 then [endUp n, endDown n] else [])
 
 /-- The integer matrix `D = 80 J A J⁻¹` of eq. (appth:diagonal) as a banded matrix. -/

@@ -10,6 +10,7 @@ import SeedKernel.Heisenberg.BoundaryTraces
 import SeedKernel.Heisenberg.OpenTrial
 import SeedKernel.Heisenberg.Reseed120
 import SeedKernel.Heisenberg.Seed36
+import SeedKernel.Heisenberg.ThermalTraces
 
 /-!
 # The spin-one gaps from the papers' printed integers
@@ -22,7 +23,9 @@ kernel-checked.
 * **Periodic paper, seed at `(36, 49/4)`.** `HornerTotals` says the floored integer recurrence of
   `ThermalTable` reproduces the eighteen printed totals `W_{n,g}` (`n = 4, …, 12`, `g = 0, 1`).
   `gap_of_hornerTotals`: every even ring `L ≥ 36` has gap `Δ_L > log(1.05882)/(49/4)`, and
-  `gap_log_twenty_of_hornerTotals` is OpenAI's eq. (1.4).
+  `gap_log_twenty_of_hornerTotals` is OpenAI's eq. (1.4). The two totals with `n = 4` are
+  kernel-checked (`SeedKernel/Heisenberg/ThermalTraces.lean`), so the `_of_hornerTotalsLarge`
+  variants assume only the sixteen with `n ≥ 5` (`HornerTotalsLarge`).
 * **Periodic paper, seed at `(60, 105/4)`.** `HornerTotals60` says the same for the nine totals of
   the `b = 21/2` table. `gap_sixty_of_hornerTotals60`: `Δ_L > log(1.16321)/(105/4)` for even
   `L ≥ 60`.
@@ -56,6 +59,18 @@ theorem gap_of_hornerTotals (h : HornerTotals) {L : ℕ} (hL : 36 ≤ L) (hLe : 
 theorem gap_log_twenty_of_hornerTotals (h : HornerTotals) {L : ℕ} (hL : 2304 ≤ L)
     (hLe : Even L) : GapGT (spectrum L) (log 20 / 784) :=
   gap_log_twenty_of_table (traceTable_of_hornerTotals h) hL hLe
+
+/-- **The periodic gap from the sixteen totals with `n ≥ 5`** (the two with `n = 4` are
+kernel-checked): every even ring of `L ≥ 36` sites has `Δ_L > log(1.05882)/(49/4)`. -/
+theorem gap_of_hornerTotalsLarge (h : HornerTotalsLarge) {L : ℕ} (hL : 36 ≤ L) (hLe : Even L) :
+    GapGT (spectrum L) (log (105882 / 100000) / (49 / 4)) :=
+  gap_of_hornerTotals (hornerTotals_of_large h) hL hLe
+
+/-- **OpenAI's eq. (1.4) from the sixteen totals with `n ≥ 5`**: `Δ_L > (log 20)/784` for every
+even `L ≥ 2304`. -/
+theorem gap_log_twenty_of_hornerTotalsLarge (h : HornerTotalsLarge) {L : ℕ} (hL : 2304 ≤ L)
+    (hLe : Even L) : GapGT (spectrum L) (log 20 / 784) :=
+  gap_log_twenty_of_hornerTotals (hornerTotals_of_large h) hL hLe
 
 /-- **The periodic gap from the nine totals of the `b = 21/2` table**: every even ring of
 `L ≥ 60` sites has a unique ground state and `Δ_L > log(1.16321)/(105/4) ≈ 0.00576`. -/
@@ -119,5 +134,19 @@ theorem spin_one_opposite_field_gap_of_integers (hW : HornerTotals)
     (hB : BoundaryThermal.BoundaryTotalsLarge) {n : ℕ} (hn : 1920 ≤ n) (hne : Even n) :
     GapGT (oppositeFieldSpectrum (3 / 5) n) (log (1000000 / 2241) / 392) :=
   oppositeFieldGapGT_of_boundaryFieldInputs_sharp (boundaryFieldInputs_of_integers hW hB) hn hne
+
+/-- **The boundary-field gap from the periodic totals with `n ≥ 5`** and the six boundary
+integers with `n = 5, 6`: `Δ_n > log(10⁶/2241)/392` for every odd `n ≥ 1921`. -/
+theorem spin_one_boundary_field_gap_of_hornerTotalsLarge (hW : HornerTotalsLarge)
+    (hB : BoundaryThermal.BoundaryTotalsLarge) {n : ℕ} (hn : 1921 ≤ n) (hno : Odd n) :
+    GapGT (equalFieldSpectrum (3 / 5) n) (log (1000000 / 2241) / 392) :=
+  spin_one_boundary_field_gap_of_integers (hornerTotals_of_large hW) hB hn hno
+
+/-- **The opposite-field gap from the periodic totals with `n ≥ 5`** and the six boundary
+integers with `n = 5, 6`: `Δ_n > log(10⁶/2241)/392` for every even `n ≥ 1920`. -/
+theorem spin_one_opposite_field_gap_of_hornerTotalsLarge (hW : HornerTotalsLarge)
+    (hB : BoundaryThermal.BoundaryTotalsLarge) {n : ℕ} (hn : 1920 ≤ n) (hne : Even n) :
+    GapGT (oppositeFieldSpectrum (3 / 5) n) (log (1000000 / 2241) / 392) :=
+  spin_one_opposite_field_gap_of_integers (hornerTotals_of_large hW) hB hn hne
 
 end CertifiedGaps.SpinOneHeisenberg

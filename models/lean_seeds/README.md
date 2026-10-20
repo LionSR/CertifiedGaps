@@ -210,9 +210,11 @@ the thirty conjunctions of `IsingLongitudinal.seeds`
 ($`1 - 9064 \times 10^{-9} \le \mathrm{spatialPurity}\; 6\; (97/4)`$ and
 $`1 - 3141 \times 10^{-8} \le \mathrm{thermalPurity}\; 12\; (97/4)`$), with no hypothesis, and then
 `ising_gap`. The steps are:
-- a residual bound gives an eigenvalue within $10^{-10}$ of each candidate (`Ising/Spectral`);
+- a residual bound gives an eigenvalue within $10^{-10}$ of each candidate
+  (`CertifiedGaps.Spectral.exists_eigenvalue_near`);
 - $`\mathrm{Re}\, \langle x, Hx \rangle \ge \sum_\sigma (E(\sigma) - L/4) |x(\sigma)|^2`$ and the
-  classical count give at most two eigenvalues below the anchor (counting by comparison);
+  classical count give at most two eigenvalues below the anchor (counting by comparison,
+  `CertifiedGaps.Spectral.eigCount_le_card_of_vanishing`);
 - the checker's integer sums are identified with the matrix `IsingLongitudinal.model (1/4) (1/20)`
   (`Ising/Hamiltonian`, `Ising/Bridge`);
 - finally
@@ -235,7 +237,7 @@ and 5); items 2–4 are done except where noted:
    Lehmann–Goerisch bounds with a priori input); this is the bottleneck of the whole route.
 2. **Ordered spectral linear algebra in Lean:** Lehmann bounds and ordered-eigenvalue statements
    (absent from Mathlib). The residual bound and counting by comparison are now proved
-   (`Ising/Spectral.lean`) and apply to any Hermitian matrix.
+   (`lean/CertifiedGaps/Spectral/Counting.lean`) and apply to any Hermitian matrix.
 3. **Packing soundness:** proofs of the specification propositions (`DotCorrect`, `HApplyCorrect`,
    `FilterCorrect`, etc.) in `lean/SeedKernel/Obligations.lean` and `Spin1/Obligations.lean`, and
    the lane decoding of `Ising/Packed.lean`; nothing assumes them.
@@ -261,18 +263,20 @@ julia --project=. -e 'using Pkg; Pkg.instantiate()'
 julia --project=. test/runtests.jl         # 30 s: 1,582 unit tests across all five studies (Julia only)
 julia --project=. check.jl                 # 1 min: exact rational replays + data checks, then
                                            #   `lake build SeedKernel` and the Lean axiom audit
-julia --project=. check.jl --full          # 4.5 min: also regenerate the spin-1 Lean witnesses,
-                                           #   rebuild SeedKernel from clean, and run all benchmarks
+julia --project=. check.jl --full          # 15 min: also regenerate the spin-1 Lean witnesses,
+                                           #   rebuild SeedKernel from clean, run the compiled
+                                           #   evaluations in `SeedKernel/Eval` (about 7 min, not a
+                                           #   proof), and run all benchmarks
 julia --project=. certify.jl [study ...]   # 75 s: regenerate exact JSON records and Lean witnesses
 ```
 
 Running `certify.jl` executes `seed_design` (5 s), `anchor` (3 s), `ising` (9 s), and
 `spin1_kernel` (55 s; run last because it records the SHA-256 hashes of shared driver files).
 `check.jl` uses the Mathlib build cache in `../../lean/` (run `lake exe cache get` inside `lean/`
-if not yet initialized); with Mathlib cached, `lake build SeedKernel` from clean takes about
-2.5 min (peak about 6 GB, in `SeedKernel/Heisenberg/BoundaryTraces.lean`), the axiom audit
-(`lake env lean SeedKernel/Audit.lean`) takes 5–30 s, and the `SeedKernelBench` files take about
-1 min.
+if not yet initialized); with Mathlib cached, `lake build SeedKernel` from clean takes 3 to
+5 min (peak about 7 GB, in `SeedKernel/Heisenberg/ThermalTraces.lean` and
+`BoundaryTraces.lean`), the axiom audit (`lake env lean SeedKernel/Audit.lean`) takes 5–30 s,
+and the `SeedKernelBench` files take about 1.5 min.
 
 Exploratory and table-generation scripts by study (writing to `results/<study>/`, with temporary
 caches in the gitignored `cache/`, `upstream/`, `.cache/`, and `runtime/` directories):
@@ -328,7 +332,7 @@ julia --project=. scripts/open_trial/generate.jl --check   # regenerates and com
 
 ## What is rigorous
 
-- **Lean 4 kernel (`decide +kernel`, standard axioms only):** All 64 declarations audited in
+- **Lean 4 kernel (`decide +kernel`, standard axioms only):** All 72 declarations audited in
   `lean/SeedKernel/Audit.lean` (verified automatically by `check.jl`) depend at most on standard
   Lean axioms (`propext`, `Classical.choice`, `Quot.sound`), with no `sorryAx` and no
   `Lean.ofReduceBool` (`native_decide`). The computational witness checks (spin-1 $H_6, H_8, H_{10}$
@@ -406,4 +410,6 @@ are gitignored and must be regenerated in their respective model directories bef
   hashes it into `results/spectrum/provenance.json`.
 - In `SeedKernel/Ising/`, `Spectral.lean`, `Hamiltonian.lean`, `Bridge.lean`, and `Seed.lean`
   completed the end-to-end proof of `first_point_seed` and the unconditional `ising_gap` theorem
-  from the kernel-checked 6- and 12-site witnesses.
+  from the kernel-checked 6- and 12-site witnesses. `Spectral.lean` and the generic entry lemmas
+  of `Hamiltonian.lean` were later replaced by the shared `lean/CertifiedGaps/Spectral` layer and
+  `lean/CertifiedGaps/Ring/Hamiltonian.lean`.
