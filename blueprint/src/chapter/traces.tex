@@ -207,12 +207,14 @@ of a shifted Gibbs operator. Integer division introduces a bounded error at each
   \label{lem:trace-packed}
   \lean{CertifiedGaps.Trace.Packed.pack_lane, CertifiedGaps.Trace.Packed.Band.check_spec,
     CertifiedGaps.Trace.Packed.hornerFloor_eq_specCol,
-    CertifiedGaps.Trace.Packed.run_spec, CertifiedGaps.Trace.Packed.run_numerator}
+    CertifiedGaps.Trace.Packed.run_spec, CertifiedGaps.Trace.Packed.run_numerator,
+    CertifiedGaps.Trace.Packed.runCols_spec, CertifiedGaps.Trace.Packed.runCols_numerator}
   \leanok
   \uses{lem:trace-horner}
   Suppose the packing parameters satisfy \texttt{Params.Ok}, a band matrix has its indices
   in range and satisfies \texttt{RowsOk}, and every coefficient is at most the offset \(B\).
-  A successful packed run decodes to the integer Horner columns in its requested window.
+  A successful packed run decodes to the integer Horner columns it was asked for: a window of
+  consecutive columns, or any list of distinct columns.
   For row and column weight lists of the specified lengths, its numerator equals the weighted
   sum of their squared entries.
   The Boolean band check implies the two band conditions.

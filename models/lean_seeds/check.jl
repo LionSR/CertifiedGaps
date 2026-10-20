@@ -2,10 +2,10 @@
 # it replays the exact records, compares the generated Lean files with the stored witnesses, and
 # runs the Lean kernel on lean/SeedKernel (`lake build SeedKernel` plus the axiom audit).
 #
-#     julia --project=. check.jl            # fast: exact replays, data checks, Lake build + audit,
-#                                           # compiled evaluation of the integer hypotheses
+#     julia --project=. check.jl            # fast: exact replays, data checks, Lake build + audit
 #     julia --project=. check.jl --full     # also regenerate the spin-1 witnesses from scratch,
-#                                           # rebuild SeedKernel from clean, run every benchmark
+#                                           # rebuild SeedKernel from clean, evaluate the integer
+#                                           # hypotheses in compiled code, run every benchmark
 #
 # Set LAKE_BIN if `lake` is not on PATH. Throws (nonzero exit) on any mismatch.
 include(joinpath(@__DIR__, "src", "LeanSeeds.jl"))
@@ -41,15 +41,15 @@ function main(full)
         println("lake build SeedKernel", full ? " (clean)" : "", " took ", round(seconds; digits=1),
             " s; ", length(names), " declarations use only standard axioms")
     end
+    full || return
     # Compiled code, not the kernel: shows that the integer hypotheses hold for the Lean
-    # definitions as written, without proving them (SeedKernel/Eval/*.lean).
+    # definitions as written, without proving them (SeedKernel/Eval/*.lean, several minutes).
     step("lean: compiled evaluation of the integer hypotheses (SeedKernel/Eval, not a proof)") do
         for file in sort(readdir(joinpath(LEAN, "SeedKernel", "Eval")))
             t = @elapsed lean_output(`$LAKE env lean $(joinpath("SeedKernel", "Eval", file))`)
             println("Eval/$file passed in $(round(t; digits=1)) s")
         end
     end
-    full || return
     step("lean: kernel benchmarks (SeedKernel/Bench)") do
         for file in sort(readdir(joinpath(LEAN, "SeedKernel", "Bench")))
             t = @elapsed lean_output(`$LAKE env lean $(joinpath("SeedKernel", "Bench", file))`)

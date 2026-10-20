@@ -16,7 +16,9 @@ of~\cite{OpenAIHaldane}. In this chapter each bound assumes one table of short-r
 The trial states are checked in the kernel (Lemma~\ref{lem:kernel-spin1-trials}).
 Each table follows from the hypothesis that an integer recurrence reproduces the totals printed
 in~\cite[Appendices A and B]{OpenAIHaldane}: eighteen integers (\texttt{HornerTotals}) and nine
-integers (\texttt{HornerTotals60}). The kernel does not recompute these integers. So both gaps
+integers (\texttt{HornerTotals60}). The kernel cannot recompute most of these integers at
+the paper's sizes; it checks the two periodic totals at length \(4\)
+(Lemma~\ref{lem:kernel-horner-four}). So both gaps
 hold given only the printed integers (Theorems~\ref{thm:kernel-gap36-integers}
 and~\ref{thm:kernel-gap60-integers}), which also give sharper constants. The older theorems of
 \texttt{Main.lean}, whose seeds are \texttt{sorry}, are not used.
@@ -270,6 +272,35 @@ length \(36\). Only the equality of the large integer totals remains a hypothesi
   for all eighteen entries of \cite[Appendix B.4]{OpenAIHaldane}.
 \end{definition}
 
+\begin{lemma}[A fast evaluation of the eighteen totals]
+  \label{lem:spin1-horner36-packed}
+  \lean{CertifiedGaps.SpinOneHeisenberg.ThermalPacked.ringBand,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.thermalMatrix_eq_submatrix,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.thermalCoeff_eq,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.coeffNat_tail,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.repNum_wordNum,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.packedHornerTotal,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.hornerTotal_eq_of_packed}
+  \leanok
+  \uses{def:spin1-horner36, lem:trace-packed}
+  Number the words in base \(3\). Then \(D\) is a band matrix: a diagonal, two hops of
+  entry \(-2\) for each bond, and two seam hops of entry \(-2\) on the untwisted ring and
+  \(+2\) on the twisted ring. The coefficients \(c_j\) vanish for \(j \ge 192\), so the
+  recursion can start at \(j = 191\). The representatives are computed on word numbers.
+  Let \texttt{packedHornerTotal} run the packed recursion of Lemma~\ref{lem:trace-packed} on
+  the representative columns, with column weights \(\nu_\rho\). For \(n \ge 2\), if it
+  returns \(W\), then \(W_{n,g} = W\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Match \(D\) with the band entry by entry, drop the zero coefficients, identify the
+  numeric representatives with \texttt{thermalRep}, and apply Lemma~\ref{lem:trace-packed}.
+\end{proof}
+
+This evaluation is fast enough for the kernel at \(n = 4\)
+(Lemma~\ref{lem:kernel-horner-four}). Compiled code, which is not a proof, reproduces the
+twelve printed totals with \(n \le 9\) (\texttt{SeedKernel/Eval/ThermalTotals.lean}).
+
 \begin{theorem}[The first trace table from its printed integers]
   \label{thm:spin1-table36}
   \lean{CertifiedGaps.SpinOneHeisenberg.shiftedTrace_mem,
@@ -522,7 +553,7 @@ defect bounds: ten steps give a larger gap for every even \(L \ge 36\)
 
 \begin{remark}
   The theorem above uses a trace-table hypothesis. Theorem~\ref{thm:kernel-gap36-integers}
-  states it directly from the eighteen printed totals. The older theorem
+  states it directly from the printed totals. The older theorem
   \texttt{spin\_one\_heisenberg\_gap} of \texttt{Main.lean} still depends on \texttt{sorry} seeds.
 \end{remark}
 

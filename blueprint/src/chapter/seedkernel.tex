@@ -35,15 +35,16 @@ gap theorem (Theorem~\ref{thm:ising-gap}).
 The last three sections treat the spin-1 chain of~\cite{OpenAIHaldane, OpenAIBoundary}. The
 kernel checks the trial bounds: periodic at lengths \(72, 120\) and open at four lengths.
 What remains are integer equalities: an integer recurrence must reproduce the printed values.
-The gap from length \(36\) assumes eighteen such totals (\texttt{HornerTotals},
-Theorem~\ref{thm:kernel-gap36-integers}); the gap from length \(60\) assumes nine
-(\texttt{HornerTotals60}, Theorem~\ref{thm:kernel-gap60-integers}). The boundary-field
-gap assumes \texttt{HornerTotals} and six of the fifteen boundary integers
+The gap from length \(36\) assumes sixteen such totals (\texttt{HornerTotalsLarge},
+Theorem~\ref{thm:kernel-gap36-integers}); the kernel checks the two with \(n = 4\)
+(Lemma~\ref{lem:kernel-horner-four}). The gap from length \(60\) assumes nine
+(\texttt{HornerTotals60}, Theorem~\ref{thm:kernel-gap60-integers}). The boundary-field gap
+assumes \texttt{HornerTotalsLarge} and six of the fifteen boundary integers
 (\texttt{BoundaryTotalsLarge}, Theorem~\ref{thm:kernel-boundary-integers}); the kernel checks
 the other nine. These theorems contain no \texttt{sorry}, but they are conditional on the
-integer hypotheses. The file \texttt{SeedKernel/Eval/BoundaryTotals.lean} evaluates all fifteen
-boundary integers with compiled code and finds the printed values. That run trusts the compiler,
-so it is evidence, not a proof.
+integer hypotheses. The files in \texttt{SeedKernel/Eval} evaluate all fifteen boundary
+integers and the twelve periodic totals with \(n \le 9\) with compiled code, and find the
+printed values. That run trusts the compiler, so it is evidence, not a proof.
 
 \section{Perturbative and variational eigenvalue bounds}
 
@@ -393,16 +394,37 @@ The hypotheses remain finite equalities of integers.
   defects of Lemma~\ref{lem:heisenberg-seed36}.
 \end{proof}
 
-\begin{theorem}[The first periodic gap from eighteen integers]
+\begin{lemma}[The two periodic totals at length four]
+  \label{lem:kernel-horner-four}
+  \lean{CertifiedGaps.SpinOneHeisenberg.packedHornerTotal_four_zero,
+    CertifiedGaps.SpinOneHeisenberg.packedHornerTotal_four_one,
+    CertifiedGaps.SpinOneHeisenberg.hornerTotal_four,
+    CertifiedGaps.SpinOneHeisenberg.HornerTotalsLarge,
+    CertifiedGaps.SpinOneHeisenberg.hornerTotals_of_large}
+  \leanok
+  \uses{lem:spin1-horner36-packed}
+  For both twists, \(W_{4,g}\) equals the printed total. So the sixteen totals with
+  \(5 \le n \le 12\) (\texttt{HornerTotalsLarge}) imply \texttt{HornerTotals}.
+\end{lemma}
+\begin{proof}
+  \leanok
+  The kernel evaluates the packed run of Lemma~\ref{lem:spin1-horner36-packed} for \(n = 4\)
+  (\texttt{decide +kernel}, about 11 s and 7 GB each).
+\end{proof}
+
+\begin{theorem}[The first periodic gap from the printed totals]
   \label{thm:kernel-gap36-integers}
   \lean{CertifiedGaps.SpinOneHeisenberg.gap_of_hornerTotals,
-    CertifiedGaps.SpinOneHeisenberg.gap_log_twenty_of_hornerTotals}
+    CertifiedGaps.SpinOneHeisenberg.gap_log_twenty_of_hornerTotals,
+    CertifiedGaps.SpinOneHeisenberg.gap_of_hornerTotalsLarge,
+    CertifiedGaps.SpinOneHeisenberg.gap_log_twenty_of_hornerTotalsLarge}
   \leanok
-  \uses{thm:spin1-table36, thm:kernel-gap36-table, thm:haldane-gap}
+  \uses{thm:spin1-table36, thm:kernel-gap36-table, thm:haldane-gap, lem:kernel-horner-four}
   Assume \texttt{HornerTotals}. For every even \(L\ge36\),
   \(\Delta_L>\log(105882/100000)/(49/4)\), with a unique ground state.
   For every even \(L\ge2304\), also \(\Delta_L>(\log20)/784\).
   No trial-state or trace-table hypothesis remains besides the eighteen integer equalities.
+  The same holds under \texttt{HornerTotalsLarge}, the sixteen equalities with \(n \ge 5\).
 \end{theorem}
 \begin{proof}
   \leanok
@@ -558,17 +580,20 @@ Nine of the fifteen short-chain integer totals are also small enough to evaluate
 \begin{theorem}[The boundary-field gaps from the remaining integers]
   \label{thm:kernel-boundary-integers}
   \lean{CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_integers,
-    CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_of_integers}
+    CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_of_integers,
+    CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_hornerTotalsLarge,
+    CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_of_hornerTotalsLarge}
   \leanok
-  \uses{thm:kernel-boundary-inputs, thm:boundary-field-gap-sharp, thm:opposite-field-gap}
+  \uses{thm:kernel-boundary-inputs, thm:boundary-field-gap-sharp, thm:opposite-field-gap,
+    lem:kernel-horner-four}
   Assume \texttt{HornerTotals} and \texttt{BoundaryTotalsLarge}.
   The equal-field chain with \(h=3/5\) at every odd \(n\ge1921\), and the opposite-field chain
   at every even \(n\ge1920\), have unique ground states and
   \[
     \Delta_n>\frac{\log(1000000/2241)}{392}.
   \]
-  These theorems have no \texttt{sorry}; the eighteen periodic totals and six boundary integers
-  remain explicit hypotheses.
+  These theorems have no \texttt{sorry}; the eighteen periodic totals (or the sixteen of
+  \texttt{HornerTotalsLarge}) and six boundary integers remain explicit hypotheses.
   The sharper constant and even-length conclusion extend
   \cite[Theorem 1.1]{OpenAIBoundary}.
 \end{theorem}

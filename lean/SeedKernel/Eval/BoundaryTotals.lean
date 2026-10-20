@@ -13,7 +13,7 @@ kernel and keeps the six with `n = 5, 6` as the hypothesis `BoundaryTotalsLarge`
 kernel would need about `10` GB and half an hour per `n = 5` entry.
 
 The `#guard` commands below evaluate all fifteen entries of the Lean definition `quotient` with
-compiled code (about `25` s in all) and fail if one differs from the printed `paperK`. This
+compiled code (about a minute in all) and fail if one differs from the printed `paperK`. This
 trusts the compiler and the runtime's big-integer arithmetic, like `native_decide`, so it
 proves nothing and no declaration depends on it. It shows that `BoundaryTotalsLarge` holds for
 the definitions as written: the remaining hypothesis is a fact about the Lean code, not a hope.
