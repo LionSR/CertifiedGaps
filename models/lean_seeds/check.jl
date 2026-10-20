@@ -2,7 +2,8 @@
 # it replays the exact records, compares the generated Lean files with the stored witnesses, and
 # runs the Lean kernel on lean/SeedKernel (`lake build SeedKernel` plus the axiom audit).
 #
-#     julia --project=. check.jl            # fast: exact replays, data checks, Lake build + audit
+#     julia --project=. check.jl            # fast: exact replays, data checks, Lake build + audit,
+#                                           # compiled evaluation of the integer hypotheses
 #     julia --project=. check.jl --full     # also regenerate the spin-1 witnesses from scratch,
 #                                           # rebuild SeedKernel from clean, run every benchmark
 #
@@ -39,6 +40,14 @@ function main(full)
         seconds, names = build_seed_kernel(; fresh=full)
         println("lake build SeedKernel", full ? " (clean)" : "", " took ", round(seconds; digits=1),
             " s; ", length(names), " declarations use only standard axioms")
+    end
+    # Compiled code, not the kernel: shows that the integer hypotheses hold for the Lean
+    # definitions as written, without proving them (SeedKernel/Eval/*.lean).
+    step("lean: compiled evaluation of the integer hypotheses (SeedKernel/Eval, not a proof)") do
+        for file in sort(readdir(joinpath(LEAN, "SeedKernel", "Eval")))
+            t = @elapsed lean_output(`$LAKE env lean $(joinpath("SeedKernel", "Eval", file))`)
+            println("Eval/$file passed in $(round(t; digits=1)) s")
+        end
     end
     full || return
     step("lean: kernel benchmarks (SeedKernel/Bench)") do
