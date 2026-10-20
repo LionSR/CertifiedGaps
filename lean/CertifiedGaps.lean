@@ -55,6 +55,10 @@ import CertifiedGaps.Trace.Orbit
 import CertifiedGaps.Trace.OrbitConj
 import CertifiedGaps.Trace.Eisenstein
 import CertifiedGaps.Trace.HornerEisenstein
+import CertifiedGaps.Trace.WeightedHorner
+import CertifiedGaps.Trace.WeightedFrobenius
+import CertifiedGaps.Trace.PackedLanes
+import CertifiedGaps.Trace.PackedHorner
 -- The spin-one Heisenberg ring (Theorem 1 of the note)
 import CertifiedGaps.Heisenberg.Hamiltonian
 import CertifiedGaps.Heisenberg.Gap
@@ -83,6 +87,9 @@ import CertifiedGaps.Heisenberg.OpenChain
 import CertifiedGaps.Heisenberg.BoundaryInit
 import CertifiedGaps.Heisenberg.BoundaryInitTable
 import CertifiedGaps.Heisenberg.OpenTrialBound
+import CertifiedGaps.Heisenberg.BoundaryData
+import CertifiedGaps.Heisenberg.BoundaryTraces
+import CertifiedGaps.Heisenberg.BoundaryThermal
 -- Local building blocks of the models
 import CertifiedGaps.Local.Pauli
 import CertifiedGaps.Local.SpinHalf

@@ -62,3 +62,7 @@ import SeedKernel
 #print axioms SeedKernel.OpenTrial.oppositeField_trial_78
 #print axioms SeedKernel.OpenTrial.oppositeField_trial_142
 #print axioms SeedKernel.OpenTrial.oppositeField_trial_240
+#print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.quotient_four_zero
+#print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.boundaryTraceTable_of_large
+#print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.sixth_of_large
+#print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryThermal.moment_polynomial_lt_of_large
