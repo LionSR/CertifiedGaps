@@ -40,7 +40,7 @@
             "lean_toolchain": "leanprover/lean4:v4.36.0-rc1",
             "lean_dependencies": "Std only (SeedKernel.Packed and SeedKernel.Spin1 import no Mathlib)"
         },
-        "created_utc": "2026-10-20T13:17:21.240",
+        "created_utc": "2026-10-20T18:02:40.360",
         "certified": false,
         "source_sha256": {
             "../../lean/SeedKernel/Bench/Bench10.lean": "bdbf7488d91683472e6a0cb163839ba45aef81950faf0851fc1fe9ce37d3686d",
@@ -58,8 +58,8 @@
             "scripts/spin1_kernel/experiments.jl": "981b360fe74b83f23eef30de6d6cd112faed08c829f10863874445539516883f",
             "../../lean/SeedKernel/Bench/Prepared12.lean": "bfdbbec96fd640f0149b592f66aeeac928bc8b9d75e556eef7b5f1a4faf80a96",
             "../../lean/SeedKernel/Spin1/Obligations.lean": "6926186a065672d0045aae0064402e3e5033b9ecdc7308f836af1f9bf9bc0736",
-            "../../lean/SeedKernel.lean": "3e5615da07bda06ad5193bdeb979bf225f265ee5be5a4e0633552cf99e333b21",
-            "check.jl": "14a7a39dee8fe61d28f5a93b84f3bfdfb32f35cb0c75be85c99dcab6c23af039",
+            "../../lean/SeedKernel.lean": "6298c5a3e5e5ed5f9cfa022b53391d53c62e1732201b4df61c0d2b66b594e4ea",
+            "check.jl": "193ec9cfe1cc291791b2a85dd60b99407c28f62e1ee7566c36f52cef4d58a59b",
             "src/spin1_kernel.jl": "a727dcd59a0a340fad1b5ada122e3010f1e5eb547f5b2c9a1a9ea13b088d4dfc",
             "../../lean/SeedKernel/Bench/FastDot12.lean": "cd0e3518576bcadd82b470252baec44a20100ed23bdb3387b1fb1e96d3246425",
             "../../lean/SeedKernel/Bench/PreparedH8.lean": "1dfdc9ea50807596f6a7c7002f2a9de146ee0b9b4fe4e2c169c4f91f0bbeb6d4",
@@ -68,7 +68,7 @@
             "../../lean/SeedKernel/PackingProofs.lean": "7202856a618816223cdafcf706da33d91929db8e4edf63db46714b83d4de66b1",
             "../../lean/SeedKernel/Spin1/H8.lean": "c25a496b06347feb5f4496d18196e5a9e538fdee8dc7191f2fb0e417f933dce1",
             "../../lean/SeedKernel/Packed.lean": "826732fa46df7fc3d5b2d256c596bbd9b8c18a5e0f74e3eb8922ec09edd539bb",
-            "../../lean/SeedKernel/Audit.lean": "603fcb27f0fe0ddbb08af25c7a1f30f4ee279af53139a7c5b2783e44d192a0f7",
+            "../../lean/SeedKernel/Audit.lean": "39e5d74360c6c1bc96d5ba614fa0ea3fa384386f9c5c622e9e3845aa59135bb5",
             "../../lean/SeedKernel/Bench/Dot12.lean": "0ab65e4c8351027d77986629c7978c79632ed525059b22fa85f26da4e3af5520",
             "../../lean/SeedKernel/Spin1/Tests.lean": "ac0c8a3a552b99874e5dfee4245fd1d18a80abed2731624e1e9a4ac72db637b8",
             "../../lean/lake-manifest.json": "2cdf23df2c4346520725eef455fd88cd627ca2c034b7c6e9369cd59a88b49980",
