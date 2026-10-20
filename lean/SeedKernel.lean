@@ -33,7 +33,6 @@ import SeedKernel.Ising.Generated
 import SeedKernel.Ising.GeneratedChunks
 import SeedKernel.Ising.ChunkCoverage
 import SeedKernel.Ising.NegativeChecks
-import SeedKernel.Ising.Spectral
 import SeedKernel.Ising.Hamiltonian
 import SeedKernel.Ising.Bridge
 import SeedKernel.Ising.Seed

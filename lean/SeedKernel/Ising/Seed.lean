@@ -21,9 +21,11 @@ configurations below a cutoff) this file proves, with no hypotheses,
 * `first_point_seed`: the first of the thirty conjunctions of `IsingLongitudinal.seeds`.
 
 The spectral input on each ring is `LowSpectrum` (one eigenvalue in `[θ₀ - r, θ₀ + r]`, another
-at least `θ₁ - r`, all others at least `ρ`), from the residual bound and counting by
-comparison with the classical energies (`Spectral.lean`). The partition functions are then
-bounded by `Z ≥ e^{-β(θ₀+r)}` and `Z ≤ e^{-β(θ₀-r)} (1 + e^{-β(θ₁-θ₀)} + 2^L e^{-β(ρ-θ₀+r)})`.
+at least `θ₁ - r`, all others at least `ρ`), from the residual bound
+`CertifiedGaps.Spectral.exists_eigenvalue_near` and counting by comparison with the classical
+energies (`CertifiedGaps.Spectral.eigCount_le_card_of_vanishing` with `re_quadratic_ge`). The
+partition functions are then bounded by `Z ≥ e^{-β(θ₀+r)}` and
+`Z ≤ e^{-β(θ₀-r)} (1 + e^{-β(θ₁-θ₀)} + 2^L e^{-β(ρ-θ₀+r)})`.
 -/
 
 open Matrix CertifiedGaps Real
@@ -44,10 +46,11 @@ theorem sum_exp_ge {ι : Type*} [Fintype ι] {e : ι → ℝ} {a₀ b₀ a₁ ρ
       Finset.single_le_sum (f := fun i ↦ exp (-(β * e i))) (fun i _ ↦ (exp_pos _).le)
         (Finset.mem_univ i₀)
 
-theorem sum_exp_le {ι : Type*} [Fintype ι] [DecidableEq ι] {e : ι → ℝ} {a₀ b₀ a₁ ρ β : ℝ}
+theorem sum_exp_le {ι : Type*} [Fintype ι] {e : ι → ℝ} {a₀ b₀ a₁ ρ β : ℝ}
     (hβ : 0 ≤ β) (h : LowSpectrum e a₀ b₀ a₁ ρ) :
     ∑ i, exp (-(β * e i)) ≤
       exp (-(β * a₀)) + exp (-(β * a₁)) + Fintype.card ι * exp (-(β * ρ)) := by
+  classical
   obtain ⟨i₀, i₁, hne, ha, -, ha₁, hρ⟩ := h
   have hi₁ : i₁ ∈ Finset.univ.erase i₀ := Finset.mem_erase.2 ⟨hne.symm, Finset.mem_univ _⟩
   rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i₀), ← Finset.add_sum_erase _ _ hi₁,
@@ -83,8 +86,13 @@ theorem exists_near_of_check {L : ℕ} (v : ℕ) (lam : ℤ) (R : ℕ)
     ∃ i, |(isingModel.spectrum L i) - lam / (20 * scale)| ≤ rad := by
   have hS : (0 : ℝ) < scale := by norm_num [scale]
   have : Nonempty (Fin L → Fin 2) := ⟨fun _ ↦ 0⟩
-  obtain ⟨i, hi⟩ := exists_eigenvalue_near (isingModel.hamiltonian_isHermitian L) (vec v)
-    (lam / (20 * scale))
+  obtain ⟨i, hi⟩ := Spectral.exists_eigenvalue_near (isingModel.hamiltonian_isHermitian L)
+    (vec v) (lam / (20 * scale))
+  -- The generic coercion `ℝ → 𝕜` is `Complex.ofReal` at `𝕜 = ℂ` only up to unfolding; restate
+  -- `hi` in the form of `residualSq_eq` so that `linarith` sees the same atom.
+  replace hi : (isingModel.spectrum L i - lam / (20 * scale)) ^ 2 * Spectral.nsq (vec (L := L) v)
+      ≤ Spectral.nsq (isingModel.hamiltonian L *ᵥ vec v -
+        ((lam / (20 * scale) : ℝ) : ℂ) • vec v) := hi
   refine ⟨i, ?_⟩
   rw [← dot_self_eq] at hi
   have hres' : ((residualSq L v lam : ℕ) : ℝ) ≤ R := by exact_mod_cast hres
@@ -117,10 +125,11 @@ theorem exists_near_of_check {L : ℕ} (v : ℕ) (lam : ℤ) (R : ℕ)
     nlinarith [sq_nonneg d]
   exact abs_le_of_sq_le_sq' hd2 (by norm_num [rad]) |> fun h ↦ abs_le.2 h
 
-/-- The classical count bounds the number of eigenvalues below `ρ = cut / 20 - L / 4`. -/
+/-- The classical count bounds the number of eigenvalues below `ρ = cut / 20 - L / 4`: the form
+of `H` is at least that of the classical energies shifted by `-L/4` (`re_quadratic_ge`), so
+counting by vanishing coordinates applies to the configurations below the cut. -/
 theorem card_low_le {L : ℕ} (cut : ℤ) (hcount : classicalCount L cut = 2) :
     (Finset.univ.filter fun i ↦ isingModel.spectrum L i < cut / 20 - L / 4).card ≤ 2 := by
-  classical
   set B := Finset.univ.filter fun σ : Fin L → Fin 2 ↦ diagonal L (encode σ) < cut
   have hB : classicalCount L cut = B.card := by
     rw [classicalCount, show (fun a s ↦ if diagonal L s < cut then a + 1 else a) =
@@ -128,13 +137,14 @@ theorem card_low_le {L : ℕ} (cut : ℤ) (hcount : classicalCount L cut = 2) :
       funext₂ fun a s ↦ by split_ifs <;> rfl, foldl_add_eq_sum, zero_add, ← sum_encode,
       Finset.card_filter]
   refine le_trans ?_ (hB.symm.trans hcount).le
-  refine card_eigenvalues_lt_le (isingModel.hamiltonian_isHermitian L) B _ fun x hx ↦ ?_
+  refine Spectral.eigCount_le_card_of_vanishing (isingModel.hamiltonian_isHermitian L) B
+    fun x hx ↦ ?_
   refine le_trans ?_ (re_quadratic_ge (1 / 4) (1 / 20) (by norm_num) x)
-  rw [normSqSum, Finset.mul_sum]
+  rw [Spectral.nsq_eq_sum, Finset.mul_sum]
   refine Finset.sum_le_sum fun σ _ ↦ ?_
   by_cases hσ : σ ∈ B
   · simp [hx σ hσ]
-  · refine mul_le_mul_of_nonneg_right ?_ (Complex.normSq_nonneg _)
+  · refine mul_le_mul_of_nonneg_right ?_ (sq_nonneg _)
     have hd : ¬ (diagonal L (encode σ) < cut) := by simpa [B] using hσ
     have h20 := diagonal_encode σ
     have : (cut : ℝ) ≤ diagonal L (encode σ) := by exact_mod_cast not_lt.1 hd
@@ -260,7 +270,8 @@ theorem lowSpectrum6 : LowSpectrum (isingModel.spectrum 6)
 /-- What `goodStats` asserts, for any statistics (no concrete sums are unfolded). -/
 theorem goodStats_spec {a b c : ℤ} {d e : ℕ} (h : goodStats (a, b, c, d, e) = true) :
     (a - scale ^ 2).natAbs * 10 ^ 12 ≤ (scale ^ 2).toNat ∧
-    (b - scale ^ 2).natAbs * 10 ^ 12 ≤ (scale ^ 2).toNat ∧ (d + e) * 10 ^ 18 ≤ (scale ^ 4).toNat := by
+    (b - scale ^ 2).natAbs * 10 ^ 12 ≤ (scale ^ 2).toNat ∧
+    (d + e) * 10 ^ 18 ≤ (scale ^ 4).toNat := by
   simp only [goodStats, Bool.and_eq_true, decide_eq_true_eq] at h
   exact ⟨h.1.1.1, h.1.1.2, h.2⟩
 
@@ -308,7 +319,8 @@ theorem partition_lower {L : ℕ} {a₀ b₀ a₁ ρ β : ℝ} (hβ : 0 ≤ β)
   rw [RPRing.partitionFunction_eq_sum]
   exact sum_exp_ge hβ h
 
-/-- The ratio step: from `Z₂ ≥ A² e^{-x}`, `Z₁ ≤ A (1 + T)`, `T ≤ t` to `Z₂ / Z₁² ≥ (1-x)/(1+t)²`. -/
+/-- The ratio step: from `Z₂ ≥ A² e^{-x}`, `Z₁ ≤ A (1 + T)`, `T ≤ t` to
+`Z₂ / Z₁² ≥ (1-x)/(1+t)²`. -/
 theorem ratio_ge {Z₁ Z₂ A x T t : ℝ} (hA : 0 < A) (hZ₁ : 0 < Z₁) (h₁ : Z₁ ≤ A * (1 + T))
     (h₂ : A ^ 2 * exp (-x) ≤ Z₂) (hT : 0 ≤ T) (hTt : T ≤ t) :
     (1 - x) / (1 + t) ^ 2 ≤ Z₂ / Z₁ ^ 2 := by

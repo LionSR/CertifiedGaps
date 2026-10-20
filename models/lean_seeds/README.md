@@ -210,9 +210,11 @@ the thirty conjunctions of `IsingLongitudinal.seeds`
 ($`1 - 9064 \times 10^{-9} \le \mathrm{spatialPurity}\; 6\; (97/4)`$ and
 $`1 - 3141 \times 10^{-8} \le \mathrm{thermalPurity}\; 12\; (97/4)`$), with no hypothesis, and then
 `ising_gap`. The steps are:
-- a residual bound gives an eigenvalue within $10^{-10}$ of each candidate (`Ising/Spectral`);
+- a residual bound gives an eigenvalue within $10^{-10}$ of each candidate
+  (`CertifiedGaps.Spectral.exists_eigenvalue_near`);
 - $`\mathrm{Re}\, \langle x, Hx \rangle \ge \sum_\sigma (E(\sigma) - L/4) |x(\sigma)|^2`$ and the
-  classical count give at most two eigenvalues below the anchor (counting by comparison);
+  classical count give at most two eigenvalues below the anchor (counting by comparison,
+  `CertifiedGaps.Spectral.eigCount_le_card_of_vanishing`);
 - the checker's integer sums are identified with the matrix `IsingLongitudinal.model (1/4) (1/20)`
   (`Ising/Hamiltonian`, `Ising/Bridge`);
 - finally
@@ -235,7 +237,7 @@ and 5); items 2–4 are done except where noted:
    Lehmann–Goerisch bounds with a priori input); this is the bottleneck of the whole route.
 2. **Ordered spectral linear algebra in Lean:** Lehmann bounds and ordered-eigenvalue statements
    (absent from Mathlib). The residual bound and counting by comparison are now proved
-   (`Ising/Spectral.lean`) and apply to any Hermitian matrix.
+   (`lean/CertifiedGaps/Spectral/Counting.lean`) and apply to any Hermitian matrix.
 3. **Packing soundness:** proofs of the specification propositions (`DotCorrect`, `HApplyCorrect`,
    `FilterCorrect`, etc.) in `lean/SeedKernel/Obligations.lean` and `Spin1/Obligations.lean`, and
    the lane decoding of `Ising/Packed.lean`; nothing assumes them.
@@ -406,4 +408,6 @@ are gitignored and must be regenerated in their respective model directories bef
   hashes it into `results/spectrum/provenance.json`.
 - In `SeedKernel/Ising/`, `Spectral.lean`, `Hamiltonian.lean`, `Bridge.lean`, and `Seed.lean`
   completed the end-to-end proof of `first_point_seed` and the unconditional `ising_gap` theorem
-  from the kernel-checked 6- and 12-site witnesses.
+  from the kernel-checked 6- and 12-site witnesses. `Spectral.lean` and the generic entry lemmas
+  of `Hamiltonian.lean` were later replaced by the shared `lean/CertifiedGaps/Spectral` layer and
+  `lean/CertifiedGaps/Ring/Hamiltonian.lean`.

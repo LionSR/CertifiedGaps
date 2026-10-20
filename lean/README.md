@@ -352,10 +352,12 @@ spin-1 work is arithmetic only):
   residual, and anchor inequalities for two generated approximate eigenvectors on the 6-site and
   12-site rings (both in packed form and, for 12 sites, in 64 direct chunks with a chunk-coverage
   theorem and negative rejection tests), and turns them into a proof of the seed:
-  - `Spectral`: for a Hermitian matrix, a residual bound `∃ i, (λᵢ − θ)² ‖x‖² ≤ ‖Ax − θx‖²` and
-    counting by comparison (`Re ⟪x, Ax⟫ ≥ ρ ‖x‖²` off a set `B` ⇒ at most `|B|` eigenvalues below
-    `ρ`), derived from the unitary diagonalization;
-  - `Hamiltonian`: `IsingLongitudinal.model g h` acts as `E(σ) x(σ) − g ∑ⱼ x(flipⱼ σ)`, and
+  - the spectral input is the shared layer `CertifiedGaps/Spectral`: the residual bound
+    `∃ i, (λᵢ − θ)² ‖x‖² ≤ ‖Ax − θx‖²` (`Spectral.exists_eigenvalue_near`) and counting by
+    comparison (`Re ⟪x, Ax⟫ ≥ ρ ‖x‖²` off a set `B` ⇒ at most `|B|` eigenvalues below `ρ`,
+    `Spectral.eigCount_le_card_of_vanishing`);
+  - `Hamiltonian`: `IsingLongitudinal.model g h` acts as `E(σ) x(σ) − g ∑ⱼ x(flipⱼ σ)` (from the
+    generic `siteOp_mulVec_apply` and `bondOp_diag_apply` of `Ring/Hamiltonian.lean`), and
     `Re ⟪x, Hx⟫ ≥ ∑ (E(σ) − gL) |x(σ)|²`;
   - `Bridge`: the checker's bit-indexed sums are exactly these quadratic forms (`xor 2ʲ` is a spin
     flip);
@@ -382,8 +384,7 @@ spin-1 work is arithmetic only):
 | `SeedKernel/Ising/Checker.lean`, `Ising/Packed.lean`, `Ising/Chunked.lean` | Integer $20H$ action and direct, packed (on the shared lanes), and 64-chunk certificate checkers |
 | `SeedKernel/Ising/Generated.lean`, `Ising/GeneratedChunks.lean` | Generated eigenvector proposals and kernel checks (`models/lean_seeds/certify.jl ising`) |
 | `SeedKernel/Ising/ChunkCoverage.lean`, `Ising/NegativeChecks.lean` | Proof that the 64 chunks cover `{0, ..., 4095}` and rejection tests for corrupted witnesses |
-| `SeedKernel/Ising/Spectral.lean` | Residual bound and counting by comparison for Hermitian matrices |
-| `SeedKernel/Ising/Hamiltonian.lean`, `Ising/Bridge.lean` | The Ising Hamiltonian acting on vectors and its identification with the integer checker |
+| `SeedKernel/Ising/Hamiltonian.lean`, `Ising/Bridge.lean` | The Ising Hamiltonian acting on vectors and its identification with the integer checker (spectral input from `CertifiedGaps/Spectral`) |
 | `SeedKernel/Ising/Seed.lean` | The unconditional seed and `ising_gap` |
 | `SeedKernel/Audit.lean` | `#print axioms` audit across all main declarations |
 | `SeedKernel/Bench/*.lean` | Kernel performance benchmarks up to $n = 12$ (`lake build SeedKernelBench`) |
@@ -497,7 +498,7 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Heisenberg/SectorTransferC.lean`, `Heisenberg/Seed60.lean` | The `2π/3`-twisted spin-1 ring and `exists_ion_approx`; the seed at `(60, 105/4)` from its inputs |
 | `Transfer/MatrixProduct.lean` | Integer matrix-product states for any ring Hamiltonian: norm and energy as transfer-matrix traces, and the trial-state bound `MPS.exp_lt_gibbsTrace` |
 | `Ring/Variational.lean` | Rayleigh-quotient bound on the Gibbs trace `gibbsTrace H β` for Hermitian `H` |
-| `Spectral/*.lean` | Eigenvalue counting (`eigCount`), rational `LDLᵀ` inertia certificates, the Schur compression bound, Weyl monotonicity, Ritz bounds and binned trace bounds |
+| `Spectral/*.lean` | Eigenvalue counting (`eigCount`; counting by a subspace, a kernel, or vanishing coordinates), the residual bound `exists_eigenvalue_near`, rational `LDLᵀ` inertia certificates, the Schur compression bound, Weyl monotonicity, Ritz bounds and binned trace bounds |
 | `Spectral/OperatorBounds.lean` | Operator inequalities `a ≤ A ≤ b` through quadratic forms: sums, unitary conjugates, the weighted Schur test `abs_qform_le_of_schur`, bounds from an annihilating polynomial, and the Gram factorization of a nonnegative Hermitian matrix |
 | `Spectral/FunctionalCalculus.lean` | Real functions `hA.cfc f = U diag(f(λᵢ)) Uᴴ` of a Hermitian matrix (Mathlib's `Matrix.IsHermitian.cfc`) without continuity side conditions: algebra, `exp`, and the norm bound `‖f(A) v‖ ≤ (max_i ‖f(λᵢ)‖) ‖v‖` |
 | `Seed/Scheme.lean` | Sector schemes (`plain`, `d2`, `ion`), the sector representation `SectorApprox`, trace tables `TraceBounds` and the sector moment bounds |
@@ -508,7 +509,7 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Heisenberg/SectorTransfer.lean`, `Heisenberg/TrialBound.lean` | Spin-1 instances: the `D₂` symmetry of the Heisenberg ring and the trial-state bound |
 | `Heisenberg/TraceTable.lean`, `Heisenberg/Seed36.lean` | The spin-1 trace table and the seed at `(36, 49/4)` (`seed36_of_table_mps`: from the table and one integer MPS inequality) |
 | `Heisenberg/EnergyBound.lean` | The Lemma "Energy bounds" of the spin-1 paper: `-(3L/2) ≤ H_L(R) ≤ L` for every rotation `R` of the closing bond, and the untwisted, `P`- and `C`-twisted cases |
-| `Ring/Hamiltonian.lean` | The one Hamiltonian API: ring geometry, `bondOp`/`siteOp` (`bondOp j k` a `*`-algebra embedding for `j ≠ k`), `twistedRingHamiltonian B Bc L` (closing bond `Bc`), `ringHamiltonian B L`, `siteSum A L`, and the Gibbs trace `gibbsTrace H β` $= \mathrm{Re}\,\mathrm{Tr}\, e^{-\beta H}$ (eigenvalue sum, positivity, unitary invariance) |
+| `Ring/Hamiltonian.lean` | The one Hamiltonian API: ring geometry, `bondOp`/`siteOp` (`bondOp j k` a `*`-algebra embedding for `j ≠ k`; entries `siteOp_apply`, `siteOp_mulVec_apply`, `bondOp_diag_apply`), `twistedRingHamiltonian B Bc L` (closing bond `Bc`), `ringHamiltonian B L`, `siteSum A L`, and the Gibbs trace `gibbsTrace H β` $= \mathrm{Re}\,\mathrm{Tr}\, e^{-\beta H}$ (eigenvalue sum, positivity, unitary invariance) |
 | `Ring/Model.lean` | `RPRing` structure, `H_L = ringHamiltonian h L + siteSum o L`, Hermiticity of $H_L$, and $Z_L = \sum_m e^{-\beta E_m}$ |
 | `Ring/Transfer.lean` | Even-bond, on-site, and odd-bond Trotter slices and the reflection-positivity identity $\operatorname{Tr} S^M = \operatorname{Tr} (B^T B)^{L/2}$ with real $B$ |
 | `Ring/Gap.lean` | Proof of `RPRing.spatialMomentBounds` and `RPRing.gapGT_of_chainCertificate` |

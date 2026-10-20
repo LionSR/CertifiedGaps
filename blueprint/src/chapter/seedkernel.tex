@@ -46,7 +46,7 @@ of \(A\) can lie below \(\rho\) (Lemma~\ref{lem:counting}).
 
 \begin{lemma}[Rayleigh--Ritz residual bound~\cite{Weinstein1934Modified}]
   \label{lem:residual}
-  \lean{SeedKernel.Ising.exists_eigenvalue_near}
+  \lean{CertifiedGaps.Spectral.exists_eigenvalue_near}
   \leanok
   For a Hermitian matrix \(A\), a vector \(x\), and \(\theta \in \R\), some eigenvalue \(\lambda_i\)
   of \(A\) satisfies
@@ -65,7 +65,7 @@ of \(A\) can lie below \(\rho\) (Lemma~\ref{lem:counting}).
 
 \begin{lemma}[Variational subspace eigenvalue bound]
   \label{lem:counting}
-  \lean{SeedKernel.Ising.card_eigenvalues_lt_le}
+  \lean{CertifiedGaps.Spectral.eigCount_le_card_of_vanishing}
   \leanok
   Let \(A\) be Hermitian, \(B\) a set of basis vectors, and \(\rho \in \R\). If
   \(\operatorname{Re}\langle x, Ax \rangle \ge \rho \|x\|^2\) for every vector \(x\) vanishing on

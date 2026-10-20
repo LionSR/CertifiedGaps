@@ -14,7 +14,9 @@ All results are dimension counts against the eigenspaces of a Hermitian matrix `
 
 * `eigCount_le_of_forall_le_qform` (**count by subspace**): if `t ‖x‖² ≤ Re ⟪x, A x⟫` on a subspace
   `V` with `card n ≤ dim V + K` (codimension at most `K`), then `N(t) ≤ K`;
-  `eigCount_le_of_ker` is the special case `V = ker f` for a linear map `f` to `ι → 𝕜`.
+  `eigCount_le_of_ker` is the special case `V = ker f` for a linear map `f` to `ι → 𝕜`, and
+  `eigCount_le_card_of_vanishing` the case of the vectors vanishing on a set `B` of coordinates
+  (`N(t) ≤ |B|`).
 * `le_eigCount_of_forall_qform_lt` (the converse direction): if `Re ⟪x, A x⟫ < t ‖x‖²` for all
   nonzero `x ∈ V`, then `dim V ≤ N(t)`.
 * `le_eigCount_of_compression` (**Rayleigh–Ritz with a Gram matrix**): for any `Z : n × k`, if
@@ -149,6 +151,17 @@ theorem eigCount_le_of_ker {ι : Type*} [Fintype ι] {t : ℝ} (f : (n → 𝕜)
     simpa [Module.finrank_fintype_fun_eq_card] using Submodule.finrank_le (LinearMap.range f)
   rw [Module.finrank_fintype_fun_eq_card] at h
   omega
+
+/-- **Count by vanishing coordinates.** If the form of `A - t` is nonnegative on every vector
+vanishing on a set `B` of coordinates, then at most `|B|` eigenvalues lie strictly below `t`. This
+is `eigCount_le_of_ker` for the restriction to `B`; with `A ≥ D` for a diagonal `D`, the set `B`
+is the set of basis states with `D σσ < t`. -/
+theorem eigCount_le_card_of_vanishing (B : Finset n) {t : ℝ}
+    (hB : ∀ x : n → 𝕜, (∀ i ∈ B, x i = 0) → t * nsq x ≤ qform A x) : eigCount hA t ≤ B.card := by
+  have h := eigCount_le_of_ker hA
+    (LinearMap.pi fun b : B ↦ LinearMap.proj (R := 𝕜) (φ := fun _ : n ↦ 𝕜) b.1) fun x hx ↦
+      hB x fun i hi ↦ by simpa using congrFun hx ⟨i, hi⟩
+  rwa [Fintype.card_coe] at h
 
 /-- **Count from below.** If the form of `A - t` is negative on every nonzero vector of `V`, then
 at least `dim V` eigenvalues lie strictly below `t`. -/

@@ -18,11 +18,12 @@ file identifies them with the matrix `IsingLongitudinal.model (1/4) (1/20)`:
   `xor 2^j` (`encode_flipAt`);
 * `20 E(σ)` is `diagonal L (encode σ)` (`diagonal_encode`), and `20 (H x)(σ)` is
   `applyH L v (encode σ)` for `x = vec v` (`applyH_encode`);
-* the `foldl` sums of the checker are sums over all configurations (`dot_eq`, `residualSq_eq`,
-  `classicalCount_eq`, `chunkStats_sum`).
+* the `foldl` sums of the checker are sums over all configurations, so the Gram entry and the
+  residual are the squared norms `Spectral.nsq` of `vec v` and of `H x - θ x` (`dot_self_eq`,
+  `residualSq_eq`).
 -/
 
-open Matrix Complex CertifiedGaps
+open Matrix Complex CertifiedGaps CertifiedGaps.Spectral
 
 namespace SeedKernel.Ising
 
@@ -94,14 +95,6 @@ theorem z_encode (σ : Fin L → Fin 2) (j : Fin L) : (z (encode σ) j : ℝ) = 
   generalize σ j = a
   fin_cases a <;> norm_num [zR]
 
-theorem finRotate_val (j : Fin L) : (finRotate L j : ℕ) = ((j : ℕ) + 1) % L := by
-  rcases L with _ | L
-  · exact j.elim0
-  rw [finRotate_apply, Fin.val_add]
-  rcases L with _ | L
-  · simp
-  · simp
-
 theorem diagonal_encode (σ : Fin L → Fin 2) :
     (diagonal L (encode σ) : ℝ) = 20 * diagE (1 / 20) σ := by
   rw [diagonal, show (fun a j ↦ a - 20 * z (encode σ) j * z (encode σ) ((j + 1) % L) -
@@ -112,7 +105,7 @@ theorem diagonal_encode (σ : Fin L → Fin 2) :
   push_cast
   simp only [diagE]
   have hrot (j : Fin L) : (z (encode σ) ((j + 1) % L) : ℝ) = zR (σ (finRotate L j)) := by
-    rw [← z_encode, finRotate_val]
+    rw [← z_encode, val_finRotate_eq_mod]
   simp only [z_encode, hrot, Finset.sum_sub_distrib, Finset.sum_neg_distrib]
   simp only [mul_assoc, ← Finset.mul_sum]
   ring
@@ -135,18 +128,19 @@ theorem applyH_encode (v : ℕ) (σ : Fin L → Fin 2) :
 
 /-! ### The checker's sums -/
 
+/-- The checker's Gram entry `dot L v v` is the squared norm `‖x‖²` of `x = vec v`. -/
 theorem dot_self_eq (v : ℕ) :
-    ((dot L v v : ℤ) : ℝ) = normSqSum (vec (L := L) v) := by
-  rw [dot, foldl_add_eq_sum, zero_add, ← sum_encode]
-  push_cast
-  simp [normSqSum, vec, normSq_apply]
+    ((dot L v v : ℤ) : ℝ) = nsq (vec (L := L) v) := by
+  change _ = nsq fun σ : Fin L → Fin 2 ↦ ((entry v (encode σ) : ℤ) : ℂ)
+  rw [nsq_intCast, dot, foldl_add_eq_sum, zero_add, ← sum_encode]
+  simp [sq]
 
 /-- The residual of `vec v` against `θ = lam / (20 S)`: `‖H x - θ x‖² = residualSq / (20 S)²`. -/
 theorem residualSq_eq (v : ℕ) (lam : ℤ) :
-    ((residualSq L v lam : ℕ) : ℝ) = (20 * (scale : ℝ)) ^ 2 * normSqSum
+    ((residualSq L v lam : ℕ) : ℝ) = (20 * (scale : ℝ)) ^ 2 * nsq
       ((IsingLongitudinal.model (1 / 4) (1 / 20)).hamiltonian L *ᵥ vec v -
         ((lam / (20 * scale) : ℝ) : ℂ) • vec v) := by
-  rw [residualSq, foldl_add_eq_sum, zero_add, ← sum_encode, normSqSum, Finset.mul_sum]
+  rw [residualSq, foldl_add_eq_sum, zero_add, ← sum_encode, nsq_eq_sum, Finset.mul_sum]
   push_cast
   refine Finset.sum_congr rfl fun σ _ ↦ ?_
   have hS : (scale : ℝ) ≠ 0 := by norm_num [scale]
@@ -160,9 +154,9 @@ theorem residualSq_eq (v : ℕ) (lam : ℤ) :
     simp only [vec]
     have hS' : (scale : ℂ) ≠ 0 := by norm_num [scale]
     field_simp
-  have h1 : ((t.natAbs : ℕ) : ℝ) ^ 2 = normSq (t : ℂ) := by
-    rw [Nat.cast_natAbs, Int.cast_abs, sq_abs, ← Complex.ofReal_intCast, normSq_ofReal, sq]
-  rw [h1, key, map_mul, normSq_ofReal, ← sq]
+  have h1 : ((t.natAbs : ℕ) : ℝ) ^ 2 = ‖(t : ℂ)‖ ^ 2 := by
+    rw [Nat.cast_natAbs, Int.cast_abs, Complex.norm_intCast]
+  rw [h1, key, norm_mul, mul_pow, Complex.norm_real, Real.norm_eq_abs, sq_abs]
   push_cast
   rfl
 

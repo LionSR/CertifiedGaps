@@ -40,6 +40,9 @@ through one definition lets a single conjugation lemma (`conj_twistedRingHamilto
 * `bondOp j k` is a linear `*`-algebra embedding for `j ≠ k`: `bondOp_mul`, `bondOp_one`,
   `bondOp_conjTranspose`, `bondOp_add`, `bondOp_sub`, `bondOp_smul`, `bondOp_sum`; its matrix
   entries in a row `σ` run over the letters of the two bond sites only (`sum_ite_agree_off`).
+* Entries in the computational basis: `siteOp_apply`, `siteOp_mulVec_apply`
+  (`(A_j x)(σ) = ∑_b A (σ j) b · x(σ with σ j := b)`), and `bondOp_diag_apply` for a diagonal
+  two-site operator; `val_finRotate_eq_mod`: `finRotate L j = (j + 1) mod L`.
 * `gibbsTrace_eq_sum`: `Re Tr e^{-βH} = ∑ₘ e^{-β Eₘ}` for Hermitian `H`.
 * `gibbsTrace_pos`: the Gibbs trace of a Hermitian matrix is positive.
 * `gibbsTrace_conj`: unitary conjugation leaves the Gibbs trace unchanged; `exp_smul_one`:
@@ -65,6 +68,16 @@ theorem val_finRotate {L : ℕ} (j : Fin L) :
   | succ n =>
     rw [coe_finRotate]
     split_ifs with h₁ h₂ h₂ <;> simp_all [Fin.ext_iff]
+
+/-- The cyclic successor as a residue: `finRotate L j = (j + 1) mod L`, the form used by integer
+checkers that index sites by `Nat`. -/
+theorem val_finRotate_eq_mod {L : ℕ} (j : Fin L) : (finRotate L j : ℕ) = ((j : ℕ) + 1) % L := by
+  rcases L with _ | L
+  · exact j.elim0
+  rw [finRotate_apply, Fin.val_add]
+  rcases L with _ | L
+  · simp
+  · simp
 
 /-- On a ring of at least two sites, the two ends of a bond are distinct. -/
 theorem ne_finRotate {L : ℕ} (hL : 2 ≤ L) (j : Fin L) : j ≠ finRotate L j := by
@@ -255,6 +268,72 @@ theorem bondOp_one {L : ℕ} (j k : Fin L) :
     split_ifs with h₁ h₂
     · exact (hστ (funext fun i ↦ if hj : i = j then hj ▸ h₂.1 else
         if hk : i = k then hk ▸ h₂.2 else h₁ i hj hk)).elim
+    · rfl
+    · rfl
+
+/-! ### Entries of one-site and diagonal operators -/
+
+/-- Summing over the configurations `τ` that agree with `σ` away from the site `j` is summing
+over the letter `τ j`. -/
+theorem sum_ite_agree_off_site {L : ℕ} {M : Type*} [AddCommMonoid M] (j : Fin L)
+    (σ : Fin L → d) (F : (Fin L → d) → M) :
+    ∑ τ, (if ∀ i, i ≠ j → σ i = τ i then F τ else 0) = ∑ b : d, F (Function.update σ j b) := by
+  rw [← Finset.sum_filter]
+  have hτ : ∀ τ ∈ Finset.univ.filter fun τ : Fin L → d ↦ ∀ i, i ≠ j → σ i = τ i,
+      Function.update σ j (τ j) = τ := fun τ hτ ↦ by
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hτ
+    funext i
+    by_cases hi : i = j
+    · subst hi; rw [Function.update_self]
+    · rw [Function.update_of_ne hi, hτ i hi]
+  refine Finset.sum_bij' (fun τ _ ↦ τ j) (fun b _ ↦ Function.update σ j b)
+    (fun _ _ ↦ Finset.mem_univ _) (fun b _ ↦ ?_) hτ (fun b _ ↦ by simp)
+    (fun τ h ↦ by rw [hτ τ h])
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  exact fun i hi ↦ (Function.update_of_ne hi _ _).symm
+
+omit [Fintype d] in
+/-- The entries of a one-site operator: `A (σ j) (τ j)` where `σ` and `τ` agree off the site
+`j`, and `0` elsewhere. -/
+theorem siteOp_apply {L : ℕ} (j : Fin L) (A : Matrix d d ℂ) (σ τ : Fin L → d) :
+    siteOp j A σ τ = if ∀ i, i ≠ j → σ i = τ i then A (σ j) (τ j) else 0 := by
+  rw [siteOp, piTensor_apply, Fintype.prod_eq_mul_prod_compl j]
+  simp only [ite_true]
+  have hp : ∏ i ∈ ({j}ᶜ : Finset (Fin L)), (if i = j then A else 1) (σ i) (τ i) =
+      ∏ i ∈ ({j}ᶜ : Finset (Fin L)), if σ i = τ i then (1 : ℂ) else 0 :=
+    Finset.prod_congr rfl fun i hi ↦ by
+      rw [Finset.mem_compl, Finset.mem_singleton] at hi
+      simp [hi, one_apply]
+  rw [hp, Finset.prod_ite_zero, Finset.prod_const_one]
+  have hiff : (∀ i ∈ ({j}ᶜ : Finset (Fin L)), σ i = τ i) ↔ ∀ i, i ≠ j → σ i = τ i := by
+    simp [Finset.mem_compl]
+  by_cases h : ∀ i, i ≠ j → σ i = τ i
+  · rw [ite_eq_left (hiff.2 h), ite_eq_left h, mul_one]
+  · rw [ite_eq_right (fun h' ↦ h (hiff.1 h')), ite_eq_right h, mul_zero]
+
+/-- A one-site operator on a vector: `(A_j x)(σ) = ∑_b A (σ j) b · x(σ with σ j := b)`. -/
+theorem siteOp_mulVec_apply {L : ℕ} (j : Fin L) (A : Matrix d d ℂ) (x : (Fin L → d) → ℂ)
+    (σ : Fin L → d) : (siteOp j A *ᵥ x) σ = ∑ b, A (σ j) b * x (Function.update σ j b) := by
+  simp only [mulVec, dotProduct, siteOp_apply, ite_mul, zero_mul]
+  rw [sum_ite_agree_off_site]
+  simp only [Function.update_self]
+
+omit [Fintype d] in
+/-- A two-site operator that is diagonal, `B p q = [p = q] f p`, acts diagonally on the ring. -/
+theorem bondOp_diag_apply {R : Type*} [Zero R] {L : ℕ} (j k : Fin L)
+    (B : Matrix (d × d) (d × d) R) (f : d × d → R) (hB : ∀ p q, B p q = if p = q then f p else 0)
+    (σ τ : Fin L → d) : bondOp j k B σ τ = if σ = τ then f (σ j, σ k) else 0 := by
+  simp only [bondOp, of_apply, hB]
+  by_cases hst : σ = τ
+  · subst hst; simp
+  · rw [ite_eq_right hst]
+    split_ifs with hag hp
+    · exact absurd (funext fun i ↦ by
+        by_cases hj : i = j
+        · subst hj; exact (Prod.ext_iff.1 hp).1
+        by_cases hk : i = k
+        · subst hk; exact (Prod.ext_iff.1 hp).2
+        exact hag i hj hk) hst
     · rfl
     · rfl
 

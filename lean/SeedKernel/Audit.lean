@@ -37,8 +37,8 @@ import SeedKernel
 #print axioms SeedKernel.Ising.coverage12
 #print axioms SeedKernel.Ising.anchor6
 #print axioms SeedKernel.Ising.anchor12
-#print axioms SeedKernel.Ising.exists_eigenvalue_near
-#print axioms SeedKernel.Ising.card_eigenvalues_lt_le
+#print axioms CertifiedGaps.Spectral.exists_eigenvalue_near
+#print axioms CertifiedGaps.Spectral.eigCount_le_card_of_vanishing
 #print axioms SeedKernel.Ising.hamiltonian_mulVec_apply
 #print axioms SeedKernel.Ising.residualSq_eq
 #print axioms SeedKernel.Ising.lowSpectrum6

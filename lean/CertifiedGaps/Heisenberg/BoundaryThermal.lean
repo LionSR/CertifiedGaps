@@ -560,27 +560,10 @@ theorem bondOp_exchangeZ_apply {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (σ τ : 
       hag fun i hj hk ↦ ((hopUp_eq_some (Ne.symm hjk) σ τ).1 h).1 i hk hj
     simp [h1, h2, h3]
 
-/-- Entries of a one-site operator. -/
-theorem siteOp_apply' {n : ℕ} (j : Fin n) (A : Matrix (Fin 3) (Fin 3) ℂ) (σ τ : Fin n → Fin 3) :
-    siteOp j A σ τ = if ∀ i, i ≠ j → σ i = τ i then A (σ j) (τ j) else 0 := by
-  rw [siteOp, piTensor_apply, Fintype.prod_eq_mul_prod_compl j]
-  simp only [ite_true]
-  have hp : ∏ i ∈ ({j}ᶜ : Finset (Fin n)), (if i = j then A else 1) (σ i) (τ i) =
-      ∏ i ∈ ({j}ᶜ : Finset (Fin n)), if σ i = τ i then (1 : ℂ) else 0 :=
-    Finset.prod_congr rfl fun i hi ↦ by
-      rw [Finset.mem_compl, Finset.mem_singleton] at hi
-      simp [hi, one_apply]
-  rw [hp, Finset.prod_ite_zero, Finset.prod_const_one]
-  have hiff : (∀ i ∈ ({j}ᶜ : Finset (Fin n)), σ i = τ i) ↔ ∀ i, i ≠ j → σ i = τ i := by
-    simp [Finset.mem_compl]
-  by_cases h : ∀ i, i ≠ j → σ i = τ i
-  · rw [ite_eq_left (hiff.2 h), ite_eq_left h, mul_one]
-  · rw [ite_eq_right (fun h' ↦ h (hiff.1 h')), ite_eq_right h, mul_zero]
-
 /-- The field `c Sᶻ` on one site, entry by entry. -/
 theorem siteOp_spinZ_two_apply {n : ℕ} (j : Fin n) (c : ℂ) (σ τ : Fin n → Fin 3) :
     siteOp j (c • spinZ 2) σ τ = if σ = τ then c * mz (σ j) else 0 := by
-  rw [siteOp_apply']
+  rw [siteOp_apply]
   by_cases h : σ = τ
   · subst h
     simp only [implies_true, ite_true, Matrix.smul_apply, smul_eq_mul]
@@ -604,7 +587,7 @@ theorem siteOp_spinZ_two_apply {n : ℕ} (j : Fin n) (c : ℂ) (σ τ : Fin n �
 theorem siteOp_spinZ_zero_apply {n : ℕ} (l : Fin n) (c : ℂ) (σ τ : Fin n → Fin 3) :
     siteOp l (c • spinZ 0) σ τ = c * invSqrtTwo *
       ((if endUp' l σ = some τ then 1 else 0) + (if endDown' l σ = some τ then 1 else 0)) := by
-  rw [siteOp_apply']
+  rw [siteOp_apply]
   by_cases hag : ∀ i, i ≠ l → σ i = τ i
   · rw [ite_eq_left hag]
     have e1 : endUp' l σ = some τ ↔ (σ l : ℕ) + 1 = τ l := by
