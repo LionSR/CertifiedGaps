@@ -319,7 +319,8 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
 julia ../../tools/fetch_upstream.jl                        # upstream evidence (trial matrices; network)
 julia --project=. scripts/trial/generate.jl                # writes lean/SeedKernel/Heisenberg/TrialData.lean
 julia --project=. scripts/trial/generate.jl --check        # regenerates and compares
-# open_trial: the boundary paper's four open-chain trial vectors (needs the upstream evidence above)
+# open_trial: the boundary paper's four open-chain trial vectors (also needs the trial evidence above)
+julia ../../tools/fetch_upstream.jl --boundary             # boundary-paper trial data (network)
 julia --project=. scripts/open_trial/generate.jl           # writes lean/SeedKernel/Heisenberg/OpenTrialData.lean
 julia --project=. scripts/open_trial/generate.jl --check   # regenerates and compares
 ```

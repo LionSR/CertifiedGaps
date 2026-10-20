@@ -31,7 +31,7 @@ using SparseArrays, LinearAlgebra
 import JSON
 
 const REPO = TrialSeed.REPO
-"Upstream evidence of the boundary-field paper (fetched by `tools/fetch_upstream.jl`)."
+"Upstream evidence of the boundary-field paper (fetched by `tools/fetch_upstream.jl --boundary`)."
 const BOUNDARY_SOURCE = joinpath(REPO, "references", "boundary-field-gap-source", "verification")
 const D = TrialSeed.D
 

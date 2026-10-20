@@ -10,7 +10,7 @@
 # exact integer arithmetic, checks the block totals against a direct contraction on the doubled
 # space and against the paper's `trial-exact-results.json`, so that a regenerated file is known to
 # pass before Lean is run. It needs the upstream evidence of both papers
-# (`julia --project=julia tools/fetch_upstream.jl`).
+# (`julia tools/fetch_upstream.jl` and `julia tools/fetch_upstream.jl --boundary`).
 include(joinpath(@__DIR__, "..", "..", "src", "open_trial.jl"))
 using .OpenTrialSeed
 
