@@ -31,14 +31,20 @@ through one definition lets a single conjugation lemma (`conj_twistedRingHamilto
 ## Definitions
 
 * `bondOp j k B`, `siteOp j A`: two-site and one-site operators on a ring of `L` sites.
-* `twistedRingHamiltonian B Bc L`, `ringHamiltonian B L`, `siteSum A L`.
+* `twistedRingHamiltonian B Bc L`, `ringHamiltonian B L`, `siteSum A L`, and the `j`-th bond
+  `twistedBond B Bc j` of the twisted ring.
 * `gibbsTrace H β`: the partition function `Re Tr e^{-βH}` of a Hamiltonian `H`.
 
 ## Main results
 
+* `bondOp j k` is a linear `*`-algebra embedding for `j ≠ k`: `bondOp_mul`, `bondOp_one`,
+  `bondOp_conjTranspose`, `bondOp_add`, `bondOp_sub`, `bondOp_smul`, `bondOp_sum`; its matrix
+  entries in a row `σ` run over the letters of the two bond sites only (`sum_ite_agree_off`).
 * `gibbsTrace_eq_sum`: `Re Tr e^{-βH} = ∑ₘ e^{-β Eₘ}` for Hermitian `H`.
 * `gibbsTrace_pos`: the Gibbs trace of a Hermitian matrix is positive.
-* `gibbsTrace_conj`: unitary conjugation leaves the Gibbs trace unchanged.
+* `gibbsTrace_conj`: unitary conjugation leaves the Gibbs trace unchanged; `exp_smul_one`:
+  `exp (z • 1) = e^z • 1`.
+* `twistedRingHamiltonian_eq_sum`: the twisted ring is the sum of its bonds `twistedBond`.
 * `twistedRingHamiltonian_isHermitian`, `ringHamiltonian_isHermitian`, `siteSum_isHermitian`.
 -/
 
@@ -78,9 +84,10 @@ theorem odd_finRotate_iff {L : ℕ} (hL : Even L) (j : Fin L) :
 /-! ### Operators on the ring -/
 
 /-- The operator `B` on two sites `j, k` of a ring of `L` sites, acting as the identity on all
-other sites. -/
-def bondOp {L : ℕ} (j k : Fin L) (B : Matrix (d × d) (d × d) ℂ) :
-    Matrix (Fin L → d) (Fin L → d) ℂ :=
+other sites. The entries may lie in any type with a zero (`ℂ` for Hamiltonians, `ℤ` for the
+integer matrices of the seed computations). -/
+def bondOp {R : Type*} [Zero R] {L : ℕ} (j k : Fin L) (B : Matrix (d × d) (d × d) R) :
+    Matrix (Fin L → d) (Fin L → d) R :=
   of fun σ τ ↦ if ∀ i, i ≠ j → i ≠ k → σ i = τ i then B (σ j, σ k) (τ j, τ k) else 0
 
 /-- The operator `A` on the site `j` of a ring of `L` sites, acting as the identity elsewhere. -/
@@ -88,16 +95,23 @@ def siteOp {L : ℕ} (j : Fin L) (A : Matrix d d ℂ) : Matrix (Fin L → d) (Fi
   piTensor fun i ↦ if i = j then A else 1
 
 omit [Fintype d] in
-/-- A Hermitian two-site operator embeds as a Hermitian operator on the ring. -/
-theorem bondOp_isHermitian {L : ℕ} (j k : Fin L) {B : Matrix (d × d) (d × d) ℂ}
-    (hB : B.IsHermitian) : (bondOp j k B).IsHermitian := by
+/-- The conjugate transpose of an embedded two-site operator is the embedded conjugate
+transpose. -/
+theorem bondOp_conjTranspose {L : ℕ} (j k : Fin L) (B : Matrix (d × d) (d × d) ℂ) :
+    (bondOp j k B)ᴴ = bondOp j k Bᴴ := by
   ext σ τ
   simp only [conjTranspose_apply, bondOp, of_apply]
   split_ifs with h₁ h₂ h₂
-  · exact hB.apply _ _
+  · rfl
   · exact (h₂ fun i hj hk ↦ (h₁ i hj hk).symm).elim
   · exact (h₁ fun i hj hk ↦ (h₂ i hj hk).symm).elim
   · exact star_zero _
+
+omit [Fintype d] in
+/-- A Hermitian two-site operator embeds as a Hermitian operator on the ring. -/
+theorem bondOp_isHermitian {L : ℕ} (j k : Fin L) {B : Matrix (d × d) (d × d) ℂ}
+    (hB : B.IsHermitian) : (bondOp j k B).IsHermitian :=
+  (bondOp_conjTranspose j k B).trans (congrArg _ hB)
 
 omit [Fintype d] [DecidableEq d] in
 /-- The conjugate transpose of a tensor product is the tensor product of the conjugate
@@ -134,6 +148,14 @@ theorem bondOp_sum {L : ℕ} (j k : Fin L) {X : Type*} (s : Finset X)
   split_ifs <;> simp
 
 omit [Fintype d] in
+/-- `bondOp` is additive in the two-site operator. -/
+theorem bondOp_add {L : ℕ} (j k : Fin L) (B C : Matrix (d × d) (d × d) ℂ) :
+    bondOp j k (B + C) = bondOp j k B + bondOp j k C := by
+  ext σ τ
+  simp only [bondOp, of_apply, Matrix.add_apply]
+  split_ifs <;> simp
+
+omit [Fintype d] in
 /-- `bondOp` is homogeneous in the two-site operator. -/
 theorem bondOp_smul {L : ℕ} (j k : Fin L) (c : ℂ) (B : Matrix (d × d) (d × d) ℂ) :
     bondOp j k (c • B) = c • bondOp j k B := by
@@ -146,6 +168,12 @@ omit [Fintype d] in
 theorem bondOp_neg {L : ℕ} (j k : Fin L) (B : Matrix (d × d) (d × d) ℂ) :
     bondOp j k (-B) = -bondOp j k B := by
   simpa using bondOp_smul j k (-1) B
+
+omit [Fintype d] in
+/-- `bondOp` commutes with subtraction. -/
+theorem bondOp_sub {L : ℕ} (j k : Fin L) (B C : Matrix (d × d) (d × d) ℂ) :
+    bondOp j k (B - C) = bondOp j k B - bondOp j k C := by
+  rw [sub_eq_add_neg, bondOp_add, bondOp_neg, ← sub_eq_add_neg]
 
 omit [Fintype d] in
 /-- A product operator `A ⊗ B` on two distinct sites is a tensor product over the ring. -/
@@ -162,6 +190,73 @@ theorem bondOp_kronecker {L : ℕ} {j k : Fin L} (hjk : j ≠ k) (A B : Matrix d
     split_ifs with h₁ h₂ h₂ <;> simp_all
   · simp only [Finset.mem_erase, Finset.mem_univ, and_true] at hi
     simp [hi.1, hi.2, one_apply]
+
+/-- Summing over the configurations `τ` that agree with `σ` away from two distinct sites
+`j, k` is summing over the pair of letters `(τ j, τ k)`. -/
+theorem sum_ite_agree_off {L : ℕ} {M : Type*} [AddCommMonoid M] {j k : Fin L} (hjk : j ≠ k)
+    (σ : Fin L → d) (F : (Fin L → d) → M) :
+    ∑ τ, (if ∀ i, i ≠ j → i ≠ k → σ i = τ i then F τ else 0) =
+      ∑ p : d × d, F (Function.update (Function.update σ j p.1) k p.2) := by
+  rw [← Finset.sum_filter]
+  refine Finset.sum_bij' (fun τ _ ↦ (τ j, τ k))
+    (fun p _ ↦ Function.update (Function.update σ j p.1) k p.2) (fun _ _ ↦ Finset.mem_univ _)
+    (fun p _ ↦ ?_) (fun τ hτ ↦ ?_) (fun p _ ↦ ?_) (fun τ hτ ↦ ?_)
+  · simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+    intro i hj hk
+    rw [Function.update_of_ne hk, Function.update_of_ne hj]
+  · simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hτ
+    funext i
+    by_cases hk : i = k
+    · subst hk; rw [Function.update_self]
+    · by_cases hj : i = j
+      · subst hj; rw [Function.update_of_ne hk, Function.update_self]
+      · rw [Function.update_of_ne hk, Function.update_of_ne hj, hτ i hj hk]
+  · rw [Function.update_of_ne hjk, Function.update_self, Function.update_self]
+  · simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hτ
+    congr 1
+    funext i
+    by_cases hk : i = k
+    · subst hk; rw [Function.update_self]
+    · by_cases hj : i = j
+      · subst hj; rw [Function.update_of_ne hk, Function.update_self]
+      · rw [Function.update_of_ne hk, Function.update_of_ne hj, hτ i hj hk]
+
+omit [Fintype d] [DecidableEq d] in
+/-- Updating the two sites of a bond does not change the other sites. -/
+theorem update_update_of_ne {L : ℕ} {j k i : Fin L} (σ : Fin L → d) (p : d × d) (hj : i ≠ j)
+    (hk : i ≠ k) : Function.update (Function.update σ j p.1) k p.2 i = σ i := by
+  rw [Function.update_of_ne hk, Function.update_of_ne hj]
+
+/-- `bondOp j k` is multiplicative on two distinct sites. -/
+theorem bondOp_mul {L : ℕ} {j k : Fin L} (hjk : j ≠ k) (B C : Matrix (d × d) (d × d) ℂ) :
+    bondOp j k B * bondOp j k C = bondOp j k (B * C) := by
+  ext σ τ
+  simp only [mul_apply, bondOp, of_apply, ite_mul, zero_mul]
+  rw [sum_ite_agree_off hjk]
+  simp only [Function.update_self, Function.update_of_ne hjk]
+  by_cases h : ∀ i, i ≠ j → i ≠ k → σ i = τ i
+  · rw [ite_eq_left h]
+    refine Finset.sum_congr rfl fun p _ ↦ ?_
+    rw [ite_eq_left fun i hj hk ↦ (update_update_of_ne σ p hj hk).trans (h i hj hk)]
+  · rw [ite_eq_right h]
+    refine Finset.sum_eq_zero fun p _ ↦ ?_
+    rw [ite_eq_right fun h' ↦ h fun i hj hk ↦ (update_update_of_ne σ p hj hk).symm.trans
+      (h' i hj hk), mul_zero]
+
+omit [Fintype d] in
+/-- `bondOp j k` is unital. -/
+theorem bondOp_one {L : ℕ} (j k : Fin L) :
+    bondOp j k (1 : Matrix (d × d) (d × d) ℂ) = 1 := by
+  ext σ τ
+  simp only [bondOp, of_apply, one_apply, Prod.mk.injEq]
+  by_cases hστ : σ = τ
+  · subst hστ; simp
+  · rw [ite_eq_right hστ]
+    split_ifs with h₁ h₂
+    · exact (hστ (funext fun i ↦ if hj : i = j then hj ▸ h₂.1 else
+        if hk : i = k then hk ▸ h₂.2 else h₁ i hj hk)).elim
+    · rfl
+    · rfl
 
 /-! ### The trace of a Gibbs operator -/
 
@@ -208,6 +303,10 @@ section Gibbs
 
 variable {n : Type*} [Fintype n] [DecidableEq n]
 
+/-- The exponential of a complex scalar matrix is the scalar matrix of the exponential. -/
+theorem exp_smul_one (z : ℂ) : exp (z • (1 : Matrix n n ℂ)) = exp z • (1 : Matrix n n ℂ) := by
+  rw [smul_one_eq_diagonal, smul_one_eq_diagonal, exp_diagonal, Pi.exp_def]
+
 /-- The Gibbs trace `Re Tr e^{-βH}`: the partition function of the Hamiltonian `H` at inverse
 temperature `β`. The real part is taken so that the value is a real number for every `H`; for
 Hermitian `H` the trace is already real (`gibbsTrace_eq_sum`). -/
@@ -241,15 +340,26 @@ end Gibbs
 /-- The ring Hamiltonian `∑ⱼ Bⱼ,ⱼ₊₁` on `L` sites whose closing bond `L - 1 → 0` carries `Bc`
 in place of `B`. With `Bc` the bond conjugated by an on-site symmetry on one end, its Gibbs
 trace is the twisted partition function `Tr (P e^{-βH_L})` of the untwisted ring. -/
-def twistedRingHamiltonian (B Bc : Matrix (d × d) (d × d) ℂ) (L : ℕ) :
-    Matrix (Fin L → d) (Fin L → d) ℂ :=
+def twistedRingHamiltonian {R : Type*} [AddCommMonoid R] (B Bc : Matrix (d × d) (d × d) R)
+    (L : ℕ) : Matrix (Fin L → d) (Fin L → d) R :=
   ∑ j : Fin L, bondOp j (finRotate L j) (if j.val + 1 = L then Bc else B)
+
+/-- The `j`-th bond `B_{j,j+1}` of the twisted ring `twistedRingHamiltonian B Bc L`: `Bc` on the
+closing bond `L - 1 → 0` and `B` elsewhere. -/
+def twistedBond {R : Type*} [Zero R] {L : ℕ} (B Bc : Matrix (d × d) (d × d) R) (j : Fin L) :
+    Matrix (Fin L → d) (Fin L → d) R :=
+  bondOp j (finRotate L j) (if j.val + 1 = L then Bc else B)
+
+omit [Fintype d] in
+/-- The twisted ring is the sum of its bonds. -/
+theorem twistedRingHamiltonian_eq_sum (B Bc : Matrix (d × d) (d × d) ℂ) (L : ℕ) :
+    twistedRingHamiltonian B Bc L = ∑ j : Fin L, twistedBond B Bc j := rfl
 
 /-- The translation-invariant ring Hamiltonian `∑ⱼ Bⱼ,ⱼ₊₁` of a two-site operator `B` on `L`
 sites, with the cyclic successor `finRotate L j = j + 1`. For `L = 2` both bonds join the sites
 `0` and `1`. -/
-def ringHamiltonian (B : Matrix (d × d) (d × d) ℂ) (L : ℕ) :
-    Matrix (Fin L → d) (Fin L → d) ℂ :=
+def ringHamiltonian {R : Type*} [AddCommMonoid R] (B : Matrix (d × d) (d × d) R) (L : ℕ) :
+    Matrix (Fin L → d) (Fin L → d) R :=
   ∑ j : Fin L, bondOp j (finRotate L j) B
 
 omit [Fintype d] in
@@ -257,6 +367,27 @@ omit [Fintype d] in
 theorem twistedRingHamiltonian_self (B : Matrix (d × d) (d × d) ℂ) (L : ℕ) :
     twistedRingHamiltonian B B L = ringHamiltonian B L := by
   simp only [twistedRingHamiltonian, ite_self, ringHamiltonian]
+
+omit [Fintype d] in
+/-- A zero-preserving map of entries commutes with embedding a bond: an integer bond embeds to
+the cast of its integer embedding. -/
+theorem bondOp_map {R S : Type*} [Zero R] [Zero S] {L : ℕ} (j k : Fin L)
+    (B : Matrix (d × d) (d × d) R) (f : R → S) (hf : f 0 = 0) :
+    (bondOp j k B).map f = bondOp j k (B.map f) := by
+  ext σ τ
+  simp only [bondOp, map_apply, of_apply]
+  split_ifs <;> simp [hf]
+
+omit [Fintype d] in
+/-- An additive map of entries commutes with the twisted ring Hamiltonian. -/
+theorem twistedRingHamiltonian_map {R S : Type*} [AddCommMonoid R] [AddCommMonoid S]
+    (B Bc : Matrix (d × d) (d × d) R) (L : ℕ) (f : R →+ S) :
+    (twistedRingHamiltonian B Bc L).map f = twistedRingHamiltonian (B.map f) (Bc.map f) L := by
+  rw [twistedRingHamiltonian, ← AddMonoidHom.mapMatrix_apply, map_sum,
+    twistedRingHamiltonian]
+  refine Finset.sum_congr rfl fun j _ ↦ ?_
+  rw [AddMonoidHom.mapMatrix_apply, bondOp_map _ _ _ _ f.map_zero]
+  split_ifs <;> rfl
 
 /-- The sum `∑ⱼ Aⱼ` of a one-site operator over the `L` sites of a ring. -/
 def siteSum (A : Matrix d d ℂ) (L : ℕ) : Matrix (Fin L → d) (Fin L → d) ℂ :=
