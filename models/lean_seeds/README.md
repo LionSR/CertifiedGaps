@@ -34,6 +34,16 @@ matrix-product trial state on 72 and 120 sites, checked in the kernel by a sixth
 hypothesis ([`lean/README.md`](../../lean/README.md), "The spin-1 gap from its trace tables").
 The obligations below are therefore narrowed to the tables.
 
+**The tables reduce to the papers' printed integers.** Lean proves that the papers' floored
+integer Horner recursion, if it returns the printed totals, gives the rational table entries.
+`SeedKernel/Heisenberg/Integers.lean` then proves both periodic gaps from those totals alone. It
+also proves the boundary-field gap of OpenAI's second paper from those totals together with two
+more inputs: the six boundary integers with $n = 5, 6$ and the spectral witness at
+$b_0 = 49/4$. The nine boundary integers with $n \le 4$ are checked in the kernel. The four
+open-chain trial vectors of that paper are checked by a seventh study, `open_trial`
+(`src/open_trial.jl`, `scripts/open_trial/generate.jl`, files
+`lean/SeedKernel/Heisenberg/OpenTrial*.lean`).
+
 ## Model
 
 - **Spin-1 Heisenberg chain** (`seed_design`, `spectrum`, `anchor`, `spin1_kernel`):
@@ -310,11 +320,14 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
 julia ../../tools/fetch_upstream.jl                        # upstream evidence (trial matrices; network)
 julia --project=. scripts/trial/generate.jl                # writes lean/SeedKernel/Heisenberg/TrialData.lean
 julia --project=. scripts/trial/generate.jl --check        # regenerates and compares
+# open_trial: the boundary paper's four open-chain trial vectors (needs the upstream evidence above)
+julia --project=. scripts/open_trial/generate.jl           # writes lean/SeedKernel/Heisenberg/OpenTrialData.lean
+julia --project=. scripts/open_trial/generate.jl --check   # regenerates and compares
 ```
 
 ## What is rigorous
 
-- **Lean 4 kernel (`decide +kernel`, standard axioms only):** All 40 declarations audited in
+- **Lean 4 kernel (`decide +kernel`, standard axioms only):** All 62 declarations audited in
   `lean/SeedKernel/Audit.lean` (verified automatically by `check.jl`) depend at most on standard
   Lean axioms (`propext`, `Classical.choice`, `Quot.sound`), with no `sorryAx` and no
   `Lean.ofReduceBool` (`native_decide`). The computational witness checks (spin-1 $H_6, H_8, H_{10}$
@@ -357,6 +370,7 @@ julia --project=. scripts/trial/generate.jl --check        # regenerates and com
 | `src/spin1_kernel.jl` | `Spin1Kernel`: witness generator, Lean source emitter, witness inventory, and checker |
 | `src/ising.jl` | `IsingSeed`: eigenvector proposal generator, `Generated*.lean` emitter, exact Julia replay, and checker |
 | `src/trial.jl`, `scripts/trial/generate.jl` | `TrialSeed`: the D = 26 trial state, its SU(2)-and-swap block reduction and integer intertwiner; writes `lean/SeedKernel/Heisenberg/TrialData.lean` (`--check` regenerates and compares) |
+| `src/open_trial.jl`, `scripts/open_trial/generate.jl` | `OpenTrialSeed`: the boundary paper's open-chain trial vectors `bᵀ A ⋯ A c` on the intertwiner blocks, checked against the paper's exact results; writes `lean/SeedKernel/Heisenberg/OpenTrialData.lean` (`--check` regenerates and compares) |
 | `scripts/<study>/` | Exploratory, benchmark, and table-generation drivers listed under "Reproduce" |
 | `scripts/fetch_paper.jl` | Shared: runs `tools/fetch_upstream.jl --paper` (paper sources into `upstream/`) |
 | `scripts/audit_mathlib.jl` | `spin1_kernel` Mathlib audit; kept outside `scripts/spin1_kernel/`, whose `.jl` files are hash-pinned by `results/spin1_kernel/witnesses.json` |
