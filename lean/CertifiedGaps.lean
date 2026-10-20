@@ -7,7 +7,9 @@ import CertifiedGaps.Transfer.PiTensor
 import CertifiedGaps.Transfer.MomentForm
 import CertifiedGaps.Transfer.ProductLimit
 import CertifiedGaps.Transfer.PolynomialFilter
+import CertifiedGaps.Transfer.RatioMonotone
 import CertifiedGaps.Transfer.MatrixProduct
+import CertifiedGaps.Transfer.OpenMatrixProduct
 import CertifiedGaps.Transfer.MatrixLemmas
 import CertifiedGaps.Transfer.SingleSite
 import CertifiedGaps.Transfer.SingleSiteLimit
@@ -33,6 +35,7 @@ import CertifiedGaps.Seed.Certificate
 import CertifiedGaps.Seed.Ring
 import CertifiedGaps.Seed.Lift
 import CertifiedGaps.Seed.LiftedSeed
+import CertifiedGaps.Seed.Reseed
 -- Reflection-positive rings
 import CertifiedGaps.Ring.Hamiltonian
 import CertifiedGaps.Ring.Model
@@ -61,6 +64,7 @@ import CertifiedGaps.Heisenberg.Seed36
 import CertifiedGaps.Heisenberg.Seed60
 import CertifiedGaps.Heisenberg.EnergyBound
 import CertifiedGaps.Heisenberg.ThermalTable
+import CertifiedGaps.Heisenberg.Reseed120
 -- Open chains with boundary fields (Appendices A–C of the note)
 import CertifiedGaps.Open.MomentBounds
 import CertifiedGaps.Open.Criterion
@@ -69,7 +73,11 @@ import CertifiedGaps.Open.Model
 import CertifiedGaps.Open.Transfer
 import CertifiedGaps.Open.Bounds
 import CertifiedGaps.Open.Gap
+import CertifiedGaps.Open.Initialization
 import CertifiedGaps.Heisenberg.OpenChain
+import CertifiedGaps.Heisenberg.BoundaryInit
+import CertifiedGaps.Heisenberg.BoundaryInitTable
+import CertifiedGaps.Heisenberg.OpenTrialBound
 -- Local building blocks of the models
 import CertifiedGaps.Local.Pauli
 import CertifiedGaps.Local.SpinHalf

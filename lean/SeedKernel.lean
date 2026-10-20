@@ -25,6 +25,8 @@ import SeedKernel.Spin1.H10
 import SeedKernel.Heisenberg.Trial
 import SeedKernel.Heisenberg.Seed36
 import SeedKernel.Heisenberg.Seed60
+import SeedKernel.Heisenberg.Reseed120
+import SeedKernel.Heisenberg.OpenTrial
 import SeedKernel.Ising.Generated
 import SeedKernel.Ising.GeneratedChunks
 import SeedKernel.Ising.ChunkCoverage

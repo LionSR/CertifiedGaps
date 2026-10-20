@@ -56,3 +56,9 @@ import SeedKernel
 #print axioms CertifiedGaps.SpinOneHeisenberg.seed60_of_table
 #print axioms CertifiedGaps.SpinOneHeisenberg.gap_sixty_of_table
 #print axioms CertifiedGaps.SpinOneHeisenberg.gap_sixty_chain_of_table
+#print axioms CertifiedGaps.SpinOneHeisenberg.seed_ring_spatial_of_table
+#print axioms CertifiedGaps.SpinOneHeisenberg.seed_ring_thermal_of_table
+#print axioms SeedKernel.OpenTrial.oppositeField_trial_34
+#print axioms SeedKernel.OpenTrial.oppositeField_trial_78
+#print axioms SeedKernel.OpenTrial.oppositeField_trial_142
+#print axioms SeedKernel.OpenTrial.oppositeField_trial_240
