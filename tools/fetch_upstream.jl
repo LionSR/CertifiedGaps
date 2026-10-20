@@ -4,6 +4,7 @@
 #
 #     julia tools/fetch_upstream.jl                  # evidence for models/spin1
 #     julia tools/fetch_upstream.jl --paper [NAME…]  # paper sources for models/lean_seeds
+#     julia tools/fetch_upstream.jl --boundary       # boundary-paper trial data for lean_seeds
 #
 # Default: the finite-verification evidence that models/spin1 reproduces, into
 # references/periodic-gap-source/ (git-ignored). Integrity chain: the downloaded
@@ -17,6 +18,11 @@
 # models/lean_seeds/scripts/seed_design/summarize.jl). Every file listed in
 # models/lean_seeds/results/spin1_kernel/paper-source-sha256.txt must match that hash; the
 # SHA-256 of every fetched file is printed.
+#
+# `--boundary`: the exact trial data of "A boundary-field gap for the spin-one Heisenberg chain"
+# (same repository and commit), read by models/lean_seeds/scripts/open_trial/generate.jl, into
+# references/boundary-field-gap-source/ (git-ignored), each file checked against the hash pinned
+# below.
 
 using Downloads, SHA
 
@@ -27,6 +33,16 @@ const REPO = normpath(joinpath(@__DIR__, ".."))
 const TARGET = joinpath(REPO, "references", "periodic-gap-source")
 const LEAN_SEEDS = joinpath(REPO, "models", "lean_seeds")
 const PAPER_NAMES = ("initialization", "transfer", "thermal72", "trials", "bootstrap")
+const BOUNDARY_PAPER =
+    "preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026"
+const BOUNDARY_TARGET = joinpath(REPO, "references", "boundary-field-gap-source")
+"The boundary paper's trial data and their SHA-256 at `COMMIT` (no manifest exists upstream)."
+const BOUNDARY_FILES = (
+    "verification/trial-exact-matrices.json" =>
+        "93b1dc3995b82279e359cc8a8aa594f0c2bfa82b01a5a7a781f914ee4a635c1e",
+    "verification/trial-exact-results.json" =>
+        "50c7b0e8653c556bf11aff39eebd5941a1ae4551ec11a8b2e8d5d4ce2d429670",
+)
 
 "The manifest hash pinned by models/spin1 (hash-pinned code, so it is read, not copied)."
 function pinned_manifest_sha()
@@ -36,20 +52,22 @@ function pinned_manifest_sha()
     return String(found[1])
 end
 
-raw_url(path) = "https://raw.githubusercontent.com/$REPOSITORY/$COMMIT/$PAPER/$path"
+raw_url(path, paper = PAPER) =
+    "https://raw.githubusercontent.com/$REPOSITORY/$COMMIT/$paper/$path"
 sha256_hex(path) = bytes2hex(sha256(read(path)))
 
 """
-    fetch(path, expected; target = TARGET, destination = joinpath(target, path))
+    fetch(path, expected; target = TARGET, destination = joinpath(target, path), paper = PAPER)
 
-Download `path` (relative to the paper directory) unless a copy with the `expected` hash exists;
+Download `path` (relative to the directory `paper`) unless a copy with the `expected` hash exists;
 `expected = nothing` accepts any content. Returns `:present` or `:downloaded`.
 """
-function fetch(path, expected; target = TARGET, destination = joinpath(target, path))
+function fetch(path, expected; target = TARGET, destination = joinpath(target, path),
+        paper = PAPER)
     expected !== nothing && isfile(destination) && sha256_hex(destination) == expected &&
         return :present
     mkpath(dirname(destination))
-    Downloads.download(raw_url(path), destination)
+    Downloads.download(raw_url(path, paper), destination)
     actual = sha256_hex(destination)
     expected === nothing || actual == expected ||
         error("hash mismatch for $path: expected $expected, got $actual")
@@ -100,10 +118,21 @@ function fetch_paper(names)
     end
 end
 
+"Fetch the boundary paper's trial data into references/boundary-field-gap-source/."
+function fetch_boundary()
+    for (path, hash) in BOUNDARY_FILES
+        status = fetch(path, hash; target = BOUNDARY_TARGET, paper = BOUNDARY_PAPER)
+        println(path, status == :present ? " already present" : " downloaded",
+            " (hash verified)")
+    end
+end
+
 if isempty(ARGS)
     fetch_evidence()
+elseif ARGS[1] == "--boundary"
+    fetch_boundary()
 elseif ARGS[1] == "--paper"
     fetch_paper(length(ARGS) > 1 ? ARGS[2:end] : PAPER_NAMES)
 else
-    error("usage: julia tools/fetch_upstream.jl [--paper [NAME ...]]")
+    error("usage: julia tools/fetch_upstream.jl [--paper [NAME ...] | --boundary]")
 end

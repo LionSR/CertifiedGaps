@@ -65,7 +65,10 @@ modulo four finite inputs at `β = 49` (the note's eq. (C1)):
 - `seed_open_thermal`: the opposite-field thermal purity `P_τ(240, 49) ≥ 0.79`.
 
 `gapGT_of_boundaryFieldInputs` proves the same gap from these four inputs as hypotheses, with no
-`sorry`.
+`sorry`. `SeedKernel/Heisenberg/Integers.lean` proves the four inputs themselves from the
+paper's printed integers (see "The spin-1 gaps from the printed integers" below):
+`spin_one_boundary_field_gap_of_integers` has no `sorry` and two hypotheses: the eighteen
+totals of the periodic table and the six boundary integers with `n = 5, 6`.
 
 The criterion itself is general. `gapGT_of_openChain` takes any seed scale `β₀`, ring seeds at
 lengths `2N₀` and `4N₀`, a boundary seed at length `2K₀`, an open-chain seed at length `4N₀`, and
@@ -163,7 +166,7 @@ The library is structured in five layers, each depending only on the preceding o
 |---|---|
 | two-purity criterion (Layers 1–2), spatial moment inequalities for every `RPRing` (Layer 3), and unitary frame conjugations | completely proved; depends only on the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound` |
 | uniform gap theorems for the spin-1 Heisenberg ring and 8 additional model families (table below) | proved **conditional on their seed lemmas** (`sorryAx` enters exclusively through the named seed declarations) |
-| the finite seed lemmas | one proved: the longitudinal-field Ising chain at `g = 1/4`, `h = 1/20` (`SeedKernel.Ising.first_point_seed`, giving the unconditional `ising_gap`). All others remain open; [`../models/lean_seeds/`](../models/lean_seeds/) has the plan and the open obligations of the spin-1 seed |
+| the finite seed lemmas | one proved: the longitudinal-field Ising chain at `g = 1/4`, `h = 1/20` (`SeedKernel.Ising.first_point_seed`, giving the unconditional `ising_gap`). All others remain open. The spin-1 seeds of both OpenAI papers reduce to the printed integer totals of their trace tables (`SeedKernel/Heisenberg/Integers.lean`); [`../models/lean_seeds/`](../models/lean_seeds/) has the plan and the open obligations |
 
 ### Build instructions
 
@@ -251,6 +254,43 @@ The first and third bounds come from the exact unequal-defect recurrence (`chain
 applied to OpenAI's own seed values; their eq. (1.3) and (1.4) use a single coefficient and are
 weaker (`Main.lean`).
 
+### The spin-1 gaps from the printed integers
+
+Both trace tables follow from the integers the papers print. The papers compute each trace with
+the same algorithm, and Lean formalizes it:
+1. Shift the Hamiltonian to a contraction `R` (energy bounds).
+2. Truncate the Poisson expansion of `e^{m(R - 1)}`.
+3. Run a floored integer Horner recursion on each representative column.
+4. Sum the integer totals over orbit representatives with multiplicities.
+
+Lean proves that the computable integer recurrence, if it returns the printed totals, implies the
+rational enclosures of the table (`ThermalTable.lean`, `ThermalTable60.lean`, the `Trace/` layer).
+The kernel cannot evaluate these recurrences at the paper's sizes, so the totals remain
+hypotheses; every other step, including all trial states, is proved
+(`SeedKernel/Heisenberg/Integers.lean`, standard axioms only).
+
+| Theorem (`SpinOneHeisenberg.`) | Hypotheses | Bound |
+|---|---|---|
+| `gap_of_hornerTotals`, `gap_log_twenty_of_hornerTotals` | `HornerTotals`: the eighteen totals `W_{n,g}` of the `b = 49/4` table | as `gap_of_table`, `gap_log_twenty_of_table` |
+| `gap_sixty_of_hornerTotals60` | `HornerTotals60`: the nine totals of the `b = 21/2` table (`ℤ[ω]` arithmetic for the `C` twist) | as `gap_sixty_chain_of_table` |
+| `spin_one_boundary_field_gap_of_integers`, `spin_one_opposite_field_gap_of_integers` | `HornerTotals`, `BoundaryTotalsLarge` (the six boundary integers `k_{n,g}` with `n = 5, 6`) | `Δ_n > log(10⁶/2241)/392` for odd `n ≥ 1921` (equal fields) and even `n ≥ 1920` (opposite fields) |
+
+For the boundary-field paper, the chain from integers to inputs is the following:
+1. Reseeding to `(120, 49)` (`Reseed120.lean`) gives `1 - P_s(120, 49) ≤ 0.047` and
+   `1 - P_τ(240, 49) ≤ 0.0179`; the paper has `0.0502` and `0.0198`.
+2. The initialization at `b₀ = 49/4` (`BoundaryInit.lean`, `BoundaryInitTable.lean`) yields
+   `e₁₄₂ ≤ 0.1306` and the open thermal purity.
+3. The fifteen short-chain traces `Z_{n,g}` (`BoundaryTraces.lean`, `BoundaryThermal.lean`) give
+   `Y₆(b₀) < 0.027` and the leading-weight polynomial `< 0.003745`. The nine entries with `n ≤ 4`
+   are checked by `decide +kernel`.
+4. The four open-chain trial vectors on 34, 78, 142 and 240 sites are checked in the kernel
+   (`SeedKernel/Heisenberg/OpenTrial*.lean`).
+5. The spectral witness at `b₀` (`BoundaryLeading.lean`, `thermalCore_of_tables`) comes from both
+   tables: on the single-site Trotter matrices, the `D₂` sector data of the seed at `(36, 49/4)`
+   give a leading line with `λ₀ ≥ 0.999` and `ρ₀ ≤ 0.874`, fixed by the `A₄` average `Π`. The
+   two-boundary transfer identifies the averaged pairings with `I(n)`, so that
+   `c₀ P_*(λ₀)² ≤ 0.003745`, and closed inequalities pass all of it to the limit.
+
 ### Unconditional theorems (no `sorry`)
 
 Every theorem in the table below is completely proved using only `propext`, `Classical.choice`, and
@@ -286,7 +326,7 @@ Heisenberg seeds are Proposition 5.5 of the OpenAI preprint, reproduced in
 finite seed inequalities inside the Lean kernel. Every computational step is discharged by
 `decide +kernel` on `Nat` or `Int` (evaluated by GMP inside the kernel), without `native_decide`,
 `sorry`, or additional axioms. `SeedKernel/Audit.lean` (a root of the library) verifies via
-`#print axioms` that all 40 main declarations depend at most on `propext`, `Classical.choice`, and
+`#print axioms` that all 64 main declarations depend at most on `propext`, `Classical.choice`, and
 `Quot.sound`. The corresponding Julia generators, witness inventory, and verification driver
 (`check.jl`: Julia replay, `lake build SeedKernel`, and the axiom audit) live in
 [`../models/lean_seeds/`](../models/lean_seeds/), whose README states the results and the open
@@ -335,6 +375,10 @@ spin-1 work is arithmetic only):
 | `SeedKernel/Spin1/H6.lean`, `H8.lean`, `H10.lean` | Generated Ritz/residual witnesses (`models/lean_seeds/certify.jl spin1_kernel`) |
 | `SeedKernel/Heisenberg/Trial*.lean` | The D = 26 integer trial state checked in the kernel (`trial_check_72`, `trial_check_120`): SU(2)-and-swap block reduction by an integer intertwiner, packed integer matrix powers with a correctness proof; data from `models/lean_seeds/scripts/trial/generate.jl` |
 | `SeedKernel/Heisenberg/Seed36.lean`, `Heisenberg/Seed60.lean` | The spin-1 seeds and gaps with the trace tables as the only hypotheses (`gap_of_table`, `gap_sixty_chain_of_table`) |
+| `SeedKernel/Heisenberg/Reseed120.lean` | The ring inputs of the boundary-field gap at `(120, 49)` from the trace table (`seed_ring_spatial_of_table`, `seed_ring_thermal_of_table`) |
+| `SeedKernel/Heisenberg/OpenTrial*.lean` | The four open-chain trial vectors of the boundary paper on 34, 78, 142 and 240 sites (`oppositeField_trial_*`); data from `models/lean_seeds/scripts/open_trial/generate.jl` |
+| `SeedKernel/Heisenberg/BoundaryTraces.lean` | The nine boundary integers `k_{n,g}` with `n ≤ 4` by `decide +kernel` (about 45 s, 6 GB) |
+| `SeedKernel/Heisenberg/Integers.lean` | Both papers' gap theorems from the printed integers (`gap_of_hornerTotals`, `gap_sixty_of_hornerTotals60`, `spin_one_boundary_field_gap_of_integers`) |
 | `SeedKernel/Ising/Checker.lean`, `Ising/Packed.lean`, `Ising/Chunked.lean` | Integer $20H$ action and direct, packed (on the shared lanes), and 64-chunk certificate checkers |
 | `SeedKernel/Ising/Generated.lean`, `Ising/GeneratedChunks.lean` | Generated eigenvector proposals and kernel checks (`models/lean_seeds/certify.jl ising`) |
 | `SeedKernel/Ising/ChunkCoverage.lean`, `Ising/NegativeChecks.lean` | Proof that the 64 chunks cover `{0, ..., 4095}` and rejection tests for corrupted witnesses |
@@ -454,6 +498,8 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Transfer/MatrixProduct.lean` | Integer matrix-product states for any ring Hamiltonian: norm and energy as transfer-matrix traces, and the trial-state bound `MPS.exp_lt_gibbsTrace` |
 | `Ring/Variational.lean` | Rayleigh-quotient bound on the Gibbs trace `gibbsTrace H β` for Hermitian `H` |
 | `Spectral/*.lean` | Eigenvalue counting (`eigCount`), rational `LDLᵀ` inertia certificates, the Schur compression bound, Weyl monotonicity, Ritz bounds and binned trace bounds |
+| `Spectral/OperatorBounds.lean` | Operator inequalities `a ≤ A ≤ b` through quadratic forms: sums, unitary conjugates, the weighted Schur test `abs_qform_le_of_schur`, bounds from an annihilating polynomial, and the Gram factorization of a nonnegative Hermitian matrix |
+| `Spectral/FunctionalCalculus.lean` | Real functions `hA.cfc f = U diag(f(λᵢ)) Uᴴ` of a Hermitian matrix (Mathlib's `Matrix.IsHermitian.cfc`) without continuity side conditions: algebra, `exp`, and the norm bound `‖f(A) v‖ ≤ (max_i ‖f(λᵢ)‖) ‖v‖` |
 | `Seed/Scheme.lean` | Sector schemes (`plain`, `d2`, `ion`), the sector representation `SectorApprox`, trace tables `TraceBounds` and the sector moment bounds |
 | `Seed/CappedMass.lean`, `Seed/Dominant.lean` | Capped-mass bounds and the dominant-sector seed `SectorSeed` |
 | `Seed/Limits.lean` | The limit `δ → 0` of a seed, shifted traces, and shift invariance of the purities |
@@ -461,11 +507,31 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Heisenberg/SzBridge.lean` | Spin-1 twisted ring and `S^z`-basis definitions, their identification with the generic `twistedRingHamiltonian`, and the Cartesian ↔ `S^z` bridge for partition functions |
 | `Heisenberg/SectorTransfer.lean`, `Heisenberg/TrialBound.lean` | Spin-1 instances: the `D₂` symmetry of the Heisenberg ring and the trial-state bound |
 | `Heisenberg/TraceTable.lean`, `Heisenberg/Seed36.lean` | The spin-1 trace table and the seed at `(36, 49/4)` (`seed36_of_table_mps`: from the table and one integer MPS inequality) |
-| `Ring/Hamiltonian.lean` | The one Hamiltonian API: ring geometry, `bondOp`/`siteOp`, `twistedRingHamiltonian B Bc L` (closing bond `Bc`), `ringHamiltonian B L`, `siteSum A L`, and the Gibbs trace `gibbsTrace H β` $= \mathrm{Re}\,\mathrm{Tr}\, e^{-\beta H}$ (eigenvalue sum, positivity, unitary invariance) |
+| `Heisenberg/EnergyBound.lean` | The Lemma "Energy bounds" of the spin-1 paper: `-(3L/2) ≤ H_L(R) ≤ L` for every rotation `R` of the closing bond, and the untwisted, `P`- and `C`-twisted cases |
+| `Ring/Hamiltonian.lean` | The one Hamiltonian API: ring geometry, `bondOp`/`siteOp` (`bondOp j k` a `*`-algebra embedding for `j ≠ k`), `twistedRingHamiltonian B Bc L` (closing bond `Bc`), `ringHamiltonian B L`, `siteSum A L`, and the Gibbs trace `gibbsTrace H β` $= \mathrm{Re}\,\mathrm{Tr}\, e^{-\beta H}$ (eigenvalue sum, positivity, unitary invariance) |
 | `Ring/Model.lean` | `RPRing` structure, `H_L = ringHamiltonian h L + siteSum o L`, Hermiticity of $H_L$, and $Z_L = \sum_m e^{-\beta E_m}$ |
 | `Ring/Transfer.lean` | Even-bond, on-site, and odd-bond Trotter slices and the reflection-positivity identity $\operatorname{Tr} S^M = \operatorname{Tr} (B^T B)^{L/2}$ with real $B$ |
 | `Ring/Gap.lean` | Proof of `RPRing.spatialMomentBounds` and `RPRing.gapGT_of_chainCertificate` |
 | `Ring/Conjugation.lean` | Sitewise unitary conjugation of ring Hamiltonians (twisted or not, `conj_twistedRingHamiltonian`), invariance of Gibbs traces and spectra |
+| `Ring/Symmetry.lean` | Signed-permutation symmetries stated entrywise over any commutative semiring (`Intertwines`, `signedPerm`): site permutations and on-site relabelings of `bondOp`, sign gauges, the rotation and reflection of a ring with a seam (`seamHamiltonian`), and the signed rotation of a twisted ring (`intertwines_twisted_rotate`) |
+| `Ring/EnergyBound.lean` | Uniform energy bounds `a L ≤ H_L ≤ b L` of twisted and untwisted rings from bounds on one bond or on pairs of consecutive bonds, and row sums of `bondOp` for local Schur tests |
+| `Trace/Poisson.lean` | Conditioned Poisson weights, the Fox–Glynn truncation bound for `e^{m(R - 1)}` of a Hermitian contraction (`nsq_exp_sub_poisson_mulVec_le`, instances `(98, 280)` and `(84, 256)`), and the Taylor enclosure of `e^x` |
+| `Trace/Horner.lean` | Integer Horner columns `X ← ⌊D X / s⌋ + cⱼ e_r` (`hornerFloor`) and their rounding error against `(∑ aⱼ Rʲ) e_r` for a contraction `R = D / s` |
+| `Trace/Frobenius.lean` | Gibbs traces from representative columns: `Z = e^{bc} ∑_r ‖F e_r‖²` with `F = e^{-(b/2)(H + c)}`, symmetric columns, weighted Minkowski, and the rational enclosure `gibbsTrace_enclosure` |
+| `Trace/Orbit.lean` | Column symmetries (`IsColumnSymmetry`) as a submonoid, and the representative hypothesis of `gibbsTrace_enclosure_of_rep` from generating symmetries (`nsq_gibbsHalf_rep`) |
+| `Heisenberg/ThermalTable.lean` | The `b = 49/4` table from the paper's integer algorithm: `D = 32R`, coefficients `⌊2⁵⁵ pⱼ⌋`, representatives and `hornerTotal`; `traceTable_of_hornerTotals : HornerTotals → TraceTable` (the eighteen rational endpoints checked by `decide +kernel`) |
+| `Trace/Eisenstein.lean`, `Trace/HornerEisenstein.lean`, `Trace/OrbitConj.lean`, `Ring/SymmetryPhase.lean` | Eisenstein integers `ℤ[ω]` with floored division and the Horner error over them; antiunitary column symmetries; symmetries up to a phase, for the `2π/3`-twisted ring |
+| `Heisenberg/ThermalTable60.lean` | The `b = 21/2` table from the paper's integer algorithm (`g = 1, P, C`, `n = 6, 8, 10`): `traceTable60_of_hornerTotals60 : HornerTotals60 → TraceTable60`, and the seed at `(60, 105/4)` |
+| `Trace/WeightedHorner.lean`, `Trace/WeightedFrobenius.lean` | The Horner rounding error and the Gibbs-trace enclosure in a weighted norm, for integer matrices `D = s J A J⁻¹` that are contractions only after a diagonal similarity |
+| `Trace/PackedLanes.lean`, `Trace/PackedHorner.lean` | A packed big-integer evaluator of `hornerFloor` for banded integer matrices (one `Nat` per row, 128-bit lanes, division by a constant via multiply and shift) proved equal to `hornerFloor` |
+| `Seed/Reseed.lean`, `Heisenberg/Reseed120.lean` | Reseeding from one ring seed to a longer one at four times the inverse temperature; the ring inputs `P_s(120, 49) ≥ 1 − 0.047`, `P_τ(240, 49) ≥ 1 − 0.0179` from the trace table |
+| `Transfer/RatioMonotone.lean`, `Open/Initialization.lean` | Monotonicity of `x^m / P(x)²` on an interval from a decidable `RatioCheck`; the scalar initialization of the boundary seeds (`move_one` steps, defect bounds from moment witnesses) |
+| `Heisenberg/BoundaryInit.lean`, `Heisenberg/BoundaryInitTable.lean` | The boundary paper's initialization at `b₀ = 49/4`: `seed_boundary` and `seed_open_thermal` from `ThermalCore`, the trial bounds `TrialData` and the trace table |
+| `Transfer/OpenMatrixProduct.lean`, `Heisenberg/OpenTrialBound.lean` | Open matrix-product trial vectors `bᵀ A ⋯ A c` for open chains with end terms, and the variational eigenvalue bound for the opposite-field chain |
+| `Open/TwoBoundary.lean`, `Open/LeadingLimit.lean` | A Hermitian transfer matrix with an isolated leading line (`IsLeadingLine`): the boundary moment witness from even and odd pairings, the leading-weight polynomial bound `c f(e₀) ≤ ∑ aₙ ⟨v, Xⁿ P v⟩` for an invariant projection `P`, and their passage to the limit (`LeadingWitness.of_tendsto`) |
+| `Transfer/OpenSingleSite.lean`, `Transfer/SingleSiteLeading.lean` | Open chains with two arbitrary end terms in the single-site Trotter matrix (`⟨v_L, Xⁿ v_R⟩` tends to the Gibbs trace); sign and relabeling actions, the `A₄` average `Π`, and the leading line from the `D₂` block eigenvalues |
+| `Heisenberg/BoundaryLeading.lean` | The spectral witness at `b₀ = 49/4` (`λ₀ ≥ 0.999`, `ρ₀ ≤ 0.874`, `c₀ P_*(λ₀)² ≤ 0.003745`) and `thermalCore_of_tables` from the trace table and the boundary trace table |
+| `Heisenberg/BoundaryData.lean`, `Heisenberg/BoundaryTraces.lean`, `Heisenberg/BoundaryThermal.lean` | The fifteen boundary traces `Z_{n,g}` (`n = 2, …, 6`, right field rotated by `g`): the paper's integer recurrence, the table `BoundaryTraceTable` from `BoundaryTotals`, `Y₆(b₀) < 0.027` and the leading-weight polynomial `< 0.003745` |
 | `Heisenberg/Hamiltonian.lean` | The spin-1 Heisenberg ring $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ (`ringHamiltonian SpinOne.exchange L`) in the Cartesian basis |
 | `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Both bounds of OpenAI's Theorem 1.1: `spin_one_heisenberg_gap` (`L ≥ 2304`, from the seeds at 36 sites and `chain36`) and `spin_one_heisenberg_gap_sixty` (`L ≥ 60`) |
 | `Heisenberg/OpenChain.lean` | Theorem 2 of the main note (`spin_one_boundary_field_gap`) and its sharper form (`spin_one_boundary_field_gap_sharp`): the equal- and opposite-field open chains as open chains of the Heisenberg ring, the four inputs, and the opposite-field gap at even lengths (`spin_one_opposite_field_gap`) |
