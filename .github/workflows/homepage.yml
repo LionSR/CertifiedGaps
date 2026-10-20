@@ -16,8 +16,8 @@ on:
       - main
     paths:
       - "home_page/**"
-      - "notes/**"
-      - "explainer/**"
+      - "paper/**"
+      - "supplementary/explainer/**"
       - ".github/workflows/homepage.yml"
   workflow_run:
     workflows: ["Compile blueprint"]
@@ -73,9 +73,9 @@ jobs:
         run: |
           rsync -a --exclude '.*' --exclude '*.mp4' --exclude 'node_modules/' \
             --exclude 'package*.json' --exclude '*.narration.wav' --exclude 'render.mjs' \
-            --exclude 'README.md' explainer/ home_page/explainer/
+            --exclude 'README.md' supplementary/explainer/ home_page/explainer/
           mkdir -p home_page/notes
-          cp notes/*.pdf home_page/notes/
+          cp paper/*.pdf home_page/notes/
 
       - name: Set up Ruby
         if: steps.site.outputs.found == 'true'

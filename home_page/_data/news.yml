@@ -2,7 +2,7 @@
 # text (one plain sentence), and a link (an http(s) URL or a site path starting with /), or prs
 # (pull request numbers; the first becomes the link). records lists the leaderboard rows the item
 # is about. Only these hand-written items appear; leaderboard rows are not announced one by one.
-# Validated by tools/leaderboard/check_records.jl.
+# Validated by code/tools/leaderboard/check_records.jl.
 
 - date: "2026-10-06"
   text: 'OpenAI publishes a proof of the spin-1 Haldane gap (result 268 of its math release), for periodic rings and for open chains with boundary fields.'

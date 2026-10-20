@@ -130,7 +130,7 @@ usemathjax: true
       <td class="num">{% if r.numerical_gap %}{{ r.numerical_gap | slice: 0, 6 }}{% else %}—{% endif %}</td>
       <td class="num">({{ r.seed.n0 }}, {{ r.seed.beta0 }})</td>
       <td class="num">{{ r.lengths.L0 }}</td>
-      <td><a href="{{ repo_blob }}{{ r.certificate }}">data</a>, <a href="{{ repo_blob }}{% if r.check %}{{ r.check }}{% else %}models/{{ f.slug }}/check.jl{% endif %}">checker</a></td>
+      <td><a href="{{ repo_blob }}{{ r.certificate }}">data</a>, <a href="{{ repo_blob }}{% if r.check %}{{ r.check }}{% else %}code/models/{{ f.slug }}/check.jl{% endif %}">checker</a></td>
     </tr>
   {%- endfor %}
   </tbody>
