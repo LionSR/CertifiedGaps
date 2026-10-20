@@ -4,13 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: thermal-mpo-gap contributors
 -/
 import CertifiedGaps.Ring.Gap
-import CertifiedGaps.Local.SpinOne
+import CertifiedGaps.Heisenberg.Hamiltonian
 
 /-!
 # The spin-one chain with single-ion anisotropy
 
 `H_L = ∑ⱼ Sⱼ · Sⱼ₊₁ + D ∑ⱼ (Sᶻⱼ)²` on a periodic ring, in the Cartesian basis
-`(S^α)_{s s'} = -i ε_{α s s'}` of `SpinOneHeisenberg.spinOne`. It is a reflection-positive ring
+`(S^α)_{s s'} = -i ε_{α s s'}` of `SpinOne.S`. It is a reflection-positive ring
 (`model D`) with real antisymmetric bond factors `C_α = SpinOne.G α = i S^α`, since
 `-S · S = ∑_α G_α ⊗ G_α`, and the real on-site term `D (Sᶻ)² = D diag(1, 1, 0)`
 (`hamiltonian_eq`). At `D = 0` it is the Heisenberg ring (`partitionFunction_zero`).
@@ -44,30 +44,30 @@ noncomputable def model (D : ℝ) : RPRing (Fin 3) (Fin 3) where
   o_symm := by ext i j; fin_cases i <;> fin_cases j <;> simp [Sz2]
 
 /-- The bond of the ring is the exchange `S · S`. -/
-theorem bondMatrix_eq (D : ℝ) : (model D).bondMatrix = SpinOneHeisenberg.exchange := by
+theorem bondMatrix_eq (D : ℝ) : (model D).bondMatrix = SpinOne.exchange := by
   rw [RPRing.bondMatrix]
   simp_rw [(model D).Dc_eq_of_refl rfl]
   rw [← Finset.sum_neg_distrib]
   ext ⟨a, b⟩ ⟨c, e⟩
-  simp only [RPRing.Cc, model, G, SpinOneHeisenberg.exchange, SpinOneHeisenberg.spinOne,
+  simp only [RPRing.Cc, model, G, SpinOne.exchange, SpinOne.S,
     Matrix.neg_apply, Matrix.sum_apply, kroneckerMap_apply, map_apply, of_apply]
   refine Finset.sum_congr rfl fun α _ ↦ ?_
   push_cast
-  linear_combination -(SpinOneHeisenberg.leviCivita α a c : ℂ) *
-    SpinOneHeisenberg.leviCivita α b e * Complex.I_sq
+  linear_combination -(SpinOne.leviCivita α a c : ℂ) *
+    SpinOne.leviCivita α b e * Complex.I_sq
 
 /-- The on-site term of the ring is `D (Sᶻ)²`. -/
 theorem oc_eq (D : ℝ) :
-    (model D).oc = (D : ℂ) • (SpinOneHeisenberg.spinOne 2 * SpinOneHeisenberg.spinOne 2) := by
+    (model D).oc = (D : ℂ) • (SpinOne.S 2 * SpinOne.S 2) := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [RPRing.oc, model, Sz2, SpinOneHeisenberg.spinOne, SpinOneHeisenberg.leviCivita,
+    simp [RPRing.oc, model, Sz2, SpinOne.S, SpinOne.leviCivita,
       mul_apply, Fin.sum_univ_three]
 
 /-- The Hamiltonian of the ring is `∑ⱼ Sⱼ · Sⱼ₊₁ + D ∑ⱼ (Sᶻⱼ)²`. -/
 theorem hamiltonian_eq (D : ℝ) (L : ℕ) :
     (model D).hamiltonian L = SpinOneHeisenberg.hamiltonian L +
-      ∑ j : Fin L, siteOp j ((D : ℂ) • (SpinOneHeisenberg.spinOne 2 * SpinOneHeisenberg.spinOne 2))
+      ∑ j : Fin L, siteOp j ((D : ℂ) • (SpinOne.S 2 * SpinOne.S 2))
     := by
   simp only [RPRing.hamiltonian, RPRing.bond, RPRing.site, bondMatrix_eq, oc_eq]
   rfl
@@ -76,7 +76,7 @@ theorem hamiltonian_eq (D : ℝ) (L : ℕ) :
 theorem partitionFunction_zero (L : ℕ) (β : ℝ) :
     (model 0).partitionFunction L β = SpinOneHeisenberg.partitionFunction L β := by
   have h0 : ∀ j : Fin L, siteOp j ((((0 : ℝ) : ℂ)) •
-      (SpinOneHeisenberg.spinOne 2 * SpinOneHeisenberg.spinOne 2)) = 0 := fun j ↦ by
+      (SpinOne.S 2 * SpinOne.S 2)) = 0 := fun j ↦ by
     simpa using siteOp_zero j
   rw [RPRing.partitionFunction, SpinOneHeisenberg.partitionFunction, hamiltonian_eq,
     Finset.sum_congr rfl fun j _ ↦ h0 j, Finset.sum_const_zero, add_zero]

@@ -46,6 +46,13 @@ noncomputable def spatialPurity (n : ℕ) (β : ℝ) : ℝ :=
 noncomputable def thermalPurity (L : ℕ) (β : ℝ) : ℝ :=
   partitionFunction L (2 * β) / partitionFunction L β ^ 2
 
+/-- The purities of the Heisenberg ring are those of its partition function. -/
+theorem spatialPurity_eq_spatialPurityOf (n : ℕ) (β : ℝ) :
+    spatialPurity n β = spatialPurityOf partitionFunction n β := rfl
+
+theorem thermalPurity_eq_thermalPurityOf (L : ℕ) (β : ℝ) :
+    thermalPurity L β = thermalPurityOf partitionFunction L β := rfl
+
 /-- The inputs of the thermal-MPO route to the gap, as statements about the traces
 `Re Tr e^{-β H_L}`: the spatial moment inequalities at every `β > 0` for even lengths `≥ n₀`,
 and the two seed purities at `(n₀, β₀)` with defect `ε₀`. -/
