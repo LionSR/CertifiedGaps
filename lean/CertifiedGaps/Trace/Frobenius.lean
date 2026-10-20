@@ -23,11 +23,14 @@ enclosure needs only the per-column error `E` and the integer `W` as data.
 * `gibbsHalf H b c = exp (-(b/2) • (H + c • 1))` is the half-step factor `F`.
 * `gibbsTrace_eq_exp_mul_sum_nsq`: `Z = e^{bc} ∑_r ‖F e_r‖²`, from `Fᴴ F = e^{-bc} e^{-bH}` and
   `Spectral.sum_nsq_mulVec_single` (`∑_r ‖M e_r‖² = Re Tr (Mᴴ M)`);
-  `sum_nsq_gibbsHalf_eq_sum`: `∑_r ‖F e_r‖² = ∑_i e^{-b(λᵢ + c)}`.
+  `sum_nsq_gibbsHalf_eq_sum`: `∑_r ‖F e_r‖² = ∑_i e^{-b(λᵢ + c)}`; a scalar shift `H + a`
+  multiplies the trace by `e^{-ba}` (`gibbsTrace_add_smul_one`) and adds to `c`
+  (`gibbsHalf_add_smul_one`).
 * `nsq_gibbsHalf_single_eq`: a unitary `U` that commutes with `H` and maps `e_r` to a phase
   times `e_{r'}` gives the columns `r` and `r'` of `F` equal norms.
 * `abs_sqrt_wsum_sub_le`: Minkowski's inequality in the weighted `ℓ²` direct sum,
-  `|√(∑ ν ‖X‖²) - √(∑ ν ‖Y‖²)| ≤ √(∑ ν) E` when every `‖X_ρ - Y_ρ‖ ≤ E`.
+  `|√(∑ ν ‖X‖²) - √(∑ ν ‖Y‖²)| ≤ √(∑ ν) E` when every `‖X_ρ - Y_ρ‖ ≤ E`; and the triangle
+  inequality `nsq_add_le_sq` for squared norms.
 * `gibbsTrace_enclosure`: the rational enclosure
   `s max(0, r - ℰ)² / Q² ≤ Z ≤ (s + t)(r + 1 + ℰ)² / Q²`, with the variants
   `gibbsTrace_enclosure_of_rep` (representatives from a map `rep`, fiber sizes `ν`, `∑ ν = dim`;
@@ -88,6 +91,21 @@ theorem sum_nsq_gibbsHalf_eq_sum {H : Matrix n n ℂ} (hH : H.IsHermitian) (b c 
   rw [eq_comm, ← mul_right_inj' (Real.exp_pos (b * c)).ne', ← h, Finset.mul_sum]
   refine Finset.sum_congr rfl fun i _ ↦ ?_
   rw [← Real.exp_add]; ring_nf
+
+/-- A scalar shift `H + a` multiplies the Gibbs trace by `e^{-ba}`. -/
+theorem gibbsTrace_add_smul_one (H : Matrix n n ℂ) (a b : ℝ) :
+    gibbsTrace (H + (a : ℂ) • 1) b = Real.exp (-(b * a)) * gibbsTrace H b := by
+  have hsplit : (-(b : ℂ)) • (H + (a : ℂ) • 1) =
+      (-(b : ℂ)) • H + ((-(b * a) : ℝ) : ℂ) • (1 : Matrix n n ℂ) := by
+    rw [smul_add, smul_smul]; push_cast; ring_nf
+  rw [gibbsTrace, hsplit, exp_add_of_commute _ _ ((Commute.one_right _).smul_right _),
+    exp_smul_one, Matrix.mul_smul, Matrix.mul_one, trace_smul, smul_eq_mul,
+    ← Complex.exp_eq_exp_ℂ, ← Complex.ofReal_exp, Complex.re_ofReal_mul, gibbsTrace]
+
+/-- The half-step factor of a shifted Hamiltonian: the shifts add up. -/
+theorem gibbsHalf_add_smul_one (H : Matrix n n ℂ) (a b c : ℝ) :
+    gibbsHalf (H + (a : ℂ) • 1) b c = gibbsHalf H b (a + c) := by
+  rw [gibbsHalf, gibbsHalf, add_assoc, ← add_smul, Complex.ofReal_add]
 
 end Gibbs
 
@@ -161,6 +179,20 @@ theorem abs_sqrt_wsum_sub_le (R : Finset ι) {w : ι → ℝ} (hw : ∀ ρ, 0 �
     fun ρ _ ↦ hw ρ), Finset.sum_mul]
   exact Real.sqrt_le_sqrt (Finset.sum_le_sum fun ρ hρ ↦
     mul_le_mul_of_nonneg_left (hXY ρ hρ) (hw ρ))
+
+/-- **The triangle inequality for squared norms**: `‖x‖ ≤ a` and `‖y‖ ≤ b` give
+`‖x + y‖ ≤ a + b`. Used to add the rounding error of an integer column to the truncation error
+of the polynomial it approximates. -/
+theorem nsq_add_le_sq [Fintype ι] {x y : ι → ℂ} {a b : ℝ} (ha : 0 ≤ a) (hb : 0 ≤ b)
+    (hx : nsq x ≤ a ^ 2) (hy : nsq y ≤ b ^ 2) : nsq (x + y) ≤ (a + b) ^ 2 := by
+  have hn : ∀ z : ι → ℂ, nsq z = ‖WithLp.toLp 2 z‖ ^ 2 := fun z ↦ by
+    rw [EuclideanSpace.norm_eq, Real.sq_sqrt (Finset.sum_nonneg fun _ _ ↦ by positivity),
+      nsq_eq_sum]
+  rw [hn] at hx hy ⊢
+  have hx' := (pow_le_pow_iff_left₀ (norm_nonneg _) ha two_ne_zero).1 hx
+  have hy' := (pow_le_pow_iff_left₀ (norm_nonneg _) hb two_ne_zero).1 hy
+  rw [WithLp.toLp_add]
+  exact pow_le_pow_left₀ (norm_nonneg _) ((norm_add_le _ _).trans (add_le_add hx' hy')) 2
 
 end Minkowski
 
