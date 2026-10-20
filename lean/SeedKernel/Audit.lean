@@ -71,3 +71,5 @@ import SeedKernel
 #print axioms CertifiedGaps.SpinOneHeisenberg.boundaryFieldInputs_of_integers
 #print axioms CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_integers
 #print axioms CertifiedGaps.SpinOneHeisenberg.spin_one_opposite_field_gap_of_integers
+#print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryInit.thermalCore_of_tables
+#print axioms CertifiedGaps.SpinOneHeisenberg.BoundaryInit.thermalCore_of_integers

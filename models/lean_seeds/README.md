@@ -37,12 +37,11 @@ The obligations below are therefore narrowed to the tables.
 **The tables reduce to the papers' printed integers.** Lean proves that the papers' floored
 integer Horner recursion, if it returns the printed totals, gives the rational table entries.
 `SeedKernel/Heisenberg/Integers.lean` then proves both periodic gaps from those totals alone. It
-also proves the boundary-field gap of OpenAI's second paper from those totals together with two
-more inputs: the six boundary integers with $n = 5, 6$ and the spectral witness at
-$b_0 = 49/4$. The nine boundary integers with $n \le 4$ are checked in the kernel. The four
-open-chain trial vectors of that paper are checked by a seventh study, `open_trial`
-(`src/open_trial.jl`, `scripts/open_trial/generate.jl`, files
-`lean/SeedKernel/Heisenberg/OpenTrial*.lean`).
+also proves the boundary-field gap of OpenAI's second paper from those totals and the six boundary
+integers with $n = 5, 6$; its spectral witness at $b_0 = 49/4$ follows from the two tables.
+The nine boundary integers with $n \le 4$ are checked in the kernel. The four open-chain trial
+vectors of that paper are checked by a seventh study, `open_trial` (`src/open_trial.jl`,
+`scripts/open_trial/generate.jl`, files `lean/SeedKernel/Heisenberg/OpenTrial*.lean`).
 
 ## Model
 
@@ -327,7 +326,7 @@ julia --project=. scripts/open_trial/generate.jl --check   # regenerates and com
 
 ## What is rigorous
 
-- **Lean 4 kernel (`decide +kernel`, standard axioms only):** All 62 declarations audited in
+- **Lean 4 kernel (`decide +kernel`, standard axioms only):** All 64 declarations audited in
   `lean/SeedKernel/Audit.lean` (verified automatically by `check.jl`) depend at most on standard
   Lean axioms (`propext`, `Classical.choice`, `Quot.sound`), with no `sorryAx` and no
   `Lean.ofReduceBool` (`native_decide`). The computational witness checks (spin-1 $H_6, H_8, H_{10}$

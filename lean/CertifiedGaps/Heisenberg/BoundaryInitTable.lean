@@ -20,10 +20,10 @@ This file discharges whatever of these the seed-36 trace table already gives:
   table and the trial states of the periodic seed.
 
 What remains of H1 is `ThermalCore`: the witness with `λ₀ ≥ 9/10`, `ρ₀ ≤ .874` and
-`c₀ P_*(λ₀)² ≤ .003745`, and `Y₆(b₀) ≤ .027`. The residual ratio `ρ₀` cannot come from the
-table through the traces: the paper bounds it sector by sector, and the sector eigenvalue facts
-of `Seed/Reseed.lean` hold for the approximating power sums only. The bound on `c₀` is the
-thermal appendix of the paper.
+`c₀ P_*(λ₀)² ≤ .003745`, and `Y₆(b₀) ≤ .027`. The ring traces alone do not bound the residual
+ratio `ρ₀`: the paper bounds it sector by sector. `Heisenberg/BoundaryLeading.lean` does so on the
+Trotter approximants and proves `ThermalCore` from this table and the boundary trace table
+(`thermalCore_of_tables`).
 
 ## Main results
 

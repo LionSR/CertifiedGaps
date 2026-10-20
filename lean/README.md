@@ -67,9 +67,8 @@ modulo four finite inputs at `β = 49` (the note's eq. (C1)):
 `gapGT_of_boundaryFieldInputs` proves the same gap from these four inputs as hypotheses, with no
 `sorry`. `SeedKernel/Heisenberg/Integers.lean` proves the four inputs themselves from the
 paper's printed integers (see "The spin-1 gaps from the printed integers" below):
-`spin_one_boundary_field_gap_of_integers` has no `sorry` and three hypotheses. These are the
-eighteen totals of the periodic table, the six boundary integers with `n = 5, 6`, and the
-spectral witness at `b₀ = 49/4` (`BoundaryWitness`).
+`spin_one_boundary_field_gap_of_integers` has no `sorry` and two hypotheses: the eighteen
+totals of the periodic table and the six boundary integers with `n = 5, 6`.
 
 The criterion itself is general. `gapGT_of_openChain` takes any seed scale `β₀`, ring seeds at
 lengths `2N₀` and `4N₀`, a boundary seed at length `2K₀`, an open-chain seed at length `4N₀`, and
@@ -167,7 +166,7 @@ The library is structured in five layers, each depending only on the preceding o
 |---|---|
 | two-purity criterion (Layers 1–2), spatial moment inequalities for every `RPRing` (Layer 3), and unitary frame conjugations | completely proved; depends only on the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound` |
 | uniform gap theorems for the spin-1 Heisenberg ring and 8 additional model families (table below) | proved **conditional on their seed lemmas** (`sorryAx` enters exclusively through the named seed declarations) |
-| the finite seed lemmas | one proved: the longitudinal-field Ising chain at `g = 1/4`, `h = 1/20` (`SeedKernel.Ising.first_point_seed`, giving the unconditional `ising_gap`). All others remain open; [`../models/lean_seeds/`](../models/lean_seeds/) has the plan and the open obligations of the spin-1 seed |
+| the finite seed lemmas | one proved: the longitudinal-field Ising chain at `g = 1/4`, `h = 1/20` (`SeedKernel.Ising.first_point_seed`, giving the unconditional `ising_gap`). All others remain open. The spin-1 seeds of both OpenAI papers reduce to the printed integer totals of their trace tables (`SeedKernel/Heisenberg/Integers.lean`); [`../models/lean_seeds/`](../models/lean_seeds/) has the plan and the open obligations |
 
 ### Build instructions
 
@@ -274,7 +273,7 @@ hypotheses; every other step, including all trial states, is proved
 |---|---|---|
 | `gap_of_hornerTotals`, `gap_log_twenty_of_hornerTotals` | `HornerTotals`: the eighteen totals `W_{n,g}` of the `b = 49/4` table | as `gap_of_table`, `gap_log_twenty_of_table` |
 | `gap_sixty_of_hornerTotals60` | `HornerTotals60`: the nine totals of the `b = 21/2` table (`ℤ[ω]` arithmetic for the `C` twist) | as `gap_sixty_chain_of_table` |
-| `spin_one_boundary_field_gap_of_integers`, `spin_one_opposite_field_gap_of_integers` | `HornerTotals`, `BoundaryTotalsLarge` (the six boundary integers `k_{n,g}` with `n = 5, 6`), `BoundaryWitness` | `Δ_n > log(10⁶/2241)/392` for odd `n ≥ 1921` (equal fields) and even `n ≥ 1920` (opposite fields) |
+| `spin_one_boundary_field_gap_of_integers`, `spin_one_opposite_field_gap_of_integers` | `HornerTotals`, `BoundaryTotalsLarge` (the six boundary integers `k_{n,g}` with `n = 5, 6`) | `Δ_n > log(10⁶/2241)/392` for odd `n ≥ 1921` (equal fields) and even `n ≥ 1920` (opposite fields) |
 
 For the boundary-field paper, the chain from integers to inputs is the following:
 1. Reseeding to `(120, 49)` (`Reseed120.lean`) gives `1 - P_s(120, 49) ≤ 0.047` and
@@ -286,10 +285,11 @@ For the boundary-field paper, the chain from integers to inputs is the following
    are checked by `decide +kernel`.
 4. The four open-chain trial vectors on 34, 78, 142 and 240 sites are checked in the kernel
    (`SeedKernel/Heisenberg/OpenTrial*.lean`).
-
-`BoundaryWitness` remains a hypothesis: the leading eigenvalue `λ₀ ≥ 9/10`, the residual ratio
-`ρ₀ ≤ 0.874`, and the identification of the leading weight with the averaged traces (the
-two-boundary transfer of the paper's thermal appendix).
+5. The spectral witness at `b₀` (`BoundaryLeading.lean`, `thermalCore_of_tables`) comes from both
+   tables: on the single-site Trotter matrices, the `D₂` sector data of the seed at `(36, 49/4)`
+   give a leading line with `λ₀ ≥ 0.999` and `ρ₀ ≤ 0.874`, fixed by the `A₄` average `Π`. The
+   two-boundary transfer identifies the averaged pairings with `I(n)`, so that
+   `c₀ P_*(λ₀)² ≤ 0.003745`, and closed inequalities pass all of it to the limit.
 
 ### Unconditional theorems (no `sorry`)
 
@@ -326,7 +326,7 @@ Heisenberg seeds are Proposition 5.5 of the OpenAI preprint, reproduced in
 finite seed inequalities inside the Lean kernel. Every computational step is discharged by
 `decide +kernel` on `Nat` or `Int` (evaluated by GMP inside the kernel), without `native_decide`,
 `sorry`, or additional axioms. `SeedKernel/Audit.lean` (a root of the library) verifies via
-`#print axioms` that all 62 main declarations depend at most on `propext`, `Classical.choice`, and
+`#print axioms` that all 64 main declarations depend at most on `propext`, `Classical.choice`, and
 `Quot.sound`. The corresponding Julia generators, witness inventory, and verification driver
 (`check.jl`: Julia replay, `lake build SeedKernel`, and the axiom audit) live in
 [`../models/lean_seeds/`](../models/lean_seeds/), whose README states the results and the open
@@ -528,6 +528,9 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Transfer/RatioMonotone.lean`, `Open/Initialization.lean` | Monotonicity of `x^m / P(x)²` on an interval from a decidable `RatioCheck`; the scalar initialization of the boundary seeds (`move_one` steps, defect bounds from moment witnesses) |
 | `Heisenberg/BoundaryInit.lean`, `Heisenberg/BoundaryInitTable.lean` | The boundary paper's initialization at `b₀ = 49/4`: `seed_boundary` and `seed_open_thermal` from `ThermalCore`, the trial bounds `TrialData` and the trace table |
 | `Transfer/OpenMatrixProduct.lean`, `Heisenberg/OpenTrialBound.lean` | Open matrix-product trial vectors `bᵀ A ⋯ A c` for open chains with end terms, and the variational eigenvalue bound for the opposite-field chain |
+| `Open/TwoBoundary.lean`, `Open/LeadingLimit.lean` | A Hermitian transfer matrix with an isolated leading line (`IsLeadingLine`): the boundary moment witness from even and odd pairings, the leading-weight polynomial bound `c f(e₀) ≤ ∑ aₙ ⟨v, Xⁿ P v⟩` for an invariant projection `P`, and their passage to the limit (`LeadingWitness.of_tendsto`) |
+| `Transfer/OpenSingleSite.lean`, `Transfer/SingleSiteLeading.lean` | Open chains with two arbitrary end terms in the single-site Trotter matrix (`⟨v_L, Xⁿ v_R⟩` tends to the Gibbs trace); sign and relabeling actions, the `A₄` average `Π`, and the leading line from the `D₂` block eigenvalues |
+| `Heisenberg/BoundaryLeading.lean` | The spectral witness at `b₀ = 49/4` (`λ₀ ≥ 0.999`, `ρ₀ ≤ 0.874`, `c₀ P_*(λ₀)² ≤ 0.003745`) and `thermalCore_of_tables` from the trace table and the boundary trace table |
 | `Heisenberg/BoundaryData.lean`, `Heisenberg/BoundaryTraces.lean`, `Heisenberg/BoundaryThermal.lean` | The fifteen boundary traces `Z_{n,g}` (`n = 2, …, 6`, right field rotated by `g`): the paper's integer recurrence, the table `BoundaryTraceTable` from `BoundaryTotals`, `Y₆(b₀) < 0.027` and the leading-weight polynomial `< 0.003745` |
 | `Heisenberg/Hamiltonian.lean` | The spin-1 Heisenberg ring $H_L = \sum_j \mathbf{S}_j \cdot \mathbf{S}_{j+1}$ (`ringHamiltonian SpinOne.exchange L`) in the Cartesian basis |
 | `Heisenberg/Gap.lean`, `Heisenberg/Main.lean` | Both bounds of OpenAI's Theorem 1.1: `spin_one_heisenberg_gap` (`L ≥ 2304`, from the seeds at 36 sites and `chain36`) and `spin_one_heisenberg_gap_sixty` (`L ≥ 60`) |

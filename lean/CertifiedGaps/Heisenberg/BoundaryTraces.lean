@@ -29,7 +29,8 @@ Proposition appth:bounds that do not involve the transfer operator:
 `Heisenberg/BoundaryThermal.lean` proves `BoundaryTraceTable` from the paper's integer table
 (`boundaryTraceTable_of_totals`). The reduction of the leading-weight bound
 `c₀ P_*(λ₀)² ≤ I(6) - .28 I(5) - …` (the two-boundary transfer identity and the averaging over
-the rotation group, eqs. (appth:average), (appth:polynomial)) is not part of these files.
+the rotation group, eqs. (appth:average), (appth:polynomial)) is in
+`Heisenberg/BoundaryLeading.lean`.
 
 ## Conventions
 
