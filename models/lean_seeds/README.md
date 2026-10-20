@@ -23,6 +23,17 @@ exact but conditional on open bridge lemmas or spectral counting anchors:
 | `spin1_kernel` | Does base-3 packed integer arithmetic fit within the Lean kernel? | Yes: $n = 12$ dense matvec + dot checks in $20\text{--}26\text{ s}$; power-filter Ritz and residual witnesses for $H_6, H_8, H_{10}$ kernel-checked (arithmetic inequalities only) |
 | `ising` | Can we run the complete pipeline on the cheapest certified model? | **Proved**: seed of `IsingLongitudinal` at $g = 1/4, h = 1/20, (n_0, \beta_0) = (6, 97/4)$ and $\Delta_L > \log(13480)/(97/4) \approx 0.3921$ for every even $L \ge 6$ (`ising_gap`; standard axioms only) |
 
+**The spin-1 seeds now reduce to their trace tables.** Since 2026-10-19 everything in OpenAI's
+two spin-1 initializations except the two trace tables is proved in Lean: the transfer spectrum in
+the `D₂` and `I/O/N` sectors at every ring length, the polynomial filters, capped masses and
+dominant eigenvalue, the temperature lift, the Cartesian-to-$`S^z`$ bridge, and the integer
+matrix-product trial state on 72 and 120 sites, checked in the kernel by a sixth study, `trial`
+(`src/trial.jl`, `scripts/trial/generate.jl`, files `lean/SeedKernel/Heisenberg/Trial*.lean`).
+`SpinOneHeisenberg.gap_of_table` (every even $L \ge 36$, $\Delta_L > 0.00467$) and
+`gap_sixty_chain_of_table` (every even $L \ge 60$, $\Delta_L > 0.00576$) take only the table as a
+hypothesis ([`lean/README.md`](../../lean/README.md), "The spin-1 gap from its trace tables").
+The obligations below are therefore narrowed to the tables.
+
 ## Model
 
 - **Spin-1 Heisenberg chain** (`seed_design`, `spectrum`, `anchor`, `spin1_kernel`):
@@ -203,7 +214,8 @@ without symmetry or cluster reductions.
 
 ### Open formalization obligations
 
-Closing an unconditional kernel-checked spin-1 seed requires completing five components:
+Closing an unconditional kernel-checked spin-1 seed now requires only the trace tables (items 1
+and 5); items 2–4 are done except where noted:
 1. **Spectral counting anchor:** a kernel-checkable certificate that $\rho \le \lambda_{k+1}(H)$ for
    the spin-1 rings (via a sharper comparison operator, fewer continuation stages, or
    Lehmann–Goerisch bounds with a priori input); this is the bottleneck of the whole route.
@@ -215,9 +227,11 @@ Closing an unconditional kernel-checked spin-1 seed requires completing five com
    the lane decoding of `Ising/Packed.lean`; nothing assumes them.
 4. **Hamiltonian basis bridges:** identification of the integer matrices checked in `SeedKernel`
    with the Lean Hamiltonians (Cartesian-to-$`S^z`$ unitary and boundary twists for spin-1); done for
-   Ising (`Ising/Bridge.lean`).
+   Ising (`Ising/Bridge.lean`). Done for spin-1 (`Heisenberg/SzBridge.lean`, also for the `π` twist; the
+   `2π/3` twist in `Heisenberg/SectorTransferC.lean`).
 5. **Scalar enclosures:** the twisted trace tables with their sector and filter lemmas (spin-1); the
-   Ising case is done in `Ising/Seed.lean`.
+   Ising case is done in `Ising/Seed.lean`. For spin-1 the sector and filter lemmas are done
+   (`CertifiedGaps/Seed/*`); the tables remain. Counting lemmas for them: `CertifiedGaps/Spectral/*`.
 
 Estimates: $900\text{--}1{,}950$ Lean lines for the Ising point, $8{,}000\text{--}15{,}000$ for the
 spin-1 route ([`METHOD.md`](METHOD.md)). Target Design C first (real arithmetic only, largest ring
@@ -286,6 +300,10 @@ julia --project=. scripts/ising/feasibility.jl
 julia --project=. scripts/ising/costs.jl --reuse           # omit --reuse to re-run kernel microbenchmarks
 julia --project=. scripts/ising/report_tables.jl
 julia --project=. scripts/ising/inventory.jl               # see "Layout" for required spectrum files
+
+# trial: the D = 26 trial state for lean/SeedKernel/Heisenberg (about 10 s; Lean build about 1.5 min)
+julia --project=. scripts/trial/generate.jl                # writes lean/SeedKernel/Heisenberg/TrialData.lean
+julia --project=. scripts/trial/generate.jl --check        # regenerates and compares
 ```
 
 ## What is rigorous
@@ -332,6 +350,7 @@ julia --project=. scripts/ising/inventory.jl               # see "Layout" for re
 | `src/anchor.jl` | `AnchorStudy`: integer bonds, boundary comparison matrices, exact $\mathrm{LDL}^\top$ and half-chain enclosures, `certify` and `check` |
 | `src/spin1_kernel.jl` | `Spin1Kernel`: witness generator, Lean source emitter, witness inventory, and checker |
 | `src/ising.jl` | `IsingSeed`: eigenvector proposal generator, `Generated*.lean` emitter, exact Julia replay, and checker |
+| `src/trial.jl`, `scripts/trial/generate.jl` | `TrialSeed`: the D = 26 trial state, its SU(2)-and-swap block reduction and integer intertwiner; writes `lean/SeedKernel/Heisenberg/TrialData.lean` (`--check` regenerates and compares) |
 | `scripts/<study>/` | Exploratory, benchmark, and table-generation drivers listed under "Reproduce" |
 | `scripts/fetch_paper.jl` | Shared: runs `tools/fetch_upstream.jl --paper` (paper sources into `upstream/`) |
 | `scripts/audit_mathlib.jl` | `spin1_kernel` Mathlib audit; kept outside `scripts/spin1_kernel/`, whose `.jl` files are hash-pinned by `results/spin1_kernel/witnesses.json` |
