@@ -307,6 +307,7 @@ julia --project=. scripts/ising/report_tables.jl
 julia --project=. scripts/ising/inventory.jl               # see "Layout" for required spectrum files
 
 # trial: the D = 26 trial state for lean/SeedKernel/Heisenberg (about 10 s; Lean build about 1.5 min)
+julia ../../tools/fetch_upstream.jl                        # upstream evidence (trial matrices; network)
 julia --project=. scripts/trial/generate.jl                # writes lean/SeedKernel/Heisenberg/TrialData.lean
 julia --project=. scripts/trial/generate.jl --check        # regenerates and compares
 ```
