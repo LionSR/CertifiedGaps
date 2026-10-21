@@ -553,6 +553,12 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Transfer/HistoryShuffle.lean` | Finite-family ordered-simplex shuffle identities |
 | `Transfer/PoissonHistory.lean` | Labeled history measure, Poisson event count, and absolutely convergent ordered-time integrals |
 | `Transfer/ProductPoissonHistory.lean` | Actual finite product history measure, count/label/shuffle series, absolute convergence, and exponential bounds |
+| `Transfer/AtomlessTimeOrdering.lean` | Atomless time laws and factorial chamber mass |
+| `Transfer/AtomlessHistoryShuffle.lean` | Finite-family chronological integrals |
+| `Transfer/WeightedPoissonHistory.lean` | Weighted measures, Poisson laws, and exponential bounds |
+| `Transfer/WeightedProductPoissonHistory.lean` | Absolutely convergent weighted shuffle expansion |
+| `Transfer/WeightedPoissonHistoryAudit.lean` | Degenerate, unequal-weight, and adapter regressions |
+| `Transfer/WeightedHistoryAudit.lean` | Independent shuffle, finite-domain, and axiom audits |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
 | `Transfer/PolynomialFilter.lean` | Polynomial filters: eigenvalue caps from finitely many moments (`CapCheck`, `momentBound`, one-sided `pairingBound`), checked by `decide` |
 | `Transfer/MatrixLemmas.lean` | Traces of powers, block matrices `blockOf` by a key, and reindexing invariance |

@@ -11,6 +11,7 @@ import CertifiedGaps.Transfer.TimeOrdering
 import CertifiedGaps.Transfer.PoissonHistory
 import CertifiedGaps.Transfer.HistoryShuffle
 import CertifiedGaps.Transfer.ProductPoissonHistory
+import CertifiedGaps.Transfer.WeightedProductPoissonHistory
 import CertifiedGaps.Transfer.PolynomialFilter
 import CertifiedGaps.Transfer.RatioMonotone
 import CertifiedGaps.Transfer.MatrixProduct
