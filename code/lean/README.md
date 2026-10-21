@@ -104,6 +104,60 @@ even `n` and the equal-field chain at odd `n` are both of this form. The closed 
 `OpenMomentBounds` pass to the limit by compactness. The sign of the leading eigenvalue at odd
 lengths is fixed by positivity of the trace, so the note's `U_P` symmetry argument is not needed.
 
+### Continuous-time history prerequisites
+
+`Transfer/TimeOrdering.lean`, `Transfer/HistoryShuffle.lean`,
+`Transfer/PoissonHistory.lean`, and `Transfer/ProductPoissonHistory.lean` formalize the untwisted
+history-space prerequisites from the [spatial-transfer proof in the September 24, 2026
+preprint](https://github.com/openai/math/blob/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/build/transfer.tex).
+These are independent analytic results, with no additional axioms or seed hypotheses:
+
+- The finite time cube is partitioned by chronological permutation chambers outside the
+  Lebesgue-null collision hyperplanes. For any integrable Banach-valued integrand, its cube
+  integral equals the finite sum of its integrals over the increasing-time simplex with permuted
+  arguments. No permutation symmetry of the integrand is assumed.
+- For arbitrary fixed event counts on a finite family of bonds, the product of the individual
+  ordered-time simplexes is partitioned, up to null collisions, by exactly the global
+  chronological shuffles preserving every bond's internal order. The Banach-valued product
+  integral equals the finite sum over the single global ordered simplex, with the inverse
+  shuffle restoring the original event slots. Explicit two-bond product and iterated-integral
+  formulas are included. No commutation of event operators is needed.
+- The increasing simplex has volume $`b^k/k!`$. The zero-event simplex has mass one.
+- `PoissonHistory.History b m` is the actual disjoint union of the increasing-time simplexes with
+  label words in `Fin m`. Its Lebesgue history measure has total mass $`e^{mb}`$; multiplying by
+  $`e^{-mb}`$ gives a probability measure whose event count has distribution `poissonMeasure (m * b)`.
+- An almost-everywhere strongly measurable observable bounded in norm by $`C R^k`$, with
+  $`R \ge 0`$, is absolutely integrable, with integral of its norm
+  at most $`C e^{mbR}`$. Integrals can then be regrouped by event count and finite label word.
+  The spin-one case has `m = 3`.
+- The actual finite product of history measures is proved equal to the countable sum of its
+  product-simplex components. `hasSum_shuffledIntegral` gives the fully ungrouped chronological
+  expansion indexed by count vectors, label-word families, and admissible shuffles. Every
+  individual term is absolutely summable; the sum of the individual norm integrals is the
+  original L¹ norm. No cancellation or rearrangement assumption is used.
+- Bondwise domination by $`C\prod_i R_i^{k_i}`$, with nonnegative $`R_i`$, implies integrability
+  and bounds the absolute chronological series by $`C\prod_i e^{m_i b R_i}`$. The measure
+  identities and convergence statements include empty families, zero times, and zero label counts.
+
+The route uses equal-volume coordinate-permutation chambers to prove the factorial normalization
+before constructing the history measure. It avoids assuming a Poisson law or a simplex-volume
+formula. `HistoryShuffle` proves the finite-family Lebesgue coordinate change and the
+within-bond order constraints, rather than assuming a partition or a measure identity.
+`ProductPoissonHistory` then proves the actual history-product decomposition and the absolutely
+convergent count/label/shuffle sum. The merged-history matrix kernel and the operator construction
+are a separate component. This history layer makes no physical partition-function or
+transfer-operator trace claim.
+
+Run `lake build CertifiedGaps.Transfer.PoissonHistoryAudit`,
+`lake build CertifiedGaps.Transfer.HistoryShuffleAudit`, and
+`lake build CertifiedGaps.Transfer.ProductPoissonHistoryAudit` for edge-case regressions and a
+dependency-axiom audit that fails on any axiom outside `propext`,
+`Classical.choice`, and `Quot.sound`. The existing kernel-replay driver can recheck each new module
+by setting `KERNEL_CHECK_MODULE=CertifiedGaps.Transfer.TimeOrdering` or
+`KERNEL_CHECK_MODULE=CertifiedGaps.Transfer.PoissonHistory`; the same driver checks
+`CertifiedGaps.Transfer.HistoryShuffle`, `CertifiedGaps.Transfer.ProductPoissonHistory`, and their
+audit modules.
+
 ### The first unconditional gap
 
 ```lean
@@ -171,7 +225,7 @@ The library is structured in five layers, each depending only on the preceding o
 ### Build instructions
 
 ```sh
-cd lean
+cd code/lean
 lake exe cache get          # download prebuilt Mathlib oleans (never build Mathlib from source)
 lake build                  # build CertifiedGaps (≈4 min from scratch; only warnings are the seed sorrys)
 lake build SeedKernel       # opt-in: kernel-checked seed arithmetic (≈80 s)
@@ -180,7 +234,7 @@ lake build SeedKernelBench  # opt-in: kernel benchmarks up to n = 12 (≈2 min, 
 
 Lean is pinned at `v4.36.0-rc1` and Mathlib at commit
 `807d3836b165983210ee2ecf3cd28f239436949c` (October 19, 2026). `CertifiedGaps` comprises
-roughly 6,800 lines of Lean
+roughly 9,100 lines of Lean
 and `SeedKernel` roughly 1,200 lines (excluding generated witness files). All declarations live in
 the `CertifiedGaps` namespace; declaration names below omit that prefix.
 
@@ -429,7 +483,7 @@ A gap certificate enters `CertifiedGaps` in exactly this form:
    one-site unitaries `a`, define the physical Hamiltonian in `Models/<Name>Physical.lean`, prove
    that it equals `piTensor a * R.hamiltonian L * piTensor aᴴ` using `RPRing.conj_hamiltonian`, and
    transfer the spectral gap via `RPRing.eigenvalues_eq_spectrum`.
-6. **Check the seeds against the certificate:** Add the model to `lean/scripts/check_seeds.jl` and
+6. **Check the seeds against the certificate:** Add the model to `code/lean/scripts/check_seeds.jl` and
    run `julia --project=code/julia code/lean/scripts/check_seeds.jl` from the repository root. It checks that
    every Lean `s[0], t[0]` is at least the certified defect at the same `(n₀, β₀)`.
 7. **Discharge the seeds from a trace table (optional):** The `seeds` lemma can be proved instead
@@ -497,6 +551,10 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `ChainCheck.lean` | Decidable rational `ChainCertificate` structure discharging the hypotheses of `gapGT_of_chain`, and `StepsValid` for the purities along a chain alone |
 | `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`), expansion of $`\mathrm{Tr}\, T^N`$ as a sum over closed label paths and of matrix elements of ordered products as sums over open paths |
 | `Transfer/MomentForm.lean` | Proof that traces of even powers of a real matrix factorization $B^T B \succeq 0$ satisfy the spatial moment form |
+| `Transfer/TimeOrdering.lean` | Null time collisions, chronological chamber decomposition, and exact ordered-simplex volume |
+| `Transfer/HistoryShuffle.lean` | Finite-family ordered-simplex shuffle identities |
+| `Transfer/PoissonHistory.lean` | Labeled history measure, Poisson event count, and absolutely convergent ordered-time integrals |
+| `Transfer/ProductPoissonHistory.lean` | Actual finite product history measure, count/label/shuffle series, absolute convergence, and exponential bounds |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
 | `Transfer/PolynomialFilter.lean` | Polynomial filters: eigenvalue caps from finitely many moments (`CapCheck`, `momentBound`, one-sided `pairingBound`), checked by `decide` |
 | `Transfer/MatrixLemmas.lean` | Traces of powers, block matrices `blockOf` by a key, and reindexing invariance |
@@ -573,15 +631,15 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 
 ## Why each piece is needed in Lean
 
-On paper, the main note obtains the spatial moment representation in a single conceptual step: it
-constructs an exact continuous-time thermal MPO on Poisson bond histories whose spatial transfer operator
-$X_\beta$ is a compact self-adjoint integral operator on $L^2(\mu_\beta)$, giving
-$Z_n(\beta) = \operatorname{Tr} X_\beta^n = \sum_i |\lambda_i|^n$. Formalizing that infinite-dimensional
-path-space construction directly in Lean still needs Poisson history measures and the bridge from
-integral kernels to Hilbert–Schmidt operators and their cycle-trace identities. Mathlib already has
-$L^2$ integration tools and the compact self-adjoint spectral theorem, but not this ready-to-use
-path-space and trace infrastructure. Instead, the Lean formalization uses a finite-dimensional
-Trotterization route that needs only finite matrix algebra and the matrix exponential limit. Each module below addresses a specific distinction between the paper proof and the formal proof:
+The paper obtains the spatial moment representation through a continuous-time transfer operator
+on Poisson bond histories. The history layer now proves the actual history measures, finite-family
+chronological shuffles, and the full absolutely convergent count/label/shuffle reorganization of
+product-history integrals. The merged-history matrix kernel and its integral operator are a separate
+component; cycle-trace and physical partition-function identities are outside this history layer.
+
+The existing gap theorems use a finite-dimensional Trotterization route that needs only finite matrix
+algebra and the matrix exponential limit. Each module below addresses a specific distinction between
+the paper proof and the formal proof:
 
 **Spectral gap as a predicate on unordered levels (`GapGT`).** The paper writes $\Delta_L = E_1 - E_0$
 with eigenvalues sorted in nondecreasing order. In Mathlib, the eigenvalues of a Hermitian matrix are
