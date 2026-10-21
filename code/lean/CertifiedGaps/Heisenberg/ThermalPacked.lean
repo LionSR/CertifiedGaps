@@ -28,11 +28,13 @@ big-integer recursion `Trace.Packed.runCols`, and proves that the two agree
   (`specCol_append_zeros`), as the paper notes.
 * **The columns.** `repNum n x` is the number of the representative `thermalRep` of the word
   numbered `x`, computed on numbers (the shift is `x ↦ ⌊x/3⌋ + (x mod 3) 3ⁿ⁻¹`, the reversal is
-  the code `wordCode`, the negation is `3ⁿ - 1 - x`; `repNum_wordNum`). `repCounts n` counts the
-  words of every representative (`countArr`), and the representatives are the numbers with a
-  nonzero count (`repCols`). One packed run computes the representative columns only (lane `r`
-  is column `repCols[r]`), and `numerator` weighs each by its count:
-  `∑_ρ ν_ρ ∑_w X_ρ(w)²`, the paper's eq. (thermal72-total).
+  the code `wordCode`, the negation is `3ⁿ - 1 - x`; `repNum_wordNum`). `countArr` counts the
+  words of every representative, and the representatives are the numbers with a nonzero count
+  (`repCols`). One packed run computes the representative columns only (lane `r` is column
+  `repCols[r]`), and `numerator` weighs each by its count: `∑_ρ ν_ρ ∑_w X_ρ(w)²`, the paper's
+  eq. (thermal72-total). This step, `packedTotal`, takes the band, the representative map and
+  the coefficients as arguments, so that `Heisenberg/ThermalPacked60.lean` reuses it for the
+  `b = 21/2` table.
 * **The parameters** (`thermalParams`): lanes of `64` bits, bias `2⁵⁷`, scale `32`, and the
   exact division `⌊u / 32⌋ = u >>> 5` (magic multiplier `1`). The range tests of the packed run
   check `|X| < 2⁵⁶`; the paper's bound is `|X| < 2Q = 2⁵⁶`.
@@ -45,6 +47,8 @@ big-integer recursion `Trace.Packed.runCols`, and proves that the two agree
 * `repNum_wordNum`: the search for the representative on numbers.
 * `hornerTotal_eq_sum_rep`: `W = ∑_x ∑_w X_{rep x}(w)²`, the sum over representatives with
   multiplicities written as a sum over all words.
+* `packedTotal_spec`: a packed total is the sum over all rows of the squared norms of their
+  representative columns.
 * `hornerTotal_eq_of_packed : packedHornerTotal n g = some W → hornerTotal n g = W`.
 
 ## Comparison with the paper
@@ -299,13 +303,21 @@ theorem specCol_append_zeros (D : Band) (s r : ℕ) (l : List ℤ) (z : ℕ) :
   rw [specCol, List.foldr_append, h0]
   rfl
 
+/-- The Horner columns of `D`, for any coefficients, are the column recursions of the banded
+matrix. -/
+theorem hornerFloor_thermalMatrix {g : Fin 2} {m : ℕ}
+    (hD : (ringBand (m + 2) g).InRange (3 ^ (m + 2))) (c : ℕ → ℤ) (J : ℕ)
+    (ρ w : Fin (m + 2) → Fin 3) :
+    hornerFloor (thermalMatrix (m + 2) g) 32 c ρ J w = specCol (ringBand (m + 2) g) 32
+      (wordNum (m + 2) ρ) ((List.range (J + 1)).map c) (wordNum (m + 2) w) := by
+  rw [thermalMatrix_eq_submatrix, hornerFloor_submatrix, hornerFloor_eq_specCol hD]
+
 /-- **The columns of `D` are the column recursions of the banded matrix.** -/
 theorem thermalColumn_eq {g : Fin 2} {m : ℕ} (hD : (ringBand (m + 2) g).InRange (3 ^ (m + 2)))
     (ρ w : Fin (m + 2) → Fin 3) :
     thermalColumn (m + 2) g ρ w = specCol (ringBand (m + 2) g) 32 (wordNum (m + 2) ρ)
       (thermalCoeffs.map (↑)) (wordNum (m + 2) w) := by
-  rw [thermalColumn, thermalMatrix_eq_submatrix, hornerFloor_submatrix,
-    hornerFloor_eq_specCol hD, coeff_list, specCol_append_zeros]
+  rw [thermalColumn, hornerFloor_thermalMatrix hD, coeff_list, specCol_append_zeros]
 
 /-! ### Representatives on word numbers
 
@@ -473,9 +485,6 @@ theorem repNum_lt {n x : ℕ} (hx : x < 3 ^ n) : repNum n x < 3 ^ n := by
 def countArr (d : ℕ) (f : ℕ → ℕ) : Array ℕ :=
   (List.range d).foldl (fun a x ↦ a.modify (f x) (· + 1)) (Array.replicate d 0)
 
-/-- The multiplicities `ν_ρ` of the representatives, indexed by their numbers. -/
-def repCounts (n : ℕ) : Array ℕ := countArr (3 ^ n) (repNum n)
-
 /-- The numbers below `d` with a nonzero count: the representatives. -/
 def repCols (cnt : Array ℕ) (d : ℕ) : List ℕ := (List.range d).filter fun j ↦ cnt.getD j 0 != 0
 
@@ -585,6 +594,55 @@ theorem hornerTotal_eq_sum_rep (n : ℕ) (g : Fin 2) :
 
 /-! ### The packed total -/
 
+/-- **A packed total** `∑_ρ ν_ρ ∑_k X_ρ(k)²` of a banded matrix `D` on `d` rows: `f` maps a row
+number to the number of its representative, `ν_ρ` counts the rows with representative `ρ`, and
+`X_ρ` is the column recursion of `D` with the coefficients `cs`. One packed run computes the
+representative columns (the numbers with a nonzero count, lane `r` for column `cols[r]`), and
+`numerator` weighs each by its count. The result is `none` if the band check or a range test
+fails. -/
+def packedTotal (P : Params) (D : Band) (f : ℕ → ℕ) (d : ℕ) (cs : List ℕ) : Option ℕ :=
+  let cst := D.cst P d
+  if D.check P cst d then
+    let cnt := countArr d f
+    let cols := repCols cnt d
+    (runCols P D cst d (colUnits P.w cols d) cols.length cs).map fun ys ↦
+      numerator P (List.replicate d 1) (cols.map (cnt.getD · 0)) ys
+  else none
+
+/-- **The packed total is the sum over all rows of the squared norm of their representative
+column**, `W = ∑_{x < d} ∑_k X_{f x}(k)²`; the band check also gives `D.InRange d`. -/
+theorem packedTotal_spec {P : Params} {D : Band} {f : ℕ → ℕ} {d : ℕ} {cs : List ℕ} {W : ℕ}
+    (hP : P.Ok) (hcs : ∀ t ∈ cs, t ≤ P.B) (hf : ∀ x < d, f x < d)
+    (h : packedTotal P D f d cs = some W) :
+    D.InRange d ∧
+      (W : ℤ) = ∑ x ∈ range d, ∑ k ∈ range d, specCol D P.s (f x) (cs.map (↑)) k ^ 2 := by
+  simp only [packedTotal] at h
+  split_ifs at h with hchk
+  obtain ⟨ys, hrun, rfl⟩ := Option.map_eq_some_iff.1 h
+  obtain ⟨hD, hR⟩ := Band.check_spec hchk
+  refine ⟨hD, ?_⟩
+  set cnt := countArr d f
+  set cols := repCols cnt d
+  have hnd : cols.Nodup := List.nodup_range.filter _
+  have hN := runCols_numerator hP hD hR (colUnits_ok P hnd _) hcs hrun
+    (u := List.replicate d 1) (v := cols.map (cnt.getD · 0)) (by simp) (by simp)
+  -- `G j = ∑_k X_j(k)²`, the squared norm of the column `j` of the banded matrix.
+  let G : ℕ → ℤ := fun j ↦ ∑ k ∈ range d, specCol D P.s j (cs.map (↑)) k ^ 2
+  -- The numerator: `∑_r ν_r G(cols r)`.
+  rw [Finset.sum_comm] at hN
+  have hN' : ∀ r ∈ range cols.length,
+      ∑ k ∈ range d, (((List.replicate d 1).getD k 0 : ℕ) : ℤ) *
+        ((cols.map (cnt.getD · 0)).getD r 0 : ℤ) *
+        specCol D P.s (cols.getD r 0) (cs.map (↑)) k ^ 2 =
+      ((cols.map (cnt.getD · 0)).getD r 0 : ℤ) * G (cols.getD r 0) := fun r _ ↦ by
+    simp only [G, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun k hk ↦ ?_
+    rw [List.getD_eq_getElem?_getD, List.getElem?_replicate_of_lt (mem_range.1 hk),
+      Option.getD_some]
+    simp only [Nat.cast_one, one_mul]
+  rw [Finset.sum_congr rfl hN', ← sum_range_eq_sum_repCols, ← sum_comp_eq_sum_count hf G] at hN
+  exact hN
+
 /-- The packing parameters: lanes of `64` bits, bias `2⁵⁷`, scale `32`, and the exact division
 `⌊u / 32⌋ = ⌊u · 1 / 2⁵⌋`. -/
 def thermalParams : Params := ⟨64, 57, 32, 5, 1⟩
@@ -592,16 +650,7 @@ def thermalParams : Params := ⟨64, 57, 32, 5, 1⟩
 /-- **The packed total** `W_{n,g} = ∑_ρ ν_ρ ∑_w X_ρ(w)²`: one packed run on the representative
 columns of the banded matrix, or `none` if the band check or a range test fails. -/
 def packedHornerTotal (n : ℕ) (g : Fin 2) : Option ℕ :=
-  let d := 3 ^ n
-  let D := ringBand n g
-  let cst := D.cst thermalParams d
-  if D.check thermalParams cst d then
-    let cnt := repCounts n
-    let cols := repCols cnt d
-    (runCols thermalParams D cst d (colUnits thermalParams.w cols d) cols.length
-      thermalCoeffs).map fun ys ↦
-        numerator thermalParams (List.replicate d 1) (cols.map (cnt.getD · 0)) ys
-  else none
+  packedTotal thermalParams (ringBand n g) (repNum n) (3 ^ n) thermalCoeffs
 
 theorem thermalParams_ok : thermalParams.Ok := by decide +kernel
 
@@ -612,47 +661,14 @@ then `hornerTotal n g = W`. -/
 theorem hornerTotal_eq_of_packed {n : ℕ} (hn : 2 ≤ n) {g : Fin 2} {W : ℕ}
     (h : packedHornerTotal n g = some W) : hornerTotal n g = W := by
   obtain ⟨m, rfl⟩ : ∃ m, n = m + 2 := ⟨n - 2, by omega⟩
-  simp only [packedHornerTotal] at h
-  split_ifs at h with hchk
-  obtain ⟨ys, hrun, rfl⟩ := Option.map_eq_some_iff.1 h
-  obtain ⟨hD, hR⟩ := Band.check_spec hchk
-  have hnd : (repCols (repCounts (m + 2)) (3 ^ (m + 2))).Nodup := List.nodup_range.filter _
-  have hN := runCols_numerator thermalParams_ok hD hR (colUnits_ok thermalParams hnd _)
-    thermalCoeffs_le hrun (u := List.replicate (3 ^ (m + 2)) 1)
-    (v := (repCols (repCounts (m + 2)) (3 ^ (m + 2))).map ((repCounts (m + 2)).getD · 0))
-    (by simp) (by simp)
-  -- `G j = ∑_k X_j(k)²`, the squared norm of the column `j` of the banded matrix.
-  let G : ℕ → ℤ := fun j ↦ ∑ k ∈ range (3 ^ (m + 2)),
-    specCol (ringBand (m + 2) g) 32 j (thermalCoeffs.map (↑)) k ^ 2
-  -- The numerator: `∑_r ν_r G(cols r)`.
-  rw [Finset.sum_comm] at hN
-  have hN' : ∀ r ∈ range (repCols (repCounts (m + 2)) (3 ^ (m + 2))).length,
-      ∑ k ∈ range (3 ^ (m + 2)), (((List.replicate (3 ^ (m + 2)) 1).getD k 0 : ℕ) : ℤ) *
-        (((repCols (repCounts (m + 2)) (3 ^ (m + 2))).map
-          ((repCounts (m + 2)).getD · 0)).getD r 0 : ℤ) *
-        specCol (ringBand (m + 2) g) thermalParams.s
-          ((repCols (repCounts (m + 2)) (3 ^ (m + 2))).getD r 0)
-          (thermalCoeffs.map (↑)) k ^ 2 =
-      (((repCols (repCounts (m + 2)) (3 ^ (m + 2))).map
-        ((repCounts (m + 2)).getD · 0)).getD r 0 : ℤ) *
-        G ((repCols (repCounts (m + 2)) (3 ^ (m + 2))).getD r 0) := fun r _ ↦ by
-    simp only [G, Finset.mul_sum]
-    refine Finset.sum_congr rfl fun k hk ↦ ?_
-    rw [List.getD_eq_getElem?_getD, List.getElem?_replicate_of_lt (mem_range.1 hk),
-      Option.getD_some]
-    simp only [Nat.cast_one, one_mul]
-    rfl
-  have hc : ∑ x ∈ range (3 ^ (m + 2)), G (repNum (m + 2) x) =
-      ∑ j ∈ range (3 ^ (m + 2)), ((repCounts (m + 2)).getD j 0 : ℤ) * G j :=
-    sum_comp_eq_sum_count (f := repNum (m + 2)) (fun _ hx ↦ repNum_lt hx) G
-  rw [Finset.sum_congr rfl hN', ← sum_range_eq_sum_repCols, ← hc] at hN
-  -- The total: `∑_x G(rep x)`.
-  rw [hornerTotal_eq_sum_rep, hN, ← sum_words (fun x ↦ G (repNum (m + 2) x))]
+  obtain ⟨hD, hW⟩ := packedTotal_spec thermalParams_ok thermalCoeffs_le
+    (fun _ hx ↦ repNum_lt hx) h
+  rw [hornerTotal_eq_sum_rep, hW, ← sum_words (fun x ↦ ∑ k ∈ range (3 ^ (m + 2)),
+    specCol (ringBand (m + 2) g) thermalParams.s (repNum (m + 2) x) (thermalCoeffs.map (↑)) k ^ 2)]
   refine Finset.sum_congr rfl fun x _ ↦ ?_
-  simp only [repNum_wordNum, G]
-  rw [← sum_words (fun k ↦ specCol (ringBand (m + 2) g) 32 (wordNum (m + 2) (thermalRep x))
-    (thermalCoeffs.map (↑)) k ^ 2)]
-  exact Finset.sum_congr rfl fun w _ ↦ by rw [thermalColumn_eq hD]
+  rw [repNum_wordNum, ← sum_words (fun k ↦ specCol (ringBand (m + 2) g) thermalParams.s
+    (wordNum (m + 2) (thermalRep x)) (thermalCoeffs.map (↑)) k ^ 2)]
+  exact Finset.sum_congr rfl fun w _ ↦ by rw [thermalColumn_eq hD]; rfl
 
 end ThermalPacked
 

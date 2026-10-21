@@ -272,7 +272,9 @@ hypotheses; every other step, including all trial states, is proved
 columns and proves the result equal to `hornerTotal` (`hornerTotal_eq_of_packed`). With it the
 kernel checks the two totals with `n = 4` (`SeedKernel/Heisenberg/ThermalTraces.lean`), and
 compiled evaluation (`SeedKernel/Eval/ThermalTotals.lean`, not a proof) reproduces the twelve
-with `n ≤ 9`.
+with `n ≤ 9`. For the `b = 21/2` table, `ThermalPacked60.lean` reduces the twists `1` and `P` to
+the same packed run (`hornerTotal60_eq_of_packed`), and compiled evaluation
+(`SeedKernel/Eval/ThermalTotals60.lean`) reproduces the four of them with `n = 6, 8`.
 
 | Theorem (`SpinOneHeisenberg.`) | Hypotheses | Bound |
 |---|---|---|
@@ -395,7 +397,7 @@ spin-1 work is arithmetic only):
 | `SeedKernel/Ising/Hamiltonian.lean`, `Ising/Bridge.lean` | The Ising Hamiltonian acting on vectors and its identification with the integer checker (spectral input from `CertifiedGaps/Spectral`) |
 | `SeedKernel/Ising/Seed.lean` | The unconditional seed and `ising_gap` |
 | `SeedKernel/Audit.lean` | `#print axioms` audit across all main declarations |
-| `SeedKernel/Eval/BoundaryTotals.lean`, `Eval/ThermalTotals.lean` | Compiled evaluation (`#guard`, not a proof; opt-in `lake build SeedKernelEval`) of the fifteen boundary integers and of the periodic totals with `n ≤ 9` |
+| `SeedKernel/Eval/BoundaryTotals.lean`, `Eval/ThermalTotals.lean`, `Eval/ThermalTotals60.lean` | Compiled evaluation (`#guard`, not a proof; opt-in `lake build SeedKernelEval`) of the fifteen boundary integers, of the `b = 49/4` totals with `n ≤ 9`, and of the `b = 21/2` totals with twists `1`, `P` and `n = 6, 8` |
 | `SeedKernel/Bench/*.lean` | Kernel performance benchmarks up to $n = 12$ (`lake build SeedKernelBench`) |
 
 ## Adding a model
@@ -536,6 +538,7 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Trace/PackedLanes.lean`, `Trace/PackedHorner.lean` | A packed big-integer evaluator of `hornerFloor` for banded integer matrices with bands of either sign (one `Nat` per row, one lane per computed column, any list of columns, division by a constant via multiply and shift) proved equal to `hornerFloor` |
 | `Heisenberg/WordBand.lean` | Spin-one words as base-3 numbers, the spin-flip hops of an exchange bond as bands (`hopBand_term`), shared by the boundary and periodic recurrences |
 | `Heisenberg/ThermalPacked.lean` | The `b = 49/4` recurrence as a packed run on the representative columns: `D = (32 - 3n) I - 2H` as a banded matrix, representatives on word numbers, and `hornerTotal_eq_of_packed` |
+| `Heisenberg/ThermalPacked60.lean` | The `b = 21/2` recurrence for the twists `1`, `P` as the same packed run (`2B` is the band of `ThermalPacked.lean`, with divisor `32`): `hornerTotal60_eq_of_packed` |
 | `Seed/Reseed.lean`, `Heisenberg/Reseed120.lean` | Reseeding from one ring seed to a longer one at four times the inverse temperature; the ring inputs `P_s(120, 49) ≥ 1 − 0.047`, `P_τ(240, 49) ≥ 1 − 0.0179` from the trace table |
 | `Transfer/RatioMonotone.lean`, `Open/Initialization.lean` | Monotonicity of `x^m / P(x)²` on an interval from a decidable `RatioCheck`; the scalar initialization of the boundary seeds (`move_one` steps, defect bounds from moment witnesses) |
 | `Heisenberg/BoundaryInit.lean`, `Heisenberg/BoundaryInitTable.lean` | The boundary paper's initialization at `b₀ = 49/4`: `seed_boundary` and `seed_open_thermal` from `ThermalCore`, the trial bounds `TrialData` and the trace table |

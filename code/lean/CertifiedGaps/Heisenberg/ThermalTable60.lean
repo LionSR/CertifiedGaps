@@ -89,6 +89,8 @@ state alone (`seed60_of_hornerTotals60_mps`, `gap_sixty_of_hornerTotals60_mps`).
   statement about exact integers, so the packing argument is not needed.
 * `hornerTotal60` is computable but not meant for compiled evaluation; the totals are computed
   by an external program (`models/spin1`, `results/source2.json`) and enter as the hypothesis.
+  For the twists `1` and `P`, `Heisenberg/ThermalPacked60.lean` evaluates the same totals with
+  packed big integers (`hornerTotal60_eq_of_packed`).
 -/
 
 open Finset Matrix
