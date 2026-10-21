@@ -7,9 +7,10 @@ note ([`../../paper/thermal-mpo-gap-note.tex`](../../paper/thermal-mpo-gap-note.
 algebraic step is proved from standard axioms except the finite numerical seed inputs** (two purity
 inequalities per model at the seed scale $(n_0, \beta_0)$). Those finite seed bounds appear as explicit
 named `sorry` lemmas whose values come from the computer certificates in [`../models/`](../models/).
-One seed is now proved outright in the kernel: `SeedKernel.Ising.ising_gap` is an unconditional gap
-theorem (below). The open-chain argument of the note (Appendices A–C) is formalized as well: it
-gives a uniform gap for open chains, with boundary fields or free ends, from four finite inputs.
+Two gaps are now proved outright in the kernel: `SeedKernel.Ising.ising_gap` (Ising rings) and
+`SeedKernel.IsingOpen.ising_free_gap` (Ising chains with free ends) are unconditional (below). The
+open-chain argument of the note (Appendices A–C) is formalized as well: it gives a uniform gap for
+open chains, with boundary fields or free ends, from four finite inputs.
 
 ## Overview
 
@@ -119,6 +120,23 @@ depends only on the axioms `propext`, `Classical.choice`, and `Quot.sound`. Its 
 kernel-checked integer residual and counting checks on the 6-site and 12-site rings (see
 [SeedKernel](#seedkernel-kernel-checked-seed-arithmetic) below).
 
+### An unconditional gap with free ends
+
+```lean
+-- SeedKernel/IsingOpen/Seed.lean (lake build SeedKernel)
+theorem SeedKernel.IsingOpen.ising_free_gap {n : ℕ} (hn : 24 ≤ n) :
+    GapGT (isingModel.openSpectrum isingModel.freeBoundary n) (log (10 ^ 12 / 3801) / (97 / 2))
+```
+
+For every length `n ≥ 24`, odd or even, the same Ising chain with open boundary conditions,
+$`-\sum_{j=1}^{n-1} Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac{1}{20} \sum_j Z_j`$, has a unique ground state
+and a spectral gap `> 0.3998` (and `> 0.4723` for `n ≥ 96`, `ising_free_gap_long`), again with no
+`sorry` and only the standard axioms. It is `RPRing.freeGapGT_of_traces` with one base step
+(`isingFreeCertificate`). Its four seeds come from low spectra of the rings of 6 and 12 sites and
+the free chains of 2, 8 and 12 sites (kernel-checked residual, counting and comparison-weight
+checks), which do not depend on `β`; the general seed theorems of `SeedKernel.Seeds` turn them into
+the seeds at any rational `β₀` through one decidable rational check (`free_gap_of_check`).
+
 ### Architecture of the formalization
 
 The library is structured in five layers, each depending only on the preceding ones:
@@ -166,7 +184,7 @@ The library is structured in five layers, each depending only on the preceding o
 |---|---|
 | two-purity criterion (Layers 1–2), spatial moment inequalities for every `RPRing` (Layer 3), and unitary frame conjugations | completely proved; depends only on the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound` |
 | uniform gap theorems for the spin-1 Heisenberg ring and 8 additional model families (table below) | proved **conditional on their seed lemmas** (`sorryAx` enters exclusively through the named seed declarations) |
-| the finite seed lemmas | one proved: the longitudinal-field Ising chain at `g = 1/4`, `h = 1/20` (`SeedKernel.Ising.first_point_seed`, giving the unconditional `ising_gap`). All others remain open. The spin-1 seeds of both OpenAI papers reduce to the printed integer totals of their trace tables (`SeedKernel/Heisenberg/Integers.lean`); [`../models/lean_seeds/`](../models/lean_seeds/) has the plan and the open obligations |
+| the finite seed lemmas | one proved: the longitudinal-field Ising chain at `g = 1/4`, `h = 1/20` (`SeedKernel.Ising.first_point_seed`, giving the unconditional `ising_gap`), together with the open-chain seeds of the same chain with free ends (`SeedKernel.IsingOpen`, giving `ising_free_gap`). All others remain open. The spin-1 seeds of both OpenAI papers reduce to the printed integer totals of their trace tables (`SeedKernel/Heisenberg/Integers.lean`); [`../models/lean_seeds/`](../models/lean_seeds/) has the plan and the open obligations of the spin-1 seed |
 
 ### Build instructions
 
@@ -228,9 +246,9 @@ physical spin basis, while the rotated `gap` theorems apply to the unitarily rot
 reflection-positive frame, which has the same spectrum.
 
 Note that the Lean model files record the seed bounds that were current when each file was formalized.
-Where a model certificate in `../models/` was subsequently tightened (for example, `models/spin1_largeD`
+Where a model certificate in `../models/` was subsequently tightened (for example, `code/models/spin1_largeD`
 now also certifies a sharper bound `0.899` at `D = 4` from an `n₀ = 12` seed, and
-`models/dimerized_heisenberg` has slightly tighter enclosures than the rounded decimals in
+`code/models/dimerized_heisenberg` has slightly tighter enclosures than the rounded decimals in
 `DimerizedHeisenberg.lean`), the weaker seed inequalities assumed in Lean remain a fortiori valid.
 
 ### The spin-1 gap from its trace tables (no `sorry`)
@@ -336,14 +354,14 @@ Heisenberg seeds are Proposition 5.5 of the OpenAI preprint, reproduced in
 finite seed inequalities inside the Lean kernel. Every computational step is discharged by
 `decide +kernel` on `Nat` or `Int` (evaluated by GMP inside the kernel), without `native_decide`,
 `sorry`, or additional axioms. `SeedKernel/Audit.lean` (a root of the library) verifies via
-`#print axioms` that all 72 main declarations depend at most on `propext`, `Classical.choice`, and
+`#print axioms` that all 108 main declarations depend at most on `propext`, `Classical.choice`, and
 `Quot.sound`. The corresponding Julia generators, witness inventory, and verification driver
 (`check.jl`: Julia replay, `lake build SeedKernel`, and the axiom audit) live in
 [`../models/lean_seeds/`](../models/lean_seeds/), whose README states the results and the open
 obligations.
 
-**Scope of what is currently proved in `SeedKernel`** (one seed is closed, for the Ising chain; the
-spin-1 work is arithmetic only):
+**Scope of what is currently proved in `SeedKernel`** (the Ising seeds are closed, for rings and for
+free chains; the spin-1 work is arithmetic only):
 
 * **Shared packed-integer lanes (`SeedKernel/Packed.lean`, `PackingProofs.lean`).** Packs a vector
   of `d` natural numbers into a single `Nat` in radix `2^w`, providing lane extraction, shifts,
@@ -374,6 +392,27 @@ spin-1 work is arithmetic only):
   - `Seed`: one eigenvalue lies within `10⁻¹⁰` of each candidate and at most two lie below the
     anchor, hence two-sided bounds on `Z₆(β)`, `Z₁₂(β)`, `Z₁₂(2β)` and the theorems `seed_spatial`,
     `seed_thermal`, `first_point_seed`, and `ising_gap`.
+* **General seeds from low spectra (`SeedKernel/Spectral`, `Comparison`, `LowSpectrum`, `ExpBounds`,
+  `Seeds`).** Model-independent: the residual bound and counting by comparison for any Hermitian
+  matrix; the weighted comparison `le_re_quadratic_of_weights` (positive weights `w` off a set `B`
+  with `∑_{τ ∉ B, τ ≠ σ} |A σ τ| w(τ) ≤ w(σ) (Re A σ σ − ρ)` give `Re ⟪x, Ax⟫ ≥ ρ ‖x‖²` on vectors
+  vanishing on `B`); the low spectrum `LowSpectrum` and its Boltzmann-sum bounds; rational upper
+  bounds `expUpQ` on `e^y`; and, for any `RPRing` and any boundary, the spatial, thermal,
+  open-thermal and boundary-trace seeds from low spectra under decidable rational conditions
+  (`SpatialCheck`, `ThermalCheck`, `TraceCheck`).
+* **The Ising ring at any `β` (`SeedKernel/Ising/Checks`).** `ring_gap_of_check`: the gap from any
+  chain certificate whose seeds pass `RingCheck` at `β₀`.
+* **The free Ising chain (`SeedKernel/IsingOpen/*`).** The same pipeline on the open chains of 2, 8
+  and 12 sites with free ends:
+  - `Hamiltonian`: the free chain acts as `E(σ) x(σ) − g ∑ⱼ x(flipⱼ σ)` with the open-chain classical
+    energy (`freeH_apply` gives its entries), and `freeH_weights` reduces the weighted comparison to
+    `g ∑ⱼ w(flipⱼ σ) ≤ w(σ) (E(σ) − ρ)`. The ring bound `E(σ) − gL` fails here: flipping an end spin
+    breaks one bond, not two;
+  - `Bridge`: the checker sums, the classical count and the integer weight checks (`weightOK`) are
+    these quadratic forms and comparison hypotheses;
+  - `Seed`: the low spectra `lowSpectrum2`, `near8`, `lowSpectrum12`; `free_gap_of_check` at any `β`
+    and certificate passing `FreeCheck`; and at `β₀ = 97/4` `ising_free_gap` (`n ≥ 24`) and
+    `ising_free_gap_long` (`n ≥ 96`).
 
 | File | Role |
 |---|---|
@@ -384,19 +423,26 @@ spin-1 work is arithmetic only):
 | `SeedKernel/Spin1/Packed.lean`, `Spin1/Optimized.lean` | Packed spin-1 `hApply`, `filterApply`, trial moments, `ritzCheck`, and prepared-mask variants |
 | `SeedKernel/Spin1/Obligations.lean`, `Spin1/Tests.lean` | Row-wise specification, open semantic propositions (`HApplyCorrect`, `FilterCorrect`, ...), and small-ring checks |
 | `SeedKernel/Spin1/Counting.lean` | Conditional one-Ritz-value trace-counting lemma and formal counterexamples to naive two-value variants |
-| `SeedKernel/Spin1/H6.lean`, `H8.lean`, `H10.lean` | Generated Ritz/residual witnesses (`models/lean_seeds/certify.jl spin1_kernel`) |
-| `SeedKernel/Heisenberg/Trial*.lean` | The D = 26 integer trial state checked in the kernel (`trial_check_72`, `trial_check_120`): SU(2)-and-swap block reduction by an integer intertwiner, packed integer matrix powers with a correctness proof; data from `models/lean_seeds/scripts/trial/generate.jl` |
+| `SeedKernel/Spin1/H6.lean`, `H8.lean`, `H10.lean` | Generated Ritz/residual witnesses (`code/models/lean_seeds/certify.jl spin1_kernel`) |
+| `SeedKernel/Heisenberg/Trial*.lean` | The D = 26 integer trial state checked in the kernel (`trial_check_72`, `trial_check_120`): SU(2)-and-swap block reduction by an integer intertwiner, packed integer matrix powers with a correctness proof; data from `code/models/lean_seeds/scripts/trial/generate.jl` |
 | `SeedKernel/Heisenberg/Seed36.lean`, `Heisenberg/Seed60.lean` | The spin-1 seeds and gaps with the trace tables as the only hypotheses (`gap_of_table`, `gap_sixty_chain_of_table`) |
 | `SeedKernel/Heisenberg/Reseed120.lean` | The ring inputs of the boundary-field gap at `(120, 49)` from the trace table (`seed_ring_spatial_of_table`, `seed_ring_thermal_of_table`) |
-| `SeedKernel/Heisenberg/OpenTrial*.lean` | The four open-chain trial vectors of the boundary paper on 34, 78, 142 and 240 sites (`oppositeField_trial_*`); data from `models/lean_seeds/scripts/open_trial/generate.jl` |
+| `SeedKernel/Heisenberg/OpenTrial*.lean` | The four open-chain trial vectors of the boundary paper on 34, 78, 142 and 240 sites (`oppositeField_trial_*`); data from `code/models/lean_seeds/scripts/open_trial/generate.jl` |
 | `SeedKernel/Heisenberg/BoundaryTraces.lean` | The nine boundary integers `k_{n,g}` with `n ≤ 4` by `decide +kernel` (about 45 s, 6 GB) |
 | `SeedKernel/Heisenberg/ThermalTraces.lean` | The two periodic totals `W_{4,g}` by `decide +kernel` on the packed evaluator; `HornerTotalsLarge` (the sixteen with `n ≥ 5`) and `hornerTotals_of_large` |
 | `SeedKernel/Heisenberg/Integers.lean` | Both papers' gap theorems from the printed integers (`gap_of_hornerTotals`, `gap_sixty_of_hornerTotals60`, `spin_one_boundary_field_gap_of_integers`) |
 | `SeedKernel/Ising/Checker.lean`, `Ising/Packed.lean`, `Ising/Chunked.lean` | Integer $20H$ action and direct, packed (on the shared lanes), and 64-chunk certificate checkers |
-| `SeedKernel/Ising/Generated.lean`, `Ising/GeneratedChunks.lean` | Generated eigenvector proposals and kernel checks (`models/lean_seeds/certify.jl ising`) |
+| `SeedKernel/Ising/Generated.lean`, `Ising/GeneratedChunks.lean` | Generated eigenvector proposals and kernel checks (`code/models/lean_seeds/certify.jl ising`) |
 | `SeedKernel/Ising/ChunkCoverage.lean`, `Ising/NegativeChecks.lean` | Proof that the 64 chunks cover `{0, ..., 4095}` and rejection tests for corrupted witnesses |
+| `SeedKernel/Spectral.lean`, `SeedKernel/Comparison.lean` | Adapters to the shared spectral residual and counting bounds, and weighted comparison for any Hermitian matrix |
+| `SeedKernel/LowSpectrum.lean`, `SeedKernel/ExpBounds.lean` | Low spectra, Boltzmann-sum and purity-ratio bounds, and rational bounds on the exponential |
+| `SeedKernel/Seeds.lean` | The seeds of any `RPRing` (ring and open chain) from low spectra and decidable rational checks |
 | `SeedKernel/Ising/Hamiltonian.lean`, `Ising/Bridge.lean` | The Ising Hamiltonian acting on vectors and its identification with the integer checker (spectral input from `CertifiedGaps/Spectral`) |
 | `SeedKernel/Ising/Seed.lean` | The unconditional seed and `ising_gap` |
+| `SeedKernel/Ising/Checks.lean` | The ring seeds and gap at any `β` (`RingCheck`, `ring_gap_of_check`) |
+| `SeedKernel/IsingOpen/Checker.lean`, `IsingOpen/Generated.lean`, `IsingOpen/GeneratedChunks.lean` | Integer checks on the free chains and their generated witnesses (`code/models/lean_seeds/certify.jl ising_open`) |
+| `SeedKernel/IsingOpen/Hamiltonian.lean`, `IsingOpen/Bridge.lean` | The free chain acting on vectors, its entries and weight condition, and the identification with the checker |
+| `SeedKernel/IsingOpen/Seed.lean` | The free-chain low spectra, `free_gap_of_check`, the certificates, `ising_free_gap` and `ising_free_gap_long` |
 | `SeedKernel/Audit.lean` | `#print axioms` audit across all main declarations |
 | `SeedKernel/Eval/BoundaryTotals.lean`, `Eval/ThermalTotals.lean`, `Eval/ThermalTotals60.lean` | Compiled evaluation (`#guard`, not a proof; opt-in `lake build SeedKernelEval`) of the fifteen boundary integers, of the `b = 49/4` totals with `n ≤ 9`, and of the six `b = 21/2` totals with `n = 6, 8` |
 | `SeedKernel/Bench/*.lean` | Kernel performance benchmarks up to $n = 12$ (`lake build SeedKernelBench`) |
@@ -416,7 +462,7 @@ A gap certificate enters `CertifiedGaps` in exactly this form:
 2. **List the parameter points:** Define a `structure Point` holding the model parameters (as `ℚ`),
    the seed inverse temperature `β₀ : ℚ`, and a `cert : ChainCertificate`, and
    `def points : List Point`. Generate each certificate with
-   `julia lean/scripts/chain_certificate.jl εₛ εₜ β₀ [J] [digits]` (the arguments are exact literals
+   `julia code/lean/scripts/chain_certificate.jl εₛ εₜ β₀ [J] [digits]` (the arguments are exact literals
    such as `a//b` or `0.064`; nothing is evaluated) and paste it in. Its first entries `s[0], t[0]`
    are the seed defects. `points_valid` and `points_β₀_pos` are checked by `decide +kernel`; the gap
    bound is `log r / β₀`.
@@ -430,7 +476,7 @@ A gap certificate enters `CertifiedGaps` in exactly this form:
    one-site unitaries `a`, define the physical Hamiltonian in `Models/<Name>Physical.lean`, prove
    that it equals `piTensor a * R.hamiltonian L * piTensor aᴴ` using `RPRing.conj_hamiltonian`, and
    transfer the spectral gap via `RPRing.eigenvalues_eq_spectrum`.
-6. **Check the seeds against the certificate:** Add the model to `lean/scripts/check_seeds.jl` and
+6. **Check the seeds against the certificate:** Add the model to `code/lean/scripts/check_seeds.jl` and
    run `julia --project=code/julia code/lean/scripts/check_seeds.jl` from the repository root. It checks that
    every Lean `s[0], t[0]` is at least the certified defect at the same `(n₀, β₀)`.
 7. **Discharge the seeds from a trace table (optional):** The `seeds` lemma can be proved instead
@@ -449,7 +495,7 @@ A gap certificate enters `CertifiedGaps` in exactly this form:
    - **The certificate** (`TableCertificate`, `Seed/Certificate.lean`): the table, one filter
      per capped sector, the dominant-sector data `SectorSeed` and `(β, κ)`; `Valid` is checked by
      `decide +kernel`. `RPRing.seeds_of_certificate` (`Seed/Ring.lean`) then gives the
-     conclusion of `seeds`. The data come from `julia lean/scripts/seed_certificate.jl
+     conclusion of `seeds`. The data come from `julia code/lean/scripts/seed_certificate.jl
      config.toml` (scheme, table, trace error, `(q, a, ℓ)`, `(β, κ)`; see the header of the
      script), which searches the filters, checks every condition in exact rationals and prints
      the Lean certificate; changing a parameter point means rerunning it.
@@ -470,7 +516,7 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 
 | Name | Meaning |
 |---|---|
-| `Models/<Name>.lean`, namespace `CertifiedGaps.<Name>` | `<Name>` is the Julia directory `models/<slug>` in UpperCamelCase (table below) |
+| `Models/<Name>.lean`, namespace `CertifiedGaps.<Name>` | `<Name>` is the Julia directory `code/models/<slug>` in UpperCamelCase (table below) |
 | `model` | the model as an `RPRing`, a function of its real parameters |
 | `Point`, `points` | the certified parameter points with `β₀` and `cert` |
 | `points_valid`, `points_β₀_pos`, `points_<field>_…` | decidable facts about all points (`decide +kernel`) |
@@ -480,14 +526,40 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 
 | Lean namespace | Julia directory |
 |---|---|
-| `SpinOneHeisenberg` (`Heisenberg/`) | `models/spin1` (the headline theorem keeps its own names: `seed_spatial`, `seed_thermal`, `spin_one_heisenberg_gap`) |
-| `SpinOneLargeD` | `models/spin1_largeD` |
-| `SpinOneDimerized` | `models/spin1_dimerized` |
-| `HeisenbergLadder` | `models/heisenberg_ladder` |
-| `StaggeredHeisenberg` | `models/heisenberg_staggered_field` |
-| `DimerizedHeisenberg` | `models/dimerized_heisenberg` |
-| `TwoLegIsing` | `models/two_leg_tfim` |
-| `IsingLongitudinal` | `models/tfim_longitudinal` |
+| `SpinOneHeisenberg` (`Heisenberg/`) | `code/models/spin1` (the headline theorem keeps its own names: `seed_spatial`, `seed_thermal`, `spin_one_heisenberg_gap`) |
+| `SpinOneLargeD` | `code/models/spin1_largeD` |
+| `SpinOneDimerized` | `code/models/spin1_dimerized` |
+| `HeisenbergLadder` | `code/models/heisenberg_ladder` |
+| `StaggeredHeisenberg` | `code/models/heisenberg_staggered_field` |
+| `DimerizedHeisenberg` | `code/models/dimerized_heisenberg` |
+| `TwoLegIsing` | `code/models/two_leg_tfim` |
+| `IsingLongitudinal` | `code/models/tfim_longitudinal` |
+
+### Replacing a seed by a kernel proof
+
+The seeds of every gap theorem above are inequalities between partition functions of a few small
+rings or chains. `SeedKernel` proves them in three model-independent steps, so a new model or
+parameter point only supplies the model-specific first step:
+
+1. **Low spectra.** For each length the seeds use, prove a `LowSpectrum` (one eigenvalue within
+   `r` of a Ritz value `θ₀`, a second at least `θ₁ - r`, all others at least `ρ`) of
+   `R.spectrum L` or `R.openSpectrum b n`. The tools are model-independent: `exists_near_of_residual`
+   for a trial vector, counting by comparison (`card_eigenvalues_lt_le` with
+   `le_re_quadratic_of_weights`), and `lowSpectrum_of_near`. What is model-specific is an integer
+   checker for the Hamiltonian in a product basis, its identification with `R.hamiltonian L` or
+   `R.openHamiltonian b n` (as in `Ising/Bridge.lean` and `IsingOpen/Bridge.lean`), and the
+   generated witnesses (`code/models/lean_seeds/certify.jl`). The low spectra do not depend on `β`.
+2. **Seeds at any `β₀`.** `spatialPurity_ge_of_check`, `thermalPurity_ge_of_check`,
+   `openThermalPurity_ge_of_check` and `openTrace_le_of_check` (`SeedKernel/Seeds.lean`) turn the
+   low spectra into the seeds when a rational inequality (`SpatialCheck`, `ThermalCheck`,
+   `TraceCheck`) holds at the chosen rational `β₀`; `decide +kernel` checks it.
+3. **The gap.** Feed the seeds to `RPRing.gapGT_of_chainCertificate` (rings) or
+   `RPRing.openGapGT_of_traces` and `RPRing.freeGapGT_of_traces` (open chains).
+
+With the low spectra in place, a new inverse temperature or a new certificate is one theorem and
+one `decide +kernel`: `SeedKernel.Ising.ring_gap_of_check` and
+`SeedKernel.IsingOpen.free_gap_of_check` take `β₀` and the certificate as arguments, and
+`ising_free_gap` and `ising_free_gap_long` are two such instances.
 
 ## Files
 
