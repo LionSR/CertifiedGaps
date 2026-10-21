@@ -1,0 +1,89 @@
+{
+    "status": "kernel arithmetic witnesses only; no physical eigenvalue or gap theorem",
+    "witnesses": [
+        {
+            "C_filter": "2578888929560489686374224861138012388608117158473802525248",
+            "ritz_upper": "-8495447//1000000",
+            "A_filter": "177846271172934690446953645163190835852705899506618331666",
+            "residual_upper": "274967//1000000",
+            "degree": "24",
+            "lane_bits": "262",
+            "G": "12269112075056515979666915011022054423153753339290521072",
+            "n": "6"
+        },
+        {
+            "C_filter": "813119936257259496822244243476553886331317494518043349559473265494717331870112068800",
+            "ritz_upper": "-11179504//1000000",
+            "A_filter": "42386225590404449582399152497623809211866389082039455741022462639257237945425746616",
+            "residual_upper": "279904//1000000",
+            "degree": "32",
+            "lane_bits": "345",
+            "G": "2209975035965761796210640472437770834047138329797131107682018117972085637965894624",
+            "n": "8"
+        },
+        {
+            "C_filter": "12260175323133539207078826081257770899589098780",
+            "ritz_upper": "-13548710//1000000",
+            "A_filter": "520255284701234047928306107875502988163645070",
+            "residual_upper": "632355//1000000",
+            "degree": "16",
+            "lane_bits": "222",
+            "G": "22092729261234912309090951559905316088630820",
+            "n": "10"
+        }
+    ],
+    "run_metadata": {
+        "julia_threads": 1,
+        "julia": "1.12.4",
+        "status": "kernel arithmetic witnesses only; no physical eigenvalue or gap theorem",
+        "config": {
+            "lean_toolchain": "leanprover/lean4:v4.36.0-rc1",
+            "lean_dependencies": "Std only (SeedKernel.Packed and SeedKernel.Spin1 import no Mathlib)"
+        },
+        "created_utc": "2026-10-21T00:21:40.166",
+        "certified": false,
+        "source_sha256": {
+            "../../lean/SeedKernel/Bench/Bench10.lean": "bdbf7488d91683472e6a0cb163839ba45aef81950faf0851fc1fe9ce37d3686d",
+            "../../lean/SeedKernel/Bench/Bench8.lean": "6a0ffa94fc865107cb133e64bf8549a1a934a07735244a77d519994dd5255976",
+            "../../lean/SeedKernel/Obligations.lean": "244580d8e2f622f982bff48bad6f18d29a93c4f4166f0d0fa7ac0e7ccbafbd22",
+            "certify.jl": "e1aab1f84a1477e8a234819590c0800009653a14e090d6eba579898afc67c472",
+            "src/Common.jl": "1cbd487edcdb0f511de8117f39383812b3a33801ad6fd96cb63b736532d43e92",
+            "../../lean/SeedKernel/Bench/Baseline.lean": "09bdf5f43a7884a2b439ebb3dc3e70857e267afa8326f4d201ca0e054bed4555",
+            "../../lean/SeedKernel/Bench/Matvec12.lean": "7b6142c6804f36609b88c07de1c8a77f63c09d2b69d7f2ee5e9dff1b00f24a1a",
+            "../../lean/SeedKernel/Bench/FastReverse8.lean": "1ca23da908707b40211cfa27823e799e16fb5a19db7b03f17c4bd04ee9b106ca",
+            "../../lean/SeedKernel/Spin1/Packed.lean": "aba544b3e299e1ea8bdb081ce5d32effad899d92711abf112d9809a32e3fbdc6",
+            "src/LeanSeeds.jl": "aaed2f44ae2253db169b5133b16087b0b104341d37aa4f09492c4b06460d47f4",
+            "../../lean/SeedKernel/Spin1/Optimized.lean": "5df46d4c436eec89d76e760db1ef04a8d01a7bb552b8555cdd31a9b903cbd045",
+            "../../lean/SeedKernel/Spin1/Counting.lean": "d185944b61f84857f6cd7320a72ddad34c82c627af7664454aea5eacfe535650",
+            "scripts/spin1_kernel/experiments.jl": "981b360fe74b83f23eef30de6d6cd112faed08c829f10863874445539516883f",
+            "../../lean/SeedKernel/Bench/Prepared12.lean": "bfdbbec96fd640f0149b592f66aeeac928bc8b9d75e556eef7b5f1a4faf80a96",
+            "../../lean/SeedKernel/Spin1/Obligations.lean": "6926186a065672d0045aae0064402e3e5033b9ecdc7308f836af1f9bf9bc0736",
+            "../../lean/SeedKernel.lean": "5cd794626771a25f96a694a17df63cca08ddf06b16e69ddde19066f815f8d213",
+            "check.jl": "973d550220cc6ff3ef7716cdb5171cc4a3184b028e67881a52ea1d344245c117",
+            "src/spin1_kernel.jl": "a727dcd59a0a340fad1b5ada122e3010f1e5eb547f5b2c9a1a9ea13b088d4dfc",
+            "../../lean/SeedKernel/Bench/FastDot12.lean": "cd0e3518576bcadd82b470252baec44a20100ed23bdb3387b1fb1e96d3246425",
+            "../../lean/SeedKernel/Bench/PreparedH8.lean": "1dfdc9ea50807596f6a7c7002f2a9de146ee0b9b4fe4e2c169c4f91f0bbeb6d4",
+            "scripts/spin1_kernel/benchmark.jl": "ceefbe4bde872b6caae1965a1122e6bb5f4c8b4516aead39509e80881b7daf98",
+            "../../lean/SeedKernel/PackedTests.lean": "5f3dcfb4c28be524efc1417e7b4651bd05ea58472357df61a56804ed6ecdb129",
+            "../../lean/SeedKernel/PackingProofs.lean": "7202856a618816223cdafcf706da33d91929db8e4edf63db46714b83d4de66b1",
+            "../../lean/SeedKernel/Spin1/H8.lean": "c25a496b06347feb5f4496d18196e5a9e538fdee8dc7191f2fb0e417f933dce1",
+            "../../lean/SeedKernel/Packed.lean": "826732fa46df7fc3d5b2d256c596bbd9b8c18a5e0f74e3eb8922ec09edd539bb",
+            "../../lean/SeedKernel/Audit.lean": "817762363145778d12a79211065bef71b6535fcbd49936394ee05d1493bab2e7",
+            "../../lean/SeedKernel/Bench/Dot12.lean": "0ab65e4c8351027d77986629c7978c79632ed525059b22fa85f26da4e3af5520",
+            "../../lean/SeedKernel/Spin1/Tests.lean": "ac0c8a3a552b99874e5dfee4245fd1d18a80abed2731624e1e9a4ac72db637b8",
+            "../../lean/lake-manifest.json": "2cdf23df2c4346520725eef455fd88cd627ca2c034b7c6e9369cd59a88b49980",
+            "../../lean/SeedKernel/Bench/PreparedMatvec12.lean": "a25c9935325b417ac68f267b842d27b9c0da1de6e7175ff43e0569b331dba36f",
+            "../../lean/SeedKernel/Spin1/H6.lean": "1b65167098fa080a70d60404a04ea8194d3dc557af48f6da52159c1f9208e995",
+            "../../lean/lean-toolchain": "d581a24b57a4ae9e0b2132ca8ac7cc3ac336a9fc2751fe6b29414e2d434d54c4",
+            "../../lean/SeedKernel/Bench/Fast12.lean": "10f130a867ea60b211e4874449bfb38d41a604979afc3d283589d5215e91ae5b",
+            "../../lean/SeedKernel/Bench/Bench6.lean": "79b192a4a5494ff59c7d58533556aa158f42e1d52c80d941187042ff6aebbccd",
+            "../../lean/SeedKernel/Bench/Gram6.lean": "b41e15bb95e8d1c98fc275e0141328f6560d2ef525dc9d293df20561a268d36e",
+            "test/spin1_kernel.jl": "5350f714368f19f159bf8be5e5b4a38d9409151c0d71b4794dd740aa88bceb9c",
+            "../../lean/SeedKernel/Bench/Bench12.lean": "8481db772bb71b2252d6d5d32085b00a56562f866720be78a1941ebe18f2f430",
+            "../../lean/lakefile.toml": "966c7df4a5dea310dee2553f28026f310b102188eedbf112f49f4795bc846462",
+            "../../lean/SeedKernel/Spin1/H10.lean": "60340d12718e18110e5412cf250e1ca8ffcdd30c7e44e37e7c7cd34b5c6e248c",
+            "../../lean/SeedKernel/Bench/PlainDot12.lean": "07d9e9fbe77678b2160c19e07ece78265e1d1688f165ac2d0f329ef3e06d4450"
+        },
+        "blas_threads": 1
+    }
+}

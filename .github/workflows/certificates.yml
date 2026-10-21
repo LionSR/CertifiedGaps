@@ -1,30 +1,33 @@
 name: Check certificates
 
 # Run the fast checker (check.jl, default mode) of model directories. A pull request or push to main
-# that changes models/ (excluding documentation) checks the changed model directories; a change to
-# the core package (julia/, excluding documentation), the weekly schedule, or a manual run checks
+# that changes code/models/ (excluding documentation) checks the changed model directories; a change to
+# the core package (code/julia/, excluding documentation), the weekly schedule, or a manual run checks
 # every model directory that records.yml references. Leaderboard data in home_page/_data/records.yml
 # is validated against both the certificates and the Lean audit in blueprint.yml.
 on:
   pull_request:
-    branches:
-      - main
+    # Stacked pull requests need the same certificate checks as PRs targeting main.
     paths:
-      - "models/**"
-      - "julia/**"
-      - "tools/leaderboard/**"
-      - "lean/CertifiedGaps/Models/**"
-      - "lean/scripts/check_seeds.jl"
+      - "code/models/**"
+      - "data/models/**"
+      - ".github/workflows/certificates.yml"
+      - "code/julia/**"
+      - "code/tools/leaderboard/**"
+      - "code/lean/CertifiedGaps/Models/**"
+      - "code/lean/scripts/check_seeds.jl"
       - "!**/*.md"
   push:
     branches:
       - main
     paths:
-      - "models/**"
-      - "julia/**"
-      - "tools/leaderboard/**"
-      - "lean/CertifiedGaps/Models/**"
-      - "lean/scripts/check_seeds.jl"
+      - "code/models/**"
+      - "data/models/**"
+      - ".github/workflows/certificates.yml"
+      - "code/julia/**"
+      - "code/tools/leaderboard/**"
+      - "code/lean/CertifiedGaps/Models/**"
+      - "code/lean/scripts/check_seeds.jl"
       - "!**/*.md"
   schedule:
     - cron: "17 4 * * 1" # Mondays 04:17 UTC
@@ -56,16 +59,16 @@ jobs:
         uses: julia-actions/cache@9353db09a0f2bbbdec6f41791918c75d37391b36 # v3.5.0
 
       - name: Test the core package
-        run: julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+        run: julia --project=code/julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 
       # The seed defects hardcoded in the Lean model files against the certificates.
       - name: Check the Lean seeds
-        run: julia --project=julia lean/scripts/check_seeds.jl
+        run: julia --project=code/julia code/lean/scripts/check_seeds.jl
 
       - name: Test the leaderboard validator and check the records against the certificates
         run: |
-          julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
-          julia --project=tools/leaderboard tools/leaderboard/check_records.jl
+          julia --project=code/tools/leaderboard -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+          julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl
 
   changed:
     name: Find models to check
@@ -95,16 +98,16 @@ jobs:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: |
           records=home_page/_data/records.yml
-          # Checkers rerun the core arithmetic, so a non-doc change to julia/ rechecks every model;
-          # otherwise on PRs and pushes, only check models with non-doc changes under models/<slug>/.
-          if ( [ "$EVENT" = pull_request ] || [ "$EVENT" = push ] ) && \
+          # Checkers rerun the core arithmetic, so a non-doc change to code/julia/ rechecks every model;
+          # otherwise on PRs and pushes, only check models with non-doc changes under code/models/<slug>/.
+          if { [ "$EVENT" = pull_request ] || [ "$EVENT" = push ]; } && \
              [ -n "$BASE_SHA" ] && [ "$BASE_SHA" != "0000000000000000000000000000000000000000" ]; then
             changed_nondoc=$(git diff --name-only "$BASE_SHA" HEAD | grep -vE '\.md$' || true)
-            if echo "$changed_nondoc" | grep -qE '^julia/'; then
+            if echo "$changed_nondoc" | grep -qE '^(code/(julia|tools|lean)/|\.github/workflows/certificates\.yml$)'; then
               slugs=$( (grep -oE 'models/[A-Za-z0-9_]+/' "$records" | cut -d/ -f2;
                         sed -nE 's/^[[:space:]]*slug:[[:space:]]*([A-Za-z0-9_]+).*/\1/p' "$records") )
             else
-              slugs=$(echo "$changed_nondoc" | grep -E '^models/' | cut -d/ -f2 || true)
+              slugs=$(echo "$changed_nondoc" | grep -E '^(code|data)/models/' | cut -d/ -f3 || true)
             fi
           else
             # Every directory referenced by a slug, certificate or check field.
@@ -113,7 +116,7 @@ jobs:
           fi
           models=$(echo "$slugs" | sort -u \
             | while read -r slug; do
-                if [ -n "$slug" ] && [ -f "models/$slug/check.jl" ] && [ "$slug" != lean_seeds ]; then
+                if [ -n "$slug" ] && [ -f "code/models/$slug/check.jl" ] && [ "$slug" != lean_seeds ]; then
                   echo "$slug"
                 fi
               done \
@@ -150,15 +153,15 @@ jobs:
       # spin1 checks its outputs against the preprint's evidence files (pinned commit, hashes).
       - name: Fetch the upstream evidence
         if: matrix.model == 'spin1'
-        run: julia tools/fetch_upstream.jl
+        run: julia code/tools/fetch_upstream.jl
 
-      # Models run in the core environment (julia/), except the few with their own Project.toml
+      # Models run in the core environment (code/julia/), except the few with their own Project.toml
       # (AGENTS.md, "Environment"), whose Manifest develops the core from ../../julia.
       - name: Choose the environment
         env:
           MODEL: ${{ matrix.model }}
         run: |
-          if [ -f "models/$MODEL/Project.toml" ]; then project="models/$MODEL"; else project=julia; fi
+          if [ -f "code/models/$MODEL/Project.toml" ]; then project="code/models/$MODEL"; else project=code/julia; fi
           echo "PROJECT=$project" >> "$GITHUB_ENV"
 
       - name: Instantiate the environment
@@ -167,4 +170,4 @@ jobs:
       - name: Run the checker
         env:
           MODEL: ${{ matrix.model }}
-        run: julia --project="$PROJECT" "models/$MODEL/check.jl"
+        run: julia --project="$PROJECT" "code/models/$MODEL/check.jl"

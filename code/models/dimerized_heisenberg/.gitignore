@@ -1,0 +1,4 @@
+# Regenerable outputs, not committed:
+# scripts/numerical_scan.jl (Float64 scans; condensed into results/numerical_summary.json)
+# scripts/scan20.jl (20-spin Ritz values, ~390 kB each; condensed into diagnostic20_summary.json)
+*.log
