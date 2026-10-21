@@ -87,6 +87,59 @@ theorem hornerFloorE_map_intCast (D : Matrix ι ι ℤ) (s : ℕ) (q : ℕ → �
     hornerFloorE (D.map (↑)) s q r J = fun i ↦ ((hornerFloor D s q r J i : ℤ) : EisensteinInt) :=
   hornerListE_map_intCast D s r _
 
+/-! ### The real form of the recursion -/
+
+/-- The coordinate `u` of `u + vω`, additive. -/
+def uHom : EisensteinInt →+ ℤ := ⟨⟨EisensteinInt.u, rfl⟩, fun _ _ ↦ rfl⟩
+
+/-- The coordinate `v` of `u + vω`, additive. -/
+def vHom : EisensteinInt →+ ℤ := ⟨⟨EisensteinInt.v, rfl⟩, fun _ _ ↦ rfl⟩
+
+/-- **The real form of a matrix over `ℤ[ω]`**: since `(a + bω)(u + vω) = (au - bv) +
+(bu + (a - b)v)ω`, a matrix `A + Bω` acts on the coordinates `(u, v)` as the block matrix
+`[[A, -B], [B, A - B]]`. -/
+def realify (M : Matrix ι ι EisensteinInt) : Matrix (ι ⊕ ι) (ι ⊕ ι) ℤ :=
+  Matrix.fromBlocks (M.map uHom) (-M.map vHom) (M.map vHom) (M.map uHom - M.map vHom)
+
+omit [DecidableEq ι] in
+/-- The real form acts on the coordinates. -/
+theorem realify_mulVec (M : Matrix ι ι EisensteinInt) (Z : ι → EisensteinInt) (i : ι) :
+    (realify M *ᵥ Sum.elim (fun j ↦ (Z j).u) (fun j ↦ (Z j).v)) (Sum.inl i) = ((M *ᵥ Z) i).u ∧
+      (realify M *ᵥ Sum.elim (fun j ↦ (Z j).u) (fun j ↦ (Z j).v)) (Sum.inr i) =
+        ((M *ᵥ Z) i).v := by
+  have hu : ((M *ᵥ Z) i).u = uHom ((M *ᵥ Z) i) := rfl
+  have hv : ((M *ᵥ Z) i).v = vHom ((M *ᵥ Z) i) := rfl
+  rw [hu, hv]
+  simp only [realify, mulVec, dotProduct, Fintype.sum_sum_type, Matrix.fromBlocks_apply₁₁,
+    Matrix.fromBlocks_apply₁₂, Matrix.fromBlocks_apply₂₁, Matrix.fromBlocks_apply₂₂,
+    Sum.elim_inl, Sum.elim_inr, map_sum, Matrix.map_apply, Matrix.neg_apply, Matrix.sub_apply]
+  rw [← Finset.sum_add_distrib, ← Finset.sum_add_distrib]
+  constructor <;> refine Finset.sum_congr rfl fun j _ ↦ ?_ <;>
+    simp [uHom, vHom] <;> ring
+
+/-- **The recursion over `ℤ[ω]` is the integer recursion of the real form**: the coordinates
+`u, v` of column `r` are the rows `inl`, `inr` of the integer column `inl r`, since the floor
+`fl` acts on each coordinate and the coefficient `q_j` adds to `u` only. -/
+theorem hornerListE_realify (M : Matrix ι ι EisensteinInt) (s : ℕ) (r : ι) (l : List ℤ)
+    (i : ι) : hornerListE M s r l i = ⟨hornerList (realify M) s (Sum.inl r) l (Sum.inl i),
+      hornerList (realify M) s (Sum.inl r) l (Sum.inr i)⟩ := by
+  induction l generalizing i with
+  | nil => rfl
+  | cons q l ih =>
+    have hU : hornerList (realify M) s (Sum.inl r) l = Sum.elim
+        (fun j ↦ (hornerListE M s r l j).u) (fun j ↦ (hornerListE M s r l j).v) := by
+      funext x; cases x <;> simp [ih]
+    obtain ⟨h1, h2⟩ := realify_mulVec M (hornerListE M s r l) i
+    rw [hornerListE_cons, hornerList_cons, hornerStepE, hornerStep, hornerStep, hU, h1, h2]
+    ext <;> by_cases hi : i = r <;> simp [fdiv, hi]
+
+/-- `hornerFloorE` in terms of the real form. -/
+theorem hornerFloorE_realify (M : Matrix ι ι EisensteinInt) (s : ℕ) (q : ℕ → ℤ) (r : ι)
+    (J : ℕ) (i : ι) : hornerFloorE M s q r J i =
+      ⟨hornerFloor (realify M) s q (Sum.inl r) J (Sum.inl i),
+        hornerFloor (realify M) s q (Sum.inl r) J (Sum.inr i)⟩ :=
+  hornerListE_realify M s r _ i
+
 /-! ### The complex recursion -/
 
 /-- `B` is `s` times a contraction over `ℂ`: `‖B v‖² ≤ s² ‖v‖²` for every complex `v`. -/

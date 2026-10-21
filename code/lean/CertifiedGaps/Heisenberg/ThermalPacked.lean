@@ -5,6 +5,7 @@ Authors: thermal-mpo-gap contributors
 -/
 import CertifiedGaps.Heisenberg.ThermalTable
 import CertifiedGaps.Heisenberg.WordBand
+import CertifiedGaps.Trace.PackedRealify
 
 /-!
 # A fast evaluator of the periodic integer totals
@@ -20,9 +21,10 @@ big-integer recursion `Trace.Packed.runCols`, and proves that the two agree
 
 * **The matrix.** Words are numbered `∑ⱼ σⱼ 3ʲ` (`wordNum`); `D = (32 - 3n) I - 2 H_n(g)` is the
   banded matrix `ringBand n g`: the diagonal `ringDiag`, the entries `-2` of the hops of the
-  bonds `j, j + 1` (`hopBand`), and the entries `∓2` of the seam hops (`seamHops`; `+2` for the
-  twisted ring `g = 1`, whose spin-flip entries on the seam bond are negated). `ringBand_entry`
-  and `thermalMatrix_apply` compute both sides entry by entry.
+  bonds `j, j + 1` (`hopBand`), and the entries `∓2` of the two seam hops (`+2` for the twisted
+  ring `g = 1`, whose spin-flip entries on the seam bond are negated). It is the case
+  `e = f = true`, `a = b = ∓2` of `seamBand`, a ring band with any integer entries on the seam
+  hops. `ringBand_entry` and `thermalMatrix_apply` compute both sides entry by entry.
 * **The coefficients.** `c_j = ⌊2⁵⁵ p_j⌋ = ⌊2⁵⁵ v_j / ∑ v⌋` with `v_j = 98ʲ 280!/j!`
   (`thermalCoeff_eq`); they vanish for `j ≥ 192`, so the recursion starts at `j = 191`
   (`specCol_append_zeros`), as the paper notes.
@@ -77,20 +79,32 @@ def ringDiag (n x : ℕ) : ℤ :=
   32 - 3 * n - 2 * (((List.range (n - 1)).map fun j ↦ letter x j * letter x (j + 1)).sum +
     letter x (n - 1) * letter x 0)
 
-/-- The two hops of the seam bond `n - 1, 0`, with entry magnitude `2`. -/
-def seamHops (n : ℕ) : List Hop := [hopBand n (n - 1) 0 2, hopBand n 0 (n - 1) 2]
+/-- The bands of the bonds `j, j + 1` of the open chain: both hops, entry magnitude `2`. -/
+def bondHops (n : ℕ) : List Hop :=
+  (List.range (n - 1)).flatMap fun j ↦ [hopBand n j (j + 1) 2, hopBand n (j + 1) j 2]
 
-/-- **The integer matrix `D = (32 - 3n) I - 2 H_n(g)` as a banded matrix** on the word numbers:
-the seam hops have the entry `-2` on the untwisted ring and `+2` on the twisted ring. -/
-def ringBand (n : ℕ) (g : Fin 2) : Band where
-  pos := (List.range (3 ^ n)).map fun x ↦ (ringDiag n x).toNat
-  neg := (List.range (3 ^ n)).map fun x ↦ (-ringDiag n x).toNat
-  hops := (List.range (n - 1)).flatMap (fun j ↦ [hopBand n j (j + 1) 2, hopBand n (j + 1) j 2]) ++
-    (if g = 0 then seamHops n else [])
-  phops := if g = 0 then [] else seamHops n
+/-- The hop `j → k` with the integer entry `a`, if `a < 0` (a band of `Band.hops`). -/
+def negHop (n j k : ℕ) (a : ℤ) : List Hop := if a < 0 then [hopBand n j k a.natAbs] else []
+
+/-- The hop `j → k` with the integer entry `a`, if `a > 0` (a band of `Band.phops`). -/
+def posHop (n j k : ℕ) (a : ℤ) : List Hop := if 0 < a then [hopBand n j k a.natAbs] else []
+
+/-- **A ring band on the word numbers**: the diagonal `ringDiag` if `e`, the bond hops with the
+entry `-2` if `f`, and the entries `a` on the seam hop `n - 1 → 0` and `b` on `0 → n - 1`. The
+integer rings (`ringBand`) and the four real blocks of the `C`-twisted ring
+(`Heisenberg/ThermalPacked60.lean`) are of this form. -/
+def seamBand (n : ℕ) (e f : Bool) (a b : ℤ) : Band where
+  pos := (List.range (3 ^ n)).map fun x ↦ if e then (ringDiag n x).toNat else 0
+  neg := (List.range (3 ^ n)).map fun x ↦ if e then (-ringDiag n x).toNat else 0
+  hops := (if f then bondHops n else []) ++ negHop n (n - 1) 0 a ++ negHop n 0 (n - 1) b
+  phops := posHop n (n - 1) 0 a ++ posHop n 0 (n - 1) b
 
 /-- The sign of the spin-flip entries of the seam bond: `+1` untwisted, `-1` twisted. -/
 def seamSign : Fin 2 → ℤ := ![1, -1]
+
+/-- **The integer matrix `D = (32 - 3n) I - 2 H_n(g)` as a banded matrix** on the word numbers:
+the seam hops have the entry `-2` on the untwisted ring and `+2` on the twisted ring. -/
+def ringBand (n : ℕ) (g : Fin 2) : Band := seamBand n true true (-2 * seamSign g) (-2 * seamSign g)
 
 /-- The diagonal of `D` in terms of the letters of the word. -/
 theorem ringDiag_wordNum (m : ℕ) (σ : Fin (m + 2) → Fin 3) :
@@ -108,22 +122,44 @@ theorem ringDiag_wordNum (m : ℕ) (σ : Fin (m + 2) → Fin 3) :
       show (j.castSucc : ℕ) + 1 = (j.succ : Fin (m + 2)) by simp, letter_wordNum]
   simp only [h0, hl, hj]
 
-/-- **The entries of the banded matrix in terms of hops.** -/
-theorem ringBand_entry (g : Fin 2) (m : ℕ) (σ τ : Fin (m + 2) → Fin 3) :
-    (ringBand (m + 2) g).matrix (3 ^ (m + 2)) (wordNum (m + 2) σ) (wordNum (m + 2) τ) =
-      (if σ = τ then ringDiag (m + 2) (wordNum (m + 2) σ) else 0) -
-      ∑ i : Fin (m + 1), ((if hopUp i.castSucc i.succ σ = some τ then (2 : ℤ) else 0) +
-        (if hopUp i.succ i.castSucc σ = some τ then (2 : ℤ) else 0)) -
-      seamSign g * ((if hopUp (Fin.last (m + 1)) 0 σ = some τ then (2 : ℤ) else 0) +
-        (if hopUp 0 (Fin.last (m + 1)) σ = some τ then (2 : ℤ) else 0)) := by
+/-- A hop with a signed entry contributes that entry: `-(negative part) + (positive part)`. -/
+theorem signedHop_term {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (a : ℤ) (σ τ : Fin n → Fin 3) :
+    -((negHop n j k a).map fun h ↦ if ((wordNum n τ : Fin _) : ℕ) = h.nb (wordNum n σ) then
+        (h.mask.getD (wordNum n σ) 0 : ℤ) else 0).sum +
+      ((posHop n j k a).map fun h ↦ if ((wordNum n τ : Fin _) : ℕ) = h.nb (wordNum n σ) then
+        (h.mask.getD (wordNum n σ) 0 : ℤ) else 0).sum =
+      a * if hopUp j k σ = some τ then 1 else 0 := by
+  have ht := congrArg (fun x : ℕ ↦ (x : ℤ)) (hopBand_term hjk a.natAbs σ τ)
+  simp only [Nat.cast_ite, Nat.cast_zero, Int.natCast_natAbs] at ht
+  rcases lt_trichotomy a 0 with ha | rfl | ha
+  · simp only [negHop, posHop, ha, ite_true, not_lt.2 ha.le, ite_false, List.map_cons,
+      List.map_nil, List.sum_cons, List.sum_nil, add_zero, ht, abs_of_neg ha]
+    split_ifs <;> ring
+  · simp [negHop, posHop]
+  · simp only [negHop, posHop, ha, ite_true, not_lt.2 ha.le, ite_false, List.map_cons,
+      List.map_nil, List.sum_cons, List.sum_nil, add_zero, neg_zero, zero_add, ht,
+      abs_of_pos ha]
+    split_ifs <;> ring
+
+/-- **The entries of a ring band in terms of hops.** -/
+theorem seamBand_entry (e f : Bool) (a b : ℤ) (m : ℕ) (σ τ : Fin (m + 2) → Fin 3) :
+    (seamBand (m + 2) e f a b).matrix (3 ^ (m + 2)) (wordNum (m + 2) σ) (wordNum (m + 2) τ) =
+      (if σ = τ then (if e then ringDiag (m + 2) (wordNum (m + 2) σ) else 0) else 0) -
+      (if f then ∑ i : Fin (m + 1), ((if hopUp i.castSucc i.succ σ = some τ then (2 : ℤ) else 0) +
+        (if hopUp i.succ i.castSucc σ = some τ then (2 : ℤ) else 0)) else 0) +
+      a * (if hopUp (Fin.last (m + 1)) 0 σ = some τ then 1 else 0) +
+      b * (if hopUp 0 (Fin.last (m + 1)) σ = some τ then 1 else 0) := by
   have hk := (wordNum (m + 2) σ).isLt
   have hm : m + 2 - 1 = m + 1 := by omega
-  have hbond : ((List.range (m + 1)).map fun a ↦ (([hopBand (m + 2) a (a + 1) 2,
-      hopBand (m + 2) (a + 1) a 2]).map fun h ↦
+  have hl0 : (Fin.last (m + 1) : Fin (m + 2)) ≠ 0 := by simp [Fin.ext_iff]
+  have hbond : ((if f then bondHops (m + 2) else []).map fun h ↦
         if ((wordNum (m + 2) τ : Fin _) : ℕ) = h.nb (wordNum (m + 2) σ) then
-          (h.mask.getD (wordNum (m + 2) σ) 0 : ℤ) else 0).sum).sum =
-      ∑ i : Fin (m + 1), ((if hopUp i.castSucc i.succ σ = some τ then (2 : ℤ) else 0) +
-        (if hopUp i.succ i.castSucc σ = some τ then (2 : ℤ) else 0)) := by
+          (h.mask.getD (wordNum (m + 2) σ) 0 : ℤ) else 0).sum =
+      if f then ∑ i : Fin (m + 1), ((if hopUp i.castSucc i.succ σ = some τ then (2 : ℤ) else 0) +
+        (if hopUp i.succ i.castSucc σ = some τ then (2 : ℤ) else 0)) else 0 := by
+    cases f
+    · rfl
+    simp only [ite_true, bondHops, hm, sum_map_flatMap]
     rw [list_sum_range, ← Fin.sum_univ_eq_sum_range]
     refine Finset.sum_congr rfl fun i _ ↦ ?_
     simp only [List.map_cons, List.map_nil, List.sum_cons, List.sum_nil, add_zero]
@@ -134,41 +170,53 @@ theorem ringBand_entry (g : Fin 2) (m : ℕ) (σ τ : Fin (m + 2) → Fin 3) :
     simp only [Fin.val_castSucc, Fin.val_succ, Nat.cast_ite, Nat.cast_zero,
       Nat.cast_ofNat] at h1 h2 ⊢
     rw [h1, h2]
-  have hseam : ((seamHops (m + 2)).map fun h ↦
-        if ((wordNum (m + 2) τ : Fin _) : ℕ) = h.nb (wordNum (m + 2) σ) then
-          (h.mask.getD (wordNum (m + 2) σ) 0 : ℤ) else 0).sum =
-      (if hopUp (Fin.last (m + 1)) 0 σ = some τ then (2 : ℤ) else 0) +
-        (if hopUp 0 (Fin.last (m + 1)) σ = some τ then (2 : ℤ) else 0) := by
-    simp only [seamHops, hm, List.map_cons, List.map_nil, List.sum_cons, List.sum_nil,
-      add_zero]
-    have h1 := congrArg (fun x : ℕ ↦ (x : ℤ))
-      (hopBand_term (n := m + 2) (j := Fin.last (m + 1)) (k := 0) (by simp [Fin.ext_iff]) 2 σ τ)
-    have h2 := congrArg (fun x : ℕ ↦ (x : ℤ))
-      (hopBand_term (n := m + 2) (j := 0) (k := Fin.last (m + 1)) (by simp [Fin.ext_iff]) 2 σ τ)
-    push_cast at h1 h2
-    exact congrArg₂ (· + ·) h1 h2
+  have hA := signedHop_term hl0 a σ τ
+  have hB := signedHop_term hl0.symm b σ τ
+  simp only [Fin.val_last, Fin.val_zero] at hA hB
   have hdiag : (if wordNum (m + 2) σ = wordNum (m + 2) τ then
-      (((List.range (3 ^ (m + 2))).map fun x ↦ (ringDiag (m + 2) x).toNat).getD
+      (((List.range (3 ^ (m + 2))).map fun x ↦ if e then (ringDiag (m + 2) x).toNat else 0).getD
         (wordNum (m + 2) σ) 0 : ℤ) -
-        (((List.range (3 ^ (m + 2))).map fun x ↦ (-ringDiag (m + 2) x).toNat).getD
-          (wordNum (m + 2) σ) 0 : ℤ) else 0) =
-      if σ = τ then ringDiag (m + 2) (wordNum (m + 2) σ) else 0 := by
-    rw [getD_map_range _ _ _ _ hk, getD_map_range _ _ _ _ hk, Int.toNat_sub_toNat_neg]
+        (((List.range (3 ^ (m + 2))).map fun x ↦
+          if e then (-ringDiag (m + 2) x).toNat else 0).getD (wordNum (m + 2) σ) 0 : ℤ) else 0) =
+      if σ = τ then (if e then ringDiag (m + 2) (wordNum (m + 2) σ) else 0) else 0 := by
+    rw [getD_map_range _ _ _ _ hk, getD_map_range _ _ _ _ hk]
     simp only [(wordNum (m + 2)).injective.eq_iff]
-  simp only [Band.matrix, ringBand, List.map_append, List.sum_append, sum_map_flatMap, hm]
+    cases e <;> simp
+  simp only [Band.matrix, seamBand, List.map_append, List.sum_append, hm]
   rw [hdiag, hbond]
-  fin_cases g
-  · simp only [Fin.zero_eta, ↓reduceIte, List.map_nil, List.sum_nil, add_zero, hseam,
-      seamSign, Matrix.cons_val_zero, one_mul]
-    ring
-  · simp only [Fin.mk_one, Fin.isValue, one_ne_zero, ↓reduceIte, List.map_nil, List.sum_nil,
-      add_zero, hseam, seamSign, Matrix.cons_val_one, Matrix.cons_val_fin_one]
-    ring
+  linarith
+
+/-- **The entries of the banded matrix in terms of hops.** -/
+theorem ringBand_entry (g : Fin 2) (m : ℕ) (σ τ : Fin (m + 2) → Fin 3) :
+    (ringBand (m + 2) g).matrix (3 ^ (m + 2)) (wordNum (m + 2) σ) (wordNum (m + 2) τ) =
+      (if σ = τ then ringDiag (m + 2) (wordNum (m + 2) σ) else 0) -
+      ∑ i : Fin (m + 1), ((if hopUp i.castSucc i.succ σ = some τ then (2 : ℤ) else 0) +
+        (if hopUp i.succ i.castSucc σ = some τ then (2 : ℤ) else 0)) -
+      seamSign g * ((if hopUp (Fin.last (m + 1)) 0 σ = some τ then (2 : ℤ) else 0) +
+        (if hopUp 0 (Fin.last (m + 1)) σ = some τ then (2 : ℤ) else 0)) := by
+  rw [ringBand, seamBand_entry]
+  simp only [ite_true]
+  split_ifs <;> ring
 
 /-- The cyclic successor of `i < m + 1` in a ring of `m + 2` sites. -/
 theorem finRotate_castSucc (m : ℕ) (i : Fin (m + 1)) :
     finRotate (m + 2) i.castSucc = i.succ :=
   Fin.ext (by rw [coe_finRotate_of_ne_last (Fin.castSucc_lt_last i).ne]; simp)
+
+/-- A ring of `m + 2` sites is the sum of its `m + 1` open bonds and the closing bond. -/
+theorem twistedRing_apply {R : Type*} [AddCommMonoid R]
+    (B Bc : Matrix (Fin 3 × Fin 3) (Fin 3 × Fin 3) R) (m : ℕ) (σ τ : Fin (m + 2) → Fin 3) :
+    twistedRingHamiltonian B Bc (m + 2) σ τ =
+      ∑ i : Fin (m + 1), bondOp i.castSucc i.succ B σ τ + bondOp (Fin.last (m + 1)) 0 Bc σ τ := by
+  simp only [twistedRingHamiltonian, Matrix.sum_apply]
+  rw [Fin.sum_univ_castSucc]
+  congr 1
+  · refine Finset.sum_congr rfl fun i _ ↦ ?_
+    have hi : ¬((i.castSucc : Fin (m + 2)) : ℕ) + 1 = m + 2 := by simp; omega
+    rw [finRotate_castSucc]
+    simp only [hi, ite_false]
+  · rw [finRotate_last]
+    simp only [Fin.val_last, ite_true]
 
 /-- **The entries of `D = (32 - 3n) I - 2 H_n(g)` in terms of hops.** -/
 theorem thermalMatrix_apply (g : Fin 2) (m : ℕ) (σ τ : Fin (m + 2) → Fin 3) :
@@ -194,16 +242,8 @@ theorem thermalMatrix_apply (g : Fin 2) (m : ℕ) (σ τ : Fin (m + 2) → Fin 3
       ring
   have hring : ringZ (m + 2) g σ τ =
       ∑ i : Fin (m + 1), bondOp i.castSucc i.succ exchangeZ σ τ +
-        bondOp (Fin.last (m + 1)) 0 (seamBond g) σ τ := by
-    simp only [ringZ, twistedRingHamiltonian, Matrix.sum_apply]
-    rw [Fin.sum_univ_castSucc]
-    congr 1
-    · refine Finset.sum_congr rfl fun i _ ↦ ?_
-      have hi : ¬((i.castSucc : Fin (m + 2)) : ℕ) + 1 = m + 2 := by simp; omega
-      rw [finRotate_castSucc]
-      simp only [hi, ite_false]
-    · rw [finRotate_last]
-      simp only [Fin.val_last, ite_true]
+        bondOp (Fin.last (m + 1)) 0 (seamBond g) σ τ :=
+    twistedRing_apply exchangeZ (seamBond g) m σ τ
   have ite2 : ∀ (c : Prop) [Decidable c], (if c then (2 : ℤ) else 0) = 2 * if c then 1 else 0 :=
     fun c _ ↦ by split_ifs <;> simp
   have hb : ∀ i : Fin (m + 1), bondOp i.castSucc i.succ exchangeZ σ τ =
@@ -640,6 +680,49 @@ theorem packedTotal_spec {P : Params} {D : Band} {f : ℕ → ℕ} {d : ℕ} {cs
     rw [List.getD_eq_getElem?_getD, List.getElem?_replicate_of_lt (mem_range.1 hk),
       Option.getD_some]
     simp only [Nat.cast_one, one_mul]
+  rw [Finset.sum_congr rfl hN', ← sum_range_eq_sum_repCols, ← sum_comp_eq_sum_count hf G] at hN
+  exact hN
+
+/-- **A packed total of norms** `∑_ρ ν_ρ ∑_{k < d} N(X_ρ(k), X_ρ(d + k))`, `N(a, b) = a² - ab + b²`,
+for a banded matrix `D` on `2d` rows whose rows `k` and `d + k` hold the coordinates `u` and
+`v` of `u + vω` (`Trace/PackedRealify.lean`); `f` maps a number below `d` to its
+representative, as in `packedTotal`. -/
+def packedTotalE (P : Params) (D : Band) (f : ℕ → ℕ) (d : ℕ) (cs : List ℕ) : Option ℤ :=
+  let cst := D.cst P (d + d)
+  if D.check P cst (d + d) then
+    let cnt := countArr d f
+    let cols := repCols cnt d
+    (runCols P D cst (d + d) (colUnits P.w cols (d + d)) cols.length cs).map fun ys ↦
+      numeratorE P d (cols.map (cnt.getD · 0)) ys
+  else none
+
+/-- **The packed total of norms is the sum over all `x < d` of the norm of their
+representative column**; the band check also gives `D.InRange (d + d)`. -/
+theorem packedTotalE_spec {P : Params} {D : Band} {f : ℕ → ℕ} {d : ℕ} {cs : List ℕ} {W : ℤ}
+    (hP : P.Ok) (hcs : ∀ t ∈ cs, t ≤ P.B) (hf : ∀ x < d, f x < d)
+    (h : packedTotalE P D f d cs = some W) :
+    D.InRange (d + d) ∧ W = ∑ x ∈ range d, ∑ k ∈ range d,
+      normSqZ (specCol D P.s (f x) (cs.map (↑)) k) (specCol D P.s (f x) (cs.map (↑)) (d + k)) := by
+  simp only [packedTotalE] at h
+  split_ifs at h with hchk
+  obtain ⟨ys, hrun, rfl⟩ := Option.map_eq_some_iff.1 h
+  obtain ⟨hD, hR⟩ := Band.check_spec hchk
+  refine ⟨hD, ?_⟩
+  set cnt := countArr d f
+  set cols := repCols cnt d
+  have hnd : cols.Nodup := List.nodup_range.filter _
+  have hN := runCols_numeratorE hP hD hR (colUnits_ok P hnd _) hcs hrun
+    (v := cols.map (cnt.getD · 0)) (by simp)
+  -- `G j = ∑_k N(X_j(k), X_j(d + k))`, the norm of the column `j`.
+  let G : ℕ → ℤ := fun j ↦ ∑ k ∈ range d,
+    normSqZ (specCol D P.s j (cs.map (↑)) k) (specCol D P.s j (cs.map (↑)) (d + k))
+  rw [Finset.sum_comm] at hN
+  have hN' : ∀ r ∈ range cols.length,
+      ∑ k ∈ range d, ((cols.map (cnt.getD · 0)).getD r 0 : ℤ) *
+        normSqZ (specCol D P.s (cols.getD r 0) (cs.map (↑)) k)
+          (specCol D P.s (cols.getD r 0) (cs.map (↑)) (d + k)) =
+      ((cols.map (cnt.getD · 0)).getD r 0 : ℤ) * G (cols.getD r 0) := fun r _ ↦ by
+    simp only [G, Finset.mul_sum]
   rw [Finset.sum_congr rfl hN', ← sum_range_eq_sum_repCols, ← sum_comp_eq_sum_count hf G] at hN
   exact hN
 

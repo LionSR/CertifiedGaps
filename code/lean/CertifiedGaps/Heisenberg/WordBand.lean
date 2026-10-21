@@ -180,18 +180,19 @@ theorem hopUp_eq_some {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (σ τ : Fin n →
 theorem hopUp_ne_self {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (σ : Fin n → Fin 3) :
     hopUp j k σ ≠ some σ := fun h ↦ by have := ((hopUp_eq_some hjk σ σ).1 h).2.1; omega
 
-/-- **An exchange-type bond in the `S^z` basis, entry by entry**: if the two-site matrix `B` is
-`mz mz` on the diagonal and `c` on the two spin-flip hops, the bond embedded on sites `j, k` has
-the diagonal `mz mz` and the entry `c` for each of the two hops. -/
-theorem bondOp_apply_of_flip {n : ℕ} {j k : Fin n} (hjk : j ≠ k)
-    {B : Matrix (Fin 3 × Fin 3) (Fin 3 × Fin 3) ℤ} {c : ℤ}
-    (hB : ∀ p q, B p q = (if p = q then mz p.1 * mz p.2 else 0) +
-      c * (if p.1.val = q.1.val + 1 ∧ p.2.val + 1 = q.2.val then 1 else 0) +
-      c * (if p.1.val + 1 = q.1.val ∧ p.2.val = q.2.val + 1 then 1 else 0))
+/-- **A bond of spin-flip type in the `S^z` basis, entry by entry**: if the two-site matrix `B`
+is `e mz mz` on the diagonal, `c₁` on the hop that lowers the first site and `c₂` on the hop that
+raises it, the bond embedded on sites `j, k` has the diagonal `e mz mz`, the entry `c₁` for the
+hop `j → k` and `c₂` for the hop `k → j`. (The `C`-twisted seam has `c₁ ≠ c₂`.) -/
+theorem bondOp_apply_of_flip₂ {n : ℕ} {j k : Fin n} (hjk : j ≠ k)
+    {B : Matrix (Fin 3 × Fin 3) (Fin 3 × Fin 3) ℤ} {e c₁ c₂ : ℤ}
+    (hB : ∀ p q, B p q = (if p = q then e * (mz p.1 * mz p.2) else 0) +
+      c₁ * (if p.1.val = q.1.val + 1 ∧ p.2.val + 1 = q.2.val then 1 else 0) +
+      c₂ * (if p.1.val + 1 = q.1.val ∧ p.2.val = q.2.val + 1 then 1 else 0))
     (σ τ : Fin n → Fin 3) :
-    bondOp j k B σ τ = (if σ = τ then mz (σ j) * mz (σ k) else 0) +
-      c * (if hopUp j k σ = some τ then 1 else 0) +
-        c * (if hopUp k j σ = some τ then 1 else 0) := by
+    bondOp j k B σ τ = (if σ = τ then e * (mz (σ j) * mz (σ k)) else 0) +
+      c₁ * (if hopUp j k σ = some τ then 1 else 0) +
+        c₂ * (if hopUp k j σ = some τ then 1 else 0) := by
   simp only [bondOp, of_apply, hB]
   by_cases hag : ∀ i, i ≠ j → i ≠ k → σ i = τ i
   · rw [ite_eq_left hag]
@@ -218,6 +219,21 @@ theorem bondOp_apply_of_flip {n : ℕ} {j k : Fin n} (hjk : j ≠ k)
     have h3 : hopUp k j σ ≠ some τ := fun h ↦
       hag fun i hj hk ↦ ((hopUp_eq_some (Ne.symm hjk) σ τ).1 h).1 i hk hj
     simp [h1, h2, h3]
+
+/-- **An exchange-type bond in the `S^z` basis, entry by entry**: if the two-site matrix `B` is
+`mz mz` on the diagonal and `c` on the two spin-flip hops, the bond embedded on sites `j, k` has
+the diagonal `mz mz` and the entry `c` for each of the two hops. -/
+theorem bondOp_apply_of_flip {n : ℕ} {j k : Fin n} (hjk : j ≠ k)
+    {B : Matrix (Fin 3 × Fin 3) (Fin 3 × Fin 3) ℤ} {c : ℤ}
+    (hB : ∀ p q, B p q = (if p = q then mz p.1 * mz p.2 else 0) +
+      c * (if p.1.val = q.1.val + 1 ∧ p.2.val + 1 = q.2.val then 1 else 0) +
+      c * (if p.1.val + 1 = q.1.val ∧ p.2.val = q.2.val + 1 then 1 else 0))
+    (σ τ : Fin n → Fin 3) :
+    bondOp j k B σ τ = (if σ = τ then mz (σ j) * mz (σ k) else 0) +
+      c * (if hopUp j k σ = some τ then 1 else 0) +
+        c * (if hopUp k j σ = some τ then 1 else 0) := by
+  simpa only [one_mul] using bondOp_apply_of_flip₂ hjk (e := 1) (c₁ := c) (c₂ := c)
+    (fun p q ↦ by rw [hB p q, one_mul]) σ τ
 
 /-- **The integer bond in the `S^z` basis, entry by entry**: the diagonal `mz mz` and one unit
 entry for each of the two bond hops. -/
@@ -288,5 +304,32 @@ theorem hopBand_term {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (c : ℕ) (σ τ : 
   · have hh : hopUp j k σ = none := dite_eq_right hc
     rw [hh, ite_eq_right hc]
     simp
+
+/-- **A hop band stays in range**: a nonzero entry in row `x < 3ⁿ` couples to a word number
+`< 3ⁿ`, and a band below the diagonal does not reach below `0` (`Band.InRange`). -/
+theorem hopBand_inRange {n : ℕ} {j k : Fin n} (hjk : j ≠ k) (c x : ℕ) (hx : x < 3 ^ n)
+    (hm : (hopBand n j k c).mask.getD x 0 ≠ 0) :
+    ((hopBand n j k c).up = true → x + (hopBand n j k c).off < 3 ^ n) ∧
+      ((hopBand n j k c).up = false → (hopBand n j k c).off ≤ x) := by
+  set σ := (wordNum n).symm ⟨x, hx⟩
+  have hσ : (wordNum n σ : ℕ) = x := by simp [σ]
+  have hmask : (hopBand n j k c).mask.getD x 0 =
+      if 1 ≤ (σ j : ℕ) ∧ (σ k : ℕ) ≤ 1 then c else 0 := by
+    rw [hopBand, getD_map_range _ _ _ _ hx, ← hσ, digit_wordNum, digit_wordNum]
+  rw [hmask] at hm
+  have hc : 1 ≤ (σ j : ℕ) ∧ (σ k : ℕ) ≤ 1 := by by_contra h; exact hm (ite_eq_right h)
+  obtain ⟨τ, hτ⟩ : ∃ τ, hopUp j k σ = some τ := ⟨_, dite_eq_left hc⟩
+  have ht := hopBand_term hjk c σ τ
+  rw [hτ, ite_eq_left rfl, hσ] at ht
+  have hnb : (wordNum n τ : ℕ) = (hopBand n j k c).nb x := by
+    by_contra h; rw [ite_eq_right h] at ht; exact hm (by rw [ite_eq_left hc]; exact ht.symm)
+  have hlt := (wordNum n τ).isLt
+  refine ⟨fun hu ↦ ?_, fun hu ↦ ?_⟩
+  · simp only [Hop.nb, hu, ite_true] at hnb; omega
+  · have h3 := le_wordNum σ j hc.1
+    rw [hσ] at h3
+    simp only [hopBand, decide_eq_false_iff_not] at hu ⊢
+    simp only [hu, ite_false]
+    exact le_trans (Nat.sub_le _ _) h3
 
 end CertifiedGaps.SpinOneHeisenberg

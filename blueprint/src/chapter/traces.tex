@@ -225,6 +225,32 @@ of a shifted Gibbs operator. Integer division introduces a bounded error at each
   coefficient list. The range and offset bounds prevent carries from changing another lane.
 \end{proof}
 
+\begin{lemma}[Recurrences over the Eisenstein integers as integer band recurrences]
+  \label{lem:trace-realify}
+  \lean{CertifiedGaps.Trace.realify, CertifiedGaps.Trace.hornerFloorE_realify,
+    CertifiedGaps.Trace.hornerFloor_smul,
+    CertifiedGaps.Trace.Packed.realBand, CertifiedGaps.Trace.Packed.realBand_entry,
+    CertifiedGaps.Trace.Packed.runCols_numeratorE}
+  \leanok
+  \uses{lem:trace-eisenstein, lem:trace-packed}
+  Write a matrix over \(\mathbb Z[\omega]\) as \(A+I\omega\) with integer matrices \(A\) and
+  \(I\). Since \((a+b\omega)(u+v\omega)=(au-bv)+(bu+(a-b)v)\omega\), it acts on the coordinates
+  \((u,v)\) as the integer block matrix
+  \(\left(\begin{smallmatrix}A&-I\\I&A-I\end{smallmatrix}\right)\).
+  The recurrence of Lemma~\ref{lem:trace-eisenstein} is the integer Horner recurrence of this
+  block matrix: the floor acts on each coordinate, and the coefficient adds to \(u\) only.
+  Scaling the matrix and the divisor by the same positive integer does not change the
+  recurrence. Four band matrices on \(d\) rows, placed as the blocks of one band matrix on
+  \(2d\) rows, have the expected entries if each stays in range. A successful packed run on
+  that band matrix gives the weighted sum of \(u^2-uv+v^2\) over the rows \(k\) and \(d+k\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Induct over the coefficient list, using the block form of the matrix product. For the band
+  entries, compare the moved bands with the original ones row by row. For the numerator, read
+  the lanes of rows \(k\) and \(d+k\) as in Lemma~\ref{lem:trace-packed}.
+\end{proof}
+
 \section{Orbit representatives and twisted traces}
 
 Column symmetries reduce a trace computation to representatives with exact multiplicities.

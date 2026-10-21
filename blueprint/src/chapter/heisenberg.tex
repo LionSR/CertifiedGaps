@@ -422,9 +422,37 @@ The cyclic seam requires Eisenstein integers.
   Lemma~\ref{lem:spin1-horner36-packed}.
 \end{proof}
 
-Compiled code, which is not a proof, reproduces the four printed totals with \(n = 6, 8\) and
-twists \(1\), \(P\) (\texttt{SeedKernel/Eval/ThermalTotals60.lean}). The twist \(C\) and the
-length \(n = 10\) are not evaluated.
+\begin{lemma}[A fast evaluation of the totals with twist \(C\)]
+  \label{lem:spin1-horner60-packed-c}
+  \lean{CertifiedGaps.SpinOneHeisenberg.ThermalPacked.seamBand,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.seamBand_entry,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.ringBandC,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.thermalMatrix60_two_entry,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.realify_thermalMatrix60_two,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.thermalColumn60_two_eq,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.packedTotalE_spec,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.hornerTotal60_two_eq_of_packed,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.packedTotal60,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.hornerTotals60_of_packed}
+  \leanok
+  \uses{lem:spin1-horner60-packed, lem:trace-realify}
+  For the twist \(C\), \(2B\) has the entry \(-2\omega\) on the seam hop \(n-1\to0\) and
+  \(-2\bar\omega=2+2\omega\) on the seam hop \(0\to n-1\); elsewhere it is the integer matrix of
+  the open chain. Each block of its real form is a band of the same kind, with the diagonal
+  and the bond hops or without them, and integer entries on the two seam hops. Let
+  \texttt{packedTotal60} run the packed recursion on the real form for the twist \(C\), and as
+  in Lemma~\ref{lem:spin1-horner60-packed} for the twists \(1\) and \(P\). For even
+  \(n \ge 2\), if it returns \(W\), then the total of \texttt{HornerTotals60} equals \(W\). In
+  particular, if it returns the nine printed totals, \texttt{HornerTotals60} holds.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Compute the two coordinates of the entries of \(2B\) from the bond entries, compare them
+  with the four blocks, and apply Lemma~\ref{lem:trace-realify}.
+\end{proof}
+
+Compiled code, which is not a proof, reproduces the six printed totals with \(n = 6, 8\)
+(\texttt{SeedKernel/Eval/ThermalTotals60.lean}). The length \(n = 10\) is not evaluated.
 
 \begin{theorem}[The second trace table from its printed integers]
   \label{thm:spin1-table60}

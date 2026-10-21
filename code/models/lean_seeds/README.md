@@ -263,9 +263,9 @@ julia --project=. -e 'using Pkg; Pkg.instantiate()'
 julia --project=. test/runtests.jl         # 30 s: 1,582 unit tests across all five studies (Julia only)
 julia --project=. check.jl                 # 1 min: exact rational replays + data checks, then
                                            #   `lake build SeedKernel` and the Lean axiom audit
-julia --project=. check.jl --full          # 18 min: also regenerate the spin-1 Lean witnesses,
+julia --project=. check.jl --full          # 25 min: also regenerate the spin-1 Lean witnesses,
                                            #   rebuild SeedKernel from clean, run the compiled
-                                           #   evaluations in `SeedKernel/Eval` (about 10 min, not a
+                                           #   evaluations in `SeedKernel/Eval` (about 17 min, not a
                                            #   proof), and run all benchmarks
 julia --project=. certify.jl [study ...]   # 75 s: regenerate exact JSON records and Lean witnesses
 ```
