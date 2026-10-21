@@ -1,0 +1,2 @@
+# Regenerable floating-point caches from scripts/scan.jl and scripts/refine_beta.jl;
+# scripts/report.jl condenses them into results/scan_summary.json.

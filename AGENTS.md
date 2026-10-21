@@ -25,7 +25,7 @@ If:
 then every even ring length $L \ge n_0$ has a unique ground state and a spectral gap
 $\Delta_L = E_1(L) - E_0(L) \ge$ `certified_gap_bound(εₛ, εₜ, β₀).bound`. Constant energy shifts cancel
 identically in both purities. For $c$-site unit cells, ring lengths $L$ count unit cells and the cell
-may carry an internal reflection $F$ (a real symmetric involution satisfying $-h = \sum_\alpha C_\alpha \otimes F \overline{C_\alpha} F$ and $F o F = o$, corresponding to a palindromic cell with $h_{c-k} = h_k$), as proved in `notes/thermal-mpo-gap-scope.tex` and formalized in the Lean structure `RPRing`. Using an odd seed length $n_0$ requires an explicit positivity argument for the transfer operator (see `models/spin1_dimerized/`).
+may carry an internal reflection $F$ (a real symmetric involution satisfying $-h = \sum_\alpha C_\alpha \otimes F \overline{C_\alpha} F$ and $F o F = o$, corresponding to a palindromic cell with $h_{c-k} = h_k$), as proved in `paper/thermal-mpo-gap-scope.tex` and formalized in the Lean structure `RPRing`. Using an odd seed length $n_0$ requires an explicit positivity argument for the transfer operator (see `code/models/spin1_dimerized/`).
 
 A **gap certificate** for a model consists of four components:
 
@@ -60,6 +60,8 @@ Use consistent terminology and notation across all documentation and comments:
   and *thermal purity* $P_\tau(n, \beta) = Z_n(2\beta)/Z_n(\beta)^2$ (`P_τ(n, β)`; never "Gibbs purity" or
   "temporal purity"). Their complements $1 - P_{\mathrm{s}}$ and $1 - P_\tau$ are the *spatial defect* and
   *thermal defect*, bounded at the seed scale $(n_0, \beta_0)$ by $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$ (`εₛ`, `εₜ`).
+  On the public website (`home_page/`), the overview follows the talk notation $P_{\mathrm S}, P_{\mathrm T}$ and
+  seed defects $(p, q)$.
 - **Hamiltonian and transfer operator:** $H_L = \sum_j h_{j,j+1} + \sum_j o_j$ on a ring of $L$ unit cells
   ($N = cL$ spins for a $c$-site cell), with bond term $h$, on-site term $o$, internal cell reflection $F$,
   and spatial transfer operator $X_\beta$ ($`\mathrm{Tr}\, X_\beta^L = Z_L(\beta)`$). For spin-$`S`$ chains in the
@@ -95,51 +97,58 @@ that makes the seed purities computable or boundable beyond raw dense diagonaliz
 - **Asymmetric and half-length seeds:** The criterion needs only $P_{\mathrm{s}}(n_0, \beta_0)$ and
   $P_\tau(2n_0, \beta_0)$. By the exact coupling identity
   $`P_\tau(2n_0, \beta_0) = P_{\mathrm{s}}(n_0, 2\beta_0)\,P_\tau(n_0, \beta_0)^2 / P_{\mathrm{s}}(n_0, \beta_0)^2 \ge P_{\mathrm{s}}(n_0, 2\beta_0)\,P_\tau(n_0, \beta_0)^2`$
-  (`notes/thermal-mpo-gap-scope.tex`, Appendix E), $P_\tau(2n_0, \beta_0)$ can be
+  (`paper/thermal-mpo-gap-scope.tex`, Appendix E), $P_\tau(2n_0, \beta_0)$ can be
   bounded in terms of $P_\tau(n_0, \beta_0)$ and $P_{\mathrm{s}}(n_0, 2\beta_0)$, halving the largest required
   ring length. Moreover, the asymmetric recurrence is much more tolerant of the spatial defect
   $\varepsilon_{\mathrm{s}}$ than the thermal defect $\varepsilon_\tau$; allocate computational effort accordingly.
 - **Symmetry and exact counting:** Use character formulas, $\mathrm{SU}(2)$ multiplet counting, and
-  sector inversion from twisted traces (as in `models/spin1/`) rather than enumerating individual basis states.
+  sector inversion from twisted traces (as in `code/models/spin1/`) rather than enumerating individual basis states.
 - **Variational sandwiches:** Upper bounds on $E_0(2n)$ from trial states (such as MPS) combined with
   lower bounds on $E_0(n)$ (such as Anderson cluster bounds) bound the ground-energy doubling mismatch
   $\delta(n) = E_0(2n) - 2E_0(n)$.
 
-Start every task by writing `models/<slug>/IDEAS.md`: explain the candidate routes, why each might or
+Start every task by writing `code/models/<slug>/IDEAS.md`: explain the candidate routes, why each might or
 might not work for the model, how its cost scales with $n_0$ and $\beta_0$, and which route was chosen.
 Commit that memo even if the implementation fails; a clear negative result ("route X fails because ...")
 is valuable documentation.
 
 ## Repository layout
 
-- `notes/`: LaTeX notes (main proof, scope, certificate method, and $`2+1`$D extension). Do not edit unless asked.
-- `explainer/`: illustrated HTML exposition of the ring and open-chain proofs.
-- `julia/`: shared core package `CertifiedGaps` (recurrence and certified bounds, exact arithmetic,
+- The top-level organization follows APP: `paper/`, `code/`, `data/`, `environment/`, and
+  `supplementary/`. This layout alone does not establish APP release validation.
+- `environment/README.md`: setup commands and canonical dependency specifications.
+- `data/models/<slug>/`: canonical stored model results. The model-local `results/` path is
+  a relative symlink to this directory, preserving checker paths and certificate contents.
+- `data/references/`: ignored external evidence fetched by `code/tools/fetch_upstream.jl`;
+  `code/references` is a compatibility symlink for hash-pinned source code.
+- `paper/`: LaTeX notes (main proof, scope, certificate method, and $`2+1`$D extension). Do not edit unless asked.
+- `supplementary/explainer/`: illustrated HTML exposition of the ring and open-chain proofs.
+- `code/julia/`: shared core package `CertifiedGaps` (recurrence and certified bounds, exact arithmetic,
   results I/O, spin operators, RP tests and exact RP certificates, exact diagonalization, verified ring
   spectra and `certify_gap`, Nemo/Arb certified MPO toolkit, and ITensors purification extension). See
-  `julia/README.md`.
-- `models/spin1/`: exact-arithmetic reproduction of the spin-1 Heisenberg certificate (integer Poisson
+  `code/julia/README.md`.
+- `code/models/spin1/`: exact-arithmetic reproduction of the spin-1 Heisenberg certificate (integer Poisson
   trace recursion with twisted rings and symmetry representatives, polynomial filters, and MPS trial
   contractions). Serves as the reference template for large-$`n`$ exact certificates.
-- `models/<model-slug>/`: **where new model certificates live** (one directory per model). Update the
+- `code/models/<model-slug>/`: **where new model certificates live** (one directory per model). Update the
   summary table in the root `README.md` whenever you add or update a model.
-- `lean/`: Lean 4 formalization of the criterion and of each certified model's gap theorem (library
+- `code/lean/`: Lean 4 formalization of the criterion and of each certified model's gap theorem (library
   `CertifiedGaps`, with the two seeds as hypotheses), plus the opt-in library `SeedKernel` for
   kernel-checked seed arithmetic (`lake build SeedKernel`).
-- `models/lean_seeds/`: generators and studies for seeds checked inside the Lean kernel (`decide +kernel`
+- `code/models/lean_seeds/`: generators and studies for seeds checked inside the Lean kernel (`decide +kernel`
   only; Julia generates witness files and Lean verifies them); its generators write the witness files
-  under `lean/SeedKernel`.
-- `leaderboard/`: Lean library `Leaderboard` packaging every Lean-verified gap record (`Record.Unconditional`
-  and `Record.Seeded`) and the `leaderboard_audit` executable. See `leaderboard/README.md`.
+  under `code/lean/SeedKernel`.
+- `code/leaderboard/`: Lean library `Leaderboard` packaging every Lean-verified gap record (`Record.Unconditional`
+  and `Record.Seeded`) and the `leaderboard_audit` executable. See `code/leaderboard/README.md`.
 - `blueprint/`, `home_page/`: the `leanblueprint` dependency graph/web/PDF and the Jekyll project website
   and leaderboard (`home_page/_data/records.yml`).
-- `tools/`: `fetch_upstream.jl` (downloads pinned upstream evidence/paper files) and `tools/leaderboard/`
+- `code/tools/`: `fetch_upstream.jl` (downloads pinned upstream evidence/paper files) and `code/tools/leaderboard/`
   (`LeaderboardCheck`, validating `home_page/_data/records.yml` against the certificates and Lean audit).
 
 ## Directory format
 
-Every `models/<slug>/` directory must contain only these top-level entries (see
-`models/heisenberg_staggered_field` for a standard certificate and `models/blbq_haldane` for a negative
+Every `code/models/<slug>/` directory must contain only these top-level entries (see
+`code/models/heisenberg_staggered_field` for a standard certificate and `code/models/blbq_haldane` for a negative
 result):
 
 | entry | content |
@@ -154,7 +163,7 @@ result):
 | `src/` | model-specific library code |
 | `scripts/` | exploratory, scan, report, and audit driver scripts |
 | `test/runtests.jl` | fast unit and regression tests (may include auxiliary files in `test/`) |
-| `results/` | committed certificate data (`results/certificate*.json[.gz]`) and compact summaries |
+| `results/` | relative symlink to `../../../data/models/<slug>/`; certificates and compact summaries live there |
 
 Do not add other top-level files. The only exception is a file whose SHA-256 hash is recorded by path
 inside a committed certificate that takes more than 10 minutes to regenerate: keep such files in place
@@ -185,11 +194,14 @@ Keep `README.md` concise and self-contained; place long derivations, scan tables
 Use Julia 1.12. From the repository root:
 
 ```sh
-julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+julia --project=code/julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 ```
 
+See `environment/README.md` for the complete setup and dependency locations. Keep package
+manifests beside their packages: the model manifests contain relative paths to the shared core.
+
 Models share one environment, the core's: run every model script from the repository root with
-`--project=julia` (for example `julia --project=julia models/<slug>/check.jl`). A model does not
+`--project=code/julia` (for example `julia --project=code/julia code/models/<slug>/check.jl`). A model does not
 get its own `Project.toml`/`Manifest.toml`; if it needs a package the core lacks, add the
 dependency to the core in a separate commit, or explain in its `README.md` why it cannot share the
 core environment. Set `OPENBLAS_NUM_THREADS=1` unless multi-threaded BLAS is specifically needed.
@@ -206,24 +218,28 @@ enclosures (`spectral_gap_enclosure`) are core features; do not reimplement them
 
 ## Rules
 
-- Work only inside `models/<your-model-slug>/` unless the task explicitly specifies otherwise. If
-  `CertifiedGaps` is missing generic functionality needed by multiple models, add it to `julia/` in a
+- Work only inside `code/models/<your-model-slug>/` unless the task explicitly specifies otherwise. If
+  `CertifiedGaps` is missing generic functionality needed by multiple models, add it to `code/julia/` in a
   separate, minimal commit with unit tests and explain why.
 - **Source hashes:** a checker enforces (fails on mismatch) only **model-local** sources, that is,
   the model's own `src/`, `certify.jl`, `check.jl`, the scripts that produce the certificate, and
   its `Project.toml`/`Manifest.toml` if it has its own environment, recorded in
   `metadata["source_sha256"]`; if a checker checks
   the recorded key set, it compares it with that model-local set only. The shared core
-  (`julia/src`, `julia/Project.toml`, `julia/Manifest.toml`) is recorded under
-  `metadata["core_sha256"]`, keyed by repository path (`julia/src/Results.jl`), as provenance
+  (`code/julia/src`, `code/julia/Project.toml`, `code/julia/Manifest.toml`) is recorded under
+  `metadata["core_sha256"]`, keyed relative to the `code/` workspace (`julia/src/Results.jl`), as provenance
   only: the checker reruns the core arithmetic instead of pinning its bytes. Do not hash
-  `notes/` or `METHOD.md`. Editing or adding core files, notes, or a `METHOD.md` therefore does
+  `paper/` or `METHOD.md`. Editing or adding core files, notes, or a `METHOD.md` therefore does
   not invalidate a certificate, but checkers rerun the core arithmetic, so any change to
-  `julia/src` must keep every model checker and test passing; run them all. Use
+  `code/julia/src` must keep every model checker and test passing; run them all. Use
   `Results.model_metadata` to record both hash sets and `Results.verify_model_metadata` (same
   `dirs` and `files`) to check the model-local set.
-- Never modify `models/spin1/results`, `models/spin2/results`, or anything under `lean/` (except when
-  running `models/lean_seeds/certify.jl` to regenerate the witness files in `lean/SeedKernel`).
+- Historical certificate source keys such as `models/<slug>/src/...` are relative to `code/`.
+  Do not add a `code/` prefix inside stored certificates. Existing manuscript paths and
+  immutable source comments may use this historical convention; see `paper/README.md`.
+- Never modify `data/models/spin1`, `data/models/spin2` (including through their model `results/`
+  links), or anything under `code/lean/` (except when
+  running `code/models/lean_seeds/certify.jl` to regenerate the witness files in `code/lean/SeedKernel`).
 - Do not add Python files; all code in this repository is written in Julia, Lean 4, or LaTeX.
 - Store every exact rational or integer in certificate JSON files as a string (`"num//den"` or `"int"`)
   using `CertifiedGaps.Results.write_result` and `parse_exact_json`. Record source file SHA-256 hashes

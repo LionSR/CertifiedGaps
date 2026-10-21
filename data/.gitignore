@@ -1,0 +1,47 @@
+# Regenerable model outputs; committed certificates and compact summaries stay tracked.
+
+# aklt
+/models/aklt/*
+!/models/aklt/README.md
+
+# blbq_haldane
+/models/blbq_haldane/*.tmp
+/models/blbq_haldane/spectrum_L*
+/models/blbq_haldane/su2_L14_S*
+
+# dimerized_heisenberg
+/models/dimerized_heisenberg/numerical_delta_*.json
+/models/dimerized_heisenberg/diagnostic20_[0-9]*.json
+
+# heisenberg_staggered_field
+/models/heisenberg_staggered_field/scan_*.json
+
+# lean_seeds
+/models/lean_seeds/seed_design/raw/
+/models/lean_seeds/spectrum/filter_s*.json
+/models/lean_seeds/spectrum/eigenvalues.csv
+/models/lean_seeds/spectrum/cost_sectors.csv
+/models/lean_seeds/spectrum/dense_validation.csv
+/models/lean_seeds/anchor/scan_n*.json
+/models/lean_seeds/anchor/n*_g[IP].json
+/models/lean_seeds/anchor/analysis.json
+/models/lean_seeds/anchor/metrics.txt
+/models/lean_seeds/anchor/homotopy_n*.json
+/models/lean_seeds/spin1_kernel/bench/
+
+# spin1_dimerized
+/models/spin1_dimerized/spectrum_d*_c*.json
+
+# spin1_largeD
+/models/spin1_largeD/scan_D*.json
+/models/spin1_largeD/summary_*.json
+/models/spin1_largeD/beta_refinement_*.json
+
+# spin2
+/models/spin2/*
+!/models/spin2/trial-certificate.json
+!/models/spin2/trial-137-certificate.json
+!/models/spin2/trial-295-symmetric-certificate.json
+
+# two_leg_tfim
+/models/two_leg_tfim/spectra_g*.json

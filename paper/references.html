@@ -1,0 +1,1401 @@
+<title>Spacetime Bootstrap References</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; each numbered entry pairs its citation with a small figure of what the paper did. */
+:root {
+  --bg: #f6f7fa;
+  --surface: #ffffff;
+  --fg: #1b1f2a;
+  --muted: #5a6273;
+  --rule: #dde1ea;
+  --accent: #2f4aa0;
+  --accent-soft: #e6eaf7;
+  --ok: #1f7a4d;
+  --ok-soft: #e3f3ea;
+  --warn: #8a5a00;
+  --warn-soft: #fbf0d9;
+  --font-display: "Spectral", Georgia, "Times New Roman", serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151c; --surface: #1a1e28; --fg: #e5e8ef; --muted: #9aa3b5; --rule: #2c3242;
+    --accent: #9db0ff; --accent-soft: #232b45; --ok: #6fd3a0; --ok-soft: #17301f;
+    --warn: #f0c46a; --warn-soft: #33290f; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151c; --surface: #1a1e28; --fg: #e5e8ef; --muted: #9aa3b5; --rule: #2c3242;
+  --accent: #9db0ff; --accent-soft: #232b45; --ok: #6fd3a0; --ok-soft: #17301f;
+  --warn: #f0c46a; --warn-soft: #33290f; color-scheme: dark;
+}
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body);
+  font-size: 15px; line-height: 1.55;
+}
+.wrap {
+  max-width: 980px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+  display: flex; flex-direction: column; gap: 36px;
+}
+h1, h2 { font-family: var(--font-display); font-weight: 600; text-wrap: balance; margin: 0; }
+h1 { font-size: 2.1rem; line-height: 1.15; }
+h2 { font-size: 1.35rem; }
+p { margin: 0; }
+a { color: var(--accent); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lede { display: flex; flex-direction: column; gap: 12px; }
+.lede p { color: var(--muted); max-width: 65ch; }
+.eyebrow {
+  font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--muted);
+}
+.panel {
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; max-width: 760px;
+}
+.panel.warn { background: var(--warn-soft); border-color: transparent; }
+.panel ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.disclaimer { font-family: var(--font-display); font-size: 1.05rem; line-height: 1.6; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+button {
+  font: 500 0.82rem var(--font-body); color: var(--accent); background: var(--accent-soft);
+  border: 0; border-radius: 4px; padding: 6px 12px; cursor: pointer;
+}
+button:hover { filter: brightness(0.97); }
+section { display: flex; flex-direction: column; gap: 14px; }
+.group-note { color: var(--muted); font-size: 0.92rem; max-width: 65ch; }
+ol.refs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+ol.refs li {
+  display: grid; grid-template-columns: 2.6rem 1fr; gap: 4px 8px;
+  padding-block: 16px; border-top: 1px solid var(--rule);
+}
+ol.refs li:last-child { border-bottom: 1px solid var(--rule); }
+.num { font-family: var(--font-mono); color: var(--muted); font-variant-numeric: tabular-nums; padding-top: 2px; }
+.entry { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+@media (min-width: 760px) {
+  .entry {
+    grid-template-columns: minmax(0, 1fr) 340px; column-gap: 28px;
+    grid-template-areas: "cite fig" "why fig" "meta fig" ". fig";
+    align-items: start;
+  }
+  .entry .cite { grid-area: cite; }
+  .entry .why { grid-area: why; }
+  .entry .meta { grid-area: meta; }
+  .entry .fig { grid-area: fig; }
+}
+.cite { overflow-wrap: anywhere; }
+.cite .t { font-family: var(--font-display); font-style: italic; }
+.why { color: var(--muted); font-size: 0.92rem; }
+.why b { color: var(--fg); font-weight: 600; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 0.8rem; }
+.chip {
+  font-family: var(--font-mono); font-size: 0.72rem; padding: 1px 7px; border-radius: 3px;
+  background: var(--ok-soft); color: var(--ok);
+}
+.chip.new { background: var(--accent-soft); color: var(--accent); }
+.meta a { font-family: var(--font-mono); font-size: 0.78rem; overflow-wrap: anywhere; }
+
+/* Figures: strokes and text follow the theme through currentColor and tokens. */
+.fig {
+  margin: 0; min-width: 0; display: flex; flex-direction: column; gap: 6px;
+  background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 10px 12px;
+}
+.fig svg { display: block; width: 100%; max-width: 340px; height: auto; color: var(--fg); margin-inline: auto; }
+.fig figcaption { font-size: 0.84rem; line-height: 1.45; color: var(--fg); }
+.fig figcaption .lab { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-right: 6px; }
+svg text { font-family: var(--font-body); font-size: 11px; fill: currentColor; }
+svg text.m { fill: var(--muted); }
+svg text.a { fill: var(--accent); }
+svg text.g { fill: var(--ok); }
+svg text.c { text-anchor: middle; }
+svg text.e { text-anchor: end; }
+svg text.mono { font-family: var(--font-mono); font-size: 10.5px; }
+svg text.sm { font-size: 9.5px; }
+svg .ln { stroke: currentColor; fill: none; stroke-width: 1.2; }
+svg .lm { stroke: var(--muted); fill: none; stroke-width: 1; }
+svg .la { stroke: var(--accent); fill: none; stroke-width: 1.7; }
+svg .lg { stroke: var(--ok); fill: none; stroke-width: 1.7; }
+svg .dash { stroke-dasharray: 4 3; }
+svg .bx { fill: var(--surface); stroke: currentColor; stroke-width: 1; }
+svg .bxa { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2; }
+svg .bxg { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.2; }
+svg .ff { fill: currentColor; }
+svg .fa { fill: var(--accent); }
+svg .fg { fill: var(--ok); }
+svg .fm { fill: var(--muted); }
+svg .fs { fill: var(--accent-soft); }
+svg .fsg { fill: var(--ok-soft); }
+svg .hole { fill: var(--surface); stroke: currentColor; stroke-width: 1.2; }
+svg .hx { fill: none; stroke: var(--muted); stroke-width: 1; }
+svg .hx.hl { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.3; }
+svg .hx.hl2 { fill: var(--ok-soft); stroke: var(--ok); stroke-width: 1.3; }
+
+details { background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; max-width: 760px; }
+summary { cursor: pointer; padding: 14px 20px; font-weight: 500; }
+details > div { padding: 0 20px 18px; display: flex; flex-direction: column; gap: 10px; }
+details ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 5px; font-size: 0.92rem; }
+.bib {
+  margin: 0; overflow-x: auto; background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 16px; font: 0.76rem/1.5 var(--font-mono); max-height: 420px;
+}
+footer { color: var(--muted); font-size: 0.85rem; max-width: 65ch; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+
+<div class="wrap">
+  <header class="lede">
+    <span class="eyebrow">Reading list · fact-checked 16 Oct 2026 · [13]–[17] added 18 Oct 2026</span>
+    <h1>Spacetime Bootstrap References</h1>
+    <p>A short list for the arXiv version of the Haldane-gap paper: only work the paper uses directly, or work that proves spectral gaps by closely related means. Each entry has a small figure of what that paper did and a line on why to cite it. Each citation was checked against its Crossref DOI record, its arXiv page, or the local copy of OpenAI's preprints.</p>
+  </header>
+
+  <div class="panel">
+    <div class="row">
+      <h2>Suggested disclaimer</h2>
+      <button type="button" id="copy-disclaimer">Copy</button>
+    </div>
+    <p class="disclaimer" id="disclaimer-text">The literature on spectral gaps of quantum spin chains is large, and this reference list is not a survey. We cite only work that we use directly or that proves spectral gaps by closely related means. Several related preprints appeared in 2026 while this work was being completed; we cite those we know of, and we apologize to authors whose relevant work we have not cited.</p>
+    <p class="why">For a PRL Letter you can keep only the first two sentences and put the full version in the Supplemental Material.</p>
+  </div>
+
+  <section>
+    <h2>The result this paper builds on</h2>
+    <ol class="refs">
+      <li><span class="num">[1]</span><div class="entry">
+        <p class="cite">OpenAI, <span class="t">The periodic spin-one Haldane gap</span>, OpenAI Math Release, result 268, preprint (Sept. 24, 2026).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 122" role="img" aria-label="Two exact finite inputs give seed purity bounds; repeated doubling of length and inverse temperature yields a gap on every even ring of at least 60 sites.">
+            <defs><marker id="k1" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker><marker id="k1a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="fa"/></marker></defs>
+            <rect class="bx" x="2" y="22" width="112" height="36" rx="3"/>
+            <text class="c" x="58" y="37">rigorous trace bounds</text>
+            <text class="c m sm" x="58" y="51">twisted rings, 4 ≤ n ≤ 12</text>
+            <rect class="bx" x="2" y="76" width="112" height="36" rx="3"/>
+            <text class="c" x="58" y="91">integer MPS trial</text>
+            <text class="c m sm" x="58" y="105">energy bound, N = 72, 120</text>
+            <path class="ln" d="M114,40 L142,60" marker-end="url(#k1)"/>
+            <path class="ln" d="M114,94 L142,76" marker-end="url(#k1)"/>
+            <rect class="bxa" x="144" y="46" width="66" height="46" rx="3"/>
+            <text class="c" x="177" y="64">seed</text>
+            <text class="c mono sm" x="177" y="78">(60, 105/4)</text>
+            <path class="la" d="M162,46 C152,20 202,20 192,46" marker-end="url(#k1a)"/>
+            <text class="c a sm" x="177" y="16">double n and β</text>
+            <path class="ln" d="M210,69 L226,69" marker-end="url(#k1)"/>
+            <rect class="bx" x="228" y="47" width="90" height="44" rx="3"/>
+            <text class="c" x="273" y="64">unique GS, gap</text>
+            <text class="c m sm" x="273" y="79">every even L ≥ 60</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Bounded the excited transfer spectrum with rigorous trace enclosures on short twisted rings (integer and rational arithmetic with explicit truncation bounds), and the ground energy with an integer MPS trial state. A doubling recurrence lifts the seed (60, 105/4) to a gap above (4/105) log(80/79) on every even ring with L ≥ 60. A second seed, (36, 49/4), lifted to (2304, 784), gives log(20)/784 for even L ≥ 2304.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> source of the spin-1 ring theorem and all its finite inputs. Cite it with section numbers.</p>
+        <div class="meta"><span class="chip">local source ✓</span><a href="https://github.com/openai/math/blob/main/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/paper.pdf">github.com/openai/math</a></div>
+      </div></li>
+      <li><span class="num">[2]</span><div class="entry">
+        <p class="cite">OpenAI, <span class="t">A boundary-field gap for the spin-one Heisenberg chain</span>, OpenAI Math Release, result 268, preprint (Sept. 24, 2026).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 120" role="img" aria-label="An odd open chain with the same field at both ends; its partition function is a boundary pairing of transfer operators between two boundary vectors.">
+            <defs><marker id="k2a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="fa"/></marker></defs>
+            <line class="ln" x1="20" y1="34" x2="300" y2="34"/>
+            <circle class="ff" cx="20" cy="34" r="3.5"/><circle class="ff" cx="48" cy="34" r="3.5"/><circle class="ff" cx="76" cy="34" r="3.5"/><circle class="ff" cx="104" cy="34" r="3.5"/><circle class="ff" cx="132" cy="34" r="3.5"/><circle class="ff" cx="160" cy="34" r="3.5"/><circle class="ff" cx="188" cy="34" r="3.5"/><circle class="ff" cx="216" cy="34" r="3.5"/><circle class="ff" cx="244" cy="34" r="3.5"/><circle class="ff" cx="272" cy="34" r="3.5"/><circle class="ff" cx="300" cy="34" r="3.5"/>
+            <path class="la" d="M20,28 L20,8" marker-end="url(#k2a)"/>
+            <path class="la" d="M300,28 L300,8" marker-end="url(#k2a)"/>
+            <text class="a" x="28" y="16">h = 3/5</text>
+            <text class="a e" x="292" y="16">h = 3/5</text>
+            <text class="c m sm" x="160" y="52">odd open chain, 2L + 1 sites</text>
+            <line class="ln" x1="49" y1="82" x2="263" y2="82"/>
+            <circle class="bxa" cx="40" cy="82" r="10"/><text class="c a" x="40" y="86">v</text>
+            <circle class="bxa" cx="272" cy="82" r="10"/><text class="c a" x="272" y="86">v</text>
+            <rect class="bx" x="62" y="71" width="30" height="22" rx="2"/><text class="c sm" x="77" y="86">X</text>
+            <rect class="bx" x="104" y="71" width="30" height="22" rx="2"/><text class="c sm" x="119" y="86">X</text>
+            <rect class="bx" x="146" y="71" width="30" height="22" rx="2"/><text class="c sm" x="161" y="86">X</text>
+            <rect class="bx" x="188" y="71" width="30" height="22" rx="2"/><text class="c sm" x="203" y="86">X</text>
+            <rect class="bx" x="230" y="71" width="22" height="22" rx="2"/><text class="c sm" x="241" y="86">…</text>
+            <text class="c mono sm" x="160" y="113">opposite-field Z = ⟨v_b, X_bⁿ v_b⟩</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Wrote the partition function of the chain with <em>opposite</em> end fields as a pairing of transfer operators between boundary vectors; rotating the right vector gives the same-field chain. They then controlled the boundary overlap while doubling. The result is a gap above log(10)/392 for every chain of 2L + 1 sites with L ≥ 960, and Sec. 7 feeds it into Tasaki's theorem [7].</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the open-chain version, needed for the open chain in the Supplemental Material and for the link to [7].</p>
+        <div class="meta"><span class="chip">local source ✓</span><a href="https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf">github.com/openai/math</a></div>
+      </div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>The Haldane problem</h2>
+    <ol class="refs">
+      <li><span class="num">[3]</span><div class="entry">
+        <p class="cite">F. D. M. Haldane, <span class="t">Continuum dynamics of the 1-D Heisenberg antiferromagnet: Identification with the O(3) nonlinear sigma model</span>, Phys. Lett. A <b>93</b>, 464–468 (1983).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 330 130" role="img" aria-label="The spin-S chain maps to an O(3) sigma model; integer S gives a gap, half-integer S gives no gap.">
+            <defs><marker id="k3" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker></defs>
+            <rect class="bx" x="2" y="48" width="70" height="34" rx="3"/>
+            <text class="c" x="37" y="62">spin-S</text><text class="c" x="37" y="76">chain</text>
+            <path class="ln" d="M72,65 L94,65" marker-end="url(#k3)"/>
+            <text class="c m sm" x="83" y="57">large S</text>
+            <rect class="bxa" x="96" y="44" width="94" height="42" rx="3"/>
+            <text class="c" x="143" y="61">O(3) σ-model</text>
+            <text class="c m sm" x="143" y="77">continuum limit</text>
+            <path class="ln" d="M190,56 L214,34" marker-end="url(#k3)"/>
+            <path class="ln" d="M190,74 L214,96" marker-end="url(#k3)"/>
+            <text class="c" x="268" y="12">integer S</text>
+            <rect class="bxa" x="232" y="20" width="60" height="14"/>
+            <line class="ln" x1="232" y1="50" x2="292" y2="50"/>
+            <path class="ln" d="M302,36 L302,48" marker-start="url(#k3)" marker-end="url(#k3)"/>
+            <text class="sm" x="307" y="46">Δ</text>
+            <text class="c" x="268" y="78">half-integer S</text>
+            <rect class="bxa" x="232" y="88" width="60" height="26"/>
+            <line class="ln" x1="232" y1="114" x2="292" y2="114"/>
+            <text class="m sm" x="298" y="110">no gap</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Identified the low-energy continuum theory of the large-spin chain with the O(3) nonlinear sigma model, and predicted that integer spins have a gap while half-integer spins do not.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the conjecture itself.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1016/0375-9601(83)90631-X">10.1016/0375-9601(83)90631-X</a></div>
+      </div></li>
+      <li><span class="num">[4]</span><div class="entry">
+        <p class="cite">F. D. M. Haldane, <span class="t">Nonlinear field theory of large-spin Heisenberg antiferromagnets: Semiclassically quantized solitons of the one-dimensional easy-axis Néel state</span>, Phys. Rev. Lett. <b>50</b>, 1153–1156 (1983).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 310 104" role="img" aria-label="A Néel chain with a domain wall where the staggered order rotates by pi: a soliton.">
+            <defs><marker id="k4" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L8,4L0,8z" class="ff"/></marker><marker id="k4a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0L8,4L0,8z" class="fa"/></marker></defs>
+            <text class="c m sm" x="155" y="14">large S, easy-axis anisotropy</text>
+            <rect class="fs" x="102" y="34" width="98" height="42" rx="4"/>
+            <path class="ln" d="M20,65 L20,45" marker-end="url(#k4)"/>
+            <path class="ln" d="M44,45 L44,65" marker-end="url(#k4)"/>
+            <path class="ln" d="M68,65 L68,45" marker-end="url(#k4)"/>
+            <path class="ln" d="M92,45 L92,65" marker-end="url(#k4)"/>
+            <path class="la" d="M110.1,63.1 L121.9,46.9" marker-end="url(#k4a)"/>
+            <path class="la" d="M149.5,51.9 L130.5,58.1" marker-end="url(#k4a)"/>
+            <path class="la" d="M154.5,51.9 L173.5,58.1" marker-end="url(#k4a)"/>
+            <path class="la" d="M193.9,63.1 L182.1,46.9" marker-end="url(#k4a)"/>
+            <path class="ln" d="M212,45 L212,65" marker-end="url(#k4)"/>
+            <path class="ln" d="M236,65 L236,45" marker-end="url(#k4)"/>
+            <path class="ln" d="M260,45 L260,65" marker-end="url(#k4)"/>
+            <path class="ln" d="M284,65 L284,45" marker-end="url(#k4)"/>
+            <text class="c" x="56" y="94">Néel</text>
+            <text class="c a" x="152" y="94">soliton</text>
+            <text class="c" x="248" y="94">reversed Néel</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Derived the O(3) nonlinear sigma model for the large-spin chain. With weak easy-axis anisotropy he found soliton (domain-wall) solutions, quantized them semiclassically, and showed that integer and half-integer spins behave differently.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> companion paper to [3]; cite the two together.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevLett.50.1153">10.1103/PhysRevLett.50.1153</a></div>
+      </div></li>
+      <li><span class="num">[5]</span><div class="entry">
+        <p class="cite">I. Affleck, T. Kennedy, E. H. Lieb, and H. Tasaki, <span class="t">Rigorous results on valence-bond ground states in antiferromagnets</span>, Phys. Rev. Lett. <b>59</b>, 799–802 (1987).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 310 100" role="img" aria-label="Valence-bond solid: each spin-1 is two symmetrized spin-halves, and neighboring halves form singlets.">
+            <path class="la dash" d="M31,46 L8,46"/>
+            <path class="la dash" d="M269,46 L302,46"/>
+            <line class="la" x1="49" y1="46" x2="86" y2="46"/>
+            <line class="la" x1="104" y1="46" x2="141" y2="46"/>
+            <line class="la" x1="159" y1="46" x2="196" y2="46"/>
+            <line class="la" x1="214" y1="46" x2="251" y2="46"/>
+            <ellipse class="bx" cx="40" cy="46" rx="20" ry="12" style="fill:none"/>
+            <ellipse class="bx" cx="95" cy="46" rx="20" ry="12" style="fill:none"/>
+            <ellipse class="bx" cx="150" cy="46" rx="20" ry="12" style="fill:none"/>
+            <ellipse class="bx" cx="205" cy="46" rx="20" ry="12" style="fill:none"/>
+            <ellipse class="bx" cx="260" cy="46" rx="20" ry="12" style="fill:none"/>
+            <circle class="ff" cx="31" cy="46" r="3.5"/><circle class="ff" cx="49" cy="46" r="3.5"/>
+            <circle class="ff" cx="86" cy="46" r="3.5"/><circle class="ff" cx="104" cy="46" r="3.5"/>
+            <circle class="ff" cx="141" cy="46" r="3.5"/><circle class="ff" cx="159" cy="46" r="3.5"/>
+            <circle class="ff" cx="196" cy="46" r="3.5"/><circle class="ff" cx="214" cy="46" r="3.5"/>
+            <circle class="ff" cx="251" cy="46" r="3.5"/><circle class="ff" cx="269" cy="46" r="3.5"/>
+            <text class="c a sm" x="122" y="26">singlet</text>
+            <text class="c m sm" x="40" y="74">spin-1 site:</text>
+            <text class="c m sm" x="40" y="85">two ½, symmetrized</text>
+            <text class="c" x="205" y="80">unique GS · gap &gt; 0</text>
+            <text class="c mono sm" x="205" y="94">ξ = 1/ln 3</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Built a spin-1 chain whose ground state is exactly a chain of singlet bonds (a valence-bond solid). They proved it has a unique ground state, a spectral gap, and exponentially decaying correlations: the first rigorous example of the Haldane phase.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the gapped reference point of the Haldane phase, and the model behind finite-size gap criteria [13, 15].</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevLett.59.799">10.1103/PhysRevLett.59.799</a></div>
+      </div></li>
+      <li><span class="num">[6]</span><div class="entry">
+        <p class="cite">S. R. White and D. A. Huse, <span class="t">Numerical renormalization-group study of low-lying eigenstates of the antiferromagnetic S=1 Heisenberg chain</span>, Phys. Rev. B <b>48</b>, 3844–3852 (1993).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 310 110" role="img" aria-label="Level diagram with a gap of 0.41050 above the ground state, and an open chain with a free spin-half at each end.">
+            <defs><marker id="k6" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker></defs>
+            <rect class="bxa" x="20" y="18" width="100" height="34"/>
+            <text class="c sm" x="70" y="38">magnon band</text>
+            <line class="ln" x1="20" y1="92" x2="120" y2="92"/>
+            <text class="sm" x="126" y="95">E₀</text>
+            <path class="ln" d="M44,55 L44,89" marker-start="url(#k6)" marker-end="url(#k6)"/>
+            <text class="mono sm" x="52" y="76">Δ = 0.41050(2)</text>
+            <text class="c m sm" x="235" y="38">open chain</text>
+            <line class="ln" x1="177" y1="60" x2="293" y2="60"/>
+            <circle class="ff" cx="190" cy="60" r="3.5"/><circle class="ff" cx="212" cy="60" r="3.5"/><circle class="ff" cx="234" cy="60" r="3.5"/><circle class="ff" cx="256" cy="60" r="3.5"/><circle class="ff" cx="278" cy="60" r="3.5"/>
+            <circle class="bxa" cx="170" cy="60" r="8"/><text class="c a sm" x="170" y="63.5">½</text>
+            <circle class="bxa" cx="300" cy="60" r="8"/><text class="c a sm" x="300" y="63.5">½</text>
+            <text class="c a sm" x="235" y="86">free spin-½ at each end</text>
+            <text class="c m sm" x="235" y="102">end moment decays over ≈ 6.03 sites</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Used DMRG to compute the spin-1 Heisenberg gap, Δ = 0.41050(2). They showed that open chains carry an effective free spin-½ at each end, whose moment decays over 6.03(1) sites; the bulk correlation length appears to be the same, but is measured less accurately.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the numerical values the certified bound is compared against.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevB.48.3844">10.1103/PhysRevB.48.3844</a></div>
+      </div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>What the gap implies</h2>
+    <ol class="refs">
+      <li><span class="num">[7]</span><div class="entry">
+        <p class="cite">H. Tasaki, <span class="t">Ground state of the S=1 antiferromagnetic Heisenberg chain is topologically nontrivial if gapped</span>, Phys. Rev. Lett. <b>134</b>, 076602 (2025).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 112" role="img" aria-label="A uniform gap on open chains with end fields implies topological index minus one, which implies a gapless edge on the half-infinite chain. The first hypothesis is proved in reference 2.">
+            <defs><marker id="k7" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker><marker id="k7a" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="fa"/></marker></defs>
+            <text class="c a sm" x="49" y="12">proved in [2]</text>
+            <path class="la dash" d="M49,17 L49,40" marker-end="url(#k7a)"/>
+            <rect class="bxa" x="2" y="44" width="94" height="56" rx="3"/>
+            <text class="c sm" x="49" y="62">open chain,</text>
+            <text class="c sm" x="49" y="75">end fields:</text>
+            <text class="c sm" x="49" y="88">uniform gap</text>
+            <path class="ln" d="M96,72 L112,72" marker-end="url(#k7)"/>
+            <rect class="bx" x="114" y="44" width="94" height="56" rx="3"/>
+            <text class="c sm" x="161" y="62">infinite chain:</text>
+            <text class="c sm" x="161" y="75">index −1</text>
+            <text class="c m sm" x="161" y="88">(nontrivial SPT)</text>
+            <path class="ln" d="M208,72 L224,72" marker-end="url(#k7)"/>
+            <rect class="bx" x="226" y="44" width="92" height="56" rx="3"/>
+            <text class="c sm" x="272" y="62">half-chain:</text>
+            <text class="c sm" x="272" y="75">gapless edge</text>
+            <text class="c m sm" x="272" y="88">excitation</text>
+            <text class="c m sm" x="160" y="34">Tasaki's theorem</text>
+          </svg>
+          <figcaption><span class="lab">What he did</span>Proved that if open chains with boundary fields have unique ground states with a uniform gap, the infinite-chain ground state has a nontrivial topological index. That rules out a gapped but topologically trivial ground state.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> his hypothesis is about open chains with boundary fields, not periodic rings, and OpenAI’s boundary-field preprint [2] proves it (its Sec. 7 applies his theorem). So attribute the topological consequence to [2] together with [7]; a gap on periodic rings alone does not meet the hypothesis.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevLett.134.076602">10.1103/PhysRevLett.134.076602</a><a href="https://arxiv.org/abs/2407.17041">arXiv:2407.17041</a></div>
+      </div></li>
+      <li><span class="num">[8]</span><div class="entry">
+        <p class="cite">H. Tasaki, expository account of the proof of the spin-1 Haldane gap, in preparation (2026); title provisional.</p>
+        <p class="why"><b>What it is:</b> on 13 Oct 2026 Tasaki announced on X that, a week after learning of OpenAI's proof, he was "almost convinced the proof is valid" and was writing a "more human-readable account", with hand-drawn figures.</p>
+        <p class="why"><b>Why cite:</b> an independent expert reading of the same proof this paper reformulates. Cite it as in preparation now and replace it with the arXiv number once it appears.</p>
+        <div class="meta"><span class="chip new">announced · not yet posted</span><a href="https://x.com/Hal_Tasaki/status/2110158403842797750">x.com/Hal_Tasaki</a></div>
+      </div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Ingredients of the method</h2>
+    <p class="group-note">The scope note also cites Dyson–Lieb–Simon, Fröhlich–Israel–Lieb–Simon and Biskup. Keep them only where the Supplemental Material uses them.</p>
+    <ol class="refs">
+      <li><span class="num">[9]</span><div class="entry">
+        <p class="cite">K. Osterwalder and R. Schrader, <span class="t">Axioms for Euclidean Green's functions</span>, Commun. Math. Phys. <b>31</b>, 83–112 (1973).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 100" role="img" aria-label="A configuration F and its mirror image across a reflection plane; positivity of the paired expectation rebuilds a Hilbert space and a positive Hamiltonian.">
+            <defs><marker id="k8" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker></defs>
+            <text class="c m sm" x="110" y="10">reflection plane</text>
+            <line class="la dash" x1="110" y1="16" x2="110" y2="76"/>
+            <polyline class="ln" points="130,30 150,50 175,25 190,45"/>
+            <circle class="ff" cx="130" cy="30" r="3"/><circle class="ff" cx="150" cy="50" r="3"/><circle class="ff" cx="175" cy="25" r="3"/><circle class="ff" cx="190" cy="45" r="3"/>
+            <polyline class="lm" points="90,30 70,50 45,25 30,45"/>
+            <circle class="fm" cx="90" cy="30" r="3"/><circle class="fm" cx="70" cy="50" r="3"/><circle class="fm" cx="45" cy="25" r="3"/><circle class="fm" cx="30" cy="45" r="3"/>
+            <text class="c" x="160" y="72">F</text>
+            <text class="c m" x="60" y="72">ΘF</text>
+            <path class="ln" d="M76,88 L144,88" marker-start="url(#k8)" marker-end="url(#k8)"/>
+            <text class="c a sm" x="110" y="84">Θ</text>
+            <path class="ln" d="M204,46 L222,46" marker-end="url(#k8)"/>
+            <text class="c mono" x="270" y="30">⟨ΘF · F⟩ ≥ 0</text>
+            <text class="c sm" x="270" y="50">rebuilds a</text>
+            <text class="c sm" x="270" y="63">Hilbert space</text>
+            <text class="c sm" x="270" y="76">and H ≥ 0</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Showed that Euclidean correlation functions with this mirror positivity rebuild a quantum theory: a Hilbert space and a positive Hamiltonian H ≥ 0, through the semigroup e<sup>−tH</sup>.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> origin of reflection positivity. The 1973 axioms contain a known gap, fixed in their sequel; cite both: K. Osterwalder and R. Schrader, <span class="t">Axioms for Euclidean Green's functions II</span>, Commun. Math. Phys. <b>42</b>, 281–305 (1975), <a href="https://doi.org/10.1007/BF01608978">10.1007/BF01608978</a>.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1007/BF01645738">10.1007/BF01645738</a></div>
+      </div></li>
+      <li><span class="num">[10]</span><div class="entry">
+        <p class="cite">M. Lüscher, <span class="t">Construction of a selfadjoint, strictly positive transfer matrix for Euclidean lattice gauge theories</span>, Commun. Math. Phys. <b>54</b>, 283–292 (1977).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 110" role="img" aria-label="Time slices of a Euclidean lattice joined by a transfer matrix T; reflection positivity across a slice makes T self-adjoint and strictly positive.">
+            <defs><marker id="k9" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker></defs>
+            <line class="lm" x1="20" y1="20" x2="180" y2="20"/><line class="lm" x1="20" y1="55" x2="180" y2="55"/><line class="lm" x1="20" y1="90" x2="180" y2="90"/>
+            <line class="lm" x1="40" y1="20" x2="40" y2="90"/><line class="lm" x1="80" y1="20" x2="80" y2="90"/><line class="lm" x1="120" y1="20" x2="120" y2="90"/><line class="lm" x1="160" y1="20" x2="160" y2="90"/>
+            <line class="la dash" x1="12" y1="55" x2="190" y2="55"/>
+            <text class="m sm" x="186" y="23">t + 1</text>
+            <text class="a sm" x="194" y="58">t</text>
+            <text class="m sm" x="186" y="93">t − 1</text>
+            <path class="ln" d="M222,88 L222,58" marker-end="url(#k9)"/>
+            <path class="ln" d="M222,52 L222,22" marker-end="url(#k9)"/>
+            <text class="sm" x="228" y="76">T</text><text class="sm" x="228" y="40">T</text>
+            <text class="mono" x="246" y="44">T = T†</text>
+            <text class="mono" x="246" y="60">T &gt; 0</text>
+            <text class="mono" x="246" y="76">T = e⁻ᵃᴴ</text>
+          </svg>
+          <figcaption><span class="lab">What he did</span>Showed that reflection positivity across a time slice makes the lattice transfer matrix T self-adjoint and strictly positive, so it defines a Hamiltonian through T = e<sup>−aH</sup>.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the doubling step uses the same idea, with space and time exchanged.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1007/BF01614090">10.1007/BF01614090</a></div>
+      </div></li>
+      <li><span class="num">[11]</span><div class="entry">
+        <p class="cite">A. Jaffe and B. Janssens, <span class="t">Characterization of reflection positivity: Majoranas and spins</span>, Commun. Math. Phys. <b>346</b>, 1021–1050 (2016).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 104" role="img" aria-label="Operators on the left of a reflection plane are coupled to reflected operators on the right; reflection positivity is a condition on the matrix of couplings across the plane.">
+            <line class="la dash" x1="100" y1="8" x2="100" y2="96"/>
+            <line class="lm" x1="60" y1="24" x2="140" y2="24"/><line class="lm" x1="60" y1="24" x2="140" y2="52"/><line class="lm" x1="60" y1="24" x2="140" y2="80"/>
+            <line class="lm" x1="60" y1="52" x2="140" y2="24"/><line class="lm" x1="60" y1="52" x2="140" y2="52"/><line class="lm" x1="60" y1="52" x2="140" y2="80"/>
+            <line class="lm" x1="60" y1="80" x2="140" y2="24"/><line class="lm" x1="60" y1="80" x2="140" y2="52"/><line class="lm" x1="60" y1="80" x2="140" y2="80"/>
+            <circle class="ff" cx="60" cy="24" r="3.5"/><circle class="ff" cx="60" cy="52" r="3.5"/><circle class="ff" cx="60" cy="80" r="3.5"/>
+            <circle class="ff" cx="140" cy="24" r="3.5"/><circle class="ff" cx="140" cy="52" r="3.5"/><circle class="ff" cx="140" cy="80" r="3.5"/>
+            <text class="e sm" x="52" y="28">C₁</text><text class="e sm" x="52" y="56">C₂</text><text class="e sm" x="52" y="84">C₃</text>
+            <text class="sm" x="148" y="28">ΘC₁</text><text class="sm" x="148" y="56">ΘC₂</text><text class="sm" x="148" y="84">ΘC₃</text>
+            <text class="c m sm" x="240" y="14">couplings J_ij</text>
+            <rect class="bxa" x="212" y="22" width="16" height="16"/><rect class="bx" x="232" y="22" width="16" height="16"/><rect class="bx" x="252" y="22" width="16" height="16"/>
+            <rect class="bx" x="212" y="42" width="16" height="16"/><rect class="bxa" x="232" y="42" width="16" height="16"/><rect class="bx" x="252" y="42" width="16" height="16"/>
+            <rect class="bx" x="212" y="62" width="16" height="16"/><rect class="bx" x="232" y="62" width="16" height="16"/><rect class="bxa" x="252" y="62" width="16" height="16"/>
+            <text class="c a mono" x="240" y="96">J ⪰ 0</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Found necessary and sufficient conditions on the coupling constants for spin and Majorana Hamiltonians to be reflection positive. The condition is checked on the matrix of couplings that cross the reflection plane.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the C ⊗ C̄ test in this paper is that criterion for one bond.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1007/s00220-015-2545-z">10.1007/s00220-015-2545-z</a></div>
+      </div></li>
+      <li><span class="num">[12]</span><div class="entry">
+        <p class="cite">M. Suzuki, <span class="t">Transfer-matrix method and Monte Carlo simulation in quantum spin systems</span>, Phys. Rev. B <b>31</b>, 2957–2965 (1985).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 124" role="img" aria-label="A space by imaginary-time lattice; transferring row to row gives exp of minus delta tau H, column to column gives the quantum transfer matrix.">
+            <defs><marker id="k11" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="fm"/></marker></defs>
+            <rect class="fsg" x="22" y="38" width="136" height="12"/>
+            <rect class="bxa" x="96" y="12" width="12" height="88"/>
+            <line class="lm" x1="30" y1="20" x2="150" y2="20"/><line class="lm" x1="30" y1="44" x2="150" y2="44"/><line class="lm" x1="30" y1="68" x2="150" y2="68"/><line class="lm" x1="30" y1="92" x2="150" y2="92"/>
+            <line class="lm" x1="30" y1="20" x2="30" y2="92"/><line class="lm" x1="54" y1="20" x2="54" y2="92"/><line class="lm" x1="78" y1="20" x2="78" y2="92"/><line class="lm" x1="102" y1="20" x2="102" y2="92"/><line class="lm" x1="126" y1="20" x2="126" y2="92"/><line class="lm" x1="150" y1="20" x2="150" y2="92"/>
+            <path class="lm" d="M30,108 L150,108" marker-end="url(#k11)"/>
+            <text class="c m sm" x="90" y="120">space, L sites</text>
+            <path class="lm" d="M12,92 L12,20" marker-end="url(#k11)"/>
+            <text class="c m sm" transform="translate(8,56) rotate(-90)">imag. time β</text>
+            <text class="g sm" x="172" y="40">row to row:</text>
+            <text class="mono sm" x="172" y="54">exp(−δτ·H)</text>
+            <text class="a sm" x="172" y="78">column to column:</text>
+            <text class="sm" x="172" y="92">quantum transfer matrix</text>
+          </svg>
+          <figcaption><span class="lab">What he did</span>Used the Trotter decomposition to turn a quantum chain at inverse temperature β into a two-dimensional classical lattice. The same partition function can then be computed row by row in imaginary time or column by column in space, the second with a quantum transfer matrix.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the paper's spatial transfer operator X_β is this column-to-column reading.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevB.31.2957">10.1103/PhysRevB.31.2957</a></div>
+      </div></li>
+      <li><span class="num">[13]</span><div class="entry">
+        <p class="cite">W. Tang, H.-H. Tu, and L. Wang, <span class="t">Continuous matrix product operator approach to finite temperature quantum states</span>, Phys. Rev. Lett. <b>125</b>, 170604 (2020).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 112" role="img" aria-label="A space by imaginary-time cylinder; one imaginary-time column is a continuous MPO T, the spatial transfer matrix, whose dominant left and right eigenvectors are approximated by continuous MPS.">
+            <defs><marker id="k25" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="fm"/></marker></defs>
+            <line class="lm" x1="20" y1="16" x2="20" y2="88"/><line class="lm" x1="44" y1="16" x2="44" y2="88"/>
+            <rect class="bxa" x="62" y="12" width="20" height="80" rx="3"/>
+            <line class="lm" x1="100" y1="16" x2="100" y2="88"/><line class="lm" x1="124" y1="16" x2="124" y2="88"/>
+            <line class="lm" x1="14" y1="30" x2="130" y2="30"/><line class="lm" x1="14" y1="52" x2="130" y2="52"/><line class="lm" x1="14" y1="74" x2="130" y2="74"/>
+            <text class="c a sm" x="72" y="104">T (cMPO)</text>
+            <path class="lm" d="M140,88 L140,16" marker-end="url(#k25)"/>
+            <text class="m sm" x="146" y="56">β, ε → 0</text>
+            <text class="mono" x="196" y="34">⟨l| T = λ ⟨l|</text>
+            <text class="mono" x="196" y="52">T |r⟩ = λ |r⟩</text>
+            <text class="sm" x="196" y="70">l, r: two cMPS</text>
+            <text class="a sm" x="196" y="90">ferro: T = T†, l = r</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Wrote the partition function of a quantum chain as a space–time tensor network. One imaginary-time column, in the limit of zero time step, is a continuous MPO: the spatial transfer matrix T. They approximated its dominant left and right eigenvectors by continuous MPS, and noted that T is Hermitian for the ferromagnetic transverse-field Ising chain and, after a basis rotation, for the XXZ chain with Δ ≥ 0.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the paper's X_β is this continuous MPO, and the C ⊗ C̄ reflection-positivity condition is the general reason it is Hermitian.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevLett.125.170604">10.1103/PhysRevLett.125.170604</a></div>
+      </div></li>
+      <li><span class="num">[14]</span><div class="entry">
+        <p class="cite">F. Göhmann, S. Goomanee, K. K. Kozlowski, and J. Suzuki, <span class="t">Thermodynamics of the spin-1/2 Heisenberg–Ising chain at high temperatures: a rigorous approach</span>, Commun. Math. Phys. <b>377</b>, 623–673 (2020).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 112" role="img" aria-label="The spectrum of the quantum transfer matrix at high temperature: one real, nondegenerate eigenvalue of largest modulus, separated from the rest, uniformly in the Trotter number.">
+            <circle class="lm dash" cx="80" cy="52" r="40"/>
+            <line class="lm" x1="20" y1="52" x2="140" y2="52"/><line class="lm" x1="80" y1="8" x2="80" y2="96"/>
+            <circle class="fm" cx="70" cy="46" r="2.5"/><circle class="fm" cx="88" cy="60" r="2.5"/><circle class="fm" cx="76" cy="62" r="2.5"/><circle class="fm" cx="92" cy="44" r="2.5"/><circle class="fm" cx="66" cy="56" r="2.5"/>
+            <circle class="fa" cx="128" cy="52" r="4"/>
+            <text class="a sm" x="122" y="42">Λmax</text>
+            <text class="c m sm" x="80" y="108">QTM spectrum, Trotter number N</text>
+            <text class="sm" x="166" y="26">high T, |Δ| &lt; 1:</text>
+            <text class="a sm" x="166" y="44">Λmax real, nondegenerate,</text>
+            <text class="a sm" x="166" y="58">uniformly in N</text>
+            <text class="mono sm" x="166" y="80">lim N→∞ ⇄ lim L→∞</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>For the spin-½ XXZ chain with |Δ| &lt; 1 at high enough temperature, proved that the quantum transfer matrix has a real, nondegenerate eigenvalue of largest modulus, uniformly in the Trotter number, and that the Trotter and infinite-volume limits commute. They then proved the nonlinear integral equations for the free energy and the high-temperature asymptotics of some subdominant eigenvalues, hence of correlation lengths.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> rigorous spectral control of a spatial transfer matrix, but only at high temperature and for an integrable chain; the bootstrap needs low temperature and no integrability.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1007/s00220-020-03749-6">10.1007/s00220-020-03749-6</a></div>
+      </div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>The spatial purity as a partition-function ratio</h2>
+    <p class="group-note">With imaginary time closed, the spatial purity P<sub>s</sub>(n, β) = Z<sub>2n</sub>(β)/Z<sub>n</sub>(β)² is the inverse of Gu and Wen's ratio X₁. These papers use X₁ numerically to count degenerate sectors and locate critical points; none bounds it rigorously or couples it to the thermal purity, which is what the doubling step does.</p>
+    <ol class="refs">
+      <li><span class="num">[15]</span><div class="entry">
+        <p class="cite">Z.-C. Gu and X.-G. Wen, <span class="t">Tensor-entanglement-filtering renormalization approach and symmetry-protected topological order</span>, Phys. Rev. B <b>80</b>, 155131 (2009).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 100" role="img" aria-label="A four-leg tensor T is closed vertically into a matrix A; the ratio X1 equals the square of the trace of A divided by the trace of A squared, which counts degenerate fixed-point sectors.">
+            <line class="ln" x1="40" y1="20" x2="40" y2="34"/><line class="ln" x1="40" y1="66" x2="40" y2="80"/>
+            <path class="la dash" d="M40,20 C40,8 66,8 66,20 L66,80 C66,92 40,92 40,80"/>
+            <line class="ln" x1="10" y1="50" x2="26" y2="50"/><line class="ln" x1="54" y1="50" x2="70" y2="50"/>
+            <rect class="bxa" x="26" y="34" width="28" height="32" rx="3"/>
+            <text class="c a" x="40" y="54">T</text>
+            <text class="c m sm" x="40" y="98">A = Σ_u T_rulu</text>
+            <text class="mono" x="110" y="26">X₁ = (Tr A)² / Tr A²</text>
+            <text class="sm" x="110" y="44">a ring of n columns, A = X_β^n:</text>
+            <text class="mono" x="110" y="60">X₁ = Z_n² / Z_2n = 1/P_s</text>
+            <text class="a sm" x="110" y="80">at a fixed point, X₁ counts</text>
+            <text class="a sm" x="110" y="92">the degenerate sectors</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Introduced tensor-entanglement-filtering renormalization. To tell fixed-point tensors and phases apart, they defined scale-invariant ratios of tensor contractions, X₁ and X₂ (Eq. 17, Fig. 13). Closing one direction of the tensor into a matrix A gives X₁ = (Tr A)²/Tr A².</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> X₁ is the inverse spatial purity, used the same way to detect a unique dominant sector. The observable predates this paper; the rigorous doubling with the thermal purity does not.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevB.80.155131">10.1103/PhysRevB.80.155131</a></div>
+      </div></li>
+      <li><span class="num">[16]</span><div class="entry">
+        <p class="cite">S. Morita and N. Kawashima, <span class="t">Tensor renormalization group calculations of partition-function ratios</span>, J. Phys. Soc. Jpn. <b>95</b>, 044001 (2026).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 96" role="img" aria-label="The Gu-Wen ratio written as the square of the partition function of an L by L torus divided by that of a 2L by L torus.">
+            <text class="c mono" x="40" y="14">Z_L×L</text>
+            <rect class="bx" x="20" y="22" width="40" height="40"/>
+            <text class="c m sm" x="40" y="76">L × L</text>
+            <text class="c" x="68" y="28">²</text>
+            <text class="c" x="88" y="48">/</text>
+            <rect class="bxa" x="114" y="22" width="80" height="40"/>
+            <text class="c m sm" x="154" y="76">2L × L</text>
+            <text class="c a mono" x="154" y="14">Z_2L×L</text>
+            <text class="mono" x="208" y="38">= X₁(T, L)</text>
+            <text class="sm" x="208" y="58">Binder-like scaling;</text>
+            <text class="sm" x="208" y="72">critical values from</text>
+            <text class="sm" x="208" y="86">torus CFT</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Wrote the Gu–Wen ratio explicitly as X₁(T, L) = Z<sub>L×L</sub>(T)²/Z<sub>2L×L</sub>(T) and computed it with the tensor renormalization group. They showed it has the same finite-size scaling form as the Binder parameter, compared its critical values with torus conformal-field-theory predictions, and treated anisotropic lattices.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the clearest statement that the Gu–Wen ratio is a ratio of partition functions on a torus and its doubling, i.e. 1/P<sub>s</sub>.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.7566/JPSJ.95.044001">10.7566/JPSJ.95.044001</a></div>
+      </div></li>
+      <li><span class="num">[17]</span><div class="entry">
+        <p class="cite">S. Akiyama, R. G. Jha, J. Maeda, Y. Tanizaki, and J. Unmuth-Yockey, <span class="t">Tensor renormalization group approach to critical phenomena via symmetry-twisted partition functions</span>, Phys. Rev. D <b>113</b>, 074502 (2026).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 96" role="img" aria-label="A torus with a symmetry twist g inserted along one cycle; the ratio of twisted to untwisted partition functions and the Gu-Wen ratio count degenerate vacua.">
+            <rect class="bx" x="20" y="18" width="90" height="56"/>
+            <line class="la" x1="66" y1="18" x2="66" y2="74"/>
+            <text class="a sm" x="70" y="30">g</text>
+            <text class="c m sm" x="65" y="90">twist g along one cycle</text>
+            <text class="mono" x="130" y="32">Z_g / Z_1</text>
+            <text class="mono" x="130" y="52">Z(L)² / Z(2L) = |G/H|</text>
+            <text class="a sm" x="130" y="74">count degenerate vacua</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Combined the Gu–Wen ratio for doubling one direction of a torus, which counts degenerate vacua, with ratios of symmetry-twisted to untwisted partition functions, and computed both with the tensor renormalization group to locate phase transitions.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> twisted partition functions to resolve symmetry sectors, as in the symmetry-sector inversion of the spin-1 certificate.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/ywhr-lt6w">10.1103/ywhr-lt6w</a></div>
+      </div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Other ways to prove spectral gaps</h2>
+    <p class="group-note">Every gap method here except [25] needs a frustration-free Hamiltonian, one whose ground state minimizes each local term, and [25] is limited to qubits (spin ½). The spin-1 Heisenberg chain is neither, and the paper should state that contrast in one sentence. [26] needs neither assumption but bounds string order, not the gap.</p>
+    <ol class="refs">
+      <li><span class="num">[18]</span><div class="entry">
+        <p class="cite">S. Knabe, <span class="t">Energy gaps and elementary excitations for certain VBS-quantum antiferromagnets</span>, J. Stat. Phys. <b>52</b>, 627–638 (1988).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 108" role="img" aria-label="If an open window of n sites has gap above 1 over n minus 1, every ring has a gap bounded below by a constant.">
+            <defs><marker id="k12" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker></defs>
+            <rect class="bxa" x="82" y="22" width="116" height="24" rx="3"/>
+            <line class="ln" x1="10" y1="34" x2="292" y2="34"/>
+            <circle class="ff" cx="16" cy="34" r="3.5"/><circle class="ff" cx="40" cy="34" r="3.5"/><circle class="ff" cx="64" cy="34" r="3.5"/><circle class="ff" cx="88" cy="34" r="3.5"/><circle class="ff" cx="112" cy="34" r="3.5"/><circle class="ff" cx="140" cy="34" r="3.5"/><circle class="ff" cx="168" cy="34" r="3.5"/><circle class="ff" cx="192" cy="34" r="3.5"/><circle class="ff" cx="216" cy="34" r="3.5"/><circle class="ff" cx="240" cy="34" r="3.5"/><circle class="ff" cx="264" cy="34" r="3.5"/><circle class="ff" cx="288" cy="34" r="3.5"/>
+            <text class="c a sm" x="140" y="14">open window of n sites: gap εₙ</text>
+            <text class="c mono" x="160" y="66">εₙ &gt; 1/(n−1)</text>
+            <path class="ln" d="M160,72 L160,84" marker-end="url(#k12)"/>
+            <text class="c sm" x="160" y="101">long rings: gap ≥ (n−1)/(n−2) · (εₙ − 1/(n−1))</text>
+          </svg>
+          <figcaption><span class="lab">What he did</span>Proved the first finite-size criterion. For frustration-free chains, a gap above 1/(n−1) on one open window of n sites forces a gap bounded away from zero on all rings longer than the window, hence in the thermodynamic limit. He applied it to AKLT-type models.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the original "small system implies every size" argument; this paper extends that idea to a frustrated chain.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1007/BF01019721">10.1007/BF01019721</a></div>
+      </div></li>
+      <li><span class="num">[19]</span><div class="entry">
+        <p class="cite">M. Fannes, B. Nachtergaele, and R. F. Werner, <span class="t">Finitely correlated states on quantum spin chains</span>, Commun. Math. Phys. <b>144</b>, 443–490 (1992).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 112" role="img" aria-label="A matrix product state, its transfer operator built from A and its conjugate, and the spectrum of that operator with a single eigenvalue 1 and the rest strictly inside the unit circle.">
+            <line class="ln" x1="8" y1="44" x2="142" y2="44"/>
+            <line class="ln" x1="24" y1="35" x2="24" y2="20"/><line class="ln" x1="58" y1="35" x2="58" y2="20"/><line class="ln" x1="92" y1="35" x2="92" y2="20"/><line class="ln" x1="126" y1="35" x2="126" y2="20"/>
+            <circle class="bx" cx="24" cy="44" r="9"/><circle class="bx" cx="58" cy="44" r="9"/><circle class="bx" cx="92" cy="44" r="9"/><circle class="bx" cx="126" cy="44" r="9"/>
+            <text class="c sm" x="24" y="48">A</text><text class="c sm" x="58" y="48">A</text><text class="c sm" x="92" y="48">A</text><text class="c sm" x="126" y="48">A</text>
+            <text class="c m sm" x="75" y="72">matrix product state</text>
+            <line class="ln" x1="160" y1="34" x2="202" y2="34"/><line class="ln" x1="160" y1="66" x2="202" y2="66"/>
+            <line class="ln" x1="181" y1="42" x2="181" y2="58"/>
+            <rect class="bx" x="170" y="26" width="22" height="16" rx="2"/><text class="c sm" x="181" y="38">A</text>
+            <rect class="bx" x="170" y="58" width="22" height="16" rx="2"/><text class="c sm" x="181" y="70">Ā</text>
+            <text class="c mono sm" x="181" y="92">E = Σ A ⊗ Ā</text>
+            <circle class="lm" cx="268" cy="50" r="32"/>
+            <circle class="la dash" cx="268" cy="50" r="16"/>
+            <circle class="fa" cx="300" cy="50" r="3.5"/>
+            <text class="a sm" x="305" y="46">1</text>
+            <circle class="ff" cx="263" cy="42" r="2.5"/><circle class="ff" cx="275" cy="58" r="2.5"/><circle class="ff" cx="258" cy="55" r="2.5"/><circle class="ff" cx="272" cy="44" r="2.5"/>
+            <text class="c m sm" x="268" y="100">|λ₂| &lt; 1 ⇒ finite ξ</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Introduced finitely correlated states (matrix product states) and the transfer operator E built from A and its conjugate. When 1 is the only eigenvalue of E on the unit circle, correlations decay exponentially and the parent Hamiltonian has a gap. They proved the gap by the martingale method.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> MPS, transfer operators, and the martingale gap method in one place. [24] improves on it.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1007/BF02099178">10.1007/BF02099178</a></div>
+      </div></li>
+      <li><span class="num">[20]</span><div class="entry">
+        <p class="cite">D. Gosset and E. Mozgunov, <span class="t">Local gap threshold for frustration-free spin systems</span>, J. Math. Phys. <b>57</b>, 091901 (2016).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 140" role="img" aria-label="Plot of local gap threshold against window size n: Knabe's 1 over n minus 1 and Gosset and Mozgunov's lower 6 over n times n plus 1.">
+            <line class="lm" x1="40" y1="110" x2="296" y2="110"/>
+            <line class="lm" x1="40" y1="110" x2="40" y2="12"/>
+            <line class="lm" x1="36" y1="15" x2="40" y2="15"/>
+            <text class="e m sm" x="34" y="113">0</text>
+            <text class="e m sm" x="34" y="18">0.5</text>
+            <line class="lm" x1="142.9" y1="110" x2="142.9" y2="114"/><line class="lm" x1="290" y1="110" x2="290" y2="114"/>
+            <text class="c m sm" x="40" y="124">3</text><text class="c m sm" x="142.9" y="124">10</text><text class="c m sm" x="290" y="124">20</text>
+            <text class="c m sm" x="168" y="137">window size n</text>
+            <polyline class="ln" points="40,15 54.7,46.7 69.4,62.5 84.1,72 98.8,78.3 113.5,82.9 142.9,88.9 172.4,92.7 216.5,96.4 290,100"/>
+            <polyline class="la" points="40,15 54.7,53 69.4,72 84.1,82.9 98.8,89.6 113.5,94.2 142.9,99.6 172.4,102.7 216.5,105.25 290,107.3"/>
+            <line class="ln" x1="186" y1="24" x2="204" y2="24"/>
+            <text class="sm" x="210" y="27">Knabe: 1/(n−1)</text>
+            <line class="la" x1="186" y1="42" x2="204" y2="42"/>
+            <text class="a sm" x="210" y="45">GM: 6/(n(n+1))</text>
+            <text class="m sm" x="186" y="66">local gap above the curve</text>
+            <text class="m sm" x="186" y="78">⇒ uniform global gap</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Lowered Knabe's one-dimensional threshold from 1/(n−1) to 6/(n(n+1)), which is smaller for every n &gt; 3 and asymptotically optimal. So much smaller windows can certify a gap.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the sharp form of the finite-size criterion in one dimension.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1063/1.4962337">10.1063/1.4962337</a></div>
+      </div></li>
+      <li><span class="num">[21]</span><div class="entry">
+        <p class="cite">M. Lemm, A. W. Sandvik, and L. Wang, <span class="t">Existence of a spectral gap in the Affleck-Kennedy-Lieb-Tasaki model on the hexagonal lattice</span>, Phys. Rev. Lett. <b>124</b>, 177204 (2020).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 96" role="img" aria-label="A highlighted patch of the hexagonal lattice; DMRG shows its gap exceeds a threshold, which implies a gap above 0.006 on the infinite lattice.">
+            <defs><marker id="k15" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker></defs>
+            <polygon points="18.0,12.0 26.7,17.0 26.7,27.0 18.0,32.0 9.3,27.0 9.3,17.0" class="hx"/>
+            <polygon points="35.3,12.0 44.0,17.0 44.0,27.0 35.3,32.0 26.7,27.0 26.7,17.0" class="hx"/>
+            <polygon points="52.6,12.0 61.3,17.0 61.3,27.0 52.6,32.0 44.0,27.0 44.0,17.0" class="hx"/>
+            <polygon points="70.0,12.0 78.6,17.0 78.6,27.0 70.0,32.0 61.3,27.0 61.3,17.0" class="hx"/>
+            <polygon points="87.3,12.0 95.9,17.0 95.9,27.0 87.3,32.0 78.6,27.0 78.6,17.0" class="hx"/>
+            <polygon points="104.6,12.0 113.3,17.0 113.3,27.0 104.6,32.0 95.9,27.0 95.9,17.0" class="hx"/>
+            <polygon points="26.7,27.0 35.3,32.0 35.3,42.0 26.7,47.0 18.0,42.0 18.0,32.0" class="hx"/>
+            <polygon points="44.0,27.0 52.6,32.0 52.6,42.0 44.0,47.0 35.3,42.0 35.3,32.0" class="hx hl"/>
+            <polygon points="61.3,27.0 70.0,32.0 70.0,42.0 61.3,47.0 52.6,42.0 52.6,32.0" class="hx hl"/>
+            <polygon points="78.6,27.0 87.3,32.0 87.3,42.0 78.6,47.0 70.0,42.0 70.0,32.0" class="hx hl"/>
+            <polygon points="95.9,27.0 104.6,32.0 104.6,42.0 95.9,47.0 87.3,42.0 87.3,32.0" class="hx"/>
+            <polygon points="113.3,27.0 121.9,32.0 121.9,42.0 113.3,47.0 104.6,42.0 104.6,32.0" class="hx"/>
+            <polygon points="18.0,42.0 26.7,47.0 26.7,57.0 18.0,62.0 9.3,57.0 9.3,47.0" class="hx"/>
+            <polygon points="35.3,42.0 44.0,47.0 44.0,57.0 35.3,62.0 26.7,57.0 26.7,47.0" class="hx hl"/>
+            <polygon points="52.6,42.0 61.3,47.0 61.3,57.0 52.6,62.0 44.0,57.0 44.0,47.0" class="hx hl"/>
+            <polygon points="70.0,42.0 78.6,47.0 78.6,57.0 70.0,62.0 61.3,57.0 61.3,47.0" class="hx hl"/>
+            <polygon points="87.3,42.0 95.9,47.0 95.9,57.0 87.3,62.0 78.6,57.0 78.6,47.0" class="hx"/>
+            <polygon points="104.6,42.0 113.3,47.0 113.3,57.0 104.6,62.0 95.9,57.0 95.9,47.0" class="hx"/>
+            <polygon points="26.7,57.0 35.3,62.0 35.3,72.0 26.7,77.0 18.0,72.0 18.0,62.0" class="hx"/>
+            <polygon points="44.0,57.0 52.6,62.0 52.6,72.0 44.0,77.0 35.3,72.0 35.3,62.0" class="hx"/>
+            <polygon points="61.3,57.0 70.0,62.0 70.0,72.0 61.3,77.0 52.6,72.0 52.6,62.0" class="hx"/>
+            <polygon points="78.6,57.0 87.3,62.0 87.3,72.0 78.6,77.0 70.0,72.0 70.0,62.0" class="hx"/>
+            <polygon points="95.9,57.0 104.6,62.0 104.6,72.0 95.9,77.0 87.3,72.0 87.3,62.0" class="hx"/>
+            <polygon points="113.3,57.0 121.9,62.0 121.9,72.0 113.3,77.0 104.6,72.0 104.6,62.0" class="hx"/>
+            <text class="c m sm" x="66" y="92">patch (schematic)</text>
+            <path class="ln" d="M130,44 L150,44" marker-end="url(#k15)"/>
+            <text class="sm" x="156" y="26">DMRG on a 36-spin</text>
+            <text class="sm" x="156" y="40">patch: gap above</text>
+            <text class="sm" x="156" y="54">a proven threshold</text>
+            <text class="a sm" x="156" y="74">⇒ Δ &gt; 0.006 on the</text>
+            <text class="a sm" x="156" y="88">infinite hexagonal lattice</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Proved a finite-size criterion for the spin-3/2 hexagonal AKLT model, then verified it with high-precision DMRG on a cut-out patch of 36 spins. Conclusion: a gap above 0.006 in the thermodynamic limit.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> computer-assisted gap proof, the closest precedent for this paper's style. Note that its numerical step is DMRG, not interval arithmetic.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevLett.124.177204">10.1103/PhysRevLett.124.177204</a></div>
+      </div></li>
+      <li><span class="num">[22]</span><div class="entry">
+        <p class="cite">N. Pomata and T.-C. Wei, <span class="t">Demonstrating the Affleck-Kennedy-Lieb-Tasaki spectral gap on 2D degree-3 lattices</span>, Phys. Rev. Lett. <b>124</b>, 177203 (2020).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 96" role="img" aria-label="Two overlapping plaquette regions A and B on the honeycomb lattice; bounding the anticommutator of their projectors by their sum, checked by Lanczos, gives a nonzero gap.">
+            <polygon points="18.0,12.0 26.7,17.0 26.7,27.0 18.0,32.0 9.3,27.0 9.3,17.0" class="hx"/>
+            <polygon points="35.3,12.0 44.0,17.0 44.0,27.0 35.3,32.0 26.7,27.0 26.7,17.0" class="hx"/>
+            <polygon points="52.6,12.0 61.3,17.0 61.3,27.0 52.6,32.0 44.0,27.0 44.0,17.0" class="hx"/>
+            <polygon points="70.0,12.0 78.6,17.0 78.6,27.0 70.0,32.0 61.3,27.0 61.3,17.0" class="hx"/>
+            <polygon points="87.3,12.0 95.9,17.0 95.9,27.0 87.3,32.0 78.6,27.0 78.6,17.0" class="hx"/>
+            <polygon points="104.6,12.0 113.3,17.0 113.3,27.0 104.6,32.0 95.9,27.0 95.9,17.0" class="hx"/>
+            <polygon points="26.7,27.0 35.3,32.0 35.3,42.0 26.7,47.0 18.0,42.0 18.0,32.0" class="hx"/>
+            <polygon points="44.0,27.0 52.6,32.0 52.6,42.0 44.0,47.0 35.3,42.0 35.3,32.0" class="hx"/>
+            <polygon points="61.3,27.0 70.0,32.0 70.0,42.0 61.3,47.0 52.6,42.0 52.6,32.0" class="hx hl"/>
+            <polygon points="78.6,27.0 87.3,32.0 87.3,42.0 78.6,47.0 70.0,42.0 70.0,32.0" class="hx hl2"/>
+            <polygon points="95.9,27.0 104.6,32.0 104.6,42.0 95.9,47.0 87.3,42.0 87.3,32.0" class="hx"/>
+            <polygon points="113.3,27.0 121.9,32.0 121.9,42.0 113.3,47.0 104.6,42.0 104.6,32.0" class="hx"/>
+            <polygon points="18.0,42.0 26.7,47.0 26.7,57.0 18.0,62.0 9.3,57.0 9.3,47.0" class="hx"/>
+            <polygon points="35.3,42.0 44.0,47.0 44.0,57.0 35.3,62.0 26.7,57.0 26.7,47.0" class="hx"/>
+            <polygon points="52.6,42.0 61.3,47.0 61.3,57.0 52.6,62.0 44.0,57.0 44.0,47.0" class="hx"/>
+            <polygon points="70.0,42.0 78.6,47.0 78.6,57.0 70.0,62.0 61.3,57.0 61.3,47.0" class="hx"/>
+            <polygon points="87.3,42.0 95.9,47.0 95.9,57.0 87.3,62.0 78.6,57.0 78.6,47.0" class="hx"/>
+            <polygon points="104.6,42.0 113.3,47.0 113.3,57.0 104.6,62.0 95.9,57.0 95.9,47.0" class="hx"/>
+            <polygon points="26.7,57.0 35.3,62.0 35.3,72.0 26.7,77.0 18.0,72.0 18.0,62.0" class="hx"/>
+            <polygon points="44.0,57.0 52.6,62.0 52.6,72.0 44.0,77.0 35.3,72.0 35.3,62.0" class="hx"/>
+            <polygon points="61.3,57.0 70.0,62.0 70.0,72.0 61.3,77.0 52.6,72.0 52.6,62.0" class="hx"/>
+            <polygon points="78.6,57.0 87.3,62.0 87.3,72.0 78.6,77.0 70.0,72.0 70.0,62.0" class="hx"/>
+            <polygon points="95.9,57.0 104.6,62.0 104.6,72.0 95.9,77.0 87.3,72.0 87.3,62.0" class="hx"/>
+            <polygon points="113.3,57.0 121.9,62.0 121.9,72.0 113.3,77.0 104.6,72.0 104.6,62.0" class="hx"/>
+            <text class="c a sm" x="61.3" y="40">A</text>
+            <text class="c g sm" x="78.6" y="40">B</text>
+            <text class="sm" x="146" y="22">bound the anticommutator</text>
+            <text class="mono sm" x="146" y="38">{P_A,P_B} ⪰ −η(P_A+P_B)</text>
+            <text class="sm" x="146" y="54">η from a few plaquettes</text>
+            <text class="sm" x="146" y="68">(Lanczos); η &lt; 1/z ⇒ gap</text>
+            <text class="a sm" x="146" y="88">⇒ gap &gt; 0 on the honeycomb</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Bounded the anticommutator of neighboring projector terms by their sum, {E, F} ⪰ −η(E + F), which gives H² ⪰ (1 − ηz)H with z overlapping neighbors, so a gap if η &lt; 1/z. The optimal η is an eigenvalue problem on a few plaquettes, solved by Lanczos for the honeycomb and by exact diagonalization for other degree-3 lattices.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> independent computer-assisted proof of the same result as [21].</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1103/PhysRevLett.124.177203">10.1103/PhysRevLett.124.177203</a></div>
+      </div></li>
+      <li><span class="num">[23]</span><div class="entry">
+        <p class="cite">K. S. Rai, I. Kull, P. Emonts, J. Tura, N. Schuch, and F. Baccari, <span class="t">A hierarchy of spectral gap certificates for frustration-free spin systems</span>, Quantum <b>10</b>, 2065 (2026).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 116" role="img" aria-label="Certify H squared minus delta H is positive by a positive local term on a window of n sites; the certified delta rises with n toward the true gap and always matches or beats Knabe.">
+            <text class="c mono sm" x="160" y="12">certify H² − δH ⪰ 0 with local positive terms</text>
+            <rect class="bxa" x="58" y="24" width="122" height="22" rx="3"/>
+            <line class="ln" x1="10" y1="35" x2="292" y2="35"/>
+            <circle class="ff" cx="16" cy="35" r="3.5"/><circle class="ff" cx="40" cy="35" r="3.5"/><circle class="ff" cx="64" cy="35" r="3.5"/><circle class="ff" cx="88" cy="35" r="3.5"/><circle class="ff" cx="112" cy="35" r="3.5"/><circle class="ff" cx="136" cy="35" r="3.5"/><circle class="ff" cx="160" cy="35" r="3.5"/><circle class="ff" cx="184" cy="35" r="3.5"/><circle class="ff" cx="208" cy="35" r="3.5"/><circle class="ff" cx="232" cy="35" r="3.5"/><circle class="ff" cx="256" cy="35" r="3.5"/><circle class="ff" cx="280" cy="35" r="3.5"/>
+            <text class="c a sm" x="119" y="60">level n = window size</text>
+            <line class="lm" x1="20" y1="90" x2="300" y2="90"/>
+            <line class="ln" x1="70" y1="84" x2="70" y2="96"/><line class="la" x1="150" y1="84" x2="150" y2="96"/><line class="la" x1="210" y1="84" x2="210" y2="96"/><line class="ln" x1="276" y1="82" x2="276" y2="98"/>
+            <text class="c sm" x="70" y="80">Knabe</text>
+            <text class="c a sm" x="150" y="80">level n</text>
+            <text class="c a sm" x="210" y="80">level n+1</text>
+            <text class="c sm" x="276" y="78">true Δ</text>
+            <text class="c m sm" x="110" y="108">≤</text><text class="c m sm" x="180" y="108">≤</text><text class="c m sm" x="243" y="108">≤</text>
+            <text class="m sm" x="20" y="108">δ</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Recast gap certification for frustration-free chains as a semidefinite program: find the largest δ for which H² − δH ⪰ 0 can be written as a sum of positive local terms on windows of n sites. Knabe's and Gosset–Mozgunov's bounds are feasible points, so the program matches or beats them. The bound cannot decrease as n grows and never exceeds the true gap Δ; whether it converges to Δ is left open.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> a strong recent finite-size gap certificate, from Schuch's group; it needs frustration-freeness.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.22331/q-2026-04-13-2065">10.22331/q-2026-04-13-2065</a><a href="https://arxiv.org/abs/2411.03680">arXiv:2411.03680</a></div>
+      </div></li>
+      <li><span class="num">[24]</span><div class="entry">
+        <p class="cite">M. Á. Rozmán, A. Molnár, and N. Schuch, <span class="t">Lower bounds on spectral gaps of parent Hamiltonians via tensor networks</span>, arXiv:2607.19078 (2026).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 116" role="img" aria-label="Overlapping block pairs Q and R on a chain; the overlap constant gamma, computed exactly from a D to the fourth transfer-matrix problem, gives a gap when gamma is below one half.">
+            <text class="c m sm" x="160" y="12">exact γ from a D⁴ × D⁴ transfer-matrix problem</text>
+            <path class="la" d="M18,48 V40 H192 V48"/>
+            <text class="c a" x="105" y="34">Q</text>
+            <line class="ln" x1="14" y1="60" x2="286" y2="60"/>
+            <circle class="ff" cx="20" cy="60" r="3"/><circle class="ff" cx="40" cy="60" r="3"/><circle class="ff" cx="60" cy="60" r="3"/><circle class="ff" cx="80" cy="60" r="3"/><circle class="ff" cx="100" cy="60" r="3"/>
+            <circle class="ff" cx="120" cy="60" r="3"/><circle class="ff" cx="140" cy="60" r="3"/><circle class="ff" cx="160" cy="60" r="3"/><circle class="ff" cx="180" cy="60" r="3"/>
+            <circle class="ff" cx="200" cy="60" r="3"/><circle class="ff" cx="220" cy="60" r="3"/><circle class="ff" cx="240" cy="60" r="3"/><circle class="ff" cx="260" cy="60" r="3"/><circle class="ff" cx="280" cy="60" r="3"/>
+            <path class="lg" d="M108,72 V80 H284 V72"/>
+            <text class="c g" x="196" y="94">R</text>
+            <text class="c mono sm" x="160" y="111">QR + RQ + γ(Q + R) ⪰ 0, γ &lt; ½ ⇒ gap ≥ (1−2γ)Δ(h̃)</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Improved the martingale method [19] for MPS parent Hamiltonians. Its key quantity, the overlap of local ground spaces, measured by the projectors Q and R onto excitations of two overlapping block pairs, is now computed exactly from transfer matrices of size D⁴ × D⁴. They also gave a much simpler proof that well-behaved MPS parent Hamiltonians are always gapped.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> a second 2026 gap method from Schuch's group, this one using tensor networks, again for frustration-free models.</p>
+        <div class="meta"><span class="chip new">arXiv ✓ · 2026 preprint</span><a href="https://arxiv.org/abs/2607.19078">arXiv:2607.19078</a></div>
+      </div></li>
+      <li><span class="num">[25]</span><div class="entry">
+        <p class="cite">S. Rao, <span class="t">A convergent hierarchy of spectral gap certificates for qubit Hamiltonians</span>, arXiv:2510.08427 (2025).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 116" role="img" aria-label="An upper bound U on the ground energy and a lower bound ell on the sum of the two lowest energies, from the second exterior power, give a gap of at least ell minus 2U.">
+            <text class="m sm" x="10" y="16">upper bound on the ground energy</text>
+            <line class="lm" x1="10" y1="30" x2="310" y2="30"/>
+            <circle class="ff" cx="90" cy="30" r="3.5"/>
+            <line class="la" x1="112" y1="23" x2="112" y2="37"/>
+            <text class="c sm" x="90" y="46">λ₀</text><text class="c a sm" x="112" y="46">U</text>
+            <text class="m sm" x="10" y="64">SDP on ∧² space: lowest level is λ₀ + λ₁</text>
+            <line class="lm" x1="10" y1="78" x2="310" y2="78"/>
+            <line class="la" x1="190" y1="71" x2="190" y2="85"/>
+            <circle class="ff" cx="214" cy="78" r="3.5"/>
+            <text class="c a sm" x="190" y="94">ℓ</text><text class="c sm" x="214" y="94">λ₀ + λ₁</text>
+            <text class="c mono" x="160" y="111">λ₁ − λ₀ ≥ ℓ − 2U</text>
+          </svg>
+          <figcaption><span class="lab">What he did</span>Built a convergent hierarchy of semidefinite programs on the second exterior power ∧², where the induced Hamiltonian's lowest level is λ₀ + λ₁. A lower bound on that sum, minus twice an upper bound on λ₀, bounds the gap from below. No frustration-freeness or geometric locality is needed.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the nearest rival in scope, since it also handles frustrated Hamiltonians. Revised 2 Oct 2026.</p>
+        <div class="meta"><span class="chip new">arXiv ✓ · preprint</span><a href="https://arxiv.org/abs/2510.08427">arXiv:2510.08427</a></div>
+      </div></li>
+      <li><span class="num">[26]</span><div class="entry">
+        <p class="cite">S. Banerjee, H. Guo, and D. Chowdhury, <span class="t">Bootstrap certification of string order in quantum spin chains</span>, arXiv:2609.22420 (2026).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 124" role="img" aria-label="A string operator with S z at both ends and exp i pi S z on every site between; certified upper and lower bounds on it as the string length grows.">
+            <line class="ln" x1="10" y1="30" x2="300" y2="30"/>
+            <circle class="ff" cx="20" cy="30" r="3"/><circle class="ff" cx="290" cy="30" r="3"/>
+            <rect class="bxa" x="40" y="22" width="16" height="16" rx="2"/><rect class="bxa" x="244" y="22" width="16" height="16" rx="2"/>
+            <circle class="ff" cx="80" cy="30" r="3"/><circle class="ff" cx="110" cy="30" r="3"/><circle class="ff" cx="140" cy="30" r="3"/><circle class="ff" cx="170" cy="30" r="3"/><circle class="ff" cx="200" cy="30" r="3"/><circle class="ff" cx="226" cy="30" r="3"/>
+            <path class="la" d="M70,16 H236"/>
+            <text class="c a sm" x="153" y="11">exp(iπSᶻ) on every site between</text>
+            <text class="c sm" x="48" y="52">Sᶻ</text><text class="c sm" x="252" y="52">Sᶻ</text>
+            <path class="fs" d="M30,64 C90,76 160,80 300,82 L300,90 C160,92 90,96 30,108 Z"/>
+            <path class="la" d="M30,64 C90,76 160,80 300,82"/>
+            <path class="la" d="M30,108 C90,96 160,92 300,90"/>
+            <line class="lm" x1="30" y1="112" x2="300" y2="112"/>
+            <text class="c m sm" x="165" y="122">string length</text>
+            <text class="m sm" x="200" y="72">upper bound</text>
+            <text class="m sm" x="200" y="104">lower bound</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Made string operators primary variables of the many-body bootstrap, so the semidefinite program grows only polynomially with string length. With the ground energy pinned in a window, they certified two-sided bounds on string order in the cluster and spin-1 Heisenberg chains.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> concurrent certification on the same spin-1 chain (string order, not the gap). OpenAI's [1] cites it too.</p>
+        <div class="meta"><span class="chip new">arXiv ✓ · 2026 preprint</span><a href="https://arxiv.org/abs/2609.22420">arXiv:2609.22420</a></div>
+      </div></li>
+      <li><span class="num">[27]</span><div class="entry">
+        <p class="cite">T. S. Cubitt, D. Pérez-García, and M. M. Wolf, <span class="t">Undecidability of the spectral gap</span>, Nature <b>528</b>, 207–211 (2015).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 104" role="img" aria-label="A Turing machine is encoded into a two-dimensional translation-invariant Hamiltonian, whose gapped or gapless behavior depends on whether the machine halts.">
+            <defs><marker id="k21" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker></defs>
+            <text class="c m sm" x="60" y="28">Turing machine</text>
+            <rect class="bx" x="10" y="38" width="20" height="20"/><rect class="bx" x="30" y="38" width="20" height="20"/><rect class="bxa" x="50" y="38" width="20" height="20"/><rect class="bx" x="70" y="38" width="20" height="20"/><rect class="bx" x="90" y="38" width="20" height="20"/>
+            <text class="c sm" x="20" y="52">0</text><text class="c sm" x="40" y="52">1</text><text class="c sm" x="60" y="52">1</text><text class="c sm" x="80" y="52">0</text><text class="c sm" x="100" y="52">_</text>
+            <path class="fa" d="M60,62 L54,72 L66,72 Z"/>
+            <path class="ln" d="M116,48 L150,48" marker-end="url(#k21)"/>
+            <text class="c m sm" x="133" y="40">encode</text>
+            <rect class="bx" x="156" y="18" width="15" height="15"/><rect class="bx" x="171" y="18" width="15" height="15"/><rect class="bx" x="186" y="18" width="15" height="15"/><rect class="bx" x="201" y="18" width="15" height="15"/>
+            <rect class="bx" x="156" y="33" width="15" height="15"/><rect class="bxa" x="171" y="33" width="15" height="15"/><rect class="bx" x="186" y="33" width="15" height="15"/><rect class="bx" x="201" y="33" width="15" height="15"/>
+            <rect class="bx" x="156" y="48" width="15" height="15"/><rect class="bx" x="171" y="48" width="15" height="15"/><rect class="bxa" x="186" y="48" width="15" height="15"/><rect class="bx" x="201" y="48" width="15" height="15"/>
+            <rect class="bx" x="156" y="63" width="15" height="15"/><rect class="bx" x="171" y="63" width="15" height="15"/><rect class="bx" x="186" y="63" width="15" height="15"/><rect class="bx" x="201" y="63" width="15" height="15"/>
+            <text class="c m sm" x="186" y="94">2D translation-invariant H</text>
+            <path class="ln" d="M222,48 L240,48" marker-end="url(#k21)"/>
+            <text class="c a sm" x="280" y="40">halts ⇒ gapped</text>
+            <text class="c sm" x="280" y="58">runs forever ⇒</text>
+            <text class="c sm" x="280" y="72">gapless</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Encoded the halting problem into the ground state of a two-dimensional, translation-invariant, nearest-neighbor Hamiltonian, so that it is gapped if a universal Turing machine halts and gapless if it runs forever. No algorithm can decide the gap question for all such Hamiltonians.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> explains why each gap needs its own certificate.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1038/nature16059">10.1038/nature16059</a></div>
+      </div></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Rigorous computation</h2>
+    <ol class="refs">
+      <li><span class="num">[28]</span><div class="entry">
+        <p class="cite">S. M. Rump, <span class="t">Verification methods: Rigorous results using floating-point arithmetic</span>, Acta Numer. <b>19</b>, 287–449 (2010).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 100" role="img" aria-label="A floating-point eigenvalue estimate with a certified interval around it that must contain a true eigenvalue.">
+            <text class="c sm" x="160" y="14">float eigenpair (x̃, λ̃) → residual r = Ax̃ − λ̃x̃</text>
+            <text class="c m sm" x="160" y="30">with an a priori bound on rounding error</text>
+            <line class="lm" x1="20" y1="66" x2="300" y2="66"/>
+            <line class="la" x1="120" y1="66" x2="200" y2="66" style="stroke-width:4"/>
+            <line class="la" x1="120" y1="58" x2="120" y2="74"/><line class="la" x1="200" y1="58" x2="200" y2="74"/>
+            <circle class="ff" cx="160" cy="66" r="3.5"/>
+            <circle class="hole" cx="178" cy="66" r="4"/>
+            <text class="c sm" x="160" y="54">λ̃</text>
+            <text class="sm" x="204" y="52">true λ inside</text>
+            <text class="c mono sm" x="160" y="90">λ̃ ± (‖r‖ + rounding bound)</text>
+          </svg>
+          <figcaption><span class="lab">What he did</span>Surveyed verification methods: compute in fast floating point, bound every rounding error a priori, and turn the result into a theorem. For a symmetric matrix, an approximate eigenpair with a bounded residual proves that a true eigenvalue lies in the computed interval.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the standard reference for verified eigenvalue enclosures, as in the certificate pipeline.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1017/S096249291000005X">10.1017/S096249291000005X</a></div>
+      </div></li>
+      <li><span class="num">[29]</span><div class="entry">
+        <p class="cite">F. Johansson, <span class="t">Arb: Efficient arbitrary-precision midpoint-radius interval arithmetic</span>, IEEE Trans. Comput. <b>66</b>, 1281–1292 (2017).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 100" role="img" aria-label="Two balls x equals 1.5 plus or minus 0.1 and y equals 2.0 plus or minus 0.05 multiply to a ball 3.0 plus or minus 0.28 that contains every possible product.">
+            <text class="c m sm" x="160" y="14">each operation returns a ball holding the exact result</text>
+            <line class="lm" x1="20" y1="60" x2="300" y2="60"/>
+            <line class="lm" x1="20" y1="57" x2="20" y2="63"/><line class="lm" x1="90" y1="57" x2="90" y2="63"/><line class="lm" x1="160" y1="57" x2="160" y2="63"/><line class="lm" x1="230" y1="57" x2="230" y2="63"/><line class="lm" x1="300" y1="57" x2="300" y2="63"/>
+            <text class="c m sm" x="20" y="76">0</text><text class="c m sm" x="90" y="76">1</text><text class="c m sm" x="160" y="76">2</text><text class="c m sm" x="230" y="76">3</text><text class="c m sm" x="300" y="76">4</text>
+            <line class="la" x1="118" y1="60" x2="132" y2="60" style="stroke-width:5"/>
+            <line class="la" x1="156.5" y1="60" x2="163.5" y2="60" style="stroke-width:5"/>
+            <line class="lg" x1="210.4" y1="60" x2="249.6" y2="60" style="stroke-width:5"/>
+            <text class="e a mono sm" x="124" y="44">x = 1.5 ± 0.1</text>
+            <text class="a mono sm" x="150" y="44">y = 2.0 ± 0.05</text>
+            <text class="c g mono sm" x="230" y="92">x·y ⊂ 3.0 ± 0.28</text>
+          </svg>
+          <figcaption><span class="lab">What he did</span>Built Arb, an arbitrary-precision library of midpoint-radius balls. Every operation returns a ball guaranteed to contain the exact result, including the effect of rounding, so long computations stay rigorous.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> the ball arithmetic behind the log Z enclosures. Cite it only if the paper reports Arb-based numbers.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1109/TC.2017.2690633">10.1109/TC.2017.2690633</a></div>
+      </div></li>
+      <li><span class="num">[30]</span><div class="entry">
+        <p class="cite">L. de Moura and S. Ullrich, <span class="t">The Lean 4 theorem prover and programming language</span>, in <i>Automated Deduction – CADE 28</i>, LNCS 12699, 625–635 (2021).</p>
+        <figure class="fig">
+          <svg viewBox="0 0 320 100" role="img" aria-label="Tactic scripts are elaborated into proof terms that only a small trusted kernel checks.">
+            <defs><marker id="k24" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L8,4L0,8z" class="ff"/></marker></defs>
+            <rect class="bx" x="4" y="38" width="62" height="28" rx="3"/><text class="c sm" x="35" y="56">tactics</text>
+            <path class="ln" d="M66,52 L82,52" marker-end="url(#k24)"/>
+            <rect class="bx" x="84" y="38" width="70" height="28" rx="3"/><text class="c sm" x="119" y="56">elaborator</text>
+            <path class="ln" d="M154,52 L170,52" marker-end="url(#k24)"/>
+            <rect class="bx" x="172" y="38" width="66" height="28" rx="3"/><text class="c sm" x="205" y="56">proof term</text>
+            <path class="ln" d="M238,52 L254,52" marker-end="url(#k24)"/>
+            <rect class="la dash" x="252" y="28" width="66" height="48" rx="4"/>
+            <rect class="bxa" x="258" y="38" width="54" height="28" rx="3"/><text class="c a sm" x="285" y="56">kernel ✓</text>
+            <text class="c a sm" x="285" y="20">trusted</text>
+            <text class="c m sm" x="160" y="94">decide +kernel: the Lean Ising seed is checked here too</text>
+          </svg>
+          <figcaption><span class="lab">What they did</span>Described Lean 4, the theorem prover and programming language used for the formalization. Lean elaborates tactic proofs into explicit terms that a small kernel checks, so only the kernel has to be trusted.</figcaption>
+        </figure>
+        <p class="why"><b>Why cite:</b> for the Lean formalization and the kernel-checked Ising gap.</p>
+        <div class="meta"><span class="chip">Crossref ✓</span><a href="https://doi.org/10.1007/978-3-030-79876-5_37">10.1007/978-3-030-79876-5_37</a></div>
+      </div></li>
+    </ol>
+  </section>
+
+  <details>
+    <summary>Considered and left out (all checked, add back if the text needs them)</summary>
+    <div>
+      <p class="group-note">Keep any reference the text actually uses. The current notes use Fox–Glynn (Poisson weights) and Pirvu et al. (MPO representations); they stay wherever those steps remain.</p>
+      <ul>
+        <li>Affleck–Lieb, Lett. Math. Phys. 12, 57 (1986); Lieb–Schultz–Mattis, Ann. Phys. 16, 407 (1961): half-integer spin chains, which have no gap.</li>
+        <li>AKLT, Commun. Math. Phys. 115, 477 (1988): the long AKLT paper.</li>
+        <li>Kennedy–Tasaki, Phys. Rev. B 45, 304 (1992); Tasaki, Phys. Rev. Lett. 121, 140604 (2018); Tasaki, <i>Physics and Mathematics of Quantum Many-Body Systems</i> (Springer, 2020).</li>
+        <li>Nachtergaele, Commun. Math. Phys. 175, 565 (1996); Lemm–Mozgunov, J. Math. Phys. 60, 051901 (2019); Anshu, Phys. Rev. B 101, 165104 (2020).</li>
+        <li>Kastoryano–Lucia–Pérez-García, Commun. Math. Phys. 366, 895 (2019); Kastoryano, arXiv:2609.27993 (2026): gaps in 2D, relevant to the 2+1D note.</li>
+        <li>Nancarrow–Xin, arXiv:2211.03819 (JHEP 2023): a bootstrap bound on a lattice gap, for the transverse-field Ising model.</li>
+        <li>Xu, Schötz, Wang, Magron, Klep, Fawzi, Renou, arXiv:2606.03836 (2026): certified <i>upper</i> bounds on the bulk gap.</li>
+        <li>Kull–Schuch–Dive–Navascués, Phys. Rev. X 14, 021008 (2024): ground-energy lower bounds. Fawzi–Fawzi–Scalet, Nat. Commun. 15, 7394 (2024): certified thermal states.</li>
+        <li>Bausch–Cubitt–Lucia–Pérez-García, Phys. Rev. X 10, 031038 (2020): undecidability in 1D.</li>
+        <li>Cirac–Pérez-García–Schuch–Verstraete, Rev. Mod. Phys. 93, 045003 (2021); Verstraete–García-Ripoll–Cirac, Phys. Rev. Lett. 93, 207204 (2004).</li>
+        <li>Dyson–Lieb–Simon, J. Stat. Phys. 18, 335 (1978); Fröhlich–Israel–Lieb–Simon, Commun. Math. Phys. 62, 1 (1978); Biskup, LNM 1970 (2009).</li>
+        <li>Todo–Kato, Phys. Rev. Lett. 87, 047203 (2001); Buyers et al., Phys. Rev. Lett. 56, 371 (1986).</li>
+        <li>Bañuls–Hastings–Verstraete–Cirac, Phys. Rev. Lett. 102, 240603 (2009); Hastings–Mahajan, Phys. Rev. A 91, 032306 (2015): transverse (space-direction) contraction for real-time evolution.</li>
+        <li>Rams–Czarnik–Cincio, Phys. Rev. X 8, 041033 (2018): correlation-length extrapolation from finite-bond-dimension MPS transfer matrices.</li>
+        <li>Verstraete–Cirac, Phys. Rev. Lett. 104, 190405 (2010); Haegeman–Cirac–Osborne–Verstraete, Phys. Rev. B 88, 085118 (2013); Tjoa–Cirac, Phys. Rev. Research 8, L022013 (2026): continuous MPS and MPO for quantum fields, continuous in space rather than imaginary time.</li>
+        <li>Fieker et al. (Nemo), ISSAC 2017; Bezanson et al. (Julia), SIAM Rev. 59, 65 (2017); mathlib, CPP 2020; Higham, <i>Accuracy and Stability</i> (SIAM, 2002).</li>
+      </ul>
+    </div>
+  </details>
+
+  <section>
+    <div class="row">
+      <h2>BibTeX (31 entries)</h2>
+      <button type="button" id="copy-bib">Copy BibTeX</button>
+    </div>
+    <p class="group-note">Identical to <code>notes/references.bib</code>: formatted like <code>~/Local/TEX/library.bib</code>, with library keys reused where the work is already there. [9] cites both Osterwalder–Schrader papers.</p>
+<pre class="bib" id="bib-text">@misc{OpenAI2026Periodic,
+  title = {The Periodic Spin-One {{Haldane}} Gap},
+  author = {{OpenAI}},
+  year = 2026,
+  month = sep,
+  url = {https://github.com/openai/math/blob/main/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/paper.pdf},
+  howpublished = {OpenAI Math Release, result 268, preprint}
+}
+
+@misc{OpenAI2026Boundaryfield,
+  title = {A Boundary-Field Gap for the Spin-One {{Heisenberg}} Chain},
+  author = {{OpenAI}},
+  year = 2026,
+  month = sep,
+  url = {https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf},
+  howpublished = {OpenAI Math Release, result 268, preprint}
+}
+
+@article{Haldane1983Continuum,
+  title = {Continuum Dynamics of the {{1-D Heisenberg}} Antiferromagnet: {{Identification}} with the {{O(3)}} Nonlinear Sigma Model},
+  author = {Haldane, F. D. M.},
+  year = 1983,
+  month = feb,
+  journal = {Phys. Lett. A},
+  volume = {93},
+  number = {9},
+  pages = {464--468},
+  doi = {10.1016/0375-9601(83)90631-X}
+}
+
+@article{Haldane1983Nonlinear,
+  title = {Nonlinear Field Theory of Large-Spin {{Heisenberg}} Antiferromagnets: {{Semiclassically}} Quantized Solitons of the One-Dimensional Easy-Axis {{N\'eel}} State},
+  author = {Haldane, F. D. M.},
+  year = 1983,
+  month = apr,
+  journal = {Phys. Rev. Lett.},
+  volume = {50},
+  number = {15},
+  pages = {1153--1156},
+  doi = {10.1103/PhysRevLett.50.1153}
+}
+
+@article{Affleck1987Rigorous,
+  title = {Rigorous Results on Valence-Bond Ground States in Antiferromagnets},
+  author = {Affleck, Ian and Kennedy, Tom and Lieb, Elliott H. and Tasaki, Hal},
+  year = 1987,
+  month = aug,
+  journal = {Phys. Rev. Lett.},
+  volume = {59},
+  number = {7},
+  pages = {799--802},
+  publisher = {American Physical Society},
+  issn = {0031-9007},
+  doi = {10.1103/PhysRevLett.59.799},
+  urldate = {2026-04-29}
+}
+
+@article{White1993Numerical,
+  title = {Numerical Renormalization-Group Study of Low-Lying Eigenstates of the Antiferromagnetic {{S}}=1 {{Heisenberg}} Chain},
+  author = {White, Steven R. and Huse, David A.},
+  year = 1993,
+  month = aug,
+  journal = {Phys. Rev. B},
+  volume = {48},
+  number = {6},
+  pages = {3844--3852},
+  doi = {10.1103/PhysRevB.48.3844}
+}
+
+@article{Tasaki2025Ground,
+  title = {Ground State of the {{S}}=1 Antiferromagnetic {{Heisenberg}} Chain Is Topologically Nontrivial If Gapped},
+  author = {Tasaki, Hal},
+  year = 2025,
+  month = feb,
+  journal = {Phys. Rev. Lett.},
+  volume = {134},
+  number = {7},
+  eprint = {2407.17041},
+  primaryclass = {cond-mat.stat-mech},
+  pages = {076602},
+  doi = {10.1103/PhysRevLett.134.076602},
+  archiveprefix = {arXiv}
+}
+
+@unpublished{Tasaki2026Haldane,
+  title = {An Expository Account of the Proof of the Spin-1 {{Haldane}} Gap},
+  author = {Tasaki, Hal},
+  year = 2026,
+  url = {https://x.com/Hal_Tasaki/status/2110158403842797750},
+  note = {In preparation; announced October 13, 2026. Title provisional}
+}
+
+@article{Osterwalder1973Axioms,
+  title = {Axioms for {{Euclidean Green}}'s Functions},
+  author = {Osterwalder, Konrad and Schrader, Robert},
+  year = 1973,
+  month = jun,
+  journal = {Commun. Math. Phys.},
+  volume = {31},
+  number = {2},
+  pages = {83--112},
+  doi = {10.1007/BF01645738}
+}
+
+@article{Osterwalder1975Axioms,
+  title = {Axioms for {{Euclidean Green}}'s Functions {{II}}},
+  author = {Osterwalder, Konrad and Schrader, Robert},
+  year = 1975,
+  month = oct,
+  journal = {Commun. Math. Phys.},
+  volume = {42},
+  number = {3},
+  pages = {281--305},
+  doi = {10.1007/BF01608978}
+}
+
+@article{Luscher1977Construction,
+  title = {Construction of a Selfadjoint, Strictly Positive Transfer Matrix for {{Euclidean}} Lattice Gauge Theories},
+  author = {L{\"u}scher, M.},
+  year = 1977,
+  month = oct,
+  journal = {Commun. Math. Phys.},
+  volume = {54},
+  number = {3},
+  pages = {283--292},
+  doi = {10.1007/BF01614090}
+}
+
+@article{Jaffe2016Characterization,
+  title = {Characterization of Reflection Positivity: {{Majoranas}} and Spins},
+  author = {Jaffe, Arthur and Janssens, Bas},
+  year = 2016,
+  month = feb,
+  journal = {Commun. Math. Phys.},
+  volume = {346},
+  number = {3},
+  eprint = {1506.04197},
+  primaryclass = {math-ph},
+  pages = {1021--1050},
+  doi = {10.1007/s00220-015-2545-z},
+  archiveprefix = {arXiv}
+}
+
+@article{Suzuki1985Transfermatrix,
+  title = {Transfer-Matrix Method and {{Monte Carlo}} Simulation in Quantum Spin Systems},
+  author = {Suzuki, Masuo},
+  year = 1985,
+  month = mar,
+  journal = {Phys. Rev. B},
+  volume = {31},
+  number = {5},
+  pages = {2957--2965},
+  doi = {10.1103/PhysRevB.31.2957}
+}
+
+@article{Tang2021Continuous,
+  title = {Continuous Matrix Product Operator Approach to Finite Temperature Quantum States},
+  author = {Tang, Wei and Tu, Hong-Hao and Wang, Lei},
+  year = 2020,
+  month = oct,
+  journal = {Phys. Rev. Lett.},
+  volume = {125},
+  number = {17},
+  pages = {170604},
+  eprint = {2004.12928},
+  primaryclass = {cond-mat.str-el},
+  doi = {10.1103/PhysRevLett.125.170604},
+  archiveprefix = {arXiv}
+}
+
+@article{Gohmann2020Thermodynamics,
+  title = {Thermodynamics of the Spin-1/2 {{Heisenberg}}--{{Ising}} Chain at High Temperatures: A Rigorous Approach},
+  author = {G{\"o}hmann, Frank and Goomanee, Salvish and Kozlowski, Karol K. and Suzuki, Junji},
+  year = 2020,
+  month = jul,
+  journal = {Commun. Math. Phys.},
+  volume = {377},
+  number = {1},
+  pages = {623--673},
+  eprint = {1811.12020},
+  primaryclass = {math-ph},
+  doi = {10.1007/s00220-020-03749-6},
+  archiveprefix = {arXiv}
+}
+
+@article{Gu2009Tensorentanglementfiltering,
+  title = {Tensor-Entanglement-Filtering Renormalization Approach and Symmetry-Protected Topological Order},
+  author = {Gu, Zheng-Cheng and Wen, Xiao-Gang},
+  year = 2009,
+  month = oct,
+  journal = {Phys. Rev. B},
+  volume = {80},
+  number = {15},
+  pages = {155131},
+  eprint = {0903.1069},
+  primaryclass = {cond-mat.str-el},
+  doi = {10.1103/PhysRevB.80.155131},
+  archiveprefix = {arXiv}
+}
+
+@article{Morita2026Tensor,
+  title = {Tensor Renormalization Group Calculations of Partition-Function Ratios},
+  author = {Morita, Satoshi and Kawashima, Naoki},
+  year = 2026,
+  month = apr,
+  journal = {J. Phys. Soc. Jpn.},
+  volume = {95},
+  number = {4},
+  pages = {044001},
+  eprint = {2512.03395},
+  primaryclass = {cond-mat.stat-mech},
+  doi = {10.7566/JPSJ.95.044001},
+  archiveprefix = {arXiv}
+}
+
+@article{Akiyama2026Tensor,
+  title = {Tensor Renormalization Group Approach to Critical Phenomena via Symmetry-Twisted Partition Functions},
+  author = {Akiyama, Shinichiro and Jha, Raghav G. and Maeda, Jun and Tanizaki, Yuya and {Unmuth-Yockey}, Judah},
+  year = 2026,
+  month = apr,
+  journal = {Phys. Rev. D},
+  volume = {113},
+  number = {7},
+  pages = {074502},
+  eprint = {2601.02681},
+  primaryclass = {hep-lat},
+  doi = {10.1103/ywhr-lt6w},
+  archiveprefix = {arXiv}
+}
+
+@article{Knabe1988Energy,
+  title = {Energy Gaps and Elementary Excitations for Certain {{VBS-quantum}} Antiferromagnets},
+  author = {Knabe, Stefan},
+  year = 1988,
+  month = aug,
+  journal = {J. Stat. Phys.},
+  volume = {52},
+  number = {3-4},
+  pages = {627--638},
+  issn = {0022-4715, 1572-9613},
+  doi = {10.1007/BF01019721},
+  urldate = {2026-04-29}
+}
+
+@article{Fannes1992Finitely,
+  title = {Finitely Correlated States on Quantum Spin Chains},
+  author = {Fannes, M. and Nachtergaele, B. and Werner, R. F.},
+  year = 1992,
+  journal = {Commun. Math. Phys.},
+  volume = {144},
+  number = {3},
+  pages = {443--490},
+  doi = {10.1007/BF02099178}
+}
+
+@article{Gosset2016Local,
+  title = {Local Gap Threshold for Frustration-Free Spin Systems},
+  author = {Gosset, David and Mozgunov, Evgeny},
+  year = 2016,
+  month = sep,
+  journal = {J. Math. Phys.},
+  volume = {57},
+  number = {9},
+  eprint = {1512.00088},
+  primaryclass = {quant-ph},
+  pages = {091901},
+  issn = {0022-2488, 1089-7658},
+  doi = {10.1063/1.4962337},
+  urldate = {2026-04-29},
+  archiveprefix = {arXiv}
+}
+
+@article{Lemm2020Existence,
+  title = {Existence of a Spectral Gap in the {{Affleck-Kennedy-Lieb-Tasaki}} Model on the Hexagonal Lattice},
+  author = {Lemm, Marius and Sandvik, Anders W. and Wang, Ling},
+  year = 2020,
+  month = apr,
+  journal = {Phys. Rev. Lett.},
+  volume = {124},
+  number = {17},
+  eprint = {1910.11810},
+  primaryclass = {quant-ph},
+  pages = {177204},
+  doi = {10.1103/PhysRevLett.124.177204},
+  archiveprefix = {arXiv}
+}
+
+@article{Pomata2020Demonstrating,
+  title = {Demonstrating the {{Affleck-Kennedy-Lieb-Tasaki}} Spectral Gap on {{2D}} Degree-3 Lattices},
+  author = {Pomata, Nicholas and Wei, Tzu-Chieh},
+  year = 2020,
+  month = apr,
+  journal = {Phys. Rev. Lett.},
+  volume = {124},
+  number = {17},
+  eprint = {1911.01410},
+  primaryclass = {cond-mat.stat-mech},
+  pages = {177203},
+  doi = {10.1103/PhysRevLett.124.177203},
+  archiveprefix = {arXiv}
+}
+
+@article{Rai2026Hierarchy,
+  title = {A Hierarchy of Spectral Gap Certificates for Frustration-Free Spin Systems},
+  author = {Rai, Kshiti Sneh and Kull, Ilya and Emonts, Patrick and Tura, Jordi and Schuch, Norbert and Baccari, Flavio},
+  year = 2026,
+  month = apr,
+  journal = {Quantum},
+  volume = {10},
+  eprint = {2411.03680},
+  primaryclass = {quant-ph},
+  pages = {2065},
+  doi = {10.22331/q-2026-04-13-2065},
+  archiveprefix = {arXiv}
+}
+
+@misc{Rozman2026Lower,
+  title = {Lower Bounds on Spectral Gaps of Parent {{Hamiltonians}} via Tensor Networks},
+  author = {Rozm{\'a}n, Mil{\'a}n {\'A}d{\'a}m and Moln{\'a}r, Andr{\'a}s and Schuch, Norbert},
+  year = 2026,
+  month = jul,
+  number = {arXiv: 2607.19078},
+  eprint = {2607.19078},
+  primaryclass = {quant-ph},
+  publisher = {arXiv},
+  url = {http://arxiv.org/abs/2607.19078},
+  archiveprefix = {arXiv}
+}
+
+@misc{Rao2025Convergent,
+  title = {A Convergent Hierarchy of Spectral Gap Certificates for Qubit {{Hamiltonians}}},
+  author = {Rao, Sujit},
+  year = 2025,
+  month = oct,
+  number = {arXiv: 2510.08427},
+  eprint = {2510.08427},
+  primaryclass = {quant-ph},
+  publisher = {arXiv},
+  url = {http://arxiv.org/abs/2510.08427},
+  archiveprefix = {arXiv}
+}
+
+@misc{Banerjee2026Bootstrap,
+  title = {Bootstrap Certification of String Order in Quantum Spin Chains},
+  author = {Banerjee, Sagnik and Guo, Haoyu and Chowdhury, Debanjan},
+  year = 2026,
+  month = sep,
+  number = {arXiv: 2609.22420},
+  eprint = {2609.22420},
+  primaryclass = {cond-mat.str-el},
+  publisher = {arXiv},
+  url = {http://arxiv.org/abs/2609.22420},
+  archiveprefix = {arXiv}
+}
+
+@article{Cubitt2015Undecidability,
+  title = {Undecidability of the Spectral Gap},
+  author = {Cubitt, Toby S. and {P{\'e}rez-Garc{\'i}a}, David and Wolf, Michael M.},
+  year = 2015,
+  month = dec,
+  journal = {Nature},
+  volume = {528},
+  number = {7581},
+  eprint = {1502.04135},
+  primaryclass = {quant-ph},
+  pages = {207--211},
+  doi = {10.1038/nature16059},
+  archiveprefix = {arXiv}
+}
+
+@article{Rump2010Verification,
+  title = {Verification Methods: {{Rigorous}} Results Using Floating-Point Arithmetic},
+  author = {Rump, Siegfried M.},
+  year = 2010,
+  month = may,
+  journal = {Acta Numer.},
+  volume = {19},
+  pages = {287--449},
+  doi = {10.1017/S096249291000005X}
+}
+
+@article{Johansson2017Arb,
+  title = {Arb: {{Efficient}} Arbitrary-Precision Midpoint-Radius Interval Arithmetic},
+  author = {Johansson, Fredrik},
+  year = 2017,
+  month = aug,
+  journal = {IEEE Trans. Comput.},
+  volume = {66},
+  number = {8},
+  eprint = {1611.02831},
+  primaryclass = {cs.MS},
+  pages = {1281--1292},
+  doi = {10.1109/TC.2017.2690633},
+  archiveprefix = {arXiv}
+}
+
+@inproceedings{Moura2021Lean,
+  title = {The {{Lean}} 4 Theorem Prover and Programming Language},
+  booktitle = {Automated Deduction -- {{CADE}} 28},
+  author = {{de Moura}, Leonardo and Ullrich, Sebastian},
+  editor = {Platzer, Andr{\'e} and Sutcliffe, Geoff},
+  year = 2021,
+  series = {Lecture Notes in Computer Science},
+  volume = {12699},
+  pages = {625--635},
+  publisher = {Springer International Publishing},
+  address = {Cham},
+  doi = {10.1007/978-3-030-79876-5_37},
+  urldate = {2026-04-29},
+  isbn = {978-3-030-79875-8 978-3-030-79876-5}
+}</pre>
+  </section>
+
+  <footer>Checked on 16 Oct 2026 against 20 Crossref DOI records and 3 arXiv-only abstract pages, with OpenAI's two preprints checked against the local clone of github.com/openai/math. An independent fact-check pass then re-verified every field and caption; its corrections are applied here. Entries [13]–[17] were added on 18 Oct 2026 and checked against their Crossref records and full arXiv texts, including every equation and figure the captions describe. Not verifiable from accessible abstracts: the captions for Lüscher [10], Knabe [18] and FNW [19], whose publisher pages were blocked.</footer>
+</div>
+
+<script>
+function wireCopy(buttonId, sourceId) {
+  const btn = document.getElementById(buttonId);
+  const src = document.getElementById(sourceId);
+  btn.addEventListener('click', () => {
+    const text = src.textContent;
+    const done = () => { const old = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => { btn.textContent = old; }, 1500); };
+    const fallback = () => {
+      const range = document.createRange(); range.selectNodeContents(src);
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      btn.textContent = 'Selected, press ⌘C';
+    };
+    try { navigator.clipboard.writeText(text).then(done, fallback); } catch (e) { fallback(); }
+  });
+}
+wireCopy('copy-disclaimer', 'disclaimer-text');
+wireCopy('copy-bib', 'bib-text');
+</script>
