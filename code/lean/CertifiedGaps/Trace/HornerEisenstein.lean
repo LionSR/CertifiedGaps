@@ -6,6 +6,7 @@ Authors: thermal-mpo-gap contributors
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import CertifiedGaps.Spectral.Basic
 import CertifiedGaps.Trace.Eisenstein
+import CertifiedGaps.Trace.Horner
 
 /-!
 # Horner columns over `ℤ[ω]` with coordinatewise floors
@@ -66,6 +67,25 @@ def hornerFloorE (B : Matrix ι ι EisensteinInt) (s : ℕ) (q : ℕ → ℤ) (r
 
 @[simp] theorem hornerListE_cons (B : Matrix ι ι EisensteinInt) (s : ℕ) (r : ι) (q : ℤ)
     (l : List ℤ) : hornerListE B s r (q :: l) = hornerStepE B s r q (hornerListE B s r l) := rfl
+
+/-- **On an integer matrix the recursion over `ℤ[ω]` is the integer recursion**: the `ω`
+coordinate stays zero, and `fl` floors the `1` coordinate as `hornerStep` does. -/
+theorem hornerListE_map_intCast (D : Matrix ι ι ℤ) (s : ℕ) (r : ι) (l : List ℤ) :
+    hornerListE (D.map (↑)) s r l = fun i ↦ ((hornerList D s r l i : ℤ) : EisensteinInt) := by
+  induction l with
+  | nil => funext i; ext <;> rfl
+  | cons c l ih =>
+    funext i
+    have hmv : (D.map (↑) *ᵥ fun j ↦ ((hornerList D s r l j : ℤ) : EisensteinInt)) i =
+        (((D *ᵥ hornerList D s r l) i : ℤ) : EisensteinInt) :=
+      (RingHom.map_mulVec (Int.castRingHom EisensteinInt) D (hornerList D s r l) i).symm
+    rw [hornerListE_cons, hornerList_cons, ih, hornerStepE, hmv, hornerStep]
+    split_ifs <;> ext <;> simp [fdiv]
+
+/-- `hornerFloorE` of an integer matrix. -/
+theorem hornerFloorE_map_intCast (D : Matrix ι ι ℤ) (s : ℕ) (q : ℕ → ℤ) (r : ι) (J : ℕ) :
+    hornerFloorE (D.map (↑)) s q r J = fun i ↦ ((hornerFloor D s q r J i : ℤ) : EisensteinInt) :=
+  hornerListE_map_intCast D s r _
 
 /-! ### The complex recursion -/
 

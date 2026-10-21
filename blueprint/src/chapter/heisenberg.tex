@@ -393,6 +393,39 @@ The cyclic seam requires Eisenstein integers.
   the integers of \cite[Appendix A.4]{OpenAIHaldane}.
 \end{definition}
 
+\begin{lemma}[A fast evaluation of the totals with twists \(1\) and \(P\)]
+  \label{lem:spin1-horner60-packed}
+  \lean{CertifiedGaps.Trace.hornerFloorE_map_intCast,
+    CertifiedGaps.Trace.hornerFloor_smul,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.thermalMatrix_eq_two_smul,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.thermalColumn60_eq,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.repNum60_wordNum,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.packedTotal_spec,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.packedHornerTotal60,
+    CertifiedGaps.SpinOneHeisenberg.ThermalPacked.hornerTotal60_eq_of_packed}
+  \leanok
+  \uses{def:spin1-horner60, lem:spin1-horner36-packed, lem:trace-packed}
+  For the twists \(1\) and \(P\), the matrix \(B\) has integer entries, so the recurrence over
+  the Eisenstein integers keeps the \(\omega\) coordinate zero. For even \(n\), \(2B\) is the
+  band matrix \(D\) of Lemma~\ref{lem:spin1-horner36-packed}, and
+  \(\lfloor 2y/32\rfloor = \lfloor y/16\rfloor\). Let \texttt{packedHornerTotal60} run the
+  packed recursion with this band, divisor \(32\) and the coefficients
+  \(\lfloor 2^{56}p_j(84,256)\rfloor\), which vanish for \(j \ge 173\). For even \(n \ge 2\),
+  if it returns \(W\), then the total of \texttt{HornerTotals60} at twist \(1\) or \(P\)
+  equals \(W\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Rewrite the Eisenstein recurrence as the integer recurrence of \(2B\) with divisor \(32\),
+  drop the zero coefficients, identify the numeric representatives with
+  \texttt{thermalRep60}, and apply the packed total of
+  Lemma~\ref{lem:spin1-horner36-packed}.
+\end{proof}
+
+Compiled code, which is not a proof, reproduces the four printed totals with \(n = 6, 8\) and
+twists \(1\), \(P\) (\texttt{SeedKernel/Eval/ThermalTotals60.lean}). The twist \(C\) and the
+length \(n = 10\) are not evaluated.
+
 \begin{theorem}[The second trace table from its printed integers]
   \label{thm:spin1-table60}
   \lean{CertifiedGaps.SpinOneHeisenberg.columnNorm_wordGens60,

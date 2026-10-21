@@ -76,6 +76,7 @@ import CertifiedGaps.Heisenberg.EnergyBound
 import CertifiedGaps.Heisenberg.ThermalTable
 import CertifiedGaps.Heisenberg.WordBand
 import CertifiedGaps.Heisenberg.ThermalPacked
+import CertifiedGaps.Heisenberg.ThermalPacked60
 import CertifiedGaps.Heisenberg.ThermalTable60
 import CertifiedGaps.Heisenberg.Reseed120
 -- Open chains with boundary fields (Appendices A–C of the note)

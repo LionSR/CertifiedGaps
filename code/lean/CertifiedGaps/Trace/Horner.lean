@@ -76,6 +76,24 @@ theorem intDiv_eq_floor (x : ℤ) (s : ℕ) : x / (s : ℤ) = ⌊(x : ℝ) / (s 
 @[simp] theorem hornerList_cons (D : Matrix ι ι ℤ) (s : ℕ) (r : ι) (c : ℤ) (l : List ℤ) :
     hornerList D s r (c :: l) = hornerStep D s r c (hornerList D s r l) := rfl
 
+/-- Scaling the matrix and the divisor by the same positive integer leaves the recursion
+unchanged, `⌊k D X / (k s)⌋ = ⌊D X / s⌋`: the `b = 21/2` table divides `B` by `16`, the packed
+evaluator divides `2B` by `32`. -/
+theorem hornerList_smul (D : Matrix ι ι ℤ) {k : ℕ} (hk : 0 < k) (s : ℕ) (r : ι) (l : List ℤ) :
+    hornerList ((k : ℤ) • D) (k * s) r l = hornerList D s r l := by
+  induction l with
+  | nil => rfl
+  | cons c l ih =>
+    funext i
+    simp only [hornerList_cons, hornerStep, ih, Matrix.smul_mulVec, Pi.smul_apply, smul_eq_mul]
+    push_cast
+    rw [Int.mul_ediv_mul_of_pos _ _ (by exact_mod_cast hk)]
+
+/-- `hornerFloor` under the same scaling. -/
+theorem hornerFloor_smul (D : Matrix ι ι ℤ) {k : ℕ} (hk : 0 < k) (s : ℕ) (c : ℕ → ℤ) (r : ι)
+    (J : ℕ) : hornerFloor ((k : ℤ) • D) (k * s) c r J = hornerFloor D s c r J :=
+  hornerList_smul D hk s r _
+
 /-! ### The real recursion -/
 
 /-- The real matrix `R = D / s`. -/
