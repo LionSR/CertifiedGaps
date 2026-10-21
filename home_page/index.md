@@ -3,146 +3,105 @@ usemathjax: true
 ---
 
 {% assign repo_url = 'https://github.com/' | append: site.repository %}
-{% assign data = site.data.records %}
 
-Haldane (1983) conjectured that the spin-1 antiferromagnetic Heisenberg chain has a uniform spectral
-gap $$\Delta_L = E_1(L) - E_0(L) > 0$$ as the chain length $$L \to \infty$$ [[1](#ref-1), [2](#ref-2)].
-In October 2026, OpenAI released two preprints proving uniform gap bounds for periodic [[3](#ref-3)]
-and open [[4](#ref-4)] spin-1 chains by combining finite-size numerical bounds with a scale-doubling
-argument.
+This project proves lower bounds on the spectral gap of quantum spin chains. Each bound holds for
+all even ring lengths above a stated length. The proofs combine certified finite calculations with
+a Lean 4 formalization.
 
-This project formulates that argument as a general criterion—the **spacetime bootstrap**
-(*two-purity doubling criterion*)—formalizes the analytic proof in **Lean 4** [[7](#ref-7)], and
-certifies the finite numerical inputs in exact or interval arithmetic across **eight families** of
-quantum spin chains and ladders:
+Haldane predicted in 1983 that the spin-1 Heisenberg chain has a gap that stays open as the chain
+grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026, as
+[result 268](https://github.com/openai/math/blob/1581d4cbdd69a0faf34b2089614fe2a814316a6a/CONTENTS.md?plain=1#L6747) of its math release [[3](#ref-3), [4](#ref-4)]. We call the method of this proof the
+*spacetime bootstrap*.
 
-* **Two purities:** For a periodic ring $$H_L$$ of $$L$$ unit cells with partition function
-  $$Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}$$, define the spatial and thermal purities
-  $$P_{\mathrm{s}}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad P_\tau(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.$$
-* **Doubling criterion (Lean 4):** When the nearest-neighbor interaction is reflection positive
-  [[6](#ref-6)], both purities contract quadratically toward $$1$$ as $$(n, \beta) \mapsto (2n, 2\beta)$$.
-  Upper bounds $$\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$$ and
-  $$\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$$ at one even seed scale $$(n_0, \beta_0)$$ in the
-  admissible region (for example, $$\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$$)
-  imply a unique ground state and an explicit lower bound on $$\Delta_L$$ for every even $$L \ge n_0$$.
-* **Certified seeds (Julia / Lean kernel):** All but one record (an odd-seed dimerized point) pair a
-  computer-checked seed certificate at $$(n_0, \beta_0)$$ with a Lean 4 theorem covering the step
-  from the seed to all lengths $$L \ge n_0$$ of the stated parity.
+The method is not specific to the spin-1 chain. It applies to many other spin chains, and the
+[leaderboard]({{ '/leaderboard.html' | relative_url }}) lists the bounds that we have so far. It can do more.
+Sharper finite calculations give larger bounds.
 
-## Headline results
+## Method
 
-* **Spin-1 Heisenberg chain** (Haldane gap [[1](#ref-1), [2](#ref-2)]): $$\Delta_L > 0.0729$$ for
-  every even ring length $$L \ge 36$$ (numerical bulk gap $$\approx 0.4105$$ [[5](#ref-5)]). The
-  seed inequalities at $$(n_0, \beta_0) = (60, 833/32)$$ and $$(36, 49/4)$$ are certified in
-  exact rational arithmetic from the finite trace and variational inputs of the OpenAI periodic
-  preprint [[3](#ref-3)], reproduced here and independently audited; Lean 4 proves the bound from
-  those two seeds. We also formalize in Lean 4 both periodic bounds from the preprint
-  ($$\Delta_L > (\log 20)/784 \approx 0.00382$$ for even $$L \ge 2304$$ and
-  $$\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79} \approx 0.000479$$ for even $$L \ge 60$$) and the
-  open spin-1 chain with endpoint fields $$h = 3/5$$ [[4](#ref-4)]
-  ($$\Delta_n > (\log 10)/392 \approx 0.00587$$ for odd $$n \ge 1921$$).
-* **Unconditional Lean 4 theorem:** For the Ising chain in transverse and longitudinal fields,
-  $$H_L = -\sum_j Z_j Z_{j+1} - \tfrac14 \sum_j X_j - \tfrac1{20} \sum_j Z_j$$, Lean 4 proves
-  $$\Delta_L > 0.3922$$ for every even $$L \ge 6$$ with no external hypotheses; both the finite
-  seed bounds at $$(n_0, \beta_0) = (6, 97/4)$$ and the doubling recurrence are checked inside
-  the Lean kernel.
-* **{{ data.records | where_exp: "r", "r.tier != 'target'" | size }} certified gap records**
-  across eight model families—including spin-1 and spin-1/2 dimerized chains, two-leg Heisenberg
-  and Ising ladders, single-ion anisotropy, and staggered fields—all except one accompanied by a
-  Lean 4 theorem from the certified seed. Browse the full table on the
-  [leaderboard]({{ '/leaderboard.html' | relative_url }}).
+Let $$Z_n(\beta) = \mathrm{Tr}\, e^{-\beta H_n}$$ be the partition function of a ring of $$n$$
+unit cells. Draw it as a torus: $$n$$ cells around the ring in space, and a circle of length
+$$\beta$$ in imaginary time. The method compares tori through two ratios:
+
+<div class="purities">
+  <div class="purity time">
+    <span class="def">\(\class{t}{P_{\mathrm T}}(n, \beta) = \dfrac{Z_n(2\beta)}{Z_n(\beta)^2} =\)</span>
+    <span class="frac"><span>{% include torus.html w=2 h=2 %}</span><span>{% include torus.html w=2 h=1 %}<sup>2</sup></span></span>
+    <span class="gloss">thermal purity: two tori glued in time</span>
+  </div>
+  <div class="purity space">
+    <span class="def">\(\class{s}{P_{\mathrm S}}(n, \beta) = \dfrac{Z_{2n}(\beta)}{Z_n(\beta)^2} =\)</span>
+    <span class="frac"><span>{% include torus.html w=4 h=1 %}</span><span>{% include torus.html w=2 h=1 %}<sup>2</sup></span></span>
+    <span class="gloss">spatial purity: two tori glued in space</span>
+  </div>
+</div>
+
+<div class="method">
+<ol>
+  <li>Show that the interaction between neighboring cells is reflection positive
+    [<a href="#ref-6">6</a>].</li>
+  <li>Pick one ring length \(n_0\) and one inverse temperature \(\beta_0\), the <em>seed</em>.
+    Calculate upper bounds on the defects \(p = 1 - P_{\mathrm S}(n_0, \beta_0)\) and
+    \(q = 1 - P_{\mathrm T}(2n_0, \beta_0)\). The method works if \((p, q)\) is in the green
+    region, for example if both are below \(0.127\).</li>
+  <li>Double \(n\) and \(\beta\) together. Each doubling moves \((p, q)\) closer to 0. The result
+    is a lower bound on the gap for all even \(L \ge n_0\).</li>
+</ol>
+<figure>
+  {% include seed-region.svg %}
+  <figcaption>The spin-1 chain. The path starts at the seed, \(n = 36\). Each step doubles
+    \(n\) and \(\beta\).</figcaption>
+</figure>
+</div>
+
+Lean 4 [[7](#ref-7)] verifies reflection positivity (step 1) and the bootstrap argument (step 3).
+The finite seed bounds in step 2 are certified by computation, either within Lean or with external
+certificate checkers.
+
+## Main results
+
+| Model | Gap bound | Ring lengths | Proof |
+|---|---|---|---|
+| Spin-1 Heisenberg chain | $$\Delta_L > 0.0729$$ | even $$L \ge 36$$ | Lean 4; seed checked by computer, from the data of [[3](#ref-3)] |
+| Ising chain, $$g = 1/4$$, $$h = 1/20$$ | $$\Delta_L > 0.392$$ | even $$L \ge 6$$ | Lean 4, seed included |
+
+The numerical value of the spin-1 gap is approximately $$0.4105$$ [[5](#ref-5)]. The Ising chain
+is $$H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j$$. The
+[leaderboard]({{ '/leaderboard.html' | relative_url }}) lists all bounds and the history of the
+spin-1 record.
+
+## Links
+
+* Explainer: [periodic rings]({{ '/explainer/' | relative_url }}),
+  [open chains]({{ '/explainer/open.html' | relative_url }})
+* Two-page note: [a short diagrammatic explanation of the spin-1 Haldane gap proof]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }}),
+  by S. Lu and GPT-6-Astra
+* Lean 4: [blueprint]({{ '/blueprint/' | relative_url }}),
+  [blueprint PDF]({{ '/blueprint.pdf' | relative_url }}),
+  [dependency graph]({{ '/blueprint/dep_graph_document.html' | relative_url }}),
+  [API documentation]({{ '/docs/' | relative_url }})
+* Contributions: [contribution guide]({{ '/contribute.html' | relative_url }}),
+  [source on GitHub]({{ repo_url }})
 
 ## News
 
-{%- comment -%}
-  Hand-written items from _data/news.yml, merged with the leaderboard rows that no item already
-  announces (by pull request or row id); rows set in one pull request form one item. Items are
-  sorted as "date|html" strings joined by ␞, a character that does not occur in the data.
-{%- endcomment -%}
-{%- assign news = site.data.news -%}
-{%- assign seen_prs = "," -%}{%- assign seen_ids = "," -%}
-{%- for n in news -%}
-  {%- for p in n.prs %}{% assign seen_prs = seen_prs | append: p | append: "," %}{% endfor -%}
-  {%- for i in n.records %}{% assign seen_ids = seen_ids | append: i | append: "," %}{% endfor -%}
-{%- endfor -%}
-{%- assign items = "" -%}
-{%- for n in news -%}
-  {%- if n.link -%}
-    {%- assign first = n.link | slice: 0 -%}
-    {%- if first == "/" %}{% assign href = n.link | relative_url %}{% else %}{% assign href = n.link %}{% endif -%}
-  {%- else -%}
-    {%- assign href = repo_url | append: "/pull/" | append: n.prs[0] -%}
-  {%- endif -%}
-  {%- capture item %}{{ n.date }}|<a href="{{ href }}">{{ n.text }}</a>{% endcapture -%}
-  {%- assign items = items | append: item | append: "␞" -%}
-{%- endfor -%}
-{%- assign groups = data.records | where_exp: "r", "r.tier != 'target'" | group_by: "pr" -%}
-{%- for g in groups -%}
-  {%- for r in g.items -%}
-    {%- capture id_key %},{{ r.id }},{% endcapture %}{% capture pr_key %},{{ r.pr }},{% endcapture -%}
-    {%- if seen_ids contains id_key or r.pr and seen_prs contains pr_key %}{% continue %}{% endif -%}
-    {%- if g.name != "" and forloop.index > 1 %}{% continue %}{% endif -%}
-    {%- assign best = r -%}
-    {%- if g.name != "" -%}
-      {%- for x in g.items %}{% assign a = x.bound.decimal | times: 1.0 %}{% assign b = best.bound.decimal | times: 1.0 %}{% if a > b %}{% assign best = x %}{% endif %}{% endfor -%}
-    {%- endif -%}
-    {%- assign fam = data.families | where: "key", best.family | first -%}
-    {%- assign tkey = best.tier -%}
-    {%- if best.lean and tkey contains "lean-" -%}
-      {%- assign lr = site.data.lean_records | where: "name", best.lean.name | first -%}
-      {%- if lr %}{% assign tkey = "lean-" | append: lr.kind %}{% else %}{% assign tkey = "" %}{% endif -%}
-    {%- endif -%}
-    {%- assign t = data.tiers | where: "key", tkey | first -%}
-    {%- capture href %}{{ '/leaderboard.html' | relative_url }}#{{ best.id }}{% endcapture -%}
-    {%- capture item -%}
-      {{ best.date }}|<a href="{{ href }}">{% if g.name != "" and g.items.size > 1 %}New records: {{ fam.name }} ({{ g.items.size }} parameter points, best bound Δ ≥ {{ best.bound.decimal }}){% else %}New record: {{ fam.name }}, {{ best.parameter }}, Δ ≥ {{ best.bound.decimal }}{% endif %}</a>{% if t %} ({{ t.label }}){% endif %}
-    {%- endcapture -%}
-    {%- assign items = items | append: item | append: "␞" -%}
-  {%- endfor -%}
-{%- endfor -%}
-{%- assign items = items | split: "␞" | sort | reverse -%}
-{%- assign cutoff = site.time | date: "%s" | minus: 1209600 | date: "%Y-%m-%d" -%}
-{%- capture list -%}
-{%- for it in items -%}
-  {%- assign d = it | split: "|" | first -%}
-  <li><span class="date">{{ d }}</span>{{ it | remove_first: d | remove_first: "|" }}{% if d >= cutoff %} <span class="new">new</span>{% endif %}</li>␞
-{%- endfor -%}
-{%- endcapture -%}
-{%- assign lines = list | split: "␞" %}
+{%- assign news = site.data.news | sort: "date" | reverse %}
 <ul class="news">
-{%- for l in lines limit: 5 %}{{ l }}{% endfor %}
+{%- for n in news limit: 3 %}{% include news-item.html item=n %}{% endfor %}
 </ul>
-{%- if lines.size > 5 %}
-<details><summary>More news</summary>
+<details><summary>Earlier news</summary>
 <ul class="news">
-{%- for l in lines offset: 5 %}{{ l }}{% endfor %}
+{%- for n in news offset: 3 %}{% include news-item.html item=n %}{% endfor %}
 </ul>
 </details>
-{%- endif %}
-
-See the [open challenges]({{ '/leaderboard.html' | relative_url }}#challenges) for concrete targets and next steps.
-
-## Documentation and resources
-
-* **Two-page note:** [The spin-1 Haldane gap proof in tensor-network diagrams]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }})
-  (S. Lu and GPT-6-Astra, PDF)
-* **Interactive explainers:** [periodic ring proof]({{ '/explainer/' | relative_url }}) ·
-  [open-chain extension]({{ '/explainer/open.html' | relative_url }})
-* **Lean 4 formalization:** [blueprint]({{ '/blueprint/' | relative_url }})
-  ([PDF]({{ '/blueprint.pdf' | relative_url }})) ·
-  [dependency graph]({{ '/blueprint/dep_graph_document.html' | relative_url }}) ·
-  [API documentation]({{ '/docs/' | relative_url }})
-* **Contribute:** [leaderboard]({{ '/leaderboard.html' | relative_url }}) ·
-  [contribution guide]({{ '/contribute.html' | relative_url }}) ·
-  [GitHub repository]({{ repo_url }})
 
 ## References
 
 <ol class="references">
 <li id="ref-1">F. D. M. Haldane, Continuum dynamics of the 1-D Heisenberg antiferromagnet: identification with the O(3) nonlinear sigma model, Phys. Lett. A <b>93</b>, 464–468 (1983). <a href="https://doi.org/10.1016/0375-9601(83)90631-X">doi:10.1016/0375-9601(83)90631-X</a></li>
 <li id="ref-2">F. D. M. Haldane, Nonlinear field theory of large-spin Heisenberg antiferromagnets: semiclassically quantized solitons of the one-dimensional easy-axis Néel state, Phys. Rev. Lett. <b>50</b>, 1153–1156 (1983). <a href="https://doi.org/10.1103/PhysRevLett.50.1153">doi:10.1103/PhysRevLett.50.1153</a></li>
-<li id="ref-3">OpenAI, The periodic spin-one Haldane gap, OpenAI Math Release preprint (October 6, 2026). <a href="https://github.com/openai/math/blob/main/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/paper.pdf">PDF</a></li>
-<li id="ref-4">OpenAI, A boundary-field gap for the spin-one Heisenberg chain, OpenAI Math Release preprint (October 6, 2026). <a href="https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf">PDF</a></li>
+<li id="ref-3">OpenAI, The periodic spin-one Haldane gap, OpenAI Math Release, result 268, preprint (October 6, 2026). <a href="https://github.com/openai/math/blob/main/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026/paper.pdf">PDF</a></li>
+<li id="ref-4">OpenAI, A boundary-field gap for the spin-one Heisenberg chain, OpenAI Math Release, result 268, preprint (October 6, 2026). <a href="https://github.com/openai/math/blob/main/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026/paper.pdf">PDF</a></li>
 <li id="ref-5">S. R. White and D. A. Huse, Numerical renormalization-group study of low-lying eigenstates of the antiferromagnetic S=1 Heisenberg chain, Phys. Rev. B <b>48</b>, 3844–3852 (1993). <a href="https://doi.org/10.1103/PhysRevB.48.3844">doi:10.1103/PhysRevB.48.3844</a></li>
 <li id="ref-6">K. Osterwalder and R. Schrader, Axioms for Euclidean Green's functions, Commun. Math. Phys. <b>31</b>, 83–112 (1973). <a href="https://doi.org/10.1007/BF01645738">doi:10.1007/BF01645738</a></li>
 <li id="ref-7">L. de Moura and S. Ullrich, The Lean 4 theorem prover and programming language, in Automated Deduction – CADE 28, Lecture Notes in Computer Science <b>12699</b>, 625–635 (2021). <a href="https://doi.org/10.1007/978-3-030-79876-5_37">doi:10.1007/978-3-030-79876-5_37</a></li>

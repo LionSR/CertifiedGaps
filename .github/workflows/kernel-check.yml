@@ -8,11 +8,10 @@ name: Kernel re-check
 # blocks the site.
 on:
   pull_request:
-    branches:
-      - main
+    # Stacked pull requests need the same kernel checks as PRs targeting main.
     paths:
-      - "leaderboard/**"
-      - "lean/**"
+      - "code/leaderboard/**"
+      - "code/lean/**"
       - "lakefile.toml"
       - "lake-manifest.json"
       - "lean-toolchain"
@@ -21,8 +20,8 @@ on:
     branches:
       - main
     paths:
-      - "leaderboard/**"
-      - "lean/**"
+      - "code/leaderboard/**"
+      - "code/lean/**"
       - "lakefile.toml"
       - "lake-manifest.json"
       - "lean-toolchain"
@@ -79,8 +78,10 @@ jobs:
             | sed -e 's|^\./||' -e 's|\.olean$||' -e 's|/|.|g' | sort)
           test -n "$mods"
           echo "Modules: $(printf '%s\n' "$mods" | wc -l)"
+          # Expand $module in the inner shell, once per module.
+          # shellcheck disable=SC2016
           ~/.elan/bin/lake env bash -euo pipefail -c '
             while IFS= read -r module; do
-              KERNEL_CHECK_MODULE="$module" lean lean/scripts/KernelCheck.lean
+              KERNEL_CHECK_MODULE="$module" lean code/lean/scripts/KernelCheck.lean
             done
           ' <<< "$mods"

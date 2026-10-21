@@ -1,0 +1,677 @@
+\chapter{Bounds on thermal traces, and seeds from trace tables}
+\label{chap:traces}
+
+The finite inputs in \cite{OpenAIHaldane, OpenAIBoundary} come from short-chain traces and
+variational bounds. This chapter records the generic tools that turn exact integer computations
+into those inputs. The spin-1 instances follow in Chapters~\ref{chap:heisenberg}
+and~\ref{chap:open}; the kernel computations appear in Chapter~\ref{chap:seedkernel}.
+
+\section{Spectral bounds}
+
+Quadratic forms bound spectra without a numerical eigensolve.
+Counting bounds also give lower and upper bounds on thermal traces.
+
+\begin{definition}[Quadratic forms and spectral counting]
+  \label{def:spectral-forms}
+  \lean{CertifiedGaps.Spectral.qform, CertifiedGaps.Spectral.nsq,
+    CertifiedGaps.Spectral.eigCount}
+  \leanok
+  For a finite Hermitian matrix \(A\), set
+  \(q_A(x)=\operatorname{Re}\langle x,Ax\rangle\), \(N(x)=\langle x,x\rangle\), and
+  \(N_A(t)=\#\{i:\lambda_i(A)<t\}\), counting multiplicities.
+\end{definition}
+
+\begin{lemma}[Operator and functional-calculus bounds]
+  \label{lem:spectral-calculus}
+  \lean{CertifiedGaps.Spectral.abs_qform_le_of_schur,
+    CertifiedGaps.Spectral.abs_eigenvalues_le_one_of_qform,
+    CertifiedGaps.Spectral.nsq_hermFun_mulVec_le,
+    CertifiedGaps.Spectral.eigenvalues_mem_of_prod_eq_zero}
+  \leanok
+  \uses{def:spectral-forms}
+  Suppose \(|A_{ij}|\le K_{ij}=K_{ji}\), \(q_i>0\), and
+  \(\sum_j K_{ij}q_j\le c q_i\). Then \(|q_A(x)|\le cN(x)\).
+  For Hermitian \(A\), \(|q_A(x)|\le N(x)\) for all \(x\) implies
+  \(|\lambda_i(A)|\le1\). If \(|f(\lambda_i(A))|\le\eta\) for every \(i\), then
+  \(N(f(A)x)\le\eta^2N(x)\).
+  If \(\prod_{r\in R}(A-rI)=0\) for a finite list \(R\) of real numbers, each eigenvalue lies in
+  that list.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Apply the weighted Schur bound and diagonalize the Hermitian matrix.
+\end{proof}
+
+\begin{lemma}[Counting by subspaces and exact inertia]
+  \label{lem:spectral-counting}
+  \lean{CertifiedGaps.Spectral.eigCount_le_of_forall_le_qform,
+    CertifiedGaps.Spectral.le_eigCount_of_forall_qform_lt,
+    CertifiedGaps.Spectral.LDLCert, CertifiedGaps.Spectral.LDLCert.exists_neg_subspace}
+  \leanok
+  \uses{def:spectral-forms}
+  If a subspace \(V\subseteq\C^d\) has codimension at most \(K\) and
+  \(tN(x)\le q_A(x)\) on \(V\), then \(N_A(t)\le K\).
+  If \(q_A(x)<tN(x)\) for every nonzero \(x\in V\), then \(\dim V\le N_A(t)\).
+  A rational factorization \(T=LDL^{\mathsf T}\), with \(L\) unit lower triangular and \(D\)
+  diagonal, supplies a negative subspace of dimension equal to the number of negative entries
+  of \(D\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Intersect \(V\) with the spectral subspace on the other side of \(t\).
+  For the inertia certificate, pull back the negative coordinate subspace through \(L^{\mathsf T}\).
+\end{proof}
+
+\begin{lemma}[Schur correction for a trial subspace]
+  \label{lem:spectral-schur}
+  \lean{CertifiedGaps.Spectral.eigCount_le_of_schur_LDL}
+  \leanok
+  \uses{lem:spectral-counting}
+  Let \(H\) be Hermitian, \(m>0\), and
+  \(q_H(u)\ge(t+m)N(u)\) whenever \(W^*u=0\).
+  Suppose
+  \(\|(H-tI)Z-WB\|_{\mathrm F}^2\le m\delta\) and
+  \(\operatorname{range}Z+\ker W^*=\C^d\).
+  Let a rational matrix \(T=LDL^{\mathsf T}\) satisfy
+  \(q_T(v)\le q_{Z^*(H-tI)Z-\delta I}(v)\) for every \(v\).
+  Then \(N_H(t)\) is at most the number of negative entries of \(D\).
+  This upper bound does not require \(L\) to be invertible.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Bound the cross term by the residual norm and \(m\), then use the nonnegative subspace
+  supplied by the factorization.
+\end{proof}
+
+\begin{lemma}[Thermal sums from counting bounds]
+  \label{lem:spectral-trace-bins}
+  \lean{CertifiedGaps.Spectral.sum_le_binned, CertifiedGaps.Spectral.binned_le_sum,
+    CertifiedGaps.Spectral.antitone_exp_neg_mul}
+  \leanok
+  \uses{def:spectral-forms, lem:spectral-counting}
+  Let \(f\) be nonincreasing, \(t_k\) nondecreasing, and \(e_i\ge t_0\) for \(i\) in a finite
+  set \(S\).
+  If \(\#\{i\in S:e_i<t_{k+1}\}\le N_{k+1}\) for \(k<m\), then
+  \[
+    \sum_{i\in S}f(e_i)\le
+    \sum_{k<m}N_{k+1}\bigl(f(t_k)-f(t_{k+1})\bigr)+|S|f(t_m).
+  \]
+  If \(f\ge0\) and \(M_k\le\#\{i\in S:e_i<t_k\}\) for \(k<m\), then
+  \(\sum_{k<m}M_k(f(t_k)-f(t_{k+1}))\le\sum_{i\in S}f(e_i)\), without the assumption \(e_i\ge t_0\).
+  In particular, \(f(x)=e^{-\beta x}\) is admissible for \(\beta\ge0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Telescope the increments of \(f\) and count the levels below each threshold.
+\end{proof}
+
+\section{Poisson truncation and Horner recursions}
+
+The thermal calculations in \cite[Appendices A and B]{OpenAIHaldane} approximate the square root
+of a shifted Gibbs operator. Integer division introduces a bounded error at each Horner step.
+
+\begin{lemma}[Normalized Poisson polynomial]
+  \label{lem:trace-poisson}
+  \lean{CertifiedGaps.Trace.poissonWeight, CertifiedGaps.Trace.poissonError,
+    CertifiedGaps.Trace.abs_exp_sub_poissonWeight_le,
+    CertifiedGaps.Trace.nsq_exp_sub_poisson_mulVec_le,
+    CertifiedGaps.Trace.poissonError_98_280, CertifiedGaps.Trace.poissonError_84_256}
+  \leanok
+  \uses{lem:spectral-calculus}
+  For rational \(m\ge0\), put
+  \[
+    p_j=\frac{m^j/j!}{\sum_{\ell=0}^J m^\ell/\ell!},
+    \qquad \eta=2e^{-m}\sum_{j>J}\frac{m^j}{j!}.
+  \]
+  For \(|x|\le1\), \(|e^{m(x-1)}-\sum_{j=0}^Jp_jx^j|\le\eta\).
+  The same error in operator norm holds for a finite Hermitian contraction.
+  The checked constants are \(\eta(98,280)<2^{-84}\) and \(\eta(84,256)<2^{-116}\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Bound the omitted exponential series and the normalization error separately.
+  Apply functional calculus to the scalar inequality.
+\end{proof}
+
+\begin{lemma}[Floored integer Horner columns]
+  \label{lem:trace-horner}
+  \lean{CertifiedGaps.Trace.hornerFloor, CertifiedGaps.Trace.intDiv_eq_floor,
+    CertifiedGaps.Trace.hornerFloor_error_card}
+  \leanok
+  Let \(D\) be an integer \(d\times d\) matrix, \(s>0\) an integer, and \(D/s\) a Euclidean
+  contraction. Starting from \(X_{J+1}=0\), set
+  \(X_j=\lfloor DX_{j+1}/s\rfloor+c_je_r\), with the floor taken entrywise.
+  If \(|c_j-a_j|\le1\) for \(0\le j\le J\), then
+  \[
+    \left\|X_0-\sum_{j=0}^J a_j(D/s)^je_r\right\|_2
+    \le(J+1)(\sqrt d+1).
+  \]
+  Integer division is floor division, including for negative entries.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Each step contributes at most \(\sqrt d\) from division and \(1\) from the coefficient.
+  The contraction does not increase earlier errors.
+\end{proof}
+
+\begin{lemma}[Horner columns over Eisenstein integers]
+  \label{lem:trace-eisenstein}
+  \lean{CertifiedGaps.Trace.EisensteinInt, CertifiedGaps.Trace.hornerFloorE,
+    CertifiedGaps.Trace.hornerFloorE_error_nsq}
+  \leanok
+  \uses{def:spectral-forms}
+  Write \(\omega=e^{2\pi i/3}\) and use pairs of integers for \(a+b\omega\).
+  Let \(D/s\) be a complex Euclidean contraction with entries in \(\mathbb Z[\omega]/s\),
+  where \(s>0\). Floor the two integer coordinates at each step.
+  With real coefficients \(a_j\), integer \(c_j\), and \(|c_j-a_j|\le1\), the squared column
+  error is at most \(((J+1)(2\delta+1))^2\) for any \(\delta\ge\sqrt d\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The two coordinate errors have complex norm at most \(2\).
+  Propagate this bound through the contraction.
+\end{proof}
+
+\begin{lemma}[Weighted Horner error]
+  \label{lem:trace-weighted}
+  \lean{CertifiedGaps.Trace.IsWeightedContraction,
+    CertifiedGaps.Trace.hornerFloor_error_weighted,
+    CertifiedGaps.Trace.isWeightedContraction_of_similar,
+    CertifiedGaps.Trace.gibbsTrace_enclosure_weighted}
+  \leanok
+  \uses{lem:trace-horner, lem:trace-poisson}
+  For weights \(w_i\ge0\), suppose \(D/s\) contracts the norm
+  \(\|x\|_w^2=\sum_i w_i x_i^2\), with \(s>0\).
+  Under the coefficient assumptions of Lemma~\ref{lem:trace-horner}, the error in column \(r\)
+  is at most \((J+1)(\delta+\gamma)\), where
+  \(\delta\ge\sqrt{\sum_iw_i}\) and \(\gamma\ge\sqrt{w_r}\).
+  If \(D=s\,\operatorname{diag}(j)A\operatorname{diag}(j)^{-1}\), \(j_i>0\), and \(A\) is a
+  Hermitian contraction, take \(w_i=j_i^{-2}\).
+  Undo this similarity before summing squared columns. Suppose
+  \(e^{-b(H+cI)/2}=e^{m(A-I)}\), \(Q>0\), \(|c_k-Qp_k|\le1\) for the Poisson weights \(p_k\),
+  \(j_i\le j_{\max}\), \(\gamma\ge j_i^{-1}\), and
+  \(\epsilon\ge\sqrt d\,(j_{\max}(J+1)(\delta+\gamma)+Q\eta)\). With
+  \(W=\sum_{r,w}(j_r/j_w)^2X_r(w)^2\),
+  \[
+    \frac{e^{bc}\max(0,\sqrt W-\epsilon)^2}{Q^2}\le\Tr e^{-bH}
+    \le\frac{e^{bc}(\sqrt W+\epsilon)^2}{Q^2}.
+  \]
+\end{lemma}
+\begin{proof}
+  \leanok
+  Bound each rounding error in the weighted norm, then apply the Poisson error and the
+  Frobenius norm triangle inequality.
+\end{proof}
+
+\begin{lemma}[Packed evaluation preserves the integer recurrence]
+  \label{lem:trace-packed}
+  \lean{CertifiedGaps.Trace.Packed.pack_lane, CertifiedGaps.Trace.Packed.Band.check_spec,
+    CertifiedGaps.Trace.Packed.hornerFloor_eq_specCol,
+    CertifiedGaps.Trace.Packed.run_spec, CertifiedGaps.Trace.Packed.run_numerator,
+    CertifiedGaps.Trace.Packed.runCols_spec, CertifiedGaps.Trace.Packed.runCols_numerator}
+  \leanok
+  \uses{lem:trace-horner}
+  Suppose the packing parameters satisfy \texttt{Params.Ok}, a band matrix has its indices
+  in range and satisfies \texttt{RowsOk}, and every coefficient is at most the offset \(B\).
+  A successful packed run decodes to the integer Horner columns it was asked for: a window of
+  consecutive columns, or any list of distinct columns.
+  For row and column weight lists of the specified lengths, its numerator equals the weighted
+  sum of their squared entries.
+  The Boolean band check implies the two band conditions.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Extract each radix lane, verify the multiply-and-shift division, and induct over the
+  coefficient list. The range and offset bounds prevent carries from changing another lane.
+\end{proof}
+
+\section{Orbit representatives and twisted traces}
+
+Column symmetries reduce a trace computation to representatives with exact multiplicities.
+The symmetry can carry a phase or complex conjugation.
+
+\begin{lemma}[Column norms on symmetry orbits]
+  \label{lem:trace-orbits}
+  \lean{CertifiedGaps.Trace.IsColumnSymmetry, CertifiedGaps.Trace.IsConjColumnSymmetry,
+    CertifiedGaps.Trace.nsq_gibbsHalf_rep,
+    CertifiedGaps.Trace.nsq_gibbsHalf_rep_of_norms,
+    CertifiedGaps.Trace.IsConjColumnSymmetry.nsq_gibbsHalf}
+  \leanok
+  Let \(F=e^{-b(H+cI)/2}\).
+  A unitary symmetry of \(H\) that sends \(e_r\) to a unit phase times \(e_{\sigma(r)}\)
+  preserves \(\|Fe_r\|^2\). For Hermitian \(H\), the same holds for an antiunitary column symmetry.
+  If each generator preserves these norms and \(\mathrm{rep}(r)\) belongs to the generated
+  orbit of \(r\), then \(\|Fe_r\|^2=\|Fe_{\mathrm{rep}(r)}\|^2\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Commute the symmetry through the exponential. Norm preservation is closed under composition.
+\end{proof}
+
+\begin{lemma}[Rational trace bounds from integer column totals]
+  \label{lem:trace-frobenius}
+  \lean{CertifiedGaps.Trace.gibbsTrace_eq_exp_mul_sum_nsq,
+    CertifiedGaps.Trace.gibbsTrace_enclosure_of_intColumns,
+    CertifiedGaps.Trace.gibbsTrace_enclosure_of_rep}
+  \leanok
+  \uses{def:spectral-forms}
+  Let \(H\) be Hermitian and \(F=e^{-b(H+cI)/2}\).
+  Suppose representative columns have multiplicities \(\nu_\rho\) that reproduce
+  \(\sum_r\|Fe_r\|^2\), and integer columns \(X_\rho\) satisfy
+  \(\|X_\rho-QFe_\rho\|\le E\), where \(Q>0\), \(E\ge0\).
+  Set \(W=\sum_\rho\nu_\rho\|X_\rho\|^2\), \(r=\lfloor\sqrt W\rfloor\), and suppose
+  \(\mathcal E\ge0\), \(\sum_\rho\nu_\rho E^2\le\mathcal E^2\), and
+  \(s\le e^{bc}\le s+t\). Then
+  \[
+    \frac{s\max(0,r-\mathcal E)^2}{Q^2}
+    \le \Tr e^{-bH}\le
+    \frac{(s+t)(r+1+\mathcal E)^2}{Q^2}.
+  \]
+  This interval is an enclosure of the trace; an enclosure of a number is an interval proved
+  to contain it.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Use \(\Tr e^{-bH}=e^{bc}\sum_r\|Fe_r\|^2\), the weighted Frobenius triangle inequality,
+  and \(r^2\le W<(r+1)^2\).
+\end{proof}
+
+\section{Seeds and reseeding}
+
+Twisted traces separate symmetry sectors. Bounds on their moments then control the leading
+eigenvalue and the remaining mass, as in \cite[Section 5]{OpenAIHaldane}.
+
+\begin{definition}[Sector schemes and finite approximations]
+  \label{def:seed-scheme}
+  \lean{CertifiedGaps.SectorScheme, CertifiedGaps.SectorScheme.Valid,
+    CertifiedGaps.SectorScheme.d2, CertifiedGaps.SectorScheme.ion,
+    CertifiedGaps.SectorApprox}
+  \leanok
+  A sector scheme records integer coefficients \(C_{gs}\) and a rational left inverse.
+  Validity requires that the rational matrix be a left inverse of \(C\), \(C_{00}=1\), and
+  \(C_{0s}\ge0\).
+  Its traces are \(Z_g(n)=\sum_s C_{gs}\sum_{i\in s}x_i^n\).
+  A sector approximation means that, for every \(\delta>0\), such finite real power sums
+  approximate all requested traces and lengths within \(\delta\).
+  The \(D_2\) scheme is \((Z,Z_P)=(J+3N,J-N)\).
+  The three-sector scheme is
+  \((Z,Z_P,Z_C)=(I+2O+3N,I+2O-N,I-O)\).
+\end{definition}
+
+\begin{lemma}[Inverting a trace table]
+  \label{lem:seed-table-inversion}
+  \lean{CertifiedGaps.TraceBounds, CertifiedGaps.TraceBounds.Holds,
+    CertifiedGaps.TraceBounds.HoldsStrict, CertifiedGaps.TraceBounds.momentBounds,
+    CertifiedGaps.TraceBounds.holdsStrict_centered}
+  \leanok
+  \uses{def:seed-scheme}
+  A trace table gives optional rational lower and upper bounds at specified lengths.
+  For a valid sector scheme, applying its rational left inverse with the correct interval
+  endpoints bounds each sector moment.
+  If traces differ from their centers by at most \(\epsilon_t<\epsilon\), they satisfy the
+  table with radius \(\epsilon\) strictly.
+\end{lemma}
+\begin{proof}
+  \leanok
+  In each linear combination use upper endpoints for positive coefficients and lower endpoints
+  for negative coefficients.
+\end{proof}
+
+\begin{lemma}[Capped masses and a dominant sector]
+  \label{lem:seed-capped}
+  \lean{CertifiedGaps.sum_pow_le_capped, CertifiedGaps.SectorSeed,
+    CertifiedGaps.SectorSeed.Valid, CertifiedGaps.SectorSeed.seed}
+  \leanok
+  If \(0\le t_i\le h\), \(\sum_i t_i\le m\), and \(h\le m\le2h\), then
+  \(\sum_i t_i^r\le h^r+(m-h)^r\) for every integer \(r\ge1\).
+  For a valid \texttt{SectorSeed}, suppose every specified eigenvalue cap holds strictly,
+  every sector's \(q\)-th moment is at most its recorded mass, and
+  \(1<Z_{2qa}\), where \(Z_n=\sum_s\mathrm{mult}_s\sum_{i\in s}x_i^n\).
+  Then
+  \((1-\es)Z_{qa}^2\le Z_{2qa}\le B_\tau\), with the defect and thermal bound recorded
+  by the certificate.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Concentrate a bounded mass at its cap. The validity inequalities force a dominant value
+  in sector \(0\), then bound the remaining mass.
+\end{proof}
+
+\begin{theorem}[Purities from a valid trace-table certificate]
+  \label{thm:seed-table}
+  \lean{CertifiedGaps.TableCertificate, CertifiedGaps.TableCertificate.Valid,
+    CertifiedGaps.TableCertificate.purities, CertifiedGaps.seed_limit,
+    CertifiedGaps.purities_of_shifted, CertifiedGaps.RPRing.seeds_of_certificate}
+  \leanok
+  \uses{lem:seed-table-inversion, lem:seed-filter, lem:seed-capped}
+  Let \(C\) be a valid table certificate, with \(n_0=qa\), inverse temperature \(\beta\),
+  shift \(\kappa\), and defects \(\es,\et\). Assume the sector approximation at its requested
+  lengths, the strict table bounds for
+  \(\widetilde Z_g(n,\beta)=e^{-\beta\kappa n}Z_g(n,\beta)\), and \(Z_0(n_0,\beta)>0\).
+  If \(\widetilde Z_0(2n_0,\beta)>1\) and
+  \(\widetilde Z_0(2n_0,2\beta)>1\), then
+  \(\Ps(n_0,\beta)\ge1-\es\) and \(\Pt(2n_0,\beta)\ge1-\et\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Apply the filter and capped-mass bounds to sufficiently close finite approximations.
+  Pass the non-strict inequalities to the limit and cancel the energy shift.
+\end{proof}
+
+\begin{lemma}[Changing inverse temperature]
+  \label{lem:seed-temperature-lift}
+  \lean{CertifiedGaps.BoltzmannRep, CertifiedGaps.BoltzmannRep.lift,
+    CertifiedGaps.boltzmann_sq_le_of_dominant}
+  \leanok
+  For a finite Boltzmann sum \(f(\beta)=\sum_i e^{-\beta E_i}\) and integers \(1\le j\le l\),
+  \(f((l/j)\beta)^j\le f(\beta)^l\).
+  More precisely, suppose one weight at \(\beta_0\) exceeds \(1\),
+  \(f(\beta_0)\le q\), \(R\ge0\), and \((q-1)^l<R^j\). Then
+  \[
+    f((l/j)\beta_0)^2\le(1+R)^2 f(2(l/j)\beta_0).
+  \]
+\end{lemma}
+\begin{proof}
+  \leanok
+  Compare powers of nonnegative weights, separating the dominant weight in the second bound.
+\end{proof}
+
+\begin{theorem}[A lifted three-sector seed]
+  \label{thm:seed-lifted}
+  \lean{CertifiedGaps.LiftedSeed, CertifiedGaps.LiftedSeed.Valid,
+    CertifiedGaps.LiftedSeed.purities}
+  \leanok
+  \uses{thm:seed-table, lem:seed-temperature-lift}
+  Let \(C\) be a valid lifted seed, \(k=qr\), and \(\beta'=(l/j)\beta\).
+  Assume the three-sector approximations at \(\beta,\beta'\) on the certificate's two length
+  sets and the strict shifted table at \(\beta\).
+  Suppose each twisted trace at length \(k\) is a finite Boltzmann sum.
+  Suppose also that the untwisted trace at length \(4k\) has a finite energy representation
+  with some energy below \(-4k\kappa\), and \(Z_0(2k,\beta')>0\).
+  Then \(\Ps(2k,\beta')\ge1-\es\) and \(\Pt(4k,\beta')\ge1-\et\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  Lift the short-trace bounds in temperature and run the certificate's rational dominance
+  steps in the three sectors.
+\end{proof}
+
+\begin{theorem}[Reseeding at another length]
+  \label{thm:seed-reseed}
+  \lean{CertifiedGaps.ReseedData, CertifiedGaps.ReseedData.Valid,
+    CertifiedGaps.ReseedData.spatial, CertifiedGaps.thermalPurity_ge_of_dominant}
+  \leanok
+  \uses{lem:seed-capped, lem:seed-temperature-lift}
+  Let \(R\) be valid reseeding data, \(m=ak\), and suppose \(Z\) admits arbitrarily accurate
+  finite real power sums at \(\{k,m,2m,n,2n\}\).
+  If \(1<Z_m\), \((1-p)Z_m^2\le Z_{2m}\), \(Z_k\le B\), and \(Z_n>0\), then
+  \((1-\es)Z_n^2\le Z_{2n}\), with the parameters of \(R\).
+  For a finite energy family at length \(N\), assume \(\beta>0\), some \(E_i<-\kappa N\),
+  \(\widetilde Z_N(\beta)\le q\), \(R_\tau\ge0\), \((q-1)^2<R_\tau\),
+  \(p_\tau\le1\), and \((1-p_\tau)(1+R_\tau)^2\le1\).
+  Then \(\Pt(N,2\beta)\ge1-p_\tau\).
+\end{theorem}
+\begin{proof}
+  \leanok
+  The old purity forces a dominant power-sum entry; the short trace controls its relative tail.
+  Pass to limits. Apply the dominant Boltzmann-weight bound for the thermal conclusion.
+\end{proof}
+
+\section{Transfer matrices and polynomial filters}
+
+Odd short-ring lengths require a single-site Trotter construction.
+Its finite symmetric matrices replace the continuous-history operator of
+\cite[Section 3]{OpenAIHaldane}; only the resulting trace inequalities pass to the limit.
+
+\begin{lemma}[Single-site transfer matrices at all lengths]
+  \label{lem:single-site-transfer}
+  \lean{CertifiedGaps.SingleSite.transfer, CertifiedGaps.SingleSite.transfer_isHermitian,
+    CertifiedGaps.SingleSite.trace_stepOp_pow,
+    CertifiedGaps.SingleSite.tendsto_stepOp_pow,
+    CertifiedGaps.SingleSite.eventually_abs_twisted_transfer_sub_le}
+  \leanok
+  \uses{lem:chernoff}
+  For real bond factors \(C_\alpha\) and real on-site matrix \(o\), use the symmetrized site
+  factor \(M(a,b)=(C_aC_b+C_bC_a)/2\), with \(C_{\varnothing}=I\).
+  The time-label transfer matrix \(X_M\) is real symmetric.
+  For nonnegative time step, the trace of the \(M\)-fold step on a ring is
+  \(\sum_\gamma D_r(\gamma)(X_M^L)_{\pi\gamma,\gamma}\), for closing-bond signs \(r\) and
+  relabeling \(\pi\).
+  At step \(\beta/M\), the physical product converges to \(e^{-\beta H_L(r,\pi)}\) for
+  \(L\ge2\). For \(\beta\ge0\), the transfer traces therefore approximate all twists on any
+  prescribed finite set of such lengths.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Exchange the space and time products. The step has value \(I\) and derivative \(-H_L\) at zero,
+  so the finite-dimensional product limit applies.
+\end{proof}
+
+\begin{lemma}[Sign and cyclic sectors]
+  \label{lem:single-site-sectors}
+  \lean{CertifiedGaps.SingleSite.SignSymmetry, CertifiedGaps.SingleSite.LabelSymmetry,
+    CertifiedGaps.SingleSite.D2Symmetry.d2Approx,
+    CertifiedGaps.SingleSite.A4Symmetry.sectorApprox_ion,
+    CertifiedGaps.exists_cyclic_sectors}
+  \leanok
+  \uses{lem:single-site-transfer, def:seed-scheme}
+  Suppose two trace-preserving sign symmetries and a cyclic relabeling satisfy
+  \texttt{D2Symmetry}. At \(\beta\ge0\), the plain and sign-twisted traces have the \(D_2\)
+  sector approximation on every finite set of lengths at least \(2\).
+  If the relabeling has order dividing three, as required by \texttt{A4Symmetry}, the additional
+  cyclic twist gives the three-sector approximation.
+  The two nonreal characters of the cyclic action have equal spectra by complex conjugation.
+\end{lemma}
+\begin{proof}
+  \leanok
+  Sign characters make the transfer matrix block diagonal. The cycle identifies the three
+  nontrivial \(D_2\) blocks and splits its trivial block into the cyclic sectors.
+\end{proof}
+
+\begin{lemma}[Polynomial caps from moments]
+  \label{lem:seed-filter}
+  \lean{CertifiedGaps.PolynomialFilter.CapCheck,
+    CertifiedGaps.PolynomialFilter.pairingBound,
+    CertifiedGaps.PolynomialFilter.abs_lt_of_filter_bounds}
+  \leanok
+  Let \(F\) be a rational polynomial nonnegative on \(\R\), and let a finite family \(x_i\)
+  satisfy the stated lower and upper moment bounds.
+  Suppose \texttt{pairingBound} returns \(B\), and \texttt{CapCheck} verifies that
+  \(F(x)>B\) on both rays \(|x|\ge v\).
+  Then every member of the family satisfies \(|x_i|<v\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Nonnegativity gives \(F(x_i)\le\sum_jF(x_j)\le B\).
+  The rational Taylor-coefficient check excludes both rays.
+\end{proof}
+
+\begin{lemma}[Periodic matrix-product trial bounds]
+  \label{lem:mps-variational}
+  \lean{CertifiedGaps.MPS.state, CertifiedGaps.MPS.sum_state_sq,
+    CertifiedGaps.MPS.dotProduct_ringHamiltonian_mulVec,
+    CertifiedGaps.MPS.exp_lt_gibbsTrace_int,
+    CertifiedGaps.exists_eigenvalue_lt_of_re_dotProduct_lt}
+  \leanok
+  \uses{def:ring-operators}
+  For integer tensors \(A_s\), put
+  \(\psi(\sigma)=\Tr(A_{\sigma_0}\cdots A_{\sigma_{N-1}})\),
+  \(T=\sum_sA_s\otimes A_s\), and
+  \(O=\sum h_{st,s't'}A_sA_t\otimes A_{s'}A_{t'}\).
+  For a symmetric integer bond \(h\) and \(N\ge2\),
+  \(\|\psi\|^2=\Tr T^N\) and
+  \(\langle\psi,H_N\psi\rangle=N\Tr(T^{N-2}O)\).
+  Thus, for integers \(a>0\) and \(b\) with \(\kappa=b/a\), the inequality
+  \(a\Tr(T^{N-2}O)<-b\Tr T^N\) implies an energy below \(-\kappa N\)
+  and \(Z_N(\beta)>e^{\beta\kappa N}\) for \(\beta>0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Contract the doubled virtual indices and use cyclicity for each bond.
+  Apply the variational principle and retain the corresponding Boltzmann weight.
+\end{proof}
+
+\begin{lemma}[Open matrix-product trial bounds]
+  \label{lem:open-mps-variational}
+  \lean{CertifiedGaps.OpenMPS.state, CertifiedGaps.OpenMPS.sum_state_sq,
+    CertifiedGaps.OpenMPS.dotProduct_openChainHamiltonian_mulVec,
+    CertifiedGaps.OpenMPS.exists_eigenvalue_lt}
+  \leanok
+  \uses{lem:mps-variational}
+  Use integer tensors and end vectors to form
+  \(\psi(\sigma)=b^{\mathsf T}A_{\sigma_0}\cdots A_{\sigma_{N-1}}c\).
+  With \(L=b\otimes b\) and \(u=c\otimes c\), its norm is \(LT^Nu\).
+  Each bond contributes \(LT^jOT^{N-2-j}u\); end terms contribute
+  \(LG_0T^{N-1}u\) and \(LT^{N-1}G_1u\), where
+  \(G_i=\sum_{s,t}(f_i)_{st}A_s\otimes A_t\).
+  For symmetric integer bonds and end matrices, with real field coefficients, a contraction
+  inequality \(\langle\psi,H\psi\rangle<E\|\psi\|^2\) gives an eigenvalue below \(E\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Keep the virtual endpoints open in the contraction identities and apply the variational
+  principle.
+\end{proof}
+
+\section{Open-chain initialization and the leading eigenvalue}
+
+The boundary argument needs the leading spectral line and its overlap with a boundary vector.
+The finite-matrix construction retains these data through the Trotter limit.
+
+\begin{lemma}[Open traces in the single-site construction]
+  \label{lem:single-site-open}
+  \lean{CertifiedGaps.SingleSite.capVec, CertifiedGaps.SingleSite.trace_openStep_pow,
+    CertifiedGaps.SingleSite.tendsto_openPairing}
+  \leanok
+  \uses{lem:single-site-transfer}
+  Give the left and right ends coefficients \(u_L,u_R\), representing
+  \(-\sum_\alpha u_{L,\alpha}C_\alpha\) and
+  \(-\sum_\alpha u_{R,\alpha}C_\alpha\).
+  For a chain of \(k+1\) sites and nonnegative time step, its Trotter trace is the bilinear
+  pairing \(v_L^{\mathsf T}X_M^{k+1}v_R\), where each cap vector is the product of its
+  time-label weights. At step \(\beta/M\), the real parts of these pairings converge to the open
+  Gibbs trace
+  for \(\beta\ge0\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Contract the two end labels into the cap vectors and use the derivative of the open step
+  at zero.
+\end{proof}
+
+\begin{definition}[A leading line and its symmetry projection]
+  \label{def:leading-line}
+  \lean{CertifiedGaps.IsLeadingLine, CertifiedGaps.SingleSite.avgProj,
+    CertifiedGaps.SingleSite.avgProj_conjTranspose,
+    CertifiedGaps.SingleSite.avgProj_mul_self,
+    CertifiedGaps.SingleSite.isLeadingLine_of_blocks}
+  \leanok
+  \uses{lem:single-site-sectors, def:spectral-forms}
+  A leading-line witness consists of a Hermitian matrix \(X\), a unit vector \(\psi\),
+  \(X\psi=e_0\psi\), and
+  \(|q_{X-e_0|\psi\rangle\langle\psi|}(y)|\le r\|y\|^2\).
+  For the \(A_4\) action, the average projection is
+  \(\Pi=\tfrac14(I+D_x)(I+D_y)\tfrac13(I+C+C^2)\).
+  It is an orthogonal projection. Scale the transfer matrix by \(t>0\). Suppose one eigenvalue
+  of the trivial \(D_2\) block has modulus \(|e_0|>r\ge0\), while the other eigenvalues of that
+  block and all eigenvalues of one nontrivial block \(N\) have modulus at most \(r\).
+  Then the scaled transfer matrix has a leading line with eigenvalue \(e_0\); its vector lies in
+  the trivial \(D_2\) block and is fixed by the cyclic relabeling.
+\end{definition}
+
+\begin{lemma}[Boundary moments and a leading-weight polynomial]
+  \label{lem:leading-polynomial}
+  \lean{CertifiedGaps.IsLeadingLine.openMomentWitness,
+    CertifiedGaps.IsLeadingLine.mul_poly_le}
+  \leanok
+  \uses{def:leading-line, def:open-moment-bounds}
+  Suppose a leading-line witness has \(r\le|e_0|\), and a unitary \(U\) commutes with \(X\)
+  and fixes \(\psi\).
+  The even ring moments \(\Tr X^{2N}\), even pairings
+  \(\operatorname{Re}\langle v,X^{2N}v\rangle\), and odd pairings
+  \(\operatorname{Re}\langle v,X^{2N+1}Uv\rangle\), for \(N\ge1\), have an open-moment
+  witness with \(\mu=|e_0|\), \(c=|\langle\psi,v\rangle|^2\),
+  \(s=\operatorname{sign}(e_0)\) (taking \(s=1\) at zero), and \(\rho\mu\le r\).
+  If an orthogonal projection \(P\) commutes with \(X\) and fixes \(\psi\), and
+  \(f(x)=\sum_{n\in S}a_nx^n\ge0\) on \(\R\), with every \(n\in S\) positive, then
+  \[
+    c f(e_0)\le\sum_{n\in S}a_n\operatorname{Re}\langle v,X^nPv\rangle.
+  \]
+\end{lemma}
+\begin{proof}
+  \leanok
+  Split off the leading rank-one projection. The remaining spectral weights are nonnegative
+  in the even moments and in the projected polynomial.
+\end{proof}
+
+\begin{lemma}[Leading witnesses pass to limits]
+  \label{lem:leading-limit}
+  \lean{CertifiedGaps.LeadingWitness, CertifiedGaps.LeadingWitness.of_tendsto,
+    CertifiedGaps.LeadingWitness.mul_poly_le}
+  \leanok
+  \uses{def:open-moment-bounds}
+  A \texttt{LeadingWitness} adds \(\ell\le\mu\), \(\rho\le\rho_{\max}\), and
+  \(c\sum_{n\in S}a_n(s\mu)^n\le\sum_{n\in S}a_nI_n\) to an open-moment witness.
+  Suppose such witnesses exist eventually along approximants, whose ring and open traces
+  converge at every length at least \(2\), and whose \(I_n\) converge for \(n\in S\).
+  If the limiting \(Z_2,Z_4\) are positive, a limiting witness exists.
+  If also \(\ell>0\), \(\rho_{\max}<1\), all odd \(G_{2N+1}>0\) for \(N\ge1\), and
+  \(\sum_{n\in S}a_nI_n\le B\) with \(B\ge0\), then \(c\sum_{n\in S}a_n\mu^n\le B\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  The witnesses lie in a compact box controlled by \(Z_2,Z_4,G_2\).
+  Pass the closed inequalities along a convergent subsequence.
+  Positivity of odd traces forces \(c=0\) or \(s=1\).
+  This finite-matrix limit replaces the compact-operator argument of
+  \cite[Sections 2--3 and Appendix A]{OpenAIBoundary}.
+\end{proof}
+
+\begin{lemma}[A decidable ratio bound]
+  \label{lem:ratio-check}
+  \lean{CertifiedGaps.PolynomialFilter.RatioCheck,
+    CertifiedGaps.PolynomialFilter.pow_div_sq_le_of_ratioCheck}
+  \leanok
+  Suppose \(\texttt{RatioCheck}(P,k_0,v)\) holds, \(v\ge0\), \(1\le k\), and \(k_0\le k\).
+  For \(v\le x\le U\),
+  \[
+    \frac{x^{2k}}{P(x)^2}\le\frac{U^{2k}}{P(U)^2}.
+  \]
+\end{lemma}
+\begin{proof}
+  \leanok
+  The rational coefficient checks imply \(P(x)>0\) and \(xP'(x)\le k_0P(x)\) on the ray.
+  Differentiate the ratio.
+\end{proof}
+
+\begin{lemma}[Initializing a boundary defect and thermal purity]
+  \label{lem:open-initialization}
+  \lean{CertifiedGaps.OpenMomentWitness.residual_le_of_bounds,
+    CertifiedGaps.OpenMomentWitness.one_sub_mul_le_of_ground,
+    CertifiedGaps.OpenMomentWitness.le_add_of_bounds,
+    CertifiedGaps.OpenMomentWitness.boundaryDefect_le,
+    CertifiedGaps.thermalPurity_ge_of_ground}
+  \leanok
+  \uses{def:open-moment-bounds, lem:ratio-check}
+  Let an open-moment witness have \(0<\mu\le U\), \(\rho\le\rho'\),
+  \(G_{2K}\le\Gamma\), and \(1\le K\le N\). Then
+  \[
+    G_{2N}-c\mu^{2N}\le(\rho'U)^{2N-2K}\Gamma.
+  \]
+  If this upper bound is at most \(\epsilon g\), with \(0<g\le G_{2N}\), then
+  \((1-\epsilon)G_{2N}\le c\mu^{2N}\).
+  When \(Z_4>0\), \(\rho<1\), and \(G_k>0\), any bound
+  \((1-E)G_k\le c\mu^k\) implies boundary defect at most \(E\).
+  For a finite energy family with \(\beta_0\ge0\), some \(E_i\le e_0\), \(R\ge0\), and
+  \(Z(\beta_0)\le e^{-\beta_0e_0}(1+R)\), its thermal purity at \(2^J\beta_0\)
+  is at least \((1+R^{2^J})^{-2}\).
+  With the same witness bounds, if also \(cP(\mu)^2\le C\),
+  \(\texttt{RatioCheck}(P,k_0,v)\) holds, \(0\le v\le\mu\), and \(k_0\le N\), then
+  \(G_{2N}\le CU^{2N}/P(U)^2+(\rho'U)^{2N-2K}\Gamma\).
+\end{lemma}
+\begin{proof}
+  \leanok
+  Use the even residual decay and the trial-state lower bound.
+  A bound on \(cP(\mu)^2\), together with Lemma~\ref{lem:ratio-check}, also bounds
+  the leading part of \(G_{2N}\). Compare powers of Boltzmann weights for the last claim.
+\end{proof}

@@ -10,6 +10,8 @@
       processEscapes: true,
       tags: 'ams'
     },
+    // Latin Modern has a larger x-height than EB Garamond; matching it would enlarge the math.
+    chtml: { matchFontHeight: false, scale: 0.97 },
     options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
   };
 </script>

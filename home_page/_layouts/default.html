@@ -3,42 +3,38 @@
 
 <head>
   <meta charset="UTF-8">
-
-  {% seo %}
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link rel="preload" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700&display=swap" as="style"
-    type="text/css" crossorigin>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#157878">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  {% seo %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap">
   <link rel="stylesheet" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
-  {% include head-custom.html %}
+  {% include mathjax.html %}
 </head>
 
 <body>
-  <a id="skip-to-content" href="#content">Skip to the content.</a>
-
+  <a id="skip-to-content" href="#content">Skip to content</a>
   {% assign repo_url = 'https://github.com/' | append: site.repository %}
-  <header class="page-header{% unless page.url == "/" or page.url == "/index.html" %} compact{% endunless %}" role="banner">
-    <h1 class="project-name">{{ page.title | default: site.title | default: site.github.repository_name }}</h1>
-    <h2 class="project-tagline">{{ page.description | default: site.description | default: site.github.project_tagline
-      }}</h2>
-    <a href="{{ '/' | relative_url }}" class="btn">Home</a>
-    <a href="{{ '/leaderboard.html' | relative_url }}" class="btn">Leaderboard</a>
-    <a href="{{ '/explainer/' | relative_url }}" class="btn">Explainer</a>
-    <a href="{{ '/blueprint/' | relative_url }}" class="btn">Lean blueprint</a>
-    <a href="{{ '/docs/' | relative_url }}" class="btn">Lean documentation</a>
-    <a href="{{ '/contribute.html' | relative_url }}" class="btn">Contribute</a>
-    <a href="{{ repo_url }}" class="btn">GitHub</a>
+  <header class="masthead">
+    <a class="site-name" href="{{ '/' | relative_url }}">Certified spectral gaps</a>
+    <nav aria-label="Site">
+      <a href="{{ '/leaderboard.html' | relative_url }}">Leaderboard</a>
+      <a href="{{ '/explainer/' | relative_url }}">Explainer</a>
+      <a href="{{ '/blueprint/' | relative_url }}">Lean blueprint</a>
+      <a href="{{ '/docs/' | relative_url }}">Lean documentation</a>
+      <a href="{{ '/contribute.html' | relative_url }}">Contribute</a>
+      <a href="{{ repo_url }}">GitHub</a>
+    </nav>
   </header>
 
-  <main id="content" class="main-content{% if page.wide %} wide{% endif %}" role="main">
+  <main id="content" class="{% if page.wide %}wide{% endif %}">
+    <h1>{{ page.title | default: site.title }}</h1>
     {{ content }}
-
-    <footer class="site-footer">
-      <span class="site-footer-owner">Code, certificates, and Lean 4 proofs: <a href="{{ repo_url }}">{{ site.repository }}</a> on GitHub.</span>
-    </footer>
   </main>
+
+  <footer class="site-footer">
+    Code, certificates, and Lean 4 proofs: <a href="{{ repo_url }}">{{ site.repository }}</a> on GitHub.
+  </footer>
 </body>
 
 </html>

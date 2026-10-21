@@ -7,14 +7,14 @@ lengths covered, and the claimed tier. -->
 
 - [ ] Row added or updated in `home_page/_data/records.yml`; an improved bound moves the previous
       entry into `history`
-- [ ] `julia --project=tools/leaderboard tools/leaderboard/check_records.jl` passes
+- [ ] `julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl` passes
 - [ ] Tier claimed (delete the others): `lean-unconditional` (Unconditional Lean 4 theorem) /
       `lean-conditional` (Lean 4 theorem from certified seed) / `certified`
       (Computer-certified bound). Open targets and challenges carry no tier
-- [ ] Computer certificate (if any): `models/<slug>/` follows `AGENTS.md`, `results/certificate*.json`
+- [ ] Computer certificate (if any): `code/models/<slug>/` follows `AGENTS.md`, `results/certificate*.json`
       committed, and `check.jl` passes (run time: ...)
 - [ ] Lean record (if any): named `Leaderboard.Records.<Model>.<point>`, its `L0`, `r`, and `beta`
-      match the YAML row, and it follows `leaderboard/README.md`
+      match the YAML row, and it follows `code/leaderboard/README.md`
       (CI enforces axiom and kernel checks)
 - [ ] Root `README.md` summary table updated (per `AGENTS.md`) for a new or updated model
 

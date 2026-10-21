@@ -1,0 +1,13 @@
+{%- comment -%}
+  Truncate a decimal string to 4 significant digits (never rounds, so a rounded-down bound stays
+  a lower bound). Usage: include sig4.html x=r.bound.decimal
+{%- endcomment -%}
+{%- assign chars = include.x | append: "" | split: "" -%}{%- assign out = "" -%}{%- assign n = 0 -%}{%- assign lead = true -%}
+{%- for ch in chars -%}
+  {%- if n >= 4 %}{% break %}{% endif -%}
+  {%- if ch != "." -%}
+    {%- if ch != "0" %}{% assign lead = false %}{% endif -%}
+    {%- unless lead %}{% assign n = n | plus: 1 %}{% endunless -%}
+  {%- endif -%}
+  {%- assign out = out | append: ch -%}
+{%- endfor -%}{{ out }}

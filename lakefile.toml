@@ -1,4 +1,4 @@
-# The Lean package of the repository. Its sources live in lean/ (srcDir); the lakefile sits at
+# The Lean package of the repository. Its sources live in code/lean/ (srcDir); the lakefile sits at
 # the repository root so that leanblueprint, checkdecls and docgen-action work as designed.
 name = "CertifiedGaps"
 defaultTargets = ["CertifiedGaps", "SeedKernel", "Leaderboard"]
@@ -21,33 +21,41 @@ git = "https://github.com/PatrickMassot/checkdecls.git"
 
 [[lean_lib]]
 name = "CertifiedGaps"
-srcDir = "lean"
+srcDir = "code/lean"
 
 # Kernel-checked seed arithmetic (spin-1 and Ising). The root `SeedKernel.Audit` prints the
 # axioms of every main declaration.
 [[lean_lib]]
 name = "SeedKernel"
-srcDir = "lean"
+srcDir = "code/lean"
 roots = ["SeedKernel", "SeedKernel.Audit"]
 
 # Kernel benchmarks (several minutes, up to ~4 GB per file), opt-in: `lake build SeedKernelBench`.
 # No roots, so that checkdecls (which imports the roots of every library) does not load them.
 [[lean_lib]]
 name = "SeedKernelBench"
-srcDir = "lean"
+srcDir = "code/lean"
 roots = []
 globs = ["SeedKernel.Bench.+"]
 
-# Leaderboard of certified spectral-gap records (leaderboard/README.md): record statements and
+# Compiled evaluation of the integer hypotheses (`#guard`, not a proof), opt-in:
+# `lake build SeedKernelEval`. No roots, for the same reason as SeedKernelBench.
+[[lean_lib]]
+name = "SeedKernelEval"
+srcDir = "code/lean"
+roots = []
+globs = ["SeedKernel.Eval.+"]
+
+# Leaderboard of certified spectral-gap records (code/leaderboard/README.md): record statements and
 # the records proved so far.
 [[lean_lib]]
 name = "Leaderboard"
-srcDir = "leaderboard"
+srcDir = "code/leaderboard"
 
 # `lake exe leaderboard_audit <out.json>`: lists every record of Leaderboard.Records.* as JSON, and
 # fails on any axiom outside propext, Classical.choice, Quot.sound.
 [[lean_exe]]
 name = "leaderboard_audit"
-srcDir = "leaderboard"
+srcDir = "code/leaderboard"
 root = "Leaderboard.Audit.Main"
 supportInterpreter = true

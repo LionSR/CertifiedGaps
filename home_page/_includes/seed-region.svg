@@ -1,0 +1,28 @@
+<svg class="region" viewBox="0 0 300 270" role="img" aria-labelledby="region-title">
+<title id="region-title">Admissible seeds: the region of seed defects (p, q) from which the doubling converges, with the orbit of the spin-1 seed at n = 36 converging to 0 by n = 2304.</title>
+<polygon class="ok" points="44.0,228.0 44.0,37.9 54.6,40.8 65.2,44.1 75.8,47.7 86.4,51.7 97.0,56.2 107.7,61.0 118.3,66.3 128.9,72.1 139.5,78.3 150.1,85.3 160.7,92.7 171.3,100.9 181.9,109.8 192.5,119.5 203.1,129.9 213.7,141.3 224.3,153.6 235.0,167.0 245.6,181.5 256.2,197.1 266.8,214.2 274.8,228.0"/>
+<text class="tick" x="44.0" y="244" text-anchor="middle">0</text>
+<text class="tick" x="37" y="232.0" text-anchor="end">0</text>
+<text class="tick" x="150.1" y="244" text-anchor="middle">0.1</text>
+<text class="tick" x="37" y="137.2" text-anchor="end">0.1</text>
+<text class="tick" x="256.2" y="244" text-anchor="middle">0.2</text>
+<text class="tick" x="37" y="42.4" text-anchor="end">0.2</text>
+<line class="axis" x1="44" y1="228.0" x2="288" y2="228.0"/>
+<line class="axis" x1="44" y1="228.0" x2="44" y2="10"/>
+<text class="label" x="166" y="264" text-anchor="middle">p = 1 − P<tspan baseline-shift="sub" font-size="9">S</tspan>(n, β)</text>
+<text class="label" transform="rotate(-90 12 119)" x="12" y="119" text-anchor="middle">q = 1 − P<tspan baseline-shift="sub" font-size="9">T</tspan>(2n, β)</text>
+<text class="ok-label" x="155.4" y="175.9" text-anchor="middle">method works</text>
+<polyline class="orbit" points="94.8,56.0 108.2,63.6 116.9,73.2 119.6,91.0 111.0,128.1 83.9,185.7 53.0,222.8"/>
+<circle class="orbit-pt" cx="94.8" cy="56.0" r="2.6"/>
+<text class="seed" x="88.8" y="70.0" text-anchor="end">n = 36</text>
+<circle class="orbit-pt" cx="108.2" cy="63.6" r="2.6"/>
+<circle class="orbit-pt" cx="116.9" cy="73.2" r="2.6"/>
+<circle class="orbit-pt" cx="119.6" cy="91.0" r="2.6"/>
+<text class="step" x="113.6" y="95.0" text-anchor="end">288</text>
+<circle class="orbit-pt" cx="111.0" cy="128.1" r="2.6"/>
+<text class="step" x="117.0" y="132.1" text-anchor="start">576</text>
+<circle class="orbit-pt" cx="83.9" cy="185.7" r="2.6"/>
+<text class="step" x="89.9" y="189.7" text-anchor="start">1152</text>
+<circle class="orbit-pt" cx="53.0" cy="222.8" r="2.6"/>
+<text class="step" x="59.0" y="218.8" text-anchor="start">2304</text>
+</svg>
