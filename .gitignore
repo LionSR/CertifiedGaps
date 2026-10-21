@@ -18,19 +18,20 @@
 /survey/
 
 # Not part of the repository: downloaded papers and upstream evidence (fetch the evidence
-# spin1 needs with `julia tools/fetch_upstream.jl`)
-/references/
+# spin1 needs with `julia code/tools/fetch_upstream.jl`)
+/data/references/*
+!/data/references/README.md
 
 # No Python in this repository (local analysis helpers stay local)
 *.py
 
 # Editor and build caches
-notes/.texpadtmp/
-lean/.lake
+paper/.texpadtmp/
+code/lean/.lake
 *.tmp
 *.jls
 
-# Model-specific ignores (regenerable results) live in models/<slug>/.gitignore.
+# Model-specific ignores (regenerable results) live in data/.gitignore and code/models/<slug>/.gitignore.
 /.lake/
 
 # Blueprint build products

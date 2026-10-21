@@ -3,168 +3,93 @@
 [![Check certificates](https://github.com/LionSR/CertifiedGaps/actions/workflows/certificates.yml/badge.svg)](https://github.com/LionSR/CertifiedGaps/actions/workflows/certificates.yml)
 [![Kernel re-check](https://github.com/LionSR/CertifiedGaps/actions/workflows/kernel-check.yml/badge.svg)](https://github.com/LionSR/CertifiedGaps/actions/workflows/kernel-check.yml)
 [![Compile blueprint](https://github.com/LionSR/CertifiedGaps/actions/workflows/blueprint.yml/badge.svg)](https://github.com/LionSR/CertifiedGaps/actions/workflows/blueprint.yml)
-[![Website](https://img.shields.io/badge/Website-CertifiedGaps-0f4c81)](https://sirui-lu.com/CertifiedGaps/)
-[![Leaderboard](https://img.shields.io/badge/Leaderboard-52_records-1f7a3f)](https://sirui-lu.com/CertifiedGaps/leaderboard.html)
-[![Blueprint](https://img.shields.io/badge/Blueprint-HTML_%7C_PDF-2b5b84)](https://sirui-lu.com/CertifiedGaps/blueprint/)
-[![Explainer](https://img.shields.io/badge/Explainer-Interactive-b84a1b)](https://sirui-lu.com/CertifiedGaps/explainer/)
-[![Lean 4](https://img.shields.io/badge/Lean_4-v4.36.0--rc1-blue)](https://github.com/leanprover/lean4)
-[![Julia](https://img.shields.io/badge/Julia-1.12-9558B2)](https://julialang.org/)
 
-Haldane (1983) conjectured that the spin-1 antiferromagnetic Heisenberg chain has a uniform spectral
-gap $\Delta_L = E_1(L) - E_0(L) > 0$ as the chain length $L \to \infty$ (numerically
-$\Delta \approx 0.4105$). In October 2026, OpenAI released two preprints proving uniform gap bounds for
-[periodic](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026)
-and
-[open](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026)
-spin-1 chains by combining finite-size numerical bounds with a scale-doubling argument.
-
-This repository formulates that argument as a general criterion—the **spacetime bootstrap**
-(*two-purity doubling criterion*)—formalizes the analytic proof in **Lean 4**, and certifies the
-finite numerical inputs in exact or interval arithmetic across **eight families** of quantum spin
-chains and ladders:
-
-- **Two purities:** For a periodic ring $H_L$ of $L$ unit cells with partition function
-  $`Z_L(\beta) = \mathrm{Tr}\, e^{-\beta H_L}`$, define the spatial and thermal purities
-```math
-P_{\mathrm{s}}(n, \beta) = \frac{Z_{2n}(\beta)}{Z_n(\beta)^2}, \qquad
-P_\tau(n, \beta) = \frac{Z_n(2\beta)}{Z_n(\beta)^2}.
-```
-- **Doubling criterion (Lean 4):** When the nearest-neighbor interaction is reflection positive,
-  both purities contract quadratically toward $1$ as $(n, \beta) \mapsto (2n, 2\beta)$. Upper bounds
-  $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(n_0, \beta_0)$ and
-  $\varepsilon_\tau \ge 1 - P_\tau(2n_0, \beta_0)$ at a single even seed scale $(n_0, \beta_0)$ in
-  the admissible region (for example, $\max(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) < 0.12731$)
-  imply a unique ground state and an explicit lower bound on $\Delta_L$ for every even $L \ge n_0$.
-- **Certified seeds (Julia / Lean kernel):** We certify the finite seed bounds at $(n_0, \beta_0)$ in
-  exact rational arithmetic (spin-1 Heisenberg) or verified interval arithmetic on complete
-  symmetry-reduced spectra (with one Ising seed proved inside the Lean 4 kernel).
-
-**Website & resources:** [Home page](https://sirui-lu.com/CertifiedGaps/) ·
+[Website](https://sirui-lu.com/CertifiedGaps/) ·
 [Leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html) ·
 [Interactive explainer](https://sirui-lu.com/CertifiedGaps/explainer/) ([open chains](https://sirui-lu.com/CertifiedGaps/explainer/open.html)) ·
-[Lean 4 blueprint](https://sirui-lu.com/CertifiedGaps/blueprint/) ([PDF](https://sirui-lu.com/CertifiedGaps/blueprint.pdf)) ·
+[Lean blueprint](https://sirui-lu.com/CertifiedGaps/blueprint/) ([PDF](https://sirui-lu.com/CertifiedGaps/blueprint.pdf)) ·
 [Lean API docs](https://sirui-lu.com/CertifiedGaps/docs/) ·
-[Contribution guide](CONTRIBUTING.md)
+[Contributing](CONTRIBUTING.md)
 
-## Spin-1 Heisenberg chain
+This repository proves lower bounds on the spectral gap $\Delta_L = E_1(L) - E_0(L)$ of quantum
+spin chains. A computer certifies a finite seed calculation in Julia, and Lean 4 proves the
+doubling step to all larger even lengths.
 
-| statement | status | where |
-|---|---|---|
-| $\Delta_L > 0.0729$ for every even $L \ge 36$ | seed certificates at $(60, 833/32)$ and $(36, 49/4)$ certified in exact rational arithmetic and independently audited (#49); two-seed doubling chain formalized in Lean 4 (`Leaderboard.Records.SpinOneHeisenberg.temperature_lifting`) | [`models/spin1/experiments/`](models/spin1/experiments/), [`lean/`](lean/), [`leaderboard/`](leaderboard/) |
-| $\Delta_L > \log(41.196029)/784 \approx 0.00474$ (and the preprint's rounded bound $(\log 20)/784 \approx 0.00382$) for every even $L \ge 2304$; $\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79} \approx 0.000479$ for every even $L \ge 60$ | seed purity bounds at $(2304, 784)$, $(36, 49/4)$, and $(60, 105/4)$ reproduced in exact integer and rational arithmetic; doubling chains formalized in Lean 4 (`SpinOneHeisenberg`) | [`models/spin1/`](models/spin1/), [`lean/`](lean/), [`leaderboard/`](leaderboard/) |
-| open chains with endpoint fields $h = 3/5$: $\Delta_n > (\log 10)/392 \approx 0.00587$ for every odd $n \ge 1921$ | formalized in Lean 4 (`SpinOneHeisenberg.spin_one_boundary_field_gap`), conditional on the four finite seed bounds at $\beta_2 = 49$ from the boundary-field preprint | [`lean/CertifiedGaps/Heisenberg/OpenChain.lean`](lean/CertifiedGaps/Heisenberg/OpenChain.lean), [`explainer/open.html`](explainer/open.html) |
-| general reflection-positive ring criterion (bond factorization and multi-site unit cells with internal reflection) | formalized in Lean 4 (`RPRing`, `PurityCriterion`, `Chain`) and implemented in `CertifiedGaps` | [`lean/CertifiedGaps/Ring/`](lean/CertifiedGaps/Ring/), [`julia/`](julia/), [`blueprint/`](blueprint/) |
-| smaller seed route for Lean verification: $\Delta_L > 0.039$ for even $L \ge 60$ from twisted traces at even $n \le 12$ using real $\mathrm{SU}(2)$ twists only | exact rational doubling chain, conditional on the finite trace tables and analytic seed lemmas | [`models/lean_seeds/`](models/lean_seeds/) (`seed_design`) |
-| kernel-checked spin-1 seed arithmetic (base-3 packed-integer operations, Ritz/residual witnesses for $H_6$, $H_8$, $H_{10}$, and local PSD counting anchors) | kernel-checked arithmetic witnesses and feasibility studies | [`models/lean_seeds/`](models/lean_seeds/), [`lean/`](lean/) (`SeedKernel`) |
+The method, the **spacetime bootstrap**, generalizes the two-purity doubling argument from OpenAI's
+October 2026 spin-1 Haldane gap preprints
+([result 268](https://github.com/openai/math/blob/1581d4cbdd69a0faf34b2089614fe2a814316a6a/CONTENTS.md?plain=1#L6747) of the OpenAI Math Release) for
+[periodic rings](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/The-periodic-spin-one-Haldane-gap-September-24-2026)
+and
+[open chains](https://github.com/openai/math/tree/adc7f1241b42e322a6451854ab7e4b4c146bf78a/preprints/A-boundary-field-gap-for-the-spin-one-Heisenberg-chain-September-24-2026).
+See the [website](https://sirui-lu.com/CertifiedGaps/) and
+[interactive explainer](https://sirui-lu.com/CertifiedGaps/explainer/) for an overview.
 
-## Other models
+## Models
 
-Each certified bound establishes a unique ground state and a uniform spectral gap lower bound for
-every even ring length $L \ge n_0$ (where lengths count unit cells). Bounds in the table below are
-rounded down for display; each model's `README.md` gives the exact rational inputs, the reflection-positive
-basis, the exact seed defects $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau)$, run times, and the verification
-scope. [`lean/`](lean/) and [`leaderboard/`](leaderboard/) formalize 51 of the 52 certified records in Lean 4:
-- **Unconditional Lean 4 theorem (no `sorry`):** the longitudinal-field Ising chain at $g = 1/4, h = 1/20$ has
-  $\Delta_L > \log(13480)/(97/4) \approx 0.3921$ for every even $L \ge 6$ (`SeedKernel.Ising.ising_gap`,
-  with the 6- and 12-site seed inequalities proved inside the Lean kernel).
-- **Lean 4 theorems from certified seeds:** all other even-seed certified points are proved in Lean 4 from their
-  computer-certified seed inequalities (`Record.Seeded`).
+All values are rounded down. The [leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html)
+and each model's `README.md` list every parameter point, seed, and Lean 4 theorem.
 
-| model | seed $(n_0, \beta_0)$ | certified uniform gap bound | directory |
-|---|---|---|---|
-| spin-½ Heisenberg + staggered field, $h = 1, 3/4, 1/2, 7/20, 1/4$ | $(8, 21/4 \dots 25/4)$ | $1.148, 0.890, 0.594, 0.383, 0.214$ | [`heisenberg_staggered_field`](models/heisenberg_staggered_field/) |
-| spin-½ dimerized Heisenberg, $\delta = 1/2, 3/10, 1/4$ (2-site cells; $\delta = 1/4$ is the smallest certifiable grid point with rings $\le 16$ spins) | $(4, 6 \dots 29/4)$ | $0.534, 0.173, 0.058$ | [`dimerized_heisenberg`](models/dimerized_heisenberg/) |
-| spin-1 dimerized Heisenberg, $\delta = 9/10, 7/10$ (2-site cells) | $(2, 7/2), (3, 17/4)$ | $0.528, 0.218$ | [`spin1_dimerized`](models/spin1_dimerized/) |
-| spin-1 Heisenberg $+ D \sum (S^z)^2$, $D = 4$ and $D \in [3.2059998, 3.206]$ | $(12, 29/10), (6, 381/125)$ | $0.899, 0.0018$ (every even $L \ge 6$) | [`spin1_largeD`](models/spin1_largeD/) |
-| two-leg Heisenberg ladder, $J_\perp = 4, 7/2, 3, 5/2, 163069/65536$ (rung cells) | $(4, 2 \dots 3)$ | $1.102, 0.778, 0.454, 0.042, 0.0015$ | [`heisenberg_ladder`](models/heisenberg_ladder/) |
-| two-leg transverse-field Ising ladder, $g = 3$ (rung cells) | $(4, 3/2)$ | $0.636$ | [`two_leg_tfim`](models/two_leg_tfim/) |
-| Ising chain $-ZZ - gX - hZ$, 30 points $g \in [1/4, 2]$, $h \in [1/20, 1]$ | $(6, 2 \dots 97/4)$ | $0.0763$ to $4.520$ (unconditional in Lean at $g = 1/4, h = 1/20$: $0.392$) | [`tfim_longitudinal`](models/tfim_longitudinal/) |
-| spin-1 bilinear–biquadratic, $\theta \in [-7/10, 0]$ | no admissible even seed with $n_0 \le 6$ | negative result; required seed scale estimated | [`blbq_haldane`](models/blbq_haldane/) |
-| spin-2 Heisenberg chain | — | certified MPS upper bounds ($N \le 1024$) and certified-MPO study; no gap certificate | [`spin2`](models/spin2/) |
-| hexagonal spin-3/2 AKLT ($2+1$ dimensions) | — | numerical pilot of the $`2+1`$D thermal-purity recursion | [`aklt`](models/aklt/) |
+| Model | Points | Largest certified gap | Lengths | Directory |
+|---|---:|---|---|---|
+| Spin-1 Heisenberg chain | 2 | $0.0729$ | even $L \ge 36$ | [`code/models/spin1`](code/models/spin1/) |
+| Spin-1 Heisenberg open chain | 1 | $0.0058$, at $h = 3/5$ | odd $n \ge 1921$ | [`code/lean/.../OpenChain.lean`](code/lean/CertifiedGaps/Heisenberg/OpenChain.lean) |
+| Transverse- and longitudinal-field Ising chain | 30 | $4.5202$, at $g = 3/4, h = 1$ | even $L \ge 6$ | [`code/models/tfim_longitudinal`](code/models/tfim_longitudinal/) |
+| Spin-½ Heisenberg chain in a staggered field | 5 | $1.1489$, at $h = 1$ | even $L \ge 8$ | [`code/models/heisenberg_staggered_field`](code/models/heisenberg_staggered_field/) |
+| Spin-½ dimerized Heisenberg chain | 3 | $0.5347$, at $\delta = 1/2$ | even $L \ge 4$ | [`code/models/dimerized_heisenberg`](code/models/dimerized_heisenberg/) |
+| Spin-1 dimerized Heisenberg chain | 2 | $0.5288$, at $\delta = 9/10$ | even $L \ge 2$ | [`code/models/spin1_dimerized`](code/models/spin1_dimerized/) |
+| Spin-1 Heisenberg chain with single-ion anisotropy | 4 | $0.8994$, at $D = 4$ | even $L \ge 6$ | [`code/models/spin1_largeD`](code/models/spin1_largeD/) |
+| Two-leg spin-½ Heisenberg ladder | 5 | $1.1024$, at $J_\perp = 4$ | even $L \ge 4$ | [`code/models/heisenberg_ladder`](code/models/heisenberg_ladder/) |
+| Two-leg transverse-field Ising ladder | 1 | $0.6368$, at $g = 3$ | even $L \ge 4$ | [`code/models/two_leg_tfim`](code/models/two_leg_tfim/) |
 
-All certified models outside `spin1/` share one pipeline in the core (`CertifiedGaps.GapCertificates`):
-each model is an exact `RingModel` with exact reflection-positivity data, and `certify_gap` computes
-the complete spectra of the seed rings at lengths $n_0$, $2n_0$ by exact symmetry blocks (charge,
-momentum, spin flip, on-site parities, cell blocking), encloses every eigenvalue by one residual,
-polar-factor and Weyl/Ostrowski bound (`verified_eigen`) whose floating-point rounding error is bounded
-a priori under the IEEE binary64 model (including BLAS matrix products), and runs the exact rational
-doubling chain; `check_certificate` re-derives it. The bounds in the table are the outward-rounded
-interval bounds; each certificate also states the exact rational chain bound.
+Pilot studies without a gap certificate: [`code/models/blbq_haldane`](code/models/blbq_haldane/)
+(bilinear–biquadratic chain), [`code/models/spin2`](code/models/spin2/) (spin-2 chain), and
+[`code/models/aklt`](code/models/aklt/) (honeycomb AKLT).
 
 ## Layout
 
-| directory | content |
-|---|---|
-| [`julia/`](julia/) | `CertifiedGaps`, the shared Julia core package: the doubling recurrence with outward-rounded and exact-rational bounds, exact arithmetic, results I/O, reflection-positivity tests and exact RP certificates, exact diagonalization, verified ring spectra, certified MPO arithmetic (Nemo/Arb), and thermal purification (ITensors) |
-| [`models/`](models/) | one directory per model in a standardized layout ([`AGENTS.md`](AGENTS.md), "Directory format"): `README.md`, `IDEAS.md`, certificate JSON, `certify.jl`, `check.jl`, and tests; documented layout exceptions are listed in each README's `## Layout`. `spin1/` reproduces the exact-arithmetic spin-1 certificate; `lean_seeds/` develops kernel-checked seed witnesses |
-| [`lean/`](lean/) | Lean 4 + Mathlib formalization of the two-purity criterion and each certified model's gap theorem (with the seeds as hypotheses), plus the opt-in library `SeedKernel` for kernel-checked seed arithmetic |
-| [`leaderboard/`](leaderboard/) | Lean library `Leaderboard` packaging every Lean-verified gap record in a uniform `Record.Unconditional` or `Record.Seeded` statement, plus the kernel axiom/parameter auditor `leaderboard_audit` |
-| [`blueprint/`](blueprint/), [`home_page/`](home_page/) | the `leanblueprint` blueprint of the Lean formalization (web, PDF, dependency graph) and the project home page and leaderboard (`home_page/_data/records.yml`), built from the root `lakefile.toml` and deployed to GitHub Pages |
-| [`explainer/`](explainer/) | interactive visual exposition of the periodic ring and open-chain proofs (two HTML pages and two narrated films; floating-point illustrations only, not part of any certificate) |
-| [`tools/`](tools/) | `fetch_upstream.jl`: downloads the OpenAI preprint's evidence files (for `spin1`) or, with `--paper`, its LaTeX sources (for `lean_seeds`) at a pinned commit and verifies their SHA-256 hashes; `leaderboard/`: the validator of `home_page/_data/records.yml` against the certificates and Lean audit |
-| [`notes/`](notes/) | working LaTeX notes and diagram macros (`tnnotes.sty`) |
+The folders follow the
+[Agentic Publication Protocol](https://github.com/LionSR/AgenticPublicationProtocol/blob/main/PROTOCOL.md)
+layout. This is a repository organization change, not a validated APP release.
 
-See [`AGENTS.md`](AGENTS.md) for the exact specification of a gap certificate and instructions on adding new models,
-and [`CONTRIBUTING.md`](CONTRIBUTING.md) for submitting a record to the leaderboard.
+| Directory | Content |
+|---|---|
+| [`paper/`](paper/) | Main diagrammatic Haldane-gap note, companion notes, and PDFs |
+| [`code/`](code/) | Julia package, model generators/checkers, Lean proofs, leaderboard, and tools |
+| [`data/`](data/) | Stored certificates, witnesses, numerical summaries, and external-data instructions |
+| [`environment/`](environment/) | Setup commands and canonical dependency specifications |
+| [`supplementary/`](supplementary/) | Interactive visual explainer and narrated-film instructions |
+| [`blueprint/`](blueprint/), [`home_page/`](home_page/) | Lean blueprint and Jekyll website |
+
+The paper entry point is
+[*A Diagrammatic Proof of the Haldane Gap via Spacetime Tensor Networks*](paper/thermal-mpo-gap-note.pdf).
+The root Lake files, `blueprint/`, and `home_page/` remain where the Lean documentation build
+expects them. Each model's `results/` is a relative symlink to its canonical data directory;
+certificate bytes and model-local source hashes are preserved.
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) to submit a record and [`AGENTS.md`](AGENTS.md) for the
+certificate specification.
 
 ## Reproduce
 
-Requirements: Julia 1.12, `elan` (Lean 4), and `leanblueprint` (with a LaTeX installation) for the
-blueprint.
+Requirements: Julia 1.12 and `elan` (Lean 4). See
+[`environment/README.md`](environment/README.md) for setup and dependency locations.
 
 ```sh
-# Julia core and its tests
-julia --project=julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
+# Julia core tests
+julia --project=code/julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 
-# spin-1 certificates: fetch the preprint's evidence (pinned commit, hash-checked), then test
-julia tools/fetch_upstream.jl
-julia --project=models/spin1 -e 'using Pkg; Pkg.instantiate()'
-julia --project=models/spin1 models/spin1/test/runtests.jl
-julia --project=models/spin1 models/spin1/check.jl                      # stored-output audit
-julia --project=models/spin1 --threads=4 models/spin1/check.jl --full   # fresh run, ≈20–45 min
+# Check a model certificate (add --full to recompute spectra)
+OPENBLAS_NUM_THREADS=1 julia --project=code/julia code/models/heisenberg_ladder/check.jl
 
-# any other model runs in the core environment: fast checker (add --full for the full
-# spectral replay), and its tests
-OPENBLAS_NUM_THREADS=1 julia --project=julia models/heisenberg_ladder/check.jl
-OPENBLAS_NUM_THREADS=1 julia --project=julia models/heisenberg_ladder/test/runtests.jl
+# Check the spin-1 certificate
+julia code/tools/fetch_upstream.jl
+julia --project=code/models/spin1 -e 'using Pkg; Pkg.instantiate()'
+julia --project=code/models/spin1 code/models/spin1/check.jl
 
-# Lean formalization, kernel-checked seeds, and leaderboard audit (from the repository root)
+# Build Lean 4 proofs and validate the leaderboard
 lake exe cache get && lake build
 lake exe leaderboard_audit home_page/_data/lean_records.json
-julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
-julia --project=tools/leaderboard tools/leaderboard/check_records.jl \
+julia --project=code/tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
+julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl \
   --lean-records home_page/_data/lean_records.json
-
-# Blueprint of the Lean formalization
-leanblueprint pdf && leanblueprint web
-lake exe checkdecls blueprint/lean_decls
 ```
-
-The root `lake build` compiles `CertifiedGaps`, `SeedKernel`, and `Leaderboard` into `.lake/`
-(`lean/` also contains a standalone `lakefile.toml` used by `models/lean_seeds/check.jl`). Each
-model directory's `README.md` provides its exact reproduction commands, measured run times, and
-trusted arithmetic base.
-
-## Status of the claims
-
-* **Spin-1 Heisenberg chain:** For periodic rings, the seed purity bounds at $(60, 833/32)$,
-  $(36, 49/4)$, $(60, 105/4)$, and $(2304, 784)$ are certified in [`models/spin1/`](models/spin1/) in
-  exact integer and rational arithmetic, and the analytic deductions of the uniform spectral gap from
-  those seeds ($\Delta_L > 0.0729$ for even $L \ge 36$, $\Delta_L > \log(41.196029)/784$ and
-  $(\log 20)/784$ for even $L \ge 2304$, and $\Delta_L > \tfrac{4}{105}\log\tfrac{80}{79}$ for even
-  $L \ge 60$) are formalized in [`lean/`](lean/). For open chains with endpoint fields $h = 3/5$, the
-  analytic deduction of $\Delta_n > (\log 10)/392$ for odd $n \ge 1921$ from the four finite seed bounds
-  at $\beta_2 = 49$ of the OpenAI boundary-field preprint is formalized in
-  [`lean/CertifiedGaps/Heisenberg/OpenChain.lean`](lean/CertifiedGaps/Heisenberg/OpenChain.lean). In `CertifiedGaps`, each
-  seeded theorem takes the finite seed inequalities as named `sorry` lemmas; in `SeedKernel`,
-  `SeedKernel.Ising.ising_gap` ([`models/lean_seeds/`](models/lean_seeds/)) proves both the seed
-  inequalities and the doubling recurrence inside the Lean kernel for the longitudinal-field Ising chain
-  at $g = 1/4$, $h = 1/20$.
-* **Other certified models:** The seed enclosures rest on verified block-diagonal eigenvalue enclosures
-  whose rounding analysis assumes standard IEEE binary64 arithmetic and conventional BLAS dot-product
-  error bounds; each was independently replayed or reviewed (see the model's `README.md` and
-  `METHOD.md`).
-* **Exploratory numerics:** Quantities labeled as numerical diagnostics (DMRG, Lanczos, unverified
-  floating-point exact diagonalization, thermal MPO purification, and finite-size extrapolations) are
-  used only for screening and scale estimation, never as part of a gap certificate.

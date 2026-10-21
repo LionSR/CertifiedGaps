@@ -1,0 +1,11 @@
+{%- comment -%}
+  A partition function Z_n(beta) drawn as a torus, as on the slides: a grid of w cells in space
+  (horizontal) and h cells in imaginary time (vertical). Usage: include torus.html w=2 h=1
+{%- endcomment -%}
+{%- assign c = 13 -%}{%- assign wpx = include.w | times: c -%}{%- assign hpx = include.h | times: c -%}
+<svg class="torus" width="{{ wpx | plus: 2 }}" height="{{ hpx | plus: 2 }}" viewBox="-1 -1 {{ wpx | plus: 2 }} {{ hpx | plus: 2 }}" aria-hidden="true">
+  <rect x="0" y="0" width="{{ wpx }}" height="{{ hpx }}" class="cell-bg"/>
+  {%- for i in (1..include.w) %}{% if i < include.w %}{% assign xx = i | times: c %}<line x1="{{ xx }}" y1="0" x2="{{ xx }}" y2="{{ hpx }}"/>{% endif %}{% endfor %}
+  {%- for j in (1..include.h) %}{% if j < include.h %}{% assign yy = j | times: c %}<line x1="0" y1="{{ yy }}" x2="{{ wpx }}" y2="{{ yy }}"/>{% endif %}{% endfor %}
+  <rect x="0" y="0" width="{{ wpx }}" height="{{ hpx }}" class="edge"/>
+</svg>

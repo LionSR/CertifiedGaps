@@ -9,12 +9,11 @@ on:
     paths:
       - "**"
       - "!home_page/**"
-      - "!notes/**"
-      - "!explainer/**"
+      - "!paper/**"
+      - "!supplementary/explainer/**"
       - "home_page/_data/records.yml"
   pull_request:
-    branches:
-      - main # Build and check pull requests into the default branch (no deploy)
+    # Also check stacked pull requests targeting another feature branch (no deploy).
   workflow_dispatch:        # Allow manual triggering of the workflow from the GitHub Actions interface
 
 # One run per ref at a time; a newer push waits for (main) or replaces (PRs) the running one
@@ -65,7 +64,7 @@ jobs:
         with:
           build: true
           lint: false # no lint driver is configured
-          mk_all-check: false # mk_all does not follow srcDir = "lean"
+          mk_all-check: false # mk_all does not follow srcDir = "code/lean"
           # Each cached run saves a 2 GB .lake cache keyed by commit. Keep that to deploys, so
           # pull requests do not push docgen's API-docs cache out of the 10 GB limit.
           use-github-cache: ${{ github.event_name != 'pull_request' }}
@@ -85,13 +84,13 @@ jobs:
         uses: julia-actions/cache@9353db09a0f2bbbdec6f41791918c75d37391b36 # v3.5.0
 
       # Schema, paths, rounded-down decimals (exact arithmetic), agreement with the Lean records,
-      # and a scan of leaderboard/ for sorry, native_decide, axiom, implemented_by and extern.
+      # and a scan of code/leaderboard/ for sorry, native_decide, axiom, implemented_by and extern.
       - name: Validate the leaderboard data
         env:
           OPENBLAS_NUM_THREADS: 1
         run: |
-          julia --project=tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
-          julia --project=tools/leaderboard tools/leaderboard/check_records.jl \
+          julia --project=code/tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
+          julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl \
             --lean-records home_page/_data/lean_records.json
 
       # Jekyll copies files without front matter verbatim, so the explainer and the PDFs are served
@@ -100,12 +99,12 @@ jobs:
         run: |
           rsync -a --exclude '.*' --exclude '*.mp4' --exclude 'node_modules/' \
             --exclude 'package*.json' --exclude '*.narration.wav' --exclude 'render.mjs' \
-            --exclude 'README.md' explainer/ home_page/explainer/
+            --exclude 'README.md' supplementary/explainer/ home_page/explainer/
           mkdir -p home_page/notes
-          cp notes/*.pdf home_page/notes/
+          cp paper/*.pdf home_page/notes/
 
       # The narrated films (about 100 MB) are too large for git; they are assets of the `films`
-      # release, uploaded after each render (explainer/README.md). Only deploys need them, and
+      # release, uploaded after each render (supplementary/explainer/README.md). Only deploys need them, and
       # fork pull requests cannot read this private repository's releases.
       - name: Download the explainer films
         if: github.event_name == 'push'
