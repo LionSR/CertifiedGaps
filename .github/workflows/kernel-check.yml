@@ -1,6 +1,7 @@
 name: Kernel re-check
 
-# Replay every declaration of the Leaderboard library, the continuous-history audit, and their imports
+# Replay every declaration of the Leaderboard library, the continuous-history/kernel audits,
+# and the repository modules they import
 # through the Lean kernel with leanchecker (bundled with the toolchain; the upstreamed
 # lean4checker). This catches `set_option debug.skipKernelTC true` and declarations written into
 # the environment by metaprograms. It runs apart from the deploy (blueprint.yml), so it never
@@ -55,14 +56,16 @@ jobs:
           use-mathlib-cache: true
           use-github-cache: false
 
-      # Include the continuous-history audit explicitly: these prerequisites are independent
-      # of Leaderboard. Keep the expensive SeedKernel spin-1 benchmarks out of this build.
-      - name: Build the Leaderboard and continuous-history audit
+      # Include the continuous-history/kernel audits, which are independent of the current
+      # finite-dimensional leaderboard proofs. Exclude the SeedKernel benchmarks.
+      - name: Build the Leaderboard and continuous-history/kernel audits
         run: >-
           ~/.elan/bin/lake build Leaderboard
           CertifiedGaps.Transfer.PoissonHistoryAudit
           CertifiedGaps.Transfer.HistoryShuffleAudit
           CertifiedGaps.Transfer.ProductPoissonHistoryAudit
+          CertifiedGaps.Transfer.ContinuousKernel.Audit
+          CertifiedGaps.Transfer.SpinOneKernelAudit
 
       # One exact module per process avoids the observed 4.36.0-rc1 repeated-replay crash.
       # The CLI also expands namespace prefixes; the driver calls the unchanged replay routine.

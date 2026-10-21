@@ -158,6 +158,37 @@ by setting `KERNEL_CHECK_MODULE=CertifiedGaps.Transfer.TimeOrdering` or
 `CertifiedGaps.Transfer.HistoryShuffle`, `CertifiedGaps.Transfer.ProductPoissonHistory`, and their
 audit modules.
 
+### Continuous spin-one history operator
+
+`Transfer/SpinOneKernel.lean` constructs the actual operator from the history measure above.
+For two histories it merges their event times in increasing order and takes the matrix trace of
+that word in the existing Cartesian `SpinOne.G` factors. Joint measurability, the bound three,
+null collisions, the empty-history value three, and real symmetry are proved from these definitions.
+Swapping histories only relabels events; no matrix word is reversed or commuted.
+
+On the complex Hilbert space `Lp ℂ 2 (historyMeasure b 3)`, the operators `SpinOneKernel.K b` and
+`SpinOneKernel.X a b = (exp(-a*b) : ℂ) • K b` are Hilbert–Schmidt, compact, and self-adjoint.
+`K_apply` and `X_apply` state their actual integral formulas. Their squared Hilbert–Schmidt bounds
+are $`9e^{6b}`$ and $`9e^{(6-2a)b}`$, respectively, for every real `a` and nonnegative `b`.
+
+The general bridge in `Transfer/ContinuousKernel/` constructs the bounded integral operator of a
+jointly strongly measurable, bounded real or complex kernel on any finite measure space. It proves
+$`\|K\| \le B\mu(\Omega)`$, the squared Hilbert–Schmidt bound $`B^2\mu(\Omega)^2`$,
+and compactness; Hermitian symmetry implies self-adjointness. The Hilbert–Schmidt criterion uses
+finite orthonormal families. Compactness follows from operator-norm convergence of rank-one
+truncations, without a separability or positive-mass assumption.
+
+Run the generic and concrete regressions with:
+
+```sh
+lake build CertifiedGaps.Transfer.ContinuousKernel.Audit \
+  CertifiedGaps.Transfer.SpinOneKernelAudit
+```
+
+The concrete audit enforces the standard-axiom whitelist on all declarations in the construction and its analytic
+dependencies. The noncommuting three-event regression distinguishes chronological order from its
+reversal. These modules do not assert an operator-trace or physical partition-function identity.
+
 ### The first unconditional gap
 
 ```lean
@@ -234,7 +265,7 @@ lake build SeedKernelBench  # opt-in: kernel benchmarks up to n = 12 (≈2 min, 
 
 Lean is pinned at `v4.36.0-rc1` and Mathlib at commit
 `807d3836b165983210ee2ecf3cd28f239436949c` (October 19, 2026). `CertifiedGaps` comprises
-roughly 9,100 lines of Lean
+roughly 10,400 lines of Lean
 and `SeedKernel` roughly 1,200 lines (excluding generated witness files). All declarations live in
 the `CertifiedGaps` namespace; declaration names below omit that prefix.
 
@@ -555,6 +586,13 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | `Transfer/HistoryShuffle.lean` | Finite-family ordered-simplex shuffle identities |
 | `Transfer/PoissonHistory.lean` | Labeled history measure, Poisson event count, and absolutely convergent ordered-time integrals |
 | `Transfer/ProductPoissonHistory.lean` | Actual finite product history measure, count/label/shuffle series, absolute convergence, and exponential bounds |
+| `Transfer/ContinuousKernel/Basic.lean` | Actual bounded-kernel integral operator on `L²`, operator-norm bound, and Hermitian-kernel self-adjointness |
+| `Transfer/ContinuousKernel/HilbertSchmidt.lean` | Basis-free Hilbert–Schmidt criterion, rank-one convergence, and compactness |
+| `Transfer/ContinuousKernel/Compact.lean`, `Audit.lean` | Integrated Bessel bound, compact kernel operators, and generic real/complex regressions |
+| `Transfer/ContinuousKernel/MatrixBounds.lean` | Submultiplicative matrix-norm bounds for chronological spin-one words |
+| `Transfer/SigmaProductMeasurable.lean`, `HistoryCollision.lean` | Joint measurability on countable history components and null cross-history collisions |
+| `Transfer/MergedHistory.lean` | Actual merged chronological kernel, measurability, bound, symmetry, and empty/collision values |
+| `Transfer/SpinOneKernel.lean`, `SpinOneKernelAudit.lean` | Concrete complex-L² `K` and normalized `X`, Hilbert–Schmidt bounds, compactness, self-adjointness, and audits |
 | `Transfer/ProductLimit.lean` | Lie–Trotter product formula: $\lim_{M\to\infty} (\prod_k (1 + (c/M) h_k))^M = e^{c \sum_k h_k}$ |
 | `Transfer/PolynomialFilter.lean` | Polynomial filters: eigenvalue caps from finitely many moments (`CapCheck`, `momentBound`, one-sided `pairingBound`), checked by `decide` |
 | `Transfer/MatrixLemmas.lean` | Traces of powers, block matrices `blockOf` by a key, and reindexing invariance |
@@ -631,15 +669,15 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 
 ## Why each piece is needed in Lean
 
-The paper obtains the spatial moment representation through a continuous-time transfer operator
-on Poisson bond histories. The history layer now proves the actual history measures, finite-family
-chronological shuffles, and the full absolutely convergent count/label/shuffle reorganization of
-product-history integrals. The merged-history matrix kernel and its integral operator are a separate
-component; cycle-trace and physical partition-function identities are outside this history layer.
+The continuous-time route now has independently proved history measures, chronological-time
+reorganization, and the concrete spin-one kernel operator. The history and kernel modules are
+described above. They establish the actual compact self-adjoint Hilbert–Schmidt operator, while the
+cycle-trace and physical partition-function identification remain separate obligations. No
+spectral-moment, rotation, twist, or sector identity is asserted by this prerequisite layer.
 
-The existing gap theorems use a finite-dimensional Trotterization route that needs only finite matrix
-algebra and the matrix exponential limit. Each module below addresses a specific distinction between
-the paper proof and the formal proof:
+The current end-to-end gap formalization continues to use the finite-dimensional Trotterization
+route, which needs only finite matrix algebra and the matrix exponential limit. Each module below
+addresses a specific distinction between the paper proof and the formal proof:
 
 **Spectral gap as a predicate on unordered levels (`GapGT`).** The paper writes $\Delta_L = E_1 - E_0$
 with eigenvalues sorted in nondecreasing order. In Mathlib, the eigenvalues of a Hermitian matrix are
