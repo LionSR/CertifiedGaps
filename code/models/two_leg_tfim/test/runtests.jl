@@ -49,11 +49,13 @@ using .RitzSeeds
 using CertifiedGaps.RitzBounds: partial_ring_spectrum, log_partition_lower
 using CertifiedGaps.VerifiedSpectra: log_partition_enclosure
 using CertifiedGaps.GapCertificates: coupled_seed_bounds, seed_bounds
+using IntervalArithmetic: inf, sup
 
 @testset "Coupled seeds from Ritz bounds (small rings)" begin
     # The doubled ring of 4 rungs with forced Lanczos in its larger blocks: the Ritz bounds
     # give lower bounds on log Z, and the coupled defects of the seed (2, β) are at least the
-    # complete-spectrum ones, and close to them when every block keeps its low levels.
+    # complete-spectrum ones (up to rounding for εₛ), and εₛ is close to them when every block
+    # keeps its low levels.
     g = 3 // 1
     m = ladder(g)
     full = verified_ring_spectrum(m, 4)
@@ -67,7 +69,8 @@ using CertifiedGaps.GapCertificates: coupled_seed_bounds, seed_bounds
     for β in (1, 2)
         coupled = coupled_seed_bounds(m, 2, β; small, large = part)
         complete = seed_bounds(m, 2, β; spectra = Dict(2 => small, 4 => full))
-        @test coupled.eps_s >= complete.eps_s && coupled.eps_t >= complete.eps_t
+        # Both are rigorous; a Ritz bound may beat a verified radius, hence the tolerance.
+        @test coupled.eps_s >= complete.eps_s - 1e-9 && coupled.eps_t >= complete.eps_t
         @test coupled.eps_s - complete.eps_s < 1e-3
     end
     @test ritz_levels(Dict("charge" => 0)) > ritz_levels(Dict("charge" => 1)) > 0
