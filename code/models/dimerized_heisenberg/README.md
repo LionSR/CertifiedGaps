@@ -178,7 +178,7 @@ times on a shared 8-core x86-64 Linux machine loaded by other jobs, one thread):
 ```sh
 julia --project=code/julia -e 'using Pkg; Pkg.instantiate()'
 julia --project=code/julia code/models/dimerized_heisenberg/check.jl         # 1.1 min
-julia --project=code/julia code/models/dimerized_heisenberg/check.jl --full  # FULLTIME
+julia --project=code/julia code/models/dimerized_heisenberg/check.jl --full  # 31 min
 julia --project=code/julia code/models/dimerized_heisenberg/test/runtests.jl # 2.1 min
 ```
 
@@ -195,7 +195,7 @@ julia --project=code/julia code/models/dimerized_heisenberg/test/runtests.jl # 2
 - **Full check (`check.jl --full`):** additionally recomputes the verified spectra of the rings of
   $2, 4, 8$ cells from the model and re-derives every seed defect, every exclusion bound, and the
   16-spin gap from them alone, and recomputes the 24-spin Ritz bounds of every coupled seed from
-  the model (about 14 minutes per $\delta$).
+  the model (7–14 minutes per $\delta$, depending on load).
 - **Test suite (`test/runtests.jl`):** the fast check, the exact frame, RP and lattice-reflection
   identities, the verified 4-spin spectrum and $\log Z$ against the closed form, the verified
   8-spin spectrum against the physical-frame `float_ring_spectrum`, the sparse 20-spin
