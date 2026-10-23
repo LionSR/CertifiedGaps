@@ -90,4 +90,4 @@ $\beta$ grid of $1/8$ (refined to $1/32$ near the optimum):
 interval-enclosed core blocks) and `coupled_seed_bounds`, plus the verified gap of the 4-rung
 ring for $L = 4$: $\Delta_L \ge 0.371180737$ at $g = 11/4$, $0.849386526$ at $g = 3$ (was
 $0.636870849$) and $2.546626505$ at $g = 4$, every even $L \ge 4$. Each point takes about
-35–38 min and 4.2 GB, dominated by building the 28 sparse blocks of $3.5 \times 10^5$ states.
+35–41 min and 4.2 GB, dominated by building the 28 sparse blocks of $3.5 \times 10^5$ states.

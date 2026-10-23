@@ -124,17 +124,22 @@ julia --project=code/julia code/models/two_leg_tfim/scripts/summarize.jl
 `Ladder.POINTS` (complete spectra, $n_0 = 4$) and `RitzSeeds.RITZ_POINTS` (coupled, $n_0 = 6$),
 or those at field `g`; `--reuse-partial` reads the stored 12-rung Ritz bounds instead of
 recomputing them. The stored certificates were last regenerated that way (all four in 110 s,
-after the defect padding was added), from Ritz bounds computed by full runs. Measured run times on a shared 8-core Linux machine (Julia 1.12.7, one BLAS thread, load
-average 8–12):
-- `certify.jl g --ritz`: 35–38 min wall per point, peak memory 4.2 GB (Julia started with
-  `--heap-size-hint=3G`); about 25 min build the 28 interval-enclosed sparse blocks of the
-  12-rung ring (dimension about $3.5 \times 10^5$ each), 12–13 min run Lanczos and the Ritz
-  bounds, and the 6-rung spectrum and the chain take seconds;
+after the defect padding was added), from Ritz bounds computed by full runs. Measured run
+times on a shared 8-core Linux machine (Julia 1.12.7, one BLAS thread, load average 8–12):
+- `certify.jl g --ritz`: 35–41 min wall per point, peak memory 4.2 GB (Julia started with
+  `--heap-size-hint=3G` or `2500M`); about 25 min build the 28 interval-enclosed sparse
+  blocks of the 12-rung ring (dimension about $3.5 \times 10^5$ each), 12–13 min run Lanczos and
+  the Ritz bounds, and the 6-rung spectrum and the chain take seconds;
 - `certify.jl 3//1 --complete` ($n_0 = 4$): 119 s wall (92 s in `certify_point`), peak memory
   1.3 GB;
 - `check.jl`: 33 s including compilation, peak memory 1.2 GB (recomputes the 6- and 4-rung
   spectra and reads the stored 12-rung bounds);
-- `check.jl --full`: FULL_TIME;
+- `check.jl --full`: not run as one command in this session (about 2 h: the fresh 12-rung
+Ritz bounds take 37–40 min per coupled point, plus about 4 min for the $n_0 = 4$ spectra).
+Its steps for each coupled point (fresh Ritz bounds and 6-rung spectrum, then `check_point`
+with these spectra and the bridge) passed for all three points: $g = 4$ in 39 min,
+$g = 3$ in 37 min, $g = 11/4$ in 37 min, peak memory 4.2 GB each; the fresh defects equal
+the unpadded certified ones to all printed digits;
 - `test/runtests.jl`: 34 tests, 47 s including compilation;
 - `scripts/ritz_scan.jl`: 15–60 min per field (Lanczos on 28 complex sectors of the
   physical-frame ring), `scripts/scan.jl`: 2–4 min per field.

@@ -35,7 +35,7 @@ Every block goes through `CertifiedGaps.VerifiedSpectra.verified_eigen`: with LA
 - **Unit tests (`test/runtests.jl`):** exact frame and RP identities at $`g \in \{2, 5/2, 3, 4\}`$; core blocks (`float_ring_spectrum`, `verified_ring_spectrum`) against independent dense ED for $L = 2, 3, 4$ (verified radii $< 10^{-9}$).
 - **Fast checker (`check.jl`):** for each point of `Ladder.POINTS`, the exact Hadamard frame change and the core `check_point`: the model-local source hashes; the stored model, RP factors, seed and `params` exactly those of the point; the seed defects at most the Lean seed hypotheses (`lean_points` of `TwoLegIsing.lean`); then `check_certificate(cert; spectra = false)`, which re-verifies the RP identity and reproduces the exact chain bound and `interval_bound_decimal`.
 - **Full check (`check.jl --full`):** `check_point(...; spectra = true)` recomputes every block spectrum of the 4- and 8-rung rings from the stored model and requires the fresh defect upper ends to be at most the stored seeds.
-- **Coupled seeds (`check.jl`, `RitzSeeds.RITZ_POINTS`):** the same `check_point` pins, with the seed defects recomputed by `coupled_seed_bounds` from a freshly verified 6-rung spectrum and the stored 12-rung Ritz bounds (`results/partial_g*_L12.json`, SHA-256 pinned by the certificate), and the 4-rung bridge recomputed and compared with the bound; `--full` recomputes the Ritz bounds from scratch (fresh Lanczos vectors, same deterministic start). A replay of the `--full` steps for g = 4 is reported in the README.
+- **Coupled seeds (`check.jl`, `RitzSeeds.RITZ_POINTS`):** the same `check_point` pins, with the seed defects recomputed by `coupled_seed_bounds` from a freshly verified 6-rung spectrum and the stored 12-rung Ritz bounds (`results/partial_g*_L12.json`, SHA-256 pinned by the certificate), and the 4-rung bridge recomputed and compared with the bound; `--full` recomputes the Ritz bounds from scratch (fresh Lanczos vectors, same deterministic start). These `--full` steps were replayed for each of the three coupled points and passed (README, Reproduce).
 - **Unit tests for the coupled route:** Ritz bounds of the 4-rung ring with forced Lanczos against its complete verified spectrum (lower bounds on log Z), coupled against complete-spectrum defects at the seed (2, β), and the 4-rung bridge.
 - **Cross-check without the leg-exchange symmetry:** a run of `certify_gap` with charge and momentum blocks only (10 blocks of dimension about 4100 at 8 rungs, 971 s) gave $\varepsilon_{\mathrm{s}} \le 0.112389884123893$, $\varepsilon_\tau \le 0.051537141979371$ and interval bound $0.6368651924843131$, consistent with the certified values.
 
@@ -84,7 +84,7 @@ $10^{-8}$ (`results/ritz_scan_g*.json`, truncation $k = 1, \dots, K$).
 
 **Finite bridge.** The criterion covers even $L \ge n_0 = 6$. Each coupled certificate also
 stores `finite_bridge`: outward bounds (to $10^{-15}$) on the gap of the 4-rung ring from its
-complete verified spectrum (`spectral_gap_enclosure`), $\Delta_4 \ge 2.12$, $2.72$, $4.78$ at
+complete verified spectrum (`spectral_gap_enclosure`), $\Delta_4 \ge 2.20$, $2.72$, $4.78$ at
 $g = 11/4, 3, 4$; since they exceed the certified bounds, every even $L \ge 4$ is covered.
 
 **Floating-point screening** (`scripts/ritz_scan.jl`, `scripts/sectors.jl`; not certified).
