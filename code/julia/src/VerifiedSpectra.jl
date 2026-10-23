@@ -28,7 +28,7 @@ and passes both here; `ring_blocks` is the generic charge-and-momentum reduction
 """
 module VerifiedSpectra
 
-using LinearAlgebra, IntervalArithmetic
+using LinearAlgebra, SparseArrays, IntervalArithmetic
 using ..ExactArithmetic: RationalBig, parse_rational
 using ..Results: write_result, read_result
 using ..RingModels: RingModel, isreal_model, _reduce, _monomial
@@ -155,8 +155,15 @@ character χ exactly when χ(δ) = σ for every element U_δ r = σ r of its sta
 
 With `exact = false` the blocks are computed in plain Float64 arithmetic and `matrix_error` is
 `nothing`: much faster, for floating-point scans only.
+
+With `sparse = true` each center `M` is a `SparseMatrixCSC` with the same entries (and the same
+`matrix_error`), for rings whose blocks are too large for dense storage. `charges`, if given,
+restricts the enumeration to the sectors whose charge lies in it (after the flip pairing, so
+only the built representative q of a pair q, −q needs to be listed); the multiplicities are
+unchanged, and the blocks then cover exactly the selected sectors.
 """
-function ring_blocks(f, model::RingModel, L::Integer; exact::Bool = true)
+function ring_blocks(f, model::RingModel, L::Integer; exact::Bool = true, sparse::Bool = false,
+    charges = nothing)
     L >= 2 || throw(ArgumentError("a ring needs L ≥ 2"))
     d = model.d
     dim = big(d)^L
@@ -180,17 +187,19 @@ function ring_blocks(f, model::RingModel, L::Integer; exact::Bool = true)
     # The flip parity needs F^{⊗L} to be an involutive signed permutation in the abelian group.
     flip_parity = flip !== nothing && model.flip * model.flip == I &&
                   all(model.flip * G == G * model.flip for G in model.symmetries)
-    total = 0
+    total, expected = 0, 0
     for q in sort!(collect(keys(codes_by_charge)))
         partner = _reduce(model, -q)
         pair = model.flip === nothing || partner == q ? 1 : 2
         # Of q and −q, build the one with the smaller |q|, and q > 0 over −q.
         pair == 2 && (abs(partner), -partner) < (abs(q), -q) && continue
+        charges === nothing || q in charges || continue
+        expected += pair * length(codes_by_charge[q])
         maps = flip_parity && partner == q ? [symmetries; [flip]] : symmetries
         table = _sector_table(model, L, codes_by_charge[q], top, maps, reflection)
         for m in momenta, parities in Iterators.product(fill((1, -1), length(maps))...)
             built = _momentum_block(table, L, m, collect(Int, parities), real_model,
-                _Arith{exact}())
+                _Arith{exact}(); sparse)
             built === nothing && continue
             M, ε = built
             mult = pair * (paired && 0 < 2m < L ? 2 : 1)
@@ -201,7 +210,8 @@ function ring_blocks(f, model::RingModel, L::Integer; exact::Bool = true)
             f(M, ε, mult, label)
         end
     end
-    total == n || error("blocks cover $total of $n states")
+    expected == (charges === nothing ? n : expected) && total == expected ||
+        error("blocks cover $total of $expected states")
     return nothing
 end
 
@@ -326,10 +336,31 @@ function _character_is(σ, L, m, parities, l, g)
     return ε == 1 ? (m * l) % L == 0 : (2m * l) % L == 0 && (m * l) % L != 0
 end
 
+# Storage of a block center: a dense matrix, or (`sparse = true`) the entries written into it
+# collected as triplets and assembled by `_finish`. Each entry is written once, or twice with
+# the same value on the diagonal, so the assembly keeps the last value instead of summing.
+struct _Triplets{T}
+    n::Int
+    rows::Vector{Int}
+    cols::Vector{Int}
+    vals::Vector{T}
+end
+_Triplets{T}(n::Int) where {T} = _Triplets{T}(n, Int[], Int[], T[])
+function Base.setindex!(t::_Triplets{T}, v, i::Integer, j::Integer) where {T}
+    push!(t.rows, i)
+    push!(t.cols, j)
+    push!(t.vals, T(v))
+    return t
+end
+_storage(sparse::Bool, T, N) = sparse ? _Triplets{T}(N) : zeros(T, N, N)
+_finish(M::Matrix) = M
+_finish(t::_Triplets) = SparseArrays.sparse(t.rows, t.cols, t.vals, t.n, t.n, (_, b) -> b)
+
 # Interval block at momentum k = 2πm/L and the given parities, then its center and an exact
 # bound on ‖A − M‖_F:  ⟨s̃|H|r̃⟩ = √(o_r/o_s) Σ c σ e^{ikl} parity(g)  (see `ring_blocks`).
 # With `_Arith{false}` the block is computed in Float64 and the bound is `nothing`.
-function _momentum_block(table, L, m, parities, real_model, A = _Arith{true}())
+function _momentum_block(table, L, m, parities, real_model, A = _Arith{true}();
+    sparse::Bool = false)
     allowed = findall(eachindex(table.sizes)) do r
         all(_character_is(σ, L, m, parities, l, g) for (l, g, σ) in table.stabilizers[r])
     end
@@ -343,10 +374,11 @@ function _momentum_block(table, L, m, parities, real_model, A = _Arith{true}())
     coefficient = Dict{Any,typeof(_zero(A))}()
     enclose(c) = get!(() -> _number(A, c), coefficient, c)
     if real_model && table.mirror !== nothing && 0 < 2m < L
-        return _real_block(table, L, m, parities, allowed, phases, ratios, enclose, A)
+        return _real_block(table, L, m, parities, allowed, phases, ratios, enclose, A;
+            sparse)
     end
     realblock = real_model && (2m) % L == 0
-    M = realblock ? zeros(Float64, N, N) : zeros(ComplexF64, N, N)
+    M = _storage(sparse, realblock ? Float64 : ComplexF64, N)
     err2 = interval(0.0)
     for (j, r) in enumerate(allowed)
         entries = Dict{Int,typeof(_zero(A))}()
@@ -373,7 +405,7 @@ function _momentum_block(table, L, m, parities, real_model, A = _Arith{true}())
             err2 += i == j ? e : 2e                # the mirrored entry has the same error
         end
     end
-    return M, exact ? RationalBig(sup(sqrt(err2))) : nothing
+    return _finish(M), exact ? RationalBig(sup(sqrt(err2))) : nothing
 end
 
 # Real basis of the block at 0 < k < π of a real model with a lattice reflection R. The
@@ -407,7 +439,8 @@ end
 # The block of `_momentum_block` in the real basis of `_real_basis`: a real symmetric center
 # and an exact bound on ‖A − M‖_F. The true entries are real, so only the real part of each
 # interval entry is kept; its imaginary part must contain zero (checked).
-function _real_block(table, L, m, parities, allowed, phases, ratios, enclose, A)
+function _real_block(table, L, m, parities, allowed, phases, ratios, enclose, A;
+    sparse::Bool = false)
     basis = _real_basis(table, L, m, parities, allowed, phases, A)
     T = typeof(_zero(A))
     members = [Tuple{Int,T}[] for _ in eachindex(table.sizes)]
@@ -416,7 +449,7 @@ function _real_block(table, L, m, parities, allowed, phases, ratios, enclose, A)
     end
     exact = A isa _Arith{true}
     N = length(basis)
-    M = zeros(Float64, N, N)
+    M = _storage(sparse, Float64, N)
     err2 = interval(0.0)
     for (j, v) in enumerate(basis)
         image = Dict{Int,T}()                    # H v on the orbit states of the block
@@ -441,7 +474,7 @@ function _real_block(table, L, m, parities, allowed, phases, ratios, enclose, A)
             err2 += i == j ? e : 2e
         end
     end
-    return M, exact ? RationalBig(sup(sqrt(err2))) : nothing
+    return _finish(M), exact ? RationalBig(sup(sqrt(err2))) : nothing
 end
 
 """

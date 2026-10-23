@@ -18,11 +18,12 @@ using ..RingModels
 using ..RingModels: _int
 using ..VerifiedSpectra
 using ..Recurrence: rational_gap_chain, certified_gap_bound
-using ..Seeds: seed_defects
+using ..Seeds: seed_defects, coupled_seed_defects
+using ..RitzBounds: log_partition_lower, partial_spectrum_summary
 using ..Results: read_result, write_result, model_metadata, verify_model_metadata
 
-export seed_bounds, certify_gap, check_certificate, certify_point, check_point,
-    certificate_row, lean_points
+export seed_bounds, coupled_seed_bounds, certify_gap, check_certificate, certify_point,
+    check_point, certificate_row, lean_points
 
 const FORMAT = "CertifiedGaps ring gap certificate v1"
 const GRID = big(10)^15                          # seed defects are rounded up to this grid
@@ -86,6 +87,45 @@ function seed_bounds(model::RingModel, n0::Integer, β0; blocking = nothing,
         small, large)
 end
 
+"""
+    coupled_seed_bounds(model, n0, β0; small, large, positive_transfer = "") -> NamedTuple
+
+Rigorous seed defects at (`n0`, `β0`) by the coupling identity (`Seeds.coupled_seed_defects`),
+for rings whose doubled length 2n₀ is beyond complete spectra: `small` is the complete verified
+spectrum (`verified_ring_spectrum`) of the ring of n₀ sites, and `large` a partial spectrum of
+the ring of 2n₀ sites (`RitzBounds.partial_ring_spectrum`: Rayleigh–Ritz upper bounds on its low
+levels in any subset of blocks), which only has to bound log Z_{2n₀}(β₀) and log Z_{2n₀}(2β₀)
+from below:
+
+    1 − Pₛ(n₀, β₀) ≤ 1 − Z_{2n₀}(β₀)⁻ / Z_{n₀}(β₀)²,
+    1 − P_τ(2n₀, β₀) ≤ 1 − Z_{2n₀}(2β₀)⁻ / Z_{n₀}(β₀)⁴.
+
+The second bound uses Pₛ(n₀, β₀) ≤ 1, which reflection positivity gives at even n₀; an odd n₀
+needs `positive_transfer` (a positive transfer operator). The result has the fields of
+`seed_bounds` plus `route = "coupled"` and can be passed as `seed` to `certify_gap` and
+`certify_point`; the certificate records the route in its seed, and `check_certificate`
+recomputes such a seed only from spectra handed to it.
+"""
+function coupled_seed_bounds(model::RingModel, n0::Integer, β0; small, large,
+    positive_transfer::AbstractString = "")
+    n0 >= 2 || throw(ArgumentError("n0 must be at least 2"))
+    iseven(n0) || !isempty(positive_transfer) ||
+        throw(ArgumentError("an odd n0 needs a positive_transfer reference (Pₛ ≤ 1)"))
+    β = RationalBig(β0)
+    β > 0 || throw(ArgumentError("β0 must be positive"))
+    zn = log_partition_enclosure(small, β)
+    z2n, z2n2 = log_partition_lower(large, β), log_partition_lower(large, 2β)
+    (; defect_s, defect_t) = coupled_seed_defects(zn, z2n, z2n2)
+    lower(x) = string(RationalBig(inf(x)))
+    return (; n0, β0 = β, blocking = nothing, positive_transfer, route = "coupled",
+        eps_s = _upper(defect_s), eps_t = _upper(defect_t), defect_s, defect_t,
+        log_partition = Dict("logZ_n0_beta0" => _endpoints(zn),
+            "logZ_2n0_beta0_lower" => lower(z2n), "logZ_2n0_2beta0_lower" => lower(z2n2)),
+        spectra = Dict(string(n0) => spectrum_summary(small),
+            string(2n0) => partial_spectrum_summary(large)),
+        small, large)
+end
+
 # The exact chain with the number of doublings that gives the best bound. Each defect is rounded
 # up to the grid 10⁻⁵¹², so once the true defects fall below it the tail bound log(1/(C u))/β_J
 # is limited by the grid rather than the gap; too few doublings and the tail is not yet reached.
@@ -140,6 +180,7 @@ function certify_gap(model::RingModel; n0::Integer, β0, rp = rp_certificate(mod
     record = Dict{String,Any}("n0" => n0, "beta0" => string(β), "eps_s" => string(seed.eps_s),
         "eps_t" => string(seed.eps_t))
     isempty(positive_transfer) || (record["positive_transfer"] = positive_transfer)
+    haskey(seed, :route) && (record["route"] = seed.route)
     cert = Dict{String,Any}(
         "format" => FORMAT,
         "claim" => "every even ring length L >= n0 has a unique ground state and " *
@@ -202,9 +243,20 @@ function check_certificate(cert; spectra = true, progress = false)
     iseven(n0) || !isempty(positive_transfer) || error("odd n0 without positive_transfer")
     blocking = _stored_blocking(cert, model)
     recomputed = Dict{String,Any}()
-    if spectra !== false
+    route = String(get(s, "route", "complete"))
+    route in ("complete", "coupled") || error("unknown seed route $route")
+    if spectra !== false && route == "coupled"
+        # The partial spectrum of the doubled ring is not determined by the certificate.
+        spectra isa AbstractDict && blocking === nothing ||
+            error("a coupled seed is rechecked only from given spectra (n0 => complete, " *
+                  "2n0 => partial)")
+        fresh = coupled_seed_bounds(model, n0, β; small = spectra[n0], large = spectra[2n0],
+            positive_transfer)
+    elseif spectra !== false
         fresh = seed_bounds(model, n0, β; blocking, positive_transfer, progress,
             spectra = spectra === true ? nothing : spectra)
+    end
+    if spectra !== false
         sup(fresh.defect_s) <= εs || error("spatial defect exceeds the stored εₛ")
         sup(fresh.defect_t) <= εt || error("thermal defect exceeds the stored εₜ")
         recomputed["defect_s_upper"] = sup(fresh.defect_s)
