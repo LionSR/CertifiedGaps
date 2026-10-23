@@ -43,3 +43,37 @@ end
         @test sum(length(s.centers) * s.multiplicity for s in spec) == N
     end
 end
+
+include(joinpath(ROOT, "src", "RitzSeeds.jl"))
+using .RitzSeeds
+using CertifiedGaps.RitzBounds: partial_ring_spectrum, log_partition_lower
+using CertifiedGaps.VerifiedSpectra: log_partition_enclosure
+using CertifiedGaps.GapCertificates: coupled_seed_bounds, seed_bounds
+
+@testset "Coupled seeds from Ritz bounds (small rings)" begin
+    # The doubled ring of 4 rungs with forced Lanczos in its larger blocks: the Ritz bounds
+    # give lower bounds on log Z, and the coupled defects of the seed (2, β) are at least the
+    # complete-spectrum ones, and close to them when every block keeps its low levels.
+    g = 3 // 1
+    m = ladder(g)
+    full = verified_ring_spectrum(m, 4)
+    part = partial_ring_spectrum(m, 4; howmany = ritz_levels, dense_max = 8)
+    @test any(b.label["method"] == "ritz" for b in part)
+    @test sum(b.label["dimension"] * b.multiplicity for b in part) == 4^4
+    for β in (1 // 2, 2, 6)
+        @test inf(log_partition_lower(part, β)) <= sup(log_partition_enclosure(full, β))
+    end
+    small = verified_ring_spectrum(m, 2)
+    for β in (1, 2)
+        coupled = coupled_seed_bounds(m, 2, β; small, large = part)
+        complete = seed_bounds(m, 2, β; spectra = Dict(2 => small, 4 => full))
+        @test coupled.eps_s >= complete.eps_s && coupled.eps_t >= complete.eps_t
+        @test coupled.eps_s - complete.eps_s < 1e-3
+    end
+    @test ritz_levels(Dict("charge" => 0)) > ritz_levels(Dict("charge" => 1)) > 0
+    @test all(p.n0 == RITZ_N0 && iseven(p.n0) for p in RITZ_POINTS)
+    # The bridge of the 4-rung ring: an outward enclosure of its gap, far above the bounds.
+    bridge = only(finite_bridge(g))
+    lo, hi = (parse(Rational{BigInt}, bridge[k]) for k in ("gap_lower", "gap_upper"))
+    @test bridge["L"] == 4 && 2.7 < lo <= hi < 2.73
+end

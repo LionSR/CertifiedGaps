@@ -65,6 +65,7 @@ $\beta$ grid of $1/8$ (refined to $1/32$ near the optimum):
 |---|---:|---:|---:|---:|---:|
 | 3 | 29/16 | 0.02418 | 0.07593 | 0.8494 | 0.6369 certified ($n_0 = 4$) |
 | 4 | 11/8 | 0.00283 | 0.01286 | 2.5466 | 2.142 float ($n_0 = 4$), no record |
+| 11/4 | 69/32 | 0.04986 | 0.12648 | 0.3712 | no record |
 | 5/2 | — | 0.106 at $\beta = 5/2$ | 0.243 (minimum over $\beta$) | no seed | no seed |
 
 - **Few states suffice.** Keeping only the lowest $k$ levels of every sector changes the bound
