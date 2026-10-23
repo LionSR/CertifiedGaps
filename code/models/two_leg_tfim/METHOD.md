@@ -1,6 +1,6 @@
 # Two-leg transverse-field Ising ladder: verification method and results
 
-**Headline result:** coupled half-length seeds at $n_0 = 6$ rungs (complete verified 6-rung spectrum, Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring) certify, for every even $L \ge 4$ rungs and with a unique ground state, $\Delta_L \ge 0.371180737$ at $g = 11/4$ (seed $(6, 69/32)$), $\Delta_L \ge 0.849386526$ at $g = 3$ (seed $(6, 29/16)$) and $\Delta_L \ge 2.546626505$ at $g = 4$ (seed $(6, 11/8)$) (section "Coupled half-length seeds" below). The earlier complete-spectrum seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636870853$ at $g = 3$ (interval bound; exact chain bound $\Delta_L > 0.636342903$) and carries the seeds of the Lean theorem. Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 5/2$ none at $n_0 = 6$ with coupled defects.
+**Headline result:** coupled half-length seeds at $n_0 = 6$ rungs (complete verified 6-rung spectrum, Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring) certify, for every even $L \ge 4$ rungs and with a unique ground state, $\Delta_L \ge 0.371180737$ at $g = 11/4$ (seed $(6, 69/32)$), $\Delta_L \ge 0.849386526$ at $g = 3$ (seed $(6, 29/16)$) and $\Delta_L \ge 2.546626505$ at $g = 4$ (seed $(6, 11/8)$) (section "Coupled half-length seeds" below). The earlier complete-spectrum seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636870849$ at $g = 3$ (interval bound; exact chain bound $\Delta_L > 0.636342898$) and carries the seeds of the Lean theorem. Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 5/2$ none at $n_0 = 6$ with coupled defects.
 
 ## Model and scope
 
@@ -146,6 +146,6 @@ For the fields without an $n_0 \le 4$ seed, a two-point fit $\delta(n) = \delta(
 
 ### Certified results
 
-- **g = 3: Δ_L ≥ 0.636870853** (interval bound `0.6368708539132061`; exact chain bound `636342903//1000000000`) for every even L ≥ 4 rungs. Seed (n0, β0) = (4, 3//2), εₛ ≤ 0.112389665753866, εₜ ≤ 0.051536217029413; bound / 8-rung ED gap = 0.239264. Certificate: `results/certificate_g3_1.json`.
+- **g = 3: Δ_L ≥ 0.636870849** (interval bound `0.6368708493341569`; exact chain bound `318171449//500000000`) for every even L ≥ 4 rungs. Seed (n0, β0) = (4, 3//2), εₛ ≤ 0.112389665926876, εₜ ≤ 0.051536217782645; bound / 8-rung ED gap = 0.239265. Certificate: `results/certificate_g3_1.json`.
 
 Certified: the exact RP identity, whole-spectrum eigenvalue enclosures for the selected parameter/seed, outward log-partition and rational defect bounds, and the resulting uniform gap under the repository's two-purity theorem. Numerical: seed optimization, all nonverified scan spectra and finite-size gaps, the literature critical point, and comparisons to finite-ring reference gaps. The ED reference gap is not claimed to be an infinite-volume limit.

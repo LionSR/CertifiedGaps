@@ -16,7 +16,7 @@ analysis: [`IDEAS.md`](IDEAS.md).
 | 3 | $(6, 29/16)$ | 0.849386526 | every even $L \ge 4$ rungs |
 | 4 | $(6, 11/8)$ | 2.546626505 | every even $L \ge 4$ rungs |
 
-The $g = 3$ certificate with seed $(4, 3/2)$, $\Delta_L \ge 0.636870853$, is kept: it carries
+The $g = 3$ certificate with seed $(4, 3/2)$, $\Delta_L \ge 0.636870849$, is kept: it carries
 the seeds of the Lean 4 theorem `CertifiedGaps.TwoLegIsing` (seed length 4).
 
 ## Model
@@ -93,7 +93,7 @@ The complete-spectrum seed (`Ladder.POINTS`, `results/certificate_g3_1.json`):
 
 | $g$ | seed $(n_0, \beta_0)$ | $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(4, 3/2)$ | $\varepsilon_\tau \ge 1 - P_\tau(8, 3/2)$ | certified gap $\ge$ (interval) | exact chain bound |
 |---|---|---:|---:|---:|---:|
-| 3 | $(4, 3/2)$ | $0.112389665753866$ | $0.051536217029413$ | 0.636870853 | $> 0.636342903$ |
+| 3 | $(4, 3/2)$ | $0.112389665926876$ | $0.051536217782645$ | 0.636870849 | $> 0.636342898$ |
 
 Its defects satisfy the seed hypotheses of the Lean theorem ($\varepsilon_{\mathrm{s}} \le 0.1125$,
 $\varepsilon_\tau \le 0.05162$, read from `code/lean/CertifiedGaps/Models/TwoLegIsing.lean` by
@@ -123,9 +123,23 @@ julia --project=code/julia code/models/two_leg_tfim/scripts/summarize.jl
 `certify.jl [g] [--ritz | --complete] [--reuse-partial]` certifies the points of
 `Ladder.POINTS` (complete spectra, $n_0 = 4$) and `RitzSeeds.RITZ_POINTS` (coupled, $n_0 = 6$),
 or those at field `g`; `--reuse-partial` reads the stored 12-rung Ritz bounds instead of
-recomputing them. The stored certificates were last regenerated that way (all four in 110 s,
-after the defect padding was added), from Ritz bounds computed by full runs. Measured run
-times on a shared 8-core Linux machine (Julia 1.12.7, one BLAS thread, load average 8–12):
+recomputing them. The stored coupled certificates were last regenerated that way (after the
+defect padding was added), from Ritz bounds computed by full runs. The stored $n_0 = 4$
+certificate keeps the numbers of its original run: a fresh `certify.jl 3//1 --complete`
+reproduces them only up to the last digits (the verified radii of LAPACK eigenpairs vary from
+run to run), so after the pinned sources changed only its provenance was refreshed, by
+
+```sh
+julia --project=code/julia code/models/two_leg_tfim/scripts/refresh_metadata.jl   # 19 s
+```
+
+which reuses the stored seed (defects, log Z enclosures, spectrum summaries), re-derives the
+RP identity, model record, exact chain and interval bound through the core `certify_gap`,
+requires every value outside `metadata` to equal the stored one exactly, and then rewrites only
+`metadata` (`model_metadata` with `RitzSeeds.SOURCES`; the original run's time, Julia version
+and `config` are kept under `metadata_refresh` and `config`). `check.jl --full` still
+recomputes that seed from fresh spectra. Measured run times on a shared 8-core Linux machine
+(Julia 1.12.7, one BLAS thread, load average 8–12):
 - `certify.jl g --ritz`: 35–41 min wall per point, peak memory 4.2 GB (Julia started with
   `--heap-size-hint=3G` or `2500M`); about 25 min build the 28 interval-enclosed sparse
   blocks of the 12-rung ring (dimension about $3.5 \times 10^5$ each), 12–13 min run Lanczos and
@@ -135,11 +149,13 @@ times on a shared 8-core Linux machine (Julia 1.12.7, one BLAS thread, load aver
 - `check.jl`: 33 s including compilation, peak memory 1.2 GB (recomputes the 6- and 4-rung
   spectra and reads the stored 12-rung bounds);
 - `check.jl --full`: not run as one command in this session (about 2 h: the fresh 12-rung
-Ritz bounds take 37–40 min per coupled point, plus about 4 min for the $n_0 = 4$ spectra).
-Its steps for each coupled point (fresh Ritz bounds and 6-rung spectrum, then `check_point`
-with these spectra and the bridge) passed for all three points: $g = 4$ in 39 min,
-$g = 3$ in 37 min, $g = 11/4$ in 37 min, peak memory 4.2 GB each; the fresh defects equal
-the unpadded certified ones to all printed digits;
+Ritz bounds take 37–40 min per coupled point, plus about 2 min for the $n_0 = 4$ spectra).
+Its step for the $n_0 = 4$ certificate (`check_point` with `spectra = true`) passed on the
+refreshed certificate in 129 s wall, with fresh defects $0.112389665753866$ and
+$0.051536217029413$ below the stored ones. Its steps for each coupled point (fresh Ritz bounds
+and 6-rung spectrum, then `check_point` with these spectra and the bridge) passed for all
+three points: $g = 4$ in 39 min, $g = 3$ in 37 min, $g = 11/4$ in 37 min, peak memory 4.2 GB
+each; the fresh defects equal the unpadded certified ones to all printed digits;
 - `test/runtests.jl`: 34 tests, 47 s including compilation;
 - `scripts/ritz_scan.jl`: 15–60 min per field (Lanczos on 28 complex sectors of the
   physical-frame ring), `scripts/scan.jl`: 2–4 min per field.
@@ -202,7 +218,8 @@ this directory's `results/` is a relative symlink to that canonical location.
 - `scripts/`: `scan.jl` (numerical seed scan, $n_0 \le 4$), `ritz_scan.jl` and `sectors.jl`
   (floating-point screening of the coupled $n_0 = 6$ seeds with a sparse sector builder of the
   physical-frame ring), `extrapolate.jl`, `summarize.jl` (rewrites the `## Results` section of
-  `METHOD.md`).
+  `METHOD.md`), `refresh_metadata.jl` (refreshes the provenance of the $n_0 = 4$ certificate
+  without changing its numbers; see "Reproduce").
 - `test/runtests.jl`: exact frame and RP tests, core blocks against an independent full
   Hamiltonian, Ritz bounds and coupled defects on small rings against complete spectra, and
   the 4-rung bridge (the stored certificates are checked by `check.jl`).
@@ -233,13 +250,11 @@ $1.5 \times 10^{-7} \to 5.7 \times 10^{-8}$.
 Coupled half-length seeds at $n_0 = 6$ (core `RitzBounds`) then raised the $g = 3$ bound from
 $0.636870849$ to $0.849386526$ and added the points $g = 11/4$ and $g = 4$. `check.jl` and
 `certify.jl` were extended for them, and every certificate now pins `RitzSeeds.SOURCES`
-instead of the whole `src/`, so the $n_0 = 4$ certificate was regenerated with the new
-Coupled half-length seeds at $n_0 = 6$ (core `RitzBounds`) then raised the $g = 3$ bound from
-$0.636870849$ to $0.849386526$ and added the points $g = 11/4$ and $g = 4$. `check.jl` and
-`certify.jl` were extended for them, and every certificate now pins `RitzSeeds.SOURCES`
-instead of the whole `src/`, so the $n_0 = 4$ certificate was regenerated with the new drivers
-(same seed). The enclosures differ between platforms in the last digits, and on the Linux
-machine of the coupled runs they came out slightly tighter: $\varepsilon_{\mathrm{s}}$
-$0.112389665926876 \to 0.112389665753866$, $\varepsilon_\tau$
-$0.051536217782645 \to 0.051536217029413$, interval bound $0.6368708493 \to 0.6368708539$,
-exact chain bound $0.636342898 \to 0.636342903$; the Lean seed hypotheses still hold.
+instead of the whole `src/`. The certified numbers of the $n_0 = 4$ certificate are unchanged
+($\varepsilon_{\mathrm{s}} = 0.112389665926876$, $\varepsilon_\tau = 0.051536217782645$,
+interval bound $0.6368708493$, exact chain bound $0.636342898$): only its provenance metadata
+(model-local and core source hashes, versions and creation time) was refreshed by
+`scripts/refresh_metadata.jl`, and every other JSON value is identical to the previous
+version. A fresh `certify.jl` run on this machine gave slightly tighter enclosures
+($\varepsilon_{\mathrm{s}} \le 0.112389665753866$), which `check.jl --full` reproduces as fresh
+defects below the stored ones; they were not stored.
