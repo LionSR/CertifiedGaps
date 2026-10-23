@@ -39,7 +39,7 @@ and each model's `README.md` list every parameter point, seed, and Lean 4 theore
 | Spin-1 dimerized Heisenberg chain | 2 | $0.5288$, at $\delta = 9/10$ | even $L \ge 2$ | [`code/models/spin1_dimerized`](code/models/spin1_dimerized/) |
 | Spin-1 Heisenberg chain with single-ion anisotropy | 4 | $0.8994$, at $D = 4$ | even $L \ge 6$ | [`code/models/spin1_largeD`](code/models/spin1_largeD/) |
 | Two-leg spin-½ Heisenberg ladder | 5 | $1.1024$, at $J_\perp = 4$ | even $L \ge 4$ | [`code/models/heisenberg_ladder`](code/models/heisenberg_ladder/) |
-| Two-leg transverse-field Ising ladder | 1 | $0.6368$, at $g = 3$ | even $L \ge 4$ | [`code/models/two_leg_tfim`](code/models/two_leg_tfim/) |
+| Two-leg transverse-field Ising ladder | 3 | $2.5466$, at $g = 4$ | even $L \ge 4$ | [`code/models/two_leg_tfim`](code/models/two_leg_tfim/) |
 
 Pilot studies without a gap certificate: [`code/models/blbq_haldane`](code/models/blbq_haldane/)
 (bilinear–biquadratic chain), [`code/models/spin2`](code/models/spin2/) (spin-2 chain), and
