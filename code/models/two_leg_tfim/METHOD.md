@@ -1,6 +1,6 @@
 # Two-leg transverse-field Ising ladder: verification method and results
 
-**Headline result:** $g = 3$ is the smallest certified transverse field on the tested grid $`g \in \{2, 5/2, 3, 4\}`$. The seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636870849$ (interval bound; exact chain bound $\Delta_L > 0.636342898$) and a unique ground state for every even $L \ge 4$ rungs ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ passes the numerical scan but was not run through full verification since $g = 3$ already succeeds.
+**Headline result:** coupled half-length seeds at $n_0 = 6$ rungs (complete verified 6-rung spectrum, Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring) certify, for every even $L \ge 4$ rungs and with a unique ground state, $\Delta_L \ge 0.371180737$ at $g = 11/4$ (seed $(6, 69/32)$), $\Delta_L \ge 0.849386526$ at $g = 3$ (seed $(6, 29/16)$) and $\Delta_L \ge 2.546626505$ at $g = 4$ (seed $(6, 11/8)$) (section "Coupled half-length seeds" below). The earlier complete-spectrum seed $(n_0, \beta_0) = (4\text{ rungs}, 3/2)$ certifies $\Delta_L \ge 0.636870853$ at $g = 3$ (interval bound; exact chain bound $\Delta_L > 0.636342903$) and carries the seeds of the Lean theorem. Fields $g = 2$ and $5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 5/2$ none at $n_0 = 6$ with coupled defects.
 
 ## Model and scope
 
@@ -35,7 +35,79 @@ Every block goes through `CertifiedGaps.VerifiedSpectra.verified_eigen`: with LA
 - **Unit tests (`test/runtests.jl`):** exact frame and RP identities at $`g \in \{2, 5/2, 3, 4\}`$; core blocks (`float_ring_spectrum`, `verified_ring_spectrum`) against independent dense ED for $L = 2, 3, 4$ (verified radii $< 10^{-9}$).
 - **Fast checker (`check.jl`):** for each point of `Ladder.POINTS`, the exact Hadamard frame change and the core `check_point`: the model-local source hashes; the stored model, RP factors, seed and `params` exactly those of the point; the seed defects at most the Lean seed hypotheses (`lean_points` of `TwoLegIsing.lean`); then `check_certificate(cert; spectra = false)`, which re-verifies the RP identity and reproduces the exact chain bound and `interval_bound_decimal`.
 - **Full check (`check.jl --full`):** `check_point(...; spectra = true)` recomputes every block spectrum of the 4- and 8-rung rings from the stored model and requires the fresh defect upper ends to be at most the stored seeds.
+- **Coupled seeds (`check.jl`, `RitzSeeds.RITZ_POINTS`):** the same `check_point` pins, with the seed defects recomputed by `coupled_seed_bounds` from a freshly verified 6-rung spectrum and the stored 12-rung Ritz bounds (`results/partial_g*_L12.json`, SHA-256 pinned by the certificate), and the 4-rung bridge recomputed and compared with the bound; `--full` recomputes the Ritz bounds from scratch (fresh Lanczos vectors, same deterministic start). A replay of the `--full` steps for g = 4 is reported in the README.
+- **Unit tests for the coupled route:** Ritz bounds of the 4-rung ring with forced Lanczos against its complete verified spectrum (lower bounds on log Z), coupled against complete-spectrum defects at the seed (2, β), and the 4-rung bridge.
 - **Cross-check without the leg-exchange symmetry:** a run of `certify_gap` with charge and momentum blocks only (10 blocks of dimension about 4100 at 8 rungs, 971 s) gave $\varepsilon_{\mathrm{s}} \le 0.112389884123893$, $\varepsilon_\tau \le 0.051537141979371$ and interval bound $0.6368651924843131$, consistent with the certified values.
+
+## Coupled half-length seeds at $n_0 = 6$
+
+**Identity.** For the ring of rungs with self-adjoint transfer operator (reflection positivity)
+and even $n_0$, $P_{\mathrm{s}}(n_0, \beta) \le 1$, and
+
+```math
+P_\tau(2n_0, \beta) = \frac{Z_{2n_0}(2\beta)}{Z_{2n_0}(\beta)^2}
+  = \frac{Z_{2n_0}(2\beta)/Z_{n_0}(\beta)^4}{P_{\mathrm{s}}(n_0, \beta)^2}
+  \ge \frac{Z_{2n_0}(2\beta)}{Z_{n_0}(\beta)^4},
+```
+
+so the seed defects need an enclosure of $Z_6$ and only lower bounds on $Z_{12}(\beta_0)$ and
+$Z_{12}(2\beta_0)$ (core `Seeds.coupled_seed_defects`, `GapCertificates.coupled_seed_bounds`).
+
+**Lower bounds on $Z_{12}$.** The 12-rung ring ($4^{12} = 16{,}777{,}216$ states) is split by
+the core `ring_blocks(...; sparse = true)` into 28 real symmetric blocks (charge $q \in \{0, 1\}$,
+momentum $0 \le m \le 6$, leg-exchange parity) of dimension $349{,}350$–$350{,}064$, with
+interval-enclosed entries and an exact bound on the distance of the `Float64` center to the
+true block (of order $10^{-11}$ in Frobenius norm). For each block, KrylovKit Lanczos
+(deterministic start vector, `tol = 1e-8`, Krylov dimension 32) gives approximate eigenvectors
+$V$, and `RitzBounds.ritz_upper_bounds` turns them into rigorous upper bounds
+$u_i \ge \lambda_i$ on the lowest levels: a priori $\gamma_n$ bounds on the products
+$\mathrm{fl}(MV)$, $V^{\mathsf T} W$ and $V^{\mathsf T} V$, a Gershgorin shift
+$c \le \lambda_{\min}$, Ostrowski's theorem for the pencil $(V^{\mathsf T} M V, V^{\mathsf T} V)$,
+`verified_eigen` on the small Rayleigh-quotient matrix, and the exact matrix error. By
+Courant–Fischer,
+$Z_{12}(\beta) \ge \sum_B m_B \sum_i e^{-\beta u_i(B)}$; omitting levels only loses weight. The
+certificates bound 6 levels per charge-0 block and 3 per charge-1 block (216 levels with
+multiplicity); the Ritz upper bounds exceed the Lanczos values by about $5 \times 10^{-8}$.
+The stored defects are raised by $10^{-8}$ (`defect_padding`, recorded in the certificate):
+the verified radii of LAPACK eigenpairs vary from run to run (presumably alignment-dependent
+OpenBLAS kernels), which moved a fresh 6-rung enclosure of $g = 11/4$ by
+$3 \times 10^{-11}$ above the first stored defects; with the padding, `check.jl` recomputes the
+defects from fresh spectra.
+
+**How many levels.** In the rotated frame the charge is the spin-flip parity of the physical
+ladder. Charge 0 holds the ground state and the two-quasiparticle continuum, charge 1 the
+one-quasiparticle band (one level per momentum and leg parity) and the three-particle states.
+At the seed temperatures ($\beta_0 \Delta \approx 4.5$–$6.5$) the weight of $Z_{12}$ beyond the
+ground state is essentially the bottom of the one-particle band, so a single level per sector
+already gives the bound to $10^{-4}$, and 4 (charge 0) and 2 (charge 1) levels give it to
+$10^{-8}$ (`results/ritz_scan_g*.json`, truncation $k = 1, \dots, K$).
+
+**Finite bridge.** The criterion covers even $L \ge n_0 = 6$. Each coupled certificate also
+stores `finite_bridge`: outward bounds (to $10^{-15}$) on the gap of the 4-rung ring from its
+complete verified spectrum (`spectral_gap_enclosure`), $\Delta_4 \ge 2.12$, $2.72$, $4.78$ at
+$g = 11/4, 3, 4$; since they exceed the certified bounds, every even $L \ge 4$ is covered.
+
+**Floating-point screening** (`scripts/ritz_scan.jl`, `scripts/sectors.jl`; not certified).
+An independent sparse builder in the physical frame (group of rung translations, leg exchange
+and global spin flip, $4L$ elements, complex blocks at $0 < m < 6$; checked against the core's
+dense spectra at $L = 4, 6$) with KrylovKit Lanczos gives the coupled defects on a $\beta$ grid
+of $1/8$, refined to $1/32$ near the optimum:
+
+| $g$ | best $\beta_0$ | $\varepsilon_{\mathrm{s}}$ | $\varepsilon_\tau$ | float bound | certified bound |
+|---|---:|---:|---:|---:|---:|
+| 5/2 | — | 0.1062 at $\beta = 5/2$ | $\ge 0.24$ on the grid | no seed | — |
+| 11/4 | 69/32 | 0.049857 | 0.126479 | 0.371182 | 0.371180737 |
+| 3 | 29/16 | 0.024179 | 0.075932 | 0.849388 | 0.849386526 |
+| 4 | 11/8 | 0.002829 | 0.012860 | 2.546638 | 2.546626505 |
+
+The certified defects exceed the float ones by about $10^{-7}$ (Ritz and enclosure radii), and
+the bounds agree to $10^{-5}$. At $g = 5/2$ the obstacle is the coupling: at $\beta = 5/2$ the
+direct thermal defect $1 - P_\tau(12, 5/2) \approx 0.054$ would be admissible together with
+$\varepsilon_{\mathrm{s}} = 0.106$, but its evaluation needs an upper bound on $Z_{12}(\beta)$
+(the complete 24-spin spectrum), and the coupled form pays the factor
+$`P_{\mathrm{s}}(6, \beta)^2 \approx 0.80`$. The 16-rung doubled ring ($n_0 = 8$, 32 spins,
+blocks of $\approx 6.7 \times 10^7$ states) is beyond the memory of the core's block
+construction (about 4 GB already at 12 rungs).
 
 ## Results
 
@@ -74,6 +146,6 @@ For the fields without an $n_0 \le 4$ seed, a two-point fit $\delta(n) = \delta(
 
 ### Certified results
 
-- **g = 3: Δ_L ≥ 0.636870849** (interval bound `0.6368708493341569`; exact chain bound `318171449//500000000`) for every even L ≥ 4 rungs. Seed (n0, β0) = (4, 3//2), εₛ ≤ 0.112389665926876, εₜ ≤ 0.051536217782645; bound / 8-rung ED gap = 0.239265. Certificate: `results/certificate_g3_1.json`.
+- **g = 3: Δ_L ≥ 0.636870853** (interval bound `0.6368708539132061`; exact chain bound `636342903//1000000000`) for every even L ≥ 4 rungs. Seed (n0, β0) = (4, 3//2), εₛ ≤ 0.112389665753866, εₜ ≤ 0.051536217029413; bound / 8-rung ED gap = 0.239264. Certificate: `results/certificate_g3_1.json`.
 
 Certified: the exact RP identity, whole-spectrum eigenvalue enclosures for the selected parameter/seed, outward log-partition and rational defect bounds, and the resulting uniform gap under the repository's two-purity theorem. Numerical: seed optimization, all nonverified scan spectra and finite-size gaps, the literature critical point, and comparisons to finite-ring reference gaps. The ED reference gap is not claimed to be an infinite-volume limit.

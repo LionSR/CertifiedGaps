@@ -84,3 +84,10 @@ $\beta$ grid of $1/8$ (refined to $1/32$ near the optimum):
   available budget: sectors of $\approx 6.7 \times 10^7$ states, so each Lanczos vector takes
   0.5 GB (real) and the core's dictionary-based block construction, which already peaks near
   3.7 GB for the 12-rung ring, would need about 200 times more.
+
+**Certified (route 4).** With the core `RitzBounds` (rigorous Rayleigh–Ritz upper bounds on
+6 levels per charge-0 block and 3 per charge-1 block of the 12-rung ring, from the sparse
+interval-enclosed core blocks) and `coupled_seed_bounds`, plus the verified gap of the 4-rung
+ring for $L = 4$: $\Delta_L \ge 0.371180737$ at $g = 11/4$, $0.849386526$ at $g = 3$ (was
+$0.636870849$) and $2.546626505$ at $g = 4$, every even $L \ge 4$. Each point takes about
+35–38 min and 4.2 GB, dominated by building the 28 sparse blocks of $3.5 \times 10^5$ states.

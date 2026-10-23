@@ -596,23 +596,65 @@ records:
       - {date: "2026-10-15", decimal: "0.001531165", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 13,
          method: 'an earlier computation from the same seed'}
   # ---------------------------------------------------------------- two-leg-tfim
+  - id: two-leg-tfim-g-11-4
+    family: two-leg-tfim
+    parameter: '$g = 11/4$'
+    params: {g: "11/4"}
+    lengths: {L0: 4}
+    bound: {value: "3343298857914117/9007199254740992", decimal: "0.371180737"}
+    seed: {n0: 6, beta0: "69/32"}
+    numerical_gap: "2.1190"
+    gap_source: '12-rung ring, Lanczos'
+    tier: certified
+    certificate: data/models/two_leg_tfim/certificate_g11_4_n6.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    notes: >-
+      Coupled half-length seed: the complete verified spectrum of the 6-rung ring and rigorous
+      Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring (24 spins); the
+      verified gap of the 4-rung ring covers L = 4.
   - id: two-leg-tfim-g-3
     family: two-leg-tfim
     parameter: '$g = 3$'
     params: {g: "3"}
     lengths: {L0: 4}
-    bound: {value: "5736422639488881/9007199254740992", decimal: "0.636870849"}
-    seed: {n0: 4, beta0: "3/2"}
+    bound: {value: "7650593684895759/9007199254740992", decimal: "0.849386526"}
+    seed: {n0: 6, beta0: "29/16"}
     numerical_gap: "2.6618"
     tier: certified
-    lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "25974347/10000000", beta: "3/2", decimal: "0.636349536"}
-    certificate: data/models/two_leg_tfim/certificate_g3_1.json
-    date: "2026-10-18"
-    pr: 81
-    contributors: ['LionSR']
+    lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "25974347/10000000", beta: "3/2", decimal: "0.636349536", certificate: data/models/two_leg_tfim/certificate_g3_1.json}
+    certificate: data/models/two_leg_tfim/certificate_g3_1_n6.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    notes: >-
+      Coupled half-length seed: the complete verified spectrum of the 6-rung ring and rigorous
+      Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring (24 spins); the
+      verified gap of the 4-rung ring covers L = 4. The Lean 4 theorem starts from the seed
+      $(4, 3/2)$ of the earlier certificate.
     history:
+      - {date: "2026-10-18", decimal: "0.636870849", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 81,
+         method: 'seed (4, 3/2) from verified spectra of the 4- and 8-rung rings'}
       - {date: "2026-10-12", decimal: "0.636386863", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 1,
          method: 'an earlier computation from the same seed'}
+  - id: two-leg-tfim-g-4
+    family: two-leg-tfim
+    parameter: '$g = 4$'
+    params: {g: "4"}
+    lengths: {L0: 4}
+    bound: {value: "2867246545090321/1125899906842624", decimal: "2.546626505"}
+    seed: {n0: 6, beta0: "11/8"}
+    numerical_gap: "4.7633"
+    tier: certified
+    certificate: data/models/two_leg_tfim/certificate_g4_1_n6.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    notes: >-
+      Coupled half-length seed: the complete verified spectrum of the 6-rung ring and rigorous
+      Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring (24 spins); the
+      verified gap of the 4-rung ring covers L = 4.
   # ---------------------------------------------------------------- ising-longitudinal
   - id: ising-g-1-4-h-1-20
     family: ising-longitudinal
