@@ -9,6 +9,10 @@
 #      identity, the exact rational chain and the interval bound); checks every all-β exclusion
 #      with the core `check_exclusion` (tiling of [0, B], the tail, every window rejected), the
 #      dimer perturbation bound and the bound-to-gap ratio.
+#   3. for every coupled seed at n₀ = 6 cells of results/ritz_summary.json (`check_ritz`): the
+#      certificate and Ritz-bound file hashes, the core `check_point` with the seed defects
+#      re-derived from a fresh verified 12-spin spectrum and the stored 24-spin Ritz bounds
+#      (`--full`: Ritz bounds recomputed from the model, about an hour per δ), and the 4-cell gap.
 # `check.jl --full` recomputes the verified spectra of the rings of 2, 4 and 8 cells from the
 # model and repeats everything from them alone: the seed defects, every exclusion bound, and the
 # 16-spin gap interval, which must contain the fresh enclosure.
@@ -20,7 +24,9 @@ using CertifiedGaps.ExactArithmetic: parse_rational
 isdefined(@__MODULE__, :DimerizedHeisenberg) ||
     include(joinpath(@__DIR__, "src", "DimerizedHeisenberg.jl"))
 isdefined(@__MODULE__, :DimerizedRP) || include(joinpath(@__DIR__, "src", "rp.jl"))
-using .DimerizedHeisenberg, .DimerizedRP
+isdefined(@__MODULE__, :RitzSeeds) || include(joinpath(@__DIR__, "src", "RitzSeeds.jl"))
+using .DimerizedHeisenberg, .DimerizedRP, .RitzSeeds
+using CertifiedGaps.RitzBounds: read_partial_spectrum
 BLAS.set_num_threads(1)
 
 const RESULTS_DIR = joinpath(@__DIR__, "results")
@@ -136,10 +142,69 @@ function check_summary(; full = false,
     return true
 end
 
+const RITZ_SUMMARY = joinpath(RESULTS_DIR, "ritz_summary.json")
+
+"""
+    check_ritz_row(row; full = false) -> true
+
+One coupled seed at n₀ = 6 cells (results/ritz_summary.json): the certificate's hash and row,
+the seed (6, `RITZ_SEEDS[δ]`) and route, the hash of its stored Rayleigh–Ritz bounds of the ring
+of 12 cells, and the core `check_point` (exactly the point's model, RP data, seed and params;
+the exact RP identity, rational chain and interval bound) with the seed defects re-derived by
+`coupled_seed_bounds` from a freshly verified spectrum of the ring of 6 cells and the stored
+Ritz bounds, or (`full = true`, about an hour per δ) Ritz bounds recomputed from the model;
+and the enclosed gap of the ring of 4 cells, which covers L = 4.
+"""
+function check_ritz_row(row; full = false)
+    δ = parse_rational(row["delta"])
+    model, rp = rotated_model(δ), rotated_rp(δ)
+    β0 = parse_rational(row["beta0"])
+    require(get(RITZ_SEEDS, δ, nothing) == β0 && asint(row["n0"]) == RITZ_N0, "coupled seed")
+    path = joinpath(@__DIR__, row["file"])
+    require(sha256_file(path) == row["sha256"], "certificate hash")
+    cert = read_result(path)
+    require(all(string(row[k]) == string(v) for (k, v) in certificate_row(cert)), "summary row")
+    require(cert["seed"]["route"] == "coupled", "seed route")
+    ppath = joinpath(@__DIR__, row["partial_spectrum_file"])
+    require(cert["coupled_seed"]["partial_spectrum_file"] == row["partial_spectrum_file"] &&
+            cert["coupled_seed"]["partial_spectrum_sha256"] == row["partial_spectrum_sha256"] ==
+            sha256_file(ppath), "Ritz bounds file hash")
+    small = verified_ring_spectrum(model, RITZ_N0)
+    large = full ? doubled_ring_bounds(δ) : read_partial_spectrum(ppath)
+    check_point(path, model; n0 = RITZ_N0, β0, params = point_params(δ), model_dir = MODEL_DIR,
+        rp, spectra = Dict(RITZ_N0 => small, 2RITZ_N0 => large))
+    lo, hi = spectral_gap_enclosure(verified_ring_spectrum(model, 4))
+    gl, gh = parse_rational.(row["gap_4_cells_interval"])
+    require(gl <= lo <= hi <= gh &&
+            gl > Rational{BigInt}(cert["interval_bound_decimal"]), "4-cell gap")
+    return true
+end
+
+"""
+    check_ritz(; full = false, summary = stored) -> true
+
+Check results/ritz_summary.json and every coupled-seed certificate it indexes.
+"""
+function check_ritz(; full = false, summary = read_result(RITZ_SUMMARY))
+    verify_model_metadata(summary["metadata"], MODEL_DIR)
+    require(summary["format"] == "dimerized-heisenberg-ritz-summary-v1", "ritz summary format")
+    require(Set(parse_rational(r["delta"]) for r in summary["rows"]) == Set(keys(RITZ_SEEDS)),
+        "ritz rows")
+    for row in summary["rows"]
+        seconds = @elapsed check_ritz_row(row; full)
+        println("checked coupled seed delta=$(row["delta"]) n0=$(row["n0"]) ",
+            "beta0=$(row["beta0"]) full=$full bound=$(row["interval_bound_decimal"]) ",
+            "seconds=$(round(seconds; digits=1))")
+    end
+    return true
+end
+
 if abspath(PROGRAM_FILE) == @__FILE__
     @testset "Dimerized Heisenberg certificates" begin
         @test check_audit()
         @test check_summary()
+        @test check_ritz()
         "--full" in ARGS && @test check_summary(; full = true)
+        "--full" in ARGS && @test check_ritz(; full = true)
     end
 end

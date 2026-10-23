@@ -695,8 +695,9 @@
             "models/dimerized_heisenberg/src/reflection_conventions.jl": "582f215f4005462d4c4215fec1decae5fde9e0b09e921915a319d6b09ac38121",
             "models/dimerized_heisenberg/src/rp.jl": "8f08c7db77f0b2fcb073073537c48f691a9d6464b7947176ec539c7543828481",
             "models/dimerized_heisenberg/src/DimerizedHeisenberg.jl": "aa96a322112bad4802be3959fe65f68e5c8ab6c19192940e55b17f8d9c0e200a",
-            "models/dimerized_heisenberg/check.jl": "177ab664a3c97e0145002ce77195d13d08dacd562a184fe2584df1f8855c474c",
-            "models/dimerized_heisenberg/certify.jl": "01a40a482015e912435933ac67672698f3d7a60d07091f7ded18378eded5f2b1",
+            "models/dimerized_heisenberg/check.jl": "5ef50ba4e96f6bcfb7bf5fe24394de317b908b7ee045f8b00f43c876711daddf",
+            "models/dimerized_heisenberg/certify.jl": "af41f6646296f877536e682234be399319ad12bf0f20e57aea9077c3ecbbe12b",
+            "models/dimerized_heisenberg/src/RitzSeeds.jl": "fb46f7d9581962c914ba22e4b947601ed7a75488a1fd6005ebe7632540877221",
             "models/dimerized_heisenberg/src/Diagnostics.jl": "6373bbebda6fc552d70fbf2aa923b1a06adf462413f8f658f8824c5ec19d7c34"
         },
         "core_sha256": {
@@ -704,9 +705,9 @@
             "julia/src/ReflectionPositivity.jl": "e8d5d3446f680f377bed27d0d9ba44dda8182b7c3055165b9b61701fe736040c",
             "julia/src/Recurrence.jl": "2dc12e517f9739e2064f5de119510c52caa0a2cfba53d0eb8b5d6c85e02f9729",
             "julia/src/RingModels.jl": "40bc01631c1f32b56436f13b4edc3b6572198724e8b4ca09939741003cd2bacd",
-            "julia/src/Seeds.jl": "3e2d5041103c7e6629f7a31a76ef381f9fcd40566b7872460793edfe433387d4",
+            "julia/src/Seeds.jl": "b3d279b067886bec760fb4c5710d7cb8f0bd2dfe15d3d32f67029850b4984c37",
             "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
-            "julia/src/VerifiedSpectra.jl": "d2d939818290005048fa18accb1d4688d36e73f5ae54c2d4e97e55706384802d",
+            "julia/src/VerifiedSpectra.jl": "34a496d08c5980c0692a460dfbe7344cfac0e128168207a03d1cc28d02a6c21b",
             "julia/src/CertifiedMPO/GaugeSearch.jl": "96d9fcdcf031b5b84c502a7582ae5715022752276d3385db724143477b2eb4f5",
             "julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
             "julia/src/CertifiedMPO/SchattenBridge.jl": "2300c4f86790906274adf9d50ac8bd43a7ef1ccbfc49e4a9aaafbbe2addc290f",
@@ -717,13 +718,14 @@
             "julia/src/Models.jl": "299d8bc7b0e377361276b26a99023e5a6130e73058639b0bdb13783b51855b2e",
             "julia/src/Purification.jl": "ea8a4b1a03a8a38b01d0289b06da72a8ea255e79287008ccf58456cfda9fadf3",
             "julia/src/ExactArithmetic.jl": "77feece9b1e56011667bd8241ff159864943433d2121f01f351dccefae769882",
-            "julia/src/GapCertificates.jl": "607be6eafe8ac46312e35c1adaebb63e0e98d3022f8cc678f7e59384949ac23e",
+            "julia/src/GapCertificates.jl": "107b72ed1e4870e26413911aefd842a7529fd9762b7aefcfb93f479d35f02746",
             "julia/src/Results.jl": "fbe920dfa26574a36bb8eb6ea277126a82a36f92d33925bdb474b0f1a2468dcf",
             "julia/src/CertifiedMPO/Products.jl": "5207b7d80375c538d531c67c699d048a0014409cf410425ffc633299959a9230",
             "julia/src/CertifiedMPO/Squaring.jl": "9e454f12d3149482d734f33d3a1f47b6c4dab21144329753cdd2826d05c5b03c",
             "julia/src/Exclusions.jl": "e04adc2f798497a47e087912dd21df57be73c5b6b6d5dec1069e1926092a7358",
             "julia/src/Spins.jl": "0474b313ac520bebeff4f986dc7bab369af04f8094640c2f68dd3832f2a962c9",
-            "julia/src/CertifiedGaps.jl": "c20ea38e4d4c87d2cdb4ccca7fc8e5e82bd1a8bc4fde3bb08bfa3014c3d08810",
+            "julia/src/CertifiedGaps.jl": "a1cfdc03eb960cf46738b6f3049d4dd2a05dc563b1322da7e8c3e7bbc3c47114",
+            "julia/src/RitzBounds.jl": "2f5292f8b0d7dc7bc8f27f96310b50cfdd3eee04f9995bf4a1041471ad704995",
             "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
             "julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
             "julia/Manifest.toml": "422dd9dcc0c0257c0ccd5852c56a5bb43b214080ece90651b2ddd9209eff9b7f",
@@ -745,6 +747,12 @@
         "julia_threads": 1,
         "julia": "1.12.4",
         "IntervalArithmetic": "1.0.12",
-        "CertifiedGaps": "0.2.0"
+        "CertifiedGaps": "0.2.0",
+        "provenance_refresh": {
+            "utc": "2026-10-23T07:56:23.053",
+            "scope": "only source_sha256, core_sha256 (and in summary.json the certificate sha256) were rewritten; every other value, including this run record, is that of the original run at from_revision",
+            "script": "models/dimerized_heisenberg/scripts/refresh_provenance.jl",
+            "from_revision": "682105277771b13301554925e7d3bc314da5dd31"
+        }
     }
 }

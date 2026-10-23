@@ -1,7 +1,8 @@
 # Fast tests: the fast checker (check.jl), the exact frame and RP identities, the lattice
 # reflection, the verified spectra of small rings against the closed-form 4-spin spectrum and the
 # physical-frame Float64 spectrum, the sparse 20-spin diagnostic blocks, the Lean points, the
-# dimer perturbation bound and the checker's rejection of corrupted certificates.
+# dimer perturbation bound, the coupled seeds at n₀ = 6 cells, and the checker's rejection of
+# corrupted certificates.
 include(joinpath(@__DIR__, "..", "check.jl"))
 include(joinpath(@__DIR__, "..", "src", "reflection_conventions.jl"))
 include(joinpath(@__DIR__, "..", "src", "Diagnostics.jl"))
@@ -141,4 +142,29 @@ end
     bad = deepcopy(summary)
     empty!(bad["metadata"]["source_sha256"])
     @test_throws ErrorException check_summary(; summary = bad)
+end
+
+@testset "Coupled seeds at n0 = 6 cells" begin
+    @test check_ritz()
+    summary = read_result(RITZ_SUMMARY)
+    row = summary["rows"][end]
+    corrupt(f) = (bad = deepcopy(row); f(bad); bad)
+    for f in (r -> r["eps_t"] = "0//1", r -> r["beta0"] = "1",
+        r -> r["sha256"] = "0"^64, r -> r["partial_spectrum_sha256"] = "0"^64,
+        r -> r["gap_4_cells_interval"][1] = "0//1")
+        @test_throws ErrorException check_ritz_row(corrupt(f))
+    end
+    # The coupled defects need the Ritz bounds: dropping blocks of the stored spectrum makes
+    # them exceed the stored εₛ, εₜ.
+    δ = parse_rational(row["delta"])
+    model = rotated_model(δ)
+    large = read_partial_spectrum(joinpath(@__DIR__, "..", row["partial_spectrum_file"]))
+    small = verified_ring_spectrum(model, RITZ_N0)
+    cert = read_result(joinpath(@__DIR__, "..", row["file"]))
+    @test check_certificate(cert; spectra = Dict(6 => small, 12 => large)) isa Dict
+    @test_throws ErrorException check_certificate(cert;
+        spectra = Dict(6 => small, 12 => large[2:end]))
+    @test_throws ErrorException check_certificate(cert)       # no spectra: refused
+    # The 4-cell gap covers L = 4 and the seed theorem L ≥ 6.
+    @test RITZ_N0 == 6 && iseven(RITZ_N0)
 end

@@ -97,6 +97,59 @@ and $2n_0$ cells once with `VerifiedSpectra.verified_ring_spectrum` and passes t
 seed (and, with `spectra = true`, the defects from fresh spectra). The 16-spin gap interval is
 `spectral_gap_enclosure` of the 8-cell spectrum, rounded outward to $10^{-6}$.
 
+## Coupled seeds at $n_0 = 6$ cells (core `RitzBounds`)
+
+The doubled ring of $2n_0 = 12$ cells has $2^{24} \approx 1.7 \cdot 10^7$ states, too many for a
+complete verified spectrum. The criterion needs
+$\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(6, \beta_0)$
+and $\varepsilon_\tau \ge 1 - P_\tau(12, \beta_0)$, and by the coupling identity
+
+```math
+P_\tau(2n_0, \beta) = \frac{Z_{2n_0}(2\beta)}{Z_{2n_0}(\beta)^2}
+  = \frac{Z_{2n_0}(2\beta)}{Z_{n_0}(\beta)^4}\, P_{\mathrm{s}}(n_0, \beta)^{-2}
+  \ge \frac{Z_{2n_0}(2\beta)}{Z_{n_0}(\beta)^4},
+```
+
+since $P_{\mathrm{s}}(n_0, \beta) = \mathrm{Tr}\,X^{2n_0}/(\mathrm{Tr}\,X^{n_0})^2 \le 1$ for the
+self-adjoint transfer operator $X$ of the reflection-positive ring and even $n_0$. So the core
+`coupled_seed_bounds` takes
+
+```math
+\varepsilon_{\mathrm{s}} = 1 - \frac{\underline{Z_{12}}(\beta_0)}{\overline{Z_6}(\beta_0)^2}, \qquad
+\varepsilon_\tau = 1 - \frac{\underline{Z_{12}}(2\beta_0)}{\overline{Z_6}(\beta_0)^4},
+```
+
+with $\overline{Z_6}$ from the complete verified spectrum of the ring of 6 cells (4096 states,
+`verified_ring_spectrum`) and lower bounds $\underline{Z_{12}}$ from rigorous upper bounds on the
+low levels of the 24-spin ring:
+
+* `ring_blocks(model, 12; sparse = true, charges = 0:2)` builds the charge (total $S^z$),
+  momentum and flip-parity blocks of the rotated model exactly as for the dense certificates
+  (interval-enclosed entries, real basis at $0 < k < \pi$, exact multiplicities, an exact
+  Frobenius bound on the distance of the `Float64` center to the true block), but stored sparse
+  ($0.8\text{--}2.1 \cdot 10^5$ rows, about 25 entries per row). The sectors $\pm q$ share a
+  block through the flip; $|S^z| \ge 3$ is omitted.
+* In each block KrylovKit's Lanczos (deterministic start vector) gives approximate eigenvectors
+  $V$ of the $k = 16, 16, 10$ lowest levels at $|S^z| = 0, 1, 2$. `ritz_upper_bounds`
+  turns them into rigorous upper bounds: by Courant–Fischer the Ritz values of $\mathrm{span}\,V$
+  bound the $k$ lowest eigenvalues from above; $V^\top M V$ and $V^\top V$ are computed in `Float64`
+  with a priori $\gamma_n$ bounds (sparse product with $\gamma_{p+2}\,\| |M| \|_\infty$, GEMMs
+  with $\gamma_{N+2}$); the $k \times k$ matrix is enclosed by `verified_eigen`; and the pencil
+  $(V^\top M V, V^\top V)$ is reduced to it by a Gershgorin shift and Ostrowski's theorem (the
+  derivation is the docstring of `ritz_upper_bounds`). The block's construction error is added.
+* `log_partition_lower` sums $m_B e^{-\beta u_i}$ in interval arithmetic. Every omitted state
+  only lowers the bound; the Lanczos vectors are never trusted.
+
+The defects are then raised by $10^{-9}$ and rounded up to that grid (`padded_seed`), so a
+replay whose Lanczos vectors differ in the last bits (another BLAS) still checks, and
+`certify_point` writes a certificate with `seed.route = "coupled"`, which also pins the SHA-256 of
+the stored bounds (`results/ritz_bounds_12_cells_delta_*.json.gz`). The seed theorem covers every
+even $L \ge 6$ cells; the remaining even length $L = 4$ is covered by the verified gap of the
+4-cell ring, which exceeds the bound. The price of the coupling is
+$\varepsilon_\tau \approx \varepsilon_\tau^{\mathrm{true}} + 2\varepsilon_{\mathrm{s}}$,
+which rules out
+$n_0 = 4$ (at $\delta = 1/4$: $(0.166, 0.339)$, not admissible) but is small at $n_0 = 6$.
+
 ## Rigorous all-$`\beta`$ exclusions (core `Exclusions`)
 
 To prove that no $\beta_0 > 0$ satisfies the doubling recurrence at a given $(n_0, \delta)$,

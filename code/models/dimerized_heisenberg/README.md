@@ -1,23 +1,27 @@
 # Dimerized spin-1/2 Heisenberg chain
 
-**Certified at $\delta = 1/2, 3/10,$ and $1/4$:** for every even ring length $L \ge 4$ two-spin
-unit cells ($N = 2L = 8, 12, 16, \dots$ spins, i.e., $N$ divisible by $4$), the ground state is
-unique and the spectral gap satisfies $\Delta_L \ge 0.534794, 0.173204, 0.058232$ (the interval
-bound `certified_gap_bound`; the exact rational chain gives
-$\Delta_L > 0.534267, 0.173082, 0.058177$). Each certificate is a core
-`GapCertificates.certify_point` certificate of the chain in a sublattice-rotated frame (exact RP
-identity, verified spectra, both bounds). On the grid
-$`\delta \in \{1/2, 3/10, 1/4, 1/5, 3/20, 1/10\}`$, $\delta = 1/4$ is the smallest dimerization
-certifiable from rings of at most $16$ spins: at $`\delta \in \{1/5, 3/20, 1/10\}`$,
-continuous-$`\beta`$ interval covers (core `Exclusions`) prove that **every** $\beta_0 > 0$
-fails the doubling recurrence at both even seed lengths $n_0 = 2$ and $n_0 = 4$ cells.
+**Certified at $\delta = 1/2, 3/10, 1/4,$ and $1/5$:** for every even ring length $L \ge 4$
+two-spin unit cells ($N = 2L = 8, 12, 16, \dots$ spins, i.e., $N$ divisible by $4$), the ground
+state is unique and the spectral gap satisfies $\Delta_L \ge 0.657292, 0.273433, 0.168489,
+0.035841$ (the interval bound `certified_gap_bound`; the exact rational chain gives
+$\Delta_L > 0.656500, 0.273238, 0.168303, 0.035800$). These are *coupled seeds* at $n_0 = 6$
+cells: the complete verified spectrum of the 12-spin ring and rigorous Rayleigh–Ritz lower
+bounds on the partition function of the 24-spin ring (core `RitzBounds`), combined by the
+coupling identity; $L = 4$ is covered by the verified 8-spin gap. The earlier seeds at
+$n_0 = 4$ cells (complete spectra of 8 and 16 spins; $\Delta_L \ge 0.534794, 0.173204,
+0.058232$ at $\delta = 1/2, 3/10, 1/4$) remain certified and are the seeds of the Lean
+theorems. Every certificate is a core `GapCertificates.certify_point` certificate of the chain
+in a sublattice-rotated frame. At $`\delta \in \{1/5, 3/20, 1/10\}`$, continuous-$`\beta`$
+interval covers (core `Exclusions`) prove that **every** $\beta_0 > 0$ fails the doubling
+recurrence at the even seed lengths $n_0 = 2$ and $n_0 = 4$ cells.
 
 | Dimerization $\delta$ | Seed $(n_0, \beta_0)$ | Certified gap $\Delta_L \ge$ | Lengths covered |
 |---|---|---:|---|
-| $1/2$ | $(4, 6)$ cells | $0.534794$ | every even $L \ge 4$ cells ($N \ge 8$ spins, $4 \mid N$) |
-| $3/10$ | $(4, 13/2)$ cells | $0.173204$ | every even $L \ge 4$ cells ($N \ge 8$ spins, $4 \mid N$) |
-| $1/4$ | $(4, 29/4)$ cells | $0.058232$ | every even $L \ge 4$ cells ($N \ge 8$ spins, $4 \mid N$) |
-| $1/5, 3/20, 1/10$ | none: all $\beta_0 > 0$ excluded at $n_0 = 2, 4$ | — | no certificate at $\le 16$ spins |
+| $1/2$ | $(6, 8)$ cells, coupled | $0.657292$ | every even $L \ge 4$ cells ($N \ge 8$ spins, $4 \mid N$) |
+| $3/10$ | $(6, 65/8)$ cells, coupled | $0.273433$ | every even $L \ge 4$ cells ($N \ge 8$ spins, $4 \mid N$) |
+| $1/4$ | $(6, 17/2)$ cells, coupled | $0.168489$ | every even $L \ge 4$ cells ($N \ge 8$ spins, $4 \mid N$) |
+| $1/5$ | $(6, 19/2)$ cells, coupled | $0.035841$ | every even $L \ge 4$ cells ($N \ge 8$ spins, $4 \mid N$) |
+| $3/20, 1/10$ | none: all $\beta_0 > 0$ excluded at $n_0 = 2, 4$; the coupled seed at $n_0 = 6$ fails at $3/20$ | — | no certificate |
 
 ## Model
 
@@ -91,6 +95,38 @@ $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) \le (0.01133, 0.01224), (0.09516, 
 (checked exactly by `check.jl` through the core `check_point` with the Lean file's `points`,
 read by `lean_points`).
 
+### Coupled seeds at $n_0 = 6$ cells (24-spin doubled ring)
+
+The doubled ring of $12$ cells ($2^{24}$ states) has no complete spectrum. By the coupling
+identity, $P_\tau(12, \beta) = Z_{12}(2\beta) / (Z_6(\beta)^4\, P_{\mathrm{s}}(6, \beta)^2) \ge
+Z_{12}(2\beta)/Z_6(\beta)^4$ since $P_{\mathrm{s}}(6, \beta) \le 1$ (reflection positivity, even
+$n_0$), so the core `coupled_seed_bounds` needs only an upper bound on $Z_6(\beta_0)$ (complete
+verified 12-spin spectrum) and *lower* bounds on $Z_{12}(\beta_0)$ and $Z_{12}(2\beta_0)$.
+Those come
+from rigorous Rayleigh–Ritz upper bounds on the $16, 16, 10$ lowest levels of every sparse
+charge, momentum and flip-parity block with $|S^z| = 0, 1, 2$ of the 24-spin ring
+(`doubled_ring_bounds`, core `partial_ring_spectrum`; 28 blocks of dimension up to
+$2.1 \cdot 10^5$), stored in `results/ritz_bounds_12_cells_delta_*.json.gz` and pinned by
+SHA-256 in each certificate (see [`METHOD.md`](METHOD.md)). The defects are raised by $10^{-9}$
+and rounded up to that grid (`padded_seed`); $\beta_0$ is the best point of a $1/8$ grid
+(`scripts/ritz_scan.jl`). The seed theorem covers every even $L \ge 6$ cells, and the verified
+gap of the 4-cell ring (8 spins), which exceeds the bound, covers $L = 4$.
+
+| $\delta$ | $\beta_0$ | $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(6, \beta_0)$ | $\varepsilon_\tau \ge 1 - P_\tau(12, \beta_0)$ | Interval $\Delta_L \ge$ | Chain $\Delta_L >$ | Enclosed $\Delta_4$ (8 spins) | Bound / $\Delta_{20}$ |
+|---|---|---:|---:|---:|---:|---|---:|
+| $1/2$ | $8$ | $0.000443014$ | $0.002284612$ | $0.657292$ | $0.656500$ | $[1.195505, 1.195506]$ | $0.5529$ |
+| $3/10$ | $65/8$ | $0.012222938$ | $0.042335250$ | $0.273433$ | $0.273238$ | $[0.852931, 0.852932]$ | $0.3374$ |
+| $1/4$ | $17/2$ | $0.027713275$ | $0.082222883$ | $0.168489$ | $0.168303$ | $[0.771418, 0.771419]$ | $0.2382$ |
+| $1/5$ | $19/2$ | $0.066058914$ | $0.157665213$ | $0.035841$ | $0.035800$ | $[0.695042, 0.695043]$ | $0.0597$ |
+
+($\Delta_{20}$ is the numerical 20-spin gap below.) The thermal bound is
+$\varepsilon_\tau \approx (1 - P_\tau(12, \beta_0)) + 2\varepsilon_{\mathrm{s}}$, so the coupled
+route pays twice the spatial defect; it fails at $n_0 = 4$ (at $\delta = 1/4$ its defects are
+$(0.166, 0.339)$) but at $n_0 = 6$ improves every point and certifies $\delta = 1/5$ for the
+first time. Truncating the Ritz bounds to 8 levels per block changes none of these defects in
+the fifth decimal, so the omitted weight is negligible. $\delta = 3/20$ is not certified (see
+`IDEAS.md`).
+
 ### Rigorous all-$`\beta`$ exclusions at $n_0 = 2, 4$ for smaller $\delta$
 
 With the largest ring capped at $16$ spins, the only even seed lengths are $n_0 = 2$ and
@@ -137,13 +173,13 @@ $\delta \le 1/2$ (recorded per $\delta$ in `results/summary.json`; see [`METHOD.
 ## Reproduce
 
 From the repository root, in the core environment, with `export OPENBLAS_NUM_THREADS=1` (wall
-times on an Apple M-series laptop that was heavily loaded by other jobs; CPU times in brackets):
+times on a shared 8-core x86-64 Linux machine loaded by other jobs, one thread):
 
 ```sh
 julia --project=code/julia -e 'using Pkg; Pkg.instantiate()'
-julia --project=code/julia code/models/dimerized_heisenberg/check.jl         # 1.5 min [28 s]
-julia --project=code/julia code/models/dimerized_heisenberg/check.jl --full  # 4.2 min [2.4 min]
-julia --project=code/julia code/models/dimerized_heisenberg/test/runtests.jl # 2.5 min [58 s]
+julia --project=code/julia code/models/dimerized_heisenberg/check.jl         # 1.1 min
+julia --project=code/julia code/models/dimerized_heisenberg/check.jl --full  # 23 min (n₀ = 4 part fails here)
+julia --project=code/julia code/models/dimerized_heisenberg/test/runtests.jl # 1.9 min
 ```
 
 - **Fast check (`check.jl`):** re-derives the exact RP audit; for every $\delta$ checks the frame
@@ -153,25 +189,44 @@ julia --project=code/julia code/models/dimerized_heisenberg/test/runtests.jl # 2
   Lean point, and the exact RP identity, rational chain and interval bound are re-derived);
   checks every exclusion with the core `check_exclusion` (tiling of $[0, B]$, the tail, every
   window's rejection witness), the dimer perturbation bound, and the bound-to-gap ratio.
+  For every coupled seed (`check_ritz`): the hashes of the certificate and of its Ritz-bound
+  file, the core `check_point` with the coupled defects re-derived from a fresh verified 12-spin
+  spectrum and the stored 24-spin Ritz bounds, and the enclosed 8-spin gap (covering $L = 4$).
 - **Full check (`check.jl --full`):** additionally recomputes the verified spectra of the rings of
   $2, 4, 8$ cells from the model and re-derives every seed defect, every exclusion bound, and the
-  16-spin gap from them alone.
+  16-spin gap from them alone, and recomputes the 24-spin Ritz bounds of every coupled seed from
+  the model (5–6.5 minutes per $\delta$ in the run above). On an x86-64 Linux machine the
+  $n_0 = 4$ part (`check_summary(; full = true)`) fails, exactly as with upstream `main`'s
+  checker, because the fresh `verified_eigen` radii differ from those of the original run (see
+  "What is rigorous"); the coupled part (`check_ritz(; full = true)`) passes. Measured run:
+  `check.jl --full` reported 4 passed, 1 errored ("spatial defect exceeds the stored εₛ" at
+  $\delta = 1/2$), and every coupled seed passed its full replay.
 - **Test suite (`test/runtests.jl`):** the fast check, the exact frame, RP and lattice-reflection
   identities, the verified 4-spin spectrum and $\log Z$ against the closed form, the verified
   8-spin spectrum against the physical-frame `float_ring_spectrum`, the sparse 20-spin
-  diagnostic blocks against complete spectra, the Lean points, the dimer bound, and
-  corrupted-record rejection.
+  diagnostic blocks against complete spectra, the Lean points, the dimer bound, the coupled seeds
+  (corrupted rows, and dropped Ritz blocks, are rejected), and corrupted-record rejection.
 
 To regenerate (not needed for checking):
 
 ```sh
-julia --project=code/julia code/models/dimerized_heisenberg/certify.jl  # 3.7 min [2.4 min], all steps
+julia --project=code/julia code/models/dimerized_heisenberg/certify.jl  # 2.8 min, all (stored Ritz bounds)
+julia --project=code/julia code/models/dimerized_heisenberg/certify.jl ritz 1 5   # 25 s stored, 14 min if not
+julia --project=code/julia code/models/dimerized_heisenberg/scripts/ritz_scan.jl   # β₀ scans
 julia --project=code/julia code/models/dimerized_heisenberg/certify.jl delta 3 10
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/scan20.jl 1 5
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/scan20.jl summary
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/numerical_scan.jl
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/summarize_numerics.jl
+julia --project=code/julia code/models/dimerized_heisenberg/scripts/refresh_provenance.jl --verify 682105277771
 ```
+
+`certify.jl` without arguments or with `delta p q` regenerates the $n_0 = 4$ certificates, whose
+numbers then move in their last digits (see "What is rigorous"). The committed $n_0 = 4$
+results keep the numbers of their original run; after a change of the model-local sources,
+`scripts/refresh_provenance.jl REV` (14 s) rewrites only their provenance metadata from the
+files at git revision `REV`, and `--verify REV` checks that every other JSON value equals
+`REV`'s.
 
 ## What is rigorous
 
@@ -179,12 +234,37 @@ julia --project=code/julia code/models/dimerized_heisenberg/scripts/summarize_nu
   (core `VerifiedSpectra`: exact charge, momentum, and charge-flip reduction; every block
   enclosed by `verified_eigen`); outward-rounded $\log Z$ enclosures, rational seed defects, and
   the exact rational gap chain (core `GapCertificates`); the 16-spin gap enclosures; the
-  continuous-$`\beta`$ exclusions (core `Exclusions`); and the dimer perturbation bounds.
+  continuous-$`\beta`$ exclusions (core `Exclusions`); the dimer perturbation bounds; and the
+  coupled seeds: the 24-spin Rayleigh–Ritz upper bounds (core `RitzBounds`: sparse blocks with
+  interval-enclosed entries and exact multiplicities, a priori rounding bounds on $V^\top M V$ and
+  $V^\top V$, Courant–Fischer, `verified_eigen` on the small Ritz matrix), the outward-rounded
+  lower bounds on $\log Z_{12}$, and the coupled defects (core `coupled_seed_defects`, valid as
+  $P_{\mathrm{s}}(6, \beta) \le 1$ by reflection positivity at even $n_0$).
 - **Trusted base:** exact rational arithmetic, `IntervalArithmetic` outward rounding, and the IEEE
   binary64 + BLAS rounding model of `CertifiedGaps.VerifiedSpectra.verified_eigen`
   (round-to-nearest, gradual underflow, the $\gamma_{N+8}$ / $\gamma_{2N+8}$ dot-product bounds
   for real blocks and for complex blocks evaluated as four real GEMMs, valid for any summation
-  order and FMA, with Frobenius norms). LAPACK eigensolver accuracy is never trusted.
+  order and FMA, with Frobenius norms), and the same model for the products of
+  `RitzBounds.ritz_upper_bounds` ($\gamma_{p+2}$ for the sparse product with $p$ entries per row,
+  $\gamma_{N+2}$ for the GEMMs). LAPACK and Lanczos (KrylovKit) accuracy is never trusted: poor
+  vectors only weaken the bounds.
+- **Stored data in the fast check:** the fast check re-derives the coupled defects from the
+  stored 24-spin Ritz bounds (hash-pinned) and a fresh 12-spin spectrum; only `--full` recomputes
+  the Ritz bounds from the model.
+- **Platform caveat (`--full` of the $n_0 = 4$ certificates):** the $n_0 = 4$ certificates were
+  made on another machine and store unpadded defects. Their `verified_eigen` radii depend on the
+  LAPACK eigenvectors, which vary from run to run and between platforms; on an x86-64 Linux
+  machine the fresh radii differ from the stored ones by about $4 \cdot 10^{-11}$ in
+  $\varepsilon_{\mathrm{s}}$, so the fresh spatial defect exceeds the stored $\varepsilon_{\mathrm{s}}$
+  and `check.jl --full` fails for them, exactly as with upstream `main`'s code. Which parts fail
+  varies between runs: a separate per-part replay (same outcome with the code of upstream
+  `main` 682105277771) failed the seed $(4, 29/4)$ at $\delta = 1/4$ ("spatial defect exceeds the stored εₛ")
+  and the $n_0 = 2$ or $4$ exclusion replays at $\delta = 1/2, 3/10, 1/5, 3/20$ ("stored lower
+  defects exceed the fresh ones", "the tail bound fails"); the other seeds, exclusions and
+  16-spin gaps passed. This is a replay tolerance issue, not a soundness issue: the stored
+  defects and exclusion bounds are rigorous from the original run, and the fast check re-derives
+  the chains, bounds and exclusion recurrences from them. The coupled seeds are padded by
+  $10^{-9}$ (`padded_seed`) and pass their full replay on this platform.
 - **Numerical only:** the 20-spin partial Krylov spectra, the `Float64` scans
   (`float_ring_spectrum`), the odd $n_0 = 5$ candidate at $\delta = 1/5$, and
   the $\xi_{\mathrm{eff}} \sim \delta^{-2/3}$ scaling fits.
@@ -196,16 +276,20 @@ this directory's `results/` is a relative symlink to that canonical location.
 
 | Path | Role |
 |---|---|
-| `certify.jl` | Generates `results/rp_audit.json`, the core certificates, and `results/summary.json` |
+| `certify.jl` | Generates `results/rp_audit.json`, the core certificates, `results/summary.json`, and `results/ritz_summary.json` |
 | `check.jl` | Certificate verifier (also loaded by the tests; `--full` recomputes every spectrum) |
 | `src/DimerizedHeisenberg.jl` | `rotated_model`, `physical_model`, `rotated_rp`, `frame_identity`, `SEEDS`, dimer bound |
 | `src/rp.jl`, `src/reflection_conventions.jl` | Exact RP audit (conjugate form) and basis-obstruction checks |
+| `src/RitzSeeds.jl` | Coupled seeds at $n_0 = 6$: `RITZ_SEEDS`, `doubled_ring_bounds` (24-spin Ritz bounds), `padded_seed` |
 | `src/Diagnostics.jl` | Sparse 20-spin Krylov diagnostics in the physical $S^z$ basis (numerical only) |
-| `scripts/` | 20-spin scan, numerical scan, and summary |
+| `scripts/` | 20-spin scan, numerical scan, summary, the $\beta_0$ scan of the coupled seeds (`ritz_scan.jl`), and the provenance-only refresh of the $n_0 = 4$ results (`refresh_provenance.jl`) |
 | `test/runtests.jl` | Fast unit and regression tests |
-| `METHOD.md` | Frame, RP, lattice reflection, core pipeline, exclusions, and dimer bound |
+| `METHOD.md` | Frame, RP, lattice reflection, core pipeline, coupled seeds, exclusions, and dimer bound |
 | `IDEAS.md` | Evaluation of candidate routes and outcome |
-| `results/certificate_delta_*_beta_*.json` | Core gap certificates, one per seed |
+| `results/certificate_delta_*_beta_*.json` | Core gap certificates of the seeds at $n_0 = 4$ |
+| `results/certificate_delta_*_n0_6_beta_*.json` | Core gap certificates of the coupled seeds (`seed.route = "coupled"`) |
+| `results/ritz_bounds_12_cells_delta_*.json.gz` | 24-spin Rayleigh–Ritz upper bounds; hash-pinned by the coupled certificates (about 14 min each to regenerate) |
+| `results/ritz_summary.json` | Per $\delta$: coupled certificate rows, file hashes, and the 8-spin gap |
 | `results/summary.json` | Per $\delta$: certificate rows and hashes, exclusions, 16-spin gap, ratio, dimer bound |
 | `results/rp_audit.json` | Exact rational RP audit at all six $\delta$ values (no seeds) |
 | `results/numerical_summary.json`, `results/diagnostic20_summary.json` | Exploratory `Float64` summaries |
@@ -214,8 +298,9 @@ The model has no Julia environment of its own; it runs in the core's (`--project
 result records (`Results.model_metadata`) the SHA-256 hashes of its model-local sources
 (`metadata.source_sha256`: `src/`, `certify.jl`, `check.jl`), which `check.jl` enforces with
 `Results.verify_model_metadata`, and of the shared core including its environment
-(`metadata.core_sha256`), which is provenance only; `paper/` and `METHOD.md` are not hashed. There
-are no hash-pinned layout exceptions.
+(`metadata.core_sha256`), which is provenance only; `paper/` and `METHOD.md` are not hashed. The
+only hash-pinned data files are the Ritz bounds `results/ritz_bounds_12_cells_delta_*.json.gz`,
+whose SHA-256 each coupled certificate and `ritz_summary.json` record.
 
 ## History
 
@@ -248,3 +333,19 @@ the lattice reflection (cell swap times spin flip), so every block at $0 < k < \
 certificates were regenerated and every defect decreased and every bound rose (e.g.
 $\delta = 1/4$: $\varepsilon_{\mathrm{s}}$ $0.165676942264 \to 0.165676941955$, interval bound
 $0.0582321291 \to 0.0582321303$).
+
+Coupled seeds at $n_0 = 6$ cells (core `RitzBounds`, `coupled_seed_bounds`) improved every
+certified point and certified $\delta = 1/5$: $\Delta_L \ge 0.534794 \to 0.657292$
+($\delta = 1/2$), $0.173204 \to 0.273433$ ($3/10$), $0.058232 \to 0.168489$ ($1/4$), and new
+$0.035841$ ($1/5$). Their defects are raised by $10^{-9}$ (`padded_seed`), since the fast check
+recomputes the 12-spin spectrum and `--full` also the 24-spin Ritz bounds. Adding the
+model-local sources changed the source hashes recorded by the $n_0 = 4$ results. Their certified
+numbers are unchanged: `scripts/refresh_provenance.jl` rewrote only the provenance metadata of
+`rp_audit.json`, `summary.json`, and the four $n_0 = 4$ certificates (`source_sha256`,
+`core_sha256`, the certificate hashes in `summary.json`, and a `provenance_refresh` record),
+starting from upstream `main` (682105277771); its `--verify` mode shows that every other JSON
+value equals `main`'s. Regenerating them with `certify.jl` would not reproduce their numbers: on
+an x86-64 Linux machine the `verified_eigen` radii differ from the stored ones by about
+$4 \cdot 10^{-11}$ in $\varepsilon_{\mathrm{s}}$ (LAPACK eigenvectors, run-to-run and platform
+variation; the core grid is $10^{-15}$), and for the same reason `check.jl --full` of the
+$n_0 = 4$ certificates fails there, as it does on upstream `main` (see "What is rigorous").
