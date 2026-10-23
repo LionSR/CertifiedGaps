@@ -329,18 +329,21 @@ records:
     parameter: '$\delta = 1/2$'
     params: {delta: "1/2"}
     lengths: {L0: 4}
-    bound: {value: "1204251241745935/2251799813685248", decimal: "0.534794"}
-    seed: {n0: 4, beta0: "6"}
+    bound: {value: "5920364896908571/9007199254740992", decimal: "0.657292"}
+    seed: {n0: 6, beta0: "8", text: 'Coupled seed: complete verified 12-spin spectrum and rigorous Rayleigh–Ritz lower bounds on the partition function of the 24-spin ring; L = 4 by the verified 8-spin gap'}
     numerical_gap: "1.188631"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "12370753/500000", beta: "6", decimal: "0.534747"}
-    certificate: data/models/dimerized_heisenberg/certificate_delta_1_2_beta_6.json
-    date: "2026-10-18"
-    pr: 81
-    contributors: ['LionSR']
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "12370753/500000", beta: "6", decimal: "0.534747", certificate: data/models/dimerized_heisenberg/certificate_delta_1_2_beta_6.json}
+    certificate: data/models/dimerized_heisenberg/certificate_delta_1_2_n0_6_beta_8.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    method: 'coupled seed at 6 cells (Rayleigh–Ritz bounds on 24 spins)'
     notes: >-
-      The seed $\beta_0 = 25/4$ also works and gives 0.533681.
+      The Lean theorem starts from the earlier seed $(n_0, \beta_0) = (4, 6)$ of 4 cells.
     history:
+      - {date: "2026-10-18", decimal: "0.534794", lengths: 'even L ≥ 4 cells', tier: certified, pr: 81,
+         method: 'seed (4, 6) from complete 8- and 16-spin spectra'}
       - {date: "2026-10-15", decimal: "0.534756", lengths: 'even L ≥ 4 cells', tier: certified, pr: 23,
          method: 'an earlier computation from the same seed'}
       - {date: "2026-10-12", decimal: "0.532658", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
@@ -350,16 +353,21 @@ records:
     parameter: '$\delta = 3/10$'
     params: {delta: "3/10"}
     lengths: {L0: 4}
-    bound: {value: "6240341034043777/36028797018963968", decimal: "0.173204"}
-    seed: {n0: 4, beta0: "13/2"}
+    bound: {value: "4925741571632125/18014398509481984", decimal: "0.273433"}
+    seed: {n0: 6, beta0: "65/8", text: 'Coupled seed: complete verified 12-spin spectrum and rigorous Rayleigh–Ritz lower bounds on the partition function of the 24-spin ring; L = 4 by the verified 8-spin gap'}
     numerical_gap: "0.810214"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "6164911/2000000", beta: "13/2", decimal: "0.173188"}
-    certificate: data/models/dimerized_heisenberg/certificate_delta_3_10_beta_13_2.json
-    date: "2026-10-18"
-    pr: 81
-    contributors: ['LionSR']
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "6164911/2000000", beta: "13/2", decimal: "0.173188", certificate: data/models/dimerized_heisenberg/certificate_delta_3_10_beta_13_2.json}
+    certificate: data/models/dimerized_heisenberg/certificate_delta_3_10_n0_6_beta_65_8.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    method: 'coupled seed at 6 cells (Rayleigh–Ritz bounds on 24 spins)'
+    notes: >-
+      The Lean theorem starts from the earlier seed $(n_0, \beta_0) = (4, 13/2)$ of 4 cells.
     history:
+      - {date: "2026-10-18", decimal: "0.173204", lengths: 'even L ≥ 4 cells', tier: certified, pr: 81,
+         method: 'seed (4, 13/2) from complete 8- and 16-spin spectra'}
       - {date: "2026-10-15", decimal: "0.173197", lengths: 'even L ≥ 4 cells', tier: certified, pr: 23,
          method: 'an earlier computation from the same seed'}
       - {date: "2026-10-12", decimal: "0.172916", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
@@ -369,23 +377,42 @@ records:
     parameter: '$\delta = 1/4$'
     params: {delta: "1/4"}
     lengths: {L0: 4}
-    bound: {value: "4196067203083483/72057594037927936", decimal: "0.058232"}
-    seed: {n0: 4, beta0: "29/4"}
+    bound: {value: "3035238769656491/18014398509481984", decimal: "0.168489"}
+    seed: {n0: 6, beta0: "17/2", text: 'Coupled seed: complete verified 12-spin spectrum and rigorous Rayleigh–Ritz lower bounds on the partition function of the 24-spin ring; L = 4 by the verified 8-spin gap'}
     numerical_gap: "0.707193"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "15251257/10000000", beta: "29/4", decimal: "0.058217"}
-    certificate: data/models/dimerized_heisenberg/certificate_delta_1_4_beta_29_4.json
-    date: "2026-10-18"
-    pr: 81
-    contributors: ['LionSR']
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "15251257/10000000", beta: "29/4", decimal: "0.058217", certificate: data/models/dimerized_heisenberg/certificate_delta_1_4_beta_29_4.json}
+    certificate: data/models/dimerized_heisenberg/certificate_delta_1_4_n0_6_beta_17_2.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    method: 'coupled seed at 6 cells (Rayleigh–Ritz bounds on 24 spins)'
     notes: >-
-      This is the smallest dimerization that rings of at most 16 spins can certify. For $\delta =
-      1/5$, $3/20$ and $1/10$, seeds of 2 or 4 cells provably fail at all $\beta_0$.
+      The Lean theorem starts from the earlier seed $(n_0, \beta_0) = (4, 29/4)$ of 4 cells, the
+      smallest dimerization that rings of at most 16 spins can certify.
     history:
+      - {date: "2026-10-18", decimal: "0.058232", lengths: 'even L ≥ 4 cells', tier: certified, pr: 81,
+         method: 'seed (4, 29/4) from complete 8- and 16-spin spectra'}
       - {date: "2026-10-15", decimal: "0.058225", lengths: 'even L ≥ 4 cells', tier: certified, pr: 23,
          method: 'an earlier computation from the same seed'}
       - {date: "2026-10-12", decimal: "0.057967", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
          method: 'earlier certificate with wider eigenvalue enclosures at the same seed'}
+  - id: dimerized-delta-1-5
+    family: dimerized-heisenberg
+    parameter: '$\delta = 1/5$'
+    params: {delta: "1/5"}
+    lengths: {L0: 4}
+    bound: {value: "5165367945806521/144115188075855872", decimal: "0.035841"}
+    seed: {n0: 6, beta0: "19/2", text: 'Coupled seed: complete verified 12-spin spectrum and rigorous Rayleigh–Ritz lower bounds on the partition function of the 24-spin ring; L = 4 by the verified 8-spin gap'}
+    numerical_gap: "0.599819"
+    tier: certified
+    certificate: data/models/dimerized_heisenberg/certificate_delta_1_5_n0_6_beta_19_2.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    method: 'coupled seed at 6 cells (Rayleigh–Ritz bounds on 24 spins)'
+    notes: >-
+      Seeds of 2 and 4 cells provably fail at all $\beta_0$; the coupled seed of 6 cells closes.
   # ---------------------------------------------------------------- spin1-dimerized
   - id: spin1-dimerized-delta-9-10
     family: spin1-dimerized
@@ -1181,13 +1208,6 @@ records:
     parameter: 'periodic ring'
     estimate: {n0: "256", beta0: "64", float_bound: "0.003019921", text: 'One trace bound is not certified yet: $\widehat{Z}_{256}(64) \le 1.08$'}
     numerical_gap: "0.08917"
-    tier: target
-  - id: target-dimerized-delta-1-5
-    family: dimerized-heisenberg
-    parameter: '$\delta = 1/5$'
-    params: {delta: "1/5"}
-    estimate: {n0: "5", beta0: "17/2", float_bound: "0.086", text: 'Seeds of 2 and 4 cells fail (proved). An odd seed of 5 cells (rings of 10 and 20 spins) probably works'}
-    numerical_gap: "0.599819"
     tier: target
   - id: target-ladder-Jperp-2
     family: heisenberg-ladder
