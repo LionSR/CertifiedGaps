@@ -44,10 +44,11 @@ const PAD = big(10)^9
     padded_seed(seed) -> NamedTuple
 
 The seed with εₛ, εₜ raised by 10⁻⁹ and rounded up to the grid 10⁻⁹ (still upper bounds), so
-that the defects of a `check.jl --full` replay stay below the stored ones: the LAPACK
-eigenvectors behind `verified_eigen` radii and the Lanczos vectors behind the Ritz bounds vary
-between runs (observed: 4·10⁻¹¹ in εₛ at n₀ = 4), while the core grid is 10⁻¹⁵. Used for every
-seed of this model.
+that the defects of a replay (the fast check recomputes the 12-spin spectrum; `--full` also the
+Ritz bounds) stay below the stored ones: the LAPACK eigenvectors behind `verified_eigen` radii
+and the Lanczos vectors behind the Ritz bounds vary between runs and platforms (observed:
+4·10⁻¹¹ in εₛ at n₀ = 4), while the core grid is 10⁻¹⁵. Used for the coupled seeds only; the
+n₀ = 4 seeds of `SEEDS` keep the unpadded defects of their original certificates.
 """
 padded_seed(seed) = merge(seed, (; eps_s = round_up(seed.eps_s + 1 // PAD, PAD),
     eps_t = round_up(seed.eps_t + 1 // PAD, PAD)))

@@ -93,9 +93,7 @@ function certify_delta(δ)
     spectra = Dict(L => verified_ring_spectrum(model, L) for L in (2, 4, 8))
     rows = Any[]
     for (n0, β0) in get(SEEDS, δ, Tuple{Int,Rational{BigInt}}[])
-        # Padded: verified_eigen radii vary between runs (LAPACK), so a --full replay needs slack.
-        seed = padded_seed(seed_bounds(model, n0, β0;
-            spectra = Dict(n0 => spectra[n0], 2n0 => spectra[2n0])))
+        seed = seed_bounds(model, n0, β0; spectra = Dict(n0 => spectra[n0], 2n0 => spectra[2n0]))
         path = certificate_path(δ, β0)
         cert = certify_point(path, model; n0, β0, params = point_params(δ),
             model_dir = MODEL_DIR, packages = (IntervalArithmetic,), rp, seed)

@@ -89,7 +89,7 @@
     "scope": "No common cell basis admits sum c*C tensor C for the stated inter-cell bond. The reflected form with the cell swap holds exactly (the certificates).",
     "largest_exact_audit_matrix_dimension": 256,
     "exact_algebraic_audit": true,
-    "audit_seconds": 1.823441259,
+    "audit_seconds": 1.111431542,
     "arithmetic": "Complex{Rational{BigInt}}; normalized basis evaluated with exact denominators",
     "metadata": {
         "source_sha256": {
@@ -97,8 +97,8 @@
             "models/dimerized_heisenberg/src/rp.jl": "8f08c7db77f0b2fcb073073537c48f691a9d6464b7947176ec539c7543828481",
             "models/dimerized_heisenberg/src/DimerizedHeisenberg.jl": "aa96a322112bad4802be3959fe65f68e5c8ab6c19192940e55b17f8d9c0e200a",
             "models/dimerized_heisenberg/check.jl": "5ef50ba4e96f6bcfb7bf5fe24394de317b908b7ee045f8b00f43c876711daddf",
-            "models/dimerized_heisenberg/certify.jl": "ae0ef44a1dc1dc42e8b07f481f50948d659be4a9829372d798ed2baf88ff5ff1",
-            "models/dimerized_heisenberg/src/RitzSeeds.jl": "494a9736a8d216c5a4e5229ae98f399a58373931a3ffc695e97f7db2ea7c3970",
+            "models/dimerized_heisenberg/certify.jl": "af41f6646296f877536e682234be399319ad12bf0f20e57aea9077c3ecbbe12b",
+            "models/dimerized_heisenberg/src/RitzSeeds.jl": "fb46f7d9581962c914ba22e4b947601ed7a75488a1fd6005ebe7632540877221",
             "models/dimerized_heisenberg/src/Diagnostics.jl": "6373bbebda6fc552d70fbf2aa923b1a06adf462413f8f658f8824c5ec19d7c34"
         },
         "core_sha256": {
@@ -142,11 +142,17 @@
             "model": "dimerized_heisenberg",
             "sites_per_cell": 2
         },
-        "created_utc": "2026-10-23T01:02:13.290",
+        "created_utc": "2026-10-18T06:15:19.941",
         "julia_threads": 1,
-        "julia": "1.12.7",
+        "julia": "1.12.4",
         "IntervalArithmetic": "1.0.12",
-        "CertifiedGaps": "0.2.0"
+        "CertifiedGaps": "0.2.0",
+        "provenance_refresh": {
+            "utc": "2026-10-23T07:56:24.134",
+            "scope": "only source_sha256, core_sha256 (and in summary.json the certificate sha256) were rewritten; every other value, including this run record, is that of the original run at from_revision",
+            "script": "models/dimerized_heisenberg/scripts/refresh_provenance.jl",
+            "from_revision": "682105277771b13301554925e7d3bc314da5dd31"
+        }
     },
     "alternative_conventions": [
         {

@@ -81,10 +81,10 @@ the Lean theorem). Both are rigorous and stored in each certificate.
 
 | $\delta$ | $\beta_0$ | $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(4, \beta_0)$ | $\varepsilon_\tau \ge 1 - P_\tau(8, \beta_0)$ | Interval $\Delta_L \ge$ | Chain $\Delta_L >$ | Enclosed $\Delta_{16}$ | Bound / $\Delta_{16}$ |
 |---|---|---:|---:|---:|---:|---|---:|
-| $1/2$ | $6$ | $0.011265193$ | $0.012004581$ | $0.534794$ | $0.534267$ | $[1.188651, 1.188652]$ | $0.4499$ |
-| $1/2$ | $25/4$ | $0.011707777$ | $0.008704103$ | $0.533722$ | $0.533215$ | (survey $\beta_0$) | |
-| $3/10$ | $13/2$ | $0.095113918$ | $0.051604792$ | $0.173204$ | $0.173082$ | $[0.811144, 0.811145]$ | $0.2135$ |
-| $1/4$ | $29/4$ | $0.165676943$ | $0.051034422$ | $0.058232$ | $0.058177$ | $[0.709347, 0.709348]$ | $0.0821$ |
+| $1/2$ | $6$ | $0.011265192$ | $0.012004580$ | $0.534794$ | $0.534267$ | $[1.188651, 1.188652]$ | $0.4499$ |
+| $1/2$ | $25/4$ | $0.011707776$ | $0.008704102$ | $0.533722$ | $0.533215$ | (survey $\beta_0$) | |
+| $3/10$ | $13/2$ | $0.095113917$ | $0.051604791$ | $0.173204$ | $0.173082$ | $[0.811144, 0.811145]$ | $0.2135$ |
+| $1/4$ | $29/4$ | $0.165676942$ | $0.051034421$ | $0.058232$ | $0.058177$ | $[0.709347, 0.709348]$ | $0.0821$ |
 
 ($\varepsilon$ rounded up to nine decimals here; the certificates store them exactly.) At
 $\delta = 1/4$ the spatial defect exceeds the diagonal threshold $\varepsilon_* \approx 0.12731$,
@@ -178,8 +178,8 @@ times on a shared 8-core x86-64 Linux machine loaded by other jobs, one thread):
 ```sh
 julia --project=code/julia -e 'using Pkg; Pkg.instantiate()'
 julia --project=code/julia code/models/dimerized_heisenberg/check.jl         # 1.1 min
-julia --project=code/julia code/models/dimerized_heisenberg/check.jl --full  # 31 min
-julia --project=code/julia code/models/dimerized_heisenberg/test/runtests.jl # 2.1 min
+julia --project=code/julia code/models/dimerized_heisenberg/check.jl --full  # 23 min (n₀ = 4 part fails here)
+julia --project=code/julia code/models/dimerized_heisenberg/test/runtests.jl # 1.9 min
 ```
 
 - **Fast check (`check.jl`):** re-derives the exact RP audit; for every $\delta$ checks the frame
@@ -195,7 +195,12 @@ julia --project=code/julia code/models/dimerized_heisenberg/test/runtests.jl # 2
 - **Full check (`check.jl --full`):** additionally recomputes the verified spectra of the rings of
   $2, 4, 8$ cells from the model and re-derives every seed defect, every exclusion bound, and the
   16-spin gap from them alone, and recomputes the 24-spin Ritz bounds of every coupled seed from
-  the model (7–14 minutes per $\delta$, depending on load).
+  the model (5–6.5 minutes per $\delta$ in the run above). On an x86-64 Linux machine the
+  $n_0 = 4$ part (`check_summary(; full = true)`) fails, exactly as with upstream `main`'s
+  checker, because the fresh `verified_eigen` radii differ from those of the original run (see
+  "What is rigorous"); the coupled part (`check_ritz(; full = true)`) passes. Measured run:
+  `check.jl --full` reported 4 passed, 1 errored ("spatial defect exceeds the stored εₛ" at
+  $\delta = 1/2$), and every coupled seed passed its full replay.
 - **Test suite (`test/runtests.jl`):** the fast check, the exact frame, RP and lattice-reflection
   identities, the verified 4-spin spectrum and $\log Z$ against the closed form, the verified
   8-spin spectrum against the physical-frame `float_ring_spectrum`, the sparse 20-spin
@@ -206,14 +211,22 @@ To regenerate (not needed for checking):
 
 ```sh
 julia --project=code/julia code/models/dimerized_heisenberg/certify.jl  # 2.8 min, all (stored Ritz bounds)
-julia --project=code/julia code/models/dimerized_heisenberg/certify.jl ritz 1 5   # 14 min if not stored
+julia --project=code/julia code/models/dimerized_heisenberg/certify.jl ritz 1 5   # 25 s stored, 14 min if not
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/ritz_scan.jl   # β₀ scans
 julia --project=code/julia code/models/dimerized_heisenberg/certify.jl delta 3 10
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/scan20.jl 1 5
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/scan20.jl summary
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/numerical_scan.jl
 julia --project=code/julia code/models/dimerized_heisenberg/scripts/summarize_numerics.jl
+julia --project=code/julia code/models/dimerized_heisenberg/scripts/refresh_provenance.jl --verify 682105277771
 ```
+
+`certify.jl` without arguments or with `delta p q` regenerates the $n_0 = 4$ certificates, whose
+numbers then move in their last digits (see "What is rigorous"). The committed $n_0 = 4$
+results keep the numbers of their original run; after a change of the model-local sources,
+`scripts/refresh_provenance.jl REV` (14 s) rewrites only their provenance metadata from the
+files at git revision `REV`, and `--verify REV` checks that every other JSON value equals
+`REV`'s.
 
 ## What is rigorous
 
@@ -238,6 +251,20 @@ julia --project=code/julia code/models/dimerized_heisenberg/scripts/summarize_nu
 - **Stored data in the fast check:** the fast check re-derives the coupled defects from the
   stored 24-spin Ritz bounds (hash-pinned) and a fresh 12-spin spectrum; only `--full` recomputes
   the Ritz bounds from the model.
+- **Platform caveat (`--full` of the $n_0 = 4$ certificates):** the $n_0 = 4$ certificates were
+  made on another machine and store unpadded defects. Their `verified_eigen` radii depend on the
+  LAPACK eigenvectors, which vary from run to run and between platforms; on an x86-64 Linux
+  machine the fresh radii differ from the stored ones by about $4 \cdot 10^{-11}$ in
+  $\varepsilon_{\mathrm{s}}$, so the fresh spatial defect exceeds the stored $\varepsilon_{\mathrm{s}}$
+  and `check.jl --full` fails for them, exactly as with upstream `main`'s code. Which parts fail
+  varies between runs: a separate per-part replay (same outcome with the code of upstream
+  `main` 682105277771) failed the seed $(4, 29/4)$ at $\delta = 1/4$ ("spatial defect exceeds the stored εₛ")
+  and the $n_0 = 2$ or $4$ exclusion replays at $\delta = 1/2, 3/10, 1/5, 3/20$ ("stored lower
+  defects exceed the fresh ones", "the tail bound fails"); the other seeds, exclusions and
+  16-spin gaps passed. This is a replay tolerance issue, not a soundness issue: the stored
+  defects and exclusion bounds are rigorous from the original run, and the fast check re-derives
+  the chains, bounds and exclusion recurrences from them. The coupled seeds are padded by
+  $10^{-9}$ (`padded_seed`) and pass their full replay on this platform.
 - **Numerical only:** the 20-spin partial Krylov spectra, the `Float64` scans
   (`float_ring_spectrum`), the odd $n_0 = 5$ candidate at $\delta = 1/5$, and
   the $\xi_{\mathrm{eff}} \sim \delta^{-2/3}$ scaling fits.
@@ -255,7 +282,7 @@ this directory's `results/` is a relative symlink to that canonical location.
 | `src/rp.jl`, `src/reflection_conventions.jl` | Exact RP audit (conjugate form) and basis-obstruction checks |
 | `src/RitzSeeds.jl` | Coupled seeds at $n_0 = 6$: `RITZ_SEEDS`, `doubled_ring_bounds` (24-spin Ritz bounds), `padded_seed` |
 | `src/Diagnostics.jl` | Sparse 20-spin Krylov diagnostics in the physical $S^z$ basis (numerical only) |
-| `scripts/` | 20-spin scan, numerical scan, summary, and the $\beta_0$ scan of the coupled seeds (`ritz_scan.jl`) |
+| `scripts/` | 20-spin scan, numerical scan, summary, the $\beta_0$ scan of the coupled seeds (`ritz_scan.jl`), and the provenance-only refresh of the $n_0 = 4$ results (`refresh_provenance.jl`) |
 | `test/runtests.jl` | Fast unit and regression tests |
 | `METHOD.md` | Frame, RP, lattice reflection, core pipeline, coupled seeds, exclusions, and dimer bound |
 | `IDEAS.md` | Evaluation of candidate routes and outcome |
@@ -310,11 +337,15 @@ $0.0582321291 \to 0.0582321303$).
 Coupled seeds at $n_0 = 6$ cells (core `RitzBounds`, `coupled_seed_bounds`) improved every
 certified point and certified $\delta = 1/5$: $\Delta_L \ge 0.534794 \to 0.657292$
 ($\delta = 1/2$), $0.173204 \to 0.273433$ ($3/10$), $0.058232 \to 0.168489$ ($1/4$), and new
-$0.035841$ ($1/5$). Adding the model-local sources changed their hashes, so `certify.jl`
-regenerated the $n_0 = 4$ certificates, `summary.json`, and `rp_audit.json` on an x86-64 Linux
-machine. A `--full` replay there showed that the `verified_eigen` radii vary between runs of the
-same code (LAPACK eigenvectors; $\varepsilon_{\mathrm{s}}$ moved by $4 \cdot 10^{-11}$, above the
-core grid $10^{-15}$), so every seed of this model is now padded by $10^{-9}$ (`padded_seed`). The
-seeds, Lean points, and every displayed decimal of the $n_0 = 4$ certificates are unchanged; their
-defects rose by about $10^{-9}$, e.g. $\delta = 1/4$: $\varepsilon_{\mathrm{s}}$
-$0.16567694195518 \to 0.165676943$, interval bound $0.0582321302717 \to 0.0582321275358$.
+$0.035841$ ($1/5$). Their defects are raised by $10^{-9}$ (`padded_seed`), since the fast check
+recomputes the 12-spin spectrum and `--full` also the 24-spin Ritz bounds. Adding the
+model-local sources changed the source hashes recorded by the $n_0 = 4$ results. Their certified
+numbers are unchanged: `scripts/refresh_provenance.jl` rewrote only the provenance metadata of
+`rp_audit.json`, `summary.json`, and the four $n_0 = 4$ certificates (`source_sha256`,
+`core_sha256`, the certificate hashes in `summary.json`, and a `provenance_refresh` record),
+starting from upstream `main` (682105277771); its `--verify` mode shows that every other JSON
+value equals `main`'s. Regenerating them with `certify.jl` would not reproduce their numbers: on
+an x86-64 Linux machine the `verified_eigen` radii differ from the stored ones by about
+$4 \cdot 10^{-11}$ in $\varepsilon_{\mathrm{s}}$ (LAPACK eigenvectors, run-to-run and platform
+variation; the core grid is $10^{-15}$), and for the same reason `check.jl --full` of the
+$n_0 = 4$ certificates fails there, as it does on upstream `main` (see "What is rigorous").

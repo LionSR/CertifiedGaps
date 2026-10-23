@@ -6,7 +6,7 @@
             "eps_s": "221507//500000000",
             "partial_spectrum_file": "results/ritz_bounds_12_cells_delta_1_2.json.gz",
             "interval_bound_decimal": 0.6572925422730437,
-            "seconds": 3.0458590984344482,
+            "seconds": 18.948506832122803,
             "gap_lower_bound_decimal": 0.656500617,
             "gap_4_cells_interval": [
                 "239101//200000",
@@ -18,7 +18,7 @@
             "eps_t": "571153//250000000",
             "gap_lower_bound": "656500617//1000000000",
             "lengths": "every even L >= 4 cells: L >= 6 by the seed theorem, L = 4 by the enclosed gap of the 4-cell ring",
-            "sha256": "d3f33cba33c40bd4ac9e60e92fc9484d53347b9906afcd17b3c36983d2148fef",
+            "sha256": "766b9a546f99735561396dfec9e8bfd327d1c107edfb41dba42eb97928774333",
             "file": "results/certificate_delta_1_2_n0_6_beta_8.json",
             "n0": 6
         },
@@ -26,7 +26,7 @@
             "eps_s": "6111469//500000000",
             "partial_spectrum_file": "results/ritz_bounds_12_cells_delta_3_10.json.gz",
             "interval_bound_decimal": 0.2734335853089645,
-            "seconds": 2.2253410816192627,
+            "seconds": 2.907642126083374,
             "gap_lower_bound_decimal": 0.273238649,
             "gap_4_cells_interval": [
                 "852931//1000000",
@@ -38,7 +38,7 @@
             "eps_t": "169341//4000000",
             "gap_lower_bound": "273238649//1000000000",
             "lengths": "every even L >= 4 cells: L >= 6 by the seed theorem, L = 4 by the enclosed gap of the 4-cell ring",
-            "sha256": "2e7c4c25c5f45ae6cc511ec5df507b4db2ec983f19039aed5834f13dd4739813",
+            "sha256": "fe04ca5e1ee12c16f336ec00bd5a4db28c013e014cf3a018443210da801698c4",
             "file": "results/certificate_delta_3_10_n0_6_beta_65_8.json",
             "n0": 6
         },
@@ -46,7 +46,7 @@
             "eps_s": "1108531//40000000",
             "partial_spectrum_file": "results/ritz_bounds_12_cells_delta_1_4.json.gz",
             "interval_bound_decimal": 0.1684895983653784,
-            "seconds": 2.035248041152954,
+            "seconds": 3.2382709980010986,
             "gap_lower_bound_decimal": 0.168303262,
             "gap_4_cells_interval": [
                 "385709//500000",
@@ -58,7 +58,7 @@
             "eps_t": "82222883//1000000000",
             "gap_lower_bound": "84151631//500000000",
             "lengths": "every even L >= 4 cells: L >= 6 by the seed theorem, L = 4 by the enclosed gap of the 4-cell ring",
-            "sha256": "8c3462e355f0bf0afc4d0cfb508d320e7f2b139a53a9741b461c91080fc7e264",
+            "sha256": "af8047449b4e87588129ae549f0d62229bcd193d85fe0689498df5f00b807d44",
             "file": "results/certificate_delta_1_4_n0_6_beta_17_2.json",
             "n0": 6
         },
@@ -66,7 +66,7 @@
             "eps_s": "33029457//500000000",
             "partial_spectrum_file": "results/ritz_bounds_12_cells_delta_1_5.json.gz",
             "interval_bound_decimal": 0.03584194015059467,
-            "seconds": 1.7533869743347168,
+            "seconds": 2.6023671627044678,
             "gap_lower_bound_decimal": 0.035800258,
             "gap_4_cells_interval": [
                 "347521//500000",
@@ -78,7 +78,7 @@
             "eps_t": "157665213//1000000000",
             "gap_lower_bound": "17900129//500000000",
             "lengths": "every even L >= 4 cells: L >= 6 by the seed theorem, L = 4 by the enclosed gap of the 4-cell ring",
-            "sha256": "a98594d8e210162bfb3204dea4a570d487b3f7121e1b12bcaacd780a51aeed01",
+            "sha256": "bf5a89a44c7718a533d0a30cf55a4d55dfb113fb6809296cc6f1049955973a3f",
             "file": "results/certificate_delta_1_5_n0_6_beta_19_2.json",
             "n0": 6
         }
@@ -89,8 +89,8 @@
             "models/dimerized_heisenberg/src/rp.jl": "8f08c7db77f0b2fcb073073537c48f691a9d6464b7947176ec539c7543828481",
             "models/dimerized_heisenberg/src/DimerizedHeisenberg.jl": "aa96a322112bad4802be3959fe65f68e5c8ab6c19192940e55b17f8d9c0e200a",
             "models/dimerized_heisenberg/check.jl": "5ef50ba4e96f6bcfb7bf5fe24394de317b908b7ee045f8b00f43c876711daddf",
-            "models/dimerized_heisenberg/certify.jl": "ae0ef44a1dc1dc42e8b07f481f50948d659be4a9829372d798ed2baf88ff5ff1",
-            "models/dimerized_heisenberg/src/RitzSeeds.jl": "494a9736a8d216c5a4e5229ae98f399a58373931a3ffc695e97f7db2ea7c3970",
+            "models/dimerized_heisenberg/certify.jl": "af41f6646296f877536e682234be399319ad12bf0f20e57aea9077c3ecbbe12b",
+            "models/dimerized_heisenberg/src/RitzSeeds.jl": "fb46f7d9581962c914ba22e4b947601ed7a75488a1fd6005ebe7632540877221",
             "models/dimerized_heisenberg/src/Diagnostics.jl": "6373bbebda6fc552d70fbf2aa923b1a06adf462413f8f658f8824c5ec19d7c34"
         },
         "core_sha256": {
@@ -134,7 +134,7 @@
             "model": "dimerized_heisenberg",
             "n0": 6
         },
-        "created_utc": "2026-10-23T01:04:45.086",
+        "created_utc": "2026-10-23T07:57:34.162",
         "julia_threads": 1,
         "julia": "1.12.7",
         "IntervalArithmetic": "1.0.12",
