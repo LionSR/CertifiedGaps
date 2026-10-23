@@ -1,0 +1,143 @@
+{
+    "format": "dimerized-heisenberg-ritz-summary-v1",
+    "scope": "Coupled seeds at n0 = 6 cells: complete verified spectrum of 12 spins, rigorous Rayleigh-Ritz lower bounds on Z of 24 spins (core RitzBounds)",
+    "rows": [
+        {
+            "eps_s": "221507//500000000",
+            "partial_spectrum_file": "results/ritz_bounds_12_cells_delta_1_2.json.gz",
+            "interval_bound_decimal": 0.6572925422730437,
+            "seconds": 3.0458590984344482,
+            "gap_lower_bound_decimal": 0.656500617,
+            "gap_4_cells_interval": [
+                "239101//200000",
+                "597753//500000"
+            ],
+            "delta": "1//2",
+            "beta0": "8//1",
+            "partial_spectrum_sha256": "e6b2d9d7020d261fbafc00dc0d885901a963339eb6a392b5dc5c72ba46181227",
+            "eps_t": "571153//250000000",
+            "gap_lower_bound": "656500617//1000000000",
+            "lengths": "every even L >= 4 cells: L >= 6 by the seed theorem, L = 4 by the enclosed gap of the 4-cell ring",
+            "sha256": "d3f33cba33c40bd4ac9e60e92fc9484d53347b9906afcd17b3c36983d2148fef",
+            "file": "results/certificate_delta_1_2_n0_6_beta_8.json",
+            "n0": 6
+        },
+        {
+            "eps_s": "6111469//500000000",
+            "partial_spectrum_file": "results/ritz_bounds_12_cells_delta_3_10.json.gz",
+            "interval_bound_decimal": 0.2734335853089645,
+            "seconds": 2.2253410816192627,
+            "gap_lower_bound_decimal": 0.273238649,
+            "gap_4_cells_interval": [
+                "852931//1000000",
+                "213233//250000"
+            ],
+            "delta": "3//10",
+            "beta0": "65//8",
+            "partial_spectrum_sha256": "eca21e4575e79ba2b5c77a87a647ab4789d765bedbdea73e03b285fd9efb9a03",
+            "eps_t": "169341//4000000",
+            "gap_lower_bound": "273238649//1000000000",
+            "lengths": "every even L >= 4 cells: L >= 6 by the seed theorem, L = 4 by the enclosed gap of the 4-cell ring",
+            "sha256": "2e7c4c25c5f45ae6cc511ec5df507b4db2ec983f19039aed5834f13dd4739813",
+            "file": "results/certificate_delta_3_10_n0_6_beta_65_8.json",
+            "n0": 6
+        },
+        {
+            "eps_s": "1108531//40000000",
+            "partial_spectrum_file": "results/ritz_bounds_12_cells_delta_1_4.json.gz",
+            "interval_bound_decimal": 0.1684895983653784,
+            "seconds": 2.035248041152954,
+            "gap_lower_bound_decimal": 0.168303262,
+            "gap_4_cells_interval": [
+                "385709//500000",
+                "771419//1000000"
+            ],
+            "delta": "1//4",
+            "beta0": "17//2",
+            "partial_spectrum_sha256": "5f395e696a465669ca057fa361a14bf09d62d54dd747c039d319d17332f9e6fa",
+            "eps_t": "82222883//1000000000",
+            "gap_lower_bound": "84151631//500000000",
+            "lengths": "every even L >= 4 cells: L >= 6 by the seed theorem, L = 4 by the enclosed gap of the 4-cell ring",
+            "sha256": "8c3462e355f0bf0afc4d0cfb508d320e7f2b139a53a9741b461c91080fc7e264",
+            "file": "results/certificate_delta_1_4_n0_6_beta_17_2.json",
+            "n0": 6
+        },
+        {
+            "eps_s": "33029457//500000000",
+            "partial_spectrum_file": "results/ritz_bounds_12_cells_delta_1_5.json.gz",
+            "interval_bound_decimal": 0.03584194015059467,
+            "seconds": 1.7533869743347168,
+            "gap_lower_bound_decimal": 0.035800258,
+            "gap_4_cells_interval": [
+                "347521//500000",
+                "695043//1000000"
+            ],
+            "delta": "1//5",
+            "beta0": "19//2",
+            "partial_spectrum_sha256": "cc32069b42792690b8e20beeff963b8d40bd23da2c9697ca4d098026cb640491",
+            "eps_t": "157665213//1000000000",
+            "gap_lower_bound": "17900129//500000000",
+            "lengths": "every even L >= 4 cells: L >= 6 by the seed theorem, L = 4 by the enclosed gap of the 4-cell ring",
+            "sha256": "a98594d8e210162bfb3204dea4a570d487b3f7121e1b12bcaacd780a51aeed01",
+            "file": "results/certificate_delta_1_5_n0_6_beta_19_2.json",
+            "n0": 6
+        }
+    ],
+    "metadata": {
+        "source_sha256": {
+            "models/dimerized_heisenberg/src/reflection_conventions.jl": "582f215f4005462d4c4215fec1decae5fde9e0b09e921915a319d6b09ac38121",
+            "models/dimerized_heisenberg/src/rp.jl": "8f08c7db77f0b2fcb073073537c48f691a9d6464b7947176ec539c7543828481",
+            "models/dimerized_heisenberg/src/DimerizedHeisenberg.jl": "aa96a322112bad4802be3959fe65f68e5c8ab6c19192940e55b17f8d9c0e200a",
+            "models/dimerized_heisenberg/check.jl": "5ef50ba4e96f6bcfb7bf5fe24394de317b908b7ee045f8b00f43c876711daddf",
+            "models/dimerized_heisenberg/certify.jl": "ae0ef44a1dc1dc42e8b07f481f50948d659be4a9829372d798ed2baf88ff5ff1",
+            "models/dimerized_heisenberg/src/RitzSeeds.jl": "494a9736a8d216c5a4e5229ae98f399a58373931a3ffc695e97f7db2ea7c3970",
+            "models/dimerized_heisenberg/src/Diagnostics.jl": "6373bbebda6fc552d70fbf2aa923b1a06adf462413f8f658f8824c5ec19d7c34"
+        },
+        "core_sha256": {
+            "julia/src/ExactDiagonalization.jl": "521e0b95085eb898e62fd37a09342bb4d3ad5b8a010e5ee3f8290d07cee1805a",
+            "julia/src/ReflectionPositivity.jl": "e8d5d3446f680f377bed27d0d9ba44dda8182b7c3055165b9b61701fe736040c",
+            "julia/src/Recurrence.jl": "2dc12e517f9739e2064f5de119510c52caa0a2cfba53d0eb8b5d6c85e02f9729",
+            "julia/src/RingModels.jl": "40bc01631c1f32b56436f13b4edc3b6572198724e8b4ca09939741003cd2bacd",
+            "julia/src/Seeds.jl": "b3d279b067886bec760fb4c5710d7cb8f0bd2dfe15d3d32f67029850b4984c37",
+            "julia/src/recurrence/map.jl": "bcd8ed97ed6701d6b030a8d834207b29276542993d1cb7f30d503bf430e43f61",
+            "julia/src/VerifiedSpectra.jl": "34a496d08c5980c0692a460dfbe7344cfac0e128168207a03d1cc28d02a6c21b",
+            "julia/src/CertifiedMPO/GaugeSearch.jl": "96d9fcdcf031b5b84c502a7582ae5715022752276d3385db724143477b2eb4f5",
+            "julia/src/CertifiedMPO/CertifiedMPO.jl": "1d57e931d6929a3fd143201862c2f079008f9b7fd8288f7b95b0c17e536ef9e0",
+            "julia/src/CertifiedMPO/SchattenBridge.jl": "2300c4f86790906274adf9d50ac8bd43a7ef1ccbfc49e4a9aaafbbe2addc290f",
+            "julia/src/recurrence/rational.jl": "2200190e83ddfca094cdbf41b0c959c4254c9244b361fc0ee647b1a7ea2a49f7",
+            "julia/src/CertifiedMPO/AdjointTrace.jl": "38f76a39b09196e1b1cd3d5fc754945e998c2b570d3ae277bd57765396908892",
+            "julia/src/CertifiedMPO/Norms.jl": "6aa188bc7a1725a51e7dd0806b7f0565ac434e5bfc6aba84e5dfdce73d749f8d",
+            "julia/src/CertifiedMPO/MPOAlgebra.jl": "e6da21eb0db582018d480677a4e8cb85e501277259c79d6035cea60f5c58811d",
+            "julia/src/Models.jl": "299d8bc7b0e377361276b26a99023e5a6130e73058639b0bdb13783b51855b2e",
+            "julia/src/Purification.jl": "ea8a4b1a03a8a38b01d0289b06da72a8ea255e79287008ccf58456cfda9fadf3",
+            "julia/src/ExactArithmetic.jl": "77feece9b1e56011667bd8241ff159864943433d2121f01f351dccefae769882",
+            "julia/src/GapCertificates.jl": "107b72ed1e4870e26413911aefd842a7529fd9762b7aefcfb93f479d35f02746",
+            "julia/src/Results.jl": "fbe920dfa26574a36bb8eb6ea277126a82a36f92d33925bdb474b0f1a2468dcf",
+            "julia/src/CertifiedMPO/Products.jl": "5207b7d80375c538d531c67c699d048a0014409cf410425ffc633299959a9230",
+            "julia/src/CertifiedMPO/Squaring.jl": "9e454f12d3149482d734f33d3a1f47b6c4dab21144329753cdd2826d05c5b03c",
+            "julia/src/Exclusions.jl": "e04adc2f798497a47e087912dd21df57be73c5b6b6d5dec1069e1926092a7358",
+            "julia/src/Spins.jl": "0474b313ac520bebeff4f986dc7bab369af04f8094640c2f68dd3832f2a962c9",
+            "julia/src/CertifiedGaps.jl": "a1cfdc03eb960cf46738b6f3049d4dd2a05dc563b1322da7e8c3e7bbc3c47114",
+            "julia/src/RitzBounds.jl": "2f5292f8b0d7dc7bc8f27f96310b50cfdd3eee04f9995bf4a1041471ad704995",
+            "julia/src/CertifiedMPO/ChargeBlocks.jl": "75304ed0190a6965a056bc24c042cd242afa097ceb1b8aef434e9bd46821b34c",
+            "julia/src/CertifiedMPO/OperatorError.jl": "e13b4fa7c095cf278a77a0f4b36f15b94f6df3af73fa8ea658aa24b624884fd7",
+            "julia/Manifest.toml": "422dd9dcc0c0257c0ccd5852c56a5bb43b214080ece90651b2ddd9209eff9b7f",
+            "julia/src/CertifiedMPO/PolynomialBounds.jl": "7acd92b77ef6bf1c22322a93bc33ff1eae741f5cd0f43330f47a6c632ab3ec4a",
+            "julia/Project.toml": "f9426a1bf9b3fb43b7d0efd3ff8ae1d603fe6354befce98fca4a41be195bc0ed",
+            "julia/src/CertifiedMPO/PositiveBounds.jl": "8921e7de4f45a27260dfc22e00719b06651674fc3dd792d6580e294b5fd68382",
+            "julia/src/recurrence/certified.jl": "3ea9426f0a87aed65cbd66f65d442c88437be11056aeb55b386c3b80eb9527e8"
+        },
+        "status": "certified",
+        "certified": true,
+        "blas_threads": 1,
+        "config": {
+            "model": "dimerized_heisenberg",
+            "n0": 6
+        },
+        "created_utc": "2026-10-23T01:04:45.086",
+        "julia_threads": 1,
+        "julia": "1.12.7",
+        "IntervalArithmetic": "1.0.12",
+        "CertifiedGaps": "0.2.0"
+    }
+}
