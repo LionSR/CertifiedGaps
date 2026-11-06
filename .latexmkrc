@@ -1,3 +1,3 @@
-# Let the notes find the shared package paper/tnnotes.sty.
-ensure_path('TEXINPUTS', './paper//');
-ensure_path('BIBINPUTS', './paper//');
+# Find shared sources without searching stale artifacts under paper/build/.
+ensure_path('TEXINPUTS', './paper');
+ensure_path('BIBINPUTS', './paper');
