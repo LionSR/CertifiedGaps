@@ -1,0 +1,525 @@
+Haldane predicted a gap for integer-spin antiferromagnetic Heisenberg
+chains, in contrast to their half-integer counterparts~\cite{Haldane1983Continuum,Haldane1983Nonlinear}.
+For spin one, numerical work places the bulk gap near
+$0.4105$~\cite{White1993Numerical}. Unlike the
+Affleck--Kennedy--Lieb--Tasaki model~\cite{Affleck1987Rigorous}, the
+Heisenberg chain is not frustration free: neighboring bonds cannot
+simultaneously attain their singlet ground states. Finite-size criteria
+based on frustration freeness~\cite{Knabe1988Energy,Gosset2016Local}
+therefore do not apply directly.
+
+OpenAI proved a unique ground state and a uniform gap
+$\Delta_L>(\log20)/784$ for every even periodic length $L\ge2304$
+using certified finite partition-function bounds~\cite{OpenAI2026Periodic}.
+Here we explain the proof using tensor-network diagrams. We extend
+it to other spin models under a condition that we identify as
+reflection positivity, and give Lean proofs. We also improve the
+spin-1 gap bound using OpenAI's finite trace calculations and trial
+states; see details~\cite{SM}.
+
+\emph{Thermal purity and the gap.---}
+Consider
+\begin{equation}
+ H_L=\sum_{j=1}^{L}\bm S_j\cdot\bm S_{j+1},
+ \qquad Z_L(\beta)=\Tr e^{-\beta H_L},
+ \label{eq:core-model}
+\end{equation}
+with periodic indices, spin one, even $L\ge4$, and exchange coupling
+one. Order energies with multiplicity and put
+$\Delta_L=E_1(L)-E_0(L)$, illustrated by \levels.
+For $\beta>0$, the Gibbs state $\rho_L=e^{-\beta H_L}/Z_L(\beta)$
+has ordered weights $w_0\ge w_1\ge\cdots$. Its thermal purity
+$\Pt(L,\beta)=\Tr\rho_L^2\le w_0$ gives
+\begin{equation}
+ e^{-\beta\Delta_L}=\frac{w_1}{w_0}
+ \le\frac{1-w_0}{w_0}
+ \le\frac{1-\Pt(L,\beta)}{\Pt(L,\beta)}.
+ \label{eq:core-purity-gap}
+\end{equation}
+Purity close to one forces a single dominant Gibbs weight,
+\specbars{.97,.02,.01}. Thus $\Pt>1/2$ forces a unique ground state, and
+$1-\Pt\le q<1/2$, with $q>0$, gives
+$\Delta_L\ge\beta^{-1}\log[(1-q)/q]$.
+
+\emph{Proof strategy.---}
+To keep the gap bound positive as we lower the temperature,
+$\log(1/q)$ must grow proportionally to $\beta$.
+Squaring and normalizing the Gibbs state doubles $\beta$, but does
+not extend the chain. The key idea from the OpenAI proof is to construct a spatial state whose square doubles
+the length, so that we can iterate both operations:
+\begin{proofdiagram}
+ \strategystairs
+\end{proofdiagram}
+% The diagram shows the intended small-error behavior, with constant factors suppressed.
+If each step squares the purity errors, their
+negative logarithms grow as $2^j$, matching $\beta_j=2^j\beta_0$.
+Taking the logarithm and dividing by $\beta_j$ therefore leaves a
+positive constant in the gap bound.
+We must establish this estimate and cover the lengths between steps.
+First we construct the spatial state.
+
+\emph{Spatial transfer matrix.---}
+Set $\tau=\beta/M$ and let $S_L(\tau)$ be the product of
+$I-\tau h_{j,j+1}$ over even bonds followed by odd bonds, where
+$h=\bm S\cdot\bm S$. Contracting the resulting finite network in
+time or space gives~\cite{Suzuki1985Transfermatrix}
+\begin{equation}
+ \underbrace{\Tr S_L(\beta/M)^M}_{\bricknetwork{1}}
+ =Z_L^{(M)}(\beta)
+ =\underbrace{\Tr T_{\beta,M}^{L/2}}_{\bricknetwork{2}}.
+ \label{eq:core-two-readings}
+\end{equation}
+
+In the Cartesian basis $\ket{x},\ket{y},\ket{z}$, the generators
+$G_\alpha=iS^\alpha$ are real antisymmetric matrices. Hence
+\begin{equation}
+ -h=\sum_{\alpha=x,y,z}G_\alpha\otimes G_\alpha,
+ \qquad
+ I-\tau h=\sum_{\gamma=0,x,y,z}A_\gamma\otimes A_\gamma,
+ \label{eq:core-bond}
+\end{equation}
+where $A_0=I$ and $A_\alpha=\sqrt{\tau}\,G_\alpha$.
+Diagrammatically, $\splitgate=\sum_\gamma\bondends$.
+Matching real bond factors express reflection
+positivity~\cite{Dyson1978Phase,Frohlich1978Phase,Jaffe2016Characterization}.
+
+For bond-label sequences $a,b\in\{0,x,y,z\}^M$, define the real matrix
+$\mathcal F_{ba}=\Tr[(A_{b_1}A_{a_1})\cdots(A_{b_M}A_{a_M})]$.
+The two sites sharing an even bond have identical factor orderings.
+Contracting their shared sequence gives
+\begin{equation}
+ T_{\beta,M}=\mathcal F^{\mathsf T}\mathcal F\ge0,
+ \qquad
+ \tnchain{\mathcal F^{\mathsf T},\mathcal F}
+ =\tnchain{T_{\beta,M}}.
+ \label{eq:core-gram}
+\end{equation}
+This transfer matrix advances by two sites and is independent of $L$.
+
+For even $n\ge4$, normalize $T_{\beta,M}^{n/2}$ by its trace to obtain
+the density operator $\sigma_n^{(M)}$. The trace is nonzero because
+$\mathcal F_{00}=3$ for the all-zero sequences.
+Nonnegative transfer eigenvalues give spatial purity, squaring, and
+power-sum monotonicity inequalities.
+At each fixed $L,\beta$, the matrix product limit
+$S_L(\beta/M)^M\to e^{-\beta H_L}$ passes these closed scalar
+inequalities to exact partition functions.
+We take this limit before the doubling argument, requiring neither a limiting
+transfer matrix nor a Trotter error uniform in $L$.
+The finite-Trotter section of the Supplemental Material~\cite{SM} proves these
+statements. Thermal identities below concern the exact Gibbs operator,
+not finite Trotter products.
+
+\emph{Coupling and squaring.---}
+The two purities are
+\begin{align}
+ \Ps(n,\beta)
+ &=\lim_{M\to\infty}\Tr[(\sigma_n^{(M)})^2]
+ =\frac{Z_{2n}(\beta)}{Z_n(\beta)^2},\nonumber\\
+ \Pt(n,\beta)
+ &=\Tr\rho_n(\beta)^2
+ =\frac{Z_n(2\beta)}{Z_n(\beta)^2}.
+ \label{eq:core-purities}
+\end{align}
+Both lie in $(0,1]$. Their contractions,
+$\tnchain[ring]{\sigma_n^{(M)},\sigma_n^{(M)}}$ and
+$\tncolumn[ring]{\rho_n,\rho_n}$, join normalized copies in
+space and time. The rectangle $\Zt21$ denotes $Z_n(\beta)$, with width
+$n$ and height $\beta$. Joining four copies in either order gives
+\begin{proofdiagram}
+ \torusgluing
+\end{proofdiagram}
+The two paths therefore give the exact identity
+\begin{equation}
+ \Ps(n,2\beta)\Pt(n,\beta)^2
+ =\Pt(2n,\beta)\Ps(n,\beta)^2.
+ \label{eq:core-coupling-s}
+\end{equation}
+It holds without reflection positivity; positivity is needed to use
+its factors as purities.
+
+For probabilities $u_i$, write $P=\sum_i u_i^2$. Their normalized
+squares have purity $P'$, with
+\begin{equation}
+ 1-P'=\frac{2\sum_{i<j}(u_i u_j)^2}{P^2}
+ \le\frac{(1-P)^2}{2P^2}=f(1-P),
+ \label{eq:core-square}
+\end{equation}
+where $f(z)=z^2/[2(1-z)^2]$.
+Thus squaring concentrates weights,
+$\specbars{.5,.3,.2}\mapsto\specbars{.66,.24,.1}$.
+The same operation acts in the two directions:
+\begin{align}
+ \tnchain{\sigma_n^{(M)},\sigma_n^{(M)}}
+ &=\Tr[(\sigma_n^{(M)})^2]\,\tnchain{\sigma_{2n}^{(M)}},\notag\\
+ \tncolumn{\rho_n(\beta),\rho_n(\beta)}
+ &=\Pt(n,\beta)\,\tncolumn{\rho_n(2\beta)}.
+ \label{eq:core-operator-square}
+\end{align}
+
+Suppose $1-\Ps(n,\beta)\le p$ and $1-\Pt(2n,\beta)\le q$.
+Dropping the favorable denominator $\Pt(n,\beta)^2\le1$ in
+Eq.~\eqref{eq:core-coupling-s}, then squaring in space, gives $p'$.
+Repeating the identity at length $2n$, then squaring in time, gives
+$q'$:
+\begin{align}
+ p'&=f(1-(1-p)^2(1-q)),\nonumber\\
+ q'&=f(1-(1-q)^2(1-p')).
+ \label{eq:core-update}
+\end{align}
+For $0\le p,q,p',q'<1$, these bound
+$1-\Ps(2n,2\beta)$ and $1-\Pt(4n,2\beta)$.
+The thermal update uses the new spatial bound:
+\begin{proofdiagram}
+ \pbcsteps
+\end{proofdiagram}
+
+\emph{The finite seed and uniform gap.---}
+The existing computation supplies an independent input.
+
+\begin{lemma}[Finite seed~\cite{OpenAI2026Periodic}]
+ \label{lem:arxiv-seed36}
+ At $\beta_0=49/4$, the periodic spin-1 chain satisfies
+ \begin{align}
+ \Ps(36,\beta_0)&\ge1-\frac{47916}{10^6},\nonumber\\
+ \Pt(72,\beta_0)&\ge1-\frac{181521}{10^6}.
+ \label{eq:core-seed}
+ \end{align}
+\end{lemma}
+
+Accepting this lemma suffices for the following argument.
+Six rationally verified, upward-rounded updates give
+$p_6=0.0084709$ and $q_6=0.0055149$ at
+$(n_6,\beta_6)=(2304,784)$, as shown in
+Fig.~\ref{fig:core-region}. The doubling-argument section of the Supplemental Material~\cite{SM} records the exact orbit and rounding rule.
+
+\input{figures/arxiv-convergence}
+
+For $p,q\le\varepsilon\le0.01$, both updates are at most
+$5\varepsilon^2$; the Supplemental Material~\cite{SM} proves this scalar estimate.
+Restarting at $(2304,784)$ gives bounds
+$\varepsilon_j=20^{-2^j}/5$ at
+$n_j=2304\,2^j$, $\beta_j=784\,2^j$.
+To cover every even $L\ge2304$, choose $j$ with
+$n_j\le L\le2n_j$. Spatial power-sum monotonicity at $\beta_j$
+and $2\beta_j$ yields
+\begin{align}
+ \Pt(L,\beta_j)
+ &\ge[\Pt(2n_j,\beta_j)\Ps(n_j,\beta_j)^2]^{L/(2n_j)}
+ \nonumber\\
+ &\ge(1-\varepsilon_j)^3\ge1-3\varepsilon_j.
+ \label{eq:core-interpolation}
+\end{align}
+Consequently the ground state is unique. Moreover,
+$3\varepsilon_j/(1-3\varepsilon_j)
+\le(60/97)20^{-2^j}<20^{-2^j}$.
+Equation~\eqref{eq:core-purity-gap} therefore proves
+\begin{equation}
+ \Delta_L>\frac{\log20}{784}\simeq0.003821
+ \qquad\text{for every even }L\ge2304.
+ \label{eq:core-gap}
+\end{equation}
+
+\emph{Finite seed bounds.---}
+
+The starting lemma requires two ratios at $\beta_0=49/4$:
+\begin{align}
+ \textcolor{mpored}{\Ps(36,\beta_0)}
+ &=\frac{Z_{72}(\beta_0)}{Z_{36}(\beta_0)^2},\notag\\
+ \textcolor{mpoblue}{\Pt(72,\beta_0)}
+ &=\frac{Z_{72}(2\beta_0)}{Z_{72}(\beta_0)^2}.
+ \label{seed:ratios}
+\end{align}
+Each numerator needs a lower bound; each denominator needs an upper
+bound. Exact trace calculations on $4$--$12$ sites and a $72$-site
+trial state supply them~\cite{OpenAI2026Periodic}:
+\begin{center}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}clll@{}}
+\toprule
+ & Quantity & Bound & Method\\
+\midrule
+$\Zt{4}{1}$ & $Z_{72}(\beta_0)$ & lower & MPS + small-ring traces\\
+$\Zt{2}{1}$ & $Z_{36}(\beta_0)$ & upper & MPS + small-ring traces\\
+$\Zt{4}{2}$ & $Z_{72}(2\beta_0)$ & lower & MPS\\
+$\Zt{4}{1}$ & $Z_{72}(\beta_0)$ & upper & small-ring traces\\
+\bottomrule
+\end{tabular}
+\end{center}
+Readers may skip this explanation and use Lemma~\ref{lem:arxiv-seed36} directly.
+Defining decimals below are exact rationals; approximate values are
+only explanatory.
+
+\paragraph{Step 1: Spatial trace moments.}
+A continuous-time, one-site spatial transfer operator gives
+\begin{equation}
+ Z_n(\beta)=\Tr K_\beta^n
+ =\tnchain[node=xvertex,ring]{,\cdots,}_{\,n},
+ \qquad n\ge4.
+ \label{seed:transfer}
+\end{equation}
+It is self-adjoint but need not be positive, unlike the positive
+two-site transfer matrix used in the doubling argument.
+Anticipating the trial energy below, set $\kappa=700741/500000$ and
+\begin{align}
+ \widehat Z_n(\beta)&=e^{-n\beta\kappa}Z_n(\beta),\notag\\
+ \widehat K&=e^{-\beta_0\kappa}K_{\beta_0},\qquad
+ \widehat Z_n(\beta_0)=\sum_i\lambda_i^n.
+ \label{seed:shift}
+\end{align}
+The $\lambda_i$ are real eigenvalues of $\widehat K$, possibly negative.
+The shift cancels from both purities. Changing $n$ changes only the
+power: short-chain traces constrain the same spectrum needed at
+$36$ and $72$ sites.
+
+\paragraph{Step 2: Separate the moments by symmetry.}
+Spin rotations preserve the Heisenberg Hamiltonian and induce
+transfer symmetries. The commuting $\pi$ rotations split four sign
+sectors: an invariant sector $J$ and three sectors with identical
+spectra, denoted $N$, exchanged by axis permutations. Thus
+\begin{align}
+ \seedring{0}\quad \widehat Z_n&=J_n+3N_n,\notag\\
+ \seedring{1}\quad \widehat Z_n(P)&=J_n-N_n.
+ \label{seed:sectors}
+\end{align}
+Here $J_n=\sum_{i\in J}\lambda_i^n$, and $N_n$ sums one $N$ list;
+all traces are at $\beta_0$.
+The twist $P$ rotates one end of the physical closing bond by $\pi$,
+rather than inserting a global rotation into the untwisted physical
+trace.
+
+Integer trace recursions with explicit truncation and rounding bounds
+enclose both traces for $4\le n\le12$.
+Inverting Eq.~\eqref{seed:sectors} gives sector moments, including
+\begin{equation}
+ J_{12}\le m_J=1.0657205,\qquad
+ N_{12}\le m_N=0.2783155.
+ \label{seed:masses}
+\end{equation}
+
+\paragraph{Step 3: A trial state gives a lower bound.}
+Integer tensors of bond dimension $26$ define a periodic $72$-site
+MPS $\psi$. Its norm and one-bond expectation are exact contractions:
+\begin{align}
+ \mathcal N&=\langle\psi,\psi\rangle=\seedmps{0},\notag\\
+ \mathcal E&=\langle\psi,h_{1,2}\psi\rangle=\seedmps{1}.
+ \label{seed:trial}
+\end{align}
+Each diagram contains $72$ tensors per layer. Translation invariance gives
+$\langle\psi,H_{72}\psi\rangle/(72\mathcal N)
+=\mathcal E/\mathcal N<-\kappa$.
+The variational principle gives $E_0(72)<-72\kappa$.
+The shift adds $\kappa$ on each of the $72$ sites, so the shifted
+ground energy is negative and its Boltzmann weight exceeds one:
+\begin{equation}
+ \widehat Z_{72}(\beta)
+ \ge e^{-\beta(E_0(72)+72\kappa)}>1
+ \qquad(\beta>0).
+ \label{seed:trial-lower}
+\end{equation}
+This calculation supplies both
+$\sum_i\lambda_i^{72}>1$ at $\beta_0$ and the thermal numerator
+$\widehat Z_{72}(2\beta_0)>1$.
+
+\paragraph{Step 4: A lower bound on the leading spatial eigenvalue.}
+Suppose every $|\lambda_i|\le\ell=0.999$.
+Write $u_i=\lambda_i^{12}\ge0$, so $\lambda_i^{72}=u_i^6$.
+In $J$, the total mass is at most $m_J$ and each entry is at most
+$\ell^{12}$. Convexity increases the sixth-power sum when mass
+passes from a smaller entry to a larger one, up to the cap.
+Since $\ell^{12}<m_J<2\ell^{12}$, the extremum has one entry
+$\ell^{12}$ and remainder $m_J-\ell^{12}$:
+\begin{proofdiagram}
+ \seedweightbars
+\end{proofdiagram}
+Taking sixth powers suppresses the remainder.
+Each $N$ list contributes at most $m_N^6$, giving
+\begin{align}
+ \widehat Z_{72}(\beta_0)
+ &\le\ell^{72}+(m_J-\ell^{12})^6+3m_N^6\notag\\
+ &<0.932<1.
+ \label{seed:dominance}
+\end{align}
+This contradicts Eq.~\eqref{seed:trial-lower}.
+Hence some $|\lambda_0|>\ell$; it belongs to $J$ because
+$m_N<\ell^{12}$.
+
+\paragraph{Step 5: Polynomial bounds on the remaining spectrum.}
+A nonnegative polynomial $F(x)=\sum_{j=4}^{12}f_jx^j$ converts known
+sector moments into individual eigenvalue bounds:
+\begin{equation}
+ F(\lambda_i)\le\sum_{a\in\mathcal S}F(\lambda_a)
+ =\sum_{j=4}^{12}f_j\mathcal S_j\le B,
+ \qquad i\in\mathcal S.
+ \label{seed:filter}
+\end{equation}
+Here $\mathcal S$ is $J$ or $N$.
+Where $F(x)>B$, no eigenvalue can occur. Two filters give
+$|\lambda|<U=1.00139$ in $J$ and $|\lambda|<V=0.872$ in $N$.
+The Supplemental Material~\cite{SM} gives their coefficients and checks both
+exterior rays.
+
+Removing $\lambda_0$ leaves $J$ mass at most $m_J-\ell^{12}$.
+Since $V^{12}<m_N<2V^{12}$, convexity bounds each $N$ list by
+one entry at $V^{12}$ and the remainder.
+For $k=36,72$, the residual moment $\sum_{i\ne0}\lambda_i^k$
+is therefore at most
+\begin{align}
+ R_k={}&(m_J-\ell^{12})^{k/12}\notag\\
+ &+3\left[V^k+(m_N-V^{12})^{k/12}\right].
+ \label{seed:residual}
+\end{align}
+Retain $\lambda_0^{72}$ in the spatial numerator and bound its
+denominator by $(\lambda_0^{36}+R_{36})^2$.
+For thermal purity, use the trial numerator and
+$\widehat Z_{72}(\beta_0)\le U^{72}+R_{72}$. Thus
+\begin{align}
+ \Ps(36,\beta_0)&\ge[1+R_{36}/\ell^{36}]^{-2}=1-p,\notag\\
+ \Pt(72,\beta_0)&\ge[U^{72}+R_{72}]^{-2}=1-q.
+ \label{seed:long}
+\end{align}
+Exact rational comparisons give the starting bounds
+\begin{equation}
+ p\le\frac{47916}{10^6},\qquad q\le\frac{181521}{10^6}.
+ \label{seed:bounds}
+\end{equation}
+For orientation, $p\simeq0.0479157710062$ and
+$q\simeq0.181520168033$; these approximations are not recurrence inputs.
+
+The same trace moments, the existing $120$-site trial state, and
+temperature lifting give $\Delta_L>0.07290$ for every even $L\ge36$.
+The lifted bound covers $L\ge60$; an unlifted estimate bridges
+$36\le L\le72$. The Supplemental Material~\cite{SM} gives the proof, and the
+\href{https://github.com/LionSR/CertifiedGaps}{repository} provides
+the certificate.
+
+
+\emph{Reflection-positive models.---}
+The argument requires locality and reflection
+positivity~\cite{Frohlich1978Phase,Jaffe2016Characterization}, not
+spin-rotation symmetry. Consider a translation-invariant ring of $L$
+cells with Hamiltonian
+\begin{equation}
+ H_L=\sum_{j=1}^L h_{j,j+1}+\sum_{j=1}^L o_j,
+ \qquad j+L\equiv j.
+ \label{scope:hamiltonian}
+\end{equation}
+Here $h$ couples neighboring cells and $o$ acts within a cell.
+Let the real matrix $F=F^{\mathsf T}$, $F^2=I$, represent reflection
+within a cell; for a dimer, $F$ exchanges the two spins.
+We take $o$ real symmetric and require $FoF=o$, so the cell
+Hamiltonian respects this reflection. Across a bond, we require
+\begin{equation}
+ -h=\sum_\alpha C_\alpha\otimes FC_\alpha F,
+ \label{scope:rp}
+\end{equation}
+where each $C_\alpha$ is real and either symmetric or antisymmetric.
+This pairs each bond factor with its reflected copy. Contracting two
+neighboring cells therefore gives a positive Gram transfer matrix,
+as in Eq.~\eqref{eq:core-gram}; see details~\cite{SM}.
+We can then use the same spatial purity inequalities and doubling
+argument as for the spin-1 chain.
+
+An admissible seed at even $n_0$ then gives a unique ground state
+and a uniform gap for every even $L\ge n_0$, using finite-prefix
+interpolation and an analytic tail bound%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.gapGT_of_chainCertificate}.
+Table~\ref{tab:models} includes staggered-field chains~\cite{Oshikawa1997Field},
+bond-alternating chains~\cite{Barnes1999Alternating,Yamamoto1995Elementary},
+chains with single-ion anisotropy~\cite{Chen2003Ground}, and Heisenberg
+ladders~\cite{Dagotto1996Surprises}. Each model needs its own finite
+seed; the analytical argument is unchanged.
+\begin{table*}[t]
+\caption{Uniform gap bounds for reflection-positive models. Every even
+length at or above the stated threshold is covered. A cell or rung
+contains two spins; $L$ counts the units shown. Spin operators have
+$\bm S^2=S(S+1)I$; $\sigma^\alpha$ are Pauli matrices. Numerical values
+are finite-ring estimates on $12$--$20$ spins, not certified uniform
+bounds, except for the spin-1 Heisenberg bulk estimate~\cite{White1993Numerical}.
+The mixed-field Ising row gives the kernel-checked bound.}
+\label{tab:models}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}p{.19\textwidth}p{.43\textwidth}lll@{}}
+\toprule
+Model & Hamiltonian & Even lengths & Gap $\ge$ & Numerical\\
+\midrule
+Staggered field, $S=\tfrac12$
+ & $\sum_j\bm S_j\cdot\bm S_{j+1}-\sum_j(-1)^jS_j^z$
+ & $L\ge8$ sites & $1.1489$ & $1.874$\\
+Dimerized, $S=\tfrac12$
+ & $\sum_j[1+(-1)^j/2]\,\bm S_j\cdot\bm S_{j+1}$
+ & $L\ge4$ cells & $0.5347$ & $1.189$\\
+Dimerized, $S=1$
+ & $\sum_j[1+9(-1)^j/10]\,\bm S_j\cdot\bm S_{j+1}$
+ & $L\ge2$ cells & $0.5288$ & $1.763$\\
+Single-ion anisotropy, $S=1$
+ & $\sum_j\bm S_j\cdot\bm S_{j+1}+4\sum_j(S_j^z)^2$
+ & $L\ge12$ sites & $0.8994$ & $2.269$\\
+Heisenberg ladder, \mbox{$S=\tfrac12$}
+ & $\sum_{j,a=1,2}\bm S_{j,a}\cdot\bm S_{j+1,a}
+    +4\sum_j\bm S_{j,1}\cdot\bm S_{j,2}$
+ & $L\ge4$ rungs & $1.1024$ & $3.138$\\
+Ising ladder
+ & $-\sum_j(\sigma^z_{j,1}\sigma^z_{j+1,1}
+    +\sigma^z_{j,2}\sigma^z_{j+1,2}
+    +\sigma^z_{j,1}\sigma^z_{j,2})$
+   \newline $\displaystyle{}-3\sum_{j,a=1,2}\sigma^x_{j,a}$
+ & $L\ge4$ rungs & $0.6368$ & $2.662$\\
+Mixed-field Ising
+ & $-\sum_j\sigma_j^z\sigma_{j+1}^z
+    -\tfrac14\sum_j\sigma_j^x-\tfrac1{20}\sum_j\sigma_j^z$
+ & $L\ge6$ sites & $0.3922$ & $1.190$\\
+Heisenberg, $S=1$
+ & $\sum_j\bm S_j\cdot\bm S_{j+1}$
+ & $L\ge36$ sites & $0.0729$ & $0.410$\\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\emph{Formal verification.---}
+The marker $\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html}$
+denotes a formalized implication with its stated assumptions.
+The analytic criterion and recurrence are formalized in Lean.
+The path-space kernel construction and trace identities needed for
+the original proof are not yet available in mathlib. We therefore
+use finite matrices. A positive transfer matrix at finite
+$M$ gives closed scalar inequalities; a controlled product limit
+at fixed $L,\beta$ passes them to exact quantities before
+iteration%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.spatialMomentBounds}.
+
+We prove the gap theorem in Lean for general reflection-positive
+Hamiltonians and apply the same theorem to the models in
+Table~\ref{tab:models}. We provide the proofs as a
+\href{https://github.com/LionSR/CertifiedGaps}{library}
+so that others can reproduce the results and add models.
+
+To obtain a complete Lean proof, we must also verify the finite
+calculations in Lean. We have done so for the mixed-field Ising model
+at $(g,h)=(1/4,1/20)$. For spin one, we check the MPS contractions
+in Lean and supply the remaining externally certified finite bounds
+as hypotheses.
+
+\emph{Discussion.---}
+Understanding the proof let us certify gaps for seven other spin-chain
+and ladder models (Table~\ref{tab:models}), and improve the spin-1 bound
+using the existing finite inputs. We also explain the boundary-field
+proof for open chains using diagrams~\cite{OpenAI2026Boundaryfield,SM}.
+
+A next target is the spin-2 Heisenberg chain, whose smaller gap and
+longer correlation length make the finite inputs harder to
+certify~\cite{Todo2001Cluster}. In two spatial dimensions, an analogous
+argument would track three purities and require additional spatial
+inequalities as well as certified finite inputs. Establishing these
+inputs for the honeycomb AKLT model~\cite{Lemm2020Existence,Pomata2020Demonstrating}
+remains open for this method.
+
+The OpenAI proof combines simple ideas with a substantial computation.
+This work also explores numerical certification in Lean and calls for
+improvements in the numerical efficiency of proof assistants, making them comparable with
+symbolic computation systems such as Mathematica and numerical linear algebra engines such as those in MATLAB and Julia.
+The fully checked Ising seed shows that the
+finite calculation can be included in the formal proof; the larger
+spin-1 calculations provide a further test of how much computation
+can be checked directly in the kernel.

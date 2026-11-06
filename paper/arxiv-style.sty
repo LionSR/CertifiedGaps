@@ -1,0 +1,32 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{arxiv-style}[2026/11/05 Shared arXiv manuscript setup]
+\RequirePackage[T1]{fontenc}
+\RequirePackage{tnnotes,booktabs,pgfplots}
+\pgfplotsset{compat=1.18}
+\RequirePackage[colorlinks=true,citecolor=blue,linkcolor=blue,urlcolor=blue]{hyperref}
+% New-paper styles reuse the tensor-network primitives from tnnotes.
+\tikzset{
+ arxiv label/.style={font=\footnotesize},
+ arxiv gate/.style={draw,fill=white,line width=.4pt},
+ arxiv mirror/.style={black!45,densely dashed,line width=.45pt},
+ arxiv spatial flow/.style={flow,mpored},
+ arxiv thermal flow/.style={flow,mpoblue},
+ arxiv leading weight/.style={black!55},
+ arxiv remainder weight/.style={black!25},
+ arxiv point/.style={circle,fill=black!75,inner sep=1.5pt}}
+\input{figures/arxiv-diagrams}
+% A linked check marks a formalized implication, with hypotheses stated in prose.
+\newcommand{\leanmark}[1]{\href{#1}{\ensuremath{\textcolor{teal!70!black}{\checkmark_{\!\mathsf L}}}}}
+% Resolve lane anchors before passing them to TikZ's key/coordinate parsers.
+\renewcommand{\lanemove}[5][black!55]{%
+ \ifnum\csname tn@lane@#2\endcsname=0
+  \def\arxiv@anchor{east}\def\arxiv@outer{west}\def\arxiv@shift{-1.5pt}%
+ \else
+  \def\arxiv@anchor{west}\def\arxiv@outer{east}\def\arxiv@shift{1.5pt}%
+ \fi
+ \path let \p1=(#3.north),\p2=(#3.south) in
+  node[lanemv] (mv#4) at (\x1,{\y1+\lanemvpos*(\lanedy*1cm-\y1+\y2)}) {#4};
+ \draw[#1,line width=.5pt,shorten <=.5pt] (#2)--(mv#4);
+ \draw[flow,#1,shorten >=.5pt] (mv#4)--(#3);
+ \node[maprule,anchor=\arxiv@anchor,inner sep=1pt,xshift=\arxiv@shift]
+  at (mv#4.\arxiv@outer) {#5};}

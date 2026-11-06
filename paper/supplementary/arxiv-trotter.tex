@@ -1,0 +1,501 @@
+
+\subsection{Finite Trotter slices and a two-site transfer matrix}
+\label{sm:sec:transfer}
+
+OpenAI's proof uses a continuous-time spatial integral kernel~\cite{OpenAI2026Periodic}.
+For our Lean formalization we instead prove the spatial inequalities
+for finite matrices and pass them to exact partition functions by a
+controlled product limit.
+% This section gives that alternative proof.
+% The subsequent doubling argument is the original one.
+
+Consider the periodic spin-1 Heisenberg Hamiltonian
+\begin{equation}
+ H_L=\sum_{j=0}^{L-1}h_{j,j+1},
+ \qquad h=\sum_{\alpha=x,y,z}S^\alpha\otimes S^\alpha,
+ \qquad Z_L(\beta)=\Tr e^{-\beta H_L},
+ \label{sm:eq:model}
+\end{equation}
+with indices taken modulo $L$, exchange coupling equal to one, and
+$\beta>0$. In the Cartesian basis $s,s'\in\{x,y,z\}$, set
+\begin{equation}
+ (S^\alpha)_{ss'}=-i\epsilon_{\alpha ss'},
+ \qquad G_\alpha=iS^\alpha,
+ \qquad -h=\sum_\alpha G_\alpha\otimes G_\alpha.
+ \label{sm:eq:generators}
+\end{equation}
+Here $\epsilon_{\alpha ss'}$ is the Levi-Civita symbol, $\Tr$ denotes
+the matrix trace, and $\smI$ denotes the identity on the relevant space.
+Each $G_\alpha$ is real antisymmetric and has operator norm one.
+Equation~\eqref{sm:eq:generators} is the real bond-reflection-positive
+factorization used below~\cite{Dyson1978Phase,Frohlich1978Phase}.
+
+To replace the continuous-time path integral by a finite-dimensional
+trace, we discretize imaginary time into $M$ brickwork slices.
+For $L=2N$, $N\ge1$, and a positive integer $M$, let
+$\tau=\beta/M$. Define the linearized brickwork slice and its trace by
+\begin{align}
+ S_{2N}(\tau)
+ &=\prod_{k=0}^{N-1}(\smI-\tau h_{2k,2k+1})
+   \prod_{k=0}^{N-1}(\smI-\tau h_{2k+1,2k+2}), \notag\\
+ \smZ{2N}(\beta)&=\Tr S_{2N}(\beta/M)^M.
+ \label{sm:eq:slice}
+\end{align}
+Products are ordered from left to right in increasing index.
+The trace is real because all factors have real entries.
+% We do not assume that the individual linearized factors are positive.
+% mannered prose here.
+
+Let $\Gamma=\{\varnothing,x,y,z\}$, with
+$C_\varnothing=\smI$ and $C_\alpha=\sqrt{\tau}\,G_\alpha$.
+The bond expansion is the exact finite identity
+\begin{equation}
+ \smI-\tau h=\sum_{\gamma\in\Gamma}C_\gamma\otimes C_\gamma.
+ \label{sm:eq:bond}
+\end{equation}
+An imaginary-time bond sequence is an element
+$p=(p_0,\ldots,p_{M-1})$ of $\smD=\Gamma^M$.
+Define the single-site trace matrix by
+\begin{equation}
+ \smF_{pq}
+ =\Tr\!\left[\prod_{t=0}^{M-1}(C_{p_t}C_{q_t})\right],
+ \qquad p,q\in\smD.
+ \label{sm:eq:F}
+\end{equation}
+The product over $t$ follows the multiplication order of the $M$ slices.
+The matrix $\smF$ depends on $M$ and $\tau$, but not on $N$.
+
+To contract the network in space, assign sequences $b_k$ and $c_k$
+to the even and odd bonds starting at $2k$ and $2k+1$, respectively.
+In slice $t$, site $2k$ carries
+$C_{b_{k,t}}C_{c_{k-1,t}}$, whereas site $2k+1$ carries
+$C_{b_{k,t}}C_{c_{k,t}}$. Expanding all bond sums, multiplying
+sitewise tensor products, and taking the physical trace gives
+\begin{align}
+ \smZ{2N}(\beta)
+ &=\sum_{\substack{b_0,\ldots,b_{N-1}\in\smD\\
+                   c_0,\ldots,c_{N-1}\in\smD}}
+   \prod_{k=0}^{N-1}
+   \smF_{b_kc_{k-1}}\smF_{b_kc_k} \notag\\
+ &=\sum_{c_0,\ldots,c_{N-1}\in\smD}
+   \prod_{k=0}^{N-1}(\smF^{\mathsf T}\smF)_{c_{k-1}c_k}
+   =\Tr(\smF^{\mathsf T}\smF)^N,
+ \label{sm:eq:factorization}
+\end{align}
+where $c_{-1}=c_{N-1}$. The middle equality sums each even-bond
+sequence $b_k$ independently; the last equality is the closed-path
+expansion of a matrix trace.
+
+Thus the spatial transfer matrix
+\begin{equation}
+ \smT=\smF^{\mathsf T}\smF=\smF^\dagger\smF\succeq0
+ \label{sm:eq:positive}
+\end{equation}
+advances \emph{two sites}, not one. Because $\smF$ is real, its
+transpose equals its adjoint, and
+$v^\dagger\smT v=\smnorm{\smF v}^2\ge0$.
+Neither symmetry nor positivity of $\smF$ itself is required.
+This finite two-site Gram matrix is distinct from the
+continuous-time one-site self-adjoint kernel used in a thermal-MPO
+description~\cite{Tang2021Continuous}, and we do not construct a
+limiting kernel.
+
+We extend the same contraction to any real reflection-positive cell model.
+Its assumptions are a finite-dimensional local cell space, a finite
+family of real matrices $C_\alpha$, each symmetric or antisymmetric,
+a real symmetric on-site matrix $o$, and a real symmetric involution
+$F$ satisfying
+\begin{equation}
+ F^2=\smI,\qquad FoF=o,\qquad
+ h=-\sum_\alpha C_\alpha\otimes FC_\alpha F.
+ \label{sm:eq:cell}
+\end{equation}
+The Hamiltonian is $H_L=\sum_j h_{j,j+1}+\sum_j o_j$, and lengths
+count cells. Insert the on-site layer
+$\prod_i(\smI-\tau o_i)$ between the even and odd bond layers.
+Writing $A_\varnothing=\smI$,
+$A_\alpha=\sqrt{\tau}\,C_\alpha$, and $O=\smI-\tau o$, the bond
+expansion becomes
+$\smI-\tau h=\sum_\gamma A_\gamma\otimes FA_\gamma F$.
+Replace Eq.~\eqref{sm:eq:F} by
+\begin{equation}
+ \smF_{pq}=\Tr\prod_{t=0}^{M-1}(A_{p_t}OFA_{q_t}F),
+ \label{sm:eq:cell-F}
+\end{equation}
+where the sequences now range over the enlarged bond-label alphabet.
+An odd cell carries $FA_{p_t}FOA_{q_t}$. Since $FO=OF$,
+this factor is the conjugate by $F$ of the even-cell factor.
+Conjugating the entire product leaves its trace unchanged.
+The two sublattices therefore contribute the same $\smF_{pq}$,
+and Eqs.~\eqref{sm:eq:factorization} and~\eqref{sm:eq:positive}
+follow without change.
+
+\subsection{Finite-transfer moment inequalities}
+\label{sm:sec:moments}
+
+Positivity of $\smT$ expresses $\smZ{L}(\beta)$ as an even moment sum of
+nonnegative weights, from which we derive the spatial purity, squaring,
+and interpolation inequalities at finite $M$.
+At fixed $M,\beta$, let $\lambda_i\ge0$ be the eigenvalues of
+$T_{M,\beta/M}$, and put $\mu_i=\sqrt{\lambda_i}$.
+For every even $L\ge2$, Eq.~\eqref{sm:eq:factorization} gives
+\begin{equation}
+ \smZ{L}(\beta)=\sum_i\mu_i^L.
+ \label{sm:eq:moments}
+\end{equation}
+
+For any finite nonnegative family $a_i$, let $S_k=\sum_i a_i^k$.
+Then
+\begin{equation}
+ S_2\le S_1^2,\qquad
+ 2(S_2^2-S_4)\le(S_1^2-S_2)^2.
+ \label{sm:eq:powers}
+\end{equation}
+Indeed, $S_1^2-S_2=2\sum_{i<j}a_i a_j$, whereas
+$S_2^2-S_4=2\sum_{i<j}a_i^2a_j^2$.
+Squaring the first sum and retaining only its diagonal terms proves
+the second inequality.
+
+If $\sum_i a_i=1$, the purity is $P=\sum_i a_i^2>0$.
+Squaring and normalizing replaces the distribution by
+$a_i^2/P$, of purity $P'=S_4/P^2$. Thus
+\begin{equation}
+ 1-P'\le f(1-P),\qquad
+ f(z)=\frac{z^2}{2(1-z)^2}.
+ \label{sm:eq:squaring}
+\end{equation}
+The map $f$ is nondecreasing on $0\le z<1$, since
+$z/(1-z)$ is nonnegative and increasing there.
+
+For $0<u\le v$, nonnegative weights also satisfy
+\begin{equation}
+ \sum_i\mu_i^v\le\left(\sum_i\mu_i^u\right)^{v/u}.
+ \label{sm:eq:lp}
+\end{equation}
+If the sum on the right is zero, the claim is immediate.
+Otherwise normalize $\mu_i^u$ to probabilities $a_i$; then
+$\sum_i a_i^{v/u}\le\sum_i a_i=1$.
+
+Applying Eqs.~\eqref{sm:eq:powers} and~\eqref{sm:eq:lp} to
+Eq.~\eqref{sm:eq:moments} yields, at fixed $\beta$, the closed scalar
+inequalities
+\begin{align}
+ \smZ{2n}&\le(\smZ{n})^2, \notag\\
+ 2((\smZ{2n})^2-\smZ{4n})
+ &\le((\smZ{n})^2-\smZ{2n})^2, \notag\\
+ \smZ{v}&\le(\smZ{u})^{v/u},
+ \label{sm:eq:closed}
+\end{align}
+for even $n\ge2$ and even $v\ge u\ge2$.
+We suppress the temperature argument only in this display.
+
+\subsection{Controlled product limit}
+\label{sm:sec:limit}
+
+To pass the finite-$M$ inequalities in Eq.~\eqref{sm:eq:closed} to the
+exact partition functions $Z_L(\beta)$, we prove the matrix product
+limit $S_L(\beta/M)^M\to e^{-\beta H_L}$ at fixed $L$ and $\beta$.
+Use the operator norm, which is submultiplicative and satisfies
+$\smnorm{\smI}=1$.
+For $\smnorm{X},\smnorm{Y}\le K$, $K\ge1$, telescoping powers
+gives
+\begin{equation}
+ \smnorm{X^k-Y^k}\le kK^k\smnorm{X-Y}.
+ \label{sm:eq:telescoping}
+\end{equation}
+For $k\ge1$, expand the difference as
+$\sum_{r=0}^{k-1}X^{k-1-r}(X-Y)Y^r$; each term is bounded by
+$K^{k-1}\smnorm{X-Y}\le K^k\smnorm{X-Y}$.
+The case $k=0$ is immediate.
+
+Suppose $M(X_M-\smI)\to A$, and set $Y_M=e^{A/M}$.
+Then $M(Y_M-\smI)\to A$ and $Y_M^M=e^A$.
+With $C=\smnorm{A}+1$, convergence implies, for sufficiently large
+$M$,
+\[
+ \smnorm{X_M},\smnorm{Y_M}\le1+C/M.
+\]
+Equation~\eqref{sm:eq:telescoping} now gives the quantitative comparison
+\begin{align}
+ \smnorm{X_M^M-e^A}
+ &\le (1+C/M)^M\smnorm{M(X_M-Y_M)} \notag\\
+ &\le e^C\smnorm{M(X_M-Y_M)}\longrightarrow0.
+ \label{sm:eq:error}
+\end{align}
+In particular, if $g(0)=\smI$ and $g'(0)=A$, then
+$g(1/M)^M\to e^A$.
+
+For fixed $L,\beta$, list the negated bond operators in the order
+of Eq.~\eqref{sm:eq:slice}, including the negated on-site operators
+when present, as $B_1,\ldots,B_k$.
+Their sum is $-H_L$. The polynomial
+\[
+ g(t)=\prod_{i=1}^k(\smI+\beta tB_i)
+\]
+has derivative $g'(0)=-\beta H_L$. Hence
+\begin{equation}
+ S_L(\beta/M)^M\longrightarrow e^{-\beta H_L},
+ \qquad \smZ{L}(\beta)\longrightarrow Z_L(\beta).
+ \label{sm:eq:limit}
+\end{equation}
+More explicitly, Taylor expansion gives
+$g(1/M)-e^{-\beta H_L/M}=O(M^{-2})$.
+Equation~\eqref{sm:eq:error} therefore bounds the operator error by
+$e^C K_{L,\beta}/M$ for some finite $K_{L,\beta}$ and sufficiently
+large $M$, with $C=\smnorm{\beta H_L}+1$.
+Trace convergence follows from
+$\lvert\Tr A\rvert\le3^L\smnorm{A}$ in the spin-1 model.
+
+We take this limit separately at each length occurring in
+Eq.~\eqref{sm:eq:closed}. Continuity preserves all three inequalities,
+so they hold for $Z_L(\beta)$. We take this limit \emph{before}
+iterating the doubling argument, which requires neither an error bound
+uniform in $L$, nor eigenvector convergence, nor a single limiting
+transfer operator. The finite slices need not form an exact Gibbs
+semigroup; thermal squaring below uses only the exact exponential
+after the limit.
+
+\subsection{Torus identities and asymmetric doubling}
+\label{sm:sec:asymmetric}
+
+With the exact partition-function inequalities established, we now set
+up the coupled doubling recurrence for the spatial and thermal purities:
+\begin{equation}
+ \Ps(n,\beta)=\frac{Z_{2n}(\beta)}{Z_n(\beta)^2},
+ \qquad
+ \Pt(L,\beta)=\frac{Z_L(2\beta)}{Z_L(\beta)^2}.
+ \label{sm:eq:purities}
+\end{equation}
+All partition functions are strictly positive. The thermal purity is
+the purity of the Gibbs state
+$\rho_L(\beta)=e^{-\beta H_L}/Z_L(\beta)$.
+The limiting spatial inequalities and the Boltzmann power sums give
+$0<\Ps,\Pt\le1$ at even lengths and
+\begin{align}
+ 1-\Ps(2n,\beta)&\le f(1-\Ps(n,\beta)), \notag\\
+ 1-\Pt(L,2\beta)&\le f(1-\Pt(L,\beta)).
+ \label{sm:eq:two-squares}
+\end{align}
+For the spatial bound, divide the second limiting inequality in
+Eq.~\eqref{sm:eq:closed} by $2Z_{2n}(\beta)^2$.
+For the thermal bound, apply Eq.~\eqref{sm:eq:squaring} to the
+normalized Boltzmann weights.
+
+A torus of width $n$ and height $\beta$ represents $Z_n(\beta)$.
+Gluing four copies in either order gives the exact cancellation
+\begin{equation}
+ \Ps(n,2\beta)\Pt(n,\beta)^2
+ =\frac{Z_{2n}(2\beta)}{Z_n(\beta)^4}
+ =\Ps(n,\beta)^2\Pt(2n,\beta).
+ \label{sm:eq:torus}
+\end{equation}
+Solving for one factor and repeating at length $2n$ yields
+\begin{align}
+ \Ps(n,2\beta)
+ &=\frac{\Ps(n,\beta)^2\Pt(2n,\beta)}{\Pt(n,\beta)^2}, \notag\\
+ \Pt(4n,\beta)
+ &=\frac{\Pt(2n,\beta)^2\Ps(2n,2\beta)}{\Ps(2n,\beta)^2}.
+ \label{sm:eq:coupling}
+\end{align}
+Both identities follow directly by substituting
+Eq.~\eqref{sm:eq:purities}; they concern exact partition functions.
+
+Let $n\ge2$ be even, and let $0\le p,q<1$ bound the seed defects:
+\begin{equation}
+ \Ps(n,\beta)\ge1-p,\qquad
+ \Pt(2n,\beta)\ge1-q.
+ \label{sm:eq:seed-pair}
+\end{equation}
+To double both $n$ and $\beta$, we alternate the coupling identity with
+squaring in space and imaginary time, feeding the updated spatial defect
+into the thermal step. Write $z(a,b)=1-(1-a)^2(1-b)$.
+The asymmetric update is
+\begin{equation}
+ p'=f(z(p,q)),\qquad q'=f(z(q,p')).
+ \label{sm:eq:update}
+\end{equation}
+Assuming $p'<1$, its four steps are:
+\begin{enumerate}
+ \item The first identity in Eq.~\eqref{sm:eq:coupling}, with
+ $\Pt(n,\beta)\le1$, gives
+ $\Ps(n,2\beta)\ge(1-p)^2(1-q)=1-z(p,q)$.
+ \item Spatial squaring and monotonicity of $f$ give
+ $\Ps(2n,2\beta)\ge1-p'$.
+ \item The second identity in Eq.~\eqref{sm:eq:coupling}, with
+ $\Ps(2n,\beta)\le1$, gives
+ $\Pt(4n,\beta)\ge(1-q)^2(1-p')=1-z(q,p')$.
+ \item Thermal squaring gives $\Pt(4n,2\beta)\ge1-q'$.
+\end{enumerate}
+Thus $(p',q')$ bounds the defects at $(2n,2\beta)$.
+Any upper bound below one substituted for $p'$ in the third step remains
+valid; we use this rounding rule next.
+
+\subsection{Six exact rational steps}
+\label{sm:sec:orbit}
+
+The analytic tail estimate in Sec.~\ref{sm:sec:gap} requires both
+defects to be at most $1/100$. Because the initial spin-1 seed defects at
+$(n_0,\beta_0)=(36,49/4)$ are larger, we first iterate the asymmetric
+update for six steps in exact rational arithmetic.
+The finite-size input is
+\begin{equation}
+ \Ps(36,49/4)\ge1-\frac{47916}{10^6},
+ \qquad
+ \Pt(72,49/4)\ge1-\frac{181521}{10^6}.
+ \label{sm:eq:initial}
+\end{equation}
+Ref.~\cite{OpenAI2026Periodic} provides these certified seed bounds for
+the periodic spin-1 chain; their finite-size spectral computation is not
+repeated here. The following calculation verifies their propagation
+under the recurrence.
+
+All terminating decimals defining bounds denote exact rationals.
+Use the ceiling grid $D^{-1}=10^{-7}$, $D=10^7$, and update
+sequentially:
+\begin{align}
+ p_{j+1}&=\frac{\left\lceil Df(z(p_j,q_j))\right\rceil}{D},
+ \notag\\
+ q_{j+1}&=\frac{\left\lceil Df(z(q_j,p_{j+1}))\right\rceil}{D}.
+ \label{sm:eq:rounding}
+\end{align}
+We round the spatial bound upward before the thermal update.
+Table~\ref{sm:tab:orbit} lists the resulting orbit.
+
+\begin{table}[ht]
+ \centering
+ \caption{Upward-rounded defect bounds at
+ $n_j=36\,2^j$, $\beta_j=(49/4)2^j$.}
+ \label{sm:tab:orbit}
+ \begin{tabular}{rrrrr}
+  \toprule
+  $j$&$n_j$&$\beta_j$&$p_j$&$q_j$\\
+  \midrule
+  0&36&$49/4$&0.0479160&0.1815210\\
+  1&72&$49/2$&0.0605003&0.1733838\\
+  2&144&49&0.0686630&0.1632461\\
+  3&288&98&0.0713693&0.1447318\\
+  4&576&196&0.0633146&0.1055663\\
+  5&1152&392&0.0376144&0.0446518\\
+  6&2304&784&0.0084709&0.0055149\\
+  \bottomrule
+ \end{tabular}
+\end{table}
+
+To check the table in integer arithmetic, write $a_j=Dp_j$,
+$b_j=Dq_j$, and set
+\begin{equation}
+ V_j=(D-a_j)^2(D-b_j),\qquad
+ W_j=(D-b_j)^2(D-a_{j+1}).
+ \label{sm:eq:integer-products}
+\end{equation}
+For each $j=0,\ldots,5$, the entries in
+Table~\ref{sm:tab:orbit} satisfy
+\begin{align}
+ 2(a_{j+1}-1)V_j^2
+ &<D(D^3-V_j)^2\le2a_{j+1}V_j^2, \notag\\
+ 2(b_{j+1}-1)W_j^2
+ &<D(D^3-W_j)^2\le2b_{j+1}W_j^2.
+ \label{sm:eq:integer-check}
+\end{align}
+Multiplying the ceiling comparisons in Eq.~\eqref{sm:eq:rounding} by
+their positive denominators gives Eq.~\eqref{sm:eq:integer-check}, since
+$f(z(p_j,q_j))=(D^3-V_j)^2/(2V_j^2)$.
+The right-hand inequalities alone suffice to verify the upper bounds.
+Because all entries lie below one, the four-step update applies at every
+row and yields
+\begin{align}
+ \Ps(2304,784)&\ge1-0.0084709>0.99,\notag \\
+ \Pt(4608,784)&\ge1-0.0055149>0.99.
+ \label{sm:eq:terminal}
+\end{align}
+Both defects at $(2304,784)$ now lie below the $1/100$ threshold.
+
+\subsection{Scalar tail, interpolation, and the strict gap}
+\label{sm:sec:gap}
+
+Once both defects are at most $1/100$, a single scalar recurrence bounds
+all subsequent doubling steps. For $0\le\varepsilon\le1/100$,
+\begin{equation}
+ f(1-(1-\varepsilon)^3)
+ \le\frac{9\varepsilon^2}{2(1-3\varepsilon)^2}
+ \le5\varepsilon^2\le\varepsilon.
+ \label{sm:eq:scalar}
+\end{equation}
+The first inequality uses
+$1-(1-\varepsilon)^3\le3\varepsilon$ and monotonicity of $f$;
+the second uses $9/[2(97/100)^2]<5$.
+If both input defects are at most $\varepsilon$, the spatial update
+is therefore at most $5\varepsilon^2\le\varepsilon$.
+Consequently, the thermal coupling input is also at most
+$1-(1-\varepsilon)^3$, and its squared defect is at most
+$5\varepsilon^2$.
+
+Starting from Eq.~\eqref{sm:eq:terminal}, reset the scale index and put
+\begin{equation}
+ n_j=2304\,2^j,\qquad
+ \beta_j=784\,2^j,\qquad
+ \varepsilon_j=\frac{20^{-2^j}}5,\qquad j\ge0.
+ \label{sm:eq:tail-scales}
+\end{equation}
+Here $\varepsilon_0=1/100$ and
+$\varepsilon_{j+1}=5\varepsilon_j^2$.
+Induction using Eq.~\eqref{sm:eq:scalar} proves
+\begin{equation}
+ \Ps(n_j,\beta_j)\ge1-\varepsilon_j,\qquad
+ \Pt(2n_j,\beta_j)\ge1-\varepsilon_j.
+ \label{sm:eq:tail}
+\end{equation}
+
+To cover every even length $L\ge2304$ between the dyadic scales $n_j$,
+choose $j$ with $n_j\le L\le2n_j$. The limiting power-sum inequality in
+Eq.~\eqref{sm:eq:closed}, applied at $\beta_j$ and $2\beta_j$, gives
+\begin{align}
+ Z_L(\beta_j)^2&\le Z_{n_j}(\beta_j)^{2L/n_j}, \notag\\
+ Z_L(2\beta_j)&\ge Z_{2n_j}(2\beta_j)^{L/(2n_j)}.
+ \label{sm:eq:interpolation-input}
+\end{align}
+Set $r=L/(2n_j)\in[1/2,1]$ and
+\[
+ x=\frac{Z_{2n_j}(2\beta_j)}{Z_{n_j}(\beta_j)^4}
+   =\Pt(2n_j,\beta_j)\Ps(n_j,\beta_j)^2.
+\]
+Since $(1-\varepsilon_j)^3\le x\le1$, dividing the second inequality in
+Eq.~\eqref{sm:eq:interpolation-input} by the first yields
+\begin{equation}
+ \Pt(L,\beta_j)\ge x^r\ge x
+ \ge(1-\varepsilon_j)^3\ge1-3\varepsilon_j>\frac12.
+ \label{sm:eq:interpolation}
+\end{equation}
+
+Finally, we convert this thermal purity bound at $\beta_j$ into a lower
+bound on the spectral gap. Let $E_0(L)\le E_1(L)\le\cdots$ include
+multiplicities, and let $w_m=e^{-\beta_j E_m(L)}/Z_L(\beta_j)$.
+The largest Gibbs weight satisfies
+$\Pt(L,\beta_j)=\sum_m w_m^2\le w_0$.
+Equation~\eqref{sm:eq:interpolation} implies $w_0>1/2$, which
+proves that the ground state is unique.
+Moreover, $w_1\le1-w_0$. With
+$\Delta_L=E_1(L)-E_0(L)$, we obtain
+\begin{align}
+ e^{-\beta_j\Delta_L}
+ &=\frac{w_1}{w_0}
+ \le\frac{3\varepsilon_j}{1-3\varepsilon_j} \notag\\
+ &\le\frac{60}{97}\,20^{-2^j}
+ <20^{-2^j},
+ \label{sm:eq:strict-ratio}
+\end{align}
+where we used $1-3\varepsilon_j\ge97/100$.
+Taking logarithms and dividing by $\beta_j=784\,2^j$ at this finite,
+length-dependent temperature gives
+\begin{equation}
+ \boxed{
+ \Delta_L>\frac{\log20}{784}
+ \quad\text{for every even }L\ge2304
+ }.
+ \label{sm:eq:gap}
+\end{equation}
+The strict inequality comes from the finite prefactor $60/97<1$,
+without taking a fixed-length limit $\beta\to\infty$.
+Given the two seed bounds in Eq.~\eqref{sm:eq:initial}, the finite-matrix
+transfer inequalities, rational orbit, scalar tail, and dyadic
+interpolation establish Eq.~\eqref{sm:eq:gap}.

@@ -1,0 +1,168 @@
+% Diagram and notation definitions shared by the new arXiv manuscript.
+
+\newcommand{\bra}[1]{\langle #1|}
+\newcommand{\ket}[1]{|#1\rangle}
+\newcommand{\ceilgrid}[1]{10^{-7}\left\lceil 10^7 #1\right\rceil}
+\newcommand{\bricknetwork}[1]{%
+ \begin{tikzpicture}[x=.43cm,y=.45cm,baseline=-.5ex]
+  \ifnum#1=1
+   \fill[mpoblue!20] (-.47,.03) rectangle (3.47,.98);
+  \else
+   \fill[mpored!20] (-.2,-.25) rectangle (1.2,2.3);
+  \fi
+  \foreach \x in {0,1,2,3}{
+   \draw[black!55] (\x,-.2)--(\x,2.25);}
+  \foreach \y in {0,1}{
+   \foreach \x in {0,2}{
+    \draw[arxiv gate] (\x-.12,\y+.17) rectangle (\x+1.12,\y+.38);}
+   \draw[arxiv gate] (.88,\y+.66) rectangle (2.12,\y+.87);
+   \draw[arxiv gate] (-.4,\y+.66) rectangle (.12,\y+.87);
+   \draw[arxiv gate] (2.88,\y+.66) rectangle (3.4,\y+.87);}
+  \draw[black!40,densely dashed] (-.4,-.2) rectangle (3.4,2.25);
+  \ifnum#1=1
+   \draw[arxiv thermal flow] (3.8,.1)--(3.8,1.9);
+  \else
+   \draw[arxiv spatial flow] (-.15,2.65)--(3.15,2.65);
+  \fi
+ \end{tikzpicture}}
+\newcommand{\splitgate}{%
+ \begin{tikzpicture}[tn,tn centered]
+  \draw[phys] (0,-.8)--(0,.8) (1.3,-.8)--(1.3,.8);
+  \node[mpo,minimum width=2.2em,minimum height=.5em] at (.65,0) {};
+ \end{tikzpicture}}
+\newcommand{\bondends}{%
+ \begin{tikzpicture}[tn,tn centered]
+  \draw[phys] (0,-.8)--(0,.8) (2,-.8)--(2,.8);
+  \draw[mpored] (0,0)--(2,0);
+  \node[mpo] at (0,0) {$A_\gamma$};
+  \node[mpo] at (2,0) {$A_\gamma$};
+ \end{tikzpicture}}
+\newcommand{\torusgluing}{%
+ \begin{tikzpicture}[x=1cm,y=1cm,font=\scriptsize]
+  \def\c{.28}\def\g{.12}
+  \foreach \a in {0,1}{\foreach \b in {0,1}{
+   \tnpatch{{\a*(2*\c+\g)}}{{1.9+\b*(\c+\g)}}{2}{1}{\c}}}
+  \foreach \b in {0,1}{
+   \tnpatch{5.1}{{1.9+\b*(\c+\g)}}{4}{1}{\c}}
+  \foreach \a in {0,1}{
+   \tnpatch{{\a*(2*\c+\g)}}{.1}{2}{2}{\c}}
+  \tnpatch{5.1}{.1}{4}{2}{\c}
+  \node[anchor=north] at (.62,1.85) {$Z_n(\beta)^4$};
+  \node[anchor=north] at (5.66,1.85) {$Z_{2n}(\beta)^2$};
+  \node[anchor=north] at (.62,.05) {$Z_n(2\beta)^2$};
+  \node[anchor=north] at (5.66,.05) {$Z_{2n}(2\beta)$};
+  \draw[arxiv spatial flow] (1.45,2.2)--(4.9,2.2)
+   node[midway,above,text=black] {$\times\Ps(n,\beta)^2$};
+  \draw[arxiv spatial flow] (1.45,.38)--(4.9,.38)
+   node[midway,above,text=black] {$\times\Ps(n,2\beta)$};
+  \draw[arxiv thermal flow] (.62,1.48)--(.62,.8)
+   node[midway,right,text=black] {$\times\Pt(n,\beta)^2$};
+  \draw[arxiv thermal flow] (5.66,1.48)--(5.66,.8)
+   node[midway,left,text=black] {$\times\Pt(2n,\beta)$};
+ \end{tikzpicture}}
+
+
+\newcommand{\seedmps}[1]{\tikz[tn,tn centered]{
+ \foreach \y/\s in {1.1/1,-1.1/-1}{
+  \draw[ring] (-.4,\y)--(-.4,{\y+\s*.6})
+   --(6.75,{\y+\s*.6})--(6.75,\y)--cycle;}
+ \foreach \x in {.4,2.6,6}{
+  \draw[phys] (\x,-1.1)--(\x,1.1);}
+ \tndots{4.2}{1.1}\tndots{4.2}{-1.1}
+ \ifnum#1=1
+  \node[sym,fill=mpoblue!20,minimum width=3.4em] at (1.5,0) {$h$};
+ \fi
+ \foreach \x in {.4,2.6,6}{
+  \node[mpo,fill=white] at (\x,1.1) {$A$};
+  \node[mpo,fill=white] at (\x,-1.1) {$A$};}}}
+
+
+\newcommand{\scopebond}{\tikz[tn,tn centered]{
+ \draw[phys] (0,-.85)--(0,.85);
+ \draw[phys] (4,-.85)--(4,.85);
+ \draw[mpored] (0,0)--(4,0);
+ \draw[arxiv mirror] (2,-1)--(2,1);
+ \node[xop] at (0,0) {$C_\alpha$};
+ \node[xop] at (4,0) {$FC_\alpha F$};}}
+
+
+\newcommand{\smI}{\mathbb I}
+\newcommand{\smF}{\mathcal F}
+\newcommand{\smZ}[1]{Z_{#1}^{(M)}}
+\newcommand{\smT}{T_{M,\tau}}
+\newcommand{\smD}{\mathcal D_M}
+\newcommand{\smnorm}[1]{\left\lVert #1\right\rVert}
+
+
+\newcommand{\obccap}[2]{%
+ \tnchain[capl={\bar v_\beta},capr={#2}]{#1}}
+\newcommand{\obcW}{%
+ \tnchain[node=mpo,legs,capl={\bar v_\beta},capr={v_\beta}]
+ {W_\beta,\cdots,W_\beta}}
+
+
+
+% Six-site ring glyph, with a spatial twist on one closing bond when #1=1.
+\newcommand{\seedring}[1]{\tikz[baseline=-.6ex,x=1em,y=1em]{
+ \draw[black!70,line width=.55pt] (90:1)--(30:1)--(-30:1)
+  --(-90:1)--(-150:1)--(150:1)--cycle;
+ \ifnum#1=1
+  \draw[mpored,line width=1.5pt] (150:1)--(90:1);
+  \node[font=\scriptsize,text=mpored] at (-.8,1.15) {$\pi$};
+ \fi
+ \foreach \a in {90,30,-30,-90,-150,150}{
+  \filldraw[draw=black!70,fill=white,line width=.45pt] (\a:1) circle (.12);}}}
+
+% Extremal twelfth-moment weights and their sixth powers, not an observed spectrum.
+\newcommand{\seedweightbars}{\begin{tikzpicture}[x=1cm,y=1.2cm,baseline=-.5ex]
+ \fill[arxiv leading weight] (0,0) rectangle (.4,.9881);
+ \fill[arxiv remainder weight] (.8,0) rectangle (1.2,.0777);
+ \draw[mpored,densely dashed,line width=.45pt] (-.1,.9881)--(1.3,.9881);
+ \node[arxiv label,anchor=south] at (.2,1.02) {$\ell^{12}$};
+ \node[arxiv label,anchor=north] at (1,-.1) {$m_J-\ell^{12}$};
+ \draw[flow,black!55] (1.9,.5)--(3.1,.5)
+  node[midway,above,arxiv label] {$u\mapsto u^6$};
+ \fill[arxiv leading weight] (3.8,0) rectangle (4.2,.9305);
+ \fill[arxiv remainder weight] (4.6,0) rectangle (5,.000001);
+ \node[arxiv label,anchor=south] at (4,.97) {$\ell^{72}$};
+ \draw[black!45,line width=.3pt] (-.1,0)--(1.3,0) (3.7,0)--(5.1,0);
+\end{tikzpicture}}
+
+% The four established coupling/squaring steps, in the talk's two-lane layout.
+\newcommand{\pbcsteps}{\begin{prooflanes}
+ \lanebound{s}{ps0}{0}{0}{$\Ps(n,\beta)\ge1-p$}
+ \lanebound{t}{pt0}{1}{0}{$\Pt(2n,\beta)\ge1-q$}
+ \lanebound{so}{ps1}{0}{1}{$\Ps(n,2\beta)\ge(1-p)^2(1-q)$}
+ \lanebound{s}{ps2}{0}{2}{$\Ps(2n,2\beta)\ge1-p'$}
+ \lanebound{to}{pt1}{1}{3}{$\Pt(4n,\beta)\ge(1-q)^2(1-p')$}
+ \lanebound{t}{pt2}{1}{4}{$\Pt(4n,2\beta)\ge1-q'$}
+ \lanemove{ps0}{ps1}{1}{identity}\laneuse{pt0}{1}
+ \lanemove[mpored]{ps1}{ps2}{2}{square in space}
+ \lanemove{pt0}{pt1}{3}{identity}\laneuse{ps2}{3}
+ \lanemove[mpoblue]{pt1}{pt2}{4}{square in time}
+\end{prooflanes}}
+
+% Adapted from the proof-strategy slide; errors are schematic, not the seed orbit.
+\newcommand{\strategystairs}{\begin{tikzpicture}[x=.8cm,y=.8cm,
+ every node/.style={arxiv label,inner sep=1pt}]
+ \foreach \x in {0,1.65,3.3}{\draw[black!15] (\x,-.1)--(\x,2.15);}
+ \foreach \y in {0,1.05,2.1}{\draw[black!15] (-.1,\y)--(3.4,\y);}
+ \draw[black!40,densely dotted] (0,0)--(3.3,2.1);
+ \foreach \x/\y in {0/0,1.65/1.05}{
+  \draw[arxiv thermal flow,line width=1pt] (\x,\y+.04)--(\x,\y+1.01);
+  \draw[arxiv spatial flow,line width=1pt,densely dashed]
+   (\x+.04,\y+1.05)--(\x+1.61,\y+1.05);}
+ \foreach \x/\y in {0/0,0/1.05,1.65/1.05,1.65/2.1,3.3/2.1}{
+  \node[arxiv point] at (\x,\y) {};}
+ \foreach \x/\lab in {0/n_0,1.65/2n_0,3.3/4n_0}{
+  \node[anchor=north] at (\x,-.16) {$\lab$};}
+ \foreach \y/\lab in {0/\beta_0,1.05/2\beta_0,2.1/4\beta_0}{
+  \node[anchor=east] at (-.15,\y) {$\lab$};}
+ \node[anchor=west,fill=white] at (.12,.22) {$\varepsilon$};
+ \node[anchor=west,fill=white] at (1.8,1.28) {$\approx\varepsilon^2$};
+ \node[anchor=south] at (3.3,2.22) {$\approx\varepsilon^4$};
+ \node[text=mpoblue] at (6.15,2.15) {double $\beta$};
+ \node at (6.15,1.65) {$\rho_n(\beta)^2\propto\rho_n(2\beta)$};
+ \node[text=mpored] at (6.15,.85) {double $n$};
+ \node at (6.15,.35) {$\sigma_n^2\propto\sigma_{2n}$};
+\end{tikzpicture}}
