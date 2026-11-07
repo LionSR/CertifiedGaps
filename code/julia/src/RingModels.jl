@@ -12,6 +12,7 @@ Everything here is exact (`Rational{BigInt}` entries, possibly complex); the flo
 module RingModels
 
 using LinearAlgebra
+using SparseArrays: sparse
 using ..ExactArithmetic: RationalBig, parse_rational
 using ..ReflectionPositivity: realign
 
@@ -145,7 +146,9 @@ function _valid_symmetry(m::RingModel, G)
     size(G) == (d, d) && _monomial(G) !== nothing && G * G == I || return false
     all(iszero(G[a, b]) || _reduce(m, m.charge[a] - m.charge[b]) == 0 for a in 1:d, b in 1:d) ||
         return false
-    GG = kron(G, G)
+    # A signed permutation has one nonzero per row; dense exact products scale poorly
+    # when a whole transverse slice is one site of the ring.
+    GG = sparse(kron(G, G))
     return GG * m.bond * GG == m.bond && G * m.onsite * G == m.onsite
 end
 
@@ -180,8 +183,8 @@ function _valid_reflection(m::RingModel)
         return false
     all(P * G == G * P for G in m.symmetries) || return false
     m.flip === nothing || P * m.flip == m.flip * P || return false
-    S = swap_matrix(d)
-    PP = kron(P, P)
+    S = sparse(swap_matrix(d))
+    PP = sparse(kron(P, P))
     return PP * m.bond * PP == S * m.bond * S && P * m.onsite * P == m.onsite
 end
 
