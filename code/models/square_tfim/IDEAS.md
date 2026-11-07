@@ -29,11 +29,30 @@ Both spatial periods must grow; a fixed-width ladder does not establish this sta
 
 Prove the spatial scalar inequalities through finite Trotter transfers and their limit.
 Use exact rational arithmetic for the three-component recurrence in the 2+1 dimensional
-note. First obtain an explicit product-perturbation seed, then use the shared verified
-spectral routines to improve the field range when computationally feasible. No changes to
+note. The verified sixteen-spin calculation proved inexpensive enough to proceed directly
+with the spectral route; the product-perturbation estimate was not needed. No changes to
 the manuscript or Lean formalization are required. The two-dimensional recurrence is
 distinct from the core one-dimensional two-purity recurrence.
 
 ## Outcome
 
-Work in progress. No numerical certificate is claimed in this initial route analysis.
+Complete verified spectra give certificates at $g/J=18,20,24$, with respective uniform
+gap lower bounds $0.59437J$, $2.17363J$, and $4.80557J$ on every even square torus of side
+at least four. All seeds have $n_0=m_0=2$ and $\beta_0g=4$. The largest spectral block
+has dimension 2392. The full spectra take about 70 seconds per field on the development
+machine with one BLAS thread.
+
+The initial defects exceed $10^{-3}$. An exact three-component chain reaches that tail
+region after five, four, and three steps, respectively. Bounding each earlier interpolation
+window is necessary to retain coverage of all even square periods. The spatial-transfer
+proof, seed enclosures, chain, and checker are documented in `METHOD.md` and `README.md`.
+
+The numerical grid at $g/J=17$, with $\beta g=2:1/8:12$, found no closing seed. This is
+a limitation of the tested finite seed and recurrence, not a gap exclusion. Further progress
+toward smaller fields calls for larger seeds with controlled connected-cluster remainders
+or sharper directional inequalities.
+
+The row model exposed a generic cost in exact symmetry validation: dense multiplication
+by signed permutation matrices. A separate minimal core change uses their sparse form,
+preserving exact arithmetic and the same validation conditions. The new model uses the
+shared core for all spectral reductions and eigenvalue enclosures.
