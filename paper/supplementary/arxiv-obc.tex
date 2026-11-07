@@ -4,7 +4,7 @@
 
 We now extend the diagrammatic doubling argument from periodic rings
 to open chains with endpoint magnetic fields. Consider the spin-1
-Heisenberg chain with equal endpoint fields,
+Heisenberg chain with equal endpoint fields, \fieldsame,
 \begin{equation}
  H_n^{\same}
  =\sum_{i=1}^{n-1}\bm S_i\cdot\bm S_{i+1}
@@ -47,8 +47,8 @@ temperatures.
 
 To see where the new difficulty enters, consider the spatial transfer
 operator at a fixed temperature. Suppose that $X_\beta$ has a simple
-positive leading eigenvalue $\lambda$ and write the normalized transfer
-operator as
+positive leading eigenvalue $\lambda$, \specbars[mpored]{.9,.06,.04}, and
+write the normalized transfer operator as
 \begin{equation}
  T:=X_\beta/\lambda=\Pi+R,\qquad
  \Pi=\ket{\psi}\bra{\psi},\qquad
@@ -57,7 +57,8 @@ operator as
 \end{equation}
 In a periodic ring, the trace weights the leading projector $\Pi$ by one.
 In an open chain, the chain ends are contracted with boundary vectors,
-so the leading contribution is weighted instead by a boundary overlap:
+so the leading contribution is weighted instead by how much of $v$ lies
+along $\psi$, \overlapglyph:
 \begin{equation}
  \underbrace{\tnchain[ring]{\Pi}}_{\trv\Pi=1},
  \qquad
@@ -79,13 +80,15 @@ and a nonnegative remainder,
  \label{obc:boundary-split}
 \end{align}
 To show that the leading eigenvector dominates $B_m$, we must bound
-the relative boundary remainder
+the remainder's share of $B_m$,
 \begin{equation}
  e_m:=\frac{D_m}{B_m}=1-\frac{c}{B_m},
  \label{obc:defect}
 \end{equation}
-rather than the absolute remainder $D_m$ alone. Increasing the chain
-length suppresses $D_m$ by powers of $\|R\|$ while leaving $c$ unchanged.
+the grey fraction of \stackbar{.14} at the seed value $e_{142}\le.14$
+of Eq.~\eqref{obc:seeds}, rather than the absolute remainder $D_m$
+alone. Increasing the chain length suppresses $D_m$ by powers of
+$\|R\|$ while leaving $c$ unchanged.
 
 When we double the inverse temperature, however, both the boundary vector $v$ and the leading eigenvector $\psi$ change. The overlap $c$ at the old temperature does not by itself bound the new overlap $c'$. The key idea is to compare two even lengths at the new temperature. Writing primes for quantities at $2\beta$, the difference
 \[
@@ -127,9 +130,9 @@ on the empty history. The local tensor is
  \kappa&=\frac{700741}{500000}.
  \label{obc:local}
 \end{align}
-Later events are placed to the left, so $W_\beta(a,b)$ depends on the
-relative event times in the two histories, not only on their event counts or
-on the measure. Tracing the physical indices gives the real symmetric transfer kernel
+Time ordering $\mathcal T_\tau$ places later events to the left
+according to the interleaved times in $a\cup b$, and tracing the
+physical indices defines the real symmetric transfer kernel
 $X_\beta(a,b)$ on $L^2(\mu_\beta)$.
 
 The energy shift $\kappa$ is the one used in
@@ -159,14 +162,14 @@ We now check the signs of the two endpoint fields produced by $v_\beta$.
 The conjugated left cap supplies $(-ih)G_z=+hS^z$ in the exponential,
 which corresponds to the Hamiltonian term $-hS_1^z$. The unconjugated right cap supplies
 $(ih)G_z=-hS^z$, corresponding to $+hS_n^z$. Contracting with the same boundary vector $v_\beta$ at both
-ends therefore gives the auxiliary opposite-field chain
+ends therefore gives the auxiliary opposite-field chain \fieldopp,
 \begin{equation}
  H_n^{\opp}=H_n^{\same}+2hS_n^z.
  \label{obc:opposite}
 \end{equation}
 To obtain equal endpoint fields, let $P=\operatorname{diag}(1,-1,-1)$ be the spin rotation by $\pi$
 about the $x$ axis. Its virtual action $U_P$ negates each $z$ event, which reverses
-the right endpoint field and produces $H_n^{\same}$. In diagram form,
+the right endpoint field and produces $H_n^{\same}$, \fieldsame. In diagram form,
 \begin{align}
  e^{-\beta(H_n^{\opp}+\kappa nI)}&=\obcW,\notag \\
  Y_n(\beta)
@@ -177,7 +180,11 @@ the right endpoint field and produces $H_n^{\same}$. In diagram form,
  &=\obccap{X_\beta^n}{U_Pv_\beta}.
  \label{obc:capping}
 \end{align}
-Tracing the physical legs in the first line gives the opposite-field partition function $Y_n(\beta)$ in the second; inserting
+For an $n$-site chain, site $i$ carries $W_\beta(a_{i-1},a_i)$, with
+internal bond histories $a_1,\ldots,a_{n-1}$ and boundary histories
+$a_0,a_n$ contracted with $\bar v_\beta,v_\beta$. Taking the physical
+trace at each of the $n$ sites produces $X_\beta^n$ and gives
+$Y_n(\beta)$ in the second line; inserting
 $U_P$ at the right cap gives the equal-field partition function $Y_n^{\same}(\beta)$ in the third.
 
 Spin rotations act on bond histories by real orthogonal operators that commute
@@ -202,6 +209,8 @@ We now identify the finite inputs required to drive the open-chain recurrence ac
  \label{obc:scales}
 \end{equation}
 where $n_j$ is a ring length and $M_j$ is an even open-chain length.
+We retain the index $j=2$ for the certified starting point of
+Ref.~\cite{OpenAI2026Boundaryfield}, at $\beta_2=49$.
 At each scale $j$, the two-length boundary comparison and the length-doubling step require three bulk properties of the transfer operator $X_{\beta_j}$: a simple positive leading eigenvalue $\lambda_j$ invariant under $U_P$, a bound on the subleading norm $\|R_j\|^{n_j}$ to suppress the boundary remainder across the length difference $M_j-k_j$, and a lower bound on the bulk normalization ratio $r_j=\lambda_{j+1}/\lambda_j^2$ relating consecutive temperatures. All three bulk properties follow at every $j\ge2$ from the periodic spatial and thermal purities $\Ps(n_2,\beta_2)$ and $\Pt(M_2,\beta_2)$ at the initial scale $j=2$ ($\beta_2=49$, $n_2=120$, $M_2=240$). To start the open-chain recurrence itself, we also need an initial bound on the boundary defect $e_{k_2}(2)$ at a shorter even length $k_2=142<M_2$, together with a lower bound on the opposite-field thermal purity $\Pt^{\opp}(M_2,\beta_2)=Y_{M_2}(2\beta_2)/Y_{M_2}(\beta_2)^2$.
 
 Ref.~\cite{OpenAI2026Boundaryfield} certifies these four finite seed bounds at $j=2$:
@@ -224,7 +233,9 @@ We first use the two ring inputs in Eq.~\eqref{obc:seeds} to control the bulk tr
 \end{align}
 To verify the factor of $6$ in this scalar recurrence, recall the squaring inequality:
 if a positive trace-one operator of purity $P$ is squared and
-renormalized, its new purity $P'$ satisfies
+renormalized, which concentrates its weights,
+$\specbars{.5,.3,.2}\mapsto\specbars{.66,.24,.1}$, its new purity $P'$
+satisfies
 \begin{equation}
  1-P'\le f(1-P),\qquad
  f(z)=\frac{z^2}{2(1-z)^2}.
@@ -323,7 +334,9 @@ For even lengths $m\ge k$, absorbing $R_j^{k/2}$ into each boundary cap gives th
  0\le D_m(j)&\le\|R_j\|^{m-k}D_k(j).
  \label{obc:decay}
 \end{align}
-In particular, $D_m(j)$ is nonincreasing in even $m$, so $c_j\le B_m(j)\le B_k(j)$.
+The remainder therefore decays geometrically with the extra length $m-k$,
+\decayglyph[black!50], and in particular $D_m(j)$ is nonincreasing in
+even $m$, so $c_j\le B_m(j)\le B_k(j)$.
 
 To connect quantities at $\beta_j$ and $\beta_{j+1}=2\beta_j$, we use the opposite-field thermal purity. By the definition of $B_m(j)$ and $r_j=\lambda_{j+1}/\lambda_j^2$, we have the exact thermal-purity bridge
 \begin{align}
@@ -333,10 +346,9 @@ To connect quantities at $\beta_j$ and $\beta_{j+1}=2\beta_j$, we use the opposi
  &=\Pt^{\opp}(m,\beta_j)r_j^{-m}B_m(j)^2.
  \label{obc:bridge}
 \end{align}
-This identity comes from multiplying the full open-chain Gibbs operators in imaginary time,
-not from a sitewise fusion of local MPO tensors. Writing
-$\rho_m^{\opp}(\beta)=e^{-\beta(H_m^{\opp}+\kappa mI)}/Y_m(\beta)$,
-the imaginary-time contraction is
+Multiplying the normalized open-chain Gibbs operators
+$\rho_m^{\opp}(\beta)=e^{-\beta(H_m^{\opp}+\kappa mI)}/Y_m(\beta)$
+in imaginary time gives
 \begin{equation}
  \tncolumn{\rho_m^{\opp}(\beta_j),\rho_m^{\opp}(\beta_j)}
  =\Pt^{\opp}(m,\beta_j)
@@ -443,7 +455,10 @@ Notice why the three steps must be performed in this order: because $\Pt^{\opp}(
 \subsection{Initialization and the small-defect induction}
 \label{obc:initialization}
 
-We now assemble the three steps of Sec.~\ref{obc:steps} into an explicit recurrence across the scales $j\ge2$. We track the boundary defect at the even lengths
+We now assemble the three steps of Sec.~\ref{obc:steps} into a
+recurrence across $j\ge2$. The initial boundary estimate in
+Eq.~\eqref{obc:seeds} is certified at $142$ sites. We use that length
+for the first comparison and the preceding target length thereafter:
 \begin{equation}
  k_2=142,\qquad k_{j+1}=M_j.
  \label{obc:k}
@@ -483,8 +498,12 @@ $j$ & $E_j$ & $\eta_j$ & upper bound for $q_j$\\
 \bottomrule
 \end{tabular}
 \end{center}
-All decimals in this table denote exact rationals. At $j=2$, the first
-suppression bound uses $k_2=142$ and $M_2=240$, so that
+All decimals in this table denote exact rationals. Both defects collapse
+along the three steps, $E_j$ as \specbars[black!45]{1,.86,.11,.007} and
+$\eta_j$ as \specbars{1,.74,.12,.005} ($j=2,\dots,5$, each relative to
+its value at $j=2$): the first step gains little because $q_2\le.142$ is
+still large, whereas once $q_j$ is small the defects square. At $j=2$,
+the first suppression bound uses $k_2=142$ and $M_2=240$, so that
 \[
  \frac{M_2-k_2}{M_2}=\frac{49}{120},\qquad
  d(\varepsilon_3)^{49}<.142^{120}.
@@ -501,23 +520,10 @@ $\varepsilon_5<.000015$, the $j=5$ row brings all three defects below $.01$, est
  \label{obc:induction}
 \end{align}
 
-To prove the induction step in Eq.~\eqref{obc:induction}, assume that the three bounds hold at scale $j\ge5$
-and write $x=x_j\le.01$. For Step~1, Eqs.~\eqref{obc:half-chain} and~\eqref{obc:ratio-excess} give $q_j\le2x$ and
-\begin{equation}
- F(2x,x,1-x)
- \le\frac{6x^2}{(1-2x)(1-x)^3}<7x^2.
- \label{obc:boundary-step}
-\end{equation}
-Thus $E_{j+1}=10x^2$ is a valid upper bound on $e_{M_j}(j+1)$. For Step~2, substituting $\eta_j\le x$, $\varepsilon_j\le x$, $\varepsilon_{j+1}\le6x^2$, and $E_{j+1}\le10x^2$ into $A_j$ gives
-$A_j\ge1-2x-16x^2$. For Step~3, since $0<x\le.01$, thermal squaring yields
-\begin{equation}
- f(2x+16x^2)<3x^2.
- \label{obc:thermal-step}
-\end{equation}
-Hence $\eta_{j+1}=10x^2$ is a valid upper bound on $1-\Pt^{\opp}(2M_j,\beta_{j+1})$, and
-$\varepsilon_{j+1}\le6x^2\le10x^2$ closes the induction at scale $j+1$.
-
-The following diagram summarizes one induction step from scale $j$ to scale $j+1=j'$ ($M_{j+1}=2M_j$):
+To prove the induction step in Eq.~\eqref{obc:induction}, assume that
+the three bounds hold at scale $j\ge5$ and write $x=x_j\le.01$. One
+step from scale $j$ to scale $j+1=j'$ ($M_{j+1}=2M_j$) proceeds along
+two coupled lanes:
 \begin{proofdiagram}
 \begin{prooflanes}
  \lanebound{b}{e0}{0}{0}{$e_{M_j/2}(j)\le x$}
@@ -532,6 +538,23 @@ The following diagram summarizes one induction step from scale $j$ to scale $j+1
  \lanemove[mpoblue]{t1}{t2}{3}{square}
 \end{prooflanes}
 \end{proofdiagram}
+For Step~1, Eqs.~\eqref{obc:half-chain} and~\eqref{obc:ratio-excess}
+give $q_j\le2x$ and
+\begin{equation}
+ F(2x,x,1-x)
+ \le\frac{6x^2}{(1-2x)(1-x)^3}<7x^2,
+ \label{obc:boundary-step}
+\end{equation}
+so $E_{j+1}=10x^2$ bounds $e_{M_j}(j+1)$. For Step~2, substituting
+$\eta_j\le x$, $\varepsilon_j\le x$, $\varepsilon_{j+1}\le6x^2$, and
+$E_{j+1}\le10x^2$ into $A_j$ gives $A_j\ge1-2x-16x^2$. For Step~3,
+since $0<x\le.01$, thermal squaring yields
+\begin{equation}
+ f(2x+16x^2)<3x^2,
+ \label{obc:thermal-step}
+\end{equation}
+so $\eta_{j+1}=10x^2$ bounds $1-\Pt^{\opp}(2M_j,\beta_{j+1})$, and
+$\varepsilon_{j+1}\le6x^2\le10x^2$ closes the induction at scale $j+1$.
 
 \subsection{Equal fields, odd lengths, and the gap}
 \label{obc:comparison}

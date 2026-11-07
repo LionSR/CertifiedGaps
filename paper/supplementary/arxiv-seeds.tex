@@ -24,13 +24,33 @@ rational number, and we mark numerical approximations explicitly.
 \subsection{The base seed at length 36}
 \label{cert:sec:base}
 
-To prove Eq.~\eqref{cert:eq:base} at $b_0=49/4$, we need lower bounds on
-the numerators $Z_{72}(b_0)$ and $Z_{72}(2b_0)$ and upper bounds on the
-denominators $Z_{36}(b_0)^2$ and $Z_{72}(b_0)^2$. A $72$-site trial state
-bounds $Z_{72}(b)$ from below for every $b>0$. Traces on $4\le n\le12$
-sites constrain the eigenvalues of the one-site spatial transfer operator
-at $b_0$, which lets us bound the subleading contributions to
-$Z_{36}(b_0)$ and $Z_{72}(b_0)$.
+The seed inverse temperature $b_0=49/4$ is the one chosen in
+Ref.~\cite{OpenAI2026Periodic}. At this scale the two ratios
+\begin{equation}
+ \textcolor{mpored}{\Ps(36,b_0)}=\frac{Z_{72}(b_0)}{Z_{36}(b_0)^2}
+ =\frac{\Zt41}{\Ztsq21},\qquad
+ \textcolor{mpoblue}{\Pt(72,b_0)}=\frac{Z_{72}(2b_0)}{Z_{72}(b_0)^2}
+ =\frac{\Zt42}{\Ztsq41}
+ \label{cert:eq:seed-ratios}
+\end{equation}
+need lower bounds on their numerators and upper bounds on their
+denominators. Two finite inputs supply them: a $72$-site trial state,
+which bounds $Z_{72}(b)$ from below at every $b>0$, and exact traces on
+rings of $4$ to $12$ sites, which constrain the spectrum of the one-site
+spatial transfer operator at $b_0$:
+\begin{center}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{@{}clll@{}}
+\toprule
+ & Partition function & Bound & Supplied by\\
+\midrule
+$\Zt41$ & $Z_{72}(b_0)$ & lower & trial state, through $|\lambda_0|>\ell$ (Sec.~\ref{cert:sec:base-defects})\\
+$\Zt21$ & $Z_{36}(b_0)$ & upper & traces, through the caps $U,V$ (Sec.~\ref{cert:sec:filters})\\
+$\Zt42$ & $Z_{72}(2b_0)$ & lower & trial state (Sec.~\ref{cert:sec:inputs})\\
+$\Zt41$ & $Z_{72}(b_0)$ & upper & traces, through the caps $U,V$\\
+\bottomrule
+\end{tabular}
+\end{center}
 
 \subsubsection{Hamiltonians, twists, and the spatial transfer operator}
 \label{cert:sec:transfer}
@@ -43,14 +63,19 @@ We consider the periodic spin-1 Heisenberg Hamiltonian
 \end{equation}
 with unit exchange coupling. Lengths count sites, and
 $\Delta_L=E_1(L)-E_0(L)$, with eigenvalues ordered with multiplicity.
-Anticipating the trial energy per site, we shift the Hamiltonian by
-$\kappa$ per site:
+We shift the Hamiltonian by $\kappa$ per site, a rational just above the
+trial energy per site of Sec.~\ref{cert:sec:inputs}, so that the shifted
+ground energy is negative and the leading transfer eigenvalue sits near
+one:
 \begin{equation}
- \kappa=\frac{700741}{500000},\qquad
+ \kappa=\frac{700741}{500000}\simeq1.401482,\qquad
  \widehat H_n=H_n+\kappa nI,\qquad
  Z_n(\beta)=\Tr e^{-\beta\widehat H_n}.
  \label{cert:eq:shift}
 \end{equation}
+We omit hats on shifted quantities in this section: $Z_n(\beta)$
+denotes $\widehat Z_n(\beta)$ in Eq.~\eqref{seed:shift}, and
+$K_{b_0}$ below denotes the shifted operator $\widehat K$.
 This extensive shift cancels in both purities:
 \begin{equation}
  \Ps(n,\beta)=\frac{Z_{2n}(\beta)}{Z_n(\beta)^2},
@@ -60,8 +85,9 @@ This extensive shift cancels in both purities:
 \end{equation}
 
 To separate the spatial transfer spectrum by spin-rotation symmetry, we
-also use rings with a twisted closing bond. For an on-site spin rotation
-$u_g$ representing $g$, we define
+also use rings whose closing bond is twisted by a spin rotation,
+\seedring{1}, alongside the plain ring \seedring{0}. For an on-site spin
+rotation $u_g$ representing $g$, we define
 \begin{align}
  H_n(g)&=\sum_{j=1}^{n-1}h_{j,j+1}+h_{n,1}(g),\notag \\
  h_{n,1}(g)&=\sum_{\alpha=x,y,z}
@@ -69,9 +95,8 @@ $u_g$ representing $g$, we define
  Z_n(\beta,g)&=\Tr e^{-\beta(H_n(g)+\kappa nI)},
  \label{cert:eq:twisted-hamiltonian}
 \end{align}
-where $h_{j,j+1}=\bm S_j\cdot\bm S_{j+1}$.
-The twist modifies the spatial seam rather than inserting $u_g^{\otimes n}$
-into the untwisted Gibbs trace.
+where $h_{j,j+1}=\bm S_j\cdot\bm S_{j+1}$ and $u_g$ acts on one side of
+the closing bond $(n,1)$.
 
 The continuous-time construction of Ref.~\cite{OpenAI2026Periodic}
 provides a self-adjoint one-site spatial transfer operator $K_\beta$ for
@@ -81,12 +106,12 @@ the shifted Hamiltonian and a virtual symmetry operator $U_g$ such that
  \label{cert:eq:transfer-trace}
 \end{equation}
 At $g=1$, $Z_n(\beta)=\sum_i\lambda_i(\beta)^n$ is a power sum of the
-real eigenvalues $\lambda_i(\beta)$ of $K_\beta$. Because the same
+real eigenvalues $\lambda_i(\beta)$ of $K_\beta$, which have either sign:
+the odd traces in Table~\ref{cert:tab:traces} are small, \tracebars{} on
+a logarithmic scale, because negative eigenvalues of nearly the same
+modulus as the positive ones cancel at odd $n$. Because the same
 eigenvalues govern every length $n\ge4$, trace bounds on $4\le n\le12$
-constrain the power sums at $n=36$ and $n=72$. Unlike the positive
-two-site Trotter matrix of Section~\ref{sm:sec:transfer}, the one-site
-operator $K_\beta$ can have negative eigenvalues, so we must bound
-$|\lambda_i(\beta)|$ on both sides of zero.
+constrain the power sums at $n=36$ and $n=72$.
 
 In our diagrams, horizontal wires carry spatial virtual indices, vertical
 double wires carry physical indices, and closed loops denote traces.
@@ -110,9 +135,10 @@ $Z_n(b_0)$ and $Z_n(b_0,P)$ for $4\le n\le12$, where $P$ is a $\pi$
 rotation about a Cartesian axis. Table~\ref{cert:tab:traces} lists the
 rational centers, each certified within the absolute error
 \begin{equation}
- \epsilon_Z=3\times10^{-5}.
+ \epsilon_Z=3\times10^{-5},
  \label{cert:eq:trace-error}
 \end{equation}
+the budget of the integer recursion described next.
 
 \begin{table}[t]
  \caption{Exact rational centers of the shifted traces at $b_0=49/4$ from
@@ -144,7 +170,14 @@ $H=H_n(g)$, we set
  \label{cert:eq:uniformization}
 \end{equation}
 which satisfies $\|R\|\le1$ on each ring in Table~\ref{cert:tab:traces}.
-At $b_0=49/4$, the shifted half-Gibbs operator is
+To check this, remove the local twist on each three-site path by a
+unitary rotation. Coupling the outer spins first shows that the
+two-bond cluster has spectrum in $[-3,2]$. Averaging over the cyclic
+clusters gives $-(3n/2)I\le H\le nI$. For $4\le n\le12$, we therefore
+have $0\le(3n/2)I+H\le(5n/2)I\le32I$, placing the spectrum of $R$
+in $[-1,1]$.
+At $b_0=49/4$, since $-(b_0/2)(H+3n/2)=8b_0(R-I)$ and $8b_0=98$, the
+shifted half-Gibbs operator is
 \begin{equation}
  e^{-b_0(H+\kappa nI)/2}
  =e^{-b_0(\kappa-3/2)n/2}e^{98(R-I)}.
@@ -157,16 +190,17 @@ We approximate $e^{98(R-I)}$ by the normalized Poisson polynomial
  \qquad J=280,
  \label{cert:eq:poisson}
 \end{equation}
-whose truncation and normalization error in operator norm is at most
+truncated eighteen standard deviations above the Poisson mean $98$, so
+its truncation and normalization error in operator norm is at most
 \begin{equation}
  2e^{-98}\sum_{j>280}\frac{98^j}{j!}<2^{-84}.
  \label{cert:eq:poisson-error}
 \end{equation}
 
-Setting $Q=2^{55}$, we replace $Qp_j$ by integers $c_j$ with
-$|c_j-Qp_j|\le1$. Writing $R=D/s$ with an integer matrix $D$ and integer
-divisor $s>0$, we evaluate each basis column $e_r$ by the downward
-recursion
+Scaling by $Q=2^{55}$, we replace $Qp_j$ by integers $c_j$ with
+$|c_j-Qp_j|\le1$, a relative rounding of $2^{-55}$ per weight. Writing
+$R=D/s$ with an integer matrix $D$ and integer divisor $s>0$, we evaluate
+each basis column $e_r$ by the downward recursion
 \begin{equation}
  X_{J+1}=0,\qquad
  X_j=\left\lfloor\frac{DX_{j+1}}s\right\rfloor+c_je_r,
@@ -235,9 +269,14 @@ projectors
 \end{equation}
 Cyclic permutation of the coordinate axes conjugates the three nontrivial
 characters into one another, so their three sectors have identical
-eigenvalue lists, which we denote by $N$; we denote the $D_2$-invariant
-eigenvalue list by $J$. Writing $J_n=\sum_{\lambda\in J}\lambda^n$ and
-$N_n=\sum_{\lambda\in N}\lambda^n$ at $b_0$, we have
+eigenvalue lists, which we denote by $N$; the $D_2$-invariant list is
+$J$. The twist $P=P_z$ weights each sector by its character,
+\begin{proofdiagram}
+ \sectorsigns
+\end{proofdiagram}
+so with $J_n=\sum_{\lambda\in J}\lambda^n$ and
+$N_n=\sum_{\lambda\in N}\lambda^n$ at $b_0$, the plain and twisted traces
+\seedring{0} and \seedring{1} invert to the sector moments:
 \begin{align}
  Z_n&=J_n+3N_n,& Z_n(P)&=J_n-N_n,\notag \\
  J_n&=\frac{Z_n+3Z_n(P)}4,&
@@ -246,44 +285,49 @@ $N_n=\sum_{\lambda\in N}\lambda^n$ at $b_0$, we have
 \end{align}
 From Eq.~\eqref{cert:eq:trace-error}, the sector moments $J_n$ and $N_n$
 for $4\le n\le12$ have absolute errors at most $\epsilon_Z$ and
-$\epsilon_Z/2$ around their rational centers. In particular, at $n=12$
-these enclosures yield the twelfth-moment upper bounds
+$\epsilon_Z/2$ around their rational centers. At $n=12$, we add the
+common tolerance $\epsilon_Z$ to both centers to obtain the
+twelfth-moment upper bounds
 \begin{equation}
  J_{12}\le m_J=\frac{2131441}{2000000},\qquad
  N_{12}\le m_N=\frac{556631}{2000000}.
  \label{cert:eq:masses}
 \end{equation}
 
-To bound individual eigenvalues from these finite power sums, we evaluate
-the nonnegative polynomials of Ref.~\cite{OpenAI2026Periodic},
+A polynomial filter turns these power sums into a cap on every single
+eigenvalue. Take a polynomial of degree at most $12$ that is nonnegative
+on $\mathbb R$, a fourth power times a square, with coefficients chosen
+in Ref.~\cite{OpenAI2026Periodic} to make the cap tight:
 \begin{align}
  F_J(x)&=x^4(7+17x-280x^2-185x^3+1000x^4)^2,\notag \\
  F_N(x)&=x^4(12-394x^2+1000x^4)^2.
  \label{cert:eq:filters}
 \end{align}
-Pairing each coefficient of $F_J$ and $F_N$ with the upper or lower
-endpoint of the corresponding moment interval for $4\le n\le12$ gives
+Expanded, $F_N$ is a combination of $x^4,x^6,\ldots,x^{12}$, so its sum
+over a sector is the same combination of $N_4,\ldots,N_{12}$ ($F_J$ also
+uses the odd moments $J_5,\ldots,J_{11}$); pairing positive coefficients
+with upper and negative coefficients with lower moment endpoints gives
+the certified totals
 \begin{align}
  \sum_{\lambda\in J}F_J(\lambda)&\le B_J=318604.54848175,\notag \\
  \sum_{\lambda\in N}F_N(\lambda)&\le B_N=48169.880699.
  \label{cert:eq:filter-bounds}
 \end{align}
-Because $F_J$ and $F_N$ are nonnegative on $\mathbb R$, each single
-eigenvalue satisfies $F_J(\lambda)\le B_J$ for $\lambda\in J$ and
-$F_N(\lambda)\le B_N$ for $\lambda\in N$.
-
-For $U=1.00139$ and $V=0.872$, we expand $F_J(\pm(U+y))$ and
-$F_N(\pm(V+y))$ in powers of $y\ge0$. Exact rational arithmetic shows that
-their constant terms exceed $B_J$ and $B_N$ and all higher coefficients
-are nonnegative, which rules out eigenvalues on the exterior rays
-$|x|\ge U$ and $|x|\ge V$:
+Every term is nonnegative, so no single eigenvalue exceeds the total,
+and the filter rises above its total outside a bounded interval:
+\begin{proofdiagram}
+ \filterfigure
+\end{proofdiagram}
+The crossings $U=1.00139$ and $V=0.872$ are rational points just beyond
+the roots of $F_J=B_J$ and $F_N=B_N$. Expanding $F_J(\pm(U+y))$ and
+$F_N(\pm(V+y))$ in powers of $y\ge0$, exact rational arithmetic shows
+that the constant terms exceed $B_J$ and $B_N$ and all higher
+coefficients are nonnegative, so both exterior rays are empty:
 \begin{equation}
  |\lambda|<U\quad(\lambda\in J),\qquad
  |\lambda|<V\quad(\lambda\in N).
  \label{cert:eq:caps}
 \end{equation}
-Checking both signs $\pm(U+y)$ and $\pm(V+y)$ is required because
-$K_{b_0}$ is self-adjoint rather than positive.
 
 \subsubsection{Capped masses and the two base defects}
 \label{cert:sec:base-defects}
@@ -300,15 +344,20 @@ set
 Whenever $0\le t_i\le a$ and $\sum_i t_i\le m$, convexity of $t^r$
 implies $\sum_i t_i^r\le\mathcal C(m,a,r)$: shifting mass from a smaller
 unsaturated entry to a larger one increases $\sum_i t_i^r$, so the maximum
-is achieved by placing $q$ entries at the cap $a$ and the remaining mass
-$m-qa$ in a single entry. Applied to $t_i=\lambda_i^{12}\ge0$, this bounds
-higher moments of the $12$th-power weights.
+is achieved by filling $q$ entries to the cap $a$ and putting the
+remaining mass $m-qa$ in a single entry, \capbars{1,1,.4}{1}. Applied to
+$t_i=\lambda_i^{12}\ge0$, this bounds higher moments of the $12$th-power
+weights.
 
 We first show that $J$ contains a dominant eigenvalue with
-$|\lambda_0|>\ell=0.999$. If every $\lambda\in J$ satisfied
-$|\lambda|\le\ell$, then applying Eq.~\eqref{cert:eq:capped} with $r=6$
-to $J$ (with cap $\ell^{12}$) and to each of the three $N$ sectors (with
-cap $V^{12}$) would give
+$|\lambda_0|>\ell=0.999$, where $\ell$ is any value for which the capped
+sum below stays under one. If every $\lambda\in J$ satisfied
+$|\lambda|\le\ell$, Eq.~\eqref{cert:eq:capped} with $r=6$ would place
+the twelfth-power masses as follows,
+\begin{proofdiagram}
+ \cappedmassfigure
+\end{proofdiagram}
+and give
 \begin{equation}
  Z_{72}(b_0)
  \le\mathcal C(m_J,\ell^{12},6)
@@ -319,7 +368,8 @@ cap $V^{12}$) would give
 contradicting the $72$-site trial bound $Z_{72}(b_0)>1$ in
 Eq.~\eqref{cert:eq:trial-consequence}. Because $m_N<\ell^{12}$, no $N$
 eigenvalue can exceed $\ell$ in modulus, so $J$ has at least one
-eigenvalue $\lambda_0$ with $|\lambda_0|>\ell$.
+eigenvalue $\lambda_0$ with $|\lambda_0|>\ell$, and the twelfth-power
+weights look like \sectorspectrum.
 
 Removing $\lambda_0^{12}>\ell^{12}$ from $J_{12}$ leaves residual twelfth
 moment at most $m_J-\ell^{12}<U^{12}$ in $J$. For even $k\ge12$, the
@@ -337,15 +387,18 @@ At $k=36$ and $k=72$, we obtain the two base purity bounds:
    \left(U^{72}+R_{72}\right)^{-2}=1-q.
  \label{cert:eq:base-purities}
 \end{align}
-For $\Ps(36,b_0)$, we bound the numerator from below by
-$Z_{72}(b_0)\ge\lambda_0^{72}$, bound $Z_{36}(b_0)\le|\lambda_0|^{36}+R_{36}$,
-and use $|\lambda_0|>\ell$. For $\Pt(72,b_0)$, we bound the numerator from
-below by $Z_{72}(2b_0)>1$ from Eq.~\eqref{cert:eq:trial-consequence} and
-bound the denominator by $Z_{72}(b_0)=\lambda_0^{72}+\sum_{i\ne0}\lambda_i^{72}
-\le U^{72}+R_{72}$.
+The spatial bound keeps $\lambda_0^{72}\le Z_{72}(b_0)$ in the numerator
+and $Z_{36}(b_0)\le|\lambda_0|^{36}+R_{36}$ in the denominator; the
+thermal bound uses $Z_{72}(2b_0)>1$ from
+Eq.~\eqref{cert:eq:trial-consequence} and
+$Z_{72}(b_0)\le U^{72}+R_{72}$. The sizes involved are
+$R_{36}<0.024$ (three $N$ lists at $0.1933^3+0.0851^3<0.00784$ each and
+$0.0777^3<0.00047$ in $J$), $R_{72}<1.6\times10^{-4}$,
+$\ell^{36}>0.9646$, and $U^{72}<1.1052$, so
+$p<1-(0.9646/0.9886)^2<0.048$ and $q<1-1.10535^{-2}<0.1816$.
 
 Because $k/12\in\{3,6\}$ is an integer, Eqs.~\eqref{cert:eq:dominance-check}--\eqref{cert:eq:base-purities}
-involve only rational arithmetic. Exact evaluation verifies
+involve only rational arithmetic. Exact evaluation sharpens these to
 \begin{equation}
  p\le\frac{47916}{10^6},\qquad
  q\le\frac{181521}{10^6},
@@ -387,8 +440,9 @@ bounds the full sector moments at any even length $k\ge12$ by
 Because $N_k\ge0$ at even $k$, we have $Z_k(b_0)=J_k+3N_k\le M_k$ and
 $Z_k(b_0,P)=J_k-N_k\le\mathcal J_k$.
 
-Now fix a rational factor $r\ge1$, an even length $12\le k\le60$, and the
-lifted inverse temperature $b=rb_0$. Both $H_k$ and $H_k(P)$ are
+Now fix a lifting ratio $r\ge1$, an even length $12\le k\le60$ at which
+the lifted traces are bounded, and the lifted inverse temperature
+$b=rb_0$. Both $H_k$ and $H_k(P)$ are
 self-adjoint, so their physical Boltzmann weights $z_i>0$ at $b_0$ satisfy
 $\sum_i z_i^r\le(\sum_i z_i)^r$. This transfers the upper bounds at $b_0$
 to $b$:
@@ -407,6 +461,9 @@ transfer operator and define the $k$th-power weights
  \tau=\frac{D+3E}{4}.
  \label{cert:eq:spatial-weights}
 \end{equation}
+Here $h$ converts $k$th powers into the $60$-site weights of the seed,
+$w_i^h=|\lambda_i(b)|^{60}$, and $\tau$ is the lifted bound on the
+$J$-sector mass by Eq.~\eqref{cert:eq:sector-inversion}.
 Since $k$ is even, $w_i=\lambda_i(b)^k\ge0$. Thus $\sum_i w_i=Z_k(b)\le D$,
 the $J$-sector sum satisfies $\sum_{\lambda_i\in J}w_i=[Z_k(b)+3Z_k(b,P)]/4\le\tau$,
 and the $120$-site trial bound~\eqref{cert:eq:trial-consequence} gives
@@ -458,10 +515,12 @@ spatial purity bound at $n=60$:
 \subsubsection{The physical thermal residual}
 \label{cert:sec:thermal-residual}
 
-To bound $\Pt(120,b)$ at $b=rb_0$, we work directly with the physical
-Boltzmann weights $z_i=e^{-b_0\widehat E_i(120)}$ of $\widehat H_{120}$
-rather than the spatial eigenvalues of $K_b$. Ordering $z_0\ge z_1\ge\cdots$,
-we have $z_0>1$ from the $120$-site trial state and
+Scaling the inverse temperature from $b_0$ to $b=rb_0$ changes the
+spatial transfer operator $K_b$, whereas it simply raises each physical
+Boltzmann weight $z_i=e^{-b_0\widehat E_i(120)}$ of $\widehat H_{120}$
+to the $r$th power. To bound $\Pt(120,b)$, we therefore work directly
+with the ordered Boltzmann weights $z_0\ge z_1\ge\cdots$ at $b_0$.
+We have $z_0>1$ from the $120$-site trial state and
 $\sum_i z_i=Z_{120}(b_0)\le M_{120}$ from Eq.~\eqref{cert:eq:moment-upper}.
 Hence
 \begin{equation}
@@ -470,17 +529,17 @@ Hence
  \le(M_{120}-1)^r.
  \label{cert:eq:boltzmann-residual}
 \end{equation}
-At $b=rb_0$, the physical partition functions are $Z_{120}(b)=\sum_i z_i^r$
-and $Z_{120}(2b)=\sum_i z_i^{2r}\ge z_0^{2r}$. Dividing numerator and
-denominator by $z_0^{2r}$ gives the lifted thermal purity bound:
+At $b=rb_0$, the partition functions are $Z_{120}(b)=\sum_i z_i^r$
+and $Z_{120}(2b)=\sum_i z_i^{2r}\ge z_0^{2r}$: raising the weights to
+the power $r>1$ concentrates them on the ground state,
+$\specbars{.6,.25,.15}\mapsto\specbars{.83,.13,.04}$ at $r=17/8$.
+Dividing numerator and denominator by $z_0^{2r}$ gives the lifted
+thermal purity bound:
 \begin{equation}
  \Pt(120,rb_0)\ge
  \left[1+(M_{120}-1)^r\right]^{-2}.
  \label{cert:eq:lifted-thermal}
 \end{equation}
-The transfer identity $\Tr K_\beta^L=Z_L(\beta)$ equates the full traces
-at each $\beta$; it does not identify individual spatial eigenvalues with
-physical Boltzmann weights.
 
 \subsubsection{Finite-prefix coverage and the doubling tail}
 \label{cert:sec:coverage}
@@ -511,6 +570,10 @@ If $g$ is strictly smaller than every member of
 then every even $L\ge n_0$ has a unique ground state and
 $\Delta_L>g$. An entry with $A_j=1$ is interpreted as $+\infty$.
 \end{proposition}
+\noindent Here $u<1/6$ keeps $1-3u>1/2$, $G$ is the exact quadratic
+coefficient of the scalar tail, $f(1-(1-x)^3)=x^2G(x)$ with $G(0)=9/2$,
+$Cu<1$ makes the tail defects decrease, and $C(1-3u)>3$ makes the
+prefactor in the proof below smaller than one.
 
 \begin{proof}
 For even $n_j\le L\le2n_j$ with $0\le j<K$, spatial power-sum
@@ -546,8 +609,10 @@ $f(x)=x^2/[2(1-x)^2]$:
  \label{cert:eq:recurrence}
 \end{align}
 where $\lceil x\rceil_\delta=\delta\lceil x/\delta\rceil$.
-For the lifted seeds at $(60,rb_0)$, we take $K=10$ steps with
-$\delta=10^{-2048}$ and apply Proposition~\ref{cert:prop:prefix}.
+For the lifted seeds at $(60,rb_0)$, we take $K=10$ steps, enough for
+the per-interval bounds to converge, with a grid $\delta=10^{-2048}$
+finer than every defect reached, and apply
+Proposition~\ref{cert:prop:prefix}.
 
 \begin{table}[t]
  \caption{Temperature-lifting certificates at $(60,rb_0)$ with $b_0=49/4$.
@@ -567,19 +632,23 @@ $\delta=10^{-2048}$ and apply Proposition~\ref{cert:prop:prefix}.
 
 Table~\ref{cert:tab:lifted} lists two parameter choices. The integer choice
 $(k,r)=(30,2)$ has $h=2$, so its spatial residual~\eqref{cert:eq:lifted-residual}
-uses only second and fourth powers and already gives $\Delta_L>0.07045$
-for even $L\ge60$. The fractional choice $(k,r)=(28,17/8)$ gives
-$\Delta_L>0.072901771$ for even $L\ge60$.
-
-To cover the remaining even lengths $36\le L<60$, we evaluate the unlifted
-base-seed formulas~\eqref{cert:eq:base-residual}--\eqref{cert:eq:base-purities}
-at $(36,b_0)$ using the sharper caps~\eqref{cert:eq:tight-caps} and
-$\ell=0.999997937629$, validated by the capped-mass inequality
-$\mathcal C(m_J,\ell^{12},6)+3\mathcal C(m_N,V^{12},6)<1$.
-At $j=0$, the resulting factor $A_0=(1-p_0)^2(1-q_0)$ satisfies
-$\log(A_0/(1-A_0))/b_0>0.09$, which by Eq.~\eqref{cert:eq:interval-gap}
-bounds $\Delta_L>0.09$ on every even $36\le L\le72$. Combining this bridge
-on $[36,72]$ with the lifted bound on $[60,\infty)$ proves
+uses only second and fourth powers; the fractional choice
+$(k,r)=(28,17/8)$ gives the better constant. The even lengths below
+$60$ are covered by the unlifted base-seed
+formulas~\eqref{cert:eq:base-residual}--\eqref{cert:eq:base-purities}
+at $(36,b_0)$ with the sharper caps~\eqref{cert:eq:tight-caps} and
+$\ell=0.999997937629$, the largest grid value with
+$\mathcal C(m_J,\ell^{12},6)+3\mathcal C(m_N,V^{12},6)<1$; its factor
+$A_0=(1-p_0)^2(1-q_0)$ gives $\log(A_0/(1-A_0))/b_0>0.09$ on
+$36\le L\le72$ by Eq.~\eqref{cert:eq:interval-gap}. The intervals and
+their bounds, for $(k,r)=(28,17/8)$, are
+\begin{proofdiagram}
+ \coveragefigure
+\end{proofdiagram}
+(per-interval values are floating-point illustrations; the certified
+minimum is the dashed line). The bound converges within a few doublings,
+so the uniform constant is the limit of the prefix rather than the
+bridge or the first intervals, and together they prove
 Eq.~\eqref{cert:eq:improved} for every even $L\ge36$.
 
 \subsection{Reproducibility and arithmetic assumptions}

@@ -1,9 +1,9 @@
 We give a diagrammatic exposition of OpenAI's computer-assisted
 proof of a uniform gap in the periodic spin-1 Heisenberg chain.
-By reading the partition-function tensor network along space and
-imaginary time, we show how bounds for finite rings imply a gap for
-all sufficiently long even rings. We improve the spin-1 gap bound
-and extend the argument to certify uniform gaps for seven additional
+Reading the partition-function tensor network along space and
+imaginary time shows how finite-ring bounds propagate across doubled
+lengths and inverse temperatures to all longer even rings. From the
+same finite inputs, we sharpen the spin-1 bound to $\Delta_L>0.07290$
+for all even $L\ge36$, and extend the method to seven additional
 reflection-positive spin chains and ladders. We formalize the general
-argument in a reusable Lean library and give a complete Lean proof
-for a mixed-field Ising example.
+theorem in Lean and verify a mixed-field Ising seed in the kernel.

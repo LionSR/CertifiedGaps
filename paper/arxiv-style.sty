@@ -15,8 +15,12 @@
  arxiv remainder weight/.style={black!25},
  arxiv point/.style={circle,fill=black!75,inner sep=1.5pt}}
 \input{figures/arxiv-diagrams}
+\input{figures/arxiv-diagrams-obc}
+\input{figures/arxiv-diagrams-trotter}
+\input{figures/arxiv-diagrams-seeds}
 % A linked check marks a formalized implication, with hypotheses stated in prose.
 \newcommand{\leanmark}[1]{\href{#1}{\ensuremath{\textcolor{teal!70!black}{\checkmark_{\!\mathsf L}}}}}
+\makeatletter
 % Allow \tocdepth@munge to be called before \tableofcontents without clobbering \l@section@saved.
 \def\tocdepth@munge{%
  \ifx\l@section\@gobble@tw@\else
@@ -37,3 +41,4 @@
  \draw[flow,#1,shorten >=.5pt] (mv#4)--(#3);
  \node[maprule,anchor=\arxiv@anchor,inner sep=1pt,xshift=\arxiv@shift]
   at (mv#4.\arxiv@outer) {#5};}
+\makeatother
