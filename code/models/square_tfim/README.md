@@ -2,15 +2,15 @@
 
 The spacetime bootstrap certifies a unique ground state and a uniform spectral gap for the
 ferromagnetic transverse-field Ising model on every even square torus of side at least four.
-Both spatial periods grow: these are two-dimensional bounds, not fixed-width ladder bounds.
-The proof uses exact spatial transfer inequalities and verified spectra of at most sixteen
-spins. The two-dimensional theorem is proved mathematically, but is not yet formalized in Lean.
+Both spatial periods grow. The proof uses exact spatial transfer inequalities and verified
+spectra of at most sixteen spins. The general small-defect theorem is formalized in Lean,
+with the model's transfer inequalities and finite seeds as separate obligations.
 
 | parameter $g/J$ | seed $(n_0=m_0,\beta_0 J)$ | certified gap $\ge$ | lengths covered |
 |---:|---|---:|---|
-| 18 | $(2,2/9)$ | $0.59437J$ | even square side $L\ge4$ |
-| 20 | $(2,1/5)$ | $2.17363J$ | even square side $L\ge4$ |
-| 24 | $(2,1/6)$ | $4.80557J$ | even square side $L\ge4$ |
+| 18 | $(2,53/240)$ | $0.74378J$ | even square side $L\ge4$ |
+| 20 | $(2,157/800)$ | $2.51376J$ | even square side $L\ge4$ |
+| 24 | $(2,79/480)$ | $5.52173J$ | even square side $L\ge4$ |
 
 ## Model
 
@@ -46,19 +46,32 @@ complete verified spectra of the 2 by 2, 4 by 2, and 4 by 4 tori. The largest sy
 has dimension 2392. The exact defects and every rational recurrence step are in
 `results/certificate_g18.json.gz`, `certificate_g20.json.gz`, and `certificate_g24.json.gz`.
 
-The certified defect bounds are exact terminating decimals:
+The refined seed bounds are exact terminating decimals:
 
 | $g/J$ | $\varepsilon_x$ | $\varepsilon_y$ | $\varepsilon_\tau$ |
 |---:|---:|---:|---:|
-| 18 | 0.02470865 | 0.04854442 | 0.01164265 |
-| 20 | 0.02002999 | 0.03948414 | 0.01145037 |
-| 24 | 0.01392379 | 0.02756791 | 0.01120587 |
+| 18 | 0.02456152 | 0.04825847 | 0.01222144 |
+| 20 | 0.01967145 | 0.03878343 | 0.01325307 |
+| 24 | 0.01375692 | 0.02723951 | 0.01236053 |
 
 The code uses the three-component update from the
 [2+1 dimensional note](../../../paper/thermal-mpo-gap-2plus1d.tex), then its quadratic tail
-once all defects are at most $1/1000$. Exact rational lower bounds for the finitely many
+after twelve steps, when all defects are at most $1/1000$. A rational grid of denominator
+$10^{2000}$ resolves the defects at these scales. Exact lower bounds for the finitely many
 earlier interpolation windows ensure that the conclusion covers every even square side,
 not only a sequence of doubled tori. The one-dimensional `certified_gap_bound` is not used.
+
+The `refinement` field contains the new seeds and bounds; the original `seed` and `chain`
+fields retain their previous exact values. The checker recomputes both. The same verified
+spectra also give the following finite-volume enclosures, rounded outward:
+
+| $g/J$ | $E_0(4,4)/(16J)$ | $\Delta_{4,4}/J$ |
+|---:|---|---|
+| 18 | $[-18.02788651,-18.02788645]$ | $[31.8789898,31.8789914]$ |
+| 20 | $[-20.02507906,-20.02507899]$ | $[35.8920390,35.8920409]$ |
+| 24 | $[-24.02087895,-24.02087887]$ | $[43.9111961,43.9111983]$ |
+
+These energy densities describe sixteen spins. No thermodynamic extrapolation is used.
 
 The floating-point search at $g/J=17$ found no closing seed on the tested grid
 $\beta g=2,2+1/8,\ldots,12$. This does not exclude another temperature, a larger seed, or
@@ -78,21 +91,26 @@ julia --project=code/julia code/models/square_tfim/test/runtests.jl
 
 The default drivers process all three fields. A field can be supplied, for example
 `check.jl 18 --full`. `certify.jl --reuse` reuses the stored verified spectra after checking
-their hashes and row models; the default regenerates them. Measured on the development
-Apple Silicon machine with one BLAS thread: spectral generation took 66--70 seconds per
-field; `certify.jl --reuse` took 26 seconds for all three fields; the compressed fast checker
-took 38 seconds; and full spectral replay took 235 seconds for all three fields. The 42 model
-tests took 101--121 seconds in their test sets. These measurements exclude process startup and initial
-package precompilation. Certificates and spectral records are stored as lossless gzip JSON;
-compression was checked to preserve every seed, recurrence step, and spectral record.
+their hashes and row models; the default regenerates them. On the development Apple Silicon
+machine with one BLAS thread, the three refined certificates regenerated from stored spectra
+in 26.2 seconds, and the 58 model tests took 133.3 seconds in their test sets. The original
+compressed fast checker took 38 seconds; full spectral generation took 66--70 seconds per
+field. Full spectral replay of all three refined certificates took 217.1 seconds and passed.
+Measurements exclude startup and initial package precompilation. Certificates and
+spectral records use lossless gzip JSON.
 
 For numerical exploration only:
 
 ```sh
 julia --project=code/julia code/models/square_tfim/scripts/scan.jl 17
+julia --project=code/julia code/models/square_tfim/scripts/refine_scan.jl
 ```
 
-This takes about 35 seconds per field and writes a clearly labeled diagnostic, not a certificate.
+The first command takes about 35 seconds per field. The second reuses stored spectra to
+search temperature with the longer recurrence. Both write floating-point diagnostics.
+
+The general Lean theorem can be checked with
+`cd code/lean && lake build CertifiedGaps.CubeCriterion`.
 
 ## What is rigorous
 
@@ -109,16 +127,21 @@ The fast checker replays stored spectral enclosures and checks their hashes. `--
 every symmetry block and independently verifies that the fresh enclosures imply the stored
 seed bounds. The tests compare small tori with a separately constructed Hamiltonian, check
 the full sixteen-spin spectral moments, and reject altered seeds, gaps, and spectrum hashes.
-The seed scans are floating-point diagnostics only. No infinite-volume gap is assumed as
-input, and no claim of Lean verification, open-boundary coverage, or arbitrary aspect ratios
-is made.
+The seed scans are floating-point diagnostics only. The Lean theorem
+`CertifiedGaps.Spacetime.gapGT_of_cube_seeds` proves the general small-defect criterion from
+scalar moment and spatial interpolation hypotheses, without `sorry` or additional axioms.
+The Ising transfer construction, the finite asymmetric recurrence preceding the small-defect
+regime, and the numerical seeds remain outside that formalization. The model certificate
+therefore combines a mathematical proof with verified Julia arithmetic. Its scope is even
+square tori with periodic boundaries.
 
 ## Layout
 
 - `src/SquareIsing.jl`: exact row models, transverse symmetries, and RP factors.
 - `src/CubeRecurrence.jl`: exact three-component recurrence and interpolation-window bounds.
 - `src/Certificate.jl`, `certify.jl`, `check.jl`: certificate generation and replay.
-- `scripts/build_spectra.jl`, `scripts/scan.jl`: verified spectra and numerical seed search.
+- `scripts/build_spectra.jl`, `scripts/scan.jl`, `scripts/refine_scan.jl`: spectral generation
+  and numerical seed searches.
 - `test/runtests.jl`: independent geometry, arithmetic, spectral-moment, and rejection tests.
 - `METHOD.md`, `IDEAS.md`: proof and route analysis.
 - `results/`: relative symlink to `../../../data/models/square_tfim/`, containing certificates,

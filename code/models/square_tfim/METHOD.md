@@ -117,6 +117,86 @@ even square side at least two. All logarithms are bounded below by the core exac
 atanh-series routine `ExactArithmetic.log_enclosure`. In particular, using initial defects
 larger than $10^{-3}$ does not assume the small-defect theorem outside its stated domain.
 
+## Refinement and finite-volume energies
+
+Replacing the three defects by their maximum loses information. The refined calculation
+retains the three-component recurrence for twelve steps and then applies the same scalar
+tail. Upward rounding uses denominator $10^{2000}$; the original denominator $10^{80}$
+would dominate the defects before twelve steps. A numerical search over
+$\beta g=3,3+1/40,\ldots,6$ selects the temperatures below. Fresh interval partition sums
+certify these choices independently of the search.
+
+| $g/J$ | $\beta_0J$ | original bound $/J$ | refined bound $/J$, rounded down |
+|---:|---:|---:|---:|
+| 18 | $53/240$ | 0.5943744623 | 0.7437803188 |
+| 20 | $157/800$ | 2.1736330392 | 2.5137666679 |
+| 24 | $79/480$ | 4.8055785105 | 5.5217326453 |
+
+The original seed, recurrence, and spectral records are retained exactly. Certificate
+format v2 adds a `refinement` record and rational enclosures of the ground energy, energy
+per site, and gap for each finite torus. Both chains and every new enclosure are recomputed
+by the checker. The finite-volume values in the README come from `ground_energy_enclosure`
+and `spectral_gap_enclosure` applied to the complete verified spectra.
+
+The uniform bounds remain well below the sixteen-spin gaps. At $g/J=24$, for example,
+the finite gap exceeds $43.91119J$, while the uniform bound is $5.52173J$. Spectral enclosure
+errors are below $10^{-6}J$ per eigenvalue. Sharper eigenvalue arithmetic alone would thus
+have little effect. Larger spatial seeds or sharper directional estimates are needed for
+a substantial further increase.
+
+## General theorem and Lean formalization
+
+Let $Z_{x,y,t}>0$ be partition data indexed by nonnegative integers counting doublings in
+two spatial directions and inverse temperature. Define
+
+```math
+p_x(x,y,t)=\frac{Z_{x+1,y,t}}{Z_{x,y,t}^2},\qquad
+p_y(x,y,t)=\frac{Z_{x,y+1,t}}{Z_{x,y,t}^2},\qquad
+p_t(x,y,t)=\frac{Z_{x,y,t+1}}{Z_{x,y,t}^2}.
+```
+
+Assume that each ratio is at most one and satisfies the single-direction squaring
+inequality: $1-p_i(v+e_i)\le f(1-p_i(v))$. These are the fields of the Lean structure
+`CertifiedGaps.Spacetime.CubeData`. Cube coupling follows from cancellation of the partition
+functions; it is proved from these definitions.
+
+For a family of finite spectra $E_L$, a positive seed period $n_0$, and $\beta_0>0$, assume
+the spatial interpolation inequality
+
+```math
+P_\tau(E_L,2^j\beta_0)\ge Q_j
+ :=p_x(j,j,j)^4p_y(j+1,j,j)^2p_t(j+1,j+1,j)
+```
+
+for every even $L$ with $n_0 2^j\le L\le2n_0 2^j$. This is `WindowInput`; it is an
+explicit hypothesis relating the partition data to the physical spectra.
+
+**Theorem.** If $0<\varepsilon\le10^{-3}$ and
+
+```math
+p_x(0,0,0),\ p_y(1,0,0),\ p_t(1,1,0)\ge1-\varepsilon,
+```
+
+then every even $L\ge n_0$ has a unique lowest energy and
+
+```math
+\Delta_L>\frac{\log(1/(25\varepsilon))}{\beta_0}.
+```
+
+**Proof.** Cube coupling and directional squaring give the common next-scale bound
+$25\varepsilon^2$. Induction yields
+$u_j=(25\varepsilon)^{2^j}/25$, and Bernoulli's inequality gives $Q_j\ge1-7u_j$.
+Choose the window containing $L$. For $c=\log(1/(25\varepsilon))/\beta_0$ one has
+$e^{2^j\beta_0c}7u_j=7/25<1-7u_j$. The purity-to-gap inequality proves the claim.
+
+This proof is `Spacetime.gapGT_of_cube_seeds` in
+[`CubeCriterion.lean`](../../lean/CertifiedGaps/CubeCriterion.lean).
+Its only axioms are Lean's standard `propext`, `Classical.choice`, and `Quot.sound`.
+The formal theorem is independent of Ising and of a local Hilbert-space dimension.
+It treats two spatial directions. The model's Trotter-limit construction, the derivation
+of `WindowInput` from spatial transfer moments, the asymmetric finite prefix, and the
+numerical seed arithmetic have not been formalized in this file.
+
 ## Verification scope
 
 The fast checker verifies model-local source hashes, exact row models and RP factors, stored
@@ -126,10 +206,11 @@ The spectral trusted base is IEEE binary64 round-to-nearest with gradual underfl
 standard dot-product rounding bound for BLAS (including arbitrary summation order and FMA),
 and interval arithmetic. Unverified eigenvalues never enter the certified defects.
 
-The transfer argument and the three-direction theorem are mathematical proofs supplied here
-and in `paper/thermal-mpo-gap-2plus1d.tex`; they have not been formalized in Lean. The
-one-dimensional Lean theorem is not claimed to cover this result. No claim about arbitrary
-aspect ratios, open boundaries, or the critical field follows from this certificate.
+The transfer argument and the finite asymmetric recurrence are mathematical proofs supplied
+here and in `paper/thermal-mpo-gap-2plus1d.tex`. The general small-defect theorem has the Lean
+formalization stated above. The complete Ising certificate is checked by Julia; there is
+no claim of a Lean proof from the Ising Hamiltonian through its numerical seeds. The
+certificate covers periodic square tori, with no conclusion about the critical field.
 
 ## Recorded verification
 
@@ -152,3 +233,11 @@ reflection checks; it changes neither the spectral verification inequalities nor
 arithmetic model. Existing model checkers and tests were also rerun as a regression check.
 Lossless compression of the stored records was separately checked to preserve every seed,
 recurrence step, and spectral record.
+
+The refinement adds sixteen tests, bringing the total to 58. All passed, including rejection
+of an altered refined gap and an altered ground-energy enclosure. Regeneration preserved
+the original seed, chain, and spectral records by exact equality for all three fields.
+Full spectral replay verified both sets of seed bounds in 217.1 seconds over all three fields.
+`lake build CertifiedGaps` passed, and the three new principal declarations
+(`cube_growth`, `cascade`, and `gapGT_of_cube_seeds`) depend only on `propext`,
+`Classical.choice`, and `Quot.sound`.

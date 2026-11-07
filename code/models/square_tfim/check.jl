@@ -8,6 +8,6 @@ isempty(points) && error("field is not a configured certificate point")
 for p in points
     seconds = @elapsed cert = check(@__DIR__, p.g; full = "--full" in ARGS)
     println("Verified g=$(p.g): gap >= ",
-        Float64(parse_rational(cert["chain"]["gap_lower_bound"])),
+        Float64(uniform_bound(cert)),
         " on every even square torus L >= 2; $seconds seconds")
 end

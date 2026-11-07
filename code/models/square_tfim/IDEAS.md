@@ -30,20 +30,36 @@ Both spatial periods must grow; a fixed-width ladder does not establish this sta
 Prove the spatial scalar inequalities through finite Trotter transfers and their limit.
 Use exact rational arithmetic for the three-component recurrence in the 2+1 dimensional
 note. The verified sixteen-spin calculation proved inexpensive enough to proceed directly
-with the spectral route; the product-perturbation estimate was not needed. No changes to
-the manuscript or Lean formalization are required. The two-dimensional recurrence is
-distinct from the core one-dimensional two-purity recurrence.
+with the spectral route; the product-perturbation estimate was not needed. The two-dimensional
+recurrence is distinct from the core one-dimensional two-purity recurrence.
+
+## Further bounds and a general formal theorem
+
+The next investigation reuses the stored complete spectra. It reports finite-volume ground
+energies and gaps separately from uniform gap bounds, and tests additional exact recurrence
+steps before the scalar tail. This costs no new diagonalization. Alternative orders of the
+three directions can also be tested from the same spectra, but require a separate proof of
+their interpolation bounds before they can improve a certificate.
+
+The formalization concerns a model-independent three-direction criterion: local purity
+squaring and cube coupling imply scale doubling, and spatial moment interpolation converts
+the resulting thermal concentration into a uniform gap. The finite spectral seed and the
+Ising transfer construction are separate mathematical and computational obligations.
 
 ## Outcome
 
 Complete verified spectra give certificates at $g/J=18,20,24$, with respective uniform
-gap lower bounds $0.59437J$, $2.17363J$, and $4.80557J$ on every even square torus of side
-at least four. All seeds have $n_0=m_0=2$ and $\beta_0g=4$. The largest spectral block
+gap lower bounds $0.74378J$, $2.51376J$, and $5.52173J$ on every even square torus of side
+at least four. All seeds have $n_0=m_0=2$; the refined temperatures are
+$\beta_0J=53/240,157/800,79/480$. The largest spectral block
 has dimension 2392. The full spectra take about 70 seconds per field on the development
 machine with one BLAS thread.
 
 The initial defects exceed $10^{-3}$. An exact three-component chain reaches that tail
-region after five, four, and three steps, respectively. Bounding each earlier interpolation
+region after a finite prefix. Retaining unequal defects for twelve steps, with rounding
+denominator $10^{2000}$, improves the bounds before applying the common scalar tail.
+The earlier $\beta_0g=4$ certificates retain their exact numerical values inside the new
+records. Bounding each earlier interpolation
 window is necessary to retain coverage of all even square periods. The spatial-transfer
 proof, seed enclosures, chain, and checker are documented in `METHOD.md` and `README.md`.
 
@@ -56,3 +72,9 @@ The row model exposed a generic cost in exact symmetry validation: dense multipl
 by signed permutation matrices. A separate minimal core change uses their sparse form,
 preserving exact arithmetic and the same validation conditions. The new model uses the
 shared core for all spectral reductions and eigenvalue enclosures.
+
+`Spacetime.gapGT_of_cube_seeds` now proves the general small-defect theorem in Lean. The
+proof checks cube coupling, the $25\varepsilon^2$ update, scale induction, and gap extraction
+from explicit scalar moment and spatial interpolation assumptions. It has no `sorry` or
+additional axioms. The model-specific transfer construction and numerical certificate
+remain outside this formalization.

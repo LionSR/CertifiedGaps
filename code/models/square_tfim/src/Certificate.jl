@@ -12,13 +12,17 @@ include("SquareIsing.jl")
 include("CubeRecurrence.jl")
 using .SquareIsing, .CubeRecurrence
 
-export POINTS, build_spectra, certify, check, seed_bounds, exact_strings, certificate_path
+export POINTS, build_spectra, certify, check, seed_bounds, exact_strings, certificate_path,
+    uniform_bound
 
 const TORI = ((2, 2), (4, 2), (4, 4))
 const POINTS = ((g = 18, beta = big(2)//big(9)), (g = 20, beta = big(1)//big(5)),
     (g = 24, beta = big(1)//big(6)))
-const FORMAT = "CertifiedGaps square TFIM cube certificate v1"
+const FORMAT = "CertifiedGaps square TFIM cube certificate v2"
 const SEED_GRID = big(10)^8
+const REFINED_BETA = Dict(18 => big(53)//240, 20 => big(157)//800, 24 => big(79)//480)
+const REFINED_STEPS = 12
+const REFINED_GRID = big(10)^2000
 
 "Encode exact integers and rationals as strings throughout a certificate record."
 exact_strings(x::Bool) = x
@@ -102,15 +106,40 @@ function seed_bounds(spectra, beta)
         "defect_enclosures" => endpoints.(defects), "defects" => string.(eps))
 end
 
+"Exact finite-volume ground-energy, energy-density, and gap enclosures."
+function finite_volume_summary(spectra)
+    return Dict(token(n, m) => Dict(
+        "sites" => string(n*m),
+        "ground_energy" => string.(collect(ground_energy_enclosure(spectra[token(n, m)]))),
+        "ground_energy_per_site" => string.(collect(
+            ground_energy_enclosure(spectra[token(n, m)]) ./ (n*m))),
+        "gap" => string.(collect(spectral_gap_enclosure(spectra[token(n, m)]))))
+        for (n, m) in TORI)
+end
+
+"Repeat the asymmetric recurrence before using the common quadratic tail."
+function refined_chain(seed)
+    return cube_chain(parse_rational.(seed["defects"]), parse_rational(seed["beta"]);
+        min_steps = REFINED_STEPS, grid = REFINED_GRID)
+end
+
+"The larger of the two independently checked uniform gap bounds."
+uniform_bound(cert) = max(parse_rational(cert["chain"]["gap_lower_bound"]),
+    parse_rational(cert["refinement"]["chain"]["gap_lower_bound"]))
+
 "Certify one field and inverse temperature, reusing only model-checked verified spectra."
 function certify(root, g, beta; reuse = false)
     record = reuse ? read_result(manifest_path(root, g)) : build_spectra(root, g)
     spectra = load_spectra(root, record, g)
     seed = seed_bounds(spectra, beta)
     chain = cube_chain(parse_rational.(seed["defects"]), beta)
+    refined_seed = seed_bounds(spectra, REFINED_BETA[g])
     certificate = Dict("format" => FORMAT, "J" => "1", "g" => string(g),
         "scope" => "unique ground state; every even square torus of side L >= 2",
         "seed" => seed, "chain" => chain, "spectral_record" => record,
+        "refinement" => Dict("seed" => refined_seed, "chain" => refined_chain(refined_seed),
+            "preliminary_steps" => string(REFINED_STEPS)),
+        "finite_volume" => finite_volume_summary(spectra),
         "metadata" => exact_strings(model_metadata(root, Dict("g" => string(g));
             dirs = ("src", "scripts"),
             packages = (CertifiedGaps, IntervalArithmetic), certified = true)))
@@ -131,6 +160,14 @@ function check(root, g; full = false)
     seed_bounds(spectra, beta) == cert["seed"] || error("seed replay mismatch")
     eps = parse_rational.(cert["seed"]["defects"])
     cube_chain(eps, beta) == cert["chain"] || error("cube recurrence mismatch")
+    refinement = cert["refinement"]
+    refinement["preliminary_steps"] == string(REFINED_STEPS) || error("wrong refinement depth")
+    seed_bounds(spectra, REFINED_BETA[g]) == refinement["seed"] ||
+        error("refined seed replay mismatch")
+    refined_chain(refinement["seed"]) == refinement["chain"] ||
+        error("refined cube recurrence mismatch")
+    finite_volume_summary(spectra) == cert["finite_volume"] ||
+        error("finite-volume enclosure mismatch")
     if full
         fresh = Dict(token(n, m) => verified_ring_spectrum(row_model(m, g), n;
             progress = true) for (n, m) in TORI)
@@ -138,9 +175,12 @@ function check(root, g; full = false)
             sum(length(s.centers) * s.multiplicity for s in fresh[token(n, m)]) == 2^(n*m) ||
                 error("full replay lost spectral multiplicity")
         end
-        replay = seed_bounds(fresh, beta)
-        all(parse_rational(replay["defect_enclosures"][i][2]) <= eps[i] for i in 1:3) ||
-            error("full spectral replay exceeds stored seed bounds")
+        for stored in (cert["seed"], refinement["seed"])
+            replay = seed_bounds(fresh, parse_rational(stored["beta"]))
+            limits = parse_rational.(stored["defects"])
+            all(parse_rational(replay["defect_enclosures"][i][2]) <= limits[i] for i in 1:3) ||
+                error("full spectral replay exceeds stored seed bounds")
+        end
     end
     return cert
 end

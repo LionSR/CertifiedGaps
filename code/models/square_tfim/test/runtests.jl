@@ -54,6 +54,11 @@ end
     @test_throws ErrorException cube_chain((frac(1, 2), frac(1, 2), frac(1, 2)), frac(1))
     @test_throws ErrorException cube_chain(small, frac(0))
     @test_throws ErrorException cube_step((frac(-1), frac(0), frac(0)))
+    refined = cube_chain(asymmetric, frac(1, 5); min_steps = 8, grid = big(10)^400)
+    @test parse_rational(refined["gap_lower_bound"]) > parse_rational(chain["gap_lower_bound"])
+    @test length(refined["rows"]) == 9
+    @test_throws ErrorException cube_chain(small, frac(1); min_steps = 13)
+    @test_throws ErrorException cube_step(small; grid = 0)
 end
 
 @testset "stored certificate and rejection of altered claims" begin
@@ -62,6 +67,8 @@ end
         record = read_result(path)
         g = parse(Int, record["g"])
         @test check(ROOT, g)["chain"] == record["chain"]
+        @test uniform_bound(record) > parse_rational(record["chain"]["gap_lower_bound"])
+        @test parse_rational(record["finite_volume"]["4x4"]["gap"][1]) > uniform_bound(record)
         name = record["spectral_record"]["spectra"]["4x4"]["file"]
         spectrum = read_spectrum(joinpath(ROOT, "results", name))
         trace1, trace2 = interval(0.0), interval(0.0)
@@ -83,6 +90,14 @@ end
             @test check(modelroot, g)["chain"] == record["chain"]
             altered = deepcopy(record)
             altered["chain"]["gap_lower_bound"] = "1000000"
+            write_result(certificate_path(modelroot, g), altered)
+            @test_throws ErrorException check(modelroot, g)
+            altered = deepcopy(record)
+            altered["refinement"]["chain"]["gap_lower_bound"] = "1000000"
+            write_result(certificate_path(modelroot, g), altered)
+            @test_throws ErrorException check(modelroot, g)
+            altered = deepcopy(record)
+            altered["finite_volume"]["4x4"]["ground_energy"][1] = "0"
             write_result(certificate_path(modelroot, g), altered)
             @test_throws ErrorException check(modelroot, g)
             altered = deepcopy(record)
