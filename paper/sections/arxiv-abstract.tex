@@ -1,11 +1,11 @@
-We explain the computer-assisted proof of the periodic spin-1 Haldane
-gap using spacetime tensor networks. Reflection positivity makes a
-finite two-site spatial transfer matrix positive, allowing spatial and
-thermal purities to propagate certified finite inputs to all sufficiently
-large even chains. We present the coupled recurrence, its certified
-spin-1 trajectory, and its extension to reflection-positive Hamiltonians,
-which we apply to seven additional spin-chain and ladder models.
-Reusing the finite inputs together with an existing 120-site trial state gives
-$\Delta_L>0.07290$ for every even $L\ge36$. A finite-dimensional proof
-supports Lean formalization; we distinguish kernel-checked steps from
-the remaining integer hypotheses.
+We advocate a diagrammatic style of proof and use tensor-network
+identities and inequalities to present OpenAI's computer-assisted
+proof of a uniform gap in the periodic spin-1 Heisenberg chain.
+Reading the partition-function tensor network in the spatial and
+thermal directions shows how finite-scale bounds imply a gap for all
+sufficiently long even rings. We extend the argument to
+reflection-positive models and certify gaps for seven other spin
+chains and ladders. Reusing the original finite inputs, we improve
+the spin-1 bound to $\Delta_L>0.07290$ for every even ring of
+$L\ge36$ sites. We formalize the general gap argument in Lean and
+provide the proofs as a reusable library.
