@@ -17,6 +17,13 @@
 \input{figures/arxiv-diagrams}
 % A linked check marks a formalized implication, with hypotheses stated in prose.
 \newcommand{\leanmark}[1]{\href{#1}{\ensuremath{\textcolor{teal!70!black}{\checkmark_{\!\mathsf L}}}}}
+% Allow \tocdepth@munge to be called before \tableofcontents without clobbering \l@section@saved.
+\def\tocdepth@munge{%
+ \ifx\l@section\@gobble@tw@\else
+  \let\l@section@saved\l@section
+  \let\l@section\@gobble@tw@
+ \fi}
+\newcommand{\hideMainFromTOC}{\addtocontents{toc}{\string\tocdepth@munge}}
 % Resolve lane anchors before passing them to TikZ's key/coordinate parsers.
 \renewcommand{\lanemove}[5][black!55]{%
  \ifnum\csname tn@lane@#2\endcsname=0

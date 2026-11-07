@@ -13,6 +13,7 @@
 \input{sections/arxiv-abstract}
 \end{abstract}
 \maketitle
+\hideMainFromTOC
 
 \input{sections/arxiv-main}
 
@@ -52,6 +53,10 @@ numerical certificates, and formal proofs were verified by the author.
 \def\theHproposition{supp.\arabic{proposition}}
 \renewcommand{\thesection}{S\Roman{section}}
 \renewcommand{\thesubsection}{\thesection.\Alph{subsection}}
+\makeatletter
+\def\p@subsection{}
+\def\p@subsubsection{\thesubsection.}
+\makeatother
 \setcounter{figure}{0}
 \renewcommand{\thefigure}{S\arabic{figure}}
 \setcounter{theorem}{0}
@@ -66,6 +71,7 @@ numerical certificates, and formal proofs were verified by the author.
 \setcounter{table}{0}
 \renewcommand{\thetable}{S\arabic{table}}
 \begin{center}\large Supplemental Material\end{center}
+\tableofcontents
 \section{Open chains with boundary fields}
 \input{supplementary/arxiv-obc}
 \section{Finite Trotter networks and the periodic doubling argument}
