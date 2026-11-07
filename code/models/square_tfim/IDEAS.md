@@ -46,7 +46,35 @@ squaring and cube coupling imply scale doubling, and spatial moment interpolatio
 the resulting thermal concentration into a uniform gap. The finite spectral seed and the
 Ising transfer construction are separate mathematical and computational obligations.
 
+## Moderate fields and a graph-level criterion
+
+The next target is $g/J=4,5,6,8$, above the square-lattice critical field and substantially
+below the existing certificate points. Complete spectra on the existing small tori give
+finite-volume energies and diagnose the spatial-versus-thermal seed obstruction. Their
+cost is unchanged from the high-field calculation. These diagnostics alone cannot prove
+a uniform gap if the finite seed fails.
+
+A second route is a general high-field criterion on a bounded-degree graph. A space-time
+random-cluster comparison or a correlation-decay estimate may bound the mass in terms of
+the incident coupling sum and the transverse field. Such a bound requires its own proof,
+including the conversion from the measured correlation channel to the full spectral gap;
+a high-field dispersion expansion is not a substitute. This route is investigated before
+attempting substantially larger complete spectra, whose cost is exponential in area.
+
 ## Outcome
+
+The graph route gives a stronger result for this model: if the minimum transverse field
+is h and each incident ferromagnetic coupling sum is at most $s<h$, then
+$\Delta\ge2\sqrt{h(h-s)}$. The proof in `METHOD.md` sums the temporal segments of Ising
+paths exactly, applies FKG to arbitrary diagonal observables, and extracts the full
+spectral gap using the strictly positive ground state. It covers every square-lattice
+field $g/J>4$, including $\Delta\ge3J$ at $g/J=4.5$, without a finite purity seed.
+The exact numerical evaluations are checked in Julia; the graph theorem is not yet in Lean.
+
+Numerical complete spectra at $g/J=4,5,6,8$ give sixteen-spin gaps approximately
+$3.24828J,5.44369J,7.56254J,11.69479J$. No tested $2\times2$ seed closes for
+$\beta g=0.5:0.025:16$. This identifies a limitation of the small bootstrap seed, while
+the analytic argument supplies uniform bounds at all four fields except $g/J=4$.
 
 Complete verified spectra give certificates at $g/J=18,20,24$, with respective uniform
 gap lower bounds $0.74378J$, $2.51376J$, and $5.52173J$ on every even square torus of side

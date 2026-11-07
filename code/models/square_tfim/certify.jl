@@ -1,4 +1,5 @@
 include(joinpath(@__DIR__, "src", "Certificate.jl"))
+include(joinpath(@__DIR__, "src", "HighField.jl"))
 using .Certificate, LinearAlgebra
 using CertifiedGaps.ExactArithmetic: parse_rational
 BLAS.set_num_threads(1)
@@ -16,3 +17,4 @@ for p in points
         Float64(uniform_bound(cert)))
     println("Elapsed: $seconds seconds")
 end
+HighField.certify_high_field(@__DIR__)

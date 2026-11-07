@@ -3,7 +3,9 @@ using CertifiedGaps.ExactArithmetic: frac, parse_rational
 using CertifiedGaps.Results: read_result, write_result
 using CertifiedGaps.VerifiedSpectra
 include(joinpath(@__DIR__, "..", "src", "Certificate.jl"))
+include(joinpath(@__DIR__, "..", "src", "HighField.jl"))
 using .Certificate
+using .HighField
 using .Certificate.SquareIsing, .Certificate.CubeRecurrence
 
 const ROOT = dirname(@__DIR__)
@@ -22,6 +24,40 @@ function direct_hamiltonian(n, m, g)
         end
     end
     return H
+end
+
+@testset "graph high-field bound" begin
+    @test parse_rational(field_bound(9//2, 4)["gap_lower"]) == 3
+    @test parse_rational(field_bound(5, 4)["gap_lower"]) > frac(4472, 1000)
+    @test field_bound(5, 4; grid = 10^12) == field_bound(5, 4)
+    @test_throws ErrorException field_bound(4, 4)
+    @test_throws ErrorException field_bound(5, -1)
+    @test_throws ErrorException field_bound(5, 4; grid = 0)
+    # Independent finite Hamiltonians test nonuniform fields and several graph geometries.
+    for n in 2:7, geometry in (:path, :star, :complete)
+        couplings = zeros(Rational{Int}, n, n)
+        for i in 1:n, j in i+1:n
+            present = geometry == :complete ||
+                (geometry == :star && i == 1) || (geometry == :path && j == i+1)
+            present && (couplings[i, j] = couplings[j, i] = (i+j)//(2n))
+        end
+        incident = maximum(vec(sum(couplings; dims = 2)))
+        h = incident + 1//2
+        fields = [h + (i-1)//10 for i in 1:n]
+        H = zeros(Float64, 2^n, 2^n)
+        for sigma in 0:2^n-1
+            spins = [iszero(sigma & (1 << (i-1))) ? 1 : -1 for i in 1:n]
+            H[sigma+1, sigma+1] = -sum(couplings[i, j]*spins[i]*spins[j]
+                for i in 1:n for j in i+1:n)
+            for i in 1:n
+                H[xor(sigma, 1 << (i-1))+1, sigma+1] = -fields[i]
+            end
+        end
+        energy = eigvals(Symmetric(H))
+        bound = parse_rational(field_bound(h, incident)["gap_lower"])
+        @test energy[2]-energy[1] >= Float64(bound)-1e-10
+    end
+    @test length(check_high_field(ROOT)["points"]) == length(FIELD_POINTS)
 end
 
 @testset "independent torus geometry and complete small spectra" begin
