@@ -180,11 +180,8 @@ The existing computation supplies an independent input.
 \begin{lemma}[Finite seed~\cite{OpenAI2026Periodic}]
  \label{lem:arxiv-seed36}
  At $\beta_0=49/4$, the periodic spin-1 chain satisfies
- \begin{align}
- \Ps(36,\beta_0)&\ge1-\frac{47916}{10^6},\nonumber\\
- \Pt(72,\beta_0)&\ge1-\frac{181521}{10^6}.
- \label{eq:core-seed}
- \end{align}
+ $\Ps(36,\beta_0)\ge1-47916/10^6$ and
+ $\Pt(72,\beta_0)\ge1-181521/10^6$.
 \end{lemma}
 
 Accepting this lemma suffices for the following argument.
@@ -501,7 +498,8 @@ in Lean and supply the remaining externally certified finite bounds
 as hypotheses.
 
 \emph{Discussion.---}
-Understanding the proof let us certify gaps for seven other spin-chain
+Using diagrams and visual summaries~\cite{Tufte1990Envisioning} to expose
+the structure of the proof let us certify gaps for seven other spin-chain
 and ladder models (Table~\ref{tab:models}), and improve the spin-1 bound
 using the existing finite inputs. We also explain the boundary-field
 proof for open chains using diagrams~\cite{OpenAI2026Boundaryfield,SM}.
