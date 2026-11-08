@@ -41,14 +41,14 @@ and each model's `README.md` list every parameter point, seed, and Lean 4 theore
 | Two-leg spin-½ Heisenberg ladder | 5 | $1.1024$, at $J_\perp = 4$ | even $L \ge 4$ | [`code/models/heisenberg_ladder`](code/models/heisenberg_ladder/) |
 | Two-leg transverse-field Ising ladder | 1 | $0.6368$, at $g = 3$ | even $L \ge 4$ | [`code/models/two_leg_tfim`](code/models/two_leg_tfim/) |
 
-The two-dimensional Ising model also has an analytic graph-level bound, proved by Ising
-path expansion and FKG in the model's `METHOD.md`, with exact rational evaluations checked
-in Julia. Separate three-direction bootstrap certificates are retained there. The physical
-model theorems are not yet formalized in Lean or included in the Lean leaderboard.
+The following genuinely two-dimensional result uses verified Julia seed arithmetic and the
+three-direction theorem in the [2+1 dimensional note](paper/thermal-mpo-gap-2plus1d.tex).
+Its spatial-transfer proof is supplied in the model's `METHOD.md`; it is not yet formalized
+in Lean and is not included in the Lean leaderboard.
 
-| Model | Parameters | Uniform lower bound | Sizes | Directory |
+| Model | Points | Largest certified gap | Sizes | Directory |
 |---|---:|---|---|---|
-| Square-lattice transverse-field Ising | all $g/J>4$ | $2\sqrt{g(g-4J)}$ | all finite open or periodic rectangles | [`code/models/square_tfim`](code/models/square_tfim/) |
+| Square-lattice transverse-field Ising | 3 ($g/J=18,20,24$) | $5.52173J$, at $g/J=24$ | every even square side $L\ge4$ | [`code/models/square_tfim`](code/models/square_tfim/) |
 
 Pilot studies without a gap certificate: [`code/models/blbq_haldane`](code/models/blbq_haldane/)
 (bilinear–biquadratic chain), [`code/models/spin2`](code/models/spin2/) (spin-2 chain), and

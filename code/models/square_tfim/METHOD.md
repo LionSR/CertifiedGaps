@@ -1,4 +1,4 @@
-# Uniform gaps for the square-lattice transverse-field Ising model
+# A finite certificate for the square-lattice transverse-field Ising model
 
 ## Hamiltonian and small periods
 
@@ -138,7 +138,7 @@ per site, and gap for each finite torus. Both chains and every new enclosure are
 by the checker. The finite-volume values in the README come from `ground_energy_enclosure`
 and `spectral_gap_enclosure` applied to the complete verified spectra.
 
-The bootstrap bounds remain well below the sixteen-spin gaps. At $g/J=24$, for example,
+The uniform bounds remain well below the sixteen-spin gaps. At $g/J=24$, for example,
 the finite gap exceeds $43.91119J$, while the uniform bound is $5.52173J$. Spectral enclosure
 errors are below $10^{-6}J$ per eigenvalue. Sharper eigenvalue arithmetic alone would thus
 have little effect. Larger spatial seeds or sharper directional estimates are needed for
@@ -194,200 +194,50 @@ This proof is `Spacetime.gapGT_of_cube_seeds` in
 Its only axioms are Lean's standard `propext`, `Classical.choice`, and `Quot.sound`.
 The formal theorem is independent of Ising and of a local Hilbert-space dimension.
 It treats two spatial directions. The model's Trotter-limit construction, the derivation
-of `WindowInput` from spatial transfer moments, the asymmetric finite prefix, and the
-numerical seed arithmetic have not been formalized in this file.
+of `WindowInput` from spatial transfer moments and the numerical seed arithmetic remain
+outside Lean. The finite asymmetric prefix is covered by the following theorem.
 
-## Moderate-field numerical checks and QMC context
+## General finite-chain criterion
 
-The script `moderate_fields.jl` diagonalizes the complete 2 by 2, 4 by 2, and 4 by 4
-spectra in floating point at $g/J=4,5,6,8$. The sixteen-spin gaps are approximately
-$3.24828451J,5.44369104J,7.56254563J,11.69479751J$. These are finite-volume numerical
-values, with no verified eigenvalue enclosure attached to this scan.
-
-Across $\beta g=0.5:0.025:16$, the largest initial cube lower bounds Q are approximately
-0.04075, 0.11899, 0.21982, and 0.41048. No three-direction recurrence closes at any tested
-temperature. This is a negative result for the tested small seed and temperature grid.
-The ground-energy doubling mismatches and full scan tables are stored in
-`results/moderate_g4.json`, `moderate_g5.json`, `moderate_g6.json`, and `moderate_g8.json`.
-
-QMC measurements of Ising excitation gaps are available in the literature.
-[Schuler et al., Physical Review Letters 117, 210401 (2016)](https://arxiv.org/abs/1603.03042)
-use continuous-time world-line QMC with cluster updates and extract finite-size gaps
-from imaginary-time spin correlations, with system sizes up to $30\times30$ at criticality
-(see their supplemental section on finite-size gap estimation). Those are literature
-results; none of the numerical values computed in this directory is a QMC measurement.
-The calculation here should also be distinguished from the even-parity excitation gap
-shown in [Quantum phase transition dynamics (2022), Fig. 2](https://pmc.ncbi.nlm.nih.gov/articles/PMC9481121/),
-which uses neural quantum states and restricts the symmetry sector.
-
-## A graph-level high-field theorem
-
-The small spatial seeds are unnecessary for a second, model-specific argument. The result
-below follows from the ferromagnetic Ising path expansion and the FKG inequality. It is
-independent of the spacetime bootstrap and does not assert a new correlation inequality.
-
-**Theorem.** Let G be a finite nonempty graph, with symmetric couplings $J_{ij}\ge0$,
-$J_{ii}=0$, and fields $g_i\ge h>0$. Set $s=\max_i\sum_jJ_{ij}$. If $h>s$, then
+Set $Q(a,b,c)=(1-a)^4(1-b)^2(1-c)$ and $f(z)=z^2/(2(1-z)^2)$.
+Let $(a_j,b_j,c_j)$, $0\le j\le K$, be upper bounds on the three staggered
+seed defects. Suppose each bound is at most one, and each step satisfies
 
 ```math
-H=-\sum_{\{i,j\}}J_{ij}Z_iZ_j-\sum_i g_iX_i
+\begin{aligned}
+a_{j+1}&\ge f(1-Q(a_j,b_j,c_j)),\\
+b_{j+1}&\ge f(1-Q(b_j,c_j,a_{j+1})),\\
+c_{j+1}&\ge f(1-Q(c_j,a_{j+1},b_{j+1})).
+\end{aligned}
 ```
 
-has a unique ground state and
+Each of the three products appearing here must be positive. This permits rational upper
+rounding at every update. Suppose the final three defects are bounded by
+$0<\varepsilon\le10^{-3}$. If $r>1$ satisfies
 
 ```math
-\Delta(H)\ge 2\sqrt{h(h-s)}.
+r^{2^j}(1-Q(a_j,b_j,c_j))<Q(a_j,b_j,c_j)\quad(0\le j<K),
+\qquad r^{2^K}25\varepsilon\le1,
 ```
 
-The bound is uniform over graph size. Consequently the square-lattice Hamiltonian, on
-any finite rectangle with open or periodic boundaries, satisfies
+then every even square side $L\ge n_0$ has a unique ground state and
+$\Delta_L>\log(r)/\beta_0$, under the scalar moment and window assumptions above.
 
-```math
-\Delta\ge2\sqrt{g(g-4J)}\qquad(g>4J).
-```
+**Proof.** The lower bound $Q(a_j,b_j,c_j)$ on the cube product bounds the last
+purity along any reordered path through that cube. Monotonicity of $f$ and the
+single-direction squaring inequality give the first update. Two cyclic permutations give
+the other updates. Induction proves the three purity bounds through step $K$.
+For a side length in an earlier dyadic window, the displayed strict inequality gives the
+gap directly from thermal purity. For $L\ge n_0 2^K$, shift the data to scale $K$ and
+apply the small-defect theorem. The tail inequality ensures
+$\log(r)/\beta_0\le\log(1/(25\varepsilon))/(2^K\beta_0)$.
 
-Periodic sides of length two may retain the repeated-bond convention: the aggregate
-incident coupling remains $4J$. Sides of length one contribute only constant self-bonds,
-which can be omitted. No even-period restriction is needed in this theorem.
-
-### 1. A discrete imaginary-time representation
-
-Write $V=\sum_{\{i,j\}}J_{ij}Z_iZ_j$ and $G_x=\sum_i g_iX_i$. For $a>0$ define
-
-```math
-T_a=e^{aV/2}e^{aG_x}e^{aV/2},\qquad H_a=-a^{-1}\log T_a.
-```
-
-The matrix $T_a$ is real symmetric, positive definite, and entrywise strictly positive.
-Its largest eigenvalue is simple with a strictly positive eigenvector. On each fixed
-finite graph, the matrix expansion at $a=0$ gives $H_a\to H$ in operator norm.
-
-For an integer time circumference M, $\mathrm{Tr}\,T_a^M$ is a classical zero-field
-ferromagnetic Ising partition function on $G\times\mathbb Z/M\mathbb Z$. The spatial
-coupling is $aJ_{ij}$ and the temporal coupling at site i is
-$K_i=\frac12\log\coth(ag_i)$. In particular,
-
-```math
-\tanh K_i=e^{-2ag_i}\le e^{-2ah},\qquad \tanh(aJ_{ij})\le aJ_{ij}.
-```
-
-These identities are exact at fixed a. The classical model therefore supplies the FKG
-inequality for the time-dependent diagonal observables of $T_a$.
-
-### 2. Summing paths after summing temporal segments
-
-For a finite zero-field ferromagnetic Ising model, let $w_e=\tanh K_e$. Its high-temperature
-expansion implies
-
-```math
-\langle\sigma_u\sigma_v\rangle
- \le\sum_{\gamma:u\to v\ \mathrm{simple}}\prod_{e\in\gamma}w_e.
-```
-
-Indeed an edge set with odd boundary $\{u,v\}$ contains such a path. Removing the path
-leaves an even edge set disjoint from it. Dropping the disjointness restriction bounds
-the remaining sum by the full even-edge partition sum, which cancels the denominator.
-The inequality also holds for $u=v$ upon including the empty path.
-
-Lift each path on the time cylinder to $G\times\mathbb Z$. Between consecutive spatial
-edges its time coordinate is monotone: a reversal would immediately revisit a vertex.
-Dropping all other self-avoidance restrictions gives an upper bound. A temporal segment
-of displacement r has weight at most
-
-```math
-b_a(r)=e^{-2ah|r|},\qquad r\in\mathbb Z.
-```
-
-For paths with m spatial edges, summing their spatial weights is at most $(as)^m$.
-Summing the intermediate time coordinates gives the convolution $b_a^{*(m+1)}$.
-Thus on the infinite time cylinder the two-point bound is dominated by
-
-```math
-\sum_{m\ge0}(as)^m b_a^{*(m+1)}(n).
-```
-
-The passage from a finite time cylinder is made below; no infinite-volume assumption is
-needed at this step. Fix $0<\kappa<2h$. The *signed* exponential weight is essential:
-
-```math
-B_a(\kappa)=\sum_{r\in\mathbb Z} e^{\kappa ar}b_a(r)
- =\frac{\sinh(2ah)}{\cosh(2ah)-\cosh(\kappa a)}.
-```
-
-Since $\sup_r e^{\kappa ar}b_a(r)\le1$, the convolution inequality between the weighted
-supremum and sum norms gives
-
-```math
-b_a^{*(m+1)}(n)\le B_a(\kappa)^m e^{-\kappa a|n|}.
-```
-
-For negative n use the weight with the opposite sign; its sum is the same. If
-$asB_a(\kappa)<1$, the geometric sum is therefore bounded by
-$C_a e^{-\kappa a|n|}$, where $C_a=[1-asB_a(\kappa)]^{-1}$.
-On a cylinder of circumference M, lifting the endpoint adds only the image sum
-
-```math
-\langle\sigma_{i,0}\sigma_{j,n}\rangle_M
- \le C_a\sum_{k\in\mathbb Z}e^{-\kappa a|n+kM|}.
-```
-
-For fixed n this tends to $C_a e^{-\kappa a|n|}$ as $M\to\infty$. The left side tends
-to the ground-state correlation for $H_a$, by the Perron eigenvalue of $T_a$. Finally,
-
-```math
-\lim_{a\downarrow0}asB_a(\kappa)=\frac{4hs}{4h^2-\kappa^2}<1
- \quad\Longleftrightarrow\quad \kappa^2<4h(h-s).
-```
-
-Every $\kappa<2\sqrt{h(h-s)}$ therefore gives this decay bound for all sufficiently
-small a. The allowed a depends only on h, s and $\kappa$, not on graph size.
-
-### 3. From two-point correlations to the full spectral gap
-
-It is necessary to control all diagonal observables, since a single spin channel need
-not detect the first excitation. Here FKG supplies the missing implication directly.
-For a real function f of one spin slice, put
-
-```math
-\ell_i(f)=\frac12\max_\sigma|f(\sigma^i)-f(\sigma)|,
-\qquad L_f(\sigma)=\sum_i\ell_i(f)\sigma_i.
-```
-
-Both $L_f+f$ and $L_f-f$ are increasing functions. Apply FKG to the four pairs
-$(L_f\pm f,L_q\pm q)$ on two time slices. Adding the two equal-sign inequalities and
-then the two opposite-sign inequalities cancels the mixed covariances and gives
-
-```math
-|\mathrm{Cov}(f,q)|\le\mathrm{Cov}(L_f,L_q)
- =\sum_{i,j}\ell_i(f)\ell_j(q)\mathrm{Cov}(\sigma_i,\sigma_j).
-```
-
-The finite-cylinder spin means vanish by spin-flip symmetry. Taking $M\to\infty$
-preserves this covariance inequality and the preceding two-point bound. In particular,
-
-```math
-0\le\langle f(0)f(na)\rangle_0-\langle f\rangle_0^2
- \le C_a\Big(\sum_i\ell_i(f)\Big)^2e^{-\kappa an}.
-```
-
-Let $\psi_0>0$ and $\psi_1$ be real normalized ground and first-excited eigenvectors of
-$H_a$. The diagonal function $f(\sigma)=\psi_1(\sigma)/\psi_0(\sigma)$ is well defined
-on the finite configuration space. It satisfies $f\psi_0=\psi_1$ and
-$\langle f\rangle_0=0$. Its covariance is exactly $e^{-na\Delta(H_a)}$.
-The last inequality, as $n\to\infty$, proves $\Delta(H_a)\ge\kappa$.
-The prefactor may depend on the graph and a; this does not affect the decay rate.
-
-Taking $a\downarrow0$ and using finite-dimensional eigenvalue continuity gives
-$\Delta(H)\ge\kappa$. Taking $\kappa\uparrow2\sqrt{h(h-s)}$ proves the theorem.
-Uniqueness also follows directly from the strictly positive entries of $e^{-tH}$ for
-$t>0$, since every $g_i>0$ connects the configuration hypercube.
-
-The only external correlation theorem used here is
-[Fortuin, Kasteleyn and Ginibre (1971)](https://doi.org/10.1007/BF01651330).
-The path estimate, temporal sum, covariance reduction, and spectral argument are given
-above. This graph theorem is a mathematical proof; it has not been formalized in Lean.
-The numerical checker verifies the exact rational evaluations of its explicit bound.
-It does not check the FKG theorem or the proof in this document.
+This is `Spacetime.gapGT_of_cube_chain` in
+[`CubeChain.lean`](../../lean/CertifiedGaps/CubeChain.lean). The Lean statement allows
+$r>0$; $r>1$ is the case giving a positive gap. Its hypotheses on the numerical chain
+are finite rational inequalities when the supplied data are rational. No Ising-specific
+high-field theorem is used. The supplied Julia records have not been converted into
+Lean witnesses, so the numerical certificates still rely on the Julia checker.
 
 ## Verification scope
 
@@ -398,13 +248,11 @@ The spectral trusted base is IEEE binary64 round-to-nearest with gradual underfl
 standard dot-product rounding bound for BLAS (including arbitrary summation order and FMA),
 and interval arithmetic. Unverified eigenvalues never enter the certified defects.
 
-The transfer argument and the finite asymmetric recurrence are mathematical proofs supplied
-here and in `paper/thermal-mpo-gap-2plus1d.tex`. The general small-defect theorem has the Lean
-formalization stated above. The complete Ising certificate is checked by Julia; there is
+The transfer argument is supplied here and in `paper/thermal-mpo-gap-2plus1d.tex`.
+The general finite-chain criterion has the Lean formalization stated above. The complete
+Ising certificate is checked by Julia; there is
 no claim of a Lean proof from the Ising Hamiltonian through its numerical seeds. The
-bootstrap certificate covers periodic square tori. The graph theorem additionally covers
-open boundaries and arbitrary finite graphs satisfying its incident-coupling condition.
-Neither argument determines the critical field.
+certificate covers periodic square tori, with no conclusion about the critical field.
 
 ## Recorded verification
 
@@ -436,10 +284,12 @@ Full spectral replay verified both sets of seed bounds in 217.1 seconds over all
 (`cube_growth`, `cascade`, and `gapGT_of_cube_seeds`) depend only on `propext`,
 `Classical.choice`, and `Quot.sound`.
 
-For the graph theorem, 25 arithmetic and numerical checks passed, including independent
-Hamiltonians on eighteen weighted graphs with nonuniform transverse fields. These numerical
-tests are checks on the implementation, not part of the proof. The existing 58 bootstrap
-checks also passed. After adding the new sources, all original seed, chain, refinement,
-spectral, and finite-volume records were preserved by exact equality; their metadata was
-regenerated and the fast checkers passed. No spectral computation is used to evaluate the
-analytic bound. The separate analytic checker completed in 2.35 seconds including startup.
+The finite-chain extension adds `cube_step`, `cube_purities_ge_chain`, and
+`gapGT_of_cube_chain`. A full `lake build CertifiedGaps` passed. An explicit axiom audit of
+these declarations reports only `propext`, `Classical.choice`, and `Quot.sound`.
+After removing the separate high-field calculation from the default drivers, all three
+bootstrap certificates were regenerated and checked. Their original seeds, chains, refined
+seeds and chains, spectral records, and finite-volume enclosures were preserved by exact
+equality. Source metadata changed to describe the active bootstrap computation.
+The 58 model regression tests passed again, including rejection of altered certificate
+claims; the test sets took 130.2 seconds, excluding startup.

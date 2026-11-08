@@ -1,5 +1,4 @@
 include(joinpath(@__DIR__, "src", "Certificate.jl"))
-include(joinpath(@__DIR__, "src", "HighField.jl"))
 using .Certificate, LinearAlgebra
 using CertifiedGaps.ExactArithmetic: parse_rational
 BLAS.set_num_threads(1)
@@ -12,5 +11,3 @@ for p in points
         Float64(uniform_bound(cert)),
         " on every even square torus L >= 2; $seconds seconds")
 end
-HighField.check_high_field(@__DIR__)
-println("Verified analytic Ising bound: gap >= 2sqrt(g(g-4J)) for every g > 4J")

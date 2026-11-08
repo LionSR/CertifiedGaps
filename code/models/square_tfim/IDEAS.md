@@ -46,7 +46,7 @@ squaring and cube coupling imply scale doubling, and spatial moment interpolatio
 the resulting thermal concentration into a uniform gap. The finite spectral seed and the
 Ising transfer construction are separate mathematical and computational obligations.
 
-## Moderate fields and a graph-level criterion
+## Moderate fields
 
 The next target is $g/J=4,5,6,8$, above the square-lattice critical field and substantially
 below the existing certificate points. Complete spectra on the existing small tori give
@@ -54,27 +54,26 @@ finite-volume energies and diagnose the spatial-versus-thermal seed obstruction.
 cost is unchanged from the high-field calculation. These diagnostics alone cannot prove
 a uniform gap if the finite seed fails.
 
-A second route is a general high-field criterion on a bounded-degree graph. A space-time
-random-cluster comparison or a correlation-decay estimate may bound the mass in terms of
-the incident coupling sum and the transverse field. Such a bound requires its own proof,
-including the conversion from the measured correlation channel to the full spectral gap;
-a high-field dispersion expansion is not a substitute. This route is investigated before
-attempting substantially larger complete spectra, whose cost is exponential in area.
+A separate graph high-field argument was considered. It uses different structural
+results and is not part of the spacetime bootstrap studied here. The present work retains
+the finite-volume diagnostics and returns to the three-direction criterion.
+
+## Formalizing the bootstrap chain
+
+The primary result is the three-direction spacetime bootstrap. The separate high-field
+argument is excluded from its reported certified bounds. The remaining Lean work extends
+the existing small-defect theorem to unequal defects, rational upper bounds at each
+directional update, finite interpolation windows, and the eventual quadratic tail. This
+matches the stored Julia chains and avoids treating a preliminary numerical update as a
+new unproved hypothesis. Model-specific transfer and spectral-seed inputs remain explicit,
+as in the one-dimensional criterion.
 
 ## Outcome
 
-The graph route gives a stronger result for this model: if the minimum transverse field
-is h and each incident ferromagnetic coupling sum is at most $s<h$, then
-$\Delta\ge2\sqrt{h(h-s)}$. The proof in `METHOD.md` sums the temporal segments of Ising
-paths exactly, applies FKG to arbitrary diagonal observables, and extracts the full
-spectral gap using the strictly positive ground state. It covers every square-lattice
-field $g/J>4$, including $\Delta\ge3J$ at $g/J=4.5$, without a finite purity seed.
-The exact numerical evaluations are checked in Julia; the graph theorem is not yet in Lean.
-
 Numerical complete spectra at $g/J=4,5,6,8$ give sixteen-spin gaps approximately
 $3.24828J,5.44369J,7.56254J,11.69479J$. No tested $2\times2$ seed closes for
-$\beta g=0.5:0.025:16$. This identifies a limitation of the small bootstrap seed, while
-the analytic argument supplies uniform bounds at all four fields except $g/J=4$.
+$\beta g=0.5:0.025:16$. These are floating-point diagnostics, not uniform gap bounds.
+The separate high-field route is not used in the bootstrap certificates.
 
 Complete verified spectra give certificates at $g/J=18,20,24$, with respective uniform
 gap lower bounds $0.74378J$, $2.51376J$, and $5.52173J$ on every even square torus of side
@@ -101,8 +100,9 @@ by signed permutation matrices. A separate minimal core change uses their sparse
 preserving exact arithmetic and the same validation conditions. The new model uses the
 shared core for all spectral reductions and eigenvalue enclosures.
 
-`Spacetime.gapGT_of_cube_seeds` now proves the general small-defect theorem in Lean. The
-proof checks cube coupling, the $25\varepsilon^2$ update, scale induction, and gap extraction
-from explicit scalar moment and spatial interpolation assumptions. It has no `sorry` or
-additional axioms. The model-specific transfer construction and numerical certificate
-remain outside this formalization.
+`Spacetime.gapGT_of_cube_chain` proves the general finite-chain criterion in Lean. It
+includes unequal directional defects, rational upper bounds on the updates, every finite
+interpolation window, and the infinite quadratic tail. The proof assumes the scalar moment
+and spatial interpolation inequalities and the initial seed bounds. The new theorem has no
+`sorry` or additional axioms. The model-specific transfer construction and numerical
+certificate remain outside Lean; the Julia chains have not been imported as Lean witnesses.
