@@ -1,0 +1,146 @@
+\label{blueprint:sec:lean}
+
+A computer-assisted proof combines an analytic reduction with a finite
+numerical calculation. Formalizing the periodic and open-chain spin-1
+proofs of Refs.~\cite{OpenAI2026Periodic,OpenAI2026Boundaryfield}
+directly in Lean~4~\cite{Moura2021Lean} faces three obstacles:
+\begin{enumerate}
+    \item \emph{Infinite-dimensional path space.} The continuous-time
+          spatial transfer kernel of Ref.~\cite{OpenAI2026Periodic} acts on
+          $L^2$ of Poisson bond histories (Sec.~\ref{obc:caps}); formalizing its
+          trace identities directly would require path-space measure and operator
+          machinery not yet in Mathlib.
+    \item \emph{Model specificity.} Writing the analytic steps around the
+          isotropic spin-1 Heisenberg Hamiltonian ties the formalization to one
+          model, so none of the operator inequalities can be reused for other
+          spin chains or ladders.
+    \item \emph{Finite numerical inputs.} The seed bounds rely on external
+          computations—block diagonalizations, short-ring trace recursions, and
+          matrix-product trial contractions—whose floating-point or C/Python
+          implementations cannot be trusted inside a proof assistant.
+\end{enumerate}
+
+The diagrammatic reformulation in the main text and
+Secs.~\ref{sm:sec:trotter}--\ref{sm:sec:models} (and
+Sec.~\ref{sm:sec:obc} for open chains) resolves all three
+obstacles before formalization begins. First, discretizing imaginary
+time into $M$ brickwork slices replaces the path-space kernel by the
+finite-dimensional Gram matrix $\smT=\smF^{\mathsf T}\smF\succeq0$
+[Eq.~\eqref{sm:eq:positive}]. Instead of constructing a limiting
+continuous-time transfer operator in Lean, we prove the three closed
+spatial power-sum inequalities~\eqref{sm:eq:closed} at finite $M$ and
+pass them to the exact partition functions $Z_L(\beta)$ via the
+fixed-$(L,\beta)$ matrix product limit of Sec.~\ref{sm:sec:limit}%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.spatialMomentBounds}.
+Likewise, to state ground-state uniqueness and
+$\Delta_L=E_1(L)-E_0(L)>c$ without sorting the eigenvalues of $H_L$, we
+require a single ground-state index $m_0$ separated from every other
+level $m\ne m_0$ by $E_L(m)-E_L(m_0)>c$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.GapGT.lt_sub_of_monotone}.
+Second, isolating the bond reflection-positivity identity
+$-h=\sum_\alpha C_\alpha\otimes FC_\alpha F$ with $FoF=o$
+[Eq.~\eqref{models:eq:rp}] makes the periodic scale-doubling theorem
+apply uniformly to any reflection-positive unit-cell ring%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.gapGT_of_chainCertificate}.
+
+\begin{table}[ht]
+    \caption{Structure of the Lean~4 formalization~\cite{Lu2026CertifiedGaps}
+        and its interactive proof blueprint~\cite{Lu2026Blueprint}. Each row
+        lists a chapter of the blueprint, the corresponding manuscript
+        sections, the theorem proved in Lean~4, and the finite numerical
+        hypotheses (if any) on which that theorem depends.}
+    \label{blueprint:tab:map}
+    \footnotesize
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        Blueprint chapter & Manuscript                                                           & Theorem proved in Lean~4 & Numerical hypotheses \\
+        \midrule
+        2.\ Two-purity criterion
+                          & Main text; Sec.~\ref{sm:sec:gap}
+                          & Uniform gap from purities $\ge1-\varepsilon_0$                                                                         %
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.gapGT_of_seeds}
+                          & None                                                                                                                   \\
+        3.\ Asymmetric doubling \& chains
+                          & Secs.~\ref{sm:sec:asymmetric}, \ref{models:sec:spectra}
+                          & Uniform gap from rational doubling chain                                                                               %
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/ChainCheck.html\#CertifiedGaps.gapGT_of_chainCertificate}
+                          & None (kernel-checked)                                                                                                  \\
+        4.\ Reflection-positive rings
+                          & Secs.~\ref{sm:sec:transfer}--\ref{sm:sec:limit}, \ref{models:sec:rp}
+                          & Reflection-positive ring gap theorem                                                                                   %
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.gapGT_of_chainCertificate}
+                          & None                                                                                                                   \\
+        5.\ Trace bounds \& sector tables
+                          & Sec.~\ref{sm:sec:seeds}
+                          & Seed purities from short-ring moments                                                                                  %
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Seed/Ring.html\#CertifiedGaps.RPRing.seeds_of_certificate}
+                          & None                                                                                                                   \\
+        6.\ Spin-1 Heisenberg ring
+                          & Main text; Sec.~\ref{sm:sec:seeds}
+                          & Spin-1 ring gap $\Delta_L>0.07290$ ($L\ge36$)                                                                          %
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/SpinOneHeisenberg.html\#Leaderboard.Records.SpinOneHeisenberg.temperature_lifting}
+                          & Short-ring traces ($4\le n\le12$)                                                                                      \\
+        7.\ Open chains with end fields
+                          & Sec.~\ref{sm:sec:obc}
+                          & Open spin-1 gap ($n\ge1921$)                                                                                           %
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/OpenChain.html\#CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap}
+                          & Four seeds at $\beta_0=49$                                                                                             \\
+        8.\ Spin chains \& ladders
+                          & Sec.~\ref{sm:sec:models}; Table~\ref{models:tab:summary}
+                          & Uniform gaps for Table~\ref{tab:models} models                                                                         %
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/StaggeredHeisenberg.html\#CertifiedGaps.StaggeredHeisenberg.gap}
+                          & Seed pair $(p_0,q_0)$                                                                                                  \\
+        9.\ Kernel-checked seeds
+                          & Secs.~\ref{sm:sec:seeds}, \ref{models:sec:ising}
+                          & Unconditional Ising gap; $S=1$ trials                                                                                  %
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Ising/Seed.html\#SeedKernel.Ising.ising_gap}
+                          & None (Ising); $n\ge5$ traces                                                                                           \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Third, separating the universal doubling recurrence from the finite seed
+allows the formalization to treat the numerical inputs at two levels
+(Table~\ref{blueprint:tab:map}):
+\begin{enumerate}
+    \item \emph{Seed-hypothesis theorems (Chapters~6--8).} Because the
+          asymmetric update~\eqref{sm:eq:update} is a rational map and the
+          interval condition~\eqref{models:eq:chain-cert} replaces logarithms by
+          rational power comparisons $r^{2^j}z_j<1-z_j$, the step from any
+          rational seed pair $(p_0,q_0)$ to a uniform gap $\Delta_L>(\log r)/\beta_0$
+          reduces to finitely many rational inequalities checked in the Lean
+          kernel. Taking $(p_0,q_0)$ (or the short-ring trace table of
+          Table~\ref{cert:tab:traces}) as an explicit hypothesis instantiates
+          machine-checked gap theorems for all eight periodic models in
+          Table~\ref{tab:models} and for the open spin-1 chain with endpoint
+          fields (Theorem~\ref{obc:theorem}), while allowing the seed enclosures
+          to be certified externally by verified block diagonalizations
+          (Sec.~\ref{models:sec:spectra}) or exact integer trace recursions
+          (Sec.~\ref{sm:sec:seeds}).
+    \item \emph{Kernel-checked seed arithmetic (Chapter~9).} Where the
+          finite seed calculation can be reduced to exact integer identities, the
+          Lean kernel verifies the seed calculation itself. For the mixed-field
+          Ising chain at $(g,h)=(1/4,1/20)$ (Sec.~\ref{models:sec:ising}), the
+          kernel checks the integer trial-vector residuals~\eqref{models:eq:residual}
+          and the classical configuration count~\eqref{models:eq:ising-rho},
+          proving the uniform gap~\eqref{models:eq:ising-gap} unconditionally
+          without external numerical hypotheses%
+          ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Ising/Seed.html\#SeedKernel.Ising.ising_gap}.
+          For the periodic and open spin-1 chains, the kernel checks the exact
+          integer contractions~\eqref{cert:eq:mps-contractions} of the $72$- and
+          $120$-site periodic matrix-product trial states, the four open-chain
+          trial states on $34$, $78$, $142$, and $240$ sites, and the shortest
+          ring trace recurrences ($n=4$ periodic and nine of fifteen boundary
+          traces), reducing the remaining hypotheses to the short-ring integer
+          trace totals for $5\le n\le12$%
+          ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Heisenberg/Integers.html\#CertifiedGaps.SpinOneHeisenberg.gap_of_hornerTotalsLarge}
+          and the remaining six boundary traces%
+          ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Heisenberg/Integers.html\#CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_hornerTotalsLarge}.
+\end{enumerate}
+
+The human-readable proof blueprint~\cite{Lu2026Blueprint}
+(\url{https://sirui-lu.com/CertifiedGaps/blueprint/}) links every
+definition, lemma, and theorem in the dependency graph to its Lean~4
+declaration, and the companion repository~\cite{Lu2026CertifiedGaps}
+bundles the manuscript, standalone numerical certificate checkers, and
+formal proofs following the Agentic Publication Protocol~\cite{Lu2026APP}.

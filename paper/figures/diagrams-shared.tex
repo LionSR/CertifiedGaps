@@ -2,23 +2,18 @@
 
 \newcommand{\bra}[1]{\langle #1|}
 \newcommand{\ket}[1]{|#1\rangle}
-\newcommand{\ceilgrid}[1]{10^{-7}\left\lceil 10^7 #1\right\rceil}
 \newcommand{\bricknetwork}[1]{%
  \begin{tikzpicture}[x=.43cm,y=.45cm,baseline=-.5ex]
-  \ifnum#1=1
-   \fill[mpoblue!20] (-.47,.03) rectangle (3.47,.98);
-  \else
-   \fill[mpored!20] (-.2,-.25) rectangle (1.2,2.3);
-  \fi
+  % the read direction is the flow arrow; no background wash
   \foreach \x in {0,1,2,3}{
-   \draw[black!55] (\x,-.2)--(\x,2.25);}
+   \draw[arxiv boundary] (\x,-.2)--(\x,2.25);}
   \foreach \y in {0,1}{
    \foreach \x in {0,2}{
     \draw[arxiv gate] (\x-.12,\y+.17) rectangle (\x+1.12,\y+.38);}
    \draw[arxiv gate] (.88,\y+.66) rectangle (2.12,\y+.87);
    \draw[arxiv gate] (-.4,\y+.66) rectangle (.12,\y+.87);
    \draw[arxiv gate] (2.88,\y+.66) rectangle (3.4,\y+.87);}
-  \draw[black!40,densely dashed] (-.4,-.2) rectangle (3.4,2.25);
+  \draw[arxiv identified] (-.4,-.2) rectangle (3.4,2.25);
   \ifnum#1=1
    \draw[arxiv thermal flow] (3.8,.1)--(3.8,1.9);
   \else
@@ -38,7 +33,7 @@
   \node[mpo] at (2,0) {$A_\gamma$};
  \end{tikzpicture}}
 \newcommand{\torusgluing}{%
- \begin{tikzpicture}[x=1cm,y=1cm,font=\scriptsize]
+ \begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
   \def\c{.28}\def\g{.12}
   \foreach \a in {0,1}{\foreach \b in {0,1}{
    \tnpatch{{\a*(2*\c+\g)}}{{1.9+\b*(\c+\g)}}{2}{1}{\c}}}
@@ -62,34 +57,42 @@
  \end{tikzpicture}}
 
 
+% Periodic MPS norm (#1=0) and one-bond energy (#1=1): the ket row and its
+% conjugate row each close into a virtual loop drawn clear of the tensors.
 \newcommand{\seedmps}[1]{\tikz[tn,tn centered]{
- \foreach \y/\s in {1.1/1,-1.1/-1}{
-  \draw[ring] (-.4,\y)--(-.4,{\y+\s*.6})
-   --(6.75,{\y+\s*.6})--(6.75,\y)--cycle;}
- \foreach \x in {.4,2.6,6}{
-  \draw[phys] (\x,-1.1)--(\x,1.1);}
- \tndots{4.2}{1.1}\tndots{4.2}{-1.1}
+ \foreach \y/\s in {.9/1,-.9/-1}{
+  \draw[ring] (-1.1,\y)--(-1.1,{\y+\s*.55})
+   --(6.7,{\y+\s*.55})--(6.7,\y)--cycle;}
+ \foreach \x in {0,2.2,5.6}{
+  \draw[phys] (\x,-.9)--(\x,.9);}
+ \tndots{3.9}{.9}\tndots{3.9}{-.9}
  \ifnum#1=1
-  \node[sym,fill=mpoblue!20,minimum width=3.4em] at (1.5,0) {$h$};
+  \node[sym,fill=mpoblue!14,minimum width=3.4em,minimum height=.65em,inner sep=0pt]
+   at (1.1,0) {$h$};
  \fi
- \foreach \x in {.4,2.6,6}{
-  \node[mpo,fill=white] at (\x,1.1) {$A$};
-  \node[mpo,fill=white] at (\x,-1.1) {$A$};}}}
+ \foreach \x in {0,2.2,5.6}{
+  \node[mpo,fill=white] at (\x,.9) {$A$};
+  \node[mpo,fill=white] at (\x,-.9) {$A$};}}}
 
 
-\newcommand{\scopebond}{\tikz[tn,tn centered]{
+% A reflection-positive bond term with explicit factors: #1 on the left site,
+% its mirror image #2 on the right site, across the mirror cut (F = I when
+% the two labels agree).
+\newcommand{\rpbondpic}[2]{\tikz[tn,tn centered]{
  \draw[phys] (0,-.85)--(0,.85);
- \draw[phys] (4,-.85)--(4,.85);
- \draw[mpored] (0,0)--(4,0);
- \draw[arxiv mirror] (2,-1)--(2,1);
- \node[xop] at (0,0) {$C_\alpha$};
- \node[xop] at (4,0) {$FC_\alpha F$};}}
+ \draw[phys] (3.4,-.85)--(3.4,.85);
+ \draw[arxiv bond] (0,0)--(3.4,0);
+ \draw[arxiv mirror] (1.7,-1)--(1.7,1);
+ \node[xop] at (0,0) {$#1$};
+ \node[xop] at (3.4,0) {$#2$};}}
+% The bond mirror of the cell theorem: C_alpha against its reflection F C_alpha F.
+\newcommand{\scopebond}{\rpbondpic{C_\alpha}{FC_\alpha F}}
 
 
-\newcommand{\smI}{\mathbb I}
+\newcommand{\smI}{I}
 \newcommand{\smF}{\mathcal F}
 \newcommand{\smZ}[1]{Z_{#1}^{(M)}}
-\newcommand{\smT}{T_{M,\tau}}
+\newcommand{\smT}{T_{\beta,M}}
 \newcommand{\smD}{\mathcal D_M}
 \newcommand{\smnorm}[1]{\left\lVert #1\right\rVert}
 
@@ -104,38 +107,41 @@
 
 % Six-site ring glyph, with a spatial twist on one closing bond when #1=1.
 \newcommand{\seedring}[1]{\tikz[baseline=-.6ex,x=1em,y=1em]{
- \draw[black!70,line width=.55pt] (90:1)--(30:1)--(-30:1)
+ \draw[black!70,line width=.45pt] (90:1)--(30:1)--(-30:1)
   --(-90:1)--(-150:1)--(150:1)--cycle;
  \ifnum#1=1
-  \draw[mpored,line width=1.5pt] (150:1)--(90:1);
-  \node[font=\scriptsize,text=mpored] at (-.8,1.15) {$\pi$};
+  \draw[mpored,line width=1.6pt] (150:1)--(90:1);
+  \node[overlay,font=\scriptsize,text=mpored] at (-.8,1.15) {$\pi$};
  \fi
  \foreach \a in {90,30,-30,-90,-150,150}{
   \filldraw[draw=black!70,fill=white,line width=.45pt] (\a:1) circle (.12);}}}
 
 % Extremal twelfth-moment weights and their sixth powers, not an observed spectrum.
-\newcommand{\seedweightbars}{\begin{tikzpicture}[x=1cm,y=1.2cm,baseline=-.5ex]
+\newcommand{\seedweightbars}{\begin{tikzpicture}[x=1cm,y=.55cm,baseline=-.5ex]
+ % half-height bars with the labels beside them, so the glyph costs three text lines
  \fill[arxiv leading weight] (0,0) rectangle (.4,.9881);
  \fill[arxiv remainder weight] (.8,0) rectangle (1.2,.0777);
- \draw[mpored,densely dashed,line width=.45pt] (-.1,.9881)--(1.3,.9881);
- \node[arxiv label,anchor=south] at (.2,1.02) {$\ell^{12}$};
- \node[arxiv label,anchor=north] at (1,-.1) {$m_J-\ell^{12}$};
- \draw[flow,black!55] (1.9,.5)--(3.1,.5)
-  node[midway,above,arxiv label] {$u\mapsto u^6$};
- \fill[arxiv leading weight] (3.8,0) rectangle (4.2,.9305);
- \fill[arxiv remainder weight] (4.6,0) rectangle (5,.000001);
- \node[arxiv label,anchor=south] at (4,.97) {$\ell^{72}$};
- \draw[black!45,line width=.3pt] (-.1,0)--(1.3,0) (3.7,0)--(5.1,0);
+ \draw[arxiv guide] (-.1,.9881)--(1.3,.9881);
+ \node[arxiv label,anchor=west,inner sep=2pt] at (1.3,.9881) {$\ell^{12}$};
+ \node[arxiv label,anchor=west,inner sep=2pt] at (1.3,.12) {$m_J-\ell^{12}$};
+ \draw[arxiv gray flow] (3.1,.5)--(4.1,.5)
+  node[midway,above,arxiv label,inner sep=1.5pt] {$u\mapsto u^6$};
+ \fill[arxiv leading weight] (4.6,0) rectangle (5,.9305);
+ \fill[arxiv remainder weight] (5.4,0) rectangle (5.8,.000001);
+ \node[arxiv label,anchor=west,inner sep=2pt] at (5.9,.9305) {$\ell^{72}$};
+ \draw[arxiv baseline] (-.1,0)--(1.3,0) (4.5,0)--(5.9,0);
 \end{tikzpicture}}
 
 % The four established coupling/squaring steps, in the talk's two-lane layout.
-\newcommand{\pbcsteps}{\begin{prooflanes}
+% Rows are packed to 1.05 cm, and the thermal lane sits half a row above
+% the spatial one, so the staircase fits a column without a tall gap.
+\newcommand{\pbcsteps}{\begin{prooflanes}\def\lanedy{1.05}
  \lanebound{s}{ps0}{0}{0}{$\Ps(n,\beta)\ge1-p$}
  \lanebound{t}{pt0}{1}{0}{$\Pt(2n,\beta)\ge1-q$}
  \lanebound{so}{ps1}{0}{1}{$\Ps(n,2\beta)\ge(1-p)^2(1-q)$}
  \lanebound{s}{ps2}{0}{2}{$\Ps(2n,2\beta)\ge1-p'$}
- \lanebound{to}{pt1}{1}{3}{$\Pt(4n,\beta)\ge(1-q)^2(1-p')$}
- \lanebound{t}{pt2}{1}{4}{$\Pt(4n,2\beta)\ge1-q'$}
+ \lanebound{to}{pt1}{1}{2.5}{$\Pt(4n,\beta)\ge(1-q)^2(1-p')$}
+ \lanebound{t}{pt2}{1}{3.5}{$\Pt(4n,2\beta)\ge1-q'$}
  \lanemove{ps0}{ps1}{1}{identity}\laneuse{pt0}{1}
  \lanemove[mpored]{ps1}{ps2}{2}{square in space}
  \lanemove{pt0}{pt1}{3}{identity}\laneuse{ps2}{3}
@@ -145,9 +151,7 @@
 % Adapted from the proof-strategy slide; errors are schematic, not the seed orbit.
 \newcommand{\strategystairs}{\begin{tikzpicture}[x=.8cm,y=.8cm,
  every node/.style={arxiv label,inner sep=1pt}]
- \foreach \x in {0,1.65,3.3}{\draw[black!15] (\x,-.1)--(\x,2.15);}
- \foreach \y in {0,1.05,2.1}{\draw[black!15] (-.1,\y)--(3.4,\y);}
- \draw[black!40,densely dotted] (0,0)--(3.3,2.1);
+ \draw[arxiv dotted guide] (0,0)--(3.3,2.1);
  \foreach \x/\y in {0/0,1.65/1.05}{
   \draw[arxiv thermal flow,line width=1pt] (\x,\y+.04)--(\x,\y+1.01);
   \draw[arxiv spatial flow,line width=1pt,densely dashed]
@@ -161,25 +165,42 @@
  \node[anchor=west,fill=white] at (.12,.22) {$\varepsilon$};
  \node[anchor=west,fill=white] at (1.8,1.28) {$\approx\varepsilon^2$};
  \node[anchor=south] at (3.3,2.22) {$\approx\varepsilon^4$};
- \node[text=mpoblue] at (6.15,2.15) {double $\beta$};
- \node at (6.15,1.65) {$\rho_n(\beta)^2\propto\rho_n(2\beta)$};
- \node[text=mpored] at (6.15,.85) {double $n$};
- \node at (6.15,.35) {$\sigma_n^2\propto\sigma_{2n}$};
+ % key: each move with the arrow that draws it, close to the staircase
+ \draw[arxiv thermal flow,line width=1pt] (4.15,1.9)--(4.15,2.35);
+ \node[text=mpoblue,anchor=west] at (4.3,2.12) {double $\beta$};
+ \node[anchor=west] at (4.3,1.68) {$\rho_n(\beta)^2\propto\rho_n(2\beta)$};
+ \draw[arxiv spatial flow,line width=1pt,densely dashed] (3.95,.95)--(4.4,.95);
+ \node[text=mpored,anchor=west] at (4.5,.95) {double $n$};
+ \node[anchor=west] at (4.3,.5) {$\sigma_n^2\propto\sigma_{2n}$};
 \end{tikzpicture}}
 
 % ------------------------------------------------- Supplemental Material glyphs
 % One site of the brickwork network through three slices, read along space:
 % the odd-bond labels q_t enter from the left and the even-bond labels p_t
 % leave to the right; the loop is the physical trace that gives F_{pq}.
-\newcommand{\sitetrace}{\tikz[tn,tn centered,font=\tiny]{
+\newcommand{\sitetrace}{\tikz[tn,tn centered,font=\scriptsize]{
  \draw[phys,ring] (0,-1.75)--(0,1.75)--(2.9,1.75)--(2.9,-1.75)--cycle;
  \foreach \y/\p/\q in {-1.05/p_0/q_0,0/p_1/q_1,1.05/p_2/q_2}{
-  \draw[mpored,line width=.5pt] (-1.05,{\y-.22})--(0,{\y-.22});
-  \draw[mpored,line width=.5pt] (0,{\y+.22})--(1.05,{\y+.22});
+  \draw[arxiv bond] (-1.05,{\y-.22})--(0,{\y-.22});
+  \draw[arxiv bond] (0,{\y+.22})--(1.05,{\y+.22});
   \node[xvertex] at (0,{\y-.22}) {};
   \node[xvertex] at (0,{\y+.22}) {};
   \node[anchor=east,inner sep=1pt] at (-1.05,{\y-.22}) {$\q$};
   \node[anchor=west,inner sep=1pt] at (1.05,{\y+.22}) {$\p$};}}}
+
+% One site of the brickwork network traced through M=2 slices, read along
+% space: on each slice the odd-bond factor A_{a_t} enters from the left and the
+% even-bond factor A_{b_t} leaves to the right; the closed physical loop is the
+% trace, so the picture is the matrix element F_{ba} of the main text.
+\newcommand{\sitetraceab}{\tikz[tn,tn centered,font=\scriptsize]{
+ \draw[phys,ring] (0,-1.2)--(0,1.2)--(2.7,1.2)--(2.7,-1.2)--cycle;
+ \foreach \y/\b/\a in {-.55/b_1/a_1,.55/b_2/a_2}{
+  \draw[arxiv bond] (-1.05,{\y-.22})--(0,{\y-.22});
+  \draw[arxiv bond] (0,{\y+.22})--(1.05,{\y+.22});
+  \node[xvertex] at (0,{\y-.22}) {};
+  \node[xvertex] at (0,{\y+.22}) {};
+  \node[anchor=east,inner sep=1pt] at (-1.05,{\y-.22}) {$\a$};
+  \node[anchor=west,inner sep=1pt] at (1.05,{\y+.22}) {$\b$};}}}
 
 % \capbars[yunit]{h1,h2,...}{cap}: twelfth-power weights filled up to a cap
 % (dashed) with the remaining mass in one smaller entry; the extremal
@@ -188,46 +209,46 @@
  \foreach \h [count=\i from 0] in {#2}{
   \fill[arxiv leading weight] ({1.15*\i},0) rectangle ++(.8,\h);
   \xdef\capn{\i}}
- \draw[mpored,densely dashed,line width=.35pt] (-.2,#3)--({1.15*\capn+1},#3);
- \draw[black!50,line width=.3pt] (-.25,0)--({1.15*\capn+1.05},0);}}
+ \draw[arxiv guide] (-.2,#3)--({1.15*\capn+1},#3);
+ \draw[arxiv baseline] (-.25,0)--({1.15*\capn+1.05},0);}}
 
 % Twelfth-power weights of K at the base seed: one dominant J eigenvalue,
 % the J remainder, and the three identical N lists.
 \newcommand{\sectorspectrum}{\tikz[baseline=0pt,x=.34em,y=1.1em]{
  \fill[arxiv leading weight] (0,0) rectangle ++(.78,1);
  \foreach \h [count=\i] in {.35,.2}{\fill[arxiv remainder weight] (\i,0) rectangle ++(.78,\h);}
- \foreach \h [count=\i from 3] in {.58,.58,.58,.3,.3,.3}{\fill[black!14] (\i,0) rectangle ++(.78,\h);}
- \draw[black!50,line width=.3pt] (-.2,0)--(9,0);
+ \foreach \h [count=\i from 3] in {.58,.58,.58,.3,.3,.3}{\fill[arxiv bulk weight] (\i,0) rectangle ++(.78,\h);}
+ \draw[arxiv baseline] (-.2,0)--(9,0);
 }}
 
 % The filter F_N against its certified total B_N: the level is crossed at
 % +-V and no eigenvalue of the N lists can sit on the shaded exterior rays.
 \newcommand{\filterglyph}{\tikz[baseline=0pt,x=1.7em,y=1.1em,line width=.45pt]{
  \clip (-1.05,-.08) rectangle (1.05,1.05);
- \fill[mpored!12] (-1.05,0) rectangle (-.872,1.05);
- \fill[mpored!12] (.872,0) rectangle (1.05,1.05);
- \draw[black!35,line width=.3pt] (-1.05,0)--(1.05,0);
- \draw[black!45,densely dashed,line width=.3pt] (-1.05,.535)--(1.05,.535);
- \draw[black!70,domain=-1:1,samples=161,smooth]
+ \fill[arxiv exclude band] (-1.05,0) rectangle (-.872,1.05);
+ \fill[arxiv exclude band] (.872,0) rectangle (1.05,1.05);
+ \draw[arxiv baseline] (-1.05,0)--(1.05,0);
+ \draw[arxiv guide] (-1.05,.535)--(1.05,.535);
+ \draw[arxiv curve,domain=-1:1,samples=161,smooth]
   plot (\x,{(\x^4)*((12-394*\x*\x+1000*\x^4)/300)^2});}}
 
 % The six exact rational steps on a logarithmic scale: data of Table sm:tab:orbit.
-\newcommand{\defectladder}{\begin{tikzpicture}[x=1.05cm,y=1.6cm,font=\scriptsize]
+\newcommand{\defectladder}{\begin{tikzpicture}[x=1.05cm,y=1.6cm,font=\footnotesize]
  \def\ps{-1.320,-1.218,-1.163,-1.146,-1.198,-1.425,-2.072}
  \def\qs{-.741,-.761,-.787,-.839,-.976,-1.350,-2.258}
- \draw[black!40,densely dashed,line width=.35pt] (0,-2)--(6,-2)
-  node[right,black!60] {$10^{-2}$};
- \draw[black!40,densely dotted,line width=.35pt] (0,-.895)--(6,-.895)
-  node[right,black!60] {$\varepsilon_*$};
- \foreach \v [count=\i from 0] in \ps{\ifnum\i>0 \draw[mpored,line width=.7pt] ({\i-1},\pl)--(\i,\v);\fi
+ \draw[arxiv guide] (0,-2)--(6,-2)
+  node[right,arxiv note] {$10^{-2}$};
+ \draw[arxiv dotted guide] (0,-.895)--(6,-.895)
+  node[right,arxiv note] {$\varepsilon_*$};
+ \foreach \v [count=\i from 0] in \ps{\ifnum\i>0 \draw[arxiv series,mpored] ({\i-1},\pl)--(\i,\v);\fi
   \fill[mpored] (\i,\v) circle[radius=1.3pt]; \xdef\pl{\v}}
- \foreach \v [count=\i from 0] in \qs{\ifnum\i>0 \draw[mpoblue,line width=.7pt] ({\i-1},\ql)--(\i,\v);\fi
+ \foreach \v [count=\i from 0] in \qs{\ifnum\i>0 \draw[arxiv series,mpoblue] ({\i-1},\ql)--(\i,\v);\fi
   \fill[mpoblue] (\i,\v) circle[radius=1.3pt]; \xdef\ql{\v}}
  \node[mpored,anchor=north] at (2.5,-1.19) {$p_j$ (spatial)};
  \node[mpoblue,anchor=south] at (1.5,-.76) {$q_j$ (thermal)};
  \foreach \n [count=\i from 0] in {36,72,144,288,576,1152,2304}{
-  \node[black!60] at (\i,-2.42) {$\n$};}
- \node[black!60,anchor=east] at (-.25,-2.42) {$n_j$};
+  \node[arxiv note] at (\i,-2.42) {$\n$};}
+ \node[arxiv note,anchor=east] at (-.25,-2.42) {$n_j$};
 \end{tikzpicture}}
 
 % Interpolation between dyadic scales, adapted from the talk: the unknown
@@ -235,22 +256,38 @@
 % below at 2 beta_j by the torus on its right.
 \newcommand{\dyadicinterval}{\begin{tikzpicture}[x=1cm,y=.75cm,
  every node/.style={arxiv label,inner sep=1pt}]
- \draw[black!25,line width=.4pt] (-.3,0)--(4.4,0) (-.3,1.8)--(4.4,1.8);
+ \draw[black!25,line width=.45pt] (-.3,0)--(4.4,0) (-.3,1.8)--(4.4,1.8);
  \foreach \x/\l in {0/n_j,3.6/2n_j}{
-  \draw[black!25,line width=.4pt] (\x,-.2)--(\x,2.2);
+  \draw[black!25,line width=.45pt] (\x,-.2)--(\x,2.2);
   \node[anchor=north] at (\x,-.25) {$\l$};}
  \node[anchor=east] at (-.35,0) {$\beta_j$};
  \node[anchor=east] at (-.35,1.8) {$2\beta_j$};
- \draw[black!40,densely dotted,line width=.5pt] (0,0)--(3.6,1.8);
- \draw[teal!70!black,line width=.9pt] (1.9,-.2)--(1.9,2.2);
- \node[anchor=north,text=teal!70!black] at (1.9,-.25) {$L$};
- \draw[arxiv spatial flow,line width=.8pt] (.12,0)--(1.78,0);
- \draw[arxiv spatial flow,line width=.8pt] (3.48,1.8)--(2.02,1.8);
+ \draw[arxiv dotted guide] (0,0)--(3.6,1.8);
+ \draw[tncert,line width=1pt] (1.9,-.2)--(1.9,2.2);
+ \node[anchor=north,arxiv cert note] at (1.9,-.25) {$L$};
+ \draw[arxiv spatial flow,line width=.7pt] (.12,0)--(1.78,0);
+ \draw[arxiv spatial flow,line width=.7pt] (3.48,1.8)--(2.02,1.8);
  \node[arxiv point] at (0,0) {};
  \node[arxiv point] at (3.6,1.8) {};
- \node[arxiv point,fill=teal!70!black] at (1.9,0) {};
- \node[arxiv point,fill=teal!70!black] at (1.9,1.8) {};
- \node[anchor=north,text=mpored] at (.95,-.06) {power $L/n_j$};
- \node[anchor=south,text=mpored] at (2.85,1.86) {power $2n_j/L$};
- \node[anchor=west,text=black!60] at (2.45,.62) {doubling};
+ \node[arxiv point,fill=tncert] at (1.9,0) {};
+ \node[arxiv point,fill=tncert] at (1.9,1.8) {};
+ \node[anchor=south,text=mpored,inner sep=1pt,fill=white] at (.95,.07) {power $L/n_j$};
+ \node[anchor=south west,text=mpored,inner sep=1pt,fill=white] at (2.05,1.86) {power $2n_j/L$};
+ \node[anchor=west,arxiv note] at (2.45,.62) {doubling};
 \end{tikzpicture}}
+
+% Word-sized dyadic interval: the two known tori (gray points, at (n_j, beta_j)
+% below and (2n_j, 2beta_j) above) bound the thermal purity at the target length
+% L (teal) from either side by the power-sum inequality along the length axis
+% (red). Unlabeled so that it stays one line tall; the prose names the points.
+\newcommand{\interpolationglyph}{\tikz[baseline=-.1em,x=1em,y=.8em]{
+ \draw[arxiv baseline] (-.15,0)--(2.75,0) (-.15,.75)--(2.75,.75);
+ \draw[arxiv series,tncert] (1.3,-.1)--(1.3,.87);
+ \draw[arxiv small arrow,mpored] (.2,0)--(1.18,0);
+ \draw[arxiv small arrow,mpored] (2.4,.75)--(1.42,.75);
+ \node[arxiv point,inner sep=.9pt] at (0,0) {};
+ \node[arxiv point,inner sep=.9pt] at (2.6,.75) {};
+ \node[arxiv point,inner sep=.9pt,fill=tncert] at (1.3,0) {};
+ \node[arxiv point,inner sep=.9pt,fill=tncert] at (1.3,.75) {};
+}}
+

@@ -1,6 +1,16 @@
 # Paper
 
-The main paper is **A Diagrammatic Proof of the Haldane Gap via Spacetime Tensor Networks**:
+The arXiv manuscript is **Bridging Gaps with Tensor Networks: From the Haldane Gap and Beyond**:
+
+- [PDF](certified-gap.pdf)
+- [LaTeX source](certified-gap.tex), with its style file `certified-gap.sty` (which loads
+  `tnnotes.sty` and the diagram macros in `figures/`), the main text in `sections/`, and the
+  Supplemental Material in `supplementary/`. Build from the repository root with
+  `latexmk -pdf -outdir=work/latex-build paper/certified-gap.tex`; the root `.latexmkrc` sets
+  the TeX search path.
+
+The earlier full-length note is **A Diagrammatic Proof of the Haldane Gap via Spacetime Tensor
+Networks**:
 
 - [PDF](thermal-mpo-gap-note.pdf)
 - [LaTeX source](thermal-mpo-gap-note.tex)
