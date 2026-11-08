@@ -68,7 +68,32 @@ matches the stored Julia chains and avoids treating a preliminary numerical upda
 new unproved hypothesis. Model-specific transfer and spectral-seed inputs remain explicit,
 as in the one-dimensional criterion.
 
+## Ordered-phase diagnostic
+
+On the low-field side, the relevant target is a gap above the lowest two states, together
+with control of their splitting. At zero field the two ferromagnetic configurations have
+energy $-2JL^2$, and the first excitation costs $8J$ on square tori of side at least four.
+The current unique-ground-state criterion cannot certify a uniform first gap in a phase
+whose two lowest levels become degenerate with increasing volume.
+
+Complete sixteen-spin spectra at $g/J=1,2$ can distinguish the splitting $E_1-E_0$ from
+$E_2-E_1$. This has the same cost exponential in area as the earlier diagnostics and does
+not depend on inverse temperature. The calculation is a diagnostic, not a certificate.
+For a future bootstrap proof, two possible routes are partition functions resolved by the
+global spin-flip symmetry, or a criterion for an isolated two-dimensional low-energy space.
+The former requires new spatial gluing inequalities for projected traces; the latter
+requires more than replacing thermal purity by twice thermal purity. Neither extension is
+assumed here. The present step computes the finite spectrum and records the obstruction to
+the existing criterion.
+
 ## Outcome
+At $g/J=1,2$, the sixteen-spin floating-point spectra give lowest-pair splittings
+$5.51\times10^{-7}J$ and $0.01502J$, and gaps above the pair of $7.28554J$ and $4.71774J$.
+No ordered-phase uniform certificate follows. At the zero-field endpoint, the exact
+thermal purity is at most $1/2$ at every temperature, obstructing the current seed criterion
+although the gap above the two ground states is exactly $8J$. Reproduction commands and
+the two candidate extensions are recorded in `METHOD.md`.
+
 
 Numerical complete spectra at $g/J=4,5,6,8$ give sixteen-spin gaps approximately
 $3.24828J,5.44369J,7.56254J,11.69479J$. No tested $2\times2$ seed closes for

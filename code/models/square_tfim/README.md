@@ -86,6 +86,13 @@ No tested seed closes at these fields on $\beta g=0.5,0.525,\ldots,16$, or at
 $g/J=17$ on $\beta g=2,2.125,\ldots,12$. These scans do not provide uniform gap bounds,
 and do not exclude a different temperature, a larger seed, or a sharper recurrence.
 
+On the ordered side, floating-point 4 by 4 spectra at $g/J=1,2$ give lowest-pair splittings
+$5.51\times10^{-7}J$ and $0.01502J$, but gaps above that pair of $7.28554J$ and $4.71774J$.
+These are different spectral quantities. At $g=0$ the pair is exactly degenerate and its
+excitation gap is $8J$ for every square side $L\ge4$. The current unique-ground-state
+criterion does not cover this phase; see [METHOD.md](METHOD.md#the-ordered-side-of-the-transition)
+for the purity obstruction, numerical reproduction, and the required extension.
+
 ## Reproduce
 
 From the repository root, using Julia 1.12 and the core environment:

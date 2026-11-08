@@ -144,6 +144,87 @@ errors are below $10^{-6}J$ per eigenvalue. Sharper eigenvalue arithmetic alone 
 have little effect. Larger spatial seeds or sharper directional estimates are needed for
 a substantial further increase.
 
+## The ordered side of the transition
+
+For the Pauli normalization used here, numerical studies place the square-lattice
+transition at $g/J\simeq3.04438$; see
+[Schmitt et al., Science Advances 8, eabl6850 (2022)](https://pmc.ncbi.nlm.nih.gov/articles/PMC9481121/).
+The appropriate low-field target on symmetric periodic tori is an isolated pair of
+low-energy states. With eigenvalues counted with multiplicity, define
+
+```math
+\delta_L=E_1(L)-E_0(L),\qquad \gamma_L=E_2(L)-E_1(L).
+```
+
+A certificate for this phase should control both the vanishing splitting $\delta_L$ and a
+positive uniform lower bound on $\gamma_L$. The existing `GapGT` conclusion concerns
+$\delta_L$ and therefore cannot establish this different statement.
+
+At $g=0$, the two constant spin configurations have energy $-2JL^2$. Every nonconstant
+configuration has at least four disagreeing edges on a square torus with $L\ge4$, and each
+such edge costs $2J$. A single flipped spin attains this minimum. Consequently
+$\delta_L=0$ and $\gamma_L=8J$ exactly.
+
+There is an exact obstruction to the present seed criterion at this endpoint. Global spin
+reversal pairs every classical configuration with a distinct configuration of the same
+energy. Summing one representative per pair gives
+
+```math
+Z_L(\beta)=2\sum_\alpha e^{-\beta e_\alpha},\qquad
+P_\tau(L,\beta)=\frac12
+ \frac{\sum_\alpha e^{-2\beta e_\alpha}}
+ {(\sum_\alpha e^{-\beta e_\alpha})^2}\le\frac12.
+```
+
+Thus the thermal defect is at least $1/2$ at every temperature. At positive field, when
+higher levels have negligible thermal weight, the two-level approximation instead gives
+
+```math
+P_\tau(L,\beta)\simeq
+\frac{1+e^{-2\beta\delta_L}}{(1+e^{-\beta\delta_L})^2}.
+```
+
+This is close to $1/2$ when $\beta\delta_L\ll1$. For fixed finite volume and nonzero
+splitting, it tends to one only when the temperature resolves the splitting. A uniform
+gap above the pair cannot be inferred from such a resolution scale.
+
+Complete floating-point spectra on the 4 by 4 torus give:
+
+| $g/J$ | $E_0/(16J)$ | $\delta_4/J$ | $\gamma_4/J$ |
+|---:|---:|---:|---:|
+| 1 | -2.12566234693 | $5.51378\times10^{-7}$ | 7.28553502 |
+| 2 | -2.51188715235 | 0.0150166052 | 4.71774367 |
+
+The first four levels, in units of $J$, are approximately
+$(-34.01059755084623,-34.01059699946832,-26.72506197570735,-26.72419743700171)$
+at $g/J=1$, and
+$(-40.19019443767035,-40.17517783245594,-35.45743416578414,-34.50218873303338)$
+at $g/J=2$. These are unverified LAPACK results, with no eigenvalue enclosures or
+thermodynamic extrapolation. Reproduce them from the repository root with:
+
+```sh
+OPENBLAS_NUM_THREADS=1 julia --project=code/julia -e '
+using CertifiedGaps.VerifiedSpectra: float_ring_spectrum
+include("code/models/square_tfim/src/SquareIsing.jl")
+using .SquareIsing
+for g in (1, 2)
+    seconds = @elapsed E = float_ring_spectrum(row_model(4, g), 4).E
+    println((g=g, levels=E[1:4], density=E[1]/16, splitting=E[2]-E[1],
+        gap_above_doublet=E[3]-E[2], seconds=seconds))
+end
+'
+```
+
+The eigensolves took 27.4 and 25.9 seconds respectively on the development machine with
+one BLAS thread, excluding initial package startup.
+
+A possible extension would use the two spin-flip sectors separately. Their thermal traces
+are positive, but spatial doubling of globally projected traces requires a new gluing
+argument. Another possibility is to control an isolated two-dimensional low-energy space
+directly. Purity near $1/2$ alone does not certify this: the three probabilities
+$(2/3,1/6,1/6)$ have purity exactly $1/2$. In particular, substituting $2P_\tau$ into the
+unique-state recurrence has no justification. No ordered-phase extension is proved here.
+
 ## General theorem and Lean formalization
 
 Let $Z_{x,y,t}>0$ be partition data indexed by nonnegative integers counting doublings in
