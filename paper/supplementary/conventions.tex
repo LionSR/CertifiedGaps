@@ -1,0 +1,53 @@
+\medskip
+\noindent
+This Supplemental Material contains the full proofs, seed
+certificates, and Lean~4 formalization details.
+Section~\ref{sm:sec:trotter} constructs the finite-dimensional spatial
+transfer matrix $T_{\beta,M}$ for any reflection-positive ring
+Hamiltonian, takes the continuum limit $M\to\infty$, and proves the
+periodic scale-doubling theorem: a finite seed $(n_0,\beta_0)$ with both
+defects at most $1/100$ gives a uniform gap on all even lengths
+$L\ge n_0$, applied to the spin-1 chain from $(2304,784)$.
+Section~\ref{sm:sec:seeds} proves the periodic spin-1 Heisenberg seeds
+from the one-site Poisson transfer operator $K_\beta$, symmetry-sector
+trace recursions, polynomial spectral filters, and matrix-product trial
+states, first at $(n_0,\beta_0)=(36,12)$ and then at $\beta_0=49/4$ to
+obtain $\Delta_L>0.07290$ for all even $L\ge36$.
+Section~\ref{sm:sec:models} gives the reflection-positive
+factorizations, finite seeds, and gap bounds for the seven other spin
+chains and ladders in Table~\ref{tab:models}, including the
+unconditional Lean-kernel proof for the mixed-field Ising chain.
+Section~\ref{sm:sec:blueprint} describes the Lean~4 formalization of the
+general criterion, the model theorems, and the kernel-checked seed
+arithmetic. Section~\ref{sm:sec:obc} extends the diagrammatic doubling
+proof and Lean~4 formalization to open spin-1 Heisenberg chains with
+endpoint fields, proving $\Delta_n>0.01556$ for all odd $n\ge1921$.
+
+\tableofcontents
+
+\subsection*{Graphical notation}
+\label{sm:sec:notation}
+
+Every diagram below is a tensor network built from the elements in the
+following legend. Red marks space, blue marks imaginary time, teal marks
+certified conclusions, grays mark spectra, weights, and boundary vectors, and ochre
+marks regions ruled out.
+\begin{center}
+    \renewcommand{\arraystretch}{1.8}
+    \begin{tabular}{@{}cl@{\qquad}cl@{}}
+        \toprule
+        \rule[-2.4ex]{0pt}{6.6ex}\physleg{}                       & physical leg: one site, through imaginary time                 &
+        \tncolumn[ring]{\rho_n(\beta)}                            & closed physical loop: the trace $\Tr$                            \\
+        \rule[-1.8ex]{0pt}{4.8ex}\virtleg{}                       & virtual leg: the bond between two sites                        &
+        \tnchain[node=xvertex,ring]{,\cdots,}                     & closed virtual loop: the trace $\trv$                            \\
+        \rule[-1.8ex]{0pt}{4.8ex}\tnchain[node=xvertex]{,}        & joined legs are contracted                                     &
+        \tnchain[capl=\bar v,capr=v]{X_\beta}                     & boundary vectors on an open chain                                \\
+        \rule[-2.4ex]{0pt}{6.0ex}\tnchain[node=mpo,legs]{W_\beta} & local MPO tensor (thermal, blue)                               &
+        \tnchain[node=xvertex]{{}}                                & transfer vertex: $W_\beta$ with physical legs traced             \\
+        \rule[-2.4ex]{0pt}{6.0ex}\tncolumn{\rho_n(\beta)}         & Gibbs state on $n$ sites (thermal, blue)                       &
+        \tnchain{X_\beta}                                         & spatial transfer operator ($T_{\beta,M},K_\beta,X_\beta$, red)   \\
+        \rule[-2.0ex]{0pt}{5.0ex}\Zt21                            & $Z_n(\beta)$: a torus of width $n$ and height $\beta$          &
+        \Zt41,\ \Zt22                                             & length doubled, inverse temperature doubled                      \\
+        \bottomrule
+    \end{tabular}
+\end{center}

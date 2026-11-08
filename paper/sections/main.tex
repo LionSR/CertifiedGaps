@@ -1,0 +1,512 @@
+Haldane mapped one-dimensional Heisenberg antiferromagnets onto the
+nonlinear $\sigma$ model to predict a gap for integer spins, in
+contrast to half-integer
+chains~\cite{Haldane1983Continuum,Haldane1983Nonlinear,Auerbach1994Interacting}
+(near $0.4105$ for spin one~\cite{White1993Numerical}). Because the
+Heisenberg chain is not frustration free, finite-size gap criteria for
+frustration-free models~\cite{Knabe1988Energy,Gosset2016Local,Rai2026Hierarchy,Rozman2026Lower}
+and ground-energy relaxations~\cite{Kull2024Lower} do not suffice.
+
+OpenAI recently gave a computer-assisted proof of a unique ground
+state and a uniform gap $\Delta_L>\tfrac{\log20}{784}\simeq0.003821$ for all
+even periodic lengths $L\ge2304$ (and
+$\Delta_L\gtrsim4.79\times10^{-4}$ for $L\ge60$) from certified finite
+partition-function bounds~\cite{OpenAI2026Periodic}. After verifying those finite inputs in exact arithmetic, we recast the
+proof in tensor-network diagrams, isolating reflection positivity as
+the condition behind its spatial inequalities. We then
+certify uniform gaps for seven additional spin chains and ladders,
+sharpen the periodic spin-1 bound from the same inputs to
+$\Delta_L>0.0729$ for all even $L\ge36$, and formalize the general
+theorem in Lean~4~\cite{SM}.
+
+\emph{Thermal purity and the gap.---}
+Consider $H_L=\sum_{j=1}^{L}\bm S_j\cdot\bm S_{j+1}$ and
+$Z_L(\beta)=\Tr e^{-\beta H_L}$ with periodic indices, spin one, even $L\ge4$, and unit coupling.
+Ordering the eigenvalues of $H_L$ with multiplicity defines the gap
+$\Delta_L=E_1(L)-E_0(L)$~(\levels).
+For $\beta>0$, the Gibbs state $\rho_L=e^{-\beta H_L}/Z_L(\beta)$
+has ordered weights $w_0\ge w_1\ge\cdots$. Its thermal purity
+$\Pt(L,\beta)=\Tr\rho_L^2\le w_0$ gives%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.exp_neg_mul_sub_le_of_isMin}
+\begin{equation}
+    e^{-\beta\Delta_L}=\frac{w_1}{w_0}
+    \le\frac{1-w_0}{w_0}
+    \le\frac{1-\Pt(L,\beta)}{\Pt(L,\beta)}.
+    \label{eq:core-purity-gap}
+\end{equation}
+When $\Pt(L,\beta)$ is close to one (\dominantglyph), $\Pt>1/2$ forces
+$w_0>1/2$ and hence a unique ground state, while $0<1-\Pt\le q<1/2$ gives
+$\Delta_L\ge\tfrac1\beta\log\tfrac{1-q}{q}$.
+
+\emph{Proof strategy.---}
+Certifying a uniform gap from Eq.~\eqref{eq:core-purity-gap} requires
+bounding $\Pt(L,\beta)$ for all even $L\ge n_0$ at $\beta\propto L$,
+whereas direct calculation reaches only a finite seed $(n_0,\beta_0)$.
+Because $H_n$ is Hermitian, the Gibbs state $\rho_n(\beta)$ is a
+density operator whose square is proportional to $\rho_n(2\beta)$ and
+squares the defect $1-\Pt$. OpenAI's proof pairs $\rho_n(\beta)$
+with a spatial density operator $\sigma_n(\beta)$ whose square is
+proportional to $\sigma_{2n}(\beta)$ and doubles the ring length
+$n\mapsto2n$. From $(n_0,\beta_0)$, the two squarings alternate along
+the staircase:
+\begin{proofdiagram}
+    \strategystairs
+\end{proofdiagram}
+Each step squares the defect $\varepsilon_j=1-P$ while doubling both
+$n_j$ and $\beta_j$, so $\tfrac{\log(1/\varepsilon_j)}{\beta_j}$ stays bounded
+below. The proof therefore needs three ingredients: a positive
+semidefinite spatial transfer operator to define the density operator
+$\sigma_n$; a coupling between the spatial ($n\mapsto2n$) and thermal
+($\beta\mapsto2\beta$) squarings; and an interpolation from the dyadic
+lengths $n_j=2^jn_0$ to every even $L\in[n_j,2n_j]$.
+
+\emph{Spatial transfer matrix.---}
+Set $\tau=\beta/M$ and let $S_L(\tau)$ be the product of
+$I-\tau h_{j,j+1}$ over even bonds followed by odd bonds, where
+$h=\bm S\cdot\bm S$. Contracting this brickwork network in imaginary
+time or space gives~\cite{Suzuki1985Transfermatrix}
+\begin{equation}
+    \underbrace{\Tr S_L(\beta/M)^M}_{\bricknetwork{1}}
+    =Z_L^{(M)}(\beta)
+    =\underbrace{\Tr T_{\beta,M}^{L/2}}_{\bricknetwork{2}}.
+    \label{eq:core-two-readings}
+\end{equation}
+
+In the Cartesian basis $\ket{x},\ket{y},\ket{z}$, the generators
+$G_\alpha=iS^\alpha$ are real antisymmetric matrices. Hence
+$-h=\sum_{\alpha=x,y,z}G_\alpha\otimes G_\alpha$ and
+$I-\tau h=\sum_{\gamma=0,x,y,z}A_\gamma\otimes A_\gamma$,
+where $A_0=I$ and $A_\alpha=\sqrt{\tau}\,G_\alpha$; diagrammatically,
+$\splitgate=\sum_\gamma\bondends$.
+Assign bond-label sequences $a,b\in\{0,x,y,z\}^M$ to the odd and even
+bonds adjacent to a site. Tracing that site through the $M$ slices,
+with $A_{a_t}$ entering from the odd bond and $A_{b_t}$ leaving on the
+even bond, defines a real matrix $\mathcal F$ independent of
+$L$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Transfer.html\#CertifiedGaps.RPRing.exists_posSemidef_transfer}:
+\begin{align}
+    \mathcal F_{ba} &=\Tr[(A_{b_1}A_{a_1})\cdots(A_{b_M}A_{a_M})]
+    =\sitetraceab,\notag\\
+    T_{\beta,M}     &=\mathcal F^{\mathsf T}\mathcal F\ge0,
+    \qquad
+    \tnchain{\mathcal F^{\mathsf T},\mathcal F}
+    =\tnchain{T_{\beta,M}}.
+    \label{eq:core-gram}
+\end{align}
+Because each bond gate $I-\tau h$ splits into matching real matrices
+$A_\gamma$, the two sites of an even bond mirror each other across $b$,
+contracting $\mathcal F$ with its transpose into the positive
+semidefinite Gram matrix $T_{\beta,M}=\mathcal F^{\mathsf T}\mathcal
+    F\ge0$—finite-slice reflection
+positivity~\cite{Dyson1978Phase,Frohlich1978Phase,Jaffe2016Characterization}.
+For even $n\ge4$, $\sigma_n^{(M)}=T_{\beta,M}^{n/2}/Z_n^{(M)}(\beta)$
+is a density matrix with $(\sigma_n^{(M)})^2\propto\sigma_{2n}^{(M)}$;
+taking $M\to\infty$ at fixed $(L,\beta)$ passes its eigenvalue
+inequalities to $Z_L(\beta)$ before doubling begins
+(Sec.~\ref{sm:sec:trotter} of Ref.~\cite{SM}).
+
+\emph{Coupling and squaring.---}
+With $Z_n(\beta)$ drawn as the $n\times\beta$ torus $\Zt21$, the
+spatial purity doubles its width and the thermal purity doubles its
+height:
+\begin{align*}
+    \Ps(n,\beta)
+     & =\lim_{M\to\infty}\Tr[(\sigma_n^{(M)})^2]
+    =\frac{Z_{2n}(\beta)}{Z_n(\beta)^2}=\frac{\Zt41}{\Ztsq21},\nonumber \\
+    \Pt(n,\beta)
+     & =\Tr\rho_n(\beta)^2
+    =\frac{Z_n(2\beta)}{Z_n(\beta)^2}=\frac{\Zt22}{\Ztsq21}.
+\end{align*}
+Assembling the $2n\times2\beta$ torus $\Zt42$
+from four copies of $\Zt21$ in either order,
+\begin{proofdiagram}
+    \torusgluing
+\end{proofdiagram}
+gives the exact coupling identity%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.spatialPurity_two_mul}
+\begin{equation}
+    \Ps(n,2\beta)\Pt(n,\beta)^2
+    =\Pt(2n,\beta)\Ps(n,\beta)^2.
+    \label{eq:core-coupling-s}
+\end{equation}
+
+For any density operator with eigenvalues $u_i$ and purity
+$P=\sum_i u_i^2$, squaring and renormalizing concentrates the weights
+($\specbars[black!55]{.5,.3,.2}\mapsto\specbars[black!55]{.66,.24,.1}$),
+giving a new purity $P'$ that obeys%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.one_sub_squaredPurity_le_squaringDefect}
+\begin{equation}
+    1-P'=\frac{2\sum_{i<j}(u_i u_j)^2}{P^2}
+    \le\frac{(1-P)^2}{2P^2}=f(1-P),
+    \label{eq:core-square}
+\end{equation}
+where $f(z)=z^2/[2(1-z)^2]$.
+This squaring map acts identically along space and imaginary time:
+\begin{align*}
+    \tnchain{\sigma_n^{(M)},\sigma_n^{(M)}}
+     & =\Tr[(\sigma_n^{(M)})^2]\,\tnchain{\sigma_{2n}^{(M)}},\notag \\
+    \tncolumn{\rho_n(\beta),\rho_n(\beta)}
+     & =\Pt(n,\beta)\,\tncolumn{\rho_n(2\beta)}.
+\end{align*}
+
+To advance the bounds $1-\Ps(n,\beta)\le p$ and
+$1-\Pt(2n,\beta)\le q$ from $(n,\beta)$ to $(2n,2\beta)$, we alternate
+torus gluing with squaring along the two directions:
+\begin{proofdiagram}
+    \pbcsteps
+\end{proofdiagram}
+Dropping a purity factor $\le1$ in Eq.~\eqref{eq:core-coupling-s}
+(moves 1, 3) and applying Eq.~\eqref{eq:core-square} (moves 2, 4) gives%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.doubling_step}
+\begin{align}
+    p' &=f(1-(1-p)^2(1-q)),\nonumber\\
+    q' &=f(1-(1-q)^2(1-p')),
+    \label{eq:core-update}
+\end{align}
+which maps bounds $(p,q)$ at $(n,\beta)$ to $(p',q')$ at $(2n,2\beta)$
+inside the convergent region of Fig.~\ref{fig:core-region}.
+\input{figures/convergence}
+
+\emph{From the finite seed to the uniform gap.---}
+Once $(p_j,q_j)$ enters $[0,0.01]^2$ (gray in
+Fig.~\ref{fig:core-region}), $f(1-(1-\varepsilon)^3)\le5\varepsilon^2$
+drives all further doubling steps analytically (Sec.~\ref{sm:sec:gap}
+of Ref.~\cite{SM}). We start from OpenAI's certified seed:
+
+\begin{lemma}[Finite seed~\cite{OpenAI2026Periodic}%
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/Seed36.html\#CertifiedGaps.SpinOneHeisenberg.seed36_of_table_mps}]
+    \label{lem:arxiv-seed36}
+    At $\beta_0=49/4$, the periodic spin-1 chain satisfies
+    $\Ps(36,\beta_0)\ge1-47916/10^6$ and
+    $\Pt(72,\beta_0)\ge1-181521/10^6$.
+\end{lemma}
+
+Although $q_0=0.181521$ exceeds the symmetric fixed point
+$\varepsilon_*\simeq0.1273$, the smaller $p_0$ pulls $q'$ below $q$,
+and six steps of Eq.~\eqref{eq:core-update} reach
+$(p_6,q_6)\le(0.0085,0.0056)$ at $(n_6,\beta_6)=(2304,784)$
+(Fig.~\ref{fig:core-region}; Sec.~\ref{sm:sec:orbit} of Ref.~\cite{SM}).
+
+Restarting at $(2304,784)$ with $\varepsilon_0=0.01$ and
+$\varepsilon_{j+1}=5\varepsilon_j^2$ gives
+$\varepsilon_j=20^{-2^j}/5$ at $n_j=2304\,2^j$ and
+$\beta_j=784\,2^j$. To cover every even $L\ge2304$, choose $j$ with
+$n_j\le L\le2n_j$. Because the eigenvalues of $\sigma_u^{(M)}$ lie in
+$[0,1]$ and sum to $1$, raising them to a power $v/u\ge1$ lowers their
+sum
+($\specbars[black!55]{.6,.3,.1}\mapsto\specbars[black!55]{.36,.09,.01}$),
+giving $Z_v(\beta)\le Z_u(\beta)^{v/u}$ for even $v\ge u$ as
+$M\to\infty$ and bounding $\Pt(L,\beta_j)$~(\interpolationglyph):%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.thermalPurity_ge_of_window}
+\begin{align}
+    \Pt(L,\beta_j)
+     &\ge[\Pt(2n_j,\beta_j)\Ps(n_j,\beta_j)^2]^{L/(2n_j)}
+    \nonumber\\
+     &\ge(1-\varepsilon_j)^3\ge1-3\varepsilon_j.
+    \label{eq:core-interpolation}
+\end{align}
+With $\varepsilon_j\le0.01$, $3\varepsilon_j/(1-3\varepsilon_j)<20^{-2^j}$,
+so Eq.~\eqref{eq:core-purity-gap} proves a unique ground state and%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/Main.html\#CertifiedGaps.SpinOneHeisenberg.spin_one_heisenberg_gap}
+\begin{equation*}
+    \Delta_L>\frac{\log20}{784}\simeq0.003821
+    \qquad\text{for all even }L\ge2304.
+\end{equation*}
+
+\emph{Bounding the finite seed.---}
+Certifying a seed at $(n_0,\beta_0)$ reduces to bounding the
+numerators of
+\begin{equation}
+    \textcolor{mpored}{\Ps(n_0,\beta_0)}=\tfrac{Z_{2n_0}(\beta_0)}{Z_{n_0}(\beta_0)^2},\qquad
+    \textcolor{mpoblue}{\Pt(2n_0,\beta_0)}=\tfrac{Z_{2n_0}(2\beta_0)}{Z_{2n_0}(\beta_0)^2}
+    \label{seed:ratios}
+\end{equation}
+from below and their denominators from above. When $2n_0$ is too large
+for direct diagonalization ($3^{72}\simeq2.3\times10^{34}$ at
+$n_0=36$), Ref.~\cite{OpenAI2026Periodic} bounds these four partition
+functions from short-ring traces on $4\le n\le12$ sites
+($3^n\le5.3\times10^5$) and a periodic matrix-product trial state at
+length $N=2n_0$:
+\begin{center}\footnotesize
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{@{}clll@{}}
+        \toprule
+                    & Quantity             & Bound & Method                            \\
+        \midrule
+        $\Zt{4}{1}$ & $Z_{2n_0}(\beta_0)$  & lower & MPS at $2n_0$ + short-ring traces \\
+        $\Zt{2}{1}$ & $Z_{n_0}(\beta_0)$   & upper & MPS at $2n_0$ + short-ring traces \\
+        $\Zt{4}{2}$ & $Z_{2n_0}(2\beta_0)$ & lower & MPS at $2n_0$                     \\
+        $\Zt{4}{1}$ & $Z_{2n_0}(\beta_0)$  & upper & short-ring traces                 \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+Five steps turn these inputs into Lemma~\ref{lem:arxiv-seed36} at
+$n_0=36$ and $\beta_0=49/4$ (Sec.~\ref{sm:sec:seeds} of
+Ref.~\cite{SM}).
+
+\paragraph{Step 1: One-site spatial transfer operator.}
+Unlike the two-site Gram matrix $T_{\beta,M}$ (even lengths only), the
+continuous-time self-adjoint one-site transfer operator $K_\beta$ of
+Ref.~\cite{OpenAI2026Periodic} gives $Z_n(\beta)$ for all $n\ge4$:
+\begin{equation*}
+    Z_n(\beta)=\Tr K_\beta^n
+    =\tnchain[node=xvertex,ring]{,\cdots,}_{\,n},
+    \qquad n\ge4.
+\end{equation*}
+Shifting the energy per site by $\kappa=700741/500000$ (so the trial
+ground-state energy in Step~3 is negative) defines
+$\widehat K=e^{-\beta_0\kappa}K_{\beta_0}$ with real eigenvalues
+$\lambda_i$ of either sign and shifted traces
+\begin{equation}
+    \widehat Z_n(\beta)=e^{-n\beta\kappa}Z_n(\beta),
+    \qquad
+    \widehat Z_n(\beta_0)=\sum_i\lambda_i^n,
+    \label{seed:shift}
+\end{equation}
+which leave both purities unchanged and sample the same $\{\lambda_i\}$
+at every $n\ge4$.
+
+\paragraph{Step 2: Symmetry sectors from twisted rings.}
+To tighten the subleading sum at $n_0$, the commuting $\pi$ spin
+rotations split $\widehat K$ into a rotation-invariant sector $J$ and
+three degenerate sectors $N$ permuted by axis rotations. Twisting the
+closing bond by a $\pi$ rotation $P$ negates two of the three $N$
+sectors, giving
+\begin{align}
+    \seedring{0}\quad &\widehat Z_n=J_n+3N_n,\notag\\
+    \seedring{1}\quad &\widehat Z_n(P)=J_n-N_n,
+    \label{seed:sectors}
+\end{align}
+with $J_n=\sum_{i\in J}\lambda_i^n$ and $N_n=\sum_{i\in N}\lambda_i^n$
+at $\beta_0$. Integer polynomial approximations to $e^{-\beta_0 H_n/2}$
+enclose both traces for $4\le n\le12$; solving Eq.~\eqref{seed:sectors}
+at $n=12$ (which divides $n_0$) gives the reference twelfth-moment
+bounds $J_{12}\le m_J=1.0657205$ and $N_{12}\le m_N=0.2783155$.
+
+\paragraph{Step 3: Partition-function lower bound from a trial state.}
+On a ring of length $N=2n_0$, integer tensors $A$ (bond dimension $26$)
+define a periodic MPS $\psi$ whose one-bond energy contracts as an
+$N$-step matrix trace,
+\begin{equation*}
+    \mathcal E=\langle\psi,h_{1,2}\psi\rangle=\seedmps{1},
+\end{equation*}
+and whose norm $\mathcal N=\langle\psi,\psi\rangle$ omits the $h$ box.
+Translation invariance gives
+$\langle\psi,H_N\psi\rangle/(N\mathcal N)=\mathcal E/\mathcal N<-\kappa$,
+so $E_0(N)<-N\kappa$ and retaining only the ground-state weight gives
+$\widehat Z_N(\beta)\ge e^{-\beta(E_0(N)+N\kappa)}>1$ for all $\beta>0$,
+supplying both $\sum_i\lambda_i^{2n_0}>1$ at $\beta_0$ and
+$\widehat Z_{2n_0}(2\beta_0)>1$.
+
+\paragraph{Step 4: Lower bound on the leading spatial eigenvalue.}
+To bound $\widehat Z_{2n_0}(\beta_0)\ge\lambda_0^{2n_0}$ from below, we
+show that $J$ contains an eigenvalue with $|\lambda_0|>\ell$
+($\ell=0.999$ at $n_0=36$). Write $u_i=\lambda_i^{12}\ge0$, so
+$\lambda_i^{2n_0}=u_i^{2n_0/12}$. If every $|\lambda_i|\le\ell$, then
+$u_i\le\ell^{12}$; since $u\mapsto u^{2n_0/12}$ is convex and
+$\ell^{12}<m_J<2\ell^{12}$, $\sum_{i\in J}u_i^{2n_0/12}$ at mass
+$\le m_J$ is maximized by one entry $\ell^{12}$ and remainder
+$m_J-\ell^{12}$:
+\begin{proofdiagram}
+    \seedweightbars
+\end{proofdiagram}
+Raising to the power $2n_0/12$ suppresses the remainder and bounds
+each $N$ sector by $m_N^{2n_0/12}$, giving at $2n_0=72$ ($<0.932$)
+\begin{equation*}
+    \widehat Z_{2n_0}(\beta_0)
+    \le\ell^{2n_0}+(m_J-\ell^{12})^{2n_0/12}+3m_N^{2n_0/12}<1,
+\end{equation*}
+contradicting $\widehat Z_{2n_0}(\beta_0)>1$ from Step~3; since
+$m_N<\ell^{12}$, the eigenvalue $|\lambda_0|>\ell$ lies in $J$.
+
+\begin{table*}[t]
+    \caption{Certified uniform gap bounds for reflection-positive spin
+        chains and ladders, covering every even length $L$ ($L$ counts sites,
+        two-spin dimer cells, or two-spin rungs; $\bm S^2=S(S+1)I$,
+        $\sigma^\alpha$ Pauli matrices). ``Gap $\ge$'' gives the certified lower
+        bound on $\Delta_L=E_1(L)-E_0(L)$ (the interval bound of the certificate)
+        and links to the Lean~4 theorem that proves the rational-chain bound from
+        the seed pair as hypothesis, equal in the quoted digits except where the
+        chain was rounded more coarsely; the single-ion row's Lean theorem starts
+        from the direct seed $(6,9/4)$ and proves $0.6946$;
+        ``Numerical'' lists uncertified $12$--$20$-spin estimates (or bulk
+        DMRG~\cite{White1993Numerical} for $S=1$ Heisenberg). The mixed-field
+        Ising bound is verified unconditionally in the Lean kernel.}
+    \label{tab:models}
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{@{}p{.23\textwidth}p{.39\textwidth}lll@{}}
+        \toprule
+        Model & Hamiltonian                                                                                              & Even lengths                                                                                                                                                      & Gap $\ge$ & Numerical \\
+        \midrule
+        Staggered field, $S=\tfrac12$
+              & $\sum_j\bm S_j\cdot\bm S_{j+1}-\sum_j(-1)^jS_j^z$
+              & $L\ge8$ sites                                                                                            & $1.1489$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/StaggeredHeisenbergPhysical.html\#CertifiedGaps.StaggeredHeisenberg.physical_gap} & $1.874$               \\
+        Dimerized, $S=\tfrac12$
+              & $\sum_j[1+(-1)^j/2]\,\bm S_j\cdot\bm S_{j+1}$
+              & $L\ge4$ cells                                                                                            & $0.5347$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/DimerizedHeisenbergPhysical.html\#CertifiedGaps.DimerizedHeisenberg.physical_gap} & $1.189$               \\
+        Dimerized, $S=1$
+              & $\sum_j[1+9(-1)^j/10]\,\bm S_j\cdot\bm S_{j+1}$
+              & $L\ge2$ cells                                                                                            & $0.5288$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/SpinOneDimerized.html\#CertifiedGaps.SpinOneDimerized.gap}                        & $1.763$               \\
+        Single-ion anisotropy, $S=1$
+              & $\sum_j\bm S_j\cdot\bm S_{j+1}+4\sum_j(S_j^z)^2$
+              & $L\ge12$ sites                                                                                           & $0.8994$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/SpinOneLargeD.html\#CertifiedGaps.SpinOneLargeD.gap}                              & $2.269$               \\
+        Heisenberg ladder, \mbox{$S=\tfrac12$}
+              & $\sum_{j,a=1,2}\bm S_{j,a}\cdot\bm S_{j+1,a}
+                    +4\sum_j\bm S_{j,1}\cdot\bm S_{j,2}$
+              & $L\ge4$ rungs                                                                                            & $1.1024$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/HeisenbergLadderPhysical.html\#CertifiedGaps.HeisenbergLadder.physical_gap}       & $3.138$               \\
+        Ising ladder
+              & $-\sum_{j,a}\sigma^z_{j,a}\sigma^z_{j+1,a}-\sum_j\sigma^z_{j,1}\sigma^z_{j,2}-3\sum_{j,a}\sigma^x_{j,a}$
+              & $L\ge4$ rungs                                                                                            & $0.6368$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/TwoLegIsing.html\#CertifiedGaps.TwoLegIsing.gap}                                  & $2.662$               \\
+        Mixed-field Ising
+              & $-\sum_j\sigma_j^z\sigma_{j+1}^z
+                    -\tfrac14\sum_j\sigma_j^x-\tfrac1{20}\sum_j\sigma_j^z$
+              & $L\ge6$ sites                                                                                            & $0.3922$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/IsingLongitudinal.html\#Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_20}        & $1.190$               \\
+        Heisenberg, $S=1$
+              & $\sum_j\bm S_j\cdot\bm S_{j+1}$
+              & $L\ge36$ sites                                                                                           & $0.0729$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/SpinOneHeisenberg.html\#Leaderboard.Records.SpinOneHeisenberg.temperature_lifting} & $0.410$               \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+\paragraph{Step 5: Polynomial upper bounds on the remaining spectrum.}
+To bound $\widehat Z_{n_0}(\beta_0)$ and $\widehat Z_{2n_0}(\beta_0)$
+from above, we bound the remaining eigenvalues in each sector
+$\mathcal S\in\{J,N\}$ using a nonnegative polynomial
+$F(x)=\sum_{j=4}^{12}f_jx^j$:
+\begin{equation*}
+    F(\lambda_i)\le\sum_{a\in\mathcal S}F(\lambda_a)
+    =\sum_{j=4}^{12}f_j\mathcal S_j\le B,
+    \qquad i\in\mathcal S.
+\end{equation*}
+No eigenvalue in $\mathcal S$ lies where $F(x)>B$~(\filterglyph).
+Two degree-$12$ polynomials rule out $|\lambda|\ge U=1.00139$ in $J$
+and $|\lambda|\ge V=0.872$ in $N$ (Sec.~\ref{cert:sec:filters} of
+Ref.~\cite{SM}).
+
+Removing $\lambda_0^{12}>\ell^{12}$ leaves twelfth moment at most
+$m_J-\ell^{12}$ in $J$, while convexity with upper bound $V^{12}$
+($V^{12}<m_N<2V^{12}$) bounds each $N$ sector by one entry at $V^{12}$
+and the remainder $m_N-V^{12}$ (\capbars{1,.44}{1}). For
+$k\in\{n_0,2n_0\}$, the subleading sum $\sum_{i\ne0}\lambda_i^k$ is at
+most
+\begin{equation*}
+    R_k=(m_J-\ell^{12})^{k/12}+3\bigl[V^k+(m_N-V^{12})^{k/12}\bigr].
+\end{equation*}
+Bounding each numerator of Eq.~\eqref{seed:ratios} below by its leading
+term and each denominator above by its leading term
+($|\lambda_0|^{n_0}>\ell^{n_0}$ and $U^{2n_0}$) plus $R_k$ gives%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Seed/Ring.html\#CertifiedGaps.RPRing.seeds_of_certificate}
+\begin{align*}
+    \Ps(n_0,\beta_0)  & \ge\bigl[1+R_{n_0}/\ell^{n_0}\bigr]^{-2},\notag \\
+    \Pt(2n_0,\beta_0) & \ge\bigl[U^{2n_0}+R_{2n_0}\bigr]^{-2};
+\end{align*}
+exact rational evaluation at $(36,72)$ returns the two bounds of
+Lemma~\ref{lem:arxiv-seed36}.
+
+Because Boltzmann weights $z_i>0$ satisfy
+$\sum_i z_i^r\le(\sum_i z_i)^r$ for $r>1$, short-ring trace bounds at
+$\beta_0$ also bound the moments at $r\beta_0$. Whereas
+Ref.~\cite{OpenAI2026Periodic} lifted a separate $n\le10$ table at
+$\beta_0'=21/2$ by $r=5/2$ to get $\Delta_L\gtrsim4.79\times10^{-4}$ for
+$L\ge60$, lifting the stronger $\beta_0=49/4$ ($n\le12$) table by
+$r=17/8$ with a $120$-site trial state and tighter polynomial bounds
+$U,V$ certifies $(p_0,q_0)=(0.0306,0.0480)$ at $n_0=60$%
+Ten steps of Eq.~\eqref{eq:core-update} and bridging $36\le L\le72$
+from $(36,\beta_0)$ then prove $\Delta_L>0.0729$ for all even
+$L\ge36$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/SpinOneHeisenberg.html\#Leaderboard.Records.SpinOneHeisenberg.temperature_lifting}
+(Sec.~\ref{cert:sec:lifting} of Ref.~\cite{SM}).
+
+
+\emph{Reflection-positive models.---}
+The spatial Gram factorization~\eqref{eq:core-gram} relies on
+locality and bond reflection positivity~\cite{Frohlich1978Phase,Jaffe2016Characterization},
+not on $\mathrm{SU}(2)$ symmetry. Consider a periodic ring of $L\ge2$
+unit cells with Hamiltonian $H_L=\sum_{j=1}^L h_{j,j+1}+\sum_{j=1}^L o_j$
+($j+L\equiv j$), where $h$ couples neighboring cells and $o$ acts within a cell.
+Suppose in some local spin basis there is a real symmetric involution
+$F$ ($F^2=I$, such as dimer spin exchange) for which $o$ is real
+symmetric with $FoF=o$ and
+\begin{equation*}
+ -h=\sum_\alpha C_\alpha\otimes FC_\alpha F,\qquad\scopebond,
+\end{equation*}
+with each $C_\alpha$ real symmetric or antisymmetric and the mirror
+(dashed) between cells. Conjugating odd cells by $F$ gives both
+sublattices the same trace matrix $\mathcal F$, so the Gram
+form~\eqref{eq:core-gram} and the doubling recurrence apply unchanged
+(Sec.~\ref{sm:sec:transfer} of Ref.~\cite{SM}).
+
+A convergent seed at even $n_0$ then certifies a unique ground state
+and a uniform gap for all even $L\ge n_0$ by applying
+Eq.~\eqref{eq:core-interpolation} on each dyadic interval $[2^j n_0,2^{j+1}n_0]$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.gapGT_of_chainCertificate}.
+Table~\ref{tab:models} applies this theorem to staggered-field
+chains~\cite{Oshikawa1997Field}, bond-alternating
+chains~\cite{Barnes1999Alternating,Yamamoto1995Elementary}, chains
+with single-ion anisotropy~\cite{Chen2003Ground}, Heisenberg
+ladders~\cite{Dagotto1996Surprises}, and Ising models, with finite
+seeds certified from verified short-ring spectra or exact matrix
+arithmetic (Sec.~\ref{sm:sec:models} of Ref.~\cite{SM}).
+
+\emph{Formal verification.---}
+References~\cite{OpenAI2026Periodic,OpenAI2026Boundaryfield} were not
+accompanied by a Lean proof, and formalizing their continuous-time
+kernel directly would require path-space trace identities not yet in
+Mathlib. Our finite Gram matrix~\eqref{eq:core-gram} and
+fixed-$(L,\beta)$ limit~\eqref{eq:core-two-readings} instead reduce
+the spatial inequalities to finite-dimensional matrix algebra%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.spatialMomentBounds}
+and yield a general reflection-positive gap theorem in
+\href{https://github.com/LionSR/CertifiedGaps}{Lean~4}~\cite{Moura2021Lean,Lu2026CertifiedGaps,Lu2026Blueprint}
+(Sec.~\ref{sm:sec:blueprint} of Ref.~\cite{SM}; each
+$\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html}$
+links to a Lean theorem).
+
+A computer-assisted proof also relies on finite seed computations that
+are too large for direct diagonalization inside a proof-assistant
+kernel. Separating the universal doubling theorem from the finite seed
+lets the formalization work at two levels: taking certified seed bounds
+as hypotheses instantiates all eight models in Table~\ref{tab:models},
+whereas reducing the seed to exact integer identities lets the Lean
+kernel verify the finite arithmetic itself—proving the mixed-field
+Ising gap unconditionally%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Ising/Seed.html\#SeedKernel.Ising.ising_gap}
+(Sec.~\ref{models:sec:ising} of Ref.~\cite{SM}) and checking the
+spin-1 trial states and shortest ring traces so that only the
+remaining short-ring trace bounds enter as hypotheses%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Heisenberg/Integers.html\#CertifiedGaps.SpinOneHeisenberg.gap_of_hornerTotalsLarge}.
+
+\emph{Discussion.---}
+Beyond periodic rings, the same diagrammatic method extends to open
+spin-1 chains with endpoint magnetic
+fields~\cite{OpenAI2026Boundaryfield}: replacing the spatial trace by
+boundary vectors and tracking their overlap (\overlapglyph) with the
+leading spatial eigenvector gives a diagrammatic proof and Lean
+formalization that sharpen the gap bound to $\Delta_n>0.01556$ for all
+odd $n\ge1921$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/OpenChain.html\#CertifiedGaps.SpinOneHeisenberg.gapGT_of_boundaryFieldInputs_sharp}
+(Sec.~\ref{sm:sec:obc} of Ref.~\cite{SM}). More broadly, as
+machine-assisted proofs become more common, raw proofs are often hard
+to understand, generalize, or formalize directly; verifying the finite
+inputs first, digesting the argument into a transparent mechanism, and
+only then formalizing the general theorem turns a raw proof into
+sharper bounds, new certified models, and a reusable formal library.
+
+% A natural next target in one dimension is the spin-2 Heisenberg
+% chain, whose smaller gap and longer correlation length push the seed
+% scale to larger rings and lower temperatures~\cite{Todo2001Cluster}.
+In two dimensions, a spacetime cube identity couples two spatial
+purities with the thermal purity when both lattice directions are
+reflection positive~\cite{Lu2026CertifiedGaps}; for the honeycomb AKLT
+model~\cite{Affleck1987Rigorous,Lemm2020Existence,Pomata2020Demonstrating},
+the spin-$3/2$ bond projector violates standard reflection positivity,
+leaving spatial gluing open.
+
+Finally, uniform gap bounds supply the hypothesis of correlation-decay
+and entanglement area-law theorems in one and two
+dimensions~\cite{Hastings2006Spectral,Hastings2007Area,Arad2013Area,OpenAI2026Twodimensional,OpenAI2026Polynomial},
+whose proofs have also been formalized in
+Lean~\cite{Lu2026Multiagent,Lu2026TNLean}. Checking the remaining
+spin-1 short-ring trace recursions in the kernel motivates verified
+numerical linear algebra in the proof assistant.

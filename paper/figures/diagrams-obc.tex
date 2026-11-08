@@ -1,0 +1,255 @@
+% Diagrams for the open-chain section of the Supplemental Material.
+% All coordinates in tn pictures are in em; standalone pictures use cm.
+
+% Folded contraction: the upper row is a ket, the lower row its adjoint,
+% so the contraction is a squared norm (from thermal-mpo-gap-note.tex).
+\newcommand{\folded}[1]{\tikz[tn,tn centered]{
+ \begin{scope}[yshift=.8em]\tnchainpath[capr=v_j,name=u]{#1}\end{scope}
+ \begin{scope}[yshift=-.8em]\tnchainpath[capr=\bar v_j,name=d]{#1}\end{scope}
+ \draw[rounded corners=3pt] (u-L)--++(-.35em,0)|-(d-L);}}
+
+% A middle operator of norm at most one lets Cauchy-Schwarz bound an open
+% signed contraction by the squared norm of its caps, which is the folded
+% even-length pair: |<ybar| R^{n-M} U_P |y>| <= ||y||^2. Use in math mode.
+\newcommand{\schwarzfold}{\left|\,\tikz[tn,tn centered]{
+  \tnchainpath[node=sym,capl={\bar y},capr={y},name=m]{R_j^{n-M}U_P}
+  \node[arxiv note,font=\scriptsize,anchor=south,inner sep=1.5pt] at (m-1.north)
+   {$\|\cdot\|\le1$};}\,\right|
+ \le\folded{R_j^{M/2}}}
+
+% \cancelled[color]{glyph}: a term struck through because it cancels.
+\newcommand{\cancelled}[2][black!60]{\tikz[baseline=(n.base)]{
+ \node[inner sep=1pt] (n) {#2};
+ \draw[#1,line width=.7pt] ([xshift=1pt]n.south west)--([xshift=-1pt]n.north east);}}
+
+% The three tracked contractions: ring purity, boundary overlap, thermal purity.
+\newcommand{\obcring}{\tnchain[node=xvertex,ring]{,\cdots,}}
+\newcommand{\obcends}{\tnchain[capl={\bar v},capr={v}]{\Pi}}
+\newcommand{\obcthermal}{\tncolumn[ring]{\rho^{\opp},\rho^{\opp}}}
+
+% Boundary caps as z-events on the end worldlines (grey: boundary objects):
+% each event is a rung from the cap to the end site at its time. The conjugated left cap weights each
+% event by -ih and the plain right cap by +ih, so the two endpoint fields are
+% opposite; with #1=1 the rotation U_P on the right cap negates its events
+% and the fields become equal.
+\newcommand{\capfields}[1]{\tikz[tn,tn centered,font=\scriptsize]{
+ \draw[phys] (0,-1.8)--(0,1.8);
+ \draw[phys] (6.4,-1.8)--(6.4,1.8);
+ \node[anchor=south,inner sep=2pt] at (0,1.8) {site $1$};
+ \node[anchor=south,inner sep=2pt] at (6.4,1.8) {site $n$};
+ \draw[mpored] (0,-.1)--(1.6,-.1); \draw[mpored] (4.8,.3)--(6.4,.3);
+ \node[xvertex] at (0,-.1) {}; \node[xvertex] at (6.4,.3) {};
+ \foreach \d in {-.3,0,.3}{\fill (3.2+\d,.1) circle[radius=.06];}
+ % left cap: conjugated, events weighted by -ih
+ \node[bvec,label=left:{$\bar v_\beta$}] (l) at (-3,0) {};
+ \draw[arxiv boundary] (l)--(0,1); \draw[arxiv boundary] (l)--(0,-1);
+ \fill[arxiv leading weight] (0,1) circle[radius=.12]; \fill[arxiv leading weight] (0,-1) circle[radius=.12];
+ \node[anchor=south east,inner sep=1pt,arxiv note] at (-.2,1.08) {$-ih\,G_z$};
+ \node[anchor=north east,inner sep=1pt,arxiv note] at (-.2,-1.08) {$-ih\,G_z$};
+ % right cap: plain (or rotated by U_P), events weighted by +ih (or -ih)
+ \ifnum#1=1
+  \node[sym,label=right:{$U_Pv_\beta$}] (r) at (9.4,0) {$U_P$};
+  \def\rsign{-}
+ \else
+  \node[bvec,label=right:{$v_\beta$}] (r) at (9.4,0) {};
+  \def\rsign{+}
+ \fi
+ \draw[arxiv boundary] (6.4,1)--(r); \draw[arxiv boundary] (6.4,-1)--(r);
+ \fill[arxiv leading weight] (6.4,1) circle[radius=.12]; \fill[arxiv leading weight] (6.4,-1) circle[radius=.12];
+ \node[anchor=south west,inner sep=1pt,arxiv note] at (6.6,1.08) {$\rsign ih\,G_z$};
+ \node[anchor=north west,inner sep=1pt,arxiv note] at (6.6,-1.08) {$\rsign ih\,G_z$};
+ % the field each end contributes to the Hamiltonian
+ \node[anchor=north,inner sep=2pt] at (0,-1.8) {$-hS_1^z$};
+ \node[anchor=north,inner sep=2pt] at (6.4,-1.8) {$\rsign hS_n^z$};}}
+
+% The local tensor is one site worldline with an event at every bond rung,
+% and the time ordering runs over both bonds together: the product follows
+% the interleaved times, not the side, so the traced kernel is symmetric,
+% X_beta(a,b) = X_beta(b,a). Display figure (open chains, local tensor).
+\newcommand{\worldlinekernel}{\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ % imaginary time runs upward along the worldline
+ \draw[arxiv thermal flow] (-.6,.1)--(-.6,1.9) node[above,inner sep=1pt] {$\tau$};
+ % the open worldline of W (left) and its physical trace X (right)
+ \foreach \x/\closed in {1.3/0,5.5/1}{
+  \draw[phys] (\x,0)--(\x,2);
+  \ifnum\closed=1
+   \draw[phys,ring] (\x,2)--(\x,2.3)--(\x+.8,2.3)--(\x+.8,-.3)--(\x,-.3)--(\x,0);
+  \else
+   \node[anchor=south,inner sep=2pt] at (\x,2) {$\langle s|$};
+   \node[anchor=north,inner sep=2pt] at (\x,0) {$|s'\rangle$};
+  \fi
+  % rungs: a enters from the left at tau_1 and tau_3, b from the right at tau_2
+  \foreach \y/\s/\g/\a in {.5/-1/G_x/south west,1/1/G_z/south east,1.5/-1/G_y/south west}{
+   \draw[arxiv bond] (\x,\y)--({\x+\s*1.2},\y);
+   \node[xvertex] at (\x,\y) {};
+   \node[anchor=\a,inner sep=1.5pt] at ({\x-\s*.07},\y) {$\g$};}}
+ \node[arxiv note,anchor=east,inner sep=2pt] at (.1,.5) {$\tau_1$};
+ \node[arxiv note,anchor=west,inner sep=2pt] at (2.5,1) {$\tau_2$};
+ \node[arxiv note,anchor=east,inner sep=2pt] at (.1,1.5) {$\tau_3$};
+ \node[text=mpored,anchor=south,inner sep=1.5pt] at (.6,1.5) {$a$};
+ \node[text=mpored,anchor=south,inner sep=1.5pt] at (2.1,1) {$b$};
+ \node[text=mpored,anchor=south,inner sep=1.5pt] at (4.8,1.5) {$a$};
+ \node[text=mpored,anchor=south,inner sep=1.5pt] at (6.55,1) {$b$};
+ \node[anchor=north,inner sep=2pt] at (1.3,-.5)
+  {$W_\beta^{ss'}(a,b)=\langle s|G_yG_zG_x|s'\rangle$};
+ \node[anchor=north,inner sep=2pt] at (5.7,-.5)
+  {$X_\beta(a,b)=\Tr(G_yG_zG_x)$};
+ \draw[arxiv gray flow] (3.1,1)--(3.9,1) node[midway,above,arxiv note] {$\sum_s$};
+\end{tikzpicture}}
+
+% One induction step in the (length, inverse temperature) plane: Step 1
+% (grey, boundary) compares two lengths at the new temperature, Step 2 (red,
+% space) doubles the length at the old temperature using the Step 1 output,
+% Step 3 (blue, time) squares in imaginary time.
+\newcommand{\obcstairs}{\begin{tikzpicture}[x=1cm,y=1cm,
+ every node/.style={arxiv label,inner sep=1pt},
+ ept/.style={circle,draw=black!55,fill=white,inner sep=2pt},
+ tpt/.style={circle,draw=mpoblue,fill=white,inner sep=2pt}]
+ % no grid: the points and the tick labels locate the three moves
+ \foreach \x/\l in {0/{M_j/2},1.4/{M_j},4.2/{2M_j}}{\node[anchor=north] at (\x,-.22) {$\l$};}
+ \node[anchor=east] at (-.35,.2) {$\beta_j$};
+ \node[anchor=east] at (-.35,1.6) {$\beta_{j+1}$};
+ % step 1: both lengths at the new temperature, overlap cancels
+ \draw[black!55,densely dashed,line width=.7pt] (0,1.6)--(1.4,1.6);
+ \draw[arxiv gray flow] (0,.12)--(0,1.48);
+ \draw[arxiv gray flow] (1.4,.12)--(1.4,1.48);
+ \node[lanemv] at (.7,1.05) {1};
+ % step 2: double the length at the old temperature
+ \draw[flow,mpored] (1.55,0)--(4.05,0);
+ \node[lanemv] at (2.8,.42) {2};
+ \draw[laneuse] (1.4,1.45)--(2.6,.55);
+ % step 3: square in imaginary time
+ \draw[flow,mpoblue] (4.2,.12)--(4.2,1.48);
+ \node[lanemv] at (4.2,.8) {3};
+ % points
+ \node[ept] at (0,0) {}; \node[tpt] at (1.4,0) {};
+ \node[ept] at (1.4,1.6) {}; \node[tpt] at (4.2,1.6) {};
+ \node[ept,draw=black!25,fill=white] at (0,1.6) {};
+ \node[anchor=south west,inner sep=2pt] at (.1,.1) {$e_{M_j/2}(j)$};
+ \node[anchor=north,inner sep=2pt,text=mpoblue] at (2.8,-.06) {$\Pt^{\opp}(M_j,\beta_j)$};
+ \node[anchor=south,inner sep=3pt] at (.7,1.66) {$e_{M_j}(j+1)$};
+ \node[anchor=south,inner sep=3pt,text=mpoblue] at (4.2,1.66) {$\Pt^{\opp}(2M_j,\beta_{j+1})$};
+ % what each move proves, keyed by its number: the step is these three bounds
+ \begin{scope}[shift={(6.1,0)},every node/.style={arxiv label,inner sep=1pt,anchor=west}]
+  \node[lanemv,anchor=center] at (0,1.6) {1};
+  \node at (.3,1.6) {$e_{M_j}(j+1)\le\dfrac{q}{1-q}\Bigl[\dfrac{1}{(1-e_{M_j/2}(j))^2\,\Pt^{\opp}(M_j,\beta_j)}-1\Bigr]$,\quad $q\ge\|R_{j+1}\|^{M_j/2}$};
+  \node[lanemv,anchor=center] at (0,.8) {2};
+  \node at (.3,.8) {$\Pt^{\opp}(2M_j,\beta_j)\ge r_j^{M_j}\,[1-e_{M_j}(j+1)]\,\Pt^{\opp}(M_j,\beta_j)$};
+  \node[lanemv,anchor=center] at (0,0) {3};
+  \node at (.3,0) {$1-\Pt^{\opp}(2M_j,\beta_{j+1})\le f\bigl(1-\Pt^{\opp}(2M_j,\beta_j)\bigr)$};
+ \end{scope}
+\end{tikzpicture}}
+
+% The length ladder of the open-chain scales: ring length n_j (red), open
+% length M_j = 2 n_j (grey), and the defect length k_j (tick), to a common
+% scale so that k_j = M_j/2 for j >= 3 and n_{j+1} = M_j are visible.
+\newcommand{\obcscales}{\begin{tikzpicture}[x=.33cm,y=1.3cm,
+ every node/.style={arxiv label,inner sep=1pt}]
+ \foreach \j/\y/\b/\M/\k/\ks in {2/0/49/2/{1.1833}/142,3/-1/98/4/2/240,4/-2/196/8/4/480,5/-3/392/16/8/960}{
+  \node[anchor=east] at (-1.2,\y) {$j=\j$};
+  \node[anchor=east,arxiv note] at (-4.2,\y) {$\beta_j=\b$};
+  \draw[black!25,line width=2.4pt] (0,\y)--(\M,\y);
+  \pgfmathsetmacro\n{\M/2}
+  \draw[mpored,line width=2.4pt] (0,\y)--(\n,\y);
+  \draw[black!70,line width=.7pt] (\k,\y-.2)--(\k,\y+.2);
+  \pgfmathtruncatemacro\Msites{\M*120}
+  \pgfmathtruncatemacro\nsites{\M*60}
+  \node[anchor=west,arxiv note] at (\M+.3,\y) {$M_j=\Msites$};
+  \node[anchor=south] at (\k,\y+.2) {$k_j=\ks$};
+  \node[anchor=north west,text=mpored] at (0,\y-.22) {$n_j=\nsites$};}
+\end{tikzpicture}}
+
+% The three open-chain defects over the initialization steps j=2..5 on a
+% logarithmic scale: boundary defect E_j (grey), thermal defect eta_j (blue),
+% ring defect eps_j (red), and the 0.01 threshold of the induction (teal).
+\newcommand{\obcladder}{\begin{tikzpicture}[x=1.4cm,y=.78cm,font=\footnotesize]
+ \def\Es{-.854,-.921,-1.796,-3}
+ \def\etas{-.678,-.810,-1.585,-3}
+ \def\epss{-1.284,-1.790,-2.801,-4.825}
+ \draw[arxiv cert guide] (0,-2)--(3,-2)
+  node[right,tncert] {$x_5=10^{-2}$};
+ \foreach \v [count=\i from 0] in \Es{\ifnum\i>0 \draw[arxiv series,black!55] ({\i-1},\El)--(\i,\v);\fi
+  \fill[arxiv leading weight] (\i,\v) circle[radius=1.3pt]; \xdef\El{\v}}
+ \foreach \v [count=\i from 0] in \etas{\ifnum\i>0 \draw[arxiv series,mpoblue] ({\i-1},\etal)--(\i,\v);\fi
+  \fill[mpoblue] (\i,\v) circle[radius=1.3pt]; \xdef\etal{\v}}
+ \foreach \v [count=\i from 0] in \epss{\ifnum\i>0 \draw[arxiv series,mpored] ({\i-1},\epsl)--(\i,\v);\fi
+  \fill[mpored] (\i,\v) circle[radius=1.3pt]; \xdef\epsl{\v}}
+ \node[mpoblue,anchor=west] at (3.08,-2.7) {$\eta_j$ (thermal)};
+ \node[arxiv boundary,anchor=west] at (3.08,-3.32) {$E_j$ (boundary)};
+ \node[mpored,anchor=west] at (3.08,-4.825) {$\varepsilon_j$ (ring)};
+ \foreach \j [count=\i from 0] in {2,3,4,5}{\node[arxiv note] at (\i,-5.3) {$\j$};}
+ \foreach \m [count=\i from 0] in {240,480,960,1920}{\node[arxiv note] at (\i,-5.72) {$\m$};}
+ \foreach \b [count=\i from 0] in {49,98,196,392}{\node[arxiv note] at (\i,-6.14) {$\b$};}
+ \node[arxiv note,anchor=east] at (-.25,-5.3) {$j$};
+ \node[arxiv note,anchor=east] at (-.25,-5.72) {$M_j$};
+ \node[arxiv note,anchor=east] at (-.25,-6.14) {$\beta_j$};
+\end{tikzpicture}}
+
+% Odd lengths covered by the length intervals [M_j, 2M_j] (red: space),
+% j >= 5, on a log_2 axis; the target odd length is teal (conclusion).
+\newcommand{\oddcoverage}{\begin{tikzpicture}[x=1.5cm,y=1cm,font=\footnotesize]
+ \draw[arxiv axis line] (-.3,0)--(3.6,0);
+ \foreach \x/\l in {0/1920,1/3840,2/7680,3/15360}{
+  \draw[arxiv axis line] (\x,-.08)--(\x,.08);
+  \node[arxiv note,anchor=north] at (\x,-.1) {$\l$};}
+ \foreach \x/\j/\y in {0/5/.6,1/6/.9,2/7/1.2}{
+  \draw[mpored,line width=1pt] (\x+.03,\y)--(\x+.97,\y);
+  \node[mpored,anchor=west] at (\x+1.03,\y) {$[M_\j,2M_\j]$ at $\beta_\j$};}
+ \fill[tncert] (.0075,0) circle[radius=1.3pt];
+ \node[tncert,anchor=south west] at (.03,.06) {$n=1921$, first odd length};
+ \node[arxiv note,anchor=west] at (3.65,0) {$n$};
+\end{tikzpicture}}
+
+% One scale of the periodic argument at the open-chain scales, read left to
+% right: the two identities (grey) and the two squarings (red: space, blue:
+% time) carry the ring defect eps to 6 eps^2 at (n_{j+1}, beta_{j+1}).
+\newcommand{\ringsteps}{\begin{tikzpicture}[x=1cm,y=1cm]
+ % the thermal lane is staggered one column to the right, so that each
+ % use arrow (the other lane's bound entering an identity) is a short diagonal
+ \node[lane s] (s0) at (0,1.05) {$\Ps(n_j,\beta_j)\ge1-\varepsilon$};
+ \node[lane so] (s1) at (4.5,1.05) {$\Ps(n_j,2\beta_j)\ge(1-\varepsilon)^3$};
+ \node[lane s] (s2) at (9,1.05) {$\Ps(2n_j,2\beta_j)\ge1-6\varepsilon^2$};
+ \node[lane t] (t0) at (4.5,0) {$\Pt(2n_j,\beta_j)\ge1-\varepsilon$};
+ \node[lane to] (t1) at (9,0) {$\Pt(4n_j,\beta_j)\ge(1-\varepsilon)^2(1-6\varepsilon^2)$};
+ \node[lane t] (t2) at (13.5,0) {$\Pt(4n_j,2\beta_j)\ge1-6\varepsilon^2$};
+ \node[lanemv] (m1) at ($(s0.east)!.5!(s1.west)$) {1};
+ \node[lanemv] (m2) at ($(s1.east)!.5!(s2.west)$) {2};
+ \node[lanemv] (m3) at ($(t0.east)!.5!(t1.west)$) {3};
+ \node[lanemv] (m4) at ($(t1.east)!.5!(t2.west)$) {4};
+ \draw[black!55,line width=.45pt] (s0)--(m1); \draw[arxiv gray flow] (m1)--(s1);
+ \draw[arxiv bond] (s1)--(m2); \draw[flow,mpored] (m2)--(s2);
+ \draw[black!55,line width=.45pt] (t0)--(m3); \draw[arxiv gray flow] (m3)--(t1);
+ \draw[mpoblue,line width=.45pt] (t1)--(m4); \draw[flow,mpoblue] (m4)--(t2);
+ \draw[laneuse,shorten <=1pt,shorten >=.5pt] (t0.north west)--(m1);
+ \draw[laneuse,shorten <=1pt,shorten >=.5pt] (s2.south west)--(m3);
+ \node[maprule,anchor=south] at (m1.north) {identity};
+ \node[maprule,anchor=south] at (m2.north) {square};
+ \node[maprule,anchor=north] at (m3.south) {identity};
+ \node[maprule,anchor=north] at (m4.south) {square};
+\end{tikzpicture}}
+
+% Two capped MPO rows at beta_j stacked in imaginary time (\obcstack) equal
+% one capped row at beta_{j+1}=2 beta_j (\obcstackdouble): the boundary
+% vectors are part of the operator, so squaring the open-chain Gibbs
+% operator is exact, and the doubled row carries the vectors v_{beta_{j+1}}.
+\newcommand{\obcstack}{\tikz[tn,tn centered]{
+ \begin{scope}[yshift=.95em]
+  \tnchainpath[node=mpo,legs=.95em,caps,name=u]{W_{\beta_j},\cdots,W_{\beta_j}}\end{scope}
+ \begin{scope}[yshift=-.95em]
+  \tnchainpath[node=mpo,legs=.95em,caps,name=d]{W_{\beta_j},\cdots,W_{\beta_j}}\end{scope}
+ \node[anchor=south,inner sep=2pt] at ([yshift=.2em]u-L) {$\bar v_j$};
+ \node[anchor=south,inner sep=2pt] at ([yshift=.2em]u-R) {$v_j$};
+ \node[anchor=north,inner sep=2pt] at ([yshift=-.2em]d-L) {$\bar v_j$};
+ \node[anchor=north,inner sep=2pt] at ([yshift=-.2em]d-R) {$v_j$};}}
+\newcommand{\obcstackdouble}{\tnchain[node=mpo,legs=1.9em,
+ item={minimum height=1.3em},capl={\bar v_{j+1}},capr={v_{j+1}}]
+ {W_{\beta_{j+1}},\cdots,W_{\beta_{j+1}}}}
+
+% A purity above 1-eps forces the largest weight p_0 (black!55) above the
+% dashed half line; the tail z=1-p_0 (black!25) is below 1/2.
+\newcommand{\dominantglyph}{\tikz[baseline=0pt,x=.34em,y=1.1em]{
+ \fill[arxiv leading weight] (0,0) rectangle ++(.78,.9);
+ \fill[arxiv remainder weight] (1,0) rectangle ++(.78,.07);
+ \fill[arxiv remainder weight] (2,0) rectangle ++(.78,.04);
+ \draw[arxiv baseline] (-.2,0)--(3,0);
+ \draw[arxiv guide] (-.2,.5)--(3,.5);}}

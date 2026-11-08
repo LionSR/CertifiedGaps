@@ -1,0 +1,795 @@
+
+\subsection{Open-chain gap theorem and boundary remainder}
+\label{obc:setup}
+
+We extend the diagrammatic doubling argument from periodic rings
+to open chains with endpoint magnetic fields. Consider the spin-1
+Heisenberg chain with equal endpoint fields (\fieldsame),
+\begin{equation}
+    H_n^{\same}
+    =\sum_{i=1}^{n-1}\bm S_i\cdot\bm S_{i+1}
+    -h(S_1^z+S_n^z),\qquad h=\frac35,
+    \label{obc:model}
+\end{equation}
+where $\sum_\alpha(S^\alpha)^2=2I$ and the exchange coupling is one.
+We give a diagrammatic proof of the following theorem from
+Ref.~\cite{OpenAI2026Boundaryfield}, using its certified finite inputs.
+
+\begin{theorem}[Boundary-field gap~\cite{OpenAI2026Boundaryfield}%
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/OpenChain.html\#CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap}]
+    \label{obc:theorem}
+    For every odd $n\ge1921$, $H_n^{\same}$ has a unique ground state and
+    \[
+        \Delta_n>\frac{\log 10}{392}\simeq0.005874.
+    \]
+\end{theorem}
+\noindent The two constants come from three doublings of the certified
+seed $(M_2,\beta_2)=(240,49)$; scale $5$ is the first at which every
+tracked bound is below $10^{-2}$:
+\[
+    M_5=2^3\cdot240=1920,\qquad \beta_5=2^3\cdot49=392,\qquad
+    n\ge M_5+1=1921.
+\]
+
+Without the endpoint fields, the effective spin-$1/2$ modes at the
+two ends produce four low-lying states whose splitting is exponentially
+small in the chain length~\cite{Kennedy1990Exact}. Applying equal fields on an odd chain lifts this
+boundary degeneracy~\cite{OpenAI2026Boundaryfield}.
+
+Our strategy is to bound the thermal purity of the open chain at a
+scale $\beta$ proportional to the length, just as in the periodic
+argument. Order the Gibbs weights of $H_n^{\same}$ as $w_0\ge w_1\ge\cdots$.
+The thermal purity $\Pt^{\same}(n,\beta)=\sum_m w_m^2$ then bounds the
+leading weight and the gap:
+\begin{equation}
+    w_0\ge\Pt^{\same}(n,\beta),\qquad
+    e^{-\beta\Delta_n}
+    \le\frac{1-\Pt^{\same}(n,\beta)}{\Pt^{\same}(n,\beta)},\qquad
+    \Delta_n=E_1(n)-E_0(n).
+    \label{obc:target}
+\end{equation}
+A thermal purity above $1/2$ forces a unique ground state and bounds the
+gap from below. What changes in the open-chain setting is how we
+propagate the thermal purity across doubled lengths and inverse
+temperatures.
+
+To see where the new difficulty enters, consider the spatial transfer
+operator at a fixed temperature. Suppose that $X_\beta$ has a simple
+positive leading eigenvalue $\lambda$ (\specbars[mpored]{.9,.06,.04}), and
+write the normalized transfer operator as
+\begin{equation}
+    T:=X_\beta/\lambda=\Pi+R,\qquad
+    \Pi=\ket{\psi}\bra{\psi},\qquad
+    \Pi R=R\Pi=0,\quad \|\psi\|=1.
+    \label{obc:split}
+\end{equation}
+In a periodic ring, the trace weights the leading projector $\Pi$ by one.
+In an open chain, the chain ends are contracted with boundary vectors,
+so the leading contribution is weighted instead by how much of $v$ lies
+along $\psi$ (\overlapglyph):
+\begin{equation}
+    \underbrace{\tnchain[ring]{\Pi}}_{\trv\Pi=1},
+    \qquad
+    \underbrace{\tnchain[capl=\bar v,capr=v]{\Pi}}_
+    {c=|\langle\psi,v\rangle|^2}.
+    \label{obc:leading-diagram}
+\end{equation}
+Because $c$ is not fixed by normalization and could a priori vanish,
+squaring in space no longer closes on its own. With $T$ self-adjoint, the
+same boundary vector at both ends, and an even length $m$, the remainder of the
+normalized boundary matrix element is a squared norm, hence nonnegative:
+\begin{align}
+    B_m
+        &=\tnchain[capl=\bar v,capr=v]{T^m}\notag\\
+        &=\tnchain[capl=\bar v,capr=v]{\Pi}
+    +\tnchain[capl=\bar v,capr=v]{R^m}
+    =c+D_m,\notag\\
+    D_m &=\|R^{m/2}v\|^2\ge0.
+    \label{obc:boundary-split}
+\end{align}
+To show that the leading eigenvector dominates $B_m$, we bound the
+remainder's share of $B_m$ rather than the remainder itself,
+\begin{equation}
+    e_m:=\frac{D_m}{B_m}=1-\frac{c}{B_m},
+    \label{obc:defect}
+\end{equation}
+the grey fraction of \stackbar{.14} at the certified seed value
+$e_{142}\le.14$ of Eq.~\eqref{obc:seeds}. Increasing the chain length
+suppresses $D_m$ by powers of $\|R\|$ while leaving $c$ unchanged.
+
+Doubling the inverse temperature changes both $v$ and $\psi$, so $c$
+does not bound the new overlap $c'$; Step~1 (Sec.~\ref{obc:move-one})
+removes $c'$ by comparing two lengths at the new temperature.
+
+The recurrence therefore tracks three contractions at every scale $j$,
+each with its small quantity and its certified seed value:
+\begin{center}
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{@{}clllc@{}}
+        \toprule
+            & contraction                        & tracked quantity                & seed ($j=2$) & controlled in                                  \\
+        \midrule
+        (R) & \obcring\ ring purity              & $\varepsilon_j\ge1-\Ps,\,1-\Pt$ & $.052$       & Sec.~\ref{obc:ring}                            \\
+        (E) & \obcends\ boundary overlap         & $e_{k_j}(j)=D/B$                & $.14$        & Sec.~\ref{obc:move-one}                        \\
+        (T) & \obcthermal\ opposite-field purity & $1-\Pt^{\opp}(M_j,\beta_j)$     & $.21$        & Secs.~\ref{obc:move-two}--\ref{obc:move-three} \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+Section~\ref{obc:caps} constructs the boundary vectors, Sec.~\ref{obc:initialization}
+runs three explicit steps from $j=2$ to $j=5$ and closes the induction,
+and Sec.~\ref{obc:comparison} passes to equal fields and odd lengths.
+
+\subsection{Continuous-time transfer kernel and boundary vectors}
+\label{obc:caps}
+
+We first represent the open-chain partition functions as transfer-operator
+matrix elements using the continuous-time bond expansion of
+Ref.~\cite{OpenAI2026Boundaryfield}, which sums over the times of bond
+insertions rather than placing them on a finite Trotter grid.
+As in the periodic proof (Sec.~\ref{cert:sec:transfer}), we shift the
+Hamiltonian by a constant $\kappa$ per site. The shift is chosen so that $-\kappa$
+lies just above the energy per site of the $72$-site matrix-product
+trial state of Ref.~\cite{OpenAI2026Periodic} ($E_0(72)/72<-\kappa$,
+Sec.~\ref{cert:sec:inputs}):
+\begin{equation}
+    \kappa=\frac{700741}{500000}=1.401482.
+    \label{obc:kappa}
+\end{equation}
+Throughout this section, $Z_n$ and all open-chain partition functions
+include the shift $\kappa nI$. It places the leading transfer eigenvalue
+near one at the seed scales and cancels from every purity and spectral
+gap.
+
+In the Cartesian basis, $G_\alpha=iS^\alpha$ is real antisymmetric and
+\[
+    -\bm S_i\cdot\bm S_{i+1}
+    =\sum_{\alpha=x,y,z}G_{\alpha,i}G_{\alpha,i+1}.
+\]
+Expanding $e^{-\beta H}$ on each bond produces a bond history $a$, an
+ordered list of events $(\tau,\alpha)$ with $0<\tau<\beta$ and
+$\alpha\in\{x,y,z\}$. The bond measure $\mu_\beta$ sums the labels and
+integrates the ordered times, with unit mass on the empty history:
+\[
+    \mu_\beta(\text{all histories})
+    =\sum_{k\ge0}\underbrace{3^k}_{\text{labels}}\,
+    \underbrace{\frac{\beta^k}{k!}}_{0<\tau_1<\cdots<\tau_k<\beta}
+    =e^{3\beta}.
+\]
+Between the left bond history $a$ and the right bond history $b$ of a
+site, the shifted local tensor is
+\begin{equation}
+    W_\beta^{ss'}(a,b)
+    =e^{-\kappa\beta}
+    \bra{s}\mathcal T_\tau
+    \prod_{(\tau,\alpha)\in a\cup b}G_\alpha\ket{s'},
+    \label{obc:local}
+\end{equation}
+where $\mathcal T_\tau$ orders the events of both bonds by time, later
+ones to the left:
+\begin{proofdiagram}
+    \worldlinekernel
+\end{proofdiagram}
+Tracing the physical indices defines the transfer kernel $X_\beta(a,b)$
+on $L^2(\mu_\beta)$. It is real, and symmetric because the product
+follows the times, not the sides.
+
+To represent a boundary field along $z$, we contract the endpoint bond
+history with the boundary vector
+\begin{equation}
+    v_\beta(a)=
+    \begin{cases}
+        (ih)^{|a|}, & \text{all event labels are }z, \\
+        0,          & \text{otherwise},
+    \end{cases}
+    \qquad \|v_\beta\|^2=e^{\beta h^2}.
+    \label{obc:vector}
+\end{equation}
+Its value on the empty history is one, and its norm follows by summing
+$(\beta h^2)^k/k!$ over the number $k$ of $z$ events.
+
+Each event on the boundary bond inserts $G_z=iS^z$ at the end site at
+its time. It enters the time-ordered product like an interior bond
+event, and summing counts and integrating times exponentiates the
+endpoint field. Conjugation reverses the sign of $ih$, so contracting
+with $v_\beta$ at both ends gives the auxiliary opposite-field chain
+\fieldopp\ (left). The $\pi$ rotation $P=\operatorname{diag}(1,-1,-1)$
+about $x$ acts on the right boundary vector as $U_P$; it negates every
+$z$ event there and restores equal fields \fieldsame\ (right):
+\begin{equation}
+    \capfields{0}\qquad\qquad\capfields{1}
+    \label{obc:capfields}
+\end{equation}
+\begin{equation}
+    H_n^{\opp}=H_n^{\same}+2hS_n^z.
+    \label{obc:opposite}
+\end{equation}
+The ring bounds of Sec.~\ref{obc:ring} concern the spectrum of $X_\beta$,
+so both open-chain partition functions must become matrix elements of
+it. In diagram form,
+\begin{align}
+    e^{-\beta(H_n^{\opp}+\kappa nI)} &=\obcW,\notag\\
+    Y_n(\beta)
+    :=\Tr e^{-\beta(H_n^{\opp}+\kappa nI)}
+                                     &=\obccap{X_\beta^n}{v_\beta},\notag\\
+    Y_n^{\same}(\beta)
+    :=\Tr e^{-\beta(H_n^{\same}+\kappa nI)}
+                                     &=\obccap{X_\beta^n}{U_Pv_\beta}.
+    \label{obc:capping}
+\end{align}
+The two end bond histories meet the boundary vectors, and the physical
+trace at every site turns the row of tensors into $X_\beta^n$; the two
+chains differ only by $U_P$ at the right end.
+
+Spin rotations act on bond histories by real orthogonal operators that
+commute with $X_\beta$, so $[U_P,X_\beta]=0$. Contracting the
+time-ordered expansion site by site is exact by Fubini's theorem, since
+$\|G_\alpha\|=1$ bounds the absolutely summed series by
+$3^ne^{3\beta(n-1)+2\beta h}$ before the energy shift.
+
+The recurrence runs on the auxiliary opposite-field chain at even
+length $m$, not on the odd equal-field chain of the theorem. With the
+same boundary vector at both ends, the remainder of $Y_m(\beta)$ is the
+squared norm $D_m\ge0$ of Eq.~\eqref{obc:boundary-split}, on which the
+doubling closes.
+
+\subsection{Bulk ring purities and transfer-operator bounds}
+\label{obc:ring}
+
+The open-chain recurrence of Steps~1--3 needs three facts about the bulk
+transfer operator at every scale $j$. They are a simple positive leading
+eigenvalue that $U_P$ fixes, a decay rate for the remainder across half
+a chain, and the ratio $r_j$ of leading eigenvalues at consecutive
+temperatures. None is certified directly at large $j$, but the periodic
+argument proves ring purity bounds at every scale from one certified
+seed, and this subsection extracts the three facts from those purities.
+The open chain thus borrows its bulk control from the ring; only the
+boundary needs new inputs.
+
+The recurrence runs over the dyadic scales
+\begin{equation}
+    \beta_j=49\,2^{j-2},\qquad n_j=120\,2^{j-2},\qquad
+    M_j=2n_j,\qquad j\ge2,
+    \label{obc:scales}
+\end{equation}
+starting at the certified point $j=2$ of Ref.~\cite{OpenAI2026Boundaryfield}.
+The ring length controls the bulk and the open length carries the
+thermal purity. The boundary ratio $e_k$ is tracked at the certified length
+$142$ first and at the previous open length thereafter,
+\begin{equation}
+    k_2=142,\qquad k_{j+1}=M_j,
+    \label{obc:k}
+\end{equation}
+so $k_j=M_j/2$ for $j\ge3$:
+\begin{proofdiagram}
+    \obcscales
+\end{proofdiagram}
+Ref.~\cite{OpenAI2026Boundaryfield} certifies four inputs at $j=2$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/BoundaryInitTable.html\#CertifiedGaps.SpinOneHeisenberg.BoundaryInit.boundaryDefect_le_of_table}:
+\begin{equation}
+    \renewcommand{\arraystretch}{1.4}
+    \begin{tabular}{@{}llcl@{}}
+        \toprule
+        input                      & controls         & weights                        & bound                       \\
+        \midrule
+        $\Ps(120,49)\ge.948$       & bulk spectrum    & \specbars[mpored]{.95,.03,.02} & $\varepsilon_2=1-.948=.052$ \\
+        $\Pt(240,49)\ge.948$       & bulk spectrum    & \specbars{.95,.03,.02}         & $\varepsilon_2$             \\
+        $e_{142}(2)\le.14$         & boundary overlap & \stackbar{.14}                 & $E_2=.14$                   \\
+        $\Pt^{\opp}(240,49)\ge.79$ & thermal          & \specbars{.79,.13,.08}         & $\eta_2=1-.79=.21$          \\
+        \bottomrule
+    \end{tabular}
+    \label{obc:seeds}
+\end{equation}
+Here $\Ps(n,\beta)=Z_{2n}(\beta)/Z_n(\beta)^2$ and
+$\Pt(n,\beta)=Z_n(2\beta)/Z_n(\beta)^2$ are ring purities, $e_m(j)$ is
+Eq.~\eqref{obc:defect} at $\beta_j$, and
+$\Pt^{\opp}(m,\beta)=Y_m(2\beta)/Y_m(\beta)^2$.
+
+The periodic argument squares $1-\Ps$ and $1-\Pt$ with constant $5$ only
+below the threshold $1/100$, which the seed $\varepsilon_2=.052$
+exceeds; repeating the four-step update with constant $6$ gives
+\begin{equation}
+    \Ps(n_j,\beta_j),\ \Pt(M_j,\beta_j)\ge1-\varepsilon_j,\qquad
+    \varepsilon_2=.052,\qquad
+    \varepsilon_{j+1}=6\varepsilon_j^2.
+    \label{obc:ring-purities}
+\end{equation}
+One scale of the periodic argument, with $\varepsilon=\varepsilon_j$,
+updates the spatial and thermal purities in four moves:
+\begin{proofdiagram}
+    \ringsteps
+\end{proofdiagram}
+Squaring and renormalizing a positive
+trace-one operator of purity $P$ concentrates its weights
+($\specbars[black!55]{.5,.3,.2}\mapsto\specbars[black!55]{.66,.24,.1}$),
+and its new purity $P'$ satisfies
+\begin{equation}
+    1-P'\le f(1-P),\qquad
+    f(z)=\frac{z^2}{2(1-z)^2}.
+    \label{obc:square}
+\end{equation}
+For $0\le\varepsilon\le.052$, Move~2 gives
+\begin{equation}
+    f(1-(1-\varepsilon)^3)
+    =\frac{\varepsilon^2}{2}
+    \left[\sum_{s=1}^3(1-\varepsilon)^{-s}\right]^2
+    \le6\varepsilon^2\le\varepsilon,
+    \label{obc:six}
+\end{equation}
+the bracket being at most $3.35$ at $\varepsilon=.052$, so the prefactor is
+at most $5.6<6$. Since
+$(1-\varepsilon)^2(1-6\varepsilon^2)\ge(1-\varepsilon)^3$, Move~4
+gives the same bound $6\varepsilon^2$, and induction on $j\ge2$ proves
+Eq.~\eqref{obc:ring-purities}.
+
+Write $\lambda_j$ for the leading eigenvalue of $X_{\beta_j}$ and
+$T_j=X_{\beta_j}/\lambda_j=\Pi_j+R_j$ as in Eq.~\eqref{obc:split}. The
+three bulk facts, each with the step that consumes it, are%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Open/Criterion.html\#CertifiedGaps.OpenMomentWitness.mu_pow_ge}
+\begin{align}
+     &\text{(i)}\quad \lambda_j>0\text{ simple},\quad U_P\Pi_j=\Pi_j
+     &                                                                           &\text{overlap $c$ in Step~1 and Sec.~\ref{obc:comparison}},\notag\\
+     &\text{(ii)}\quad \|R_j\|^{n_j}\le d(\varepsilon_j)<1,\quad
+    d(\varepsilon)=\frac{\varepsilon}{2-3\varepsilon}
+     &                                                                           &\text{suppression factor $q$ in Step~1},\notag\\
+     &\text{(iii)}\quad r_j^{M_j}\ge(1-\varepsilon_j)(1-\varepsilon_{j+1}),\quad
+    r_j=\frac{\lambda_{j+1}}{\lambda_j^2}\le1
+     &                                                                           &\text{bulk factor in Step~2 and Sec.~\ref{obc:comparison}}.
+    \label{obc:ring-bounds}
+\end{align}
+
+No transfer eigenvalue is computed, so (i) and (ii) must follow from
+the ring purity alone. A purity at least $1-\varepsilon>1/2$ forces one
+weight $p_0$ above $1/2$ (\dominantglyph), and its tail bounds every
+subleading ratio. The purity is at most $p_0$,
+so the tail $z=1-p_0$ is below $1/2$. The purity is also at most
+$p_0^2+z^2=1-2z(1-z)$, so $2z(1-z)\le\varepsilon$ and
+\[
+    z\le\varepsilon,\qquad
+    z\le\frac{\varepsilon}{2(1-\varepsilon)},\qquad
+    \frac{z}{1-z}\le\frac{\varepsilon}{2(1-\varepsilon)-\varepsilon}=d(\varepsilon).
+\]
+Applying this estimate to the normalized weights
+$p_i=|\lambda_i(\beta_j)|^{n_j}/Z_{n_j}(\beta_j)$ yields the subleading tail bound
+\begin{equation}
+    \sum_{i\ge1}
+    \left|\frac{\lambda_i(\beta_j)}{\lambda_j}\right|^{n_j}
+    \le d(\varepsilon_j).
+    \label{obc:full-tail}
+\end{equation}
+Since $d(\varepsilon_j)<1$, three consequences follow.
+\begin{itemize}
+    \item $\lambda_j$ is simple, and $\|R_j\|^{n_j}\le d(\varepsilon_j)<1$
+          is property (ii).
+    \item $\lambda_j>0$. A negative leading eigenvalue would make
+          $\trv X_{\beta_j}^N<0$ for all large odd $N$, because $X_{\beta_j}$ is
+          Hilbert--Schmidt and the rest of its spectrum has smaller radius;
+          but $Z_N(\beta_j)>0$.
+    \item $U_P\Pi_j=\Pi_j$. The cyclic axis permutation and the three $\pi$
+          rotations commute with the real kernel $X_{\beta_j}$, so each acts by a
+          sign on the leading eigenline. The permutation has order three, so its
+          sign is $+1$. It conjugates the three rotations into one another, so
+          their signs agree; two of them multiply to the third, so the common
+          sign is $+1$.
+\end{itemize}
+
+Property (iii) bounds the bulk factor that Step~2 loses when the
+temperature doubles. The two transfer operators do not commute, so we
+compare both leading eigenvalues with one ring partition function.
+First, $\Pt(N,\beta_j)\le1$ and even $N$th roots as $N\to\infty$
+give $\lambda_{j+1}\le\lambda_j^2$, so $r_j\le1$. At length
+$M_j=n_{j+1}$,
+\begin{align}
+    \lambda_{j+1}^{M_j}
+     &\ge(1-\varepsilon_{j+1})Z_{M_j}(\beta_{j+1})
+     &                                             &\text{leading weight at }\beta_{j+1},\notag\\
+     &\ge(1-\varepsilon_{j+1})(1-\varepsilon_j)
+    Z_{M_j}(\beta_j)^2
+     &                                             &\text{ring thermal purity at }\beta_j,\notag\\
+     &\ge(1-\varepsilon_{j+1})(1-\varepsilon_j)
+    \lambda_j^{2M_j}
+     &                                             &\text{even }M_j\text{: trace}\ge\text{leading term},
+    \label{obc:bulk}
+\end{align}
+and dividing by $\lambda_j^{2M_j}$ proves (iii). The bulk is now
+controlled at every scale; the rest of this section concerns the
+boundary only.
+
+\subsection{One doubling step for the opposite-field chain}
+\label{obc:steps}
+
+Normalizing by $\lambda_j^m$ removes the extensive part of the
+partition function, so the recurrence tracks only the overlap and the
+remainder. At scale $j$, write $v_j=v_{\beta_j}$ and, for even $m\ge2$,
+define the normalized opposite-field partition function, its remainder,
+and the boundary remainder ratio by
+\begin{align}
+    c_j    &=|\langle\psi_j,v_j\rangle|^2,\notag\\
+    B_m(j) &=\frac{Y_m(\beta_j)}{\lambda_j^m}
+    =c_j+D_m(j)>0,\notag\\
+    D_m(j) &=\folded{R_j^{m/2}}=\|R_j^{m/2}v_j\|^2,\qquad
+    e_m(j)=\frac{D_m(j)}{B_m(j)}.
+    \label{obc:normalized}
+\end{align}
+Folding only $R_j^{k/2}$, $k\le m$ even, onto each boundary vector
+leaves $R_j^{m-k}$ in the middle, and the remainder decays
+geometrically with the extra length (\decayglyph[mpored]):
+\begin{equation}
+    D_m(j)
+    =\tnchain[capl={\bar y},capr=y]{R_j^{m-k}}
+    \le\|R_j\|^{m-k}D_k(j),
+    \qquad y=R_j^{k/2}v_j,\quad D_m(j)\ge0.
+    \label{obc:decay}
+\end{equation}
+In particular $c_j\le B_m(j)\le B_k(j)$; Steps~1 and~2 use this
+monotonicity in the length.
+
+Steps~1 and~2 also need the normalized contraction at the doubled
+temperature in terms of quantities at $\beta_j$. Two rows of
+Eq.~\eqref{obc:capping} stacked in imaginary time do not fuse site by
+site, but the full operators multiply:
+\begin{equation}
+    \obcstack=\obcstackdouble.
+    \label{obc:thermal-diagram}
+\end{equation}
+Its trace, normalized by $Y_m(\beta_j)^2$, is the thermal purity
+$\Pt^{\opp}(m,\beta_j)=\Tr\rho_m^{\opp}(\beta_j)^2\in(0,1]$ of the
+Gibbs state $\rho_m^{\opp}(\beta)=e^{-\beta(H_m^{\opp}+\kappa mI)}/Y_m(\beta)$.
+Substituting $Y_m(\beta_j)=\lambda_j^mB_m(j)$ and
+$\lambda_{j+1}=r_j\lambda_j^2$ relates the normalized contractions at
+the two temperatures:
+\begin{equation}
+    B_m(j+1)
+    =\Pt^{\opp}(m,\beta_j)\,r_j^{-m}B_m(j)^2.
+    \label{obc:bridge}
+\end{equation}
+The thermal purity is the only factor not yet tracked; it is entry (T)
+of the recurrence.
+
+Given the boundary remainder ratio at length $M_j/2$ and the thermal purity at
+length $M_j$, both at $\beta_j$, one step to scale $j+1$ moves through
+the (length, inverse temperature) plane in a fixed order; the key lists
+the three bounds that Steps~1--3 below derive:
+\begin{proofdiagram}
+    \obcstairs
+\end{proofdiagram}
+The proved pair sits at $k_{j+1}=M_j$ and $M_{j+1}=2M_j$, so the step
+repeats.
+
+\subsubsection{Step 1: Boundary remainder at the doubled inverse temperature}
+\label{obc:move-one}
+
+Step~1 must bound the boundary remainder ratio at the doubled
+temperature, which Step~2 then uses. The old overlap says nothing about
+the new one $c'$. But $c'$ does not depend on the length, so it cancels
+from the difference of two lengths at the new temperature, and
+Eq.~\eqref{obc:bridge} returns their ratio to scale $j$. Fix even
+lengths $m>k\ge2$, assume $e_k(j)<1$, and write primes for scale $j+1$.
+Choose $q<1$ with $\|R_{j+1}\|^{m-k}\le q$, so that
+Eq.~\eqref{obc:decay} gives $D_m'\le qD_k'$. Subtracting the two
+lengths cancels $c'$:
+\begin{align}
+    B_k'-B_m'
+     &=\Bigl[\cancelled{$\tnchain[capl={\bar v'},capr={v'}]{\Pi'}$}
+           +\tnchain[capl={\bar v'},capr={v'}]{(R')^k}\Bigr]
+    -\Bigl[\cancelled{$\tnchain[capl={\bar v'},capr={v'}]{\Pi'}$}
+         +\tnchain[capl={\bar v'},capr={v'}]{(R')^m}\Bigr]
+    =D_k'-D_m'.
+    \label{obc:cancellation-diagram}
+\end{align}
+Combining $D_k'=D_m'+B_k'-B_m'$ with $D_m'\le qD_k'$ gives
+\begin{equation}
+    (1-q)D_m'\le q(B_k'-B_m'),\qquad
+    e_m'\le\frac{q}{1-q}\left(\frac{B_k'}{B_m'}-1\right).
+    \label{obc:new-defect}
+\end{equation}
+
+Equation~\eqref{obc:bridge} at both lengths expresses the
+new-temperature ratio in terms of quantities at scale $j$:
+\begin{align}
+    \frac{B_k'}{B_m'}
+     &=\underbrace{\frac{\Pt^{\opp}(k,\beta_j)}{\Pt^{\opp}(m,\beta_j)}}_{\le1/\Pt^{\opp}(m,\beta_j)}
+    \underbrace{r_j^{m-k}}_{\le1}
+    \underbrace{\left[\frac{B_k(j)}{B_m(j)}\right]^2}_{\le[1-e_k(j)]^{-2}}\notag\\
+     &\le\frac{1}{\Pt^{\opp}(m,\beta_j)[1-e_k(j)]^2},
+    \label{obc:ratio}
+\end{align}
+the last since $B_m(j)\ge c_j=[1-e_k(j)]B_k(j)>0$. Once $e_m'<1$
+follows, so does $c'=(1-e_m')B_m'>0$.
+
+Equation~\eqref{obc:new-defect} is a product of two small factors, the
+decay $q/(1-q)$ over the length difference and the excess of
+$B_k'/B_m'$ above one, which is why the boundary remainder ratio squares.
+For the induction, both factors must be $O(x)$ once every tracked bound
+is at most $x$. Take
+$m=M_j$ and $k=M_j/2$ with $\varepsilon_j\le x\le.01$. Property (ii) at
+scale $j+1$ gives $\|R_{j+1}\|^{M_j}\le d(\varepsilon_{j+1})\le d(6x^2)$,
+so across the half-chain $m-k=M_j/2$ we may take
+\begin{equation}
+    q=\sqrt{d(\varepsilon_{j+1})}
+    \le\sqrt{\frac{6x^2}{2-18x^2}}\le2x.
+    \label{obc:half-chain}
+\end{equation}
+Separately, when $e_k(j)\le x$ and
+$\Pt^{\opp}(m,\beta_j)\ge1-x$, Eq.~\eqref{obc:ratio} bounds the excess above one by
+\begin{equation}
+    \frac{B_k'}{B_m'}-1\le(1-x)^{-3}-1=O(x).
+    \label{obc:ratio-excess}
+\end{equation}
+Multiplying Eqs.~\eqref{obc:half-chain} and~\eqref{obc:ratio-excess}
+in Eq.~\eqref{obc:new-defect} bounds the new boundary remainder ratio $e_m'$ by
+$O(x^2)$.
+
+\subsubsection{Step 2: Thermal purity at the doubled length}
+\label{obc:move-two}
+
+Step~2 must bound the thermal purity at length $2M$ and the old
+temperature $\beta_j$, which Step~3 squares. Doubling an open chain is
+not a squaring, since the boundary vectors appear once, so no purity
+inequality applies directly. Instead, for even $M$, dividing
+Eq.~\eqref{obc:bridge} at length $2M$ by that at length $M$ gives three
+factors, each already controlled:
+\begin{align}
+    \frac{\Pt^{\opp}(2M,\beta_j)}{\Pt^{\opp}(M,\beta_j)}
+     &=\underbrace{r_j^M}_{\text{(iii)}}\;
+    \underbrace{\frac{B_{2M}(j+1)}{B_M(j+1)}}_{\ge1-e_M(j+1)\ \text{(Step 1)}}\;
+    \underbrace{\left[\frac{B_M(j)}{B_{2M}(j)}\right]^2}_{\ge1\ \eqref{obc:decay}}\notag\\
+     &\ge r_j^M[1-e_M(j+1)].
+    \label{obc:length}
+\end{align}
+The doubling thus costs only the bulk factor of (iii) and the Step~1
+ratio.
+
+\subsubsection{Step 3: Thermal squaring at the doubled length}
+\label{obc:move-three}
+
+Step~3 returns to the dyadic grid at $(2M_j,\beta_{j+1})$, where the
+next scale starts. The open-chain Gibbs state is positive with unit
+trace, so the periodic squaring inequality applies to it unchanged; the
+boundary plays no role. Squaring the Gibbs state $\rho_{2M}^{\opp}(\beta_j)$,
+Eq.~\eqref{obc:thermal-diagram}, and applying the squaring
+inequality~\eqref{obc:square} doubles the inverse temperature at length
+$2M$:
+\begin{equation}
+    1-\Pt^{\opp}(2M,\beta_{j+1})
+    \le f(1-\Pt^{\opp}(2M,\beta_j)).
+    \label{obc:thermal-square}
+\end{equation}
+With Steps~1 and~2 this closes one scale of the recurrence.
+
+\subsection{Initial rational steps and the small-remainder induction}
+\label{obc:initialization}
+
+The three steps of Sec.~\ref{obc:steps} now become a recurrence across
+$j\ge2$ on two numbers per scale, iterated from the seeds, with the
+comparison lengths $k_j$ of Eq.~\eqref{obc:k}.
+Let $E_j$ and $\eta_j$ denote upper bounds on $e_{k_j}(j)$ and
+$1-\Pt^{\opp}(M_j,\beta_j)$. Step~1 needs the decay over the length
+difference, while (ii) bounds it over the ring length; a fractional
+power converts one to the other. One scale $j\to j+1$ updates them by%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Open/Criterion.html\#CertifiedGaps.OpenMomentWitness.open_step}
+\begin{align}
+    F(q,e,t)   &=\frac{q}{1-q}
+    \left[\frac{1}{(1-e)^2t}-1\right],
+               &                                       &\text{Step 1, Eqs.~\eqref{obc:new-defect}--\eqref{obc:ratio}},\notag\\
+    q_j        &=d(\varepsilon_{j+1})^{(M_j-k_j)/M_j},
+               &                                       &\text{(ii) at scale $j+1$, where $n_{j+1}=M_j$},\notag\\
+    E_{j+1}    &\ge F(q_j,E_j,1-\eta_j),
+               &                                       &\text{Step 1},\notag\\
+    A_j        &=(1-\eta_j)(1-\varepsilon_j)
+    (1-\varepsilon_{j+1})(1-E_{j+1}),
+               &                                       &\text{Step 2, Eq.~\eqref{obc:length}: }\Pt^{\opp}(2M_j,\beta_j)\ge A_j,\notag\\
+    \eta_{j+1} &\ge f(1-A_j),
+               &                                       &\text{Step 3, Eq.~\eqref{obc:thermal-square}},
+    \label{obc:updates}
+\end{align}
+valid whenever all four bounds lie in $[0,1)$; $F$ increases in $q$
+and $e$ and decreases in $t$, so any upper bound on $q_j$ may be
+substituted.
+
+The seed bounds $E_2=.14$ and $\eta_2=.21$ are too large for the
+analytical induction below, which needs $x\le.01$, so we first run
+Eq.~\eqref{obc:updates} for three explicit rational steps:
+\begin{center}
+    \begin{minipage}[c]{.42\textwidth}
+        \centering
+        \begin{tabular}{@{}rrrcr@{}}
+            \toprule
+            $j$ & $E_j$ & $\eta_j$ & $(M_j-k_j)/M_j$ & $q_j\le$ \\
+            \midrule
+            2   & .14   & .21      & $49/120$        & .142     \\
+            3   & .12   & .155     & $1/2$           & .0282    \\
+            4   & .016  & .026     & $1/2$           & .0028    \\
+            5   & .001  & .001     & ---             & ---      \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}\hfill
+    \begin{minipage}[c]{.55\textwidth}
+        \centering
+        \obcladder
+    \end{minipage}
+\end{center}
+Following Ref.~\cite{OpenAI2026Boundaryfield}, each entry is rounded
+upward to a simple rational. The fractional powers then reduce to
+integer power comparisons that a proof assistant checks directly,
+$d(\varepsilon_3)^{49}<.142^{120}$ for $q_2$. Each row follows from
+the previous one; at $j=2$,
+\begin{align*}
+    E_3    & :\ \frac{q_2}{1-q_2}\simeq.166,\quad
+    \frac{1}{(1-E_2)^2(1-\eta_2)}-1\simeq.712,\quad
+    .166\cdot.712\simeq.118\le.12,                                      \\
+    \eta_3 & :\ A_2=(1-\eta_2)(1-\varepsilon_2)(1-\varepsilon_3)(1-E_3)
+    \simeq.79\cdot.948\cdot.984\cdot.88=.648,\quad
+    f(.352)\simeq.147\le.155.
+\end{align*}
+The first step gains little because $q_2$ is still large; once $q_j$
+is small, the bounds square, as the plot above shows. With
+$\varepsilon_5=6\varepsilon_4^2<.000015$, the $j=5$ row brings all
+three bounds below $.01$, the base case of the small-remainder
+induction:
+\begin{equation}
+    \varepsilon_j,\ e_{k_j}(j),\
+    1-\Pt^{\opp}(M_j,\beta_j)\le x_j,\quad j\ge5;\qquad
+    x_5=.01,\quad x_{j+1}=10x_j^2,\quad
+    x_j=10^{-1-2^{j-5}}.
+    \label{obc:induction}
+\end{equation}
+
+The induction step of Eq.~\eqref{obc:induction} must return all three
+bounds from $x$ to $10x^2$ in one scale. Each step is quadratic in $x$,
+but Step~2 consumes the Step~1 output and the ring bound $\varepsilon_j$ enters both
+$q$ and $A$, so the constants are tracked jointly. Assume that the
+three bounds hold at scale $j\ge5$ and write $x=x_j\le.01$. One step
+from scale $j$ to scale $j+1$ ($M_{j+1}=2M_j$) updates the boundary and
+thermal bounds in turn:
+\begin{proofdiagram}
+    \begin{prooflanes}\def\lanedy{1.05}
+        \lanebound{b}{e0}{0}{0}{$e_{M_j/2}(j)\le x$}
+        \lanebound{t}{t0}{1}{0}{$\Pt^{\opp}(M_j,\beta_j)\ge1-x$}
+        \lanebound{b}{e1}{0}{1}{$e_{M_j}(j+1)\le10x^2$}
+        \lanebound{to}{t1}{1}{1.5}{$\Pt^{\opp}(2M_j,\beta_j)\ge1-2x-16x^2$}
+        \lanebound{t}{t2}{1}{2.5}{$\Pt^{\opp}(2M_j,\beta_{j+1})\ge1-10x^2$}
+        \lanemove{e0}{e1}{1}{\eqref{obc:new-defect}}
+        \laneuse{t0}{1}
+        \lanemove[mpored]{t0}{t1}{2}{\eqref{obc:length}}
+        \laneuse{e1}{2}
+        \lanemove[mpoblue]{t1}{t2}{3}{square}
+    \end{prooflanes}
+\end{proofdiagram}
+For Step~1, Eqs.~\eqref{obc:half-chain} and~\eqref{obc:ratio-excess}
+give $q_j\le2x$ and
+\begin{equation}
+    F(2x,x,1-x)
+    \le\frac{6x^2}{(1-2x)(1-x)^3}<7x^2,
+    \label{obc:boundary-step}
+\end{equation}
+so $E_{j+1}=10x^2$ bounds $e_{M_j}(j+1)$. For Step~2, the four factors
+of $A_j$ are at least $1-x$, $1-x$, $1-6x^2$, and $1-10x^2$. Hence
+$A_j\ge(1-x)^2(1-16x^2)\ge1-2x-16x^2$, with $16=6+10$ and the positive
+cross terms dropped. For Step~3, since $0<x\le.01$, thermal squaring
+yields
+\begin{equation}
+    f(2x+16x^2)<3x^2,
+    \label{obc:thermal-step}
+\end{equation}
+so $\eta_{j+1}=10x^2$ bounds $1-\Pt^{\opp}(2M_j,\beta_{j+1})$, and
+$\varepsilon_{j+1}\le6x^2\le10x^2$ closes the induction at scale $j+1$;
+the common prefactor $10$ covers the three constants $7$, $3$, and $6$.
+
+\subsection{Equal endpoint fields, odd lengths, and the uniform gap}
+\label{obc:comparison}
+
+Equation~\eqref{obc:induction} controls even opposite-field chains at
+every $j\ge5$; the theorem needs the thermal purity of odd equal-field
+chains, which Eq.~\eqref{obc:target} turns into the gap. Three things
+change: the right boundary vector carries the twist $U_P$, the odd
+length makes the remainder neither a square nor necessarily positive,
+and only even lengths are certified. Define the normalized equal-field
+partition function $Q_j(n)=Y_n^{\same}(\beta_j)/\lambda_j^n$. The twist
+is harmless for the leading term, because $U_P$ commutes with the
+transfer operator and fixes $\psi_j$ by (i), so the overlap $c_j$
+survives:
+\begin{equation}
+    \tnchain[last=sym]{\Pi_j,U_P}=\tnchain{\Pi_j}.
+    \label{obc:twist}
+\end{equation}
+For the remainder, pull half of an even length $M\le n$ onto each
+boundary vector, commuting $U_P$ through $R_j^{M/2}$ ($[U_P,R_j]=0$ because
+$[U_P,X_\beta]=0$ and $U_P\Pi_j=\Pi_j$); the middle operator then has norm
+at most one ($\|R_j\|\le1$, $U_P$ orthogonal):
+\begin{align}
+    Q_j(n)-c_j
+     &=\tnchain[capl={\bar v_j},capr={v_j}]
+       {R_j^{M/2},R_j^{n-M}U_P,R_j^{M/2}}\notag\\
+     &=\tnchain[capl={\bar y},capr={y}]{R_j^{n-M}U_P},\qquad
+    y=R_j^{M/2}v_j.
+    \label{obc:signed}
+\end{align}
+Cauchy--Schwarz bounds the open contraction by the squared norm of its
+caps, the even-length opposite-field remainder:
+\begin{equation}
+    \schwarzfold=D_M(j).
+    \label{obc:absolute}
+\end{equation}
+The odd equal-field chain is thus controlled by the even opposite-field
+remainder at any even $M\le n$, and the recurrence certifies $M=M_j$.
+
+Fix a scale $j\ge5$ and an odd length $n$ with $M_j\le n\le2M_j$. The
+equal-field purity is a ratio of $Q$ at the two temperatures, as in
+Eq.~\eqref{obc:bridge}, so $Q$ needs an upper bound at $\beta_j$ and a
+lower bound at $\beta_{j+1}$. Both follow from Eq.~\eqref{obc:absolute}
+at the certified even length $M=M_j=k_{j+1}$, where the recurrence
+bounds the remainder at both temperatures:
+\begin{align}
+    Q_j(n)     &\le c_j+D_M(j)=B_M(j),\notag\\
+    Q_{j+1}(n) &\ge c_{j+1}-D_M(j+1)\notag\\
+               &=[1-2e_M(j+1)]B_M(j+1)\notag\\
+               &\ge(1-2x_{j+1})B_M(j+1)>0.
+    \label{obc:comparison-bounds}
+\end{align}
+Equation~\eqref{obc:bridge} at length $M$ and
+Eq.~\eqref{obc:comparison-bounds} then bound the equal-field thermal
+purity factor by factor; the bulk factor is the only term that still
+depends on $n$:
+\begin{align}
+    \Pt^{\same}(n,\beta_j)
+     &=r_j^n\frac{Q_{j+1}(n)}{Q_j(n)^2}\notag\\
+     &\ge\underbrace{(1-2x_{j+1})}_{\eqref{obc:comparison-bounds}}\;
+    \underbrace{\Pt^{\opp}(M,\beta_j)}_{\ge1-x_j}\;
+    \underbrace{r_j^{n-M}}_{\ge r_j^{M},\ n-M\le M}\notag\\
+     &\ge(1-2x_{j+1})(1-x_j)
+    \underbrace{(1-\varepsilon_j)(1-\varepsilon_{j+1})}_{\text{(iii)}}\notag\\
+     &\ge1-2x_j-26x_j^2\notag\\
+     &\ge1-4x_j,
+    \label{obc:final-purity}
+\end{align}
+where $26=20+6$ collects $2x_{j+1}=20x_j^2$ and
+$\varepsilon_{j+1}\le6x_j^2$, and $26x_j^2\le2x_j$ for $x_j\le1/13$.
+Every odd $n$ in $[M_j,2M_j]$ thus inherits the even-length bound at
+scale $j$ up to a factor $4$, which the proof below converts into the gap.
+
+\begin{proof}[Proof of Theorem~\ref{obc:theorem}]
+    Each odd $n$ gets its own scale $j$, so the gap bound must be uniform
+    in $j$. Both $-\log(1-\Pt^{\same}(n,\beta_j))$ and the inverse temperature
+    $\beta_j$ double from one scale to the next, so their ratio in
+    Eq.~\eqref{obc:target} is scale independent.
+    The intervals $[M_j,2M_j]$, $j\ge5$, cover every odd $n\ge M_5+1=1921$,
+    each at its own inverse temperature:
+    \begin{proofdiagram}
+        \oddcoverage
+    \end{proofdiagram}
+    Given odd $n$, choose $j\ge5$ with $M_j\le n\le2M_j$.
+    Since $x_j\le x_5=.01$, Eq.~\eqref{obc:final-purity} gives
+    $w_0\ge\Pt^{\same}(n,\beta_j)\ge1-4x_j>1/2$, so $H_n^{\same}$ has a unique ground state. At this
+    length $n$ and finite inverse temperature $\beta_j$,
+    Eq.~\eqref{obc:target} gives
+    \begin{align}
+        e^{-\beta_j\Delta_n}
+         &\le\frac{4x_j}{1-4x_j}
+         &                               &x_j=10^{-1}\,10^{-2^{j-5}},\quad 1-4x_j\ge.96,\notag\\
+         &\le\frac{5}{12}\,10^{-2^{j-5}}
+        <10^{-2^{j-5}},
+         &                               &\tfrac{.4}{.96}=\tfrac{5}{12}<1.
+        \label{obc:gap-final}
+    \end{align}
+    Taking logarithms and dividing by $\beta_j=\beta_5\,2^{j-5}$ with
+    $\beta_5=49\cdot2^3=392$ proves $\Delta_n>\tfrac{\log10}{392}$ for every $j$.
+\end{proof}
+
+In Lean~4, we formalize both the general open-chain theorem from a
+rational certificate%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Open/Certificate.html\#CertifiedGaps.OpenCertificate.gapGT_of_openCertificate}
+and the derivation of the four seeds~\eqref{obc:seeds} from the short
+boundary trace table%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/BoundaryInitTable.html\#CertifiedGaps.SpinOneHeisenberg.BoundaryInit.boundaryDefect_le_of_table},
+and verify the open-chain integer matrix-product trial contractions on
+$m=34,78,142,240$ sites and the nine shortest boundary trace totals
+directly in the Lean kernel, leaving only the remaining six short-chain
+trace totals as hypotheses%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Heisenberg/Integers.html\#CertifiedGaps.SpinOneHeisenberg.spin_one_boundary_field_gap_of_hornerTotalsLarge}.
+Rerunning the same three rational steps of Eq.~\eqref{obc:updates} from
+the four seeds~\eqref{obc:seeds} with four-digit rounding and the ring
+constant $5.583$ in place of $6$, and entering the quadratic tail at the
+scale-$5$ defect $2.241\times10^{-4}$ instead of $10^{-2}$, sharpens the
+uniform bound to $\Delta_n>\log(10^6/2241)/392\simeq0.01556$ for every
+odd $n\ge1921$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/OpenChain.html\#CertifiedGaps.SpinOneHeisenberg.gapGT_of_boundaryFieldInputs_sharp}.
