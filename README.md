@@ -24,6 +24,21 @@ and
 See the [website](https://sirui-lu.com/CertifiedGaps/) and
 [interactive explainer](https://sirui-lu.com/CertifiedGaps/explainer/) for an overview.
 
+## Paper
+
+**Bridging Gaps with Tensor Networks: From the Haldane Gap and Beyond**, Sirui Lu (2026).
+[PDF](paper/certified-gap.pdf) · [LaTeX source](paper/certified-gap.tex) ·
+[PDF on the website](https://sirui-lu.com/CertifiedGaps/notes/certified-gap.pdf). The arXiv link
+goes here once the listing appears. [`paper/README.md`](paper/README.md) has the build command
+and the earlier companion notes.
+
+### Talk to this paper
+
+The repository follows the
+[Agentic Publication Protocol](https://github.com/LionSR/AgenticPublicationProtocol). Clone it and
+open it in an AI coding agent that reads [`AGENTS.md`](AGENTS.md); in Claude Code,
+`/load-paper https://github.com/LionSR/CertifiedGaps`.
+
 ## Models
 
 All values are rounded down. The [leaderboard](https://sirui-lu.com/CertifiedGaps/leaderboard.html)
@@ -49,7 +64,8 @@ Pilot studies without a gap certificate: [`code/models/blbq_haldane`](code/model
 
 The folders follow the
 [Agentic Publication Protocol](https://github.com/LionSR/AgenticPublicationProtocol/blob/main/PROTOCOL.md)
-layout. This is a repository organization change, not a validated APP release.
+layout. [`AGENTS.md`](AGENTS.md) has the APP frontmatter and the paper-agent sections. There is no
+validated release yet; a tagged release with an `APP_PUBLICATION.json` manifest will follow.
 
 | Directory | Content |
 |---|---|
@@ -60,7 +76,7 @@ layout. This is a repository organization change, not a validated APP release.
 | [`supplementary/`](supplementary/) | Interactive visual explainer and narrated-film instructions |
 | [`blueprint/`](blueprint/), [`home_page/`](home_page/) | Lean blueprint and Jekyll website |
 
-The paper entry point is
+The paper is [`paper/certified-gap.pdf`](paper/certified-gap.pdf); the earlier full-length note is
 [*A Diagrammatic Proof of the Haldane Gap via Spacetime Tensor Networks*](paper/thermal-mpo-gap-note.pdf).
 The root Lake files, `blueprint/`, and `home_page/` remain where the Lean documentation build
 expects them. Each model's `results/` is a relative symlink to its canonical data directory;
@@ -93,3 +109,18 @@ julia --project=code/tools/leaderboard -e 'using Pkg; Pkg.instantiate()'
 julia --project=code/tools/leaderboard code/tools/leaderboard/check_records.jl \
   --lean-records home_page/_data/lean_records.json
 ```
+
+## Citation
+
+```bibtex
+@article{Lu2026BridgingGaps,
+  title  = {Bridging Gaps with Tensor Networks: From the {Haldane} Gap and Beyond},
+  author = {Lu, Sirui},
+  year   = {2026},
+  note   = {Companion repository: \url{https://github.com/LionSR/CertifiedGaps}}
+}
+```
+
+## License
+
+Manuscript and notes: CC BY 4.0. Code and data: MIT. See [`LICENSE`](LICENSE).
