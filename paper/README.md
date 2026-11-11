@@ -9,6 +9,9 @@ The arXiv manuscript is **Bridging Gaps with Tensor Networks: From the Haldane G
   `latexmk -pdf -outdir=work/latex-build paper/certified-gap.tex`; the root `.latexmkrc` sets
   the TeX search path.
 
+The manuscript is CC BY 4.0 (root `LICENSE`). The arXiv link goes in the root `README.md` once the
+listing appears.
+
 The earlier full-length note is **A Diagrammatic Proof of the Haldane Gap via Spacetime Tensor
 Networks**:
 
