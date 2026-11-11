@@ -50,6 +50,46 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
    large 20-spin symmetry blocks ($n_0 = 5$ cells) provides numerical insight into how the seed
    defects and energy-defect decay length $\xi_{\mathrm{eff}}$ scale with $\delta$, without
    entering the certified proof path.
+7. **Coupling identity with Rayleigh–Ritz lower bounds on the doubled ring ($n_0 = 6$ cells):**
+   The complete spectrum of the doubled ring is needed only for an *upper* bound on
+   $Z_{2n_0}(\beta_0)$ in $\varepsilon_\tau$. With the exact coupling identity,
+   ```math
+   P_\tau(2n_0, \beta) = \frac{Z_{2n_0}(2\beta)}{Z_{2n_0}(\beta)^2}
+     = \frac{Z_{2n_0}(2\beta)}{Z_{n_0}(\beta)^4}\, P_{\mathrm{s}}(n_0, \beta)^{-2}
+     \ge \frac{Z_{2n_0}(2\beta)}{Z_{n_0}(\beta)^4}
+   ```
+   whenever $P_{\mathrm{s}}(n_0, \beta) \le 1$ (reflection positivity at even $n_0$), so both
+   defects need only the complete verified spectrum of the ring of $n_0$ cells and *lower*
+   bounds on $Z_{2n_0}(\beta_0)$ and $Z_{2n_0}(2\beta_0)$. Any set of rigorous upper bounds on low
+   eigenvalues gives such lower bounds, and Rayleigh–Ritz values of approximate Lanczos vectors
+   in the sparse charge and momentum blocks are rigorous upper bounds (Courant–Fischer) once
+   $V^\top H V$ and $V^\top V$ carry a priori rounding bounds (new core `RitzBounds`). Omitted
+   states only lower the bound, so the eigensolver is never trusted.
+   *Cost of the defect:* the thermal bound is $1 - P_\tau(2n_0)\,P_{\mathrm{s}}(n_0)^2$, i.e.
+   $\varepsilon_\tau^{\mathrm{coupled}} \approx \varepsilon_\tau + 2\varepsilon_{\mathrm{s}}$. At
+   $n_0 = 4$ this is fatal: at $\delta = 1/4$, $\beta_0 = 29/4$ the coupled defects are
+   $(0.166, 0.339)$ (computed with the core route from the complete 16-spin spectrum), which are
+   not admissible. The route needs a seed length at which $\varepsilon_{\mathrm{s}}$ itself is
+   small, i.e. $n_0 = 6$ cells: complete spectrum of 12 spins (4096 states, seconds) and Ritz
+   bounds on the ring of 24 spins.
+   *Scaling:* the 24-spin ring splits into charge (total $S^z$) sectors of at most
+   $\binom{24}{12} = 2.7 \cdot 10^6$ states and $12$ momenta (plus the flip parity at $S^z = 0$),
+   giving sparse blocks of dimension $0.8\text{--}2.1 \cdot 10^5$ with about $25$ entries per
+   row. Bounding $40$ levels in a block takes about one minute with one thread (Lanczos,
+   `KrylovKit`), so a full $\delta$ point takes under an hour. The low-temperature weight sits in
+   the sectors $|S^z| \le 2$ (zero, one and two magnons, gap $\approx 0.6$ at $\delta = 1/5$).
+   A first run kept $40, 40, 30, 12$ levels per block at $|S^z| = 0, 1, 2, 3$ (46 minutes per
+   $\delta$); truncating it to 10 levels per block, or dropping $|S^z| = 3$, changed no defect
+   in the fifth decimal near the optimal $\beta_0$. The certificates therefore keep
+   $16, 16, 10$ levels at $|S^z| = 0, 1, 2$ (about 14 minutes per $\delta$, which also makes the
+   `--full` replay affordable); the dropped weight enters only as a slightly larger defect.
+   $n_0 = 8$ cells needs a 32-spin doubled ring ($4^{16} \approx 4.3 \cdot 10^9$ states, blocks
+   of $\approx 3.7 \cdot 10^7$): out of reach of the sector enumeration in `ring_blocks`
+   (capped at $2^{26}$ states) and of the memory budget. An odd $n_0 = 5$ (10 and 20 spins) would
+   need $P_{\mathrm{s}}(5, \beta) \le 1$, i.e. a positive transfer operator, which this model
+   lacks a proof of (`code/models/spin1_dimerized` has one for its own cell structure); it is
+   only worth pursuing if $n_0 = 6$ fails. **Chosen route: it improves every certified $\delta$ and
+   reaches $\delta = 1/5$.**
 
 ## Outcome
 
@@ -71,3 +111,16 @@ cells (while a 20-spin diagnostic ceiling reaches $n_0 = 5$ cells).
   fail at $\delta \le 1/2$. The 20-spin Krylov diagnostics identify a numerical odd-seed candidate
   at $(\delta, n_0, \beta_0) = (1/5, 5, 8.5)$ and confirm that the next even seeds for
   $`\delta \in \{1/5, 3/20, 1/10\}`$ require $n_0 \ge 6\text{--}8$ cells ($24\text{--}32$ spins).
+- **Coupled seeds at $n_0 = 6$ cells (route 7):** the new core `RitzBounds` (sparse blocks,
+  rigorous Rayleigh–Ritz upper bounds) and `coupled_seed_bounds` certify, for every even
+  $L \ge 4$ cells, $\Delta_L \ge 0.657292$ ($\delta = 1/2$, $\beta_0 = 8$), $0.273433$
+  ($3/10$, $65/8$), $0.168489$ ($1/4$, $17/2$), and $0.035841$ ($1/5$, $19/2$; the first
+  certificate at this dimerization), up from $0.534794, 0.173204, 0.058232$. The bounds are
+  $0.55, 0.34, 0.24, 0.06$ of the numerical 20-spin gaps. The coupling costs about
+  $2\varepsilon_{\mathrm{s}}$ in the thermal defect: at $\delta = 1/5$ the seed is
+  $(\varepsilon_{\mathrm{s}}, \varepsilon_\tau) = (0.066, 0.158)$, close to the edge of the
+  admissible region. At $\delta = 3/20$ the same route fails (floating-point scan of the
+  rigorous coupled defects, $\beta_0 \in [6, 15]$: $\varepsilon_\tau \ge 0.317$ throughout, with
+  $\varepsilon_{\mathrm{s}} \ge 0.068$), and $\delta = 1/10$ is further out; both would need
+  $n_0 = 8$ (32 spins), a sharper thermal bound than the coupling identity (an upper bound on
+  $Z_{2n_0}(\beta_0)$), or an odd seed with a positivity proof.

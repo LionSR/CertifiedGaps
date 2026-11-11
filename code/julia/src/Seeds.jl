@@ -12,8 +12,8 @@ using ..ExactArithmetic: RationalBig
 using ..ExactDiagonalization: logZ_bounds
 using ..Recurrence: certified_gap_bound
 
-export SeedResult, seed_defects, spectral_defects, scan_seeds, best_seed, seed_record,
-    purity_peaks
+export SeedResult, seed_defects, coupled_seed_defects, spectral_defects, scan_seeds, best_seed,
+    seed_record, purity_peaks
 
 """
     seed_defects(spectra, n, β) -> (εₛ, εₜ)
@@ -47,6 +47,37 @@ need 0 ≤ ε < 1 check it.
 function seed_defects(logZn::Interval, logZ2n::Interval, logZ2n_2β::Interval)
     defect_s, eps_s = _defect(logZ2n - 2logZn)
     defect_t, eps_t = _defect(logZ2n_2β - 2logZ2n)
+    return (; eps_s, eps_t, defect_s, defect_t)
+end
+
+"""
+    coupled_seed_defects(logZn, logZ2n_lower, logZ2n_2β_lower) -> (; eps_s, eps_t, defect_s,
+        defect_t)
+
+Rigorous seed defects at (n, β) that need only LOWER bounds on the partition functions of the
+doubled ring, for instance from Rayleigh–Ritz (`RitzBounds.log_partition_lower`). The inputs are
+an enclosure of log Z_n(β) and intervals whose lower ends bound log Z_{2n}(β) and log Z_{2n}(2β)
+from below (their upper ends are ignored). With the exact coupling identity
+
+    P_τ(2n, β) = Pₛ(n, 2β) P_τ(n, β)² / Pₛ(n, β)² = Z_{2n}(2β) / (Z_{2n}(β)²)
+               = [Z_{2n}(2β) / Z_n(β)⁴] / Pₛ(n, β)² ≥ Z_{2n}(2β) / Z_n(β)⁴,
+
+(Z_n(2β) cancels), the defects are bounded by
+
+    1 − Pₛ(n, β) ≤ 1 − exp(log Z_{2n}(β)⁻ − 2 log Z_n(β)⁺),
+    1 − P_τ(2n, β) ≤ 1 − exp(log Z_{2n}(2β)⁻ − 4 log Z_n(β)⁺).
+
+The second inequality REQUIRES Pₛ(n, β) ≤ 1, i.e. Z_{2n}(β) ≤ Z_n(β)²: this holds by
+Cauchy–Schwarz (Tr X²ⁿ ≤ (Tr Xⁿ)²) for a reflection-positive ring (self-adjoint transfer
+operator X) at even n, or at any n when X is positive; callers must establish it. `eps_s`,
+`eps_t` are exact rationals as in `seed_defects`; `defect_s`, `defect_t` are intervals whose
+upper ends are these bounds (their lower ends carry no meaning).
+"""
+function coupled_seed_defects(logZn::Interval, logZ2n_lower::Interval,
+    logZ2n_2β_lower::Interval)
+    low(x) = interval(inf(x))
+    defect_s, eps_s = _defect(low(logZ2n_lower) - 2logZn)
+    defect_t, eps_t = _defect(low(logZ2n_2β_lower) - 4logZn)
     return (; eps_s, eps_t, defect_s, defect_t)
 end
 

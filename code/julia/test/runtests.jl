@@ -296,4 +296,5 @@ using ITensors, ITensorMPS, CertifiedGaps.Purification
 end
 
 include(joinpath(@__DIR__, "ring_certificates.jl"))
+include(joinpath(@__DIR__, "ritz_bounds.jl"))
 include(joinpath(@__DIR__, "certified_mpo", "runtests.jl"))

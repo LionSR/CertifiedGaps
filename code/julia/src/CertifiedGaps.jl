@@ -20,6 +20,7 @@ Submodules, each used on its own (`using CertifiedGaps.ExactDiagonalization`):
 | `ExactDiagonalization` | chains on any bond graph, charge sectors, spectra, log Z enclosures |
 | `RingModels` | exact ring models and the exact RP certificate −h = Σ w C ⊗ C̄ |
 | `VerifiedSpectra` | rigorous complete spectra of rings by symmetry blocks, and log Z enclosures |
+| `RitzBounds` | Rayleigh–Ritz upper bounds on low levels of sparse blocks; lower bounds on log Z |
 | `GapCertificates` | `certify_gap` and `check_certificate`: end-to-end certificates from small seeds |
 | `Exclusions` | all-β rejections of a seed length (negative results for the doubling recurrence) |
 | `Models` | TFIM (with its exact log Z), spin-s Heisenberg, staggered-field Heisenberg |
@@ -40,6 +41,7 @@ include("Recurrence.jl")
 include("Seeds.jl")
 include("RingModels.jl")
 include("VerifiedSpectra.jl")
+include("RitzBounds.jl")
 include("GapCertificates.jl")
 include("Exclusions.jl")
 include("Models.jl")
