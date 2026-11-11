@@ -78,7 +78,7 @@ headline value, rounded down here) and the exact rational chain bound $\Delta_L 
 `gap_lower_bound`. At $\delta = 9/10$ the seed defects are below the values hardcoded in
 `code/lean/CertifiedGaps/Models/SpinOneDimerized.lean` ($\varepsilon_{\mathrm{s}} \le 0.04972$,
 $\varepsilon_\tau \le 0.03206$; read with `GapCertificates.lean_points` and checked by
-`check.jl`); the Lean file has no $\delta = 7/10$ point. Each certificate records its point as
+`check.jl`); the $\delta = 7/10$ point is proved in Lean 4 from the odd seed $n_0 = 3$ (the transfer operator factors as $X_\beta = K K^* \succeq 0$, `Leaderboard.OddSeed.Dimerized`), theorem `Leaderboard.Records.SpinOneDimerized.delta_7_10`. Each certificate records its point as
 `params` (`"delta"`).
 The 12-spin ED gaps are floating-point references. At $\delta = 4/5$ the scan also finds an
 admissible seed $(3, 17/4)$ with $\approx 0.5447$; $\delta = 3/5$ and $1/2$ need estimated seeds of

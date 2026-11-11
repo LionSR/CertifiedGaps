@@ -171,14 +171,6 @@ challenges:
       This gives $\Delta_L > 0.039$ for all even $L \ge 60$, and the calculation is small enough
       for Lean 4 to check.
     link: code/models/lean_seeds/README.md
-  - id: lean-odd-seed
-    family: spin1-dimerized
-    title: 'Odd seeds in Lean'
-    need: >-
-      One bound, for the dimerized spin-1 chain at $\delta = 7/10$, uses a seed of 3 cells. Its
-      Lean 4 proof needs one more lemma: the transfer operator factors as $X_\beta = K K^*$.
-      Prove this lemma in Lean 4.
-    link: code/models/spin1_dimerized/README.md
 
 
 records:
@@ -440,6 +432,7 @@ records:
     seed: {n0: 3, beta0: "17/4", text: 'The seed length $n_0 = 3$ is odd, which is allowed because the transfer operator factors as $X_\beta = K K^* \succeq 0$'}
     numerical_gap: "1.2659"
     tier: certified
+    lean: {name: Leaderboard.Records.SpinOneDimerized.delta_7_10, r: "12670213/5000000", beta: "17/4", decimal: "0.218780210146"}
     certificate: data/models/spin1_dimerized/certificate_d7.json
     date: "2026-10-18"
     pr: 81

@@ -6,6 +6,10 @@ Authors: CertifiedGaps contributors
 import Leaderboard.Record
 import Leaderboard.RPRing
 import Leaderboard.TwoSeeded
+import Leaderboard.OddSeed.Moment
+import Leaderboard.OddSeed.Criterion
+import Leaderboard.OddSeed.Dimerized
+import Leaderboard.OddSeed.Record
 import Leaderboard.Records.SpinOneHeisenberg
 import Leaderboard.Records.StaggeredHeisenberg
 import Leaderboard.Records.DimerizedHeisenberg
