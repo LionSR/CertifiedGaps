@@ -11,6 +11,7 @@ Toward a Lean-checked seed: five studies sharing one environment, each a submodu
 | `AnchorStudy` | `anchor` | exact local PSD comparison anchors |
 | `Spin1Kernel` | `spin1_kernel` | packed-`Nat` witnesses checked in `lean/SeedKernel/Spin1` |
 | `IsingSeed` | `ising` | longitudinal-Ising seed arithmetic checked in `lean/SeedKernel/Ising` |
+| `IsingOpenSeed` | `ising_open` | the same for the free-end chain, checked in `lean/SeedKernel/IsingOpen` |
 
 Scripts load this file and then `using .LeanSeeds.<Submodule>` (each submodule exports all its
 names); `certify.jl`, `check.jl` and the tests use qualified names.
@@ -23,5 +24,6 @@ include("spectrum.jl")
 include("anchor.jl")
 include("spin1_kernel.jl")
 include("ising.jl")
+include("ising_open.jl")
 
 end

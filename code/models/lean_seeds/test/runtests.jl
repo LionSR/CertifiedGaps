@@ -1,4 +1,4 @@
-# Fast tests of all five studies (about 30 s; no Lean). Each study's tests live in
+# Fast tests of all six studies (about 30 s; no Lean). Each study's tests live in
 # test/<study>.jl, in a module of their own, so that study namespaces do not collide.
 #
 #     julia --project=. test/runtests.jl [study ...]

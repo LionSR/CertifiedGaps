@@ -9,6 +9,8 @@
 #                 {exact_witnesses.tsv,witnesses.json}                            ~2 min
 #   ising         results/ising/certificate.json, lean/SeedKernel/Ising/
 #                 Generated{,Chunks}.lean                                          ~15 s
+#   ising_open    results/ising_open/certificate.json, lean/SeedKernel/IsingOpen/
+#                 Generated{,Chunks}.lean                                          ~20 s
 #
 # The spectrum study is NON-CERTIFYING Float64 data; its drivers are under scripts/spectrum.
 # Run spin1_kernel last when other sources changed: it records the hashes of the shared drivers.
@@ -19,6 +21,7 @@ const TASKS = [
     "seed_design" => LeanSeeds.SeedDesign.certify_seed_design,
     "anchor" => LeanSeeds.AnchorStudy.certify_anchor,
     "ising" => LeanSeeds.IsingSeed.certify_ising,
+    "ising_open" => LeanSeeds.IsingOpenSeed.certify_ising_open,
     "spin1_kernel" => LeanSeeds.Spin1Kernel.certify_spin1_kernel,
 ]
 
