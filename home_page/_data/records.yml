@@ -167,9 +167,11 @@ challenges:
     family: spin1-heisenberg
     title: 'A small seed for spin-1'
     need: >-
-      Certify the spin-1 seed calculation on rings of at most 12 sites, to an error of $10^{-3}$.
-      This gives $\Delta_L > 0.039$ for all even $L \ge 60$, and the calculation is small enough
-      for Lean 4 to check.
+      The seed calculation on rings of at most 12 sites (error $10^{-3}$) is now
+      computer-certified as record `spin1-small-seed-bound` (`code/models/spin1_small_seed/`):
+      $\Delta_L > 0.039036761$ for all even $L \ge 60$. Remaining: check the trace tables
+      inside the Lean 4 kernel, so the bound becomes unconditional (see
+      `code/models/lean_seeds`).
     link: code/models/lean_seeds/README.md
 
 
@@ -227,6 +229,30 @@ records:
          method: 'OpenAI preprint, rounded purities'}
       - {date: "2026-10-06", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: 'even L ≥ 60', tier: lean-conditional, pr: null,
          method: 'OpenAI preprint, smaller seed'}
+  - id: spin1-small-seed-bound
+    family: spin1-heisenberg
+    parameter: 'periodic ring'
+    lengths: {L0: 60}
+    bound: {value: "39036761//1000000000", decimal: "0.039036761", display: '\Delta_L > 0.039036761'}
+    seed: {n0: 60, beta0: "49/2", text: 'Twisted traces on even rings $n \le 12$ (twists $I, P$) at $\beta = 49/4$ with error $10^{-3}$, temperature-lifted to $\beta_0 = 49/2$; length-120 integer MPS trial'}
+    numerical_gap: "0.41048"
+    tier: certified
+    method: 'small seed from rings of at most 12 sites'
+    certificate: data/models/spin1_small_seed/certificate.json
+    check: code/models/spin1_small_seed/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+    notes: >-
+      The finite inputs are the 10 twisted thermal traces on even rings of at most 12 sites at
+      $\beta = 49/4$ (real twists $I, P$, rational intervals of half-width $3\times10^{-5}$ from
+      the frozen hash-audited spin-1 certificate, inside the $10^{-3}$ challenge tolerance) plus
+      the stored length-120 integer MPS trial. Exact rational replay (design C of
+      `code/models/lean_seeds`) bounds the seed defects at $(60, 49/2)$ by
+      $p < 0.047914768$ and $q < 0.112578548$; the 9-step rational doubling chain gives
+      $\Delta_L > 39036761/10^9$ for every even $L \ge 60$. The seed uses rings of at most 12
+      sites only, so it is small enough to be checked inside the Lean 4 kernel (open; see
+      `code/models/lean_seeds`).
   # ---------------------------------------------------------------- heisenberg-staggered-field
   - id: staggered-h-1
     family: heisenberg-staggered-field

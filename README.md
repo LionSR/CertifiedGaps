@@ -46,7 +46,7 @@ and each model's `README.md` list every parameter point, seed, and Lean 4 theore
 
 | Model | Points | Largest certified gap | Lengths | Directory |
 |---|---:|---|---|---|
-| Spin-1 Heisenberg chain | 2 | $0.0729$ | even $L \ge 36$ | [`code/models/spin1`](code/models/spin1/) |
+| Spin-1 Heisenberg chain | 3 | $0.0729$ | even $L \ge 36$ | [`code/models/spin1`](code/models/spin1/) |
 | Spin-1 Heisenberg open chain | 1 | $0.0058$, at $h = 3/5$ | odd $n \ge 1921$ | [`code/lean/.../OpenChain.lean`](code/lean/CertifiedGaps/Heisenberg/OpenChain.lean) |
 | Transverse- and longitudinal-field Ising chain | 30 | $4.5202$, at $g = 3/4, h = 1$ | even $L \ge 6$ | [`code/models/tfim_longitudinal`](code/models/tfim_longitudinal/) |
 | Transverse-field Ising chain (free fermions, $h = 0$) | 3 | $1.9189$, at $g = 2$ | even $L \ge 128$ (at $g = 2$) | [`code/models/tfim_free_fermions`](code/models/tfim_free_fermions/) |
