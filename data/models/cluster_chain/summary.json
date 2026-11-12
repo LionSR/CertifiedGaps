@@ -1,0 +1,15 @@
+{
+    "points": [
+        {
+            "eps_t": "77451717//250000000000000000000000000000000000000000000",
+            "g": "1//2",
+            "eps_s": "446369469//10000000000000000000000000000000000000000000000",
+            "chain_bound_decimal": 0.951422276,
+            "interval_bound_decimal": 0.9515670061272473,
+            "exact_gap": "1//1",
+            "n0_cells": 128,
+            "beta0": "175//2"
+        }
+    ],
+    "format": "CertifiedGaps cluster-chain free-fermion ring certificate v1 summary"
+}

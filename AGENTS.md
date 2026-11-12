@@ -380,9 +380,4 @@ from a prior survey for models that do not yet have a certificate:
 
 | model | RP basis | estimated seed $(n_0, \beta_0)$ | float bound | exact gap |
 |---|---|---|---|---|
-| TFIM $-\sum ZZ - g\sum X$, $g = 2$ | $\sigma^z$, $C = Z$ | $(128, 32)$ free fermions | $1.885$ | $2$ |
-| TFIM $g = 1.25$ | $\sigma^z$ | $(144, 64)$ | $0.451$ | $0.5$ |
-| TFIM $g = 1.1$ | $\sigma^z$ | $(384, 161)$ | $0.178$ | $0.2$ |
-| cluster $-\sum ZXZ - g\sum X$, $g = 0.5$ (2-site cells) | cell basis $\mathrm{CS}(H \otimes H)$ | $(128, 64)$ cells | $0.932$ | $1$ |
-| XY chain in a field, $J_x J_y < 0$ | standard basis | free fermions | — | — |
 | spin-1 bilinear–biquadratic $\theta = -0.1$ | Cartesian | $\approx (34, 31)$ estimated | $\approx 0.107$ | $\approx 0.338$ |
