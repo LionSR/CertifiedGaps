@@ -462,9 +462,10 @@ records:
     certificate: data/models/spin1_dimerized/certificate_d7.json
     date: "2026-10-18"
     pr: 81
-    contributors: ['LionSR']
+    contributors: ['LionSR', 'lm1909']
     notes: >-
-      The seed rings have 6 and 12 sites.
+      The seed rings have 6 and 12 sites. Maximilian Lutz contributed the odd-seed Lean proof
+      ([#110](https://github.com/LionSR/CertifiedGaps/pull/110)); the original certificate credit is retained.
     history:
       - {date: "2026-10-12", decimal: "0.218793170915", lengths: 'even L ≥ 4 cells', tier: certified, pr: 3,
          method: 'an earlier computation from the same seed'}
