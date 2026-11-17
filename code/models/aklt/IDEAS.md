@@ -37,6 +37,28 @@ diagnostics \(R\), \(C\) and \(G\) and to test whether the purification reproduc
 
 ## Outcome
 
+### Exact obstruction and conditional trajectory refinement (November 17, 2026)
+
+Before attempting another thermal contraction, separate an impossible local route from the
+weaker input that the bootstrap actually needs. The chosen route is an analytic on-site
+antiunitary no-go and a conditional absolute-error envelope, documented in `METHOD.md`.
+The coherent-state frame is strictly positive, while every antiunitary in dimension four
+fixes a nonzero traceless Hermitian operator. This rules out all on-site antiunitary bond
+reflections, not merely physical time reversal. A 16-dimensional exact rational calculation
+checks the frame spectrum and constants; its cost is independent of lattice size and beta.
+
+For the positive part of the combined thermal gluing defect, an absolute envelope
+`eta_j <= q^(2^(j+1))/40` is sufficient with `R_0 <= q/10`. This is weaker than requiring a
+bound relative to the unknown actual `R_j^2`, but still needs a model-specific uniform proof.
+The defect uses a doubled-temperature companion sequence; only the direct doubling-coefficient
+formulation uses the main trajectory alone. Neither a larger floating-point seed nor the
+fixed-width projection filter supplies that missing estimate. No new AKLT gap is certified.
+
+The literature check identifies established RP characterization and coherent-state tomography
+ingredients, but does not establish novelty or priority for the exact combined statements.
+
+### Earlier floating-point pilot
+
 Negative. The purification does not reproduce the 8-spin reference. At β = 2 the exact
 \(\log Z=5.31205522615\) is missed by −1.773, −1.424, −0.587 and −0.333 at χ = 16, 32, 64 and 128.
 Halving δβ does not help, so the error is compression bias. The gluing diagnostics are therefore
