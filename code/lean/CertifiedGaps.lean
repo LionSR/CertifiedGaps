@@ -6,6 +6,11 @@ import CertifiedGaps.ChainCheck
 import CertifiedGaps.Transfer.PiTensor
 import CertifiedGaps.Transfer.MomentForm
 import CertifiedGaps.Transfer.ProductLimit
+-- Continuous-time history prerequisites
+import CertifiedGaps.Transfer.TimeOrdering
+import CertifiedGaps.Transfer.PoissonHistory
+import CertifiedGaps.Transfer.HistoryShuffle
+import CertifiedGaps.Transfer.ProductPoissonHistory
 import CertifiedGaps.Transfer.PolynomialFilter
 import CertifiedGaps.Transfer.RatioMonotone
 import CertifiedGaps.Transfer.MatrixProduct
