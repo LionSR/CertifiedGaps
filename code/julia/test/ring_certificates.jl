@@ -13,6 +13,23 @@ rotated_staggered(hs) = RingModel(2, -kron(SX, SX) - kron(ISY, ISY) - kron(SZ, S
 
 levels(spec) = sort(reduce(vcat, [repeat(s.centers, s.multiplicity) for s in spec]))
 
+@testset "signed-permutation checks for a large local space" begin
+    d = 16
+    G = zeros(Int, d, d)
+    for a in 1:d
+        G[d + 1 - a, a] = isodd(min(a, d + 1 - a)) ? 1 : -1
+    end
+    eye = Matrix{Int}(I, d, d)
+    @test G * G == I
+    model = RingModel(d, -kron(G, G), G; symmetries = [G], reflection = G)
+    @test model.bond == -kron(G, G)
+    # A symmetry-breaking site term and a non-mirror-symmetric bond must still be rejected.
+    bad = copy(G)
+    bad[1, 1] += 1
+    @test_throws ArgumentError RingModel(d, -kron(G, G), bad; symmetries = [G])
+    @test_throws ArgumentError RingModel(d, -kron(G, eye), G; reflection = G)
+end
+
 @testset "ring models and exact RP certificates" begin
     m = rotated_staggered(1)
     cert = rp_certificate(m; factors = [SX, ISY, SZ])
