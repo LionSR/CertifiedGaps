@@ -86,7 +86,7 @@ requires more than replacing thermal purity by twice thermal purity. Neither ext
 assumed here. The present step computes the finite spectrum and records the obstruction to
 the existing criterion.
 
-## Outcome
+## Initial outcome
 At $g/J=1,2$, the sixteen-spin floating-point spectra give lowest-pair splittings
 $5.51\times10^{-7}J$ and $0.01502J$, and gaps above the pair of $7.28554J$ and $4.71774J$.
 No ordered-phase uniform certificate follows. At the zero-field endpoint, the exact
@@ -131,3 +131,34 @@ interpolation window, and the infinite quadratic tail. The proof assumes the sca
 and spatial interpolation inequalities and the initial seed bounds. The new theorem has no
 `sorry` or additional axioms. The model-specific transfer construction and numerical
 certificate remain outside Lean; the Julia chains have not been imported as Lean witnesses.
+
+## Direct-temperature prefix and parameter intervals
+
+The follow-up reuses the same sixteen-spin spectral problem but keeps a quantity the
+original staggered update estimates indirectly: the spatial purity on the 4 by 2 torus
+at twice the original inverse temperature. A face identity and two spatial squaring
+steps turn it into the two spatial seed bounds at side four. The thermal cube identity
+then supplies the third seed. This costs only three partition sums from the existing
+4 by 2 and 4 by 4 spectra, followed by the same exact cube recurrence.
+
+The chosen implementation keeps one spectral loader, one certificate payload builder,
+and one checker. It preserves the original three points' numerical records as a legacy
+section, rather than maintaining a second certification pipeline. A normalized-Hamiltonian
+Weyl bound expands each new pair of seed inequalities to a small closed field interval.
+The parameter bound is uniform and does not assume monotonicity of the physical gap.
+
+The target points are g/J=15,16,18,20,24. The direct-temperature prefix and parameter
+perturbation argument remain outside Lean. The separate graph high-field theorem is
+stronger for this Ising model, so these results are improvements to the finite-data
+spacetime bootstrap, not a newly established physical gapped phase.
+
+## Outcome
+
+The direct-temperature prefix certifies g/J=15 and 16 using no spectrum larger than
+sixteen spins. At g/J=18,20,24 it raises the stored bootstrap lower bounds to
+3.39128J, 4.97710J, and 8.14192J. All five points have certified closed intervals of
+radius 1/1000 in g/J. The new claims cover every even square side L >= 4; earlier
+side-two claims are preserved separately. The stored floating-point temperature scan
+records the choice of the five input temperatures and is explicitly not a certificate.
+The new prefix and interval argument remain unformalized, and the Ising-specific graph
+high-field theorem is stronger than every new bootstrap bound.
