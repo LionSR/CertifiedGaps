@@ -77,7 +77,16 @@ even ring lengths only. Odd rings and open chains would need new record forms.
 
    For a physical frame, add `|>.congr` with the spectrum equality, as in
    `Records/StaggeredHeisenberg.lean`.
-5. Run the CI commands below.
+5. Run the CI commands below. When adding or changing a Lean record, refresh the committed
+   validator fixture from that successful audit, then run the validator tests:
+
+   ```sh
+   cp home_page/_data/lean_records.json code/tools/leaderboard/test/lean_records.fixture.json
+   julia --project=code/tools/leaderboard -e 'using Pkg; Pkg.test()'
+   ```
+
+   The Julia-only test job uses this fixture without building Lean. Do not fill it by hand
+   or remove a record from the validator to make a stale fixture pass.
 
 Proofs may use only the axioms `propext`, `Classical.choice` and `Quot.sound`. Do not use
 `sorry`, a new `axiom`, or `native_decide`, which trusts the compiler. For large finite checks,

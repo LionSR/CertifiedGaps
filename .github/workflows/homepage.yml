@@ -40,7 +40,8 @@ jobs:
   deploy:
     # After a full deploy, only when it succeeded and so uploaded a fresh `site` artifact.
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
+    # Match blueprint.yml: the pinned Ruby/Jekyll setup needs a supported image.
+    runs-on: ubuntu-24.04
     name: Deploy home page
     steps:
       - name: Checkout project
