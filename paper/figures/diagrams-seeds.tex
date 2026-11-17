@@ -1,0 +1,263 @@
+% Diagrams for the Supplemental Material section on finite seed certificates.
+% Every macro carries one step of the seed argument; none is decorative.
+
+% The traces of Table cert:tab:traces on a logarithmic scale, even n tall and
+% odd n short: K_{b_0} has eigenvalues of both signs with nearly equal modulus.
+\newcommand{\tracebars}{\tikz[baseline=0pt,x=.34em,y=1.1em]{
+ \foreach \h [count=\i] in {1,.1,.78,.37,.68,.49,.63,.55,.6}{
+  \fill[mpored!70] ({\i-1},0) rectangle ++(.78,\h);}
+ \draw[arxiv baseline] (-.2,0)--(9,0);}}
+
+% The half-Gibbs trace as a squared Frobenius norm: for the real symmetric
+% A = exp(-b_0 H/2), Tr A^2 = sum_c ||A e_c||^2 (the lower box is the mirror image
+% of the upper one), so every basis column is one Poisson recursion at b_0/2 and
+% the rounding errors add column by column. Use in math mode.
+\newcommand{\halfgibbstrace}{\tncolumn[ring]{A,A}
+ =\sum_c\;\tikz[tn,tn centered]{
+  \draw[phys] (0,-1.9)--(0,1.9);
+  \draw[arxiv mirror] (-1.2,0)--(1.2,0);
+  \node[gibbs] at (0,.78) {$A$};
+  \node[gibbs] at (0,-.78) {$A$};
+  \node[bvec,label=right:{$e_c$}] at (0,1.9) {};
+  \node[bvec,label=right:{$e_c$}] at (0,-1.9) {};}}
+
+% Signed spectrum of the spatial transfer operator at b_0: eigenvalues of both
+% signs with nearly equal moduli, so the odd power sums nearly cancel and traces
+% of both parities of n are needed. Word-sized, in the \specbars idiom.
+\newcommand{\signedspectrum}{\tikz[baseline={([yshift=-.5ex]current bounding box.center)},
+ x=.34em,y=.6em]{
+ \foreach \h [count=\i] in {1,-.94,.45,-.4,.25,-.2,.12}{
+  \fill[mpored!70] ({\i-1},0) rectangle ++(.78,\h);}
+ \draw[arxiv baseline] (-.2,0)--(7,0);}}
+
+% Six-site ring drawn at (#1,#2) inside a picture, twisted on its closing bond
+% when #3=1 (the in-picture form of \seedring).
+\newcommand{\seedringat}[3]{\begin{scope}[shift={(#1,#2)},x=.2cm,y=.2cm]
+ \draw[black!70,line width=.45pt] (90:1)--(30:1)--(-30:1)
+  --(-90:1)--(-150:1)--(150:1)--cycle;
+ \ifnum#3=1
+  \draw[mpored,line width=1.6pt] (150:1)--(90:1);
+  \node[font=\scriptsize,text=mpored] at (-.95,1.1) {$\pi$};
+ \fi
+ \foreach \a in {90,30,-30,-90,-150,150}{
+  \filldraw[draw=black!70,fill=white,line width=.45pt] (\a:1) circle (.12);}
+\end{scope}}
+
+% Character table of the four pi-rotation sectors against the plain and the
+% P_z-twisted ring: the twist counts N_x and N_y with a minus sign, so the two
+% traces are J_n+3N_n and J_n-N_n.
+\newcommand{\sectortable}{\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \foreach \x/\s in {0/J,1.3/N_x,2.6/N_y,3.9/N_z}{
+  \node[draw=black!55,line width=.45pt,minimum width=.95cm,minimum height=.5cm,
+   inner sep=2pt] at (\x,0) {$\s$};}
+ \foreach \x in {0,1.3,2.6,3.9}{\node[arxiv strong note] at (\x,-.68) {$+$};}
+ \foreach \x/\sgn in {0/+,1.3/-,2.6/-,3.9/+}{\node[arxiv strong note] at (\x,-1.38) {$\sgn$};}
+ \seedringat{-1.35}{-.68}{0}
+ \seedringat{-1.35}{-1.38}{1}
+ \node[anchor=west] at (4.7,-.68) {$Z_n=J_n+3N_n$};
+ \node[anchor=west] at (4.7,-1.38) {$Z_n(P)=J_n-N_n$};
+ \node[anchor=north,arxiv note] at (2.6,-1.62) {identical spectra};
+\end{tikzpicture}}
+
+% Both filters against their certified totals (plotted in units of 10^3):
+% nonnegativity makes each total a limit for every eigenvalue of its sector,
+% and the shaded exterior rays beyond +-U (for J) and +-V (for N) are empty.
+\newcommand{\filterpair}{\begin{tikzpicture}
+ \begin{axis}[arxiv axis,name=fj,width=6.2cm,height=4.1cm,
+  xmin=-1.12,xmax=1.12,ymin=0,ymax=620,
+  xlabel={$\lambda$},ylabel={$F_J(\lambda)$},
+  xtick={-1.00139,0,1.00139},xticklabels={$-U$,$0$,$U$},
+  ytick={0,318.6},yticklabels={$0$,$B_J$},scaled y ticks=false,
+  samples=300,domain=-1.12:1.12,clip mode=individual,clip=false]
+  \fill[arxiv exclude band] (axis cs:1.00139,0) rectangle (axis cs:1.12,620);
+  \fill[arxiv exclude band] (axis cs:-1.12,0) rectangle (axis cs:-1.00139,620);
+  \addplot[arxiv cert guide] coordinates {(-1.12,318.6) (1.12,318.6)};
+  \addplot[arxiv curve,restrict y to domain=0:640]
+   {x^4*(7+17*x-280*x^2-185*x^3+1000*x^4)^2/1000};
+  \node[arxiv cert note,anchor=south] at (axis cs:0,318.6)
+   {total $B_J$};
+  \node[arxiv exclude note,anchor=south] at (axis cs:-1.06,628) {no $\lambda$};
+  \node[arxiv exclude note,anchor=south] at (axis cs:1.06,628) {no $\lambda$};
+ \end{axis}
+ \begin{axis}[arxiv axis,at={(fj.east)},anchor=west,xshift=1.9cm,width=6.2cm,height=4.1cm,
+  xmin=-1,xmax=1,ymin=0,ymax=90,
+  xlabel={$\lambda$},ylabel={$F_N(\lambda)$},
+  xtick={-0.872,0,0.872},xticklabels={$-V$,$0$,$V$},
+  ytick={0,48.17},yticklabels={$0$,$B_N$},scaled y ticks=false,
+  samples=300,domain=-1:1,clip mode=individual,clip=false]
+  \fill[arxiv exclude band] (axis cs:0.872,0) rectangle (axis cs:1,90);
+  \fill[arxiv exclude band] (axis cs:-1,0) rectangle (axis cs:-0.872,90);
+  \addplot[arxiv cert guide] coordinates {(-1,48.17) (1,48.17)};
+  \addplot[arxiv curve,restrict y to domain=0:92] {x^4*(12-394*x^2+1000*x^4)^2/1000};
+  \node[arxiv cert note,anchor=south] at (axis cs:0,48.17)
+   {total $B_N$};
+  \node[arxiv exclude note,anchor=south] at (axis cs:-0.936,91) {no $\lambda$};
+  \node[arxiv exclude note,anchor=south] at (axis cs:0.936,91) {no $\lambda$};
+ \end{axis}
+\end{tikzpicture}}
+
+% Convexity of t^r moves mass to the cap: shifting mass from a smaller entry to
+% a larger one never lowers sum t_i^r, until q entries sit at the cap a (dashed)
+% and the remainder m-qa sits in one entry.
+\newcommand{\massmoves}{\tikz[baseline=0pt,x=.5em,y=1.1em,line width=.35pt]{
+ \foreach \o/\ha/\hb/\hc/\ca in {0/.4/.35/.25/30,5.3/.6/.15/.25/55,10.6/.6/.4/0/55}{
+  \fill[black!\ca] (\o,0) rectangle ++(.8,\ha);
+  \fill[arxiv remainder weight] ({\o+1.15},0) rectangle ++(.8,\hb);
+  \fill[arxiv remainder weight] ({\o+2.3},0) rectangle ++(.8,\hc);
+  \draw[arxiv guide] ({\o-.2},.6)--({\o+3.5},.6);
+  \draw[arxiv baseline] ({\o-.25},0)--({\o+3.55},0);}
+ \foreach \o in {3.75,9.05}{\draw[arxiv small arrow] (\o,.3)--({\o+1.2},.3);}}}
+
+% Capped-mass extremum at the sixth power, both sectors on one vertical scale:
+% the J mass sits as one entry at the cap ell^12 plus a remainder, each N list
+% as one entry at V^12 plus a remainder; the sixth power keeps only the capped
+% entry; Eq. cert:eq:dominance-check adds the three surviving numbers.
+\newcommand{\cappedmassfigure}{\begin{tikzpicture}[x=1cm,y=2.4cm,font=\footnotesize]
+ \node[arxiv strong note,anchor=south] at (2.1,1.14) {$J$: mass $m_J\le1.0658$, bound $\ell^{12}$};
+ \fill[arxiv leading weight] (0,0) rectangle (.5,.9881);
+ \fill[arxiv remainder weight] (.8,0) rectangle (1.3,.0777);
+ \draw[arxiv guide] (-.1,.9881)--(1.4,.9881);
+ \node[anchor=south] at (.25,.9881) {$0.9881$};
+ \node[anchor=south] at (1.05,.0777) {$0.0777$};
+ \draw[arxiv baseline] (-.1,0)--(1.4,0);
+ \draw[arxiv gray flow] (1.7,.45)--(2.6,.45) node[midway,above] {$u\mapsto u^6$};
+ \fill[arxiv leading weight] (2.9,0) rectangle (3.4,.9305);
+ \node[anchor=south] at (3.15,.9305) {$0.9305$};
+ \draw[arxiv baseline] (2.8,0)--(4.3,0);
+ \begin{scope}[xshift=5.6cm]
+  \node[arxiv strong note,anchor=south] at (2.1,1.14) {each $N$ list: mass $m_N\le0.2784$, bound $V^{12}$};
+  \fill[arxiv bulk weight] (0,0) rectangle (.5,.1933);
+  \fill[arxiv bulk weight] (1.1,0) rectangle (1.6,.0851);
+  \draw[arxiv guide] (.55,.1933)--(.8,.1933);
+  \node[anchor=south] at (.25,.1933) {$0.1933$};
+  \node[anchor=south] at (1.35,.0851) {$0.0851$};
+  \draw[arxiv baseline] (-.1,0)--(1.7,0);
+  \draw[arxiv gray flow] (1.7,.45)--(2.6,.45) node[midway,above] {$u\mapsto u^6$};
+  \node[anchor=south] at (3.55,0) {$<5.3\times10^{-5}$};
+  \draw[arxiv baseline] (2.8,0)--(4.3,0);
+ \end{scope}
+\end{tikzpicture}}
+
+% The lift from b_0 to b=rb_0: the trace bound M_k, split into its J share
+% (dark) and the three N lists (light), is raised to the power r by
+% sum z^r <= (sum z)^r, so the lifted total is D=M_k^r and the lifted J share
+% is at most tau=(D+3E)/4 with E=J_k^r bounding the twisted trace.
+\newcommand{\liftbars}{\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \fill[arxiv leading weight] (0,0) rectangle (.45,.7);
+ \fill[arxiv remainder weight] (0,.7) rectangle (.45,1.25);
+ \draw[arxiv baseline] (-.1,0)--(.55,0);
+ \node[anchor=east] at (-.05,.35) {$J$ share $\mathcal J_k$};
+ \node[anchor=east] at (-.05,.98) {$N$ lists $3\mathcal N_k$};
+ \node[anchor=south] at (.22,1.3) {$Z_k(b_0)\le M_k$};
+ \node[anchor=north,arxiv note] at (.22,-.05) {at $b_0$};
+ \draw[arxiv thermal flow] (1.3,.65)--(3.1,.65)
+  node[midway,above,text=black] {$\sum_i z_i^r\le\bigl(\sum_i z_i\bigr)^r$};
+ \fill[arxiv leading weight] (3.5,0) rectangle (3.95,.9);
+ \fill[arxiv remainder weight] (3.5,.9) rectangle (3.95,1.55);
+ \draw[arxiv baseline] (3.4,0)--(4.05,0);
+ \node[anchor=west] at (4.0,.45) {$J$ share $\le\tau$};
+ \node[anchor=south] at (3.72,1.6) {$Z_k(b)\le D=M_k^r$};
+ \node[anchor=north,arxiv note] at (3.72,-.05) {at $b=rb_0$};
+\end{tikzpicture}}
+
+% Weight forcing at the lifted temperature: were every k-th power weight below
+% the threshold t (dashed), the 120-site power sum would be at most D t^{2h-1}<1,
+% so one weight w_0 exceeds t; three copies of such a weight in N would already
+% exceed the total D, so w_0 lies in J.
+\newcommand{\weightforcing}{\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \foreach \h [count=\i from 0] in {.5,.4,.3,.2,.15}{
+  \fill[arxiv remainder weight] ({.35*\i},0) rectangle ++(.27,\h);}
+ \draw[arxiv baseline] (-.1,0)--(1.85,0);
+ \draw[arxiv cert guide] (-.1,.6)--(1.85,.6) node[right] {$t$};
+ \node[anchor=north,arxiv note,align=center] at (.85,-.05)
+  {all $w_i\le t$:\\$\sum_iw_i^{2h}\le Dt^{2h-1}<1$};
+ \begin{scope}[xshift=3.9cm]
+  \fill[arxiv leading weight] (0,0) rectangle (.27,1.15);
+  \foreach \h [count=\i from 1] in {.3,.2,.15,.1}{
+   \fill[arxiv remainder weight] ({.35*\i},0) rectangle ++(.27,\h);}
+  \draw[arxiv baseline] (-.1,0)--(1.85,0);
+  \draw[arxiv cert guide] (-.1,.6)--(1.85,.6) node[right] {$t$};
+  \node[anchor=south] at (.135,1.17) {$w_0$};
+  \node[anchor=north,arxiv note,align=center] at (.85,-.05)
+   {so some $w_0>t$,\\since $\sum_iw_i^{2h}=Z_{120}(b)>1$};
+ \end{scope}
+ \begin{scope}[xshift=7.8cm]
+  \foreach \i in {0,1,2}{
+   \filldraw[arxiv bulk box] (0,{.45*\i}) rectangle (.27,{.45*\i+.45});
+   \node[anchor=east] at (-.05,{.45*\i+.22}) {$t$};}
+  \draw[arxiv baseline] (-.1,0)--(1.1,0);
+  \draw[arxiv guide] (.35,1.05)--(1.1,1.05) node[right] {$D$};
+  \node[anchor=north,arxiv note,align=center] at (.5,-.05)
+   {three copies in $N$:\\$3t>D$, so $w_0\in J$};
+ \end{scope}
+\end{tikzpicture}}
+
+% The residual moment after removing w_0 is convex in the J remainder x, so its
+% maximum sits at an endpoint: x=0 (all residual mass D-t in the N lists) or
+% x=tau-t (the J remainder full, D-tau left for the N lists).
+\newcommand{\residualends}{\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \draw[arxiv dotted guide] (0,0) rectangle (.27,.75);
+ \foreach \i in {1,2,3}{
+  \filldraw[arxiv bulk box] ({.35*\i},0) rectangle ++(.27,.6);}
+ \draw[arxiv baseline] (-.1,0)--(1.45,0);
+ \node[anchor=north,arxiv note] at (.135,-.05) {$x=0$};
+ \node[anchor=west,arxiv note] at (1.45,.3) {$\tfrac{D-t}3$ each};
+ \node[anchor=south] at (.7,.8) {$3\bigl(\tfrac{D-t}3\bigr)^s$};
+ \node[arxiv note] at (3.3,.4) {or};
+ \begin{scope}[xshift=4cm]
+  \fill[arxiv leading weight] (0,0) rectangle (.27,.75);
+  \foreach \i in {1,2,3}{
+   \filldraw[arxiv bulk box] ({.35*\i},0) rectangle ++(.27,.35);}
+  \draw[arxiv baseline] (-.1,0)--(1.45,0);
+  \node[anchor=north,arxiv note] at (.135,-.05) {$x=\tau-t$};
+  \node[anchor=west,arxiv note] at (1.45,.3) {$\tfrac{D-\tau}3$ each};
+  \node[anchor=south] at (.7,.8) {$(\tau-t)^s+3\bigl(\tfrac{D-\tau}3\bigr)^s$};
+ \end{scope}
+\end{tikzpicture}}
+
+% Refinement: once w_0 > t, Eq. cert:eq:refinement raises the threshold to t'.
+\newcommand{\thresholdup}{\tikz[baseline=0pt,x=.5em,y=1.1em,line width=.35pt]{
+ \fill[arxiv leading weight] (0,0) rectangle (.8,1);
+ \foreach \h [count=\i from 1] in {.25,.15,.1}{
+  \fill[arxiv remainder weight] ({1.15*\i},0) rectangle ++(.8,\h);}
+ \draw[arxiv baseline] (-.25,0)--(4.9,0);
+ \draw[arxiv cert guide] (-.25,.45)--(4.9,.45);
+ \draw[arxiv cert guide] (-.25,.8)--(4.9,.8);
+ \draw[arxiv small arrow,tncert] (4.5,.48)--(4.5,.77);}}
+
+% Ordered Boltzmann weights of the 120-site ring at b_0: the ground weight z_0
+% exceeds one (dotted line) and the others share at most M_120 - 1.
+\newcommand{\boltzmannbars}{\tikz[baseline=0pt,x=.34em,y=1.1em]{
+ \foreach \h [count=\i] in {1,.22,.12,.07}{
+  \fill[mpoblue] ({\i-1},0) rectangle ++(.78,\h);}
+ \draw[arxiv baseline] (-.2,0)--(4,0);
+ \draw[arxiv dotted guide] (-.2,.7)--(4,.7);}}
+
+% Finite-prefix coverage of even lengths for the lifted certificate: the base
+% bridge on [36,72], the dyadic intervals [60 2^j, 120 2^j] with their
+% per-interval gap bounds, and the uniform bound they all exceed.
+\newcommand{\coveragefigure}{\begin{tikzpicture}
+ \begin{axis}[arxiv axis,width=9.6cm,height=4cm,xmode=log,
+  xmin=30,xmax=9000,ymin=.068,ymax=.096,
+  xtick={36,60,120,240,480,960,1920,3840},
+  xticklabels={$36$,$60$,$120$,$240$,$480$,$960$,$1920$,$3840$},
+  ytick={.0729,.08,.09},yticklabels={$0.0729$,$0.08$,$0.09$},scaled y ticks=false,
+  xlabel={even length $L$},ylabel={gap bound for $\Delta_L$},
+  clip=false]
+  \addplot[arxiv bar] coordinates {(36,.090) (72,.090)};
+  \node[arxiv note,anchor=south] at (axis cs:51,.0905) {$(36,b_0)$};
+  \addplot[arxiv bar] coordinates {(60,.0822) (120,.0822)};
+  \addplot[arxiv bar] coordinates {(120,.0749) (240,.0749)};
+  \addplot[arxiv bar] coordinates {(240,.0732) (480,.0732)};
+  \addplot[arxiv bar] coordinates {(480,.07294) (960,.07294)};
+  \addplot[arxiv bar] coordinates {(960,.07293) (1920,.07293)};
+  \addplot[arxiv bar] coordinates {(1920,.07293) (3840,.07293)};
+  \node[arxiv note,anchor=south west] at (axis cs:62,.0828) {$j=0$};
+  \node[arxiv note,anchor=south west] at (axis cs:124,.0755) {$j=1$};
+  \node[arxiv note,anchor=south west] at (axis cs:248,.0738) {$j=2$};
+  \node[arxiv note,anchor=south west] at (axis cs:2000,.0735) {$j\ge3$; the tail sets the uniform bound};
+  \addplot[arxiv cert guide,line width=.7pt] coordinates {(30,.072901771) (9000,.072901771)};
+  \node[arxiv cert note,anchor=north west] at (axis cs:31,.0727) {uniform bound};
+ \end{axis}
+\end{tikzpicture}}
+

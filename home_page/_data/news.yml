@@ -40,3 +40,6 @@
 - date: "2026-10-18"
   text: 'Lean 4 proves the gap bounds of both OpenAI preprints, for rings and for open chains, from their finite data.'
   prs: [74]
+- date: "2026-11-08"
+  text: 'The paper "Bridging Gaps with Tensor Networks: From the Haldane Gap and Beyond" is online.'
+  link: '/notes/certified-gap.pdf'

@@ -1,0 +1,204 @@
+% Diagrams for Supplemental Material Section SIV (reflection-positive models and seed certificates).
+% Every macro carries one step of the structural classification or seed-certification argument.
+
+% A staggered longitudinal field along a chain, matching \fieldsame and \fieldopp.
+\newcommand{\fieldstag}{\tikz[baseline=0pt,x=1em,y=1em,line width=.45pt]{
+ \draw[arxiv boundary] (0,.4)--(1.8,.4);
+ \foreach \x/\s in {0/1,.6/-1,1.2/1,1.8/-1}{
+   \fill (\x,.4) circle[radius=.08];
+   \draw[arxiv small arrow,black!55,line width=.7pt]
+     (\x,{.4-.36*\s})--(\x,{.4+.36*\s});}}}
+
+% A pi rotation about y on every odd site (ticked) turns the staggered field
+% into the uniform on-site term o = -h_st P_z, and each bond between a rotated
+% and an unrotated site is one matched real pair across its mirror. Display
+% figure; the pair itself is drawn beside it with \rpbondpic{P_\alpha}{P_\alpha}.
+\newcommand{\staggerrotation}{\begin{tikzpicture}[x=1em,y=1em,font=\footnotesize,
+  baseline={([yshift=-.5ex]current bounding box.center)}]
+ \draw[arxiv boundary] (-.4,0)--(5.9,0);
+ \foreach \x/\s/\t in {0/-1/1,1.1/1/0,2.2/-1/1,3.3/1/0,4.4/-1/1,5.5/1/0}{
+  \fill (\x,0) circle[radius=.09];
+  \draw[arxiv small arrow] (\x,{-.5*\s})--(\x,{.5*\s});
+  \ifnum\t=1 \draw[arxiv boundary] (\x,-.75)--(\x,-1);\fi}
+ \node[arxiv note,anchor=north] at (2.75,-1.1) {$-h_{\mathrm{st}}\sum_j(-1)^jS_j^z$};
+ \draw[arxiv gray flow] (6.9,0)--(11.6,0) node[midway,above,arxiv note] {$u_y$ on odd sites};
+ \draw[arxiv boundary] (12.2,0)--(18.5,0);
+ \foreach \x in {12.6,13.7,14.8,15.9,17,18.1}{
+  \fill (\x,0) circle[radius=.09];
+  \draw[arxiv small arrow] (\x,-.5)--(\x,.5);}
+ \draw[arxiv bond] (14.8,0)--(15.9,0);
+ \draw[arxiv mirror] (15.35,-.75)--(15.35,.75);
+ \node[arxiv note,text=mpoblue,anchor=north] at (15.35,-1.1) {$o=-h_{\mathrm{st}}P_z$};
+\end{tikzpicture}}
+
+
+% Two-site unit cell (a,b) with internal swap F across an inter-cell mirror cut:
+% C_\alpha acts on the right spin b of the left cell, and F C_\alpha F acts on its
+% mirror image, the left spin a of the right cell.
+% Site labels sit below the legs, outside the cells, so nothing crosses a box.
+\newcommand{\cellbondform}{\tikz[tn,tn centered]{
+ \draw[arxiv cell] (-3.3,-.95) rectangle (1.1,.95);
+ \draw[arxiv cell] (2.4,-.95) rectangle (7.1,.95);
+ \foreach \x/\l in {-2.2/a,0/b,3.8/a,6/b}{
+  \draw[phys] (\x,-1.3)--(\x,1.3);
+  \node[font=\scriptsize,arxiv note,anchor=north,inner sep=1pt] at (\x,-1.35) {$\l$};}
+ \draw[mpored] (0,0)--(3.8,0);
+ \draw[arxiv mirror] (1.75,-1.45)--(1.75,1.45);
+ \node[xop,fill=white] at (0,0) {$C_\alpha$};
+ \node[xop,fill=white] at (3.8,0) {$FC_\alpha F$};}}
+
+% Internal mirror cut across the intra-cell bond of a reflection-positive dimer
+% cell (a,b), factoring the one-cell spatial transfer operator as K K^T >= 0.
+\newcommand{\oddcellpos}{\tikz[tn,tn centered]{
+ \draw[arxiv cell] (-2.7,-.95) rectangle (2.7,.95);
+ \draw[phys] (-1.3,-1.3)--(-1.3,1.3) (1.3,-1.3)--(1.3,1.3);
+ \draw[mpored] (-3.6,0)--(3.6,0);
+ \draw[arxiv mirror] (0,-1.45)--(0,1.45);
+ \node[xop,fill=white] at (-1.3,0) {$K$};
+ \node[xop,fill=white] at (1.3,0) {$K^{\mathsf T}$};}}
+
+% Rung cell of a two-leg ladder across an inter-cell mirror cut: the reflection
+% keeps each leg on its own side (F = I), so C_{1,alpha} on leg 1 and C_{2,alpha}
+% on leg 2 each face their own copy, and the rung interaction, even under the
+% reflection, sits in the on-site box o. Twin of \cellbondform; a bond line hops
+% over the other leg's wire where it has no vertex.
+\newcommand{\rungcellform}{\tikz[tn,tn centered]{
+ \draw[arxiv cell] (-3.7,-1.95) rectangle (1.4,1.95);
+ \draw[arxiv cell] (2.4,-1.95) rectangle (7.5,1.95);
+ \foreach \x/\l in {-2.3/1,0/2,3.8/1,6.1/2}{
+  \draw[phys] (\x,-2.3)--(\x,2.3);
+  \node[font=\scriptsize,arxiv note,anchor=north,inner sep=1pt] at (\x,-2.35) {$\l$};}
+ \node[gibbs,minimum width=3.6em] at (-1.15,0) {$o$};
+ \node[gibbs,minimum width=3.6em] at (4.95,0) {$o$};
+ \draw[arxiv bond] (-2.3,1.25)--(-.3,1.25)
+  arc[start angle=180,end angle=0,radius=.3]--(3.8,1.25);
+ \draw[arxiv bond] (0,-1.25)--(3.5,-1.25)
+  arc[start angle=180,end angle=0,radius=.3]--(6.1,-1.25);
+ \draw[arxiv mirror] (1.9,-2.45)--(1.9,2.45);
+ \node[xop,fill=white] at (-2.3,1.25) {$C_{1,\alpha}$};
+ \node[xop,fill=white] at (3.8,1.25) {$C_{1,\alpha}$};
+ \node[xop,fill=white] at (0,-1.25) {$C_{2,\alpha}$};
+ \node[xop,fill=white] at (6.1,-1.25) {$C_{2,\alpha}$};
+ \node[font=\scriptsize,arxiv note,anchor=south,inner sep=1pt] at (1.9,2.5) {$F=\smI$};}}
+
+% Spin-1 bilinear-biquadratic phase circle showing the reflection-positive arc
+% [-pi + arctan 2, 0] (teal, admissible), the Haldane sub-arc (-pi/4, 0] where the
+% bootstrap applies (dashed gray), and the special points.
+\newcommand{\blbqcircle}{\begin{tikzpicture}[x=1.05cm,y=1.05cm,font=\footnotesize]
+ \def\R{1.2}
+ \draw[arxiv axis line] (0,0) circle[radius=\R];
+ \draw[tncert,line width=2.2pt] (0:\R) arc[start angle=0,end angle=-116.57,radius=\R];
+ \draw[black!55,densely dashed,line width=2.2pt] (0:{\R+.12}) arc[start angle=0,end angle=-45,radius={\R+.12}];
+ \foreach \a in {45,90,-45,-135}{\draw[black!55,line width=.45pt] (\a:{\R-.12})--(\a:{\R+.12});}
+ \node[arxiv strong note] at (-22:{\R+.75}) {Haldane};
+ \node[arxiv strong note] at (67.5:{\R+.38}) {critical};
+ \node[arxiv strong note] at (180:{\R+.42}) {FM};
+ \node[arxiv strong note] at (-90:{\R+.38}) {dimerized};
+ \foreach \a in {0,18.43,45,-45,-116.57}{\fill (\a:\R) circle[radius=1.3pt];}
+ \node[anchor=west] at (18.43:{\R+.08}) {AKLT};
+ \node[anchor=west] at ([yshift=-1pt]0:{\R+.2}) {Heisenberg ($\vartheta=0$)};
+ \node[anchor=south west] at (45:{\R+.02}) {ULS};
+ \node[anchor=north west] at (-45:{\R+.26}) {TB};
+ \node[anchor=north east] at (-116.57:{\R+.02}) {$-\pi{+}\arctan2$};
+ \draw[arxiv gray flow] (0,0)--(35:.58) node[pos=1.18,arxiv note] {$\vartheta$};
+\end{tikzpicture}}
+
+% Half-length seed lift (spin1_largeD, stage 2): the spectra at lengths n_0
+% and 2n_0 give three purities. Squaring in space at beta_0 and at 2beta_0
+% bounds both spatial purities at 2n_0; the torus identity at length 2n_0,
+% with P_s(2n_0,beta_0) <= 1 dropped, bounds the thermal purity at 4n_0. The
+% pair (f(s), 1-(1-f(s_2))(1-t)^2) is the seed at 2n_0; no ring of length
+% 4n_0 is diagonalized.
+\newcommand{\halflengthlift}{\begin{prooflanes}[5.2]\def\lanedy{1.1}
+ \lanebound{s}{hs0}{0}{0}{$\Ps(n_0,\beta_0)\ge1-s,\quad\Ps(n_0,2\beta_0)\ge1-s_2$}
+ \lanebound{t}{ht0}{1}{0}{$\Pt(2n_0,\beta_0)\ge1-t$}
+ \lanebound{s}{hs1}{0}{1}{$\Ps(2n_0,\beta_0)\ge1-f(s),\quad\Ps(2n_0,2\beta_0)\ge1-f(s_2)$}
+ \lanebound{t}{ht1}{1}{1.6}{$\Pt(4n_0,\beta_0)\ge(1-f(s_2))(1-t)^2$}
+ \lanemove[mpored]{hs0}{hs1}{1}{square in space at $\beta_0$ and $2\beta_0$}
+ \lanemove{ht0}{ht1}{2}{identity~\eqref{models:eq:half-length} at $2n_0$}
+ \laneuse{hs1}{2}
+ \lanetag[above]{hs0}{spectra at $n_0$ and $2n_0$, at $\beta_0$ and $2\beta_0$}
+ \lanetag[above]{ht0}{spectrum at $2n_0$}
+ \lanetag[below]{hs1}{seed at $2n_0$: $p_0=f(s)$}
+ \lanetag[below]{ht1}{seed at $2n_0$: $q_0=1-(1-f(s_2))(1-t)^2$}
+\end{prooflanes}}
+
+% Spectral sandwich used in the unconditional Lean-kernel proof for the
+% mixed-field Ising chain at L in {6,12}: two residual intervals near E_0, E_1
+% and a configuration-counting threshold rho bounding all remaining 2^L - 2 levels.
+% Read along the eigenvalue axis: two certified intervals, the empty band up to
+% the counting threshold rho, and the bulk of levels at or above rho.
+\newcommand{\isingsandwich}{\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \draw[arxiv axis line,-{Latex[length=1.4mm]}] (0,0)--(11.6,0)
+  node[anchor=west,arxiv note] {$\lambda$};
+ \foreach \x/\i in {1.1/0,3.4/1}{
+  \draw[tncert,line width=.45pt] (\x-.35,-.18) rectangle (\x+.35,.18);
+  \fill[tncert] (\x,0) circle[radius=1.3pt];
+  \node[anchor=south,arxiv cert note] at (\x,.26) {$\lambda_\i\in[\theta_\i\pm\delta]$};
+  \node[anchor=north,arxiv note] at (\x,-.26) {trial $x_\i$};}
+ \fill[arxiv exclude band] (4.1,-.12) rectangle (7.1,.12);
+ \node[anchor=south,arxiv exclude note] at (5.6,.2) {no eigenvalue};
+ \node[anchor=north,arxiv exclude note] at (5.4,-.2) {$|B|=2$ below $\rho$};
+ \draw[black!70,line width=.7pt] (7.1,-.28)--(7.1,.28);
+ \node[anchor=north,arxiv strong note] at (7.1,-.3) {$\rho$};
+ \foreach \x in {7.5,7.85,8.15,8.5,8.9,9.35,9.85,10.3,10.75}{
+  \draw[arxiv axis line] (\x,-.12)--(\x,.12);}
+ \node[anchor=south,arxiv note] at (9.1,.2) {$2^L-2$ eigenvalues $\lambda_i\ge\rho$};
+ \node[anchor=north,arxiv note] at (9.1,-.26) {diagonal count~\eqref{models:eq:gershgorin}};
+\end{tikzpicture}}
+
+% A classical Ising configuration on a ring segment, one arrow per spin; a
+% dashed tick marks each domain wall between opposite neighbors. Carries the
+% counting fact: only the two uniform configurations have no wall.
+\newcommand{\spinrow}[1]{\tikz[baseline=0pt,x=1em,y=1em]{
+ \xdef\tnprev{0}
+ \foreach \s [count=\i from 0] in {#1}{
+  \draw[arxiv small arrow] ({.42*\i},{.42-.32*\s})--({.42*\i},{.42+.32*\s});
+  \ifnum\i>0 \ifnum\tnprev=\s\else
+   \draw[arxiv identified] ({.42*\i-.21},-.02)--({.42*\i-.21},.86);\fi\fi
+  \xdef\tnprev{\s}}}}
+
+% The eight certified seeds of Table S2 in the (p_0, q_0) plane against the
+% admissible region of the asymmetric recurrence (boundary: the update of
+% Eq. sm:eq:update iterated in floating point until both defects fall below
+% 1/100; p_0 may reach 0.217 at q_0 -> 0 and q_0 may reach 0.200 at p_0 -> 0)
+% and the symmetric threshold eps_* = 0.1273 (dashed). Seeds are numbered in
+% the key; the D = 4 point is plotted at the values printed in the table.
+\newcommand{\seedscatter}{\begin{tikzpicture}
+ \begin{axis}[arxiv axis,xmode=log,ymode=log,width=10.5cm,height=6cm,
+  xmin=2e-6,xmax=1,ymin=6e-6,ymax=1,clip=false,
+  xlabel={\textcolor{mpored}{$p_0\ge1-\Ps(n_0,\beta_0)$ (spatial)}},
+  ylabel={\textcolor{mpoblue}{$q_0\ge1-\Pt(2n_0,\beta_0)$ (thermal)}},
+  xlabel near ticks,ylabel near ticks]
+  \addplot[arxiv curve,draw=tncert] coordinates {
+   (2e-6,6e-6) (2e-6,0.2006) (0.0001,0.2006) (0.001,0.2003) (0.003,0.1997)
+   (0.006,0.1988) (0.01,0.1975) (0.015,0.1958) (0.02,0.194) (0.03,0.1902)
+   (0.04,0.186) (0.05,0.1813) (0.06,0.1762) (0.07,0.1706) (0.08,0.1645)
+   (0.09,0.1579) (0.1,0.1506) (0.11,0.1427) (0.12,0.1341) (0.13,0.1247)
+   (0.14,0.1145) (0.15,0.1035) (0.16,0.09152) (0.17,0.07852) (0.18,0.06442)
+   (0.19,0.04913) (0.2,0.03255) (0.205,0.02375) (0.21,0.01459)
+   (0.215,0.005041) (0.217,0.001114) (0.2175,6e-6)};
+  \draw[arxiv guide] (axis cs:2e-6,0.12731)--(axis cs:0.12731,0.12731)
+   --(axis cs:0.12731,6e-6);
+  \node[arxiv note,anchor=south west] at (axis cs:2.6e-6,0.135) {$\varepsilon_*$};
+  \node[arxiv cert note,anchor=west] at (axis cs:2.6e-6,1.5e-4) {admissible: recurrence converges};
+  \node[arxiv exclude note,anchor=south] at (axis cs:3e-3,0.4) {diverges};
+  \addplot[only marks,mark=*,mark size=1.3pt,tncert] coordinates {
+   (6.937e-4,7.327e-4) (1.133e-2,1.224e-2) (4.972e-2,3.206e-2)
+   (3.633e-3,3.141e-2) (3.509e-2,2.463e-2) (1.125e-1,5.162e-2)
+   (9.064e-6,3.141e-5) (3.054e-2,4.796e-2)};
+  % direct labels; the crowded top-right cluster gets short leaders to the right margin
+  \node[arxiv strong note,anchor=west,inner sep=2.5pt] at (axis cs:6.937e-4,7.327e-4) {staggered field};
+  \node[arxiv strong note,anchor=east,inner sep=2.5pt] at (axis cs:1.133e-2,1.224e-2) {dimerized $S=\tfrac12$};
+  \node[arxiv strong note,anchor=east,inner sep=2.5pt] at (axis cs:3.633e-3,3.141e-2) {single-ion $D=4$};
+  \node[arxiv strong note,anchor=west,inner sep=2.5pt] at (axis cs:9.064e-6,3.141e-5) {mixed-field Ising};
+  \draw[arxiv boundary,line width=.3pt] (axis cs:4.972e-2,3.206e-2)--(axis cs:1.6,1.3e-2);
+  \node[arxiv strong note,anchor=west,inner sep=2pt] at (axis cs:1.6,1.3e-2) {dimerized $S=1$};
+  \draw[arxiv boundary,line width=.3pt] (axis cs:3.509e-2,2.463e-2)--(axis cs:1.6,5e-3);
+  \node[arxiv strong note,anchor=west,inner sep=2pt] at (axis cs:1.6,5e-3) {Heisenberg ladder};
+  \draw[arxiv boundary,line width=.3pt] (axis cs:1.125e-1,5.162e-2)--(axis cs:1.6,9e-2);
+  \node[arxiv strong note,anchor=west,inner sep=2pt] at (axis cs:1.6,9e-2) {Ising ladder};
+  \draw[arxiv boundary,line width=.3pt] (axis cs:3.054e-2,4.796e-2)--(axis cs:1.6,3.3e-1);
+  \node[arxiv strong note,anchor=west,inner sep=2pt] at (axis cs:1.6,3.3e-1) {Heisenberg $S=1$};
+ \end{axis}
+\end{tikzpicture}}

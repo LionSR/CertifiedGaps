@@ -13,6 +13,16 @@ grows [[1](#ref-1), [2](#ref-2)]. OpenAI published a proof in October 2026, as
 [result 268](https://github.com/openai/math/blob/1581d4cbdd69a0faf34b2089614fe2a814316a6a/CONTENTS.md?plain=1#L6747) of its math release [[3](#ref-3), [4](#ref-4)]. We call the method of this proof the
 *spacetime bootstrap*.
 
+## Paper
+
+**Bridging Gaps with Tensor Networks: From the Haldane Gap and Beyond**, Sirui Lu (2026):
+[PDF]({{ '/notes/certified-gap.pdf' | relative_url }}), [LaTeX source]({{ repo_url }}/tree/main/paper).
+The paper rewrites the OpenAI proof in tensor-network diagrams, formalizes it in Lean 4, sharpens
+the spin-1 bound to $$\Delta_L > 0.0729$$ for all even $$L \ge 36$$, and certifies gaps in seven
+more spin chains and ladders. The repository follows the
+[Agentic Publication Protocol](https://github.com/LionSR/AgenticPublicationProtocol): clone
+[{{ site.repository }}]({{ repo_url }}) and open it in an agent that reads `AGENTS.md`.
+
 The method is not specific to the spin-1 chain. It applies to many other spin chains, and the
 [leaderboard]({{ '/leaderboard.html' | relative_url }}) lists the bounds that we have so far. It can do more.
 Sharper finite calculations give larger bounds.
@@ -74,6 +84,8 @@ spin-1 record.
 
 * Explainer: [periodic rings]({{ '/explainer/' | relative_url }}),
   [open chains]({{ '/explainer/open.html' | relative_url }})
+* Paper: [Bridging Gaps with Tensor Networks: From the Haldane Gap and Beyond]({{ '/notes/certified-gap.pdf' | relative_url }})
+  (PDF, 5+33 pages)
 * Two-page note: [a short diagrammatic explanation of the spin-1 Haldane gap proof]({{ '/notes/spin1-gap-tn-diagrams.pdf' | relative_url }}),
   by S. Lu and GPT-6-Astra
 * Lean 4: [blueprint]({{ '/blueprint/' | relative_url }}),

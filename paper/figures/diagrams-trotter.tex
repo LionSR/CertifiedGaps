@@ -1,0 +1,192 @@
+% Diagrams for the finite-Trotter and doubling section of the Supplemental Material.
+
+% Two-site column of the brickwork network through three slices (dashed top and
+% bottom edges identified): the two sites share the even-bond labels b_{k,t} on the
+% rungs and carry the odd-bond labels c_{k-1,t}, c_{k,t} on their outer legs; the mirror
+% maps the left site onto the right one, so the column is F^T F summed over b.
+\newcommand{\twositecolumn}{\begin{tikzpicture}[x=1em,y=1em,line width=.45pt,
+ font=\scriptsize,baseline={([yshift=-.5ex]current bounding box.center)}]
+ \fill[mpored!8] (-.9,-1.75) rectangle (4.9,1.75);
+ \draw[arxiv identified] (-.9,-1.75)--(4.9,-1.75) (-.9,1.75)--(4.9,1.75);
+ \draw[phys] (0,-1.75)--(0,1.75);
+ \draw[phys] (4,-1.75)--(4,1.75);
+ \draw[arxiv mirror] (2,-2.15)--(2,2.15);
+ \foreach \y/\t in {-1.05/0,0/1,1.05/2}{
+  \draw[arxiv bond] (0,{\y+.22})--(4,{\y+.22});
+  \draw[arxiv bond] (-1.5,{\y-.22})--(0,{\y-.22});
+  \draw[arxiv bond] (4,{\y-.22})--(5.5,{\y-.22});
+  \node[xvertex] at (0,{\y+.22}) {}; \node[xvertex] at (4,{\y+.22}) {};
+  \node[xvertex] at (0,{\y-.22}) {}; \node[xvertex] at (4,{\y-.22}) {};
+  \node[text=mpored,anchor=south,inner sep=1pt,fill=white] at (2,{\y+.27}) {$b_{k,\t}$};
+  \node[anchor=east,inner sep=1pt] at (-1.5,{\y-.22}) {$c_{k-1,\t}$};
+  \node[anchor=west,inner sep=1pt] at (5.5,{\y-.22}) {$c_{k,\t}$};}
+ \node[anchor=north,inner sep=2pt] at (0,-1.8) {$\smF_{b_kc_{k-1}}$};
+ \node[anchor=north,inner sep=2pt] at (4,-1.8) {$\smF_{b_kc_k}$};
+\end{tikzpicture}}
+
+% The ring of alternating F^T and F columns whose trace is Z^{(M)}_{2N}.
+\newcommand{\columnring}{\tnchain[ring]{\smF^{\mathsf T},\smF,\cdots,\smF^{\mathsf T},\smF}}
+
+% The square of side S_1 = a_1 + a_2 + a_3 cut by the weights (grays, as all
+% weights): the dark diagonal blocks have area S_2, the light off-diagonal blocks
+% have area S_1^2 - S_2.
+\newcommand{\pairsquare}{\tikz[baseline={(0,.4)},x=2.2em,y=2.2em,line width=.35pt]{
+ \foreach \l/\h in {0/.5,.5/.8,.8/1}{
+  \foreach \L/\H in {0/.5,.5/.8,.8/1}{
+   \ifdim\l pt=\L pt \fill[arxiv leading weight] (\l,\L) rectangle (\h,\H);
+   \else \fill[arxiv remainder weight] (\l,\L) rectangle (\h,\H);\fi}}
+ \draw[white,line width=.45pt] (.5,0)--(.5,1) (.8,0)--(.8,1) (0,.5)--(1,.5) (0,.8)--(1,.8);
+ \draw[arxiv axis line] (0,0) rectangle (1,1);}}
+
+% A brickwork patch of fixed width (four sites) and height beta, sliced into #3
+% rows: \refinedpatch{x}{y}{rows}.
+\newcommand{\refinedpatch}[3]{\begin{scope}[shift={(#1,#2)}]
+ \draw[arxiv identified] (0,0) rectangle (1.28,.64);
+ \foreach \i in {1,...,4}{\draw[line width=.45pt] ({(\i-.5)*.32},0)--({(\i-.5)*.32},.64);}
+ \foreach \j in {1,...,#3}{
+  \draw[line width=.45pt] (0,{(\j-.5)*.64/#3})--(1.28,{(\j-.5)*.64/#3});
+  \foreach \i in {1,...,4}{\filldraw[fill=mpoblue,line width=.35pt]
+   ({(\i-.5)*.32-.045},{(\j-.5)*.64/#3-.045}) rectangle ++(.09,.09);}}
+\end{scope}}
+
+% At one fixed (L, beta), the brickwork network is refined, M = 1, 2, 4, ..., and
+% converges to the exact Gibbs operator; the doubling argument acts only on the
+% limits.
+\newcommand{\limitfirst}{\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+ \foreach \i/\rows/\lab in {0/1/{M=1},1/2/{M=2},2/4/{M=4}}{
+  \refinedpatch{\i*1.75}{0}{\rows}
+  \node[anchor=north,arxiv note] at ({\i*1.75+.64},-.08) {$\lab$};}
+ \foreach \x in {1.33,3.08}{\draw[arxiv gray flow] (\x,.32)--(\x+.37,.32);}
+ \draw[arxiv gray flow] (4.83,.32)--(6.05,.32) node[midway,above,arxiv note] {$M\to\infty$};
+ \node[gibbs,minimum width=1.28cm,minimum height=.64cm] at (6.74,.32) {};
+ \node at (6.74,.32) {$e^{-\beta H_L}$};
+ \node[anchor=north,arxiv note] at (6.74,-.08) {exact};
+\end{tikzpicture}}
+
+% One asymmetric doubling step with the identity or inequality used on each move.
+\newcommand{\asymsteps}{\begin{prooflanes}[5.4]\def\lanedy{1.05}
+ \lanebound{s}{as0}{0}{0}{$\Ps(n,\beta)\ge1-p$}
+ \lanebound{t}{at0}{1}{0}{$\Pt(2n,\beta)\ge1-q$}
+ \lanebound{so}{as1}{0}{1}{$\Ps(n,2\beta)\ge(1-p)^2(1-q)=1-z(p,q)$}
+ \lanebound{s}{as2}{0}{2}{$\Ps(2n,2\beta)\ge1-f(z(p,q))=1-p'$}
+ \lanebound{to}{at1}{1}{2.5}{$\Pt(4n,\beta)\ge(1-q)^2(1-p')=1-z(q,p')$}
+ \lanebound{t}{at2}{1}{3.5}{$\Pt(4n,2\beta)\ge1-f(z(q,p'))=1-q'$}
+ \lanemove{as0}{as1}{1}{\eqref{sm:eq:coupling}, drop $\Pt(n,\beta)^2\le1$}\laneuse{at0}{1}
+ \lanemove[mpored]{as1}{as2}{2}{\eqref{sm:eq:two-squares}, $f$ monotone}
+ \lanemove{at0}{at1}{3}{\eqref{sm:eq:coupling}, drop $\Ps(2n,\beta)^2\le1$}\laneuse{as2}{3}
+ \lanemove[mpoblue]{at1}{at2}{4}{\eqref{sm:eq:two-squares}, $f$ monotone}
+ \lanetag[above]{as0}{given}
+ \lanetag[above]{at0}{given}
+\end{prooflanes}}
+
+% The gate I - tau h split into matching bond factors C_gamma on its two sites,
+% joined by the summed bond label (space, red): the real bond-reflection-positive form.
+\newcommand{\bondendsA}{\begin{tikzpicture}[tn,tn centered]
+ \draw[phys] (0,-.8)--(0,.8) (2,-.8)--(2,.8);
+ \draw[mpored] (0,0)--(2,0);
+ \node[xop] at (0,0) {$A_\gamma$};
+ \node[xop] at (2,0) {$A_\gamma$};
+\end{tikzpicture}}
+
+% One cell through two slices of the reflection-positive cell model, bottom to
+% top on each slice: the reflection F (gray tick), the odd-bond factor (red), F
+% again, the on-site factor O (blue, imaginary time), and the even-bond factor;
+% the trace gives F_{pq}.
+\newcommand{\cellsitetrace}{\tikz[tn,tn centered,font=\scriptsize]{
+ \draw[phys,ring] (0,-1.75)--(0,1.75)--(2.9,1.75)--(2.9,-1.75)--cycle;
+ \foreach \y/\p/\q in {-.85/p_0/q_0,.85/p_1/q_1}{
+  \draw[arxiv bond] (-1.05,{\y-.3})--(0,{\y-.3});
+  \draw[arxiv bond] (0,{\y+.5})--(1.05,{\y+.5});
+  \draw[arxiv boundary] (-.32,{\y-.55})--(.32,{\y-.55});
+  \node[xvertex] at (0,{\y-.3}) {};
+  \draw[arxiv boundary] (-.32,{\y-.05})--(.32,{\y-.05});
+  \node[mpo,minimum size=.44em,inner sep=0pt] at (0,{\y+.2}) {};
+  \node[xvertex] at (0,{\y+.5}) {};
+  \node[anchor=east,inner sep=1pt] at (-1.05,{\y-.3}) {$\q$};
+  \node[anchor=west,inner sep=1pt] at (1.05,{\y+.5}) {$\p$};}}}
+
+% The odd cell of the reflection-positive cell model through two slices: the
+% same worldline as \cellsitetrace with the two F ticks around the even-bond
+% factor instead of the odd one (F A_p F O A_q, using FO = OF). The closed loop
+% is a trace, so moving F around it (F^2 = I) leaves F_{pq} unchanged and both
+% sublattices share one transfer matrix. Display glyph beside \cellsitetrace.
+\newcommand{\oddcellsitetrace}{\tikz[tn,tn centered,font=\scriptsize]{
+ \draw[phys,ring] (0,-1.75)--(0,1.75)--(2.9,1.75)--(2.9,-1.75)--cycle;
+ \foreach \y/\p/\q in {-.85/p_0/q_0,.85/p_1/q_1}{
+  \draw[arxiv bond] (-1.05,{\y-.6})--(0,{\y-.6});
+  \draw[arxiv bond] (0,{\y+.3})--(1.05,{\y+.3});
+  \node[xvertex] at (0,{\y-.6}) {};
+  \node[mpo,minimum size=.44em,inner sep=0pt] at (0,{\y-.28}) {};
+  % the ticks protrude past the vertex and the box so that their new place shows
+  \draw[arxiv boundary] (-.32,{\y+.02})--(.32,{\y+.02});
+  \node[xvertex] at (0,{\y+.3}) {};
+  \draw[arxiv boundary] (-.32,{\y+.58})--(.32,{\y+.58});
+  \node[anchor=east,inner sep=1pt] at (-1.05,{\y-.6}) {$\q$};
+  \node[anchor=west,inner sep=1pt] at (1.05,{\y+.3}) {$\p$};}}}
+
+% One term of X^k - Y^k = sum_r X^{k-1-r} (X - Y) Y^r: k - 1 links of norm at most
+% K and one link X - Y, so the term has norm at most K^{k-1} ||X - Y||.
+\newcommand{\telescopechain}{\tikz[tn,tn centered]{
+ \tnchainpath[node=sym,name=t,item={minimum height=1.1em}]{X,\cdots,X,X-Y,Y,\cdots,Y}
+ \node[sym,fill=black!25,minimum height=1.1em] at (t-4) {$X-Y$};
+ \draw[arxiv baseline]
+  ([yshift=-.3em]t-1.south west)--([yshift=-.3em]t-3.south east)
+  node[midway,below,inner sep=1.5pt,arxiv note] {$k-1-r$};
+ \draw[arxiv baseline]
+  ([yshift=-.3em]t-5.south west)--([yshift=-.3em]t-7.south east)
+  node[midway,below,inner sep=1.5pt,arxiv note] {$r$};}}
+
+% The squaring map f(z) = z^2/[2(1-z)^2] on 0 <= z <= .3 lies under the diagonal
+% (gray: f acts on spatial and thermal weights alike).
+\newcommand{\fbelowdiag}{\tikz[baseline=0pt,x=3.3em,y=3.3em,line width=.45pt]{
+ \draw[arxiv baseline] (0,0)--(.3,0) (0,0)--(0,.3);
+ \draw[arxiv dotted guide] (0,0)--(.3,.3);
+ \draw[arxiv curve,domain=0:.3,samples=25,smooth] plot (\x,{\x*\x/(2*(1-\x)*(1-\x))});}}
+
+% The integer check behind one table entry: the exact value D f (gray) lies on the
+% grid interval (a - 1, a], so the stored entry a (teal) is its ceiling.
+\newcommand{\ceilcheck}{\tikz[baseline=-.6ex,x=3.6em,y=.8em,line width=.45pt,font=\scriptsize]{
+ \draw[arxiv axis line] (-.4,0)--(1.4,0);
+ \draw[arxiv axis line] (0,-.14)--(0,.14) (1,-.14)--(1,.14);
+ \node[anchor=north,inner sep=1.5pt,arxiv note] at (0,-.14) {$a_{j+1}-1$};
+ \node[anchor=north,inner sep=1.5pt,arxiv cert note] at (1,-.14) {$a_{j+1}$};
+ \draw[black!55] (0,0) circle[radius=.14em];
+ \fill[arxiv leading weight] (.58,0) circle[radius=.14em];
+ \node[anchor=south,inner sep=1.5pt,arxiv note] at (.58,.1) {$Df$};
+ \draw[arxiv small arrow] (.66,.2)--(.94,.2);
+ \fill[tncert] (1,0) circle[radius=.14em];}}
+
+% Energy levels with the gap (teal, the certified quantity) and their Gibbs weights
+% (gray): the purity is at most the largest weight w_0, and w_0 above one half
+% (dashed) leaves no room for a second weight of the same size.
+\newcommand{\levelweights}{\tikz[baseline={([yshift=-.5ex]current bounding box.center)},
+ x=1.8em,y=2.8em,line width=.45pt,font=\scriptsize]{
+ \draw (0,0)--(1,0);
+ \foreach \y in {.55,.75,.9}{\draw[arxiv axis line] (0,\y)--(1,\y);}
+ \node[anchor=east,inner sep=2pt,arxiv note] at (0,0) {$E_0$};
+ \node[anchor=east,inner sep=2pt,arxiv note] at (0,.55) {$E_1$};
+ \draw[tncert,line width=1pt] (1.15,0)--(1.15,.55);
+ \node[anchor=west,inner sep=2pt,arxiv cert note] at (1.15,.27) {$\Delta_L$};
+ \draw[arxiv gray flow] (2.3,.45)--(3.2,.45);
+ \node[anchor=south,inner sep=2pt,arxiv note] at (2.75,.47) {$e^{-\beta_jE}$};
+ \draw[arxiv baseline] (3.4,0)--(4.95,0);
+ \fill[arxiv leading weight] (3.5,0) rectangle (3.85,.97);
+ \fill[arxiv remainder weight] (4,0) rectangle (4.35,.03);
+ \fill[arxiv remainder weight] (4.5,0) rectangle (4.85,.015);
+ \draw[arxiv guide] (3.4,.5)--(4.95,.5)
+  node[anchor=west,inner sep=2pt,arxiv note] {$\tfrac12$};
+ \node[anchor=south,inner sep=2pt,arxiv note] at (3.675,.97) {$w_0$};
+ \node[anchor=south,inner sep=2pt,arxiv note] at (4.175,.05) {$w_1$};}}
+
+% \trendline[floor]{min}{max}{v0,v1,...}: word-sized line of the values with gray
+% end marks; an optional floor draws the uniform bound (teal, dashed) they approach.
+\newcommand{\trendline}[4][]{\tikz[baseline=0pt,x=.75em,y=.9em,line width=.45pt]{
+ \foreach \tv [count=\ti from 0] in {#4}{
+  \pgfmathsetmacro\ty{(\tv-(#2))/((#3)-(#2))}
+  \ifnum\ti=0 \fill[black!70] (0,\ty) circle[radius=.09em];
+  \else\draw[black!70] ({\ti-1},\tpy)--(\ti,\ty);\fi
+  \xdef\tpy{\ty}\xdef\tlx{\ti}}
+ \fill[black!70] (\tlx,\tpy) circle[radius=.09em];
+ \if\relax\detokenize{#1}\relax\else
+  \pgfmathsetmacro\tfl{((#1)-(#2))/((#3)-(#2))}
+  \draw[arxiv cert guide] (-.2,\tfl)--(\tlx+.3,\tfl);\fi}}

@@ -1,15 +1,23 @@
 # Two-leg transverse-field Ising ladder
 
-This module certifies a uniform spectral gap for the two-leg transverse-field Ising ladder at
-transverse field $g = 3$: **$\Delta_L \ge 0.636870849$ and a unique ground state for every even
-$L \ge 4$ rungs** ($N = 2L$ spins, $N$ divisible by 4, $N \ge 8$). The certificate is produced
-end to end by the shared core (`CertifiedGaps.GapCertificates.certify_point`) from the ladder
-written as a reflection-positive `RingModel` of rungs. The method, scan tables and finite-size
-diagnostics are in [`METHOD.md`](METHOD.md); the route analysis is in [`IDEAS.md`](IDEAS.md).
+This module certifies uniform spectral gaps for the two-leg transverse-field Ising ladder at
+transverse fields $`g \in \{11/4, 3, 4\}`$, each with a unique ground state, for every even
+$L \ge 4$ rungs ($N = 2L$ spins). The certificates are produced by the shared core
+(`CertifiedGaps.GapCertificates.certify_point`) from the ladder written as a
+reflection-positive `RingModel` of rungs. The bounds use **coupled half-length seeds** at
+$n_0 = 6$ rungs: the complete verified spectrum of the 6-rung ring and rigorous Rayleigh–Ritz
+upper bounds on the low levels of the 12-rung ring (24 spins, core `RitzBounds`), plus the
+verified gap of the 4-rung ring. Method, scans and diagnostics: [`METHOD.md`](METHOD.md); route
+analysis: [`IDEAS.md`](IDEAS.md).
 
 | $g$ | seed $(n_0 \text{ rungs}, \beta_0)$ | certified gap $\ge$ | lengths covered |
 |---|---|---:|---|
-| 3 | $(4, 3/2)$ | 0.636870849 | every even $L \ge 4$ rungs |
+| 11/4 | $(6, 69/32)$ | 0.371180737 | every even $L \ge 4$ rungs |
+| 3 | $(6, 29/16)$ | 0.849386526 | every even $L \ge 4$ rungs |
+| 4 | $(6, 11/8)$ | 2.546626505 | every even $L \ge 4$ rungs |
+
+The $g = 3$ certificate with seed $(4, 3/2)$, $\Delta_L \ge 0.636870849$, is kept: it carries
+the seeds of the Lean 4 theorem `CertifiedGaps.TwoLegIsing` (seed length 4).
 
 ## Model
 
@@ -52,22 +60,46 @@ them. In the physical frame the same identity holds with $C_1 = Z \otimes I$, $C
 
 ## Seeds and certified bounds
 
-| $g$ | seed $(n_0, \beta_0)$ | $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(4, 3/2)$ | $\varepsilon_\tau \ge 1 - P_\tau(8, 3/2)$ | certified gap $\ge$ (interval) | exact chain bound | 8-rung ED gap |
-|---|---|---:|---:|---:|---:|---:|
-| 3 | $(4, 3/2)$ | $0.112389665926876$ | $0.051536217782645$ | 0.636870849 | $> 0.636342898$ | 2.6618 (numerical) |
+Coupled seeds at $n_0 = 6$ rungs (`RitzSeeds.RITZ_POINTS`, certificates
+`results/certificate_g<g>_n6.json`). By the coupling identity (AGENTS.md; IDEAS.md, route 4)
+and $P_{\mathrm{s}}(6, \beta) \le 1$ (reflection positivity, even $n_0$),
 
-The seeds are the exact rationals `seed.eps_s = 28097416481719//250000000000000` and
-`seed.eps_t = 10307243556529//200000000000000` of
-[`results/certificate_g3_1.json`](results/certificate_g3_1.json) (`params = {g: 3}`). The
-headline is the outward-rounded interval bound `certified_gap_bound(εₛ, εₜ, 3//2).bound`
-$= 0.6368708493341569$ (`interval_bound_decimal`, rounded down above), about $`24\%`$ of the
-8-rung numerical gap; the certificate's claim `gap_lower_bound` is the exact rational doubling
-chain, $\Delta_L > 318171449/(5 \cdot 10^8)$. Both are rigorous. The defects satisfy the Lean
-theorem's seed hypotheses ($\varepsilon_{\mathrm{s}} \le 0.1125$, $\varepsilon_\tau \le 0.05162$,
-read from `code/lean/CertifiedGaps/Models/TwoLegIsing.lean` by the core `lean_points` and checked
-exactly by `check.jl`). On the scanned grid $`g \in \{2, 5/2, 3, 4\}`$, the fields $g = 2$ and
-$5/2$ have no admissible seed with $n_0 \le 4$ rungs, and $g = 4$ (numerical bound $2.142$) was
-not certified because $g = 3$ already is.
+```math
+\varepsilon_{\mathrm{s}} \ge 1 - \frac{Z_{12}(\beta_0)}{Z_6(\beta_0)^2}, \qquad
+\varepsilon_\tau \ge 1 - \frac{Z_{12}(2\beta_0)}{Z_6(\beta_0)^4} \ge 1 - P_\tau(12, \beta_0),
+```
+
+with $Z_6$ enclosed from the complete verified 6-rung spectrum and $Z_{12}$ bounded below by
+Rayleigh–Ritz upper bounds on 6 (charge 0) and 3 (charge 1) levels of each of the 28 blocks of
+the 12-rung ring (core `coupled_seed_bounds`). The exact rationals are `seed.eps_s`,
+`seed.eps_t` of each certificate. They are raised by $10^{-8}$ (`defect_padding`, a valid
+weakening): the verified radii of LAPACK eigenpairs vary slightly from run to run, and
+`check.jl` recomputes the defects from a fresh 6-rung spectrum.
+
+| $g$ | seed $(n_0, \beta_0)$ | $\varepsilon_{\mathrm{s}}$ | $\varepsilon_\tau$ | certified gap $\ge$ (interval) | exact chain bound | 4-rung gap $\ge$ (verified) | 12-rung gap (Lanczos) |
+|---|---|---:|---:|---:|---:|---:|---:|
+| 11/4 | $(6, 69/32)$ | 0.049856612220172 | 0.126479296586788 | 0.371180737 | $> 0.370813466$ | 2.2092349 | 2.1190 |
+| 3 | $(6, 29/16)$ | 0.024179319356254 | 0.075932324712783 | 0.849386526 | $> 0.848512677$ | 2.7219276 | 2.6599 |
+| 4 | $(6, 11/8)$ | 0.002828638097851 | 0.012860144463702 | 2.546626505 | $> 2.544322725$ | 4.7822235 | 4.7632 |
+
+The headline is the outward-rounded interval bound `interval_bound_decimal` of
+`certified_gap_bound(εₛ, εₜ, β₀)` (rounded down above); the exact rational doubling chain
+`gap_lower_bound` is slightly smaller. Both are rigorous for every even $L \ge 6$. Each
+certificate also stores `finite_bridge`, outward bounds on the gap of the 4-rung ring from its
+complete verified spectrum; it exceeds the bound, so the claim covers every even $L \ge 4$.
+The 12-rung gaps are numerical (Lanczos, `scripts/ritz_scan.jl`).
+
+The complete-spectrum seed (`Ladder.POINTS`, `results/certificate_g3_1.json`):
+
+| $g$ | seed $(n_0, \beta_0)$ | $\varepsilon_{\mathrm{s}} \ge 1 - P_{\mathrm{s}}(4, 3/2)$ | $\varepsilon_\tau \ge 1 - P_\tau(8, 3/2)$ | certified gap $\ge$ (interval) | exact chain bound |
+|---|---|---:|---:|---:|---:|
+| 3 | $(4, 3/2)$ | $0.112389665926876$ | $0.051536217782645$ | 0.636870849 | $> 0.636342898$ |
+
+Its defects satisfy the seed hypotheses of the Lean theorem ($\varepsilon_{\mathrm{s}} \le 0.1125$,
+$\varepsilon_\tau \le 0.05162$, read from `code/lean/CertifiedGaps/Models/TwoLegIsing.lean` by
+the core `lean_points` and checked exactly by `check.jl`). $g = 5/2$ has no admissible seed at
+$n_0 \le 4$ (complete spectra) nor at $n_0 = 6$ with the coupled defects (minimum coupled
+$\varepsilon_\tau \approx 0.24$); $g = 2$ has none at $n_0 \le 4$.
 
 ## Reproduce
 
@@ -76,70 +108,128 @@ environment:
 
 ```sh
 julia --project=code/julia -e 'using Pkg; Pkg.instantiate()'
-julia --project=code/julia code/models/two_leg_tfim/certify.jl          # results/certificate_g3_1.json
+julia --project=code/julia code/models/two_leg_tfim/certify.jl          # every certificate
+julia --project=code/julia code/models/two_leg_tfim/certify.jl 3//1 --ritz      # one point
 julia --project=code/julia code/models/two_leg_tfim/check.jl            # fast checker
-julia --project=code/julia code/models/two_leg_tfim/check.jl --full     # + freshly verified spectra
+julia --project=code/julia code/models/two_leg_tfim/check.jl --full     # + fresh Ritz bounds
 julia --project=code/julia code/models/two_leg_tfim/test/runtests.jl    # model unit tests
-# Numerical seed scan for one field, then the extrapolation and the METHOD.md tables:
+# Floating-point scans: complete spectra up to 8 rungs, and the coupled n0 = 6 seeds
 julia --project=code/julia code/models/two_leg_tfim/scripts/scan.jl 3//1
+julia --project=code/julia code/models/two_leg_tfim/scripts/ritz_scan.jl 3//1 14 6
 julia --project=code/julia code/models/two_leg_tfim/scripts/extrapolate.jl
 julia --project=code/julia code/models/two_leg_tfim/scripts/summarize.jl
 ```
 
-`certify.jl [g]` certifies every point of `Ladder.POINTS` (or the one at field `g`). The scan
-writes full spectra to `results/spectra_g<g>.json` (gitignored) for `extrapolate.jl` and
-`summarize.jl`. Measured run times (Julia 1.12.4, one BLAS thread, Apple M-series laptop shared
-with other jobs):
-- `certify.jl`: 406 s wall (355 s in `certify_point`, 332 s of it for the 8-rung spectrum) at
-  a load average of about 100–200, peak memory 0.9 GB (32 real blocks; the 8-rung blocks have
-  dimension at most 2102);
-- `check.jl`: 38 s including compilation;
-- `check.jl --full`: 234 s (recomputes both verified spectra);
-- `test/runtests.jl`: 22 tests, 28 s including compilation;
-- `scripts/scan.jl`: 2–4 min per field (unverified spectra of the core blocks).
+`certify.jl [g] [--ritz | --complete] [--reuse-partial]` certifies the points of
+`Ladder.POINTS` (complete spectra, $n_0 = 4$) and `RitzSeeds.RITZ_POINTS` (coupled, $n_0 = 6$),
+or those at field `g`; `--reuse-partial` reads the stored 12-rung Ritz bounds instead of
+recomputing them. The stored coupled certificates were last regenerated that way (after the
+defect padding was added), from Ritz bounds computed by full runs. The stored $n_0 = 4$
+certificate keeps the numbers of its original run: a fresh `certify.jl 3//1 --complete`
+reproduces them only up to the last digits (the verified radii of LAPACK eigenpairs vary from
+run to run), so after the pinned sources changed only its provenance was refreshed, by
+
+```sh
+julia --project=code/julia code/models/two_leg_tfim/scripts/refresh_metadata.jl   # 19 s
+```
+
+which reuses the stored seed (defects, log Z enclosures, spectrum summaries), re-derives the
+RP identity, model record, exact chain and interval bound through the core `certify_gap`,
+requires every value outside `metadata` to equal the stored one exactly, and then rewrites only
+`metadata` (`model_metadata` with `RitzSeeds.SOURCES`; the original run's time, Julia version
+and `config` are kept under `metadata_refresh` and `config`). `check.jl --full` still
+recomputes that seed from fresh spectra. Measured run times on a shared 8-core Linux machine
+(Julia 1.12.7, one BLAS thread, load average 8–12):
+- `certify.jl g --ritz`: 35–41 min wall per point, peak memory 4.2 GB (Julia started with
+  `--heap-size-hint=3G` or `2500M`); about 25 min build the 28 interval-enclosed sparse
+  blocks of the 12-rung ring (dimension about $3.5 \times 10^5$ each), 12–13 min run Lanczos and
+  the Ritz bounds, and the 6-rung spectrum and the chain take seconds;
+- `certify.jl 3//1 --complete` ($n_0 = 4$): 119 s wall (92 s in `certify_point`), peak memory
+  1.3 GB;
+- `check.jl`: 33 s including compilation, peak memory 1.2 GB (recomputes the 6- and 4-rung
+  spectra and reads the stored 12-rung bounds);
+- `check.jl --full`: not run as one command in this session (about 2 h: the fresh 12-rung
+Ritz bounds take 37–40 min per coupled point, plus about 2 min for the $n_0 = 4$ spectra).
+Its step for the $n_0 = 4$ certificate (`check_point` with `spectra = true`) passed on the
+refreshed certificate in 129 s wall, with fresh defects $0.112389665753866$ and
+$0.051536217029413$ below the stored ones. Its steps for each coupled point (fresh Ritz bounds
+and 6-rung spectrum, then `check_point` with these spectra and the bridge) passed for all
+three points: $g = 4$ in 39 min, $g = 3$ in 37 min, $g = 11/4$ in 37 min, peak memory 4.2 GB
+each; the fresh defects equal the unpadded certified ones to all printed digits;
+- `test/runtests.jl`: 34 tests, 47 s including compilation;
+- `scripts/ritz_scan.jl`: 15–60 min per field (Lanczos on 28 complex sectors of the
+  physical-frame ring), `scripts/scan.jl`: 2–4 min per field.
 
 ## What is rigorous
 
 - **Rigorous:** the exact RP identity and frame change (`Rational{BigInt}`); the complete
-  spectra of the rings of 4 and 8 rungs, split exactly by the core `VerifiedSpectra.ring_blocks`
-  into $`\mathbb{Z}_2`$ charge, lattice momentum (±k merged with multiplicity 2) and leg-exchange
-  parity, with block entries enclosed in interval arithmetic and every block real symmetric
-  (the lattice reflection makes the momentum blocks real); each block enclosed by
-  `CertifiedGaps.VerifiedSpectra.verified_eigen` (residual and Gram matrices in `Float64` with
-  the a priori $`\gamma_{N+8}`$ rounding bound and Frobenius norms, then Ostrowski/polar-factor
-  and Weyl bounds, plus the exact construction error); $\log Z$ by `log_partition_enclosure` in interval arithmetic; seed defects rounded up
-  to a $10^{-15}$ grid; the exact rational doubling chain and the interval
-  `certified_gap_bound`. Trusted base: IEEE binary64 round-to-nearest with gradual underflow,
-  standard (non-fast-math) BLAS and LAPACK producing finite output, `IntervalArithmetic`, and
-  the repository's two-purity theorem.
+  spectra of the rings of 4, 6 and 8 rungs, split exactly by the core
+  `VerifiedSpectra.ring_blocks` into $`\mathbb{Z}_2`$ charge, lattice momentum (±k merged with
+  multiplicity 2) and leg-exchange parity, with block entries enclosed in interval arithmetic
+  and every block real symmetric (the lattice reflection makes the momentum blocks real); each
+  block enclosed by `CertifiedGaps.VerifiedSpectra.verified_eigen` (residual and Gram matrices
+  in `Float64` with the a priori $`\gamma_{N+8}`$ rounding bound and Frobenius norms, then
+  Ostrowski/polar-factor and Weyl bounds, plus the exact construction error). For the 12-rung
+  ring, the same sparse interval-enclosed blocks and `RitzBounds.ritz_upper_bounds`: from any
+  `Float64` basis $V$ (Lanczos vectors, never trusted), a priori $\gamma_n$ bounds on
+  $\mathrm{fl}(MV)$, $V^{\mathsf T} W$ and $V^{\mathsf T} V$, a Gershgorin shift, Ostrowski
+  for the pencil and `verified_eigen` on the small Rayleigh-quotient matrix give rigorous upper
+  bounds on the lowest eigenvalues of each block (Courant–Fischer), hence a rigorous lower
+  bound on $Z_{12}$. $\log Z$ in interval arithmetic; seed defects rounded up to a $10^{-15}$
+  grid; the coupling identity with $P_{\mathrm{s}}(6, \beta) \le 1$ (reflection positivity at
+  even $n_0$); the exact rational doubling chain and the interval `certified_gap_bound`; the
+  4-rung gap bounds of `finite_bridge` (`spectral_gap_enclosure`, rounded outward). Trusted
+  base: IEEE binary64 round-to-nearest with gradual underflow, standard (non-fast-math) BLAS
+  and LAPACK producing finite output, `IntervalArithmetic`, and the repository's two-purity
+  theorem.
 - **Fast vs. full verification:** `check.jl` (core `check_point`) requires the model-local
-  source hashes, the stored model, RP factors, seed and params to be exactly those of
-  `Ladder.POINTS` and `Ladder.ladder(g)`, the Lean seed hypotheses and the Hadamard frame
-  change, and re-verifies the RP identity, the exact chain and the interval bound; `--full`
-  also recomputes and re-verifies every block spectrum and requires the fresh defects to be at most the stored ones.
-- **Numerical only (not used in the proof):** the seed search ($`g \in \{2, 5/2, 3, 4\}`$,
-  $`n_0 \in \{2, 3, 4\}`$, $\beta = 1/8 : 1/8 : 32$), the negative scan results at $g = 2$ and
-  $5/2$, the extrapolated seed sizes, finite-ring ED reference gaps, and the literature critical
-  field $g_c \approx 1.83214(5)$.
+  source hashes (`RitzSeeds.SOURCES`), the stored model, RP factors, seed and params to be
+  exactly those of the point and of `Ladder.ladder(g)`, the Lean seed hypotheses (seed
+  $(4, 3/2)$) and the Hadamard frame change, and re-verifies the RP identity, the exact chain
+  and the interval bound. For the coupled seeds it also recomputes the defects from a freshly
+  verified 6-rung spectrum and the stored Ritz bounds `results/partial_g*_L12.json` (whose
+  SHA-256 the certificate pins) and recomputes the 4-rung bridge. **The fast check trusts the
+  stored 12-rung Ritz bounds as written by `certify.jl`**; `--full` recomputes them (and every
+  complete spectrum of the $n_0 = 4$ point) and requires the fresh defects to be at most the
+  stored ones. Lanczos starts from deterministic vectors; on another platform the fresh Ritz
+  bounds may differ in the last bits, so `--full` can in principle fail by $10^{-15}$ without
+  any error in the certificate.
+- **Numerical only (not used in the proof):** the seed searches (`scripts/scan.jl`:
+  $`g \in \{2, 5/2, 3, 4\}`$, $`n_0 \in \{2, 3, 4\}`$; `scripts/ritz_scan.jl`:
+  $`g \in \{5/2, 11/4, 3, 4\}`$ at $n_0 = 6$ with Lanczos values of the 12-rung ring), the
+  choice of $\beta_0$ and of the number of bounded levels, the negative results at $g = 2$
+  and $5/2$, the extrapolated seed sizes, finite-ring ED and Lanczos reference gaps, and the
+  literature critical field $g_c \approx 1.83214(5)$.
 
 ## Layout
 
 Stored results live in [`data/models/two_leg_tfim/`](../../../data/models/two_leg_tfim/);
 this directory's `results/` is a relative symlink to that canonical location.
 
-- `certify.jl`, `check.jl`: certificate generator (core `certify_point`) and checker (core
-  `check_point`, with the Lean seeds from `lean_points`).
-- `src/Ladder.jl`: the model only: physical and rotated terms and models, the frame change, the
-  core `RingModel` with its charge, leg-exchange symmetry and lattice reflection, the RP
-  factors, the certified points and their certificate file names.
-- `scripts/`: `scan.jl` (numerical seed scan), `extrapolate.jl`, `summarize.jl` (rewrites the
-  `## Results` section of `METHOD.md`).
+- `certify.jl`, `check.jl`: certificate generator (core `certify_point`, with
+  `coupled_seed_bounds` for the coupled points) and checker (core `check_point`, with the Lean
+  seeds from `lean_points`).
+- `src/Ladder.jl`: the model: physical and rotated terms and models, the frame change, the core
+  `RingModel` with its charge, leg-exchange symmetry and lattice reflection, the RP factors,
+  the complete-spectrum points `POINTS` and their certificate file names.
+- `src/RitzSeeds.jl`: the coupled seeds: Ritz levels per block, `doubled_ring_bounds`,
+  `finite_bridge`, file names and the pinned `SOURCES`; `src/ritz_points.jl`: the list
+  `RITZ_POINTS` (not pinned, so that adding a point leaves the other certificates valid).
+- `scripts/`: `scan.jl` (numerical seed scan, $n_0 \le 4$), `ritz_scan.jl` and `sectors.jl`
+  (floating-point screening of the coupled $n_0 = 6$ seeds with a sparse sector builder of the
+  physical-frame ring), `extrapolate.jl`, `summarize.jl` (rewrites the `## Results` section of
+  `METHOD.md`), `refresh_metadata.jl` (refreshes the provenance of the $n_0 = 4$ certificate
+  without changing its numbers; see "Reproduce").
 - `test/runtests.jl`: exact frame and RP tests, core blocks against an independent full
-  Hamiltonian (the stored certificate is checked by `check.jl`).
-- `results/certificate_g3_1.json`: the core-format certificate (model, RP data, seed, log Z
-  enclosures, spectrum summaries, exact chain, `params`, and `metadata` with the model-local
-  `source_sha256` of `src/`, `certify.jl`, `check.jl` and the core `core_sha256`);
-  `scan_g*.json` (numerical scans) and `extrapolation.json`.
+  Hamiltonian, Ritz bounds and coupled defects on small rings against complete spectra, and
+  the 4-rung bridge (the stored certificates are checked by `check.jl`).
+- `results/certificate_g3_1.json` ($n_0 = 4$) and `results/certificate_g<g>_n6.json`
+  (coupled): core-format certificates (model, RP data, seed, log Z enclosures, spectrum
+  summaries, exact chain, `params`, `metadata` with the model-local `source_sha256` and the
+  core `core_sha256`; the coupled ones also `partial_spectrum` and `finite_bridge`);
+  `results/partial_g<g>_L12.json`: the Ritz upper bounds of the 12-rung ring (hash-pinned by
+  the coupled certificates); `scan_g*.json`, `ritz_scan_g*.json`, `ritz_spectra_g*.json`
+  (numerical scans) and `extrapolation.json`.
 
 ## History
 
@@ -156,3 +246,15 @@ $\varepsilon_{\mathrm{s}}$ $0.11238966699 \to 0.11238966593$, $\varepsilon_\tau$
 $0.05153622006 \to 0.05153621778$, interval bound $0.6368708320 \to 0.6368708493$, exact chain
 bound $0.636342881 \to 0.636342898$, largest 8-rung radius
 $1.5 \times 10^{-7} \to 5.7 \times 10^{-8}$.
+
+Coupled half-length seeds at $n_0 = 6$ (core `RitzBounds`) then raised the $g = 3$ bound from
+$0.636870849$ to $0.849386526$ and added the points $g = 11/4$ and $g = 4$. `check.jl` and
+`certify.jl` were extended for them, and every certificate now pins `RitzSeeds.SOURCES`
+instead of the whole `src/`. The certified numbers of the $n_0 = 4$ certificate are unchanged
+($\varepsilon_{\mathrm{s}} = 0.112389665926876$, $\varepsilon_\tau = 0.051536217782645$,
+interval bound $0.6368708493$, exact chain bound $0.636342898$): only its provenance metadata
+(model-local and core source hashes, versions and creation time) was refreshed by
+`scripts/refresh_metadata.jl`, and every other JSON value is identical to the previous
+version. A fresh `certify.jl` run on this machine gave slightly tighter enclosures
+($\varepsilon_{\mathrm{s}} \le 0.112389665753866$), which `check.jl --full` reproduces as fresh
+defects below the stored ones; they were not stored.

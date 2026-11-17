@@ -1,0 +1,578 @@
+Applying the periodic doubling argument of Section~\ref{sm:sec:trotter} to a
+new Hamiltonian requires two inputs:
+\begin{enumerate}
+    \item write $H_L=\sum_j h_{j,j+1}+\sum_j o_j$ in the real
+          bond-reflection-positive form $-h=\sum_\alpha C_\alpha\otimes FC_\alpha F$
+          with $FoF=o$ on a chosen unit cell, so that the two-cell Trotter
+          transfer matrix $\smT=\smF^{\mathsf T}\smF\succeq0$ of
+          Eq.~\eqref{sm:eq:positive} is positive semidefinite at every even cell
+          count $L$;
+    \item bound $1-\Ps(n_0,\beta_0)$ and $1-\Pt(2n_0,\beta_0)$ at one
+          finite scale by rationals $(p_0,q_0)$ inside the convergence region of
+          the doubling recurrence.
+\end{enumerate}
+
+Reflection positivity carries no gap information (gapless and
+spontaneously dimerized chains are reflection positive too;
+Proposition~\ref{models:cor:obstruct}), so the seed computation must be
+matched to the correlation length $\xi$ and gap $\Delta$ of the model:
+\begin{center}
+    \renewcommand{\arraystretch}{1.3}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}llp{4.1cm}p{5.3cm}@{}}
+        \toprule
+        Regime                           & Finite inputs          & Seed strategy                           & Models in Table~\ref{tab:models}                                     \\
+        \midrule
+        Short $\xi$, small $d^{2n_0}$    & $2n_0\le16$ spins      & Symmetry blocks + Weyl bound            & Staggered, dimerized, ladders, Ising (Sec.~\ref{models:sec:spectra}) \\
+        Moderate $\xi$, large $d^{4n_0}$ & $6,12$ spins           & Block spectra + Eq.~\eqref{sm:eq:torus} & Single-ion anisotropy, $D=4$ (Sec.~\ref{models:sec:spectra})         \\
+        Weak off-diagonal term           & $6,12$ spins           & Trial residuals + diagonal count        & Mixed-field Ising, kernel seed (Sec.~\ref{models:sec:ising})         \\
+        Long $\xi$ ($n_0\ge36$)          & $4$--$12$ traces + MPS & Twisted-ring moments + integer MPS      & Heisenberg, $S=1$ (Sec.~\ref{sm:sec:seeds})                          \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\subsection{Reflection-positive spin chains, unit cells, and obstructions}
+\label{models:sec:rp}
+
+To apply the finite-Trotter Gram factorization of
+Section~\ref{sm:sec:transfer} to a periodic ring of $L\ge2$ unit cells,
+\begin{equation}
+    H_L=\sum_{j=1}^L h_{j,j+1}+\sum_{j=1}^L o_j,
+    \qquad j+L\equiv j,
+    \label{models:eq:ring}
+\end{equation}
+we require a real local cell basis, a real symmetric involution $F$
+($F^2=\smI$), a real symmetric on-site matrix $o$ satisfying $FoF=o$,
+and real symmetric or antisymmetric bond matrices $C_\alpha$ such that
+\begin{equation}
+    -h=\sum_\alpha C_\alpha\otimes FC_\alpha F
+    =\sum_\alpha\;\scopebond\,.
+    \label{models:eq:rp}
+\end{equation}
+Hermiticity of $h$ alone does not supply this form: the factors must be
+real and $o$ even under $F$, so basis and cell are chosen model by model.
+
+\subsubsection{Bilinear, staggered, and biquadratic spin chains}
+\label{models:sec:catalogue}
+
+For a bilinear bond, a factor $v\cdot\bm S$ and its mirror image must
+multiply back to $-\bm S^{\mathsf T}J\bm S$, so the mirror has to act on
+the spin components by a $3\times3$ matrix $O$. Only maps realized by an
+antiunitary symmetry qualify, which restricts the sign pattern of $J$.
+Consider first a single-site spin-$S$ chain
+($F=\smI$) with a real symmetric exchange matrix $J$ and a uniform
+field $\bm h$,
+\begin{equation}
+    H_L=\sum_{j=1}^L\bm S_j^{\mathsf T}J\bm S_{j+1}
+    +\sum_{j=1}^L\bm h\cdot\bm S_j.
+    \label{models:eq:bilinear}
+\end{equation}
+In the standard $S^z$ eigenbasis, $S^x$ and $S^z$ are real and $S^y$ is
+purely imaginary, so complex conjugation $K$ acts on the spin vector by
+$\operatorname{diag}(1,-1,1)$. Composing $K$ with a $\pi$ rotation $U_R$
+about a principal axis gives an antiunitary reflection $\Theta=U_RK$ that
+acts on the spin vector by a symmetric orthogonal matrix
+$O=R\operatorname{diag}(1,-1,1)$ with $\det O=-1$; the rotation about $y$
+gives time reversal $T=e^{i\pi S^y}K$ with $O=-I$.
+
+\begin{proposition}[Bilinear spin chains]
+    \label{models:prop:xyz}
+    If there exists a symmetric orthogonal matrix $O\in\mathrm O(3)$ with
+    $\det O=-1$ such that $-JO\succeq0$ and $O\bm h=\bm h$, then
+    Eq.~\eqref{models:eq:bilinear} admits a reflection-positive bond
+    factorization for every spin $S$. For diagonal exchange
+    $J=\operatorname{diag}(J_x,J_y,J_z)$ with nonzero entries and $\bm h=0$,
+    such an $O$ exists if and only if an even number of $J_x,J_y,J_z$ are
+    negative.
+\end{proposition}
+
+\begin{proof}
+    Factor the positive semidefinite matrix $-JO=\sum_\alpha v_\alpha v_\alpha^{\mathsf T}$
+    with real vectors $v_\alpha\in\mathbb R^3$ and set
+    $C_\alpha=v_\alpha\cdot\bm S$. Under $\Theta=U_RT$,
+    $\Theta(C_\alpha)=(Ov_\alpha)\cdot\bm S$, so
+    $\sum_\alpha C_\alpha\otimes\Theta(C_\alpha)
+        =\bm S^{\mathsf T}(-JO)O\bm S=-\bm S^{\mathsf T}J\bm S$, while
+    $\Theta(\bm h\cdot\bm S)=(O\bm h)\cdot\bm S=\bm h\cdot\bm S$. When $J$
+    is diagonal with nonzero entries, $-JO\succeq0$ forces
+    $O=\operatorname{sign}(-J)$, whose determinant $(-1)^{n_-}$ is $-1$ if
+    and only if the number $n_-$ of ferromagnetic ($J_\alpha<0$) components
+    is even.
+\end{proof}
+
+Proposition~\ref{models:prop:xyz} sorts the standard single-site spin
+chains by the sign parity $n_-$ of their exchange couplings; a uniform
+field fails because $O=-\smI$ reverses it:
+\begin{center}
+    \setlength{\tabcolsep}{5pt}
+    \begin{tabular}{@{}llll@{}}
+        \toprule
+        Chain                                         & $(J_x,J_y,J_z)$, $\bm h$ & Mirror $O$                                  & Reflection positive \\
+        \midrule
+        Heisenberg antiferromagnet, any $S$           & $(1,1,1)$, $0$           & $-\smI$ ($n_-=0$)                           & yes                 \\
+        XXZ, $\Delta\ge0$                             & $(1,1,\Delta)$, $0$      & $-\smI$                                     & yes                 \\
+        XY, either sign                               & $(J_x,J_y,0)$, $0$       & $J_z=0$ frees $O_{zz}$                      & yes                 \\
+        Transverse- or mixed-field Ising              & $(0,0,-1)$, $(g,0,h)$    & $\operatorname{diag}(1,-1,1)$ fixes $\bm h$ & yes                 \\
+        Heisenberg ferromagnet                        & $(-1,-1,-1)$, $0$        & $n_-=3$                                     & no                  \\
+        XXZ, $\Delta<0$                               & $(1,1,\Delta)$, $0$      & $n_-=1$                                     & no                  \\
+        Heisenberg antiferromagnet in a uniform field & $(1,1,1)$, $\bm h\ne0$   & $-\smI$ reverses $\bm h$                    & no                  \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+Although a uniform field breaks reflection positivity of the Heisenberg
+antiferromagnet, a \emph{staggered} field restores it on every even
+ring: a $\pi$ rotation about the $y$ axis on every odd site makes the
+field uniform,
+\begin{equation}
+    \staggerrotation\qquad
+    -h_{j,j+1}=\sum_\alpha\;\rpbondpic{P_\alpha}{P_\alpha}\,,
+    \label{models:eq:stagger-rotation}
+\end{equation}
+and the bond sign parity stays even, $n_-=2$, because the remaining sign
+sits in the real antisymmetric factor $P_y=iS^y$. The same rotation
+underlies the staggered-field chain in Table~\ref{tab:models} and, on
+open chains, relates opposite endpoint fields \fieldopp\ to equal
+endpoint fields \fieldsame\ (Section~\ref{sm:sec:obc}).
+
+For $S=1$, adding a biquadratic interaction gives the family
+\begin{equation}
+    H_L(\vartheta)=\sum_{j=1}^L\Bigl[
+        \cos\vartheta\,\bm S_j\cdot\bm S_{j+1}
+        +\sin\vartheta\,(\bm S_j\cdot\bm S_{j+1})^2\Bigr].
+    \label{models:eq:blbq}
+\end{equation}
+Proposition~\ref{models:prop:xyz} does not reach the biquadratic term,
+which mixes products $S^\alpha S^\beta$ across the bond; factoring it
+needs one-site real operators without cross terms across the mirror. In
+the Cartesian basis $\ket{x},\ket{y},\ket{z}$ of
+Eq.~\eqref{sm:eq:generators}, the spin generators $G_\alpha=iS^\alpha$
+are real antisymmetric and the products $Q_{\alpha\beta}=S^\alpha S^\beta$
+are real matrices whose symmetric part
+$Q_{\alpha\beta}^+=\tfrac12(Q_{\alpha\beta}+Q_{\beta\alpha})$ and
+antisymmetric part $\tfrac12\epsilon_{\alpha\beta\gamma}G_\gamma$ are
+orthogonal under the trace. Expanding $(\bm S_1\cdot\bm S_2)^2$ into
+$G_\alpha$ and $Q_{\alpha\beta}^+$ diagonalizes the bond across the
+mirror:
+\begin{equation}
+    -h(\vartheta)=\bigl(\cos\vartheta-\tfrac12\sin\vartheta\bigr)
+    \sum_\alpha\;\rpbondpic{G_\alpha}{G_\alpha}
+    \;-\sin\vartheta\sum_{\alpha,\beta}\;
+    \rpbondpic{Q_{\alpha\beta}^+}{Q_{\alpha\beta}^+}\,.
+    \label{models:eq:blbq-decomp}
+\end{equation}
+
+\begin{proposition}[Reflection positivity of the bilinear--biquadratic chain]
+    \label{models:prop:blbq}
+    In the Cartesian basis, the bond~\eqref{models:eq:blbq-decomp} is
+    reflection positive if and only if both coefficients are nonnegative,
+    that is,
+    \begin{equation}
+        -\pi+\arctan2\le\vartheta\le0.
+        \label{models:eq:blbq-window}
+    \end{equation}
+\end{proposition}
+
+\begin{proofdiagram}
+    \blbqcircle
+\end{proofdiagram}
+\noindent Reflection positivity of the whole family thus reduces to the
+signs of two coefficients; the frustration-free AKLT point
+($\tan\vartheta=1/3>0$) lies outside the arc because its positive
+biquadratic term has the wrong sign in Eq.~\eqref{models:eq:blbq-decomp}.
+The doubling argument applies only on the Haldane sub-arc $(-\pi/4,0]$: the
+spontaneously dimerized phase $\vartheta\in[-\pi+\arctan2,-\pi/4]$ and
+the gapless spin-$1/2$ Heisenberg chain are reflection positive but
+have no seed in the convergence region, for reasons no larger ring or lower
+temperature removes:
+
+\begin{proposition}[Obstructions to a convergent seed]
+    \label{models:cor:obstruct}
+    For any reflection-positive ring Hamiltonian~\eqref{models:eq:ring}, no
+    scale $(n_0,\beta_0)$ has purities $\Ps(n_0,\beta_0)$ and
+    $\Pt(2n_0,\beta_0)$ inside the convergence region of the doubling
+    recurrence if either
+    \begin{enumerate}
+        \item[(i)] $H_{2n_0}$ has a $k$-fold degenerate ground level with
+              $k\ge2$: the ordered Gibbs weights satisfy $w_0=w_1\le1/k\le1/2$
+              (\specbars{.49,.49,.02}), so $\Pt(2n_0,\beta_0)=\sum_m w_m^2\le w_0\le1/2$;
+              or
+        \item[(ii)] $\liminf_{L\to\infty,\;L\text{ even}}\Delta_L=0$: a
+              seed in the convergence region would give a uniform positive lower bound on $\Delta_L$
+              for all even $L\ge n_0$.
+    \end{enumerate}
+\end{proposition}
+\noindent Reflection positivity thus supplies the squaring map, and only
+a finite seed inside the convergence region separates gapped chains with
+a unique ground state from critical or symmetry-broken ones.
+
+\subsubsection{Multi-spin unit cells, dimer reflections, and explicit decompositions}
+\label{models:sec:explicit-rp}
+
+When interactions alternate from bond to bond or couple two parallel
+legs, we block sites into a multi-spin unit cell. A single-site mirror
+then fails, because the inter-cell bond couples the last spin of one
+cell to the first spin of the next. The cell reflection $F$ repairs
+this: across an inter-cell mirror cut, a reflection of the ring
+reverses the left-to-right order of the sites inside each cell:
+\begin{equation}
+    -h_{j,j+1}=\sum_\alpha\;\cellbondform\,.
+    \label{models:eq:cell-mirror}
+\end{equation}
+In a two-spin dimer cell $(a,b)$, $F$ is the two-spin swap
+$F(x\otimes y)=y\otimes x$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Local/CellSwap.html\#CertifiedGaps.cellSwap_mul_cellSwap},
+which maps $C_\alpha=\smI\otimes G_\alpha$ on spin $b$ to
+$FC_\alpha F=G_\alpha\otimes\smI$ on spin $a$ of the next cell as drawn, and the intra-cell bond is a
+swap-invariant on-site matrix $FoF=o$. In a two-leg ladder the cell is
+a rung and the mirror keeps each leg on its own side,
+\begin{equation}
+    -h_{j,j+1}=\sum_\alpha\;\rungcellform\,,
+    \label{models:eq:rung-mirror}
+\end{equation}
+so the rung interaction is even under the reflection and belongs to
+$o$. These two reflections, the dimer swap and the identity on a rung,
+are all that Table~\ref{models:tab:rp} needs.
+
+The two-cell Gram form makes $Z_n(\beta)$ a sum of nonnegative powers
+only at even $n$, so an odd seed length needs positivity of the one-cell
+transfer operator itself. A dimer cell whose intra-cell bond is
+reflection positive supplies it: cutting the cell across its internal
+bond factors the \emph{one-cell} spatial transfer operator into a
+half-cell product with its transpose,
+\begin{equation}
+    X_\beta=\oddcellpos=KK^{\mathsf T}\succeq0.
+    \label{models:eq:odd-cell}
+\end{equation}
+Every eigenvalue of $KK^{\mathsf T}$ is nonnegative, so
+$Z_n(\beta)=\Tr X_\beta^n=\sum_i\lambda_i(\beta)^n$ is a sum of
+nonnegative powers at \emph{odd} cell counts $n_0$ too.
+In the dimerized spin-$1$ chain at $\delta=7/10$,
+Eq.~\eqref{models:eq:odd-cell} allows an odd seed of $n_0=3$ dimer cells
+($6$ and $12$ spins), avoiding the $16$-spin ($3^{16}\simeq4.3\times10^7$)
+ring that an even seed $n_0=4$ would require.
+
+Proposition~\ref{models:prop:xyz} guarantees a factorization, but the
+exact checkers behind Table~\ref{models:tab:rp} need its factors as
+explicit real matrices, and $S^y$ is imaginary in the $S^z$ basis.
+For $S=1/2$, we write $P_x=S^x=\tfrac12\sigma^x$,
+$P_y=iS^y=\tfrac12(i\sigma^y)$, and $P_z=S^z=\tfrac12\sigma^z$, which
+are real matrices satisfying $P_x^{\mathsf T}=P_x$,
+$P_y^{\mathsf T}=-P_y$, and $P_z^{\mathsf T}=P_z$. Rotating one site of
+an antiferromagnetic bond by $u_y=e^{i\pi S^y}=2P_y$ maps
+$(S^x,S^y,S^z)\mapsto(-S^x,S^y,-S^z)$ and converts $-\bm S_1\cdot\bm S_2$
+into the real reflection-positive form%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Local/SpinHalfRotation.html\#CertifiedGaps.SpinHalf.rot_conj_spinHalf}
+\begin{equation}
+    -u_{y,2}(\bm S_1\cdot\bm S_2)u_{y,2}^\dagger
+    =\sum_{\alpha=x,y,z}P_\alpha\otimes P_\alpha
+    =\sum_{\alpha=x,y,z}\;\rpbondpic{P_\alpha}{P_\alpha}\,.
+    \label{models:eq:spinhalf-bond}
+\end{equation}
+Applying $u_y$ on every odd site of an even spin-$1/2$ chain (or on the
+second spin $b$ of every dimer cell, or on the checkerboard sublattice
+of a two-leg ladder for even $L$) is a unitary transformation that
+preserves the spectrum%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Conjugation.html\#CertifiedGaps.RPRing.eigenvalues_eq_spectrum}
+and puts every antiferromagnetic bond into the
+form~\eqref{models:eq:spinhalf-bond}. For $S=1$, we work directly in the
+Cartesian basis $\ket{x},\ket{y},\ket{z}$ of
+Eq.~\eqref{sm:eq:generators}, where $G_\alpha=iS^\alpha$ is real
+antisymmetric, $-\bm S_1\cdot\bm S_2=\sum_\alpha G_\alpha\otimes G_\alpha$,
+and $(S^z)^2=\operatorname{diag}(1,1,0)$ is real diagonal without any
+sublattice rotation. Table~\ref{models:tab:rp} lists the resulting cell,
+reflection $F$, bond operators $C_\alpha$, and on-site matrix $o$ for all
+seven additional models in Table~\ref{tab:models}.
+
+\begin{table*}[t]
+    \caption{Explicit reflection-positive cell decompositions
+        $-h=\sum_\alpha C_\alpha\otimes FC_\alpha F$ and $FoF=o$ for the seven
+        additional models in Table~\ref{tab:models}, with links to their
+        Lean~4 reflection-positivity proofs. Here $F$ is the cell
+        reflection involution, $u_y=e^{i\pi S^y}$ is a $\pi$ spin rotation about
+        $y$, $P_\alpha\in\{S^x,iS^y,S^z\}$ are the real spin-$1/2$ operators of
+        Eq.~\eqref{models:eq:spinhalf-bond}, $G_\alpha=iS^\alpha$ are the real
+        antisymmetric spin-$1$ generators in the Cartesian basis, and
+        $S_{ab}(x\otimes y)=y\otimes x$ swaps the two spins of a dimer cell.}
+    \label{models:tab:rp}
+    \setlength{\tabcolsep}{5pt}
+    \footnotesize
+    \begin{tabular}{@{}lllll@{}}
+        \toprule
+        Model                                                                                                                                                                   & Unit cell ($F$)           & Local basis / rotation & Bond operators $C_\alpha$                    & On-site cell matrix $o$                                               \\
+        \midrule
+        Staggered field, $S=\tfrac12$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/StaggeredHeisenberg.html\#CertifiedGaps.StaggeredHeisenberg.model} & $1$ spin ($\smI$)         & $u_y$ on odd sites     & $P_\alpha$ ($\alpha=x,y,z$)                  & $-h_{\mathrm{st}}P_z$                                                 \\
+        Dimerized, $S=\tfrac12$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/DimerizedHeisenberg.html\#CertifiedGaps.DimerizedHeisenberg.model}       & $2$-spin dimer ($S_{ab}$) & $u_y$ on spin $b$      & $\sqrt{1-\delta}\,(\smI\otimes P_\alpha)$    & $-(1+\delta)\sum_\alpha P_\alpha\otimes P_\alpha$                     \\
+        Dimerized, $S=1$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/SpinOneDimerized.html\#CertifiedGaps.SpinOneDimerized.model}                    & $2$-spin dimer ($S_{ab}$) & Cartesian basis        & $\sqrt{1+\delta}\,(\smI\otimes G_\alpha)$    & $-(1-\delta)\sum_\alpha G_\alpha\otimes G_\alpha$                     \\
+        Single-ion anisotropy, $S=1$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/SpinOneLargeD.html\#CertifiedGaps.SpinOneLargeD.model}              & $1$ spin ($\smI$)         & Cartesian basis        & $G_\alpha$ ($\alpha=x,y,z$)                  & $D\operatorname{diag}(1,1,0)$                                         \\
+        Heisenberg ladder, $S=\tfrac12$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/HeisenbergLadder.html\#CertifiedGaps.HeisenbergLadder.model}     & $2$-spin rung ($\smI$)    & checkerboard $u_y$     & $P_\alpha\otimes\smI,\;\smI\otimes P_\alpha$ & $-J_\perp\sum_\alpha P_\alpha\otimes P_\alpha$                        \\
+        Ising ladder~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/TwoLegIsing.html\#CertifiedGaps.TwoLegIsing.model}                                  & $2$-spin rung ($\smI$)    & $\sigma^z$ basis       & $\sigma^z\otimes\smI,\;\smI\otimes\sigma^z$  & $-\sigma^z\otimes\sigma^z-g(\sigma^x\otimes\smI+\smI\otimes\sigma^x)$ \\
+        Mixed-field Ising~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/IsingLongitudinal.html\#CertifiedGaps.IsingLongitudinal.model}                 & $1$ spin ($\smI$)         & $\sigma^z$ basis       & $\sigma^z$                                   & $-g\sigma^x-h\sigma^z$                                                \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+\subsection{Seed bounds from verified finite-ring block spectra}
+\label{models:sec:spectra}
+
+Once a model is in the reflection-positive form~\eqref{models:eq:rp},
+the doubling recurrence of Section~\ref{sm:sec:trotter} applies. For
+the first six models in
+Table~\ref{tab:models}, the correlation length is short enough that the
+seed scale $n_0$ lies between $2$ and $12$ unit cells. Even there, the
+upper bounds $(p_0,q_0)$ need two-sided enclosures of three partition
+functions, and a dense eigensolve returns only floating-point numbers
+whose accuracy nothing certifies. The remedy is a posteriori: take the
+floating-point eigenbasis as a candidate and certify it by residual
+norms whose own rounding error is bounded.
+
+To enclose the complete spectrum of $H_L$ at $L\in\{n_0,2n_0\}$ (up to
+$16$ spin-$1/2$ or $12$ spin-$1$ sites), we block-diagonalize $H_L$ by
+translation, lattice reflection, and conserved spin or parity quantum
+numbers into self-adjoint blocks $B_q$ whose exact integer multiplicities
+$m_q$ sum to $d^L$, with every entry enclosed in rational or interval
+arithmetic. From a floating-point eigenbasis $V$ and candidate
+eigenvalues $\tilde\lambda_i$ of $B_q$, we bound the Frobenius norms of
+the residual $R=B_qV-V\operatorname{diag}(\tilde\lambda)$ and orthogonality
+error $G=V^{\mathsf T}V-\smI$ (including floating-point rounding
+error~\cite{Rump2010Verification}); Ostrowski's and Weyl's theorems then
+enclose the sorted exact eigenvalues $\lambda_i$ of $B_q$ within
+\begin{equation}
+    |\lambda_i-\tilde\lambda_i|\le
+    \frac{2\|G\|_F\max_j|\tilde\lambda_j|+(1+\|G\|_F)\|R\|_F}{1-\|G\|_F}
+    \qquad(\|G\|_F<1).
+    \label{models:eq:weyl}
+\end{equation}
+Summing $m_qe^{-\beta\lambda_i}$ over all blocks in interval arithmetic
+encloses $\log Z_{n_0}(\beta_0)$, $\log Z_{2n_0}(\beta_0)$, and
+$\log Z_{2n_0}(2\beta_0)$, yielding the certified rational upper bounds
+$(p_0,q_0)$. The staggered-field, dimerized, ladder, and mixed-field
+Ising models in Table~\ref{models:tab:summary} come from this pipeline
+directly; the single-ion anisotropy model at $D=4$ uses the half-length
+lift below.
+
+When $2n_0$ reaches the limit of block diagonalization, a direct seed at
+length $2n_0$ is out of reach, since both of its purities need the
+partition function of a ring of $4n_0$ cells. The spectra already in
+hand at lengths $n_0$ and $2n_0$ bound $1-\Ps(n_0,\beta_0)\le s$,
+$1-\Ps(n_0,2\beta_0)\le s_2$, and $1-\Pt(2n_0,\beta_0)\le t$. The
+obstacle is the thermal purity at $4n_0$, which no computed spectrum
+reaches; the torus identity~\eqref{sm:eq:torus} at length $2n_0$
+supplies it:
+\begin{proofdiagram}
+    \halflengthlift
+\end{proofdiagram}
+Move 2 is this identity with the denominator $\Ps(2n_0,\beta_0)^2\le1$
+dropped%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.thermalPurity_four_mul}:
+\begin{equation}
+    \Pt(4n_0,\beta_0)
+    =\frac{\Ps(2n_0,2\beta_0)\,\Pt(2n_0,\beta_0)^2}{\Ps(2n_0,\beta_0)^2}
+    \ge\bigl(1-f(s_2)\bigr)(1-t)^2.
+    \label{models:eq:half-length}
+\end{equation}
+For the spin-$1$ chain with single-ion anisotropy $D=4$ at
+$\beta_0=29/10$, the $L=6$ and $L=12$ spectra ($3^{12}=531{,}441$
+states) supply $s$, $s_2$, and $t$, and the lift gives the seed at
+$n_0=12$ without the $24$-site ring ($3^{24}\simeq2.8\times10^{11}$
+states). It sharpens the uniform gap bound at $D=4$ from $0.6946$ (the
+Lean chain from the direct seed $(6,9/4)$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/SpinOneLargeD.html\#Leaderboard.Records.SpinOneLargeD.D_4})
+to $0.8994$ for all even
+$L\ge12$; the short rings $L=6,8,10$ are covered directly by their
+verified spectral gaps.
+
+\begin{table*}[t]
+    \caption{Seed scales $(n_0,\beta_0)$, certified starting bounds
+        $p_0\ge1-\Ps(n_0,\beta_0)$ and $q_0\ge1-\Pt(2n_0,\beta_0)$, and
+        resulting uniform gap bounds for all eight models in
+        Table~\ref{tab:models} ($n_0$ counts sites, two-spin dimer cells, or
+        two-spin rungs as in Table~\ref{tab:models}). The pairs $(p_0,q_0)$ are
+        four-digit upper bounds on the enclosures of the model certificates and
+        enter the Lean theorems as hypotheses; the last row is the lifted seed
+        $(k,r)=(28,17/8)$ of Table~\ref{cert:tab:lifted}. The printed gap is the
+        interval bound of the certificate; each linked Lean theorem proves the
+        rational-chain bound~\eqref{models:eq:chain-cert} from its seed pair,
+        which agrees in the quoted digits except for the single-ion row, whose
+        Lean theorem starts from the direct seed $(6,9/4)$ and proves $0.6946$.
+        The mixed-field Ising seed is proved unconditionally in the Lean kernel.}
+    \label{models:tab:summary}
+    \begin{tabular}{@{}llcccc@{}}
+        \toprule
+        Model                           & Parameter           & Seed $(n_0,\beta_0)$ & $p_0\ge1-\Ps(n_0,\beta_0)$ & $q_0\ge1-\Pt(2n_0,\beta_0)$ & Certified gap $\ge$                                                                                                                                               \\
+        \midrule
+        Staggered field, $S=\tfrac12$   & $h_{\mathrm{st}}=1$ & $(8,21/4)$           & $6.937\times10^{-4}$       & $7.327\times10^{-4}$        & $1.1489$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/StaggeredHeisenbergPhysical.html\#CertifiedGaps.StaggeredHeisenberg.physical_gap} \\
+        Dimerized, $S=\tfrac12$         & $\delta=1/2$        & $(4,6)$              & $1.133\times10^{-2}$       & $1.224\times10^{-2}$        & $0.5347$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/DimerizedHeisenbergPhysical.html\#CertifiedGaps.DimerizedHeisenberg.physical_gap} \\
+        Dimerized, $S=1$                & $\delta=9/10$       & $(2,7/2)$            & $4.972\times10^{-2}$       & $3.206\times10^{-2}$        & $0.5288$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/SpinOneDimerized.html\#CertifiedGaps.SpinOneDimerized.gap}                        \\
+        Single-ion anisotropy, $S=1$    & $D=4$               & $(12,29/10)$         & $3.633\times10^{-3}$       & $3.141\times10^{-2}$        & $0.8994$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/SpinOneLargeD.html\#CertifiedGaps.SpinOneLargeD.gap}                              \\
+        Heisenberg ladder, $S=\tfrac12$ & $J_\perp=4$         & $(4,2)$              & $3.509\times10^{-2}$       & $2.463\times10^{-2}$        & $1.1024$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/HeisenbergLadderPhysical.html\#CertifiedGaps.HeisenbergLadder.physical_gap}       \\
+        Ising ladder                    & $g=3$               & $(4,3/2)$            & $1.125\times10^{-1}$       & $5.162\times10^{-2}$        & $0.6368$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Models/TwoLegIsing.html\#CertifiedGaps.TwoLegIsing.gap}                                  \\
+        Mixed-field Ising               & $(g,h)=(1/4,1/20)$  & $(6,97/4)$           & $9.064\times10^{-6}$       & $3.141\times10^{-5}$        & $0.3922$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/IsingLongitudinal.html\#Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_20}        \\
+        Heisenberg, $S=1$               & isotropic           & $(60,833/32)$        & $3.054\times10^{-2}$       & $4.796\times10^{-2}$        & $0.0729$~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/SpinOneHeisenberg.html\#Leaderboard.Records.SpinOneHeisenberg.temperature_lifting} \\
+        \bottomrule
+    \end{tabular}
+\end{table*}
+
+Finally, to verify the $J$ doubling steps~\eqref{sm:eq:update} from
+$(p_0,q_0)$ and the resulting gap bound $\Delta_L>\tfrac{\log r}{\beta_0}$ in
+Lean, whose kernel decides rational inequalities but has no certified
+logarithm, we express the
+interval bounds~\eqref{cert:eq:interval-gap} and the quadratic tail
+of Sec.~\ref{sm:sec:gap} in terms of a rational base factor $r>1$ and
+tail threshold $\varepsilon\le1/100$:
+\begin{equation}
+    r^{2^j}z_j<1-z_j\quad(0\le j<J),\qquad
+    p_J,q_J\le\varepsilon\le\frac1{100},\qquad
+    5\varepsilon r^{2^J}\le1,
+    \label{models:eq:chain-cert}
+\end{equation}
+where $z_j=1-(1-p_j)^2(1-q_j)$ along the upward-rounded rational
+sequence $(p_j,q_j)$. The first inequality is equivalent to
+$\tfrac{\log[(1-z_j)/z_j]}{2^j\beta_0}>\tfrac{\log r}{\beta_0}$ on $[2^jn_0,2^{j+1}n_0]$,
+and the remaining two initialize the quadratic tail
+inequality~\eqref{sm:eq:scalar} for all $j\ge J$. The Lean kernel checks these rational
+inequalities directly, and the general theorem%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.gapGT_of_chainCertificate}
+concludes that any reflection-positive ring satisfying
+$1-\Ps(n_0,\beta_0)\le p_0$ and $1-\Pt(2n_0,\beta_0)\le q_0$ has a unique
+ground state and $\Delta_L>\tfrac{\log r}{\beta_0}$ for every even $L\ge n_0$.
+All eight seeds of Table~\ref{models:tab:summary} (labeled by model) lie
+inside the admissible region of the asymmetric recurrence and below the
+symmetric threshold $\varepsilon_*\simeq0.1273$:
+\begin{proofdiagram}
+    \seedscatter
+\end{proofdiagram}
+The boundary is the update~\eqref{sm:eq:update} iterated in floating
+point until $(p_j,q_j)$ enters $[0,1/100]^2$; it admits $p_0$ up to
+$0.217$ when $q_0\to0$ and $q_0$ up to $0.200$ when $p_0\to0$, so the
+recurrence tolerates $1-\Ps$ and $1-\Pt$ almost independently.
+
+\subsection{Unconditional seed proof for the mixed-field Ising chain}
+\label{models:sec:ising}
+
+Section~\ref{models:sec:spectra} supplies the seed bounds $(p_0,q_0)$ to
+the Lean theorem as hypotheses. To eliminate that hypothesis and prove an
+unconditional gap theorem in Lean, the kernel must bound
+$Z_{n_0}(\beta_0)$, $Z_{2n_0}(\beta_0)$, and $Z_{2n_0}(2\beta_0)$ from
+above and below directly. A full $2^{12}\times2^{12}$ eigensolve inside
+a proof-assistant kernel is prohibitive, but at the mixed-field Ising
+point $(g,h)=(1/4,1/20)$,
+\begin{equation}
+    H_L=-\sum_{j=1}^L\sigma_j^z\sigma_{j+1}^z
+    -\frac14\sum_{j=1}^L\sigma_j^x
+    -\frac1{20}\sum_{j=1}^L\sigma_j^z,
+    \label{models:eq:ising}
+\end{equation}
+we do not need the full spectrum. On a ring of length $L\in\{6,12\}$,
+the longitudinal field splits the two classical ferromagnetic states
+$\ket{\uparrow\cdots\uparrow}$ and $\ket{\downarrow\cdots\downarrow}$ by
+$2hL=L/10$, whereas creating a pair of domain walls costs energy $4$.
+Because the transverse field $-g\sum_{j=1}^L\sigma_j^x$ has operator
+norm $gL=L/4$, which at $L\le12$ exceeds the ferromagnetic splitting
+$2hL$ but remains below the domain-wall cost $4$, bounding the
+transverse field by its norm separates all $2^L-2$ domain-wall states
+from the two ferromagnetic levels, while two integer trial vectors
+locate the two lowest eigenvalues to within $\delta=10^{-10}$:
+\begin{proofdiagram}
+    \isingsandwich
+\end{proofdiagram}
+
+\emph{Two low-lying eigenvalues from integer trial residuals.}
+For any Hermitian matrix $H$ with eigenvalues $\lambda_i$, any nonzero
+trial vector $x$, and any real shift $\theta$, expanding
+$\|(H-\theta\smI)x\|^2$ in the eigenbasis shows that at least one
+eigenvalue $\lambda_i$ satisfies
+$(\lambda_i-\theta)^2\|x\|^2\le\|(H-\theta\smI)x\|^2$. Because $H_L$ has
+rational entries in the $\sigma^z$ basis, this residual inequality
+reduces to an exact integer dot-product comparison. On each ring
+$L\in\{6,12\}$, we supply two integer trial vectors
+$x_0,x_1\in\mathbb Z^{2^L}$ scaled by $2^{52}$ and rational candidate
+energies $\theta_0<\theta_1$. The Lean kernel checks in exact integer
+arithmetic that%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Ising/Seed.html\#SeedKernel.Ising.exists_near_of_check}
+\begin{equation}
+    \|(H_L-\theta_a\smI)x_a\|^2\le\delta^2\|x_a\|^2
+    \qquad(a=0,1,\quad\delta=10^{-10}),
+    \label{models:eq:residual}
+\end{equation}
+which places two distinct eigenvalues of $H_L$ in the disjoint intervals
+$[\theta_0-\delta,\theta_0+\delta]$ and
+$[\theta_1-\delta,\theta_1+\delta]$ ($\theta_0\simeq-6.3918$ and
+$\theta_1\simeq-5.7966$ at $L=6$; $\theta_0\simeq-12.7835$ and
+$\theta_1\simeq-11.5932$ at $L=12$).
+
+\emph{Lower bound on the remaining $2^L-2$ eigenvalues by configuration counting.}
+To verify that the two eigenvalues in $[\theta_0\pm\delta]$ and
+$[\theta_1\pm\delta]$ are the two lowest levels of $H_L$ and to bound
+all remaining $2^L-2$ eigenvalues from below, we split $H_L$ in the
+$\sigma^z$ basis $\ket{\sigma}$ ($\sigma\in\{\pm1\}^L$) into the
+diagonal Ising energy $E_{\mathrm{cl}}(\sigma)$ and the off-diagonal
+transverse field $-g\sum_{j=1}^L\sigma_j^x$. Since each $\sigma_j^x$ has
+operator norm one, the transverse field contributes at most $gL\|x\|^2$
+to $\langle x,H_Lx\rangle$, giving the quadratic-form lower bound
+\begin{equation}
+    \langle x,H_Lx\rangle
+    \ge\sum_{\sigma\in\{\pm1\}^L}\bigl(E_{\mathrm{cl}}(\sigma)-gL\bigr)|x(\sigma)|^2.
+    \label{models:eq:gershgorin}
+\end{equation}
+For any threshold $\rho$, let
+$B=\{\sigma:E_{\mathrm{cl}}(\sigma)-gL<\rho\}$. By the min--max
+principle, at most $|B|$ eigenvalues of $H_L$ lie below $\rho$, because
+Eq.~\eqref{models:eq:gershgorin} gives $\langle x,H_Lx\rangle\ge\rho\|x\|^2$
+on the codimension-$|B|$ subspace of vectors vanishing on $B$. On a
+ring, the two uniform configurations \spinrow{1,1,1,1,1,1} and
+\spinrow{-1,-1,-1,-1,-1,-1} have classical energies $-L\mp hL$; every
+other configuration, such as \spinrow{1,1,-1,-1,1,1}, has at least two
+domain walls ($\sum_j\sigma_j\sigma_{j+1}\le L-4$) and at least one spin
+against the field ($\sum_j\sigma_j\le L-2$), so its shifted classical
+energy is at least
+\begin{equation}
+    \rho=-(L-4)-h(L-2)-gL,
+    \label{models:eq:ising-rho}
+\end{equation}
+which equals $-3.7>\theta_1+\delta$ at $L=6$ and $-11.5>\theta_1+\delta$
+at $L=12$. The kernel checks $|B|=2$ at this $\rho$ over all $2^L$
+configurations, so, with two eigenvalues already located below
+$\theta_1+\delta<\rho$, the remaining $2^L-2$ satisfy $\lambda_i\ge\rho$.
+
+\emph{Partition-function bounds and unconditional gap theorem.}
+Combining the two eigenvalue enclosures with the lower bound
+$\lambda_i\ge\rho$ ($i\ge2$) sandwiches $Z_L(\beta)$ from both sides:
+dropping all excited states bounds $Z_L(\beta)$ from below by the ground
+state alone, $Z_L(\beta)\ge e^{-\beta(\theta_0+\delta)}$, while bounding
+the two lowest eigenvalues from below by $\theta_0-\delta$ and
+$\theta_1-\delta$ and all remaining $2^L-2$ eigenvalues by $\rho$ gives
+the upper bound%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Ising/Seed.html\#SeedKernel.Ising.partition_upper}
+\begin{equation}
+    Z_L(\beta)\le e^{-\beta(\theta_0-\delta)}
+    \left[1+e^{-\beta(\theta_1-\theta_0)}
+        +2^Le^{-\beta(\rho-\theta_0+\delta)}\right].
+    \label{models:eq:ising-z}
+\end{equation}
+The leading factor $e^{-\beta\theta_0}$ cancels between numerator and
+denominator in both $\Ps(6,\beta_0)=Z_{12}(\beta_0)/Z_6(\beta_0)^2$ and
+$\Pt(12,\beta_0)=Z_{12}(2\beta_0)/Z_{12}(\beta_0)^2$ because
+$2\theta_0(6)\simeq\theta_0(12)$ to within $10^{-7}$. Using rational
+bounds on $e$ in Lean, evaluating Eq.~\eqref{models:eq:ising-z} at
+$\beta_0=97/4$ proves the starting bounds at $(n_0,\beta_0)=(6,97/4)$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Ising/Seed.html\#SeedKernel.Ising.first_point_seed},
+\begin{equation}
+    p_0=\frac{9064}{10^9}\ge1-\Ps(6,97/4),\qquad
+    q_0=\frac{3141}{10^8}\ge1-\Pt(12,97/4).
+    \label{models:eq:ising-seed}
+\end{equation}
+At $j=0$, these bounds give $z_0=1-(1-p_0)^2(1-q_0)\simeq4.954\times10^{-5}$,
+so $(1-z_0)/z_0>20{,}184$; substituting Eq.~\eqref{models:eq:ising-seed}
+into the rational doubling inequalities~\eqref{models:eq:chain-cert}
+over $J=14$ steps with base factor $r=13531935/10^3<(1-z_0)/z_0$ proves
+a unique ground state and%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/IsingLongitudinal.html\#Leaderboard.Records.IsingLongitudinal.g_1_4_h_1_20}
+\begin{equation}
+    \boxed{
+        \Delta_L>\frac{\log(13531.935)}{97/4}>0.3922
+        \qquad\text{for every even }L\ge6
+    }
+    \label{models:eq:ising-gap}
+\end{equation}
+unconditionally in Lean.

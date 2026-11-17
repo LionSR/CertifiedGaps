@@ -9,6 +9,7 @@ certificate contents or recompute numerical results.
 |---|---|
 | `models/spin1/` | Exact trace, trial-state, and scalar data reproduced from the pinned OpenAI evidence; checked by `code/models/spin1/check.jl` |
 | `models/heisenberg_staggered_field/`, `models/dimerized_heisenberg/`, `models/spin1_dimerized/`, `models/spin1_largeD/`, `models/heisenberg_ladder/`, `models/two_leg_tfim/`, `models/tfim_longitudinal/` | Model generators produce seed enclosures and certificates; each model's `check.jl` replays its certificate arithmetic |
+| `models/spin1_small_seed/` | Spin-1 small-seed certificate (even rings ≤ 12 sites, error 10⁻³); its trace inputs are re-audited from `models/spin1/`; checked by `code/models/spin1_small_seed/check.jl` |
 | `models/lean_seeds/` | Witness studies, exact arithmetic outputs, and cost diagnostics supporting the Lean seed generators |
 | `models/spin2/` | Stored trial certificates and local numerical studies; no uniform spin-2 gap certificate |
 | `models/blbq_haldane/` | Negative-result scan summaries and diagnostic data; no gap certificate |

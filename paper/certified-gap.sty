@@ -1,0 +1,154 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{certified-gap}[2026/11/08 Manuscript setup for the certified-gap paper]
+\RequirePackage[T1]{fontenc}
+\RequirePackage{tnnotes,booktabs,mathtools,pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{decorations.pathreplacing}
+\RequirePackage[colorlinks=true]{hyperref}
+\hypersetup{pdftitle={Bridging Gaps with Tensor Networks: From the Haldane Gap and Beyond},
+ pdfauthor={Sirui Lu}}
+
+% ------------------------------------------------------------------ palette
+% One meaning per color, used identically in the main text and the SM:
+%   mpored     space: spatial transfer objects, P_s, p, moves along the length axis
+%   mpoblue    imaginary time: Gibbs/MPO objects, P_tau, q, moves along the beta axis
+%   tncert     conclusions: certified or admissible quantities (bounds, target region)
+%   tnexclude  regions ruled out (no eigenvalue can lie there)
+%   grays      spectra and weights (black!55 leading, black!25 remainder), caps, guides
+% Never red or blue for an upper bound or an excluded region. The muted values
+% below override the brighter defaults of tnnotes for this manuscript only.
+\definecolor{mpored}{HTML}{A8625B}
+\definecolor{mpoblue}{HTML}{5F7E99}
+\definecolor{tncert}{HTML}{4F7F74}
+\definecolor{tnexclude}{HTML}{B08A4A}
+% Links in a slate blue that sits beside the palette instead of shouting over it.
+\hypersetup{citecolor=blue,linkcolor=blue,urlcolor=blue}
+
+% ------------------------------------------------------------------- styles
+% Every TikZ style of the manuscript lives here; the figure files only draw.
+\tikzset{
+ % tensor-network nodes: the tnnotes shapes with lighter fills and gray outlines
+ mpo/.style={draw=black!70,fill=mpoblue!18,minimum width=1.1em,minimum height=.85em},
+ gibbs/.style={draw=black!70,fill=mpoblue!14,minimum height=1em,inner xsep=2pt},
+ xop/.style={draw=black!70,fill=mpored!14,minimum height=1.05em,inner xsep=2.5pt},
+ xvertex/.style={draw=mpored!80!black,fill=mpored!85,minimum size=.42em,inner sep=0pt},
+ % physical legs are plain vertical wires: space and imaginary time are told
+ % apart by orientation alone, not by a double line
+ phys/.style={line width=.45pt},
+ % proof lanes: pale fills, thin colored outlines
+ lane s/.style={lanebox,draw=mpored!80,fill=mpored!7,line width=.45pt},
+ lane so/.style={lanebox,draw=mpored!80,densely dashed,fill=white,line width=.45pt},
+ lane t/.style={lanebox,draw=mpoblue!85,fill=mpoblue!7,line width=.45pt},
+ lane to/.style={lanebox,draw=mpoblue!85,densely dashed,fill=white,line width=.45pt},
+ lane b/.style={lanebox,draw=black!50,fill=black!6,line width=.45pt},
+ % manuscript-wide helpers
+ arxiv label/.style={font=\footnotesize},
+ arxiv gate/.style={draw,fill=white,line width=.4pt},
+ arxiv mirror/.style={black!45,densely dashed,line width=.45pt},
+ arxiv cell/.style={rounded corners=1.5pt,draw=black!35,line width=.4pt},
+ arxiv spatial flow/.style={flow,mpored},
+ arxiv thermal flow/.style={flow,mpoblue},
+ arxiv leading weight/.style={black!55},
+ arxiv remainder weight/.style={black!25},
+ arxiv point/.style={circle,fill=black!75,inner sep=1.5pt},
+ % lines: a baseline under bars, an axis, a background grid, and three guides
+ arxiv baseline/.style={black!45,line width=.35pt},
+ arxiv axis line/.style={black!45,line width=.45pt},
+ arxiv grid/.style={black!14,line width=.45pt},
+ arxiv guide/.style={black!60,densely dashed,line width=.45pt},
+ arxiv cert guide/.style={tncert,densely dashed,line width=.45pt},
+ arxiv dotted guide/.style={black!45,densely dotted,line width=.45pt},
+ arxiv identified/.style={black!45,densely dashed,line width=.35pt},
+ arxiv curve/.style={black!70,line width=.7pt},
+ arxiv bond/.style={mpored,line width=.45pt},
+ arxiv bar/.style={black!45,line width=1.6pt},
+ arxiv series/.style={line width=.7pt},
+ % boundary objects (caps, endpoint fields, boundary defects) are gray
+ arxiv boundary/.style={black!55,line width=.45pt},
+ % fills: the N lists and the excluded band, beside the leading and remainder weights
+ arxiv bulk weight/.style={black!14},
+ arxiv bulk box/.style={fill=black!14,draw=black!45,line width=.35pt},
+ arxiv exclude band/.style={fill=tnexclude!15},
+ % arrows: the gray move arrow and the word-sized arrow
+ arxiv gray flow/.style={flow,black!55},
+ arxiv small arrow/.style={-{Latex[length=.8mm]},black!70,line width=.45pt},
+ % annotations: gray notes, the darker emphasis, and the two colored notes
+ arxiv note/.style={font=\footnotesize,text=black!60},
+ arxiv strong note/.style={font=\footnotesize,text=black!70},
+ arxiv cert note/.style={font=\footnotesize,text=tncert},
+ arxiv exclude note/.style={font=\footnotesize,text=tnexclude}}
+% Tufte-style axes shared by every pgfplots figure.
+% proof-lane move labels and tags at the display annotation size
+\tikzset{maprule/.style={font=\footnotesize,text=black!65,fill=white,inner sep=1pt},
+ maptag/.style={font=\footnotesize,text=black!50}}
+\pgfplotsset{arxiv axis/.style={axis lines*=left,
+ axis line style={black!55,line width=.4pt},
+ tick style={black!55,line width=.4pt},
+ tick label style={font=\footnotesize,color=black!65},
+ label style={font=\footnotesize},
+ major tick length=2pt,tick align=outside}}
+% Energy levels with the gap in the conclusion color, overriding the red gap of
+% tnnotes so that red keeps its single meaning, space.
+% Endpoint fields are boundary objects (gray), not spatial ones (red).
+\renewcommand{\fieldchain}[1]{\tikz[baseline=0pt,x=1em,y=1em,line width=.5pt]{
+ \draw[black!55] (0,.4)--(1.8,.4);
+ \foreach \x in {0,.45,.9,1.35,1.8}{\fill (\x,.4) circle[radius=.09];}
+ \draw[-{Latex[length=1.2mm,width=1mm]},black!55,line width=.8pt] (-.38,-.05)--(-.38,.9);
+ \draw[-{Latex[length=1.2mm,width=1mm]},black!55,line width=.8pt] (2.18,{.425-#1*.475})--(2.18,{.425+#1*.475});}}
+% A whole split into a leading share and a remainder: both gray, since the split
+% is a boundary quantity (the overlap share), not a spatial one.
+\renewcommand{\stackbar}[1]{\tikz[baseline=0pt,x=1.8em,y=1em]{
+ \fill[arxiv leading weight] (0,0) rectangle ({1-#1},.45);
+ \fill[arxiv remainder weight] ({1-#1},0) rectangle (1,.45);}}
+\renewcommand{\levels}{\tikz[baseline=0pt,x=1em,y=1em,line width=.6pt]{
+ \draw (0,0)--(1,0);
+ \foreach \y in {.5,.72,.9}{\draw[black!50,line width=.4pt] (0,\y)--(1,\y);}
+ \draw[tncert,line width=1pt] (1.18,0)--(1.18,.5);}}
+
+% ----------------------------------------------------------------- diagrams
+\input{figures/diagrams-shared}
+\input{figures/diagrams-obc}
+\input{figures/diagrams-trotter}
+\input{figures/diagrams-seeds}
+\input{figures/diagrams-models}
+
+% A linked check marks a formalized implication, with hypotheses stated in prose.
+\newcommand{\leanmark}[1]{\href{#1}{\ensuremath{\textcolor{tncert}{\checkmark_{\!\mathsf L}}}}}
+\makeatletter
+% Do not force a paragraph indent after \end{proofdiagram} unless a blank line follows.
+\renewenvironment{proofdiagram}
+ {\par\smallskip\noindent\begin{minipage}{\columnwidth}\centering}
+ {\end{minipage}\par\smallskip\@endpetrue}
+% Allow \tocdepth@munge to be called before \tableofcontents without clobbering saved macros,
+% and suppress main-text subsections/paragraphs from leaking into the Supplemental Material TOC.
+\def\tocdepth@munge{%
+ \ifx\l@section\@gobble@tw@\else
+  \let\l@section@saved\l@section
+  \let\l@subsection@saved\l@subsection
+  \let\l@subsubsection@saved\l@subsubsection
+  \let\l@paragraph@saved\l@paragraph
+  \let\l@section\@gobble@tw@
+  \let\l@subsection\@gobble@tw@
+  \let\l@subsubsection\@gobble@tw@
+  \let\l@paragraph\@gobble@tw@
+ \fi}
+\def\tocdepth@restore{%
+ \let\l@section\l@section@saved
+ \let\l@subsection\l@subsection@saved
+ \let\l@subsubsection\l@subsubsection@saved
+ \let\l@paragraph\l@paragraph@saved}
+\newcommand{\hideMainFromTOC}{\addtocontents{toc}{\string\tocdepth@munge}}
+% Resolve lane anchors before passing them to TikZ's key/coordinate parsers.
+\renewcommand{\lanemove}[5][black!55]{%
+ \ifnum\csname tn@lane@#2\endcsname=0
+  \def\arxiv@anchor{east}\def\arxiv@outer{west}\def\arxiv@shift{-1.5pt}%
+ \else
+  \def\arxiv@anchor{west}\def\arxiv@outer{east}\def\arxiv@shift{1.5pt}%
+ \fi
+ \path let \p1=(#3.north),\p2=(#3.south) in
+  node[lanemv] (mv#4) at (\x1,{\y1+\lanemvpos*(\lanedy*1cm-\y1+\y2)}) {#4};
+ \draw[#1,line width=.5pt,shorten <=.5pt] (#2)--(mv#4);
+ \draw[flow,#1,shorten >=.5pt] (mv#4)--(#3);
+ \node[maprule,anchor=\arxiv@anchor,inner sep=1pt,xshift=\arxiv@shift]
+  at (mv#4.\arxiv@outer) {#5};}
+\makeatother

@@ -1,0 +1,565 @@
+
+\subsection{Finite Trotter slices and the two-site transfer matrix}
+\label{sm:sec:transfer}
+
+OpenAI's proof uses a continuous-time spatial integral
+kernel~\cite{OpenAI2026Periodic}, whose trace identities require
+infinite-dimensional path-space integration. To formalize the general
+gap theorem in Lean with finite-dimensional linear algebra only, we
+discretize imaginary time into $M$ brickwork slices. The spatial
+transfer operator is then a finite Gram matrix
+$\smT=\smF^{\mathsf T}\smF\succeq0$, and a fixed-$(L,\beta)$ matrix
+product limit passes its moment inequalities to the exact partition
+functions $Z_L(\beta)$.
+
+Consider the periodic spin-1 Heisenberg Hamiltonian
+\begin{equation}
+    H_L=\sum_{j=0}^{L-1}h_{j,j+1},
+    \qquad h=\sum_{\alpha=x,y,z}S^\alpha\otimes S^\alpha,
+    \qquad Z_L(\beta)=\Tr e^{-\beta H_L},
+    \label{sm:eq:model}
+\end{equation}
+with indices taken modulo $L$, exchange coupling equal to one, and
+$\beta>0$. In the Cartesian basis $s,s'\in\{x,y,z\}$, set
+\begin{equation}
+    (S^\alpha)_{ss'}=-i\epsilon_{\alpha ss'},
+    \qquad G_\alpha=iS^\alpha,
+    \qquad -h=\sum_\alpha G_\alpha\otimes G_\alpha.
+    \label{sm:eq:generators}
+\end{equation}
+Here $\epsilon_{\alpha ss'}$ is the Levi-Civita symbol, $\Tr$ denotes
+the matrix trace, and $\smI$ denotes the identity on the relevant space.
+Each $G_\alpha$ is real antisymmetric and has operator norm one.
+
+For $L=2N$, $N\ge1$, and a positive integer $M$, let
+$\tau=\beta/M$. Define the linearized brickwork slice and its trace by
+\begin{align}
+    S_{2N}(\tau)
+                    &=\prod_{k=0}^{N-1}(\smI-\tau h_{2k,2k+1})
+    \prod_{k=0}^{N-1}(\smI-\tau h_{2k+1,2k+2}), \notag\\
+    \smZ{2N}(\beta) &=\Tr S_{2N}(\beta/M)^M.
+    \label{sm:eq:slice}
+\end{align}
+Products run from left to right in increasing index, and the trace is
+real because every factor is.
+Equation~\eqref{sm:eq:slice} multiplies $M$ slices; the same network read
+along space multiplies two-site columns,
+\begin{equation}
+    \underbrace{\bricknetwork{1}}_{\Tr S_{2N}(\tau)^M}
+    \;=\;\smZ{2N}(\beta)\;=\;
+    \underbrace{\bricknetwork{2}}_{\Tr\smT^N}.
+    \label{sm:eq:two-readings}
+\end{equation}
+
+The moment inequalities of Sec.~\ref{sm:sec:moments} need
+$\smZ{2N}(\beta)=\Tr\smT^N$ with a positive semidefinite column. A
+one-site column, like the continuous-time thermal-MPO kernel of
+Ref.~\cite{Tang2021Continuous}, is real symmetric but need not be
+positive; two sites mirrored across a bond give a Gram matrix instead.
+Let $\Gamma=\{0,x,y,z\}$, with $A_0=\smI$ and
+$A_\alpha=\sqrt{\tau}\,G_\alpha$. Each bond gate $\smI-\tau h$ splits
+into matching matrices $A_\gamma$ on its two sites,
+\begin{equation}
+    \smI-\tau h=\sum_{\gamma\in\Gamma}A_\gamma\otimes A_\gamma,
+    \qquad
+    \splitgate=\sum_{\gamma\in\Gamma}\bondendsA.
+    \label{sm:eq:bond}
+\end{equation}
+An imaginary-time bond sequence $p\in\smD=\Gamma^M$ lists one label per
+slice. Define the single-site trace matrix, independent of $N$, by
+\begin{equation}
+    \smF_{pq}
+    =\Tr\!\left[\prod_{t=0}^{M-1}(A_{p_t}A_{q_t})\right]
+    =\sitetrace,
+    \qquad p,q\in\smD,
+    \label{sm:eq:F}
+\end{equation}
+drawn for $M=3$ with $A_{q_t}$ entering from the odd bond on the left
+and $A_{p_t}$ leaving on the even bond to the right.
+
+To contract the network in space, assign sequences $b_k$ to the even
+bonds and $c_k$ to the odd bonds. Across the mirror of an even bond the
+left site is the reflected right site, so the column is $\smF$
+contracted with its own transpose:
+\begin{equation}
+    \twositecolumn
+    \qquad
+    \sum_{b_k\in\smD}\smF_{b_kc_{k-1}}\smF_{b_kc_k}=(\smF^{\mathsf T}\smF)_{c_{k-1}c_k}.
+    \label{sm:eq:column}
+\end{equation}
+Summing all bond labels and tracing every site gives%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Transfer.html\#CertifiedGaps.RPRing.trace_trotterSlice_pow_eq_trace_transfer}
+\begin{align}
+    \smZ{2N}(\beta)
+     &=\sum_{\substack{b_0,\ldots,b_{N-1}\in\smD\\
+               c_0,\ldots,c_{N-1}\in\smD}}
+    \prod_{k=0}^{N-1}
+    \smF_{b_kc_{k-1}}\smF_{b_kc_k} \notag\\
+     &=\sum_{c_0,\ldots,c_{N-1}\in\smD}
+    \prod_{k=0}^{N-1}(\smF^{\mathsf T}\smF)_{c_{k-1}c_k}
+    =\Tr(\smF^{\mathsf T}\smF)^N
+    =\columnring,
+    \label{sm:eq:factorization}
+\end{align}
+where $c_{-1}=c_{N-1}$: the middle equality is Eq.~\eqref{sm:eq:column}
+at each even bond, and the last closes the $N$ columns into a ring.
+
+Thus the spatial transfer matrix%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Transfer.html\#CertifiedGaps.RPRing.exists_posSemidef_transfer}
+\begin{equation}
+    \smT=\smF^{\mathsf T}\smF=\smF^\dagger\smF\succeq0
+    \label{sm:eq:positive}
+\end{equation}
+advances \emph{two sites}. Because $\smF$ is real,
+$v^\dagger\smT v=\smnorm{\smF v}^2\ge0$ without $\smF$ itself being
+symmetric or positive. The mirror across the even bond in
+Eq.~\eqref{sm:eq:column} is the matching of real factors in
+Eq.~\eqref{sm:eq:bond}, that is, reflection
+positivity~\cite{Dyson1978Phase,Frohlich1978Phase,Jaffe2016Characterization}.
+
+The models of Sec.~\ref{sm:sec:models} carry on-site terms and
+multi-site cells, which Eq.~\eqref{sm:eq:F} omits. The same contraction
+covers any real reflection-positive cell model, with lengths counting
+cells. Take a finite-dimensional cell space with
+real symmetric or antisymmetric bond matrices $C_\alpha$, a real
+symmetric on-site matrix $o$, and a real symmetric involution $F$ in
+the bond mirror $\scopebond$, such that%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Model.html\#CertifiedGaps.RPRing}
+\begin{equation}
+    F^2=\smI,\qquad FoF=o,\qquad
+    h=-\sum_\alpha C_\alpha\otimes FC_\alpha F.
+    \label{sm:eq:cell}
+\end{equation}
+The transpose signs cancel between the two factors of each bond term,
+so $h^{\mathsf T}=h$ and $H_L=\sum_j h_{j,j+1}+\sum_j o_j$ is
+self-adjoint. Insert the on-site layer $\prod_i(\smI-\tau o_i)$ between
+the even and odd bond layers and expand with
+\[
+    A_0=\smI,\qquad A_\alpha=\sqrt{\tau}\,C_\alpha,\qquad
+    O=\smI-\tau o,\qquad
+    \smI-\tau h=\sum_\gamma A_\gamma\otimes FA_\gamma F.
+\]
+Each even cell now carries the on-site factor $O$ (blue box) and the
+two reflections $F$ (gray ticks) on its worldline, so
+Eq.~\eqref{sm:eq:F} becomes
+\begin{equation}
+    \smF_{pq}=\Tr\prod_{t=0}^{M-1}(A_{p_t}OFA_{q_t}F)=\cellsitetrace=\oddcellsitetrace,
+    \label{sm:eq:cell-F}
+\end{equation}
+with sequences over the enlarged bond-label alphabet. The last
+equality is the odd cell, $FA_{p_t}FOA_{q_t}$ ($FO=OF$, $F^2=\smI$),
+so both sublattices give the same $\smF$ and
+Eqs.~\eqref{sm:eq:factorization} and~\eqref{sm:eq:positive} follow;
+everything below applies with $L$ counting cells.
+
+\subsection{Spatial and thermal purity inequalities at finite $M$}
+\label{sm:sec:moments}
+
+The recurrence of Sec.~\ref{sm:sec:asymmetric} needs three facts: the
+spatial purity is at most one, squaring a distribution shrinks its
+defect quadratically, and power sums interpolate between lengths.
+Positivity of $\smT$ expresses $\smZ{L}(\beta)$ as an even moment sum of
+nonnegative weights, which supplies all three at finite $M$.
+At fixed $M,\beta$, let $\lambda_i\ge0$ be the eigenvalues of the
+transfer matrix (\specbars[black!55]{1,.45,.3,.1}) and put
+$\mu_i=\sqrt{\lambda_i}$.
+For every even $L\ge2$, Eq.~\eqref{sm:eq:factorization} gives
+\begin{equation}
+    \smZ{L}(\beta)=\sum_i\mu_i^L.
+    \label{sm:eq:moments}
+\end{equation}
+
+Doubling $n$ replaces the weights $\mu_i^n$ by their squares, so we
+need the defect of a squared family in terms of the original defect.
+For any finite nonnegative family $a_i$, let $S_k=\sum_i a_i^k$.
+Then%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.sq_sub_sum_sq_finset}
+\begin{equation}
+    S_2\le S_1^2,\qquad
+    2(S_2^2-S_4)\le(S_1^2-S_2)^2.
+    \label{sm:eq:powers}
+\end{equation}
+Cut the square of side $S_1$ by the weights (\pairsquare): the
+dark diagonal blocks have area $S_2$ and each symmetric pair of light
+blocks has area $2a_ia_j$, so
+\[
+    S_1^2-S_2=\sum_{i<j}2a_ia_j,\qquad
+    2(S_2^2-S_4)=\sum_{i<j}(2a_ia_j)^2\le\Big(\sum_{i<j}2a_ia_j\Big)^2,
+\]
+a sum of squares being at most the square of the sum.
+
+If $\sum_i a_i=1$, the purity is $P=\sum_i a_i^2>0$.
+Squaring and normalizing concentrates the distribution
+($\specbars[black!55]{.5,.3,.2}\mapsto\specbars[black!55]{.66,.24,.1}$)
+onto $a_i^2/P$, of purity $P'=S_4/P^2$. Thus%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.one_sub_squaredPurity_le_squaringDefect}
+\begin{equation}
+    1-P'\le f(1-P),\qquad
+    f(z)=\frac{z^2}{2(1-z)^2}.
+    \label{sm:eq:squaring}
+\end{equation}
+The map $f$ is nondecreasing on $0\le z<1$, since
+$z/(1-z)$ is nonnegative and increasing there. For $0<z<1/2$,
+$f(z)<z$ (\fbelowdiag), and squaring makes a small $1-P$ quadratically
+smaller.
+
+Section~\ref{sm:sec:gap} must also bound even lengths between dyadic
+scales, which it does by comparing power sums of different orders.
+For $0<u\le v$, nonnegative weights also satisfy%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.hasSum_pow_le_rpow}
+\begin{equation}
+    \sum_i\mu_i^v\le\left(\sum_i\mu_i^u\right)^{v/u}.
+    \label{sm:eq:lp}
+\end{equation}
+If the sum on the right is zero, the claim is immediate.
+Otherwise normalize $\mu_i^u$ to probabilities $a_i$; the power
+$v/u\ge1$ lowers every bar
+($\specbars[black!55]{.6,.3,.1}\mapsto\specbars[black!55]{.36,.09,.01}$),
+so $\sum_i a_i^{v/u}\le\sum_i a_i=1$.
+
+Substituting Eq.~\eqref{sm:eq:moments} gives, at fixed $\beta$, the
+closed scalar inequalities%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.hasMomentForm_trotterTrace}
+\begin{align}
+    \smZ{2n} &\le(\smZ{n})^2,
+             &                             &\text{Eq.~\eqref{sm:eq:powers} with }a_i=\mu_i^n, \notag\\
+    2((\smZ{2n})^2-\smZ{4n})
+             &\le((\smZ{n})^2-\smZ{2n})^2,
+             &                             &\text{Eq.~\eqref{sm:eq:powers} with }a_i=\mu_i^n, \notag\\
+    \smZ{v}  &\le(\smZ{u})^{v/u},
+             &                             &\text{Eq.~\eqref{sm:eq:lp}},
+    \label{sm:eq:closed}
+\end{align}
+for even $n\ge2$ and even $v\ge u\ge2$ (temperature argument suppressed
+only here). These three inequalities are all the recurrence uses;
+Sec.~\ref{sm:sec:limit} passes them to the exact $Z_L(\beta)$.
+
+\subsection{Taking the Trotter limit $M\to\infty$}
+\label{sm:sec:limit}
+
+To pass the finite-$M$ inequalities in Eq.~\eqref{sm:eq:closed} to the
+exact partition functions, we need the matrix product limit
+$S_L(\beta/M)^M\to e^{-\beta H_L}$. Each inequality involves
+finitely many fixed pairs $(L,\beta)$, so the error may grow with $L$
+and a telescoping estimate at fixed $L$ and $\beta$ suffices.
+Use the operator norm, which is submultiplicative and satisfies
+$\smnorm{\smI}=1$.
+For $\smnorm{X},\smnorm{Y}\le K$, $K\ge1$, the difference of $k$-fold
+products telescopes into $k$ chains that differ in one link, each of
+norm at most $K^{k-1}\smnorm{X-Y}\le K^k\smnorm{X-Y}$:
+\begin{equation}
+    X^k-Y^k=\sum_{r=0}^{k-1}\;\telescopechain\,,
+    \qquad
+    \smnorm{X^k-Y^k}\le kK^k\smnorm{X-Y}.
+    \label{sm:eq:telescoping}
+\end{equation}
+
+Suppose $M(X_M-\smI)\to A$, and set $Y_M=e^{A/M}$.
+Then $M(Y_M-\smI)\to A$ and $Y_M^M=e^A$.
+With $C=\smnorm{A}+1$, convergence implies
+$\smnorm{X_M},\smnorm{Y_M}\le1+C/M$ for sufficiently large $M$, and
+Eq.~\eqref{sm:eq:telescoping} gives the quantitative comparison
+\begin{align}
+    \smnorm{X_M^M-e^A}
+     &\le (1+C/M)^M\smnorm{M(X_M-Y_M)} \notag\\
+     &\le e^C\smnorm{M(X_M-Y_M)}\longrightarrow0.
+    \label{sm:eq:error}
+\end{align}
+In particular, if $g(0)=\smI$ and $g'(0)=A$, then
+$g(1/M)^M\to e^A$.
+
+For fixed $L,\beta$, list the negated bond operators in the order
+of Eq.~\eqref{sm:eq:slice}, including the negated on-site operators
+when present, as $B_1,\ldots,B_k$.
+Their sum is $-H_L$, so the polynomial
+$g(t)=\prod_{i=1}^k(\smI+\beta tB_i)$ has $g'(0)=-\beta H_L$. Hence%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.tendsto_trotterTrace}
+\begin{equation}
+    S_L(\beta/M)^M\longrightarrow e^{-\beta H_L},
+    \qquad \smZ{L}(\beta)\longrightarrow Z_L(\beta).
+    \label{sm:eq:limit}
+\end{equation}
+More explicitly, Taylor expansion gives
+$g(1/M)-e^{-\beta H_L/M}=O(M^{-2})$.
+Equation~\eqref{sm:eq:error} therefore bounds the operator error by
+$e^C\kappa/M$ for a finite $\kappa$ depending on $L$ and $\beta$, with
+$C=\smnorm{\beta H_L}+1$, once $M$ is large enough.
+Trace convergence follows from
+$\lvert\Tr A\rvert\le3^L\smnorm{A}$, with $3^L$ the dimension of the
+spin-1 ring.
+
+Taking $M\to\infty$ at each fixed $(L,\beta)$ occurring in
+Eq.~\eqref{sm:eq:closed} passes all three inequalities to the exact
+partition functions $Z_L(\beta)$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Gap.html\#CertifiedGaps.RPRing.spatialMomentBounds}:
+\begin{proofdiagram}
+    \limitfirst
+\end{proofdiagram}
+The recurrence therefore starts from exact partition functions, and no
+Trotter error enters any later step.
+
+\subsection{Torus coupling identities and the asymmetric recurrence}
+\label{sm:sec:asymmetric}
+
+Once the spatial moment inequalities hold for the exact partition
+functions $Z_L(\beta)$, we couple the spatial and thermal purities on a
+torus. A torus of width $n$ and height $\beta$ (\Zt21) represents
+$Z_n(\beta)$; the spatial purity joins two copies side by side and the
+thermal purity stacks them in imaginary time:
+\begin{equation}
+    \Ps(n,\beta)=\frac{Z_{2n}(\beta)}{Z_n(\beta)^2}=\frac{\Zt41}{\Ztsq21},
+    \qquad
+    \Pt(L,\beta)=\frac{Z_L(2\beta)}{Z_L(\beta)^2}=\frac{\Zt22}{\Ztsq21}.
+    \label{sm:eq:purities}
+\end{equation}
+All partition functions are strictly positive, and the thermal purity
+is the purity of the Gibbs state $e^{-\beta H_L}/Z_L(\beta)$.
+The limiting spatial inequalities and the Boltzmann power sums give
+$0<\Ps,\Pt\le1$ at even lengths and
+\begin{align}
+    1-\Ps(2n,\beta) &\le f(1-\Ps(n,\beta)),
+                    &                       &\text{second line of Eq.~\eqref{sm:eq:closed}, divided by }
+    2Z_{2n}(\beta)^2, \notag\\
+    1-\Pt(L,2\beta) &\le f(1-\Pt(L,\beta)),
+                    &                       &\text{Eq.~\eqref{sm:eq:squaring} on the Boltzmann weights}.
+    \label{sm:eq:two-squares}
+\end{align}
+
+Equation~\eqref{sm:eq:two-squares} doubles $n$ at fixed $\beta$ or
+$\beta$ at fixed $L$, but one recurrence step must double both; an
+exact identity between tori supplies the missing move. Gluing four
+copies into the doubled torus in either order gives the exact
+cancellation
+\begin{equation}
+    \Ps(n,2\beta)\Pt(n,\beta)^2
+    =\frac{Z_{2n}(2\beta)}{Z_n(\beta)^4}
+    =\frac{\Zt42}{\Ztsq[4]21}
+    =\Ps(n,\beta)^2\Pt(2n,\beta).
+    \label{sm:eq:torus}
+\end{equation}
+Solving for one factor and repeating at length $2n$ (substitute
+Eq.~\eqref{sm:eq:purities}) yields%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.spatialPurity_two_mul}~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.thermalPurity_four_mul}
+\begin{align}
+    \Ps(n,2\beta)
+     &=\frac{\Ps(n,\beta)^2\Pt(2n,\beta)}{\Pt(n,\beta)^2}, \notag\\
+    \Pt(4n,\beta)
+     &=\frac{\Pt(2n,\beta)^2\Ps(2n,2\beta)}{\Ps(2n,\beta)^2}.
+    \label{sm:eq:coupling}
+\end{align}
+Dropping each denominator, a purity at most one, turns the identity
+into a lower bound on the purity the recurrence lacks.
+
+Let $n\ge2$ be even, and let $0\le p,q<1$ bound the seed purities:
+\begin{equation}
+    \Ps(n,\beta)\ge1-p,\qquad
+    \Pt(2n,\beta)\ge1-q.
+    \label{sm:eq:seed-pair}
+\end{equation}
+To double both $n$ and $\beta$ (\torusseq), write
+$z(a,b)=1-(1-a)^2(1-b)$. The asymmetric update is%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.doubling_step}
+\begin{equation}
+    p'=f(z(p,q)),\qquad q'=f(z(q,p')).
+    \label{sm:eq:update}
+\end{equation}
+Assuming $p'<1$, one doubling step advances $(p,q)$ to $(p',q')$ in four
+moves across space and imaginary time (thin arrows mark the second
+input at each torus step):
+\begin{proofdiagram}
+    \asymsteps
+\end{proofdiagram}
+Move~3 substitutes the updated spatial bound $p'$, not $p$, into the
+thermal step, so a small $p'$ pulls $q'$ down even when $q$ starts above
+the symmetric fixed point $\varepsilon_*$ of Sec.~\ref{sm:sec:orbit}.
+Any upper bound below one may be substituted for $p'$ in Move~3.
+
+\subsection{Six rational steps from the seed to $[0,1/100]^2$}
+\label{sm:sec:orbit}
+
+The analytic tail estimate in Sec.~\ref{sm:sec:gap} requires both
+$p$ and $q$ to be at most $1/100$ (there one step costs at most
+$5\varepsilon^2$). The seed bounds of Sec.~\ref{sm:sec:seeds} at
+$(n_0,\beta_0)=(36,49/4)$,
+\begin{equation}
+    \Ps(36,49/4)\ge1-\frac{47916}{10^6},
+    \qquad
+    \Pt(72,49/4)\ge1-\frac{181521}{10^6},
+    \label{sm:eq:initial}
+\end{equation}
+have larger $(p_0,q_0)$. Moreover $q_0=0.1815$ exceeds the fixed point
+$\varepsilon_*\simeq0.1273$ of the symmetric map
+$\varepsilon\mapsto f(1-(1-\varepsilon)^3)$, so a symmetric recurrence
+cannot start from this seed. We therefore iterate the asymmetric
+update~\eqref{sm:eq:update} six times, to
+$(n_6,\beta_6)=(36\cdot2^6,\tfrac{49}{4}2^6)=(2304,784)$.
+Iterating $f$ exactly squares the denominators at every step, so the
+exact orbit is not a usable certificate. Following
+Ref.~\cite{OpenAI2026Periodic}, each update is rounded upward to seven
+decimal places: with $D=10^7$, the stored integer $a_{j+1}=Dp_{j+1}$
+is the ceiling of the exact value $Df$, \ceilcheck, and likewise for
+$q$. Rounding up keeps every bound valid, and the kernel checks the
+twelve rational inequalities, each exact update at most its stored
+entry.
+Table~\ref{sm:tab:orbit} lists the resulting sequence, drawn here on a
+logarithmic scale:
+\begin{proofdiagram}
+    \defectladder
+\end{proofdiagram}
+The spatial bound $p_j$ first rises, to $0.0714$ at $j=3$, because its
+input $z(p,q)\ge q$ stays large while $q$ does; once $q$ drops below
+$0.15$, both sequences fall rapidly. The thermal bound $q_j$ falls from
+the first step, although it starts above $\varepsilon_*$ (dotted): the
+updated $p'$ in Move~3 keeps $f(z(q,p'))<q$ at every step.
+
+\begin{table}[ht]
+    \centering
+    \caption{Six steps of the asymmetric recurrence~\eqref{sm:eq:update}
+        along the dyadic scales $n_j=36\,2^j$ and $\beta_j=(49/4)2^j$, starting
+        from the seed bounds~\eqref{sm:eq:initial} at $j=0$. Column $p_j$
+        bounds $1-\Ps(n_j,\beta_j)$ and column $q_j$ bounds
+        $1-\Pt(2n_j,\beta_j)$, each rounded upward to seven decimal places.}
+    \label{sm:tab:orbit}
+    \begin{tabular}{rrrrr}
+        \toprule
+        $j$ & $n_j$ & $\beta_j$ & $p_j$     & $q_j$     \\
+        \midrule
+        0   & 36    & $49/4$    & 0.0479160 & 0.1815210 \\
+        1   & 72    & $49/2$    & 0.0605003 & 0.1733838 \\
+        2   & 144   & 49        & 0.0686630 & 0.1632461 \\
+        3   & 288   & 98        & 0.0713693 & 0.1447318 \\
+        4   & 576   & 196       & 0.0633146 & 0.1055663 \\
+        5   & 1152  & 392       & 0.0376144 & 0.0446518 \\
+        6   & 2304  & 784       & 0.0084709 & 0.0055149 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+At $j=6$, Table~\ref{sm:tab:orbit} gives%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/Main.html\#CertifiedGaps.SpinOneHeisenberg.seeds2304_of_seeds36}
+\begin{align}
+    \Ps(2304,784) &\ge1-0.0084709>0.99,\notag\\
+    \Pt(4608,784) &\ge1-0.0055149>0.99,
+    \label{sm:eq:terminal}
+\end{align}
+with both $p_6$ and $q_6$ below $1/100$, the entry condition of
+Sec.~\ref{sm:sec:gap}.
+
+\subsection{Quadratic tail, spatial interpolation, and the uniform gap}
+\label{sm:sec:gap}
+
+Rounded rational steps cannot continue to arbitrarily large $j$, so the
+remaining steps need a closed-form bound. With $p,q\le\varepsilon$ the
+input $z(p,q)$ is at most $1-(1-\varepsilon)^3$ and $f$ is quadratic
+near zero, so one scalar recurrence bounds every further step.
+For $0\le\varepsilon\le1/100$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.squaringDefect_le},
+\begin{equation}
+    f(1-(1-\varepsilon)^3)
+    \le\frac{9\varepsilon^2}{2(1-3\varepsilon)^2}
+    \le5\varepsilon^2\le\varepsilon.
+    \label{sm:eq:scalar}
+\end{equation}
+The first inequality uses $1-(1-\varepsilon)^3\le3\varepsilon$ and the
+monotonicity of $f$, the second uses $1-3\varepsilon\ge97/100$ so that
+$9/[2(97/100)^2]<5$, and the third uses $5\varepsilon\le1/20\le1$.
+With $p,q\le\varepsilon$, the spatial update is
+therefore at most $5\varepsilon^2\le\varepsilon$; the thermal coupling
+input is then again at most $1-(1-\varepsilon)^3$, so the thermal
+update is at most $5\varepsilon^2$ as well.
+
+Starting from Eq.~\eqref{sm:eq:terminal}, reset the scale index and put
+\begin{equation}
+    n_j=2304\,2^j,\qquad
+    \beta_j=784\,2^j,\qquad
+    \varepsilon_j=\frac{20^{-2^j}}5,\qquad j\ge0.
+    \label{sm:eq:tail-scales}
+\end{equation}
+The step $\varepsilon\mapsto5\varepsilon^2$ squares $5\varepsilon$, and
+$5\varepsilon_0=1/20$ at the threshold: hence the base $20$, and
+$\log_{10}\varepsilon_j$ falls doubly exponentially from $-2$ at $j=0$
+to $-21.5$ at $j=4$ (\trendline{-22}{0}{-2,-3.3,-5.9,-11.1,-21.5}).
+Induction using Eq.~\eqref{sm:eq:scalar} proves%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/PurityCriterion.html\#CertifiedGaps.purities_ge_defect}
+\begin{equation}
+    \Ps(n_j,\beta_j)\ge1-\varepsilon_j,\qquad
+    \Pt(2n_j,\beta_j)\ge1-\varepsilon_j.
+    \label{sm:eq:tail}
+\end{equation}
+
+Equation~\eqref{sm:eq:tail} holds only at the dyadic scales, and an
+even $L$ between them has no torus bound of its own. To cover every
+even length $L\ge2304$, choose $j$ with $n_j\le L\le2n_j$. The two
+known tori supply the missing bound, from above at $\beta_j$ and
+from below at $2\beta_j$:
+\begin{proofdiagram}
+    \dyadicinterval
+\end{proofdiagram}
+The power-sum inequality in Eq.~\eqref{sm:eq:closed} applies twice,
+with the powers $v/u$ drawn above. At $\beta_j$ take $(u,v)=(n_j,L)$; at
+$2\beta_j$ take $(u,v)=(L,2n_j)$ and solve
+for the unknown torus:
+\begin{align}
+    Z_L(\beta_j)^2 &\le Z_{n_j}(\beta_j)^{2L/n_j}, \notag\\
+    Z_L(2\beta_j)  &\ge Z_{2n_j}(2\beta_j)^{L/(2n_j)}.
+    \label{sm:eq:interpolation-input}
+\end{align}
+Set $r=L/(2n_j)\in[1/2,1]$. Let $x$ be the four-copy ratio of
+Eq.~\eqref{sm:eq:torus} at scale $j$,
+\[
+    x=\frac{Z_{2n_j}(2\beta_j)}{Z_{n_j}(\beta_j)^4}
+    =\frac{\Zt42}{\Ztsq[4]21}
+    =\Pt(2n_j,\beta_j)\Ps(n_j,\beta_j)^2.
+\]
+By Eq.~\eqref{sm:eq:tail}, $(1-\varepsilon_j)^3\le x\le1$, so dividing
+the second inequality in Eq.~\eqref{sm:eq:interpolation-input} by the
+first yields
+\begin{equation}
+    \Pt(L,\beta_j)\ge x^r\ge x
+    \ge(1-\varepsilon_j)^3\ge1-3\varepsilon_j>\frac12.
+    \label{sm:eq:interpolation}
+\end{equation}
+Every even $L\ge2304$ thus has thermal purity above $1/2$ at a
+temperature $\beta_j$ of its own scale.
+
+Finally, we convert this thermal purity bound into a lower bound on
+the spectral gap. A purity above $1/2$ at one finite temperature bounds
+the largest Gibbs weight, and the ratio of the two largest weights is
+$e^{-\beta_j\Delta_L}$. Bounding that ratio strictly below $20^{-2^j}$
+gives a strict gap independent of $L$. List the energies with
+multiplicity,
+$E_0(L)\le E_1(L)\le\cdots$. Each level $m$ carries the Gibbs weight
+\[
+    w_m=\frac{e^{-\beta_jE_m(L)}}{Z_L(\beta_j)},\qquad\levelweights
+\]
+The purity is at most the largest weight, $\sum_m w_m^2\le w_0$, so
+Eq.~\eqref{sm:eq:interpolation} gives $w_0>1/2$. The ground state is
+therefore unique, with $w_1\le1-w_0$. With $\Delta_L$ the gap drawn
+above, we obtain
+\begin{align}
+    e^{-\beta_j\Delta_L}
+     &=\frac{w_1}{w_0}
+    \le\frac{3\varepsilon_j}{1-3\varepsilon_j} \notag\\
+     &\le\frac{60}{97}\,20^{-2^j}
+    <20^{-2^j},
+    \label{sm:eq:strict-ratio}
+\end{align}
+where $3\varepsilon_j=(3/5)20^{-2^j}$ and
+$1-3\varepsilon_j\ge97/100$ give the prefactor $(3/5)(100/97)=60/97$.
+Taking logarithms and dividing by $\beta_j=784\,2^j$ at this finite,
+length-dependent temperature gives%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/Main.html\#CertifiedGaps.SpinOneHeisenberg.spin_one_heisenberg_gap}
+\begin{equation}
+    \boxed{
+        \Delta_L>\frac{\log20}{784}
+        \quad\text{for every even }L\ge2304
+    }.
+    \label{sm:eq:gap}
+\end{equation}
+The strict inequality comes from the finite prefactor $60/97<1$,
+without taking a fixed-length limit $\beta\to\infty$. On the $j$th dyadic
+interval, Eq.~\eqref{sm:eq:strict-ratio} gives the larger bound
+$\tfrac{1}{\beta_j}\log\tfrac{1-3\varepsilon_j}{3\varepsilon_j}$, which decreases
+from $4.43\times10^{-3}$ at $j=0$ to $3.86\times10^{-3}$ at $j=4$
+toward the uniform bound $\tfrac{\log20}{784}\approx3.82\times10^{-3}$
+(\trendline[3.821]{3.7}{4.5}{4.434,4.146,3.984,3.903,3.862}, dashed).

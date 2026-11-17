@@ -31,4 +31,18 @@ def delta_9_10 : ChainCertificate where
 
 theorem delta_9_10_valid : delta_9_10.Valid := by decide +kernel
 
+/-- `spin1-dimerized-delta-7-10`: seed `(n₀, β₀) = (3, 17/4)` from
+`data/models/spin1_dimerized/certificate_d7.json`; `log r / β₀ ≥ 0.218780210146`. -/
+def delta_7_10 : ChainCertificate where
+  s := [11719569e-8, 60671231e-9, 11413876e-9, 29261667e-11, 17279975e-14, 59723762e-21,
+      71338556e-34, 1017838e-58, 20719884e-111, 85862719e-215, 14744814e-421, 43481908e-835,
+      37813527e-1662, 28597257e-3316, 16356063e-6624]
+  t := [48363911e-9, 15408647e-9, 94414039e-11, 23853958e-13, 12219637e-18, 30010045e-29,
+      18012485e-50, 64889924e-93, 84214045e-178, 14184011e-347, 40237234e-687, 323807e-1364,
+      20970195e-2724, 87949816e-5441, 15470341e-10873]
+  r := 25340426e-7
+  ε := 16356063e-6624
+
+theorem delta_7_10_valid : delta_7_10.Valid := by decide +kernel
+
 end Leaderboard.Chains.SpinOneDimerized

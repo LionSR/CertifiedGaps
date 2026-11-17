@@ -1,0 +1,649 @@
+
+The unformalized computer-assisted proof of Ref.~\cite{OpenAI2026Periodic}
+establishes two periodic spin-1 gap bounds from two sets of finite
+inputs (in this section we write $b_0=\beta_0$ and $b=rb_0$ for the seed
+inverse temperatures). First, short-ring trace enclosures on
+$4\le n\le12$ sites at $b_0=49/4$ together with a $72$-site
+matrix-product trial state certify the seed bounds at
+$(n_0,b_0)=(36,49/4)$ (Lemma~\ref{lem:arxiv-seed36})%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/Seed36.html\#CertifiedGaps.SpinOneHeisenberg.seed36_of_table_mps},
+\begin{align}
+    1-\Ps(36,49/4) &\le\frac{47916}{10^6},\notag\\
+    1-\Pt(72,49/4) &\le\frac{181521}{10^6},
+    \label{cert:eq:base}
+\end{align}
+from which six asymmetric doubling steps reach $(2304,784)$ and prove
+$\Delta_L>\tfrac{\log20}{784}\simeq0.003821$ for every even $L\ge2304$
+(Sec.~\ref{cert:sec:base}). Second (Sec.~2.2 of
+Ref.~\cite{OpenAI2026Periodic}), a separate table of nine traces on
+$n\in\{6,8,10\}$ sites at $b_0'=21/2$ combined with a $120$-site trial
+state and a temperature lift $r=5/2$ to $b=105/4$ certifies
+$1-\Ps(60,105/4),\,1-\Pt(120,105/4)<1/8$, proving
+$\Delta_L>\frac{4}{105}\log\frac{80}{79}\simeq0.000479$ for every even
+$L\ge60$.
+
+We first independently reproduced and verified all of OpenAI's finite
+trace and matrix-product trial contractions in exact arithmetic.
+Section~\ref{cert:sec:base} reviews the derivation of
+Eq.~\eqref{cert:eq:base} at $(36,49/4)$. Section~\ref{cert:sec:lifting}
+then adapts the temperature-lifting and threshold-refinement mechanism
+from Sec.~2.2 of Ref.~\cite{OpenAI2026Periodic} to the stronger
+$b_0=49/4$ ($4\le n\le12$) trace table together with the $120$-site
+trial state at $r=17/8$ ($b=833/32$), tighter twelve-decimal polynomial
+caps $U,V$, and per-interval gap evaluation across ten doubling steps
+plus $[36,72]$ from $(36,b_0)$. From the same verified finite inputs,
+this proves a unique ground state and%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/SpinOneHeisenberg.html\#Leaderboard.Records.SpinOneHeisenberg.temperature_lifting}
+\begin{equation}
+    \Delta_L>0.072901771
+    \quad\text{for every even }L\ge36.
+    \label{cert:eq:improved}
+\end{equation}
+Following Ref.~\cite{OpenAI2026Periodic}, intermediate bounds are
+rounded outward to rationals so that every step reduces to exact
+rational comparisons. In Lean~4, we formalize the deduction from the short-ring trace table
+to Eq.~\eqref{cert:eq:base} and the doubling chains behind
+Eqs.~\eqref{cert:eq:base} and~\eqref{cert:eq:improved}; the lifted seed
+bounds of Table~\ref{cert:tab:lifted} and the twelve-decimal bridge
+seeds enter the Lean theorem for Eq.~\eqref{cert:eq:improved} as
+hypotheses, verified in exact rational arithmetic outside Lean. We further
+verify the $72$- and $120$-site integer matrix-product trial contractions
+and the $n=4$ trace totals directly in the Lean kernel, reducing the
+remaining hypotheses to the printed integer trace totals for
+$5\le n\le12$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Heisenberg/Integers.html\#CertifiedGaps.SpinOneHeisenberg.gap_of_hornerTotalsLarge}.
+
+\subsection{Seed purities at length $36$ and inverse temperature $49/4$}
+\label{cert:sec:base}
+
+The seed inverse temperature $b_0=49/4$ is the one chosen in
+Ref.~\cite{OpenAI2026Periodic}. At this scale the two ratios
+\begin{equation}
+    \textcolor{mpored}{\Ps(36,b_0)}=\frac{Z_{72}(b_0)}{Z_{36}(b_0)^2}
+    =\frac{\Zt41}{\Ztsq21},\qquad
+    \textcolor{mpoblue}{\Pt(72,b_0)}=\frac{Z_{72}(2b_0)}{Z_{72}(b_0)^2}
+    =\frac{\Zt42}{\Ztsq41}
+    \label{cert:eq:seed-ratios}
+\end{equation}
+need lower bounds on their numerators and upper bounds on their
+denominators. A $72$-site trial state and exact traces on rings of $4$
+to $12$ sites supply them:
+\begin{center}
+    \setlength{\tabcolsep}{6pt}
+    \begin{tabular}{@{}clll@{}}
+        \toprule
+                & Partition function & Bound & Supplied by                                                                \\
+        \midrule
+        $\Zt41$ & $Z_{72}(b_0)$      & lower & trial state, through $|\lambda_0|>\ell$ (Sec.~\ref{cert:sec:base-defects}) \\
+        $\Zt21$ & $Z_{36}(b_0)$      & upper & traces, through the bounds $U,V$ (Sec.~\ref{cert:sec:filters})             \\
+        $\Zt42$ & $Z_{72}(2b_0)$     & lower & trial state (Sec.~\ref{cert:sec:inputs})                                   \\
+        $\Zt41$ & $Z_{72}(b_0)$      & upper & traces, through the bounds $U,V$                                           \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+\subsubsection{Shifted Hamiltonian, twisted rings, and the spatial transfer operator}
+\label{cert:sec:transfer}
+
+The seed ratios~\eqref{cert:eq:seed-ratios} need partition functions at
+$36$ and $72$ sites, while certified traces stop at $12$ sites. Three
+objects connect them: a Hamiltonian shift that turns the trial bound into
+$Z>1$, twisted rings that label spin-rotation sectors, and a transfer
+operator whose eigenvalues govern every ring length.
+We consider the periodic spin-1 Heisenberg Hamiltonian
+\begin{equation}
+    H_n=\sum_{j=1}^n\bm S_j\cdot\bm S_{j+1},
+    \qquad \bm S_j^2=2I,\qquad \bm S_{n+1}=\bm S_1,
+    \label{cert:eq:hamiltonian}
+\end{equation}
+with unit exchange coupling. Lengths count sites, and
+$\Delta_L=E_1(L)-E_0(L)$, with eigenvalues ordered with multiplicity.
+We shift the Hamiltonian by $\kappa$ per site, a rational with $-\kappa$
+just above the trial energy per site of Sec.~\ref{cert:sec:inputs}. The
+shifted ground energy is then negative and the leading transfer
+eigenvalue sits near one:
+\begin{equation}
+    \kappa=\frac{700741}{500000}\simeq1.401482,\qquad
+    \widehat H_n=H_n+\kappa nI,\qquad
+    Z_n(\beta)=\Tr e^{-\beta\widehat H_n}.
+    \label{cert:eq:shift}
+\end{equation}
+We drop the hats of Eq.~\eqref{seed:shift}: in this section $Z_n$ and
+$K_\beta$ denote the shifted quantities.
+This extensive shift cancels in both purities%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Seed/Limits.html\#CertifiedGaps.purities_of_shifted}:
+\begin{equation}
+    \Ps(n,\beta)=\frac{Z_{2n}(\beta)}{Z_n(\beta)^2},
+    \qquad
+    \Pt(n,\beta)=\frac{Z_n(2\beta)}{Z_n(\beta)^2}.
+    \label{cert:eq:purities}
+\end{equation}
+
+To separate the spatial transfer spectrum by spin-rotation symmetry, we
+also use rings whose closing bond is twisted by a spin rotation,
+\seedring{1}, alongside the plain ring \seedring{0}. For an on-site spin
+rotation $u_g$ representing $g$, we define
+\begin{align}
+    H_n(g)       &=\sum_{j=1}^{n-1}h_{j,j+1}+\sum_{\alpha=x,y,z}
+    S_n^\alpha(u_gS^\alpha u_g^\dagger)_1,\notag\\
+    Z_n(\beta,g) &=\Tr e^{-\beta(H_n(g)+\kappa nI)},
+    \label{cert:eq:twisted-hamiltonian}
+\end{align}
+where $h_{j,j+1}=\bm S_j\cdot\bm S_{j+1}$.
+
+The continuous-time construction of Ref.~\cite{OpenAI2026Periodic}
+provides a self-adjoint one-site spatial transfer operator $K_\beta$ for
+the shifted Hamiltonian and a virtual symmetry operator $U_g$ for the
+twist. The twisted trace is then a ring of $n$ transfer vertices closed
+through $U_g$:
+\begin{equation}
+    Z_n(\beta,g)=\Tr(K_\beta^nU_g)
+    =\tnchain[node=xvertex,last=sym,ring]{,,\cdots,,U_g},\qquad n\ge4.
+    \label{cert:eq:transfer-trace}
+\end{equation}
+At $g=1$ the trace is the $n$th power sum of the signed spectrum
+\signedspectrum{} of $K_\beta$. Its two signs nearly cancel at odd $n$,
+so the odd traces in Table~\ref{cert:tab:traces} are small (\tracebars{}
+on a logarithmic scale) and both parities are needed. Because the same
+eigenvalues govern every length $n\ge4$, trace bounds on $4\le n\le12$
+constrain the power sums at $n_0$ and $2n_0$.
+
+\subsubsection{Short-ring traces and the matrix-product trial state}
+\label{cert:sec:inputs}
+
+Two numerical inputs from Ref.~\cite{OpenAI2026Periodic} supply the
+short-ring moments and ground-state energy bound at $b_0=49/4$. The
+first input is the table of shifted traces $Z_n(b_0)$ and $Z_n(b_0,P)$
+for $4\le n\le12$, where $P$ is a $\pi$ rotation about a Cartesian axis. Table~\ref{cert:tab:traces} lists the
+rational centers, each certified within the absolute error
+\begin{equation}
+    \epsilon_Z=3\times10^{-5},
+    \label{cert:eq:trace-error}
+\end{equation}
+the error bound of the integer recursion described next.
+
+\begin{table}[t]
+    \caption{Shifted short-ring traces $Z_n(b_0)=\Tr e^{-b_0(H_n+\kappa nI)}$
+        and twisted traces $Z_n(b_0,P)=\Tr e^{-b_0(H_n(P)+\kappa nI)}$ at
+        $b_0=49/4$ and $\kappa=700741/500000$ from Ref.~\cite{OpenAI2026Periodic},
+        where $P$ is a $\pi$ spin rotation on the closing bond. Each tabulated
+        rational center is certified within absolute error
+        $\epsilon_Z=3\times10^{-5}$ and supplies the sector moments $J_n,N_n$ in
+        Eq.~\eqref{cert:eq:sector-inversion}.}
+    \label{cert:tab:traces}
+    \begin{tabular}{@{}r rr r rr@{}}
+        \toprule
+        $n$ & $Z_n(b_0)$ center & $Z_n(b_0,P)$ center &
+        $n$ & $Z_n(b_0)$ center & $Z_n(b_0,P)$ center                            \\
+        \midrule
+        4   & 124.885379        & 0.065757            & 9  & 0.195455 & 1.514846 \\
+        5   & 0.002925          & 2.960742            & 10 & 2.654823 & 0.675419 \\
+        6   & 12.870614         & 0.286599            & 11 & 0.377629 & 1.314544 \\
+        7   & 0.054069          & 1.920414            & 12 & 1.900547 & 0.787405 \\
+        8   & 4.639283          & 0.510140            &    &          &          \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The exact integer recursion of Ref.~\cite{OpenAI2026Periodic} writes
+each trace as $\Tr A^2$ with $A$ real symmetric and folds it into
+squared columns,
+\begin{equation}
+    Z_n(b_0,g)=\halfgibbstrace,\qquad A=e^{-b_0(H_n(g)+\kappa nI)/2},
+    \label{cert:eq:half-gibbs-fold}
+\end{equation}
+so the recursion runs at $b_0/2$, one truncated Poisson polynomial of a
+rescaled Hamiltonian of norm at most one per column, in scaled integer
+arithmetic; the rounding errors add column by column over symmetry
+representatives with their multiplicities, within total error
+$\epsilon_Z$.
+
+The numerators need lower bounds at $72$ sites, which no certified trace
+reaches; a variational state supplies them once its energy per site lies
+below $-\kappa$.
+The second input is a periodic matrix-product trial state $\psi_N$ of
+bond dimension $26$ with integer tensors $A$, used at $N=72$ and at
+$N=120$. Its norm and its energy, with $h$ on one of the $N$ bonds, are
+exact integer contractions,
+\begin{align}
+    \|\psi_N\|^2 &=\seedmps0,\notag\\
+    \langle\psi_N,H_N\psi_N\rangle
+                 &=N\,\seedmps1.
+    \label{cert:eq:mps-contractions}
+\end{align}
+Exact integer arithmetic (verified in the Lean kernel for both
+$N=72$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Heisenberg/Seed36.html\#CertifiedGaps.SpinOneHeisenberg.one_lt_shiftedZ_seventytwo}
+and $N=120$%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/SeedKernel/Heisenberg/Seed60.html\#CertifiedGaps.SpinOneHeisenberg.exists_spectrum_lt_onetwenty})
+verifies that for $N\in\{72,120\}$,
+\begin{equation}
+    \frac{\langle\psi_N,H_N\psi_N\rangle}{N\,\|\psi_N\|^2}<-\kappa,
+    \label{cert:eq:trial-input}
+\end{equation}
+so the shifted ground energy $E_0(N)+\kappa N$ is negative by the
+variational principle. Retaining only the ground-state
+Boltzmann weight gives the lower bounds%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Ring/Variational.html\#CertifiedGaps.exp_lt_gibbsTrace_of_re_dotProduct_lt}
+\begin{equation}
+    Z_{72}(\beta)>1,\qquad Z_{120}(\beta)>1
+    \quad(\beta>0).
+    \label{cert:eq:trial-consequence}
+\end{equation}
+In the base seed, $Z_{72}(2b_0)>1$ bounds the thermal numerator directly,
+whereas $Z_{72}(b_0)>1$ forces a large leading spatial eigenvalue.
+
+\subsubsection{Spin-rotation sectors and polynomial eigenvalue bounds}
+\label{cert:sec:filters}
+
+Bounding all eigenvalues of $K_{b_0}$ from the untwisted traces alone
+would give the subleading eigenvalues the same bound $U>1$ as the
+leading one, leaving the $36$-site remainder too large. Instead, we split the spectrum of $K_{b_0}$ into spin-rotation
+sectors so that the subleading sectors carry a strictly smaller bound
+$V<1$. The four virtual $\pi$ rotations $D_2=\{1,P_x,P_y,P_z\}$ commute
+with $K_{b_0}$,
+\begin{equation}
+    \tnchain[last=sym]{K_{b_0},U_g}
+    =\tnchain[node=sym,last=xop]{U_g,K_{b_0}},\qquad g\in D_2,
+    \label{cert:eq:twist-diagram}
+\end{equation}
+and define the character projectors
+\begin{equation}
+    \Pi_\chi=\frac14\sum_{g\in D_2}\chi(g)U_g,\qquad
+    \Tr(K_{b_0}^n\Pi_\chi)
+    =\tnchain[node=xvertex,last=sym,ring]{,,\cdots,,\Pi_\chi}.
+    \label{cert:eq:projectors}
+\end{equation}
+Cyclic permutation of the coordinate axes conjugates the three nontrivial
+characters into one another, so their three sectors share a common
+eigenvalue list $N$, while the $D_2$-invariant sector has eigenvalue
+list $J$. Writing $J_n=\sum_{\lambda\in J}\lambda^n$ and
+$N_n=\sum_{\lambda\in N}\lambda^n$ for their $n$th power sums at $b_0$,
+the character table of the plain and $P_z$-twisted rings,
+\begin{proofdiagram}
+    \sectortable
+\end{proofdiagram}
+inverts to the sector moments:
+\begin{align}
+    J_n &=\frac{Z_n+3Z_n(P)}4, &
+    N_n &=\frac{Z_n-Z_n(P)}4.
+    \label{cert:eq:sector-inversion}
+\end{align}
+The inversion maps the trace error~\eqref{cert:eq:trace-error} to an
+error at most $\epsilon_Z$ on every sector moment for $4\le n\le12$.
+Adding $\epsilon_Z$ to both twelfth-moment centers of
+Table~\ref{cert:tab:traces} gives the upper bounds
+\begin{equation}
+    J_{12}\le m_J=\frac{2131441}{2000000},\qquad
+    N_{12}\le m_N=\frac{556631}{2000000}.
+    \label{cert:eq:masses}
+\end{equation}
+
+The twelfth moment alone bounds a $J$ eigenvalue only by
+$m_J^{1/12}\simeq1.0053$, whose $72$nd power exceeds $1.46$; the thermal
+denominator below needs a far tighter upper bound. A polynomial that is
+nonnegative on $\mathbb R$ makes its sector sum an upper bound for each
+eigenvalue. One that nearly vanishes on the subleading spectrum draws
+its total from the leading eigenvalue alone, tightening the bound.
+Ref.~\cite{OpenAI2026Periodic} takes degree at most $12$, a fourth power
+times a square:
+\begin{align}
+    F_J(x) &=x^4(7+17x-280x^2-185x^3+1000x^4)^2,\notag\\
+    F_N(x) &=x^4(12-394x^2+1000x^4)^2.
+    \label{cert:eq:filters}
+\end{align}
+Expanded, each polynomial is a combination $\sum_jf_jx^j$ of
+$x^4,\ldots,x^{12}$ ($F_N$ of the even powers only), so its sum over a
+sector is the same combination of the sector moments. Taking each moment
+at the end of its $\epsilon_Z$ interval that bounds its term (upper for
+$f_j>0$, lower for $f_j<0$) gives the certified totals
+\begin{equation}
+    \sum_{\lambda\in J}F_J(\lambda)\le B_J=318604.54848175,\qquad
+    \sum_{\lambda\in N}F_N(\lambda)\le B_N=48169.880699.
+    \label{cert:eq:filter-bounds}
+\end{equation}
+Each polynomial rises above its total outside a bounded interval:
+\begin{proofdiagram}
+    \filterpair
+\end{proofdiagram}
+Each equation $F(x)=B$ has one positive root, $x_J\simeq1.0013506440113$
+for $J$ and $x_N\simeq0.8712557046526$ for $N$; the negative root for $J$
+has the smaller modulus, near $0.9315$. For the base seed,
+Ref.~\cite{OpenAI2026Periodic} rounds the roots up to the short rationals
+$U=1.00139$ and $V=0.872$. Shifting $x=\pm(U+y)$ with $y\ge0$ gives
+polynomials with positive coefficients, so Lean checks the bounds (with its own,
+slightly tighter rational caps) without root extraction, ruling out both
+exterior rays%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Heisenberg/Seed36.html\#CertifiedGaps.SpinOneHeisenberg.seed36}:
+\begin{equation}
+    |\lambda|<U\quad(\lambda\in J),\qquad
+    |\lambda|<V\quad(\lambda\in N).
+    \label{cert:eq:caps}
+\end{equation}
+Section~\ref{cert:sec:base-defects} uses $U$ in the thermal denominator
+and $V$ for the three $N$ sectors of both residuals.
+
+\subsubsection{Purity bounds at lengths $36$ and $72$ from twelfth moments}
+\label{cert:sec:base-defects}
+
+The seed ratios need power sums at $n=36$ and $n=72$, far beyond the
+certified rings. The twelfth moments~\eqref{cert:eq:masses} and the
+eigenvalue bounds~\eqref{cert:eq:caps} still bound every higher moment through one
+extremal function. For $m\ge0$, $a>0$, and $r\ge1$,
+set%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Seed/CappedMass.html\#CertifiedGaps.sum_pow_le_capped}
+\begin{equation}
+    \mathcal C(m,a,r)=qa^r+(m-qa)^r,\qquad
+    q=\lfloor m/a\rfloor.
+    \label{cert:eq:capped}
+\end{equation}
+Whenever $0\le t_i\le a$ and $\sum_i t_i\le m$, convexity of $t^r$ lets
+mass move from a smaller entry to a larger one without lowering
+$\sum_i t_i^r$ (\massmoves). The maximum therefore fills $q$ entries to
+the bound $a$ and leaves $m-qa$ in one entry, so $\sum_i t_i^r\le\mathcal C(m,a,r)$.
+Applied to $t_i=\lambda_i^{12}\ge0$, this bounds higher moments of the
+twelfth-power weights.
+
+The spatial numerator is bounded by the leading eigenvalue alone, so that
+eigenvalue must also dominate the $36$-site denominator; the trial bound
+$Z_{72}(b_0)>1$ constrains only a sum. We first show that $J$ contains a dominant eigenvalue with
+$|\lambda_0|>\ell=0.999$, the short rational of
+Ref.~\cite{OpenAI2026Periodic}; any $\ell$ that keeps the
+sum~\eqref{cert:eq:dominance-check} under one would serve. If every $\lambda\in J$
+satisfied $|\lambda|\le\ell$, Eq.~\eqref{cert:eq:capped} with $r=6$ would
+place the twelfth-power masses as follows,
+\begin{proofdiagram}
+    \cappedmassfigure
+\end{proofdiagram}
+and give
+\begin{equation}
+    Z_{72}(b_0)
+    \le\mathcal C(m_J,\ell^{12},6)
+    +3\mathcal C(m_N,V^{12},6)
+    <0.931<1,
+    \label{cert:eq:dominance-check}
+\end{equation}
+contradicting the $72$-site trial bound $Z_{72}(b_0)>1$ in
+Eq.~\eqref{cert:eq:trial-consequence}. Because $m_N<\ell^{12}$, no $N$
+eigenvalue reaches $\ell$ in modulus, so $J$ holds an eigenvalue
+$\lambda_0$ with $|\lambda_0|>\ell$ (\sectorspectrum). This is where the sector split
+is needed: the plain traces alone could not exclude three copies of
+$\lambda_0$ in $N$.
+
+Removing $\lambda_0^{12}>\ell^{12}$ leaves residual twelfth moment at
+most $m_J-\ell^{12}$ in $J$, below $U^{12}$, so it counts as a
+single entry. For even $k\ge12$, the subleading moment
+$\sum_{i\ne0}\lambda_i^k$ is therefore at most
+\begin{equation}
+    R_k=(m_J-\ell^{12})^{k/12}
+    +3\mathcal C(m_N,V^{12},k/12).
+    \label{cert:eq:base-residual}
+\end{equation}
+At $k=36$ and $k=72$, keeping only the leading eigenvalue in the spatial
+numerator, the trial bound~\eqref{cert:eq:trial-consequence} in the
+thermal numerator, and $R_k$ in both denominators gives the two base
+purity bounds:
+\begin{align}
+    \Ps(36,b_0) &=\frac{Z_{72}(b_0)}{Z_{36}(b_0)^2}
+    \ge\frac{\lambda_0^{72}}{(|\lambda_0|^{36}+R_{36})^2}
+    \ge\left(1+\frac{R_{36}}{\ell^{36}}\right)^{-2}=1-p,\notag\\
+    \Pt(72,b_0) &=\frac{Z_{72}(2b_0)}{Z_{72}(b_0)^2}
+    \ge\frac{1}{(U^{72}+R_{72})^2}=1-q.
+    \label{cert:eq:base-purities}
+\end{align}
+The sizes entering these bounds are
+\begin{center}
+    \footnotesize
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}llllll@{}}
+        \toprule
+        $k$ & $(m_J-\ell^{12})^{k/12}$  & $3\,\mathcal C(m_N,V^{12},k/12)$        & $R_k$
+            & leading term              & bound on $1-P$                                                      \\
+        \midrule
+        36  & $0.0777^3<0.00047$        & $3(0.1933^3+0.0851^3)<0.02352$          & $<0.024$
+            & $\ell^{36}>0.9646$        & $p<1-(0.9646/0.9886)^2<0.048$                                       \\
+        72  & $0.0777^6<3\times10^{-7}$ & $3(0.1933^6+0.0851^6)<1.6\times10^{-4}$
+            & $<1.6\times10^{-4}$       & $U^{72}<1.1052$                         & $q<1-1.10536^{-2}<0.1816$ \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+Evaluating Eq.~\eqref{cert:eq:base-purities} gives%
+~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/CertifiedGaps/Seed/Ring.html\#CertifiedGaps.RPRing.seeds_of_certificate}
+\begin{equation}
+    p\simeq0.0479158\le\frac{47916}{10^6},\qquad
+    q\simeq0.1815202\le\frac{181521}{10^6},
+    \label{cert:eq:scalar-checks}
+\end{equation}
+which completes the proof of Eq.~\eqref{cert:eq:base}.
+Section~\ref{cert:sec:coverage} reuses these formulas with sharper
+constants as the bridge on $36\le L\le72$.
+
+\subsection{Seed purities at length $60$ and the bound $\Delta_L>0.07290$}
+\label{cert:sec:lifting}
+
+The gap bound of the doubling argument is inversely proportional to the
+seed inverse temperature, so a seed at $b=rb_0$ with $r>1$ gives a larger constant if
+$1-\Ps$ and $1-\Pt$ stay small. Ref.~\cite{OpenAI2026Periodic}, Sec.~2.2,
+introduced this temperature lifting on a separate trace table at
+$b_0'=21/2$ (rings of $6$, $8$, and $10$ sites, twists $1,P,C$), with $r=5/2$
+and the $120$-site trial state. That seed at $n_0=60$ proves
+$\Delta_L>\frac{4}{105}\log\frac{80}{79}\simeq0.000479$ for even
+$L\ge60$. Here we apply the same lift to the two-sector trace table at
+$b_0=49/4$ (Table~\ref{cert:tab:traces}), raised to $b=rb_0$ by a
+convexity inequality and combined with the $120$-site trial bound of
+Eq.~\eqref{cert:eq:trial-consequence}, twelve-decimal polynomial caps,
+and per-interval gap bounds over ten doubling steps. The length $n_0=60$
+is half the trial ring, and the $(36,b_0)$ bound covers $36\le L\le72$,
+so every even length $L\ge36$ is reached with $\Delta_L>0.072901771$.
+
+\subsubsection{Spatial purity at length $60$ and inverse temperature $b=rb_0$}
+\label{cert:sec:lifted-moments}
+
+At $120$ sites and inverse temperature $b=rb_0$ ($r\simeq2$), the
+eigenvalue bound $U$ enters raised to the power $120r\ge240$. At that
+exponent the five-decimal rounding $U=1.00139$ of Eq.~\eqref{cert:eq:caps}
+inflates $U^{120r}$ by nearly $1\%$ relative to the root $x_J$. Rounding
+both roots up to twelve decimal places instead gives
+\begin{equation}
+    U=1.001350644012,\qquad V=0.871255704653.
+    \label{cert:eq:tight-caps}
+\end{equation}
+The step below needs trace bounds at $b_0$ on a ring of $k>12$ sites
+(Table~\ref{cert:tab:lifted}); the extremal moment bound supplies them.
+With $m_J,m_N$ from Eq.~\eqref{cert:eq:masses}, since
+$U^{12}<m_J<2U^{12}$ and $V^{12}<m_N<2V^{12}$, Eq.~\eqref{cert:eq:capped}
+bounds the sector moments at any even length $k\ge12$ by
+\begin{equation}
+    \mathcal J_k=U^k+(m_J-U^{12})^{k/12},\qquad
+    \mathcal N_k=V^k+(m_N-V^{12})^{k/12},\qquad
+    M_k=\mathcal J_k+3\mathcal N_k.
+    \label{cert:eq:moment-upper}
+\end{equation}
+Because $N_k\ge0$ at even $k$, these bound both traces,
+$Z_k(b_0)\le M_k$ and $Z_k(b_0,P)\le\mathcal J_k$.
+
+Trace bounds exist only at $b_0$, so the step to $b=rb_0$ must act on
+the Boltzmann weights themselves. Fix a temperature ratio $r\ge1$ and an even
+length $12\le k\le n_0$ (here $n_0=60$ and $2n_0=120$). Both
+$H_k$ and $H_k(P)$ are self-adjoint, so their Boltzmann weights $z_i>0$
+satisfy $\sum_i z_i^r\le(\sum_i z_i)^r$. This raises the trace bounds
+from $b_0$ to $b$, and with them the $J$ share of
+Eq.~\eqref{cert:eq:sector-inversion}:
+\begin{proofdiagram}
+    \liftbars
+\end{proofdiagram}
+\begin{equation}
+    Z_k(b)\le D:=M_k^r,\qquad
+    Z_k(b,P)\le E:=\mathcal J_k^r.
+    \label{cert:eq:temperature-lift}
+\end{equation}
+
+The totals $D$ and $E$ are all the lifted argument knows at $b$; as at
+$b_0$, the trial bound must force one weight that dominates the
+$n_0$-site denominator.
+At $b$, let $w_i=\lambda_i(b)^k\ge0$ be the $k$th powers of the
+eigenvalues of the one-site transfer operator ($k$ is even). With
+$h=n_0/k$, so that $w_i^h$ and $w_i^{2h}$ are the $n_0$- and
+$2n_0$-site weights, Eq.~\eqref{cert:eq:temperature-lift} and the
+trial bound $Z_{2n_0}(b)>1$ of Eq.~\eqref{cert:eq:trial-consequence}
+give
+\begin{align}
+    \sum_i w_i     &=Z_k(b)\le D,\qquad
+    \sum_{\lambda_i\in J}w_i=\frac{Z_k(b)+3Z_k(b,P)}4\le\tau:=\frac{D+3E}4,
+    \label{cert:eq:spatial-weights}\\
+    \sum_iw_i^{2h} &=Z_{2n_0}(b)>1.
+    \label{cert:eq:lifted-trial}
+\end{align}
+If a threshold $t>0$ satisfies $Dt^{2h-1}<1$ and $3t>D$, then some
+weight $w_0$ exceeds $t$ and lies in $J$:
+\begin{proofdiagram}
+    \weightforcing
+\end{proofdiagram}
+
+The $n_0$-site denominator is $w_0^h$ plus the $h$th moment of the other
+weights, whose split between $J$ and the $N$ lists is unknown.
+Removing $w_0$ leaves residual $J$ mass $x\in[0,\tau-t]$ and at most
+$(D-t-x)/3$ in each of the three identical $N$ sectors. For $s\ge1$ the
+residual moment $\sum_{i\ne0}w_i^s\le x^s+3[(D-t-x)/3]^s$ is convex in
+$x$, so its maximum sits at an endpoint,
+\begin{proofdiagram}
+    \residualends
+\end{proofdiagram}
+\begin{equation}
+    \mathcal R_s(t)=
+    \max\left\{3\left(\frac{D-t}{3}\right)^s,
+    (\tau-t)^s+3\left(\frac{D-\tau}{3}\right)^s\right\}.
+    \label{cert:eq:lifted-residual}
+\end{equation}
+All choices below satisfy $0<t\le\tau\le D$.
+
+Once $w_0>t$ holds, any larger rational $t'$ with
+$(t')^{2h}+\mathcal R_{2h}(t)<1$ also satisfies $w_0>t'$, since
+otherwise the $2n_0$-site sum would fall below one. Testing rationals
+avoids a $2h$th root, and iterating raises the threshold
+(\thresholdup). At $n_0=60$, the leading $n_0$-site weight $w_0^h$
+exceeds $t^h$ and the rest sum to at most $\mathcal R_h(t)$, so the
+spatial purity satisfies%
+\begin{equation}
+    \Ps(n_0,b)\ge
+    \left(1+\frac{\mathcal R_h(t)}{t^h}\right)^{-2}.
+    \label{cert:eq:lifted-spatial}
+\end{equation}
+Its complement is the $p_0$ column of Table~\ref{cert:tab:lifted}.
+
+\subsubsection{Thermal purity at length $120$ and inverse temperature $b=rb_0$}
+\label{cert:sec:thermal-residual}
+
+Neither $120$-site partition function in the thermal purity at $b$ is
+certified. Both the trial bound and the moment bound~\eqref{cert:eq:moment-upper}
+concern the Boltzmann weights $z_i$ of the shifted $120$-site Hamiltonian
+at $b_0$; the lift to $b$ raises each to the $r$th power. We therefore bound $\Pt(2n_0,b)$ from the ordered
+weights at $b_0$ (\boltzmannbars): the trial state gives $z_0>1$ and
+Eq.~\eqref{cert:eq:moment-upper} gives $\sum_i z_i\le M_{2n_0}$, hence
+\begin{equation}
+    \sum_{i>0}\frac{z_i}{z_0}\le M_{2n_0}-1,\qquad
+    \sum_{i>0}\left(\frac{z_i}{z_0}\right)^r
+    \le(M_{2n_0}-1)^r.
+    \label{cert:eq:boltzmann-residual}
+\end{equation}
+At $b=rb_0$ the weights become $z_i^r$, which concentrates them on the
+ground state ($\specbars{.6,.25,.15}\mapsto\specbars{.83,.13,.04}$ at
+$r=17/8$). Keeping only the ground term $z_0^{2r}$ in the numerator
+$Z_{2n_0}(2b)$ and dividing by it gives the thermal purity bound at
+$2n_0=120$%
+\begin{equation}
+    \Pt(2n_0,rb_0)\ge
+    \left[1+(M_{2n_0}-1)^r\right]^{-2}.
+    \label{cert:eq:lifted-thermal}
+\end{equation}
+Its complement is the $q_0$ column of Table~\ref{cert:tab:lifted}; with
+$p_0$ it seeds the recurrence of Sec.~\ref{cert:sec:coverage}.
+
+\subsubsection{Combining the dyadic intervals for all even $L\ge36$}
+\label{cert:sec:coverage}
+
+The quadratic tail of Sec.~\ref{sm:sec:gap} needs both $p$ and $q$ below
+$1/100$, reached only after $K$ doublings, so it covers only $L\ge n_K$;
+the $K$ earlier doubling intervals need their own bounds.
+Write $(p_j,q_j)$ for the bounds on $1-\Ps(n_j,b_j)$ and
+$1-\Pt(2n_j,b_j)$ after $j$ of $K$ steps of the
+asymmetric recurrence~\eqref{sm:eq:update} from the seed, with the last
+step below the threshold $1/100$ of Sec.~\ref{sm:sec:gap}:
+\[
+    (n_j,b_j)=(2^jn_0,2^jb),\qquad A_j=(1-p_j)^2(1-q_j),\qquad
+    u=\max(p_K,q_K)\le\frac1{100}.
+\]
+On the interval between two consecutive scales, the spatial
+interpolation inequality~\eqref{sm:eq:interpolation} bounds the largest
+normalized Boltzmann weight $a_0$ by $A_j$, which exceeds $1/2$ at every
+step below. The ground state is therefore unique, the next weight is
+$a_1\le1-a_0$, and
+\begin{align}
+    a_0      &\ge\Pt(L,b_j)\ge A_j^{L/(2n_j)}\ge A_j,\qquad
+    e^{-b_j\Delta_L}=\frac{a_1}{a_0}\le\frac{1-A_j}{A_j},\notag\\
+    \Delta_L &\ge\frac{\log(A_j/(1-A_j))}{b_j}
+    \quad(n_j\le L\le2n_j,\ j<K).
+    \label{cert:eq:interval-gap}
+\end{align}
+For even $L\ge n_K$, the quadratic tail of Sec.~\ref{sm:sec:gap} takes
+over with its exact coefficient $G(u)=f(1-(1-u)^3)/u^2$, which rises from
+$G(0)=9/2$ to $4.69$ at $u=1/100$ (Sec.~\ref{sm:sec:gap} rounds it to
+$5$). With a rational $C\ge G(u)$, the bounds $(p_m,q_m)$ at scale $m\ge K$ are at
+most $C^{-1}(Cu)^{2^{m-K}}$, and $\Delta_L>\tfrac{\log(1/(Cu))}{b_K}$ (using
+$3u/(1-3u)\le Cu$, which holds because $C\ge9/2$ and $u\le1/100$). The
+minimum of the $K$ interval bounds~\eqref{cert:eq:interval-gap} and this
+tail bound therefore bounds $\Delta_L$ for every even $L\ge n_0$.
+
+For the seeds at $(60,rb_0)$, we run $K=10$ doubling steps, enough for
+the per-interval bounds to converge.
+
+\begin{table}[t]
+    \caption{Certified seed bounds $p_0\ge1-\Ps(60,rb_0)$ and
+        $q_0\ge1-\Pt(120,rb_0)$%
+        and resulting uniform gap bounds at length
+        $n_0=60$ and inverse temperature $b=rb_0$ ($b_0=49/4$). Here $k$ is the
+        even ring length at which the trace bounds~\eqref{cert:eq:moment-upper}
+        are raised to the power $r$ in Eq.~\eqref{cert:eq:temperature-lift}.
+        Running $K=10$ doubling steps from $(60,rb_0)$ certifies the stated gap
+        bound for all even $L\ge60$%
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Chains/SpinOneHeisenberg.html\#Leaderboard.Chains.SpinOneHeisenberg.temperature_lifting_valid},
+        and combining with the $(36,b_0)$ bound on
+        $36\le L\le72$ extends it to all even $L\ge36$%
+        ~\leanmark{https://sirui-lu.com/CertifiedGaps/docs/Leaderboard/Records/SpinOneHeisenberg.html\#Leaderboard.Records.SpinOneHeisenberg.temperature_lifting}.}
+    \label{cert:tab:lifted}
+    \begin{tabular}{@{}ccccc@{}}
+        \toprule
+        $k$ & $r$    & $p_0\ge1-\Ps$ & $q_0\ge1-\Pt$ & $\Delta_L>$ \\
+        \midrule
+        30  & $2$    & 0.0307608679  & 0.0590740709  & 0.070450002 \\
+        28  & $17/8$ & 0.0305302052  & 0.0479556776  & 0.072901771 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+Choosing $r$ balances two effects. A larger $r$ shrinks the thermal
+residual $(M_{120}-1)^r$ in Eq.~\eqref{cert:eq:lifted-thermal} and
+increases $b=rb_0$. Too large an $r$, however, makes $D=M_k^r$ too large
+for a threshold $t$ with $Dt^{2h-1}<1$ and $3t>D$ to isolate a leading spatial
+eigenvalue.
+
+Table~\ref{cert:tab:lifted} lists two choices near the optimum
+$r\approx2$. The integer choice $(k,r)=(30,2)$ has $h=60/k=2$, so
+Eq.~\eqref{cert:eq:lifted-residual} uses only second and fourth powers;
+$(k,r)=(28,17/8)$ maximizes the gap bound.
+
+To cover the remaining even lengths $36\le L<60$, we evaluate the
+$(36,b_0)$ formulas~\eqref{cert:eq:base-residual}--\eqref{cert:eq:base-purities}
+with the twelve-decimal bounds~\eqref{cert:eq:tight-caps} and
+$\ell=0.999997937629$. This $\ell$ is the largest twelve-decimal value
+satisfying Eq.~\eqref{cert:eq:dominance-check}, and its $A_0$ in
+Eq.~\eqref{cert:eq:interval-gap} gives $\Delta_L>0.09$ on $36\le L\le72$.
+The intervals and their bounds for $(k,r)=(28,17/8)$ are
+\begin{proofdiagram}
+    \coveragefigure
+\end{proofdiagram}
+(per-interval values are floating-point illustrations; the certified
+minimum is the dashed line). Because $[36,72]$ and the dyadic intervals
+$[60\,2^j,120\,2^j]$ overlap on $[60,72]$, together they prove
+Eq.~\eqref{cert:eq:improved} for every even $L\ge36$.

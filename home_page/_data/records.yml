@@ -167,18 +167,12 @@ challenges:
     family: spin1-heisenberg
     title: 'A small seed for spin-1'
     need: >-
-      Certify the spin-1 seed calculation on rings of at most 12 sites, to an error of $10^{-3}$.
-      This gives $\Delta_L > 0.039$ for all even $L \ge 60$, and the calculation is small enough
-      for Lean 4 to check.
+      The seed calculation on rings of at most 12 sites (error $10^{-3}$) is now
+      computer-certified as record `spin1-small-seed-bound` (`code/models/spin1_small_seed/`):
+      $\Delta_L > 0.039036761$ for all even $L \ge 60$. Remaining: check the trace tables
+      inside the Lean 4 kernel, so the bound becomes unconditional (see
+      `code/models/lean_seeds`).
     link: code/models/lean_seeds/README.md
-  - id: lean-odd-seed
-    family: spin1-dimerized
-    title: 'Odd seeds in Lean'
-    need: >-
-      One bound, for the dimerized spin-1 chain at $\delta = 7/10$, uses a seed of 3 cells. Its
-      Lean 4 proof needs one more lemma: the transfer operator factors as $X_\beta = K K^*$.
-      Prove this lemma in Lean 4.
-    link: code/models/spin1_dimerized/README.md
 
 
 records:
@@ -235,6 +229,30 @@ records:
          method: 'OpenAI preprint, rounded purities'}
       - {date: "2026-10-06", decimal: "0.000479", display: '(4/105)\log(80/79)', lengths: 'even L ≥ 60', tier: lean-conditional, pr: null,
          method: 'OpenAI preprint, smaller seed'}
+  - id: spin1-small-seed-bound
+    family: spin1-heisenberg
+    parameter: 'periodic ring'
+    lengths: {L0: 60}
+    bound: {value: "39036761//1000000000", decimal: "0.039036761", display: '\Delta_L > 0.039036761'}
+    seed: {n0: 60, beta0: "49/2", text: 'Twisted traces on even rings $n \le 12$ (twists $I, P$) at $\beta = 49/4$ with error $10^{-3}$, temperature-lifted to $\beta_0 = 49/2$; length-120 integer MPS trial'}
+    numerical_gap: "0.41048"
+    tier: certified
+    method: 'small seed from rings of at most 12 sites'
+    certificate: data/models/spin1_small_seed/certificate.json
+    check: code/models/spin1_small_seed/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+    notes: >-
+      The finite inputs are the 10 twisted thermal traces on even rings of at most 12 sites at
+      $\beta = 49/4$ (real twists $I, P$, rational intervals of half-width $3\times10^{-5}$ from
+      the frozen hash-audited spin-1 certificate, inside the $10^{-3}$ challenge tolerance) plus
+      the stored length-120 integer MPS trial. Exact rational replay (design C of
+      `code/models/lean_seeds`) bounds the seed defects at $(60, 49/2)$ by
+      $p < 0.047914768$ and $q < 0.112578548$; the 9-step rational doubling chain gives
+      $\Delta_L > 39036761/10^9$ for every even $L \ge 60$. The seed uses rings of at most 12
+      sites only, so it is small enough to be checked inside the Lean 4 kernel (open; see
+      `code/models/lean_seeds`).
   # ---------------------------------------------------------------- heisenberg-staggered-field
   - id: staggered-h-1
     family: heisenberg-staggered-field
@@ -329,18 +347,21 @@ records:
     parameter: '$\delta = 1/2$'
     params: {delta: "1/2"}
     lengths: {L0: 4}
-    bound: {value: "1204251241745935/2251799813685248", decimal: "0.534794"}
-    seed: {n0: 4, beta0: "6"}
+    bound: {value: "5920364896908571/9007199254740992", decimal: "0.657292"}
+    seed: {n0: 6, beta0: "8", text: 'Coupled seed: complete verified 12-spin spectrum and rigorous Rayleigh–Ritz lower bounds on the partition function of the 24-spin ring; L = 4 by the verified 8-spin gap'}
     numerical_gap: "1.188631"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "12370753/500000", beta: "6", decimal: "0.534747"}
-    certificate: data/models/dimerized_heisenberg/certificate_delta_1_2_beta_6.json
-    date: "2026-10-18"
-    pr: 81
-    contributors: ['LionSR']
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_2, r: "12370753/500000", beta: "6", decimal: "0.534747", certificate: data/models/dimerized_heisenberg/certificate_delta_1_2_beta_6.json}
+    certificate: data/models/dimerized_heisenberg/certificate_delta_1_2_n0_6_beta_8.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    method: 'coupled seed at 6 cells (Rayleigh–Ritz bounds on 24 spins)'
     notes: >-
-      The seed $\beta_0 = 25/4$ also works and gives 0.533681.
+      The Lean theorem starts from the earlier seed $(n_0, \beta_0) = (4, 6)$ of 4 cells.
     history:
+      - {date: "2026-10-18", decimal: "0.534794", lengths: 'even L ≥ 4 cells', tier: certified, pr: 81,
+         method: 'seed (4, 6) from complete 8- and 16-spin spectra'}
       - {date: "2026-10-15", decimal: "0.534756", lengths: 'even L ≥ 4 cells', tier: certified, pr: 23,
          method: 'an earlier computation from the same seed'}
       - {date: "2026-10-12", decimal: "0.532658", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
@@ -350,16 +371,21 @@ records:
     parameter: '$\delta = 3/10$'
     params: {delta: "3/10"}
     lengths: {L0: 4}
-    bound: {value: "6240341034043777/36028797018963968", decimal: "0.173204"}
-    seed: {n0: 4, beta0: "13/2"}
+    bound: {value: "4925741571632125/18014398509481984", decimal: "0.273433"}
+    seed: {n0: 6, beta0: "65/8", text: 'Coupled seed: complete verified 12-spin spectrum and rigorous Rayleigh–Ritz lower bounds on the partition function of the 24-spin ring; L = 4 by the verified 8-spin gap'}
     numerical_gap: "0.810214"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "6164911/2000000", beta: "13/2", decimal: "0.173188"}
-    certificate: data/models/dimerized_heisenberg/certificate_delta_3_10_beta_13_2.json
-    date: "2026-10-18"
-    pr: 81
-    contributors: ['LionSR']
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_3_10, r: "6164911/2000000", beta: "13/2", decimal: "0.173188", certificate: data/models/dimerized_heisenberg/certificate_delta_3_10_beta_13_2.json}
+    certificate: data/models/dimerized_heisenberg/certificate_delta_3_10_n0_6_beta_65_8.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    method: 'coupled seed at 6 cells (Rayleigh–Ritz bounds on 24 spins)'
+    notes: >-
+      The Lean theorem starts from the earlier seed $(n_0, \beta_0) = (4, 13/2)$ of 4 cells.
     history:
+      - {date: "2026-10-18", decimal: "0.173204", lengths: 'even L ≥ 4 cells', tier: certified, pr: 81,
+         method: 'seed (4, 13/2) from complete 8- and 16-spin spectra'}
       - {date: "2026-10-15", decimal: "0.173197", lengths: 'even L ≥ 4 cells', tier: certified, pr: 23,
          method: 'an earlier computation from the same seed'}
       - {date: "2026-10-12", decimal: "0.172916", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
@@ -369,23 +395,42 @@ records:
     parameter: '$\delta = 1/4$'
     params: {delta: "1/4"}
     lengths: {L0: 4}
-    bound: {value: "4196067203083483/72057594037927936", decimal: "0.058232"}
-    seed: {n0: 4, beta0: "29/4"}
+    bound: {value: "3035238769656491/18014398509481984", decimal: "0.168489"}
+    seed: {n0: 6, beta0: "17/2", text: 'Coupled seed: complete verified 12-spin spectrum and rigorous Rayleigh–Ritz lower bounds on the partition function of the 24-spin ring; L = 4 by the verified 8-spin gap'}
     numerical_gap: "0.707193"
     tier: certified
-    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "15251257/10000000", beta: "29/4", decimal: "0.058217"}
-    certificate: data/models/dimerized_heisenberg/certificate_delta_1_4_beta_29_4.json
-    date: "2026-10-18"
-    pr: 81
-    contributors: ['LionSR']
+    lean: {name: Leaderboard.Records.DimerizedHeisenberg.delta_1_4, r: "15251257/10000000", beta: "29/4", decimal: "0.058217", certificate: data/models/dimerized_heisenberg/certificate_delta_1_4_beta_29_4.json}
+    certificate: data/models/dimerized_heisenberg/certificate_delta_1_4_n0_6_beta_17_2.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    method: 'coupled seed at 6 cells (Rayleigh–Ritz bounds on 24 spins)'
     notes: >-
-      This is the smallest dimerization that rings of at most 16 spins can certify. For $\delta =
-      1/5$, $3/20$ and $1/10$, seeds of 2 or 4 cells provably fail at all $\beta_0$.
+      The Lean theorem starts from the earlier seed $(n_0, \beta_0) = (4, 29/4)$ of 4 cells, the
+      smallest dimerization that rings of at most 16 spins can certify.
     history:
+      - {date: "2026-10-18", decimal: "0.058232", lengths: 'even L ≥ 4 cells', tier: certified, pr: 81,
+         method: 'seed (4, 29/4) from complete 8- and 16-spin spectra'}
       - {date: "2026-10-15", decimal: "0.058225", lengths: 'even L ≥ 4 cells', tier: certified, pr: 23,
          method: 'an earlier computation from the same seed'}
       - {date: "2026-10-12", decimal: "0.057967", lengths: 'even L ≥ 4 cells', tier: certified, pr: 4,
          method: 'earlier certificate with wider eigenvalue enclosures at the same seed'}
+  - id: dimerized-delta-1-5
+    family: dimerized-heisenberg
+    parameter: '$\delta = 1/5$'
+    params: {delta: "1/5"}
+    lengths: {L0: 4}
+    bound: {value: "5165367945806521/144115188075855872", decimal: "0.035841"}
+    seed: {n0: 6, beta0: "19/2", text: 'Coupled seed: complete verified 12-spin spectrum and rigorous Rayleigh–Ritz lower bounds on the partition function of the 24-spin ring; L = 4 by the verified 8-spin gap'}
+    numerical_gap: "0.599819"
+    tier: certified
+    certificate: data/models/dimerized_heisenberg/certificate_delta_1_5_n0_6_beta_19_2.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    method: 'coupled seed at 6 cells (Rayleigh–Ritz bounds on 24 spins)'
+    notes: >-
+      Seeds of 2 and 4 cells provably fail at all $\beta_0$; the coupled seed of 6 cells closes.
   # ---------------------------------------------------------------- spin1-dimerized
   - id: spin1-dimerized-delta-9-10
     family: spin1-dimerized
@@ -413,6 +458,7 @@ records:
     seed: {n0: 3, beta0: "17/4", text: 'The seed length $n_0 = 3$ is odd, which is allowed because the transfer operator factors as $X_\beta = K K^* \succeq 0$'}
     numerical_gap: "1.2659"
     tier: certified
+    lean: {name: Leaderboard.Records.SpinOneDimerized.delta_7_10, r: "12670213/5000000", beta: "17/4", decimal: "0.218780210146"}
     certificate: data/models/spin1_dimerized/certificate_d7.json
     date: "2026-10-18"
     pr: 81
@@ -596,23 +642,65 @@ records:
       - {date: "2026-10-15", decimal: "0.001531165", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 13,
          method: 'an earlier computation from the same seed'}
   # ---------------------------------------------------------------- two-leg-tfim
+  - id: two-leg-tfim-g-11-4
+    family: two-leg-tfim
+    parameter: '$g = 11/4$'
+    params: {g: "11/4"}
+    lengths: {L0: 4}
+    bound: {value: "3343298857914117/9007199254740992", decimal: "0.371180737"}
+    seed: {n0: 6, beta0: "69/32"}
+    numerical_gap: "2.1190"
+    gap_source: '12-rung ring, Lanczos'
+    tier: certified
+    certificate: data/models/two_leg_tfim/certificate_g11_4_n6.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    notes: >-
+      Coupled half-length seed: the complete verified spectrum of the 6-rung ring and rigorous
+      Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring (24 spins); the
+      verified gap of the 4-rung ring covers L = 4.
   - id: two-leg-tfim-g-3
     family: two-leg-tfim
     parameter: '$g = 3$'
     params: {g: "3"}
     lengths: {L0: 4}
-    bound: {value: "5736422639488881/9007199254740992", decimal: "0.636870849"}
-    seed: {n0: 4, beta0: "3/2"}
+    bound: {value: "7650593684895759/9007199254740992", decimal: "0.849386526"}
+    seed: {n0: 6, beta0: "29/16"}
     numerical_gap: "2.6618"
     tier: certified
-    lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "25974347/10000000", beta: "3/2", decimal: "0.636349536"}
-    certificate: data/models/two_leg_tfim/certificate_g3_1.json
-    date: "2026-10-18"
-    pr: 81
-    contributors: ['LionSR']
+    lean: {name: Leaderboard.Records.TwoLegIsing.g_3, r: "25974347/10000000", beta: "3/2", decimal: "0.636349536", certificate: data/models/two_leg_tfim/certificate_g3_1.json}
+    certificate: data/models/two_leg_tfim/certificate_g3_1_n6.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    notes: >-
+      Coupled half-length seed: the complete verified spectrum of the 6-rung ring and rigorous
+      Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring (24 spins); the
+      verified gap of the 4-rung ring covers L = 4. The Lean 4 theorem starts from the seed
+      $(4, 3/2)$ of the earlier certificate.
     history:
+      - {date: "2026-10-18", decimal: "0.636870849", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 81,
+         method: 'seed (4, 3/2) from verified spectra of the 4- and 8-rung rings'}
       - {date: "2026-10-12", decimal: "0.636386863", lengths: 'even L ≥ 4 rungs', tier: certified, pr: 1,
          method: 'an earlier computation from the same seed'}
+  - id: two-leg-tfim-g-4
+    family: two-leg-tfim
+    parameter: '$g = 4$'
+    params: {g: "4"}
+    lengths: {L0: 4}
+    bound: {value: "2867246545090321/1125899906842624", decimal: "2.546626505"}
+    seed: {n0: 6, beta0: "11/8"}
+    numerical_gap: "4.7633"
+    tier: certified
+    certificate: data/models/two_leg_tfim/certificate_g4_1_n6.json
+    date: "2026-10-23"
+    pr: null
+    contributors: ['lm1909']
+    notes: >-
+      Coupled half-length seed: the complete verified spectrum of the 6-rung ring and rigorous
+      Rayleigh–Ritz lower bounds on the partition functions of the 12-rung ring (24 spins); the
+      verified gap of the 4-rung ring covers L = 4.
   # ---------------------------------------------------------------- ising-longitudinal
   - id: ising-g-1-4-h-1-20
     family: ising-longitudinal
@@ -1132,43 +1220,121 @@ records:
     history:
       - {date: "2026-10-12", decimal: "3.491169", lengths: 'even L ≥ 6', tier: certified, pr: 5,
          method: 'an earlier computation from the same seed'}
-  # ---------------------------------------------------------------- open targets (estimates only)
-  - id: target-tfim-g-2
+  - id: ising-g-2-h-0
     family: ising-longitudinal
     parameter: '$g = 2,\ h = 0$'
     params: {g: "2", h: "0"}
-    estimate: {n0: "128", beta0: "32", float_bound: "1.885", text: 'Free fermions; reflection positive in the $\sigma^z$ basis'}
+    lengths: {L0: 128}
+    bound: {value: "4321152898597103/2251799813685248", decimal: "1.918977"}
+    seed: {n0: 128, beta0: "175/4", text: 'Free-fermion closed form for $Z_L$ in 512-bit interval arithmetic'}
     numerical_gap: "2"
     gap_source: 'exact (free fermions)'
-    tier: target
-  - id: target-tfim-g-5-4
+    tier: certified
+    method: 'free-fermion closed form, interval arithmetic'
+    certificate: data/models/tfim_free_fermions/certificate_g2_1.json.gz
+    check: code/models/tfim_free_fermions/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+    notes: 'Floating-point survey estimate before certification: 1.885 at $(n_0, \beta_0) = (128, 32)$'
+  - id: ising-g-5-4-h-0
     family: ising-longitudinal
     parameter: '$g = 5/4,\ h = 0$'
     params: {g: "5/4", h: "0"}
-    estimate: {n0: "144", beta0: "64", float_bound: "0.451", text: 'Reflection positive in the $\sigma^z$ basis'}
+    lengths: {L0: 144}
+    bound: {value: "2032396943107871/4503599627370496", decimal: "0.451282"}
+    seed: {n0: 144, beta0: "63", text: 'Free-fermion closed form for $Z_L$ in 512-bit interval arithmetic'}
     numerical_gap: "0.5"
     gap_source: 'exact (free fermions)'
-    tier: target
-  - id: target-tfim-g-11-10
+    tier: certified
+    method: 'free-fermion closed form, interval arithmetic'
+    certificate: data/models/tfim_free_fermions/certificate_g5_4.json.gz
+    check: code/models/tfim_free_fermions/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+    notes: 'Floating-point survey estimate before certification: 0.451 at $(144, 64)$'
+  - id: ising-g-11-10-h-0
     family: ising-longitudinal
     parameter: '$g = 11/10,\ h = 0$'
     params: {g: "11/10", h: "0"}
-    estimate: {n0: "384", beta0: "161", float_bound: "0.178", text: 'Reflection positive in the $\sigma^z$ basis'}
+    lengths: {L0: 384}
+    bound: {value: "3289328394981203/18014398509481984", decimal: "0.182594"}
+    seed: {n0: 384, beta0: "359/2", text: 'Free-fermion closed form for $Z_L$ in 512-bit interval arithmetic'}
     numerical_gap: "0.2"
     gap_source: 'exact (free fermions)'
-    tier: target
-  - id: target-cluster-g-1-2
+    tier: certified
+    method: 'free-fermion closed form, interval arithmetic'
+    certificate: data/models/tfim_free_fermions/certificate_g11_10.json.gz
+    check: code/models/tfim_free_fermions/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+    notes: 'Floating-point survey estimate before certification: 0.178 at $(384, 161)$'
+  # ---------------------------------------------------------------- xy-field
+  - id: xy-Jx-m1-Jy-1-4-h-1
+    family: xy-field
+    parameter: '$J_x = -1,\ J_y = 1/4,\ h = 1$'
+    params: {Jx: "-1", Jy: "1/4", h: "1"}
+    lengths: {L0: 128}
+    bound: {value: "1970606566334941/4503599627370496", decimal: "0.437562"}
+    seed: {n0: 128, beta0: "189/4", text: 'Free-fermion closed form for $Z_L$ in 512-bit interval arithmetic'}
+    numerical_gap: "0.5"
+    tier: certified
+    method: 'free-fermion closed form, interval arithmetic'
+    certificate: data/models/xy_field/certificate_Jxm1_1_Jy1_4_h1_1.json.gz
+    check: code/models/xy_field/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+  - id: xy-Jx-m1-Jy-1-2-h-1
+    family: xy-field
+    parameter: '$J_x = -1,\ J_y = 1/2,\ h = 1$'
+    params: {Jx: "-1", Jy: "1/2", h: "1"}
+    lengths: {L0: 128}
+    bound: {value: "4138383990400245/4503599627370496", decimal: "0.918905"}
+    seed: {n0: 128, beta0: "157/4", text: 'Free-fermion closed form for $Z_L$ in 512-bit interval arithmetic'}
+    numerical_gap: "1"
+    tier: certified
+    method: 'free-fermion closed form, interval arithmetic'
+    certificate: data/models/xy_field/certificate_Jxm1_1_Jy1_2_h1_1.json.gz
+    check: code/models/xy_field/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+  - id: xy-Jx-m1-Jy-1-h-1
+    family: xy-field
+    parameter: '$J_x = -1,\ J_y = 1,\ h = 1$'
+    params: {Jx: "-1", Jy: "1", h: "1"}
+    lengths: {L0: 128}
+    bound: {value: "2099759308587299/1125899906842624", decimal: "1.864960"}
+    seed: {n0: 128, beta0: "121/4", text: 'Free-fermion closed form for $Z_L$ in 512-bit interval arithmetic'}
+    numerical_gap: "2"
+    tier: certified
+    method: 'free-fermion closed form, interval arithmetic'
+    certificate: data/models/xy_field/certificate_Jxm1_1_Jy1_1_h1_1.json.gz
+    check: code/models/xy_field/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+  # ---------------------------------------------------------------- cluster
+  - id: cluster-g-1-2
     family: cluster
     parameter: '$g = 1/2$'
     params: {g: "1/2"}
-    estimate: {n0: "128", beta0: "64", float_bound: "0.932", text: 'Two-site cells; reflection positive in a rotated cell basis'}
+    lengths: {L0: 128}
+    bound: {value: "8570953628425459/9007199254740992", decimal: "0.951567"}
+    seed: {n0: 128, beta0: "175/2", text: 'Two-site cells; free-fermion closed form for $Z_L$ in 512-bit interval arithmetic; reflection positive in the cell frame $(H \otimes H)\,\mathrm{CS}$'}
     numerical_gap: "1"
-    tier: target
-  - id: target-xy-field
-    family: xy-field
-    parameter: '$J_x J_y < 0$'
-    estimate: {text: 'Free fermions; reflection positive in the standard basis'}
-    tier: target
+    tier: certified
+    method: 'free-fermion closed form, interval arithmetic'
+    certificate: data/models/cluster_chain/certificate_g1_2.json.gz
+    check: code/models/cluster_chain/check.jl
+    date: "2026-10-30"
+    pr: null
+    contributors: ['lm1909']
+    notes: 'Floating-point survey estimate before certification: 0.932 at $(n_0, \beta_0) = (128, 64)$ cells'
+  # ---------------------------------------------------------------- open targets (estimates only)
   - id: target-blbq-theta-0-1
     family: spin1-blbq
     parameter: '$\theta = -0.1$'
@@ -1181,13 +1347,6 @@ records:
     parameter: 'periodic ring'
     estimate: {n0: "256", beta0: "64", float_bound: "0.003019921", text: 'One trace bound is not certified yet: $\widehat{Z}_{256}(64) \le 1.08$'}
     numerical_gap: "0.08917"
-    tier: target
-  - id: target-dimerized-delta-1-5
-    family: dimerized-heisenberg
-    parameter: '$\delta = 1/5$'
-    params: {delta: "1/5"}
-    estimate: {n0: "5", beta0: "17/2", float_bound: "0.086", text: 'Seeds of 2 and 4 cells fail (proved). An odd seed of 5 cells (rings of 10 and 20 spins) probably works'}
-    numerical_gap: "0.599819"
     tier: target
   - id: target-ladder-Jperp-2
     family: heisenberg-ladder
