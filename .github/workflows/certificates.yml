@@ -61,6 +61,11 @@ jobs:
       - name: Test the core package
         run: julia --project=code/julia -e 'using Pkg; Pkg.instantiate(); Pkg.test()'
 
+      # This research model has no gap certificate checker; keep its exact claims tested.
+      - name: Check the AKLT obstruction and conditional estimates
+        if: hashFiles('code/models/aklt/scripts/verify_rp_trajectory.jl') != ''
+        run: julia --startup-file=no code/models/aklt/scripts/verify_rp_trajectory.jl
+
       # The seed defects hardcoded in the Lean model files against the certificates.
       - name: Check the Lean seeds
         run: julia --project=code/julia code/lean/scripts/check_seeds.jl
