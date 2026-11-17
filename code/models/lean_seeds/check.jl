@@ -16,7 +16,7 @@ using .LeanSeeds.Common: build_seed_kernel, lean_output, LAKE, LEAN
 function step(f, name)
     println("== ", name)
     t = @elapsed f()
-    println("== ", name, " passed in ", round(t; digits=1), " s")
+    println("== ", name, " passed in ", round(t; digits = 1), " s")
 end
 
 function main(full)
@@ -36,10 +36,20 @@ function main(full)
     step("ising: exact replay and generated Lean files") do
         LeanSeeds.IsingSeed.check_ising()
     end
+    step("ising_open: exact replay and generated Lean files") do
+        LeanSeeds.IsingOpenSeed.check_ising_open()
+    end
     step("lean: lake build SeedKernel and axiom audit") do
-        seconds, names = build_seed_kernel(; fresh=full)
-        println("lake build SeedKernel", full ? " (clean)" : "", " took ", round(seconds; digits=1),
-            " s; ", length(names), " declarations use only standard axioms")
+        seconds, names = build_seed_kernel(; fresh = full)
+        println(
+            "lake build SeedKernel",
+            full ? " (clean)" : "",
+            " took ",
+            round(seconds; digits = 1),
+            " s; ",
+            length(names),
+            " declarations use only standard axioms",
+        )
     end
     full || return
     # Compiled code, not the kernel: shows that the integer hypotheses hold for the Lean
