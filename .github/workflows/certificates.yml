@@ -114,6 +114,12 @@ jobs:
             slugs=$( (grep -oE 'models/[A-Za-z0-9_]+/' "$records" | cut -d/ -f2;
                       sed -nE 's/^[[:space:]]*slug:[[:space:]]*([A-Za-z0-9_]+).*/\1/p' "$records") )
           fi
+          # New certificates need checks even before they acquire leaderboard entries.
+          # A core change must not replace the changed-model list with only known records.
+          if [ -n "${changed_nondoc:-}" ]; then
+            changed_models=$(echo "$changed_nondoc" | grep -E '^(code|data)/models/' | cut -d/ -f3 || true)
+            slugs=$(printf '%s\n%s\n' "$slugs" "$changed_models")
+          fi
           models=$(echo "$slugs" | sort -u \
             | while read -r slug; do
                 if [ -n "$slug" ] && [ -f "code/models/$slug/check.jl" ] && [ "$slug" != lean_seeds ]; then
