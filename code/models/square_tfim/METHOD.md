@@ -1,5 +1,10 @@
 # A finite certificate for the square-lattice transverse-field Ising model
 
+The original side-two certificates below are retained in the `legacy` section of each
+applicable record. The current side-four construction is described in
+[Direct-temperature prefix](#direct-temperature-prefix); it uses the same transfer
+assumptions and the same subsequent cube recurrence.
+
 ## Hamiltonian and small periods
 
 For even periods $n,m\ge2$, with both indices read periodically, the Pauli Hamiltonian is
@@ -385,3 +390,199 @@ took 28.3 seconds. Exact comparison of every non-metadata field of all three cer
 confirmed unchanged seed enclosures, original and refined chains, spectral records, and
 finite-volume energies and gaps. Only source and core provenance metadata changed; no
 stored spectrum was regenerated.
+
+## Direct-temperature prefix
+
+The original recurrence estimates some finite-temperature spatial purities indirectly,
+although they can be computed from the same stored spectra. At inverse temperature β,
+use the two directly enclosed inputs
+
+```math
+u=P_y(4,2,2\beta)=\frac{Z(4,4,2\beta)}{Z(4,2,2\beta)^2},\qquad
+ t=P_\tau(4,4,\beta)=\frac{Z(4,4,2\beta)}{Z(4,4,\beta)^2}.
+```
+
+Axis exchange gives $P_x(2,4,2\beta)=u$. Put $f(z)=z^2/[2(1-z)^2]$. If rational
+upper input defects are $e_x\ge1-u$ and $e_t\ge1-t$, choose upward rational roundings
+
+```math
+a\ge f(e_x),\qquad
+b\ge f\!\left(1-(1-e_x)^2(1-a)\right),\qquad
+c\ge f\!\left(1-(1-e_t)^4(1-a)^2(1-b)\right).
+```
+
+All input and intermediate defects must lie in $[0,1)$. These are upper defects of
+$P_x(4,4,2\beta)$, $P_y(8,4,2\beta)$, and $P_\tau(8,8,2\beta)$, respectively.
+
+**Proof.** Spatial squaring of $P_x(2,4,2\beta)=u$ gives the first bound. At
+$v=(4,2,2\beta)$, the face identity gives
+
+```math
+P_y(D_xv)=\frac{P_y(v)^2P_x(D_yv)}{P_x(v)^2}
+ \ge u^2(1-a),
+```
+
+because the denominator is at most one. Squaring in y gives the second bound. At
+$w=(4,4,\beta)$, the cube path $(\tau,x,y)$ gives
+
+```math
+Q(w)=P_\tau(w)^4P_x(D_\tau w)^2P_y(D_xD_\tau w)
+ \ge t^4(1-a)^2(1-b).
+```
+
+Reorder the same cube with time last, discard the two other purity factors, which are
+at most one, and square in time. This gives the third bound. Every expression is
+monotone in its defect inputs on the stated domain, so upward rational rounding is valid.
+
+The output has the staggered form of the existing three-component theorem, now with
+$n_0=m_0=4$ and $\beta_0=2\beta$. Its spatial interpolation windows cover every even
+square side $L\ge4$. This construction does not establish the stronger point bounds for
+$L=2$. It requires no new transfer inequality and no spectrum larger than sixteen spins.
+The prefix proof has not been formalized in Lean.
+
+The implementation encloses the two input defects with `IntervalArithmetic`, rounds them
+upward on denominator $10^{12}$ with one additional unit, and applies the exact prefix.
+Twelve subsequent cube steps use denominator $10^{8000}$. The earlier $10^{2000}$ grid
+would dominate the rapidly decreasing defects at the stronger points, artificially
+limiting the final tail bound; this is separate from the spectral enclosure error.
+
+| $g/J$ | effective $\beta_0J$ | new uniform gap lower bound $/J$ | previous bootstrap bound $/J$ |
+|---:|---:|---:|---:|
+| 15 | $47/100$ | 0.7420846910 | no certificate |
+| 16 | $141/320$ | 1.7235616330 | no certificate |
+| 18 | $143/360$ | 3.3912873530 | 0.7437803188 |
+| 20 | $29/80$ | 4.9771004373 | 2.5137666679 |
+| 24 | $5/16$ | 8.1419217133 | 5.5217326453 |
+
+The displayed new bounds are rounded down. The smaller field points and stronger bounds
+remain well inside the high-field phase; they do not locate its boundary.
+
+## Closed parameter intervals
+
+Normalize the Hamiltonian by its field,
+
+```math
+K(\lambda)=H(g)/g=-\sum_iX_i-\lambda\sum_{\langle i,j\rangle}Z_iZ_j,
+\qquad \lambda=1/g,
+```
+
+with $J=1$. On an $n\times m$ torus, the interaction has norm at most $2nm$, including
+the period-two convention. Weyl's eigenvalue bound therefore implies
+
+```math
+|\log Z_\lambda(n,m,s)-\log Z_{\lambda_0}(n,m,s)|
+ \le2nms|\lambda-\lambda_0|.
+```
+
+Keep the scaled effective inverse temperature $s=2\beta g_0$ fixed. For
+$|\lambda-\lambda_0|\le r$, both input log purities can decrease by at most $64sr$:
+for u the coefficient is $(32+2\cdot16)s$, and for t it is
+$32s+2\cdot32(s/2)$. For the closed field interval $[g_0-d,g_0+d]$, take
+
+```math
+r=\frac{d}{g_0(g_0-d)},\qquad \alpha=64sr,
+\qquad 0<d<g_0,\quad 0<\alpha<1.
+```
+
+Since $e^{-\alpha}\ge1-\alpha$, uniform rational input defects are
+
+```math
+e_{x,I}=1-(1-e_x)(1-\alpha),\qquad
+e_{t,I}=1-(1-e_t)(1-\alpha).
+```
+
+Apply the same prefix and cube chain at the central physical effective inverse temperature
+$2\beta$. Multiply its resulting lower gap by $(g_0-d)/g_0$ to undo the normalization
+conservatively throughout the interval. The physical inverse temperature used for another field
+is $2\beta g_0/g$, which is positive everywhere in the interval. This argument does not
+assume monotonicity of the gap or interpolate unverified eigenvalues.
+
+For $d=1/1000$, the five intervals centered at $g_0=15,16,18,20,24$ have uniform lower
+bounds $0.5138469652J$, $1.5537930078J$, $3.2375915369J$, $4.8216727850J$, and
+$7.9752457078J$, respectively, rounded down. No optimality of these interval widths is
+claimed, and the intervals do not establish a continuous bootstrap regime $g/J\ge15$.
+
+## Comparison with the Ising high-field argument
+
+The independent ferromagnetic Ising graph argument gives
+
+```math
+\Delta\ge2\sqrt{h(h-s)},\qquad h>s,
+```
+
+where h is a lower bound on the transverse fields and s bounds the sum of incident
+nonnegative couplings. On the square lattice this becomes
+$`\Delta\ge2\sqrt{g(g-4J)}`$ for $g>4J$. The proof, using the Ising path expansion and
+FKG covariance bound, is recorded in the
+[earlier graph-theorem revision](https://github.com/LionSR/CertifiedGaps/blob/8152499722e0d6987188a477b22e41465563e827/code/models/square_tfim/METHOD.md#a-graph-level-high-field-theorem).
+It is separate from the spacetime bootstrap and has not been formalized in Lean.
+
+At $g/J=15$ the graph bound is approximately $25.69046J$, and at $g/J=24$ it is
+approximately $43.81780J$. It is substantially stronger than the corresponding new
+bootstrap bounds and applies to a broader class of finite graphs and boundaries.
+The present contribution is a better use of finite spectral information within the
+general spacetime-bootstrap method, not a new physical high-field gapped region or an
+improvement over that Ising-specific bound.
+
+## Certificate format and replay
+
+Format v3 uses one spectral manifest and one payload builder for generation and checking.
+`direct_temperature` records the two spectral input enclosures, the exact finite prefix,
+and the side-four chain. `parameter_interval` records every normalized perturbation
+quantity and its uniform chain. `legacy` retains the original and refined side-two
+numerical records for the three earlier points; it is null for the two new points.
+The primary certificate scope and command-line output always state $L\ge4$.
+
+All scientific integers and rationals are quoted strings. The unusually long tail
+rationals can exceed the regex parser's JIT stack limit, so this model uses the core's
+typed JSON reader and explicitly rejects unquoted scientific numbers. This avoids a
+parser limitation without converting an exact value through binary floating point or
+changing the shared core. Model-local source hashes, spectral hashes, exact row models,
+RP factors, dimensions, seed enclosures, chains, field intervals, and finite-volume
+summaries are checked again on replay. Core hashes remain provenance only.
+
+## Follow-up validation and dependencies
+
+The follow-up uses the existing core environment without new packages or changes to
+shared code, Lean, or manuscript files. Validation used Julia 1.12.4, `CertifiedGaps`
+0.2.0, `IntervalArithmetic` 1.0.12, and `JSON3` 1.14.3 on Apple Silicon with one BLAS
+thread. The core manifest and source hashes are retained as provenance in each record.
+The system `gzip` compresses the records; there is no new compression dependency.
+
+An independent production-code review found no blocking issue in the prefix, the factor
+64 in the perturbation bound, the field rescaling, or the side-four scope. The final model
+test suite passes all 1,161 assertions (176.4 seconds in its test sets, excluding startup):
+14 geometry/spectrum checks, 15 recurrence/window tests, 10 prefix/domain tests, 1,103
+stored-record and independently expanded inequality/moment checks, and 19 rejection or
+exact-reader checks. The independent inequality checks do not call `cube_step`,
+`cube_chain`, or `direct_temperature_prefix` to derive the tested inequalities.
+
+The rejection tests alter the field, claimed scope, model-local hash, row model,
+minimum side, cube row, quoted-number convention, seed defects, point gap, interval
+endpoint, interval loss, interval gap, finite-volume energy, spectral manifest field,
+spectral hash, model source hash, legacy gap, and an unknown top-level field. Each is
+rejected from an otherwise valid record. A long-rational JSON round trip is also checked.
+
+A separate exact regression comparison passes 15 assertions: for each of g/J=18,20,24,
+the old seed, original chain, refinement, spectral manifest, and finite-volume summary
+are equal to their preserved v3 counterparts. Their spectra were not regenerated when
+writing v3. The five-point floating scan reproduces the selected input temperatures;
+its unverified results are stored separately in `direct_temperature_scan.json`.
+
+Full replay regenerates every symmetry block through the same shared `VerifiedSpectra`
+implementation, not a second independent eigensolver. It checks completeness and proves
+that the fresh spectral enclosures imply all saved direct and legacy seed bounds. The
+closed intervals then follow from those seed bounds and the exact perturbation argument.
+Finite-volume energy/gap summaries are recomputed from the hash-pinned stored spectra;
+full replay does not assert that new finite-volume intervals are nested in the old ones.
+
+Five-point reused-spectrum generation takes 53.6 seconds and the default checker takes
+53.8 seconds in their driver timings. Timings exclude process startup and precompilation;
+some verification tasks ran concurrently, so they are reproducibility observations,
+not performance benchmarks.
+
+All five full spectral replays pass on the frozen implementation and final records.
+Their driver timings are 83.9, 72.1, 73.0, 72.0, and 72.8 seconds at g/J=15,16,18,20,24,
+respectively, totaling 373.9 seconds. Each rebuild covers 2 by 2, 4 by 2, and 4 by 4 tori
+with total Hilbert-space dimensions 16, 256, and 65,536. Both new direct input bounds and
+all applicable legacy seed bounds survive fresh spectral regeneration.

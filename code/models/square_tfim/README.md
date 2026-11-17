@@ -1,101 +1,99 @@
 # Square-lattice transverse-field Ising model
 
-The spacetime bootstrap certifies a unique ground state and a uniform spectral gap for the
-ferromagnetic transverse-field Ising model on every even square torus of side at least four.
-Both spatial periods grow. The proof uses exact spatial transfer inequalities and verified
-spectra of at most sixteen spins. The general finite-chain criterion is formalized in Lean,
-with the model's transfer inequalities and finite seeds as separate obligations.
+The spacetime bootstrap certifies a unique ground state and a uniform gap on every even
+square torus of side at least four. Both spatial periods grow. A direct-temperature seed
+prefix improves the use of complete verified spectra of at most sixteen spins; the
+subsequent three-direction recurrence and spatial interpolation are unchanged.
 
-| parameter $g/J$ | seed $(n_0=m_0,\beta_0 J)$ | certified gap $\ge$ | lengths covered |
+| parameter $g/J$ | seed $(n_0=m_0,\beta_0J)$ | certified gap $\ge$ | lengths covered |
 |---:|---|---:|---|
-| 18 | $(2,53/240)$ | $0.74378J$ | even square side $L\ge4$ |
-| 20 | $(2,157/800)$ | $2.51376J$ | even square side $L\ge4$ |
-| 24 | $(2,79/480)$ | $5.52173J$ | even square side $L\ge4$ |
+| 15 | $(4,47/100)$ | $0.74208J$ | even square side $L\ge4$ |
+| 16 | $(4,141/320)$ | $1.72356J$ | even square side $L\ge4$ |
+| 18 | $(4,143/360)$ | $3.39128J$ | even square side $L\ge4$ |
+| 20 | $(4,29/80)$ | $4.97710J$ | even square side $L\ge4$ |
+| 24 | $(4,5/16)$ | $8.14192J$ | even square side $L\ge4$ |
 
 ## Model
 
-With Pauli matrices and periodic indices, the Hamiltonian is
+With Pauli matrices and periodic indices,
 
 ```math
 H_{n,m}=-J\sum_{x,y}(Z_{x,y}Z_{x+1,y}+Z_{x,y}Z_{x,y+1})-g\sum_{x,y}X_{x,y}.
 ```
 
-The computation sets $J=1$; energies and inverse temperatures rescale as in the table.
-Lengths count individual lattice spacings, and an $L$ by $L$ torus has $L^2$ spins. At period
-two each bond in that direction is counted twice, as required by the periodic sum and the
-transfer trace. The certificate also covers $L=2$ with this convention; for $L\ge4$ it is the
-ordinary square lattice with each undirected bond counted once.
+The computation sets $J=1$. Lengths count individual lattice spacings; an $L$ by $L$
+torus has $L^2$ spins. At period two each bond in that direction is counted twice, as
+required by the periodic sum and transfer trace. For $L\ge4$, each undirected bond in
+the square Hamiltonian occurs once. The new bounds do not claim coverage of $L=2$.
 
 ## Reflection positivity
 
-In the physical basis, a crossing bond has $-h=Z\otimes Z$. After a Hadamard rotation on
-every spin, a complete row has inter-row bond $-\sum_y X_y\otimes X_y$ and real symmetric
-on-site term $-\sum_y X_yX_{y+1}-g\sum_y Z_y$. The integer factors $C_y=X_y$ are checked by
-`SquareIsing.row_rp` and the core `verify_rp`.
+In the physical basis a crossing bond has $-h=Z\otimes Z$. A Hadamard rotation on every
+spin gives the complete-row interaction $-\sum_y X_y\otimes X_y$ and real symmetric
+on-site term $-\sum_y X_yX_{y+1}-g\sum_y Z_y$. `SquareIsing.row_rp` and the core
+`verify_rp` check the integer factors $C_y=X_y$ exactly.
 
-In both spatial directions, finite Trotter transfers have the form $D^{1/2}KD^{1/2}$ with
-real symmetric positive K. Their scalar squaring and moment interpolation inequalities
-pass to the exact quantum partition function. See [METHOD.md](METHOD.md) for the proof;
-no numerical Trotter or tensor truncation is used in the certificate.
+Finite Trotter transfers in both spatial directions have the form $D^{1/2}KD^{1/2}$,
+with real symmetric positive K. Their squaring and moment interpolation inequalities
+pass to the exact quantum partition function. The proof is in [METHOD.md](METHOD.md);
+no numerical Trotter or tensor truncation is used.
 
 ## Seeds and certified bounds
 
-All points use the staggered defects of $P_x(2,2,\beta_0)$,
-$P_y(4,2,\beta_0)$ and $P_\tau(4,4,\beta_0)$. The four log partition enclosures come from
-complete verified spectra of the 2 by 2, 4 by 2, and 4 by 4 tori. The largest symmetry block
-has dimension 2392. The exact defects and every rational recurrence step are in
-`results/certificate_g18.json.gz`, `certificate_g20.json.gz`, and `certificate_g24.json.gz`.
+At half the effective seed inverse temperature, $\beta=\beta_0/2$, the verified spectra directly
+enclose the defects of
 
-The refined seed bounds are exact terminating decimals:
+```math
+u=P_y(4,2,2\beta)=\frac{Z(4,4,2\beta)}{Z(4,2,2\beta)^2},\qquad
+ t=P_\tau(4,4,\beta)=\frac{Z(4,4,2\beta)}{Z(4,4,\beta)^2}.
+```
+
+The prefix uses these two bounds to obtain the staggered defects of
+$P_x(4,4,\beta_0)$, $P_y(8,4,\beta_0)$, and $P_\tau(8,8,\beta_0)$:
 
 | $g/J$ | $\varepsilon_x$ | $\varepsilon_y$ | $\varepsilon_\tau$ |
 |---:|---:|---:|---:|
-| 18 | 0.02456152 | 0.04825847 | 0.01222144 |
-| 20 | 0.01967145 | 0.03878343 | 0.01325307 |
-| 24 | 0.01375692 | 0.02723951 | 0.01236053 |
+| 15 | 0.008988535251 | 0.044342296190 | 0.020778805396 |
+| 16 | 0.006829707080 | 0.032764009742 | 0.016668809184 |
+| 18 | 0.004282379581 | 0.019758812120 | 0.010617692121 |
+| 20 | 0.002839873795 | 0.012752261131 | 0.007384511624 |
+| 24 | 0.001433660730 | 0.006222333403 | 0.003739202719 |
 
-The code uses the three-component update from the
-[2+1 dimensional note](../../../paper/thermal-mpo-gap-2plus1d.tex), then its quadratic tail
-after twelve steps, when all defects are at most $1/1000$. A rational grid of denominator
-$10^{2000}$ resolves the defects at these scales. Exact lower bounds for the finitely many
-earlier interpolation windows ensure that the conclusion covers every even square side,
-not only a sequence of doubled tori. The one-dimensional `certified_gap_bound` is not used.
+These are exact terminating-decimal upper bounds. The face/cube identities and the usual
+squaring lemma prove the prefix; no new transfer assumption or larger spectrum is needed.
+The complete 4 by 4 spectrum has 65,536 levels with exact multiplicities, and its largest
+symmetry block has dimension 2392. The 2 by 2 spectra remain in the common spectral record
+for comparison with the earlier certificates; the new prefix needs only 4 by 2 and 4 by 4.
 
-The `refinement` field contains the new seeds and bounds; the original `seed` and `chain`
-fields retain their previous exact values. The checker recomputes both. The same verified
-spectra also give the following finite-volume enclosures, rounded outward:
+Twelve exact three-component updates precede the quadratic tail. The stronger bounds use
+a rational grid of denominator $10^{8000}$ so that rounding does not set the tail's scale.
+Every earlier interpolation window is included, giving all even sides rather than only
+doubled sizes. The one-dimensional `certified_gap_bound` is not used.
 
-| $g/J$ | $E_0(4,4)/(16J)$ | $\Delta_{4,4}/J$ |
-|---:|---|---|
-| 18 | $[-18.02788651,-18.02788645]$ | $[31.8789898,31.8789914]$ |
-| 20 | $[-20.02507906,-20.02507899]$ | $[35.8920390,35.8920409]$ |
-| 24 | $[-24.02087895,-24.02087887]$ | $[43.9111961,43.9111983]$ |
+Each certificate also proves a closed field interval using a finite-volume Weyl estimate
+for $H/g$. This is a uniform parameter bound, not interpolation of numerical eigenvalues:
 
-These energy densities describe sixteen spins. No thermodynamic extrapolation is used.
+| interval of $g/J$ | uniform gap $\ge$ |
+|---|---:|
+| $[14.999,15.001]$ | $0.51384J$ |
+| $[15.999,16.001]$ | $1.55379J$ |
+| $[17.999,18.001]$ | $3.23759J$ |
+| $[19.999,20.001]$ | $4.82167J$ |
+| $[23.999,24.001]$ | $7.97524J$ |
 
-At smaller fields, complete sixteen-spin spectra give the following floating-point results:
+The `legacy` section preserves the original and refined certificates at $g/J=18,20,24$,
+including their numerical values. Their former best bounds were $0.74378J$, $2.51376J$,
+and $5.52173J$. The current primary scope is $L\ge4$, even though the legacy certificates
+also cover the repeated-bond $L=2$ torus. No continuous bootstrap regime $g/J\ge15$ is claimed.
 
-| $g/J$ | $E_0(4,4)/(16J)$ | $\Delta_{4,4}/J$ |
-|---:|---:|---:|
-| 4 | -4.13897624 | 3.24828451 |
-| 5 | -5.10617353 | 5.44369104 |
-| 6 | -6.08666146 | 7.56254563 |
-| 8 | -8.06381620 | 11.69479751 |
-
-No tested seed closes at these fields on $\beta g=0.5,0.525,\ldots,16$, or at
-$g/J=17$ on $\beta g=2,2.125,\ldots,12$. These scans do not provide uniform gap bounds,
-and do not exclude a different temperature, a larger seed, or a sharper recurrence.
-
-On the ordered side, floating-point 4 by 4 spectra at $g/J=1,2$ give lowest-pair splittings
-$5.51\times10^{-7}J$ and $0.01502J$, but gaps above that pair of $7.28554J$ and $4.71774J$.
-These are different spectral quantities. At $g=0$ the pair is exactly degenerate and its
-excitation gap is $8J$ for every square side $L\ge4$. The current unique-ground-state
-criterion does not cover this phase; see [METHOD.md](METHOD.md#the-ordered-side-of-the-transition)
-for the purity obstruction, numerical reproduction, and the required extension.
+The separate ferromagnetic Ising graph argument gives
+$`\Delta\ge2\sqrt{g(g-4J)}`$ for $g>4J$, and is substantially stronger numerically.
+The results here improve the finite-data spacetime bootstrap, not the known high-field
+physical regime. [METHOD.md](METHOD.md) gives the comparison and the archived proof reference.
 
 ## Reproduce
 
-From the repository root, using Julia 1.12 and the core environment:
+From the repository root, with Julia 1.12 and the core environment:
 
 ```sh
 export OPENBLAS_NUM_THREADS=1
@@ -105,69 +103,63 @@ julia --project=code/julia code/models/square_tfim/check.jl --full
 julia --project=code/julia code/models/square_tfim/test/runtests.jl
 ```
 
-The default drivers process all three fields. A field can be supplied, for example
-`check.jl 18 --full`. `certify.jl --reuse` reuses the stored verified spectra after checking
-their hashes and row models; the default regenerates them. On the development Apple Silicon
-machine with one BLAS thread, the three refined certificates regenerated from stored spectra
-in 28.3 seconds after integration with the current shared core. The 62 model tests passed
-in 162.3 seconds in their test sets (concurrent verification jobs were also running). The original
-compressed fast checker took 38 seconds; full spectral generation took 66--70 seconds per
-field. Full spectral replay of all three refined certificates took 217.1 seconds and passed.
-Measurements exclude startup and initial package precompilation. Certificates and
-spectral records use lossless gzip JSON.
+The default drivers process all five fields. Supply one field, for example `check.jl 15 --full`.
+`certify.jl --reuse` reuses model-checked, hash-pinned spectra. Without it, every verified
+spectral block is regenerated. The full replay regenerates spectra independently of the
+stored enclosures, then verifies that their fresh bounds imply the saved seed limits.
+On the development Apple Silicon machine with one BLAS thread, the five-point fast
+replay takes 53.8 seconds, reused-spectrum regeneration 53.6 seconds, and the 1,161 model
+tests 176.4 seconds in their test sets. These timings exclude process startup and
+precompilation. Full spectral replay timings and detailed checks are in [METHOD.md](METHOD.md).
 
-For numerical exploration only:
+For floating-point temperature searches only:
 
 ```sh
-julia --project=code/julia code/models/square_tfim/scripts/scan.jl 17
+julia --project=code/julia code/models/square_tfim/scripts/refine_scan.jl --direct
 julia --project=code/julia code/models/square_tfim/scripts/refine_scan.jl
 julia --project=code/julia code/models/square_tfim/scripts/moderate_fields.jl
 ```
 
-The first command takes about 35 seconds per field. The second reuses stored spectra to
-search temperature with the longer recurrence. All three write floating-point diagnostics.
-
-The general Lean theorem can be checked with
+The first command scans the direct prefix; the second reproduces the earlier three-point
+refinement. Neither scan is a certificate. The general Lean theorem can be checked with
 `cd code/lean && lake build CertifiedGaps.CubeChain`.
 
 ## What is rigorous
 
-The spatial transfer argument, exact RP identity, full spectral enclosures, interval
-partition sums, and exact rational three-direction recurrence establish the bounds together.
-The spectral arithmetic uses the shared `VerifiedSpectra` implementation. Its trusted base
-is IEEE binary64 round-to-nearest with gradual underflow, the standard a priori dot-product
-rounding bound for any summation order and FMA, BLAS/LAPACK finite outputs, and
-`IntervalArithmetic`; residual and orthogonality bounds are followed by Weyl and
-Ostrowski/polar-factor estimates. All logarithms in the final gap bound use the exact
-rational series in `ExactArithmetic.log_enclosure`.
+The spatial transfer proof, exact RP identity, full spectral enclosures, interval partition
+sums, direct-temperature prefix, parameter perturbation estimate, and exact rational cube
+chain establish the bounds together. The spectral trusted base is IEEE binary64
+round-to-nearest with gradual underflow, the a priori dot-product rounding bound for BLAS
+(including arbitrary summation order and FMA), verified residual/orthogonality estimates,
+and `IntervalArithmetic`. Final logarithms use the exact rational series in `ExactArithmetic`.
 
-The fast checker replays stored spectral enclosures and checks their hashes. `--full` rebuilds
-every symmetry block and independently verifies that the fresh enclosures imply the stored
-seed bounds. The tests compare small tori with a separately constructed Hamiltonian, check
-the full sixteen-spin spectral moments, and reject altered seeds, gaps, and spectrum hashes.
-The seed scans are floating-point diagnostics only. The Lean theorem
-`CertifiedGaps.Spacetime.gapGT_of_cube_chain` proves the general criterion with unequal
-defects, finite directional updates, all earlier interpolation windows, and the infinite
-quadratic tail. It assumes scalar moment inequalities, spatial window interpolation, and
-the initial seed bounds; it has no `sorry` or additional axioms. The Ising transfer
-construction and the numerical seed arithmetic remain outside Lean. The stored Julia
-chains have not been imported as Lean witnesses. The model certificate therefore combines
-a mathematical proof with verified Julia arithmetic. Its scope is even square tori with
-periodic boundaries.
+The default checker verifies model-local source hashes, exact row models and RP factors,
+spectral hashes and multiplicities, fresh partition enclosures, both new chains, every
+parameter-interval quantity, finite-volume energy enclosures, and the legacy records.
+The tests include independent geometry and spectral moments, an independent audit of the
+chain inequalities, and deliberate changes to seeds, gaps, field intervals, scope, and hashes.
+Long certificate rationals are already quoted exact strings. The model reader uses the
+core's typed JSON reader rather than its regex-based integer-token conversion, and rejects
+unquoted scientific numbers.
+
+Lean's `CertifiedGaps.Spacetime.gapGT_of_cube_chain` proves the general criterion from
+explicit scalar moment, spatial interpolation, and seed hypotheses. The Ising transfer
+construction, new finite prefix, parameter perturbation proof, and numerical seeds remain
+outside Lean; these Julia chains have not been imported as Lean witnesses. This is not an
+end-to-end Lean proof of the Ising Hamiltonian's gap. The field scans remain floating-point
+diagnostics. Ordered-phase splitting and the gap above the lowest pair are different
+quantities; the current unique-ground-state criterion does not cover that phase.
 
 ## Layout
 
 - `src/SquareIsing.jl`: exact row models, transverse symmetries, and RP factors.
-- `src/CubeRecurrence.jl`: exact three-component recurrence and interpolation-window bounds.
-- `src/Certificate.jl`, `certify.jl`, `check.jl`: certificate generation and replay.
-- `scripts/build_spectra.jl`, `scripts/scan.jl`, `scripts/refine_scan.jl`: spectral generation
-  and numerical seed searches; `scripts/moderate_fields.jl` records the smaller-field scans.
-- `test/runtests.jl`: independent geometry, arithmetic, spectral-moment, and rejection tests.
-- `METHOD.md`, `IDEAS.md`: proof and route analysis.
-- `results/`: relative symlink to `../../../data/models/square_tfim/`, containing certificates,
-  spectrum manifests, compressed verified spectra, and numerical scans.
+- `src/CubeRecurrence.jl`: direct-temperature prefix, exact recurrence, and window bounds.
+- `src/Certificate.jl`, `certify.jl`, `check.jl`: one generation/replay path for all points,
+  closed parameter intervals, and preserved legacy records.
+- `scripts/`: spectral generation and clearly labeled numerical diagnostics.
+- `test/runtests.jl`: independent geometry, arithmetic, moment, and rejection tests.
+- `METHOD.md`, `IDEAS.md`: proofs, comparisons, route analysis, and earlier diagnostics.
+- `results/`: relative symlink to `../../../data/models/square_tfim/`.
 
 Model-local `src/`, `scripts/`, `certify.jl`, and `check.jl` hashes are enforced. Core hashes
-are provenance only; the checker reruns core arithmetic. Spectrum files are hash-pinned by
-the certificates. All can be regenerated in a few minutes; no immutable source exceptions
-are needed.
+are provenance; the checker reruns the arithmetic. No immutable source exceptions are needed.
