@@ -33,7 +33,8 @@ permissions:
 
 jobs:
   build_project:
-    runs-on: ubuntu-latest
+    # The pinned Ruby/Jekyll setup does not yet recognize the Ubuntu 26.04 image.
+    runs-on: ubuntu-24.04
     name: Build project
     steps:
       - name: Cleanup to free disk space
