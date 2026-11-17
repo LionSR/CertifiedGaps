@@ -109,7 +109,8 @@ The default drivers process all three fields. A field can be supplied, for examp
 `check.jl 18 --full`. `certify.jl --reuse` reuses the stored verified spectra after checking
 their hashes and row models; the default regenerates them. On the development Apple Silicon
 machine with one BLAS thread, the three refined certificates regenerated from stored spectra
-in 26.2 seconds, and the 58 model tests took 133.3 seconds in their test sets. The original
+in 28.3 seconds after integration with the current shared core. The 62 model tests passed
+in 162.3 seconds in their test sets (concurrent verification jobs were also running). The original
 compressed fast checker took 38 seconds; full spectral generation took 66--70 seconds per
 field. Full spectral replay of all three refined certificates took 217.1 seconds and passed.
 Measurements exclude startup and initial package precompilation. Certificates and

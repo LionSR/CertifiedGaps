@@ -108,13 +108,13 @@ end
 
 "Exact finite-volume ground-energy, energy-density, and gap enclosures."
 function finite_volume_summary(spectra)
-    return Dict(token(n, m) => Dict(
-        "sites" => string(n*m),
-        "ground_energy" => string.(collect(ground_energy_enclosure(spectra[token(n, m)]))),
-        "ground_energy_per_site" => string.(collect(
-            ground_energy_enclosure(spectra[token(n, m)]) ./ (n*m))),
-        "gap" => string.(collect(spectral_gap_enclosure(spectra[token(n, m)]))))
-        for (n, m) in TORI)
+    return Dict(token(n, m) => let spectrum = spectra[token(n, m)]
+        ground = ground_energy_enclosure(spectrum)
+        Dict("sites" => string(n*m),
+            "ground_energy" => string.(collect(ground)),
+            "ground_energy_per_site" => string.(collect(ground ./ (n*m))),
+            "gap" => string.(collect(spectral_gap_enclosure(spectrum))))
+    end for (n, m) in TORI)
 end
 
 "Repeat the asymmetric recurrence before using the common quadratic tail."

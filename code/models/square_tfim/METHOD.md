@@ -374,3 +374,14 @@ seeds and chains, spectral records, and finite-volume enclosures were preserved 
 equality. Source metadata changed to describe the active bootstrap computation.
 The 58 model regression tests passed again, including rejection of altered certificate
 claims; the test sets took 130.2 seconds, excluding startup.
+
+Integration with the current shared core retains its Rayleigh--Ritz extension and the model's
+complete-spectrum route. A small consolidation reuses the same cube-product polynomial in
+the three staggered updates and computes each finite-volume ground-energy enclosure once.
+Four independent expanded-polynomial regression cases check the update order and rounding
+at two grids, bringing the model suite to 62 passing tests (162.3 seconds in the test sets,
+with concurrent verification jobs running). Regenerating the certificates with `--reuse`
+took 28.3 seconds. Exact comparison of every non-metadata field of all three certificates
+confirmed unchanged seed enclosures, original and refined chains, spectral records, and
+finite-volume energies and gaps. Only source and core provenance metadata changed; no
+stored spectrum was regenerated.

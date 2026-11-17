@@ -1,5 +1,5 @@
 using Test, LinearAlgebra, IntervalArithmetic
-using CertifiedGaps.ExactArithmetic: frac, parse_rational
+using CertifiedGaps.ExactArithmetic: frac, parse_rational, round_up
 using CertifiedGaps.Results: read_result, write_result
 using CertifiedGaps.VerifiedSpectra
 include(joinpath(@__DIR__, "..", "src", "Certificate.jl"))
@@ -48,6 +48,14 @@ end
     chain = cube_chain(small, frac(1))
     @test frac(3688, 1000) < parse_rational(chain["gap_lower_bound"]) < frac(3689, 1000)
     asymmetric = (frac(1, 100), frac(2, 100), frac(1, 10000))
+    # Guard the staggered order independently of the shared cube-product helper.
+    for (x, y, t) in (small, asymmetric), grid in (big(10)^40, big(10)^80)
+        update(z) = z^2 / (2(1-z)^2)
+        a = round_up(update(1 - (1-x)^4 * (1-y)^2 * (1-t)), grid)
+        b = round_up(update(1 - (1-y)^4 * (1-t)^2 * (1-a)), grid)
+        c = round_up(update(1 - (1-t)^4 * (1-a)^2 * (1-b)), grid)
+        @test cube_step((x, y, t); grid) == (a, b, c)
+    end
     chain = cube_chain(asymmetric, frac(1, 5))
     @test length(chain["rows"]) > 1
     @test parse_rational(chain["gap_lower_bound"]) > 0
