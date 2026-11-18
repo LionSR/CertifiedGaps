@@ -80,6 +80,14 @@ is $$H_L = -\sum_j Z_j Z_{j+1} - g \sum_j X_j - h \sum_j Z_j$$. The
 [leaderboard]({{ '/leaderboard.html' | relative_url }}) lists all bounds and the history of the
 spin-1 record.
 
+## Community contributions
+
+The repository and leaderboard also include contributions beyond the paper's results.
+[Maximilian Lutz (lm1909)](https://github.com/lm1909) contributed improved coupled-seed
+certificates, free-fermion examples, an odd-seed Lean proof, and a spin-1 small-seed certificate.
+[See the contributions and their verification status]({{ '/contributions.html' | relative_url }}).
+These are credited separately and are not additions to the manuscript.
+
 ## Links
 
 * Explainer: [periodic rings]({{ '/explainer/' | relative_url }}),

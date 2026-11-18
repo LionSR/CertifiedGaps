@@ -675,6 +675,24 @@
   "beta": "7/2",
   "axioms": ["Classical.choice", "Quot.sound", "propext"],
   "L0": 6},
+ {"t": "48363911/1000000000",
+  "spectrum":
+  {"printed":
+   "CertifiedGaps.RPRing.spectrum (CertifiedGaps.SpinOneDimerized.model (7 / 10))",
+   "params": ["7/10"],
+   "model": "CertifiedGaps.SpinOneDimerized.model",
+   "frame": "spectrum"},
+  "seed2": null,
+  "s": "11719569/100000000",
+  "r": "12670213/5000000",
+  "name": "Leaderboard.Records.SpinOneDimerized.delta_7_10",
+  "n0": 3,
+  "module": "Leaderboard.Records.SpinOneDimerized",
+  "kind": "conditional",
+  "interval": null,
+  "beta": "17/4",
+  "axioms": ["Classical.choice", "Quot.sound", "propext"],
+  "L0": 4},
  {"t": "3205449/100000000",
   "spectrum":
   {"printed":

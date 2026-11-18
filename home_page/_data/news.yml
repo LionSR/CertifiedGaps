@@ -43,3 +43,12 @@
 - date: "2026-11-08"
   text: 'The paper "Bridging Gaps with Tensor Networks: From the Haldane Gap and Beyond" is online.'
   link: '/notes/certified-gap.pdf'
+
+- date: "2026-11-11"
+  text: 'Maximilian Lutz contributes coupled-seed improvements for dimerized chains and the Ising ladder, plus an odd-seed Lean proof.'
+  link: '/contributions.html'
+  prs: [107, 108, 110]
+- date: "2026-11-12"
+  text: 'Maximilian Lutz contributes computer-certified free-fermion examples and a spin-1 small-seed bound; their verification status is documented separately from the paper.'
+  link: '/contributions.html'
+  prs: [111, 112, 113, 116]
