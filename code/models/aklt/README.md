@@ -6,6 +6,8 @@ periodic spin-$`3/2`$ Affleck–Kennedy–Lieb–Tasaki (AKLT) model on the hone
 floating-point implementation check, not a certificate: standard MPS thermal purification on
 snake-ordered two-dimensional torus quotients suffers from severe bond-compression bias and does not
 reproduce the smallest exact reference, so no seed or gluing diagnostic is resolved.
+The separate [method note](METHOD.md) proves an on-site antiunitary reflection obstruction
+and conditional error-envelope criteria, with exact rational checks. Neither is a gap proof.
 
 | parameter | seed (n₀, β₀) | certified gap ≥ | lengths covered |
 |---|---|---|---|
@@ -50,17 +52,21 @@ although direct characteristic-polynomial bounds at width $2$ yield $d_{2L} \le 
 
 ## Reflection positivity
 
-Not available. The 2+1D note proves that the standard time-reversal construction fails for one
+Not available. Theorem 3 in [`METHOD.md`](METHOD.md) rules out every on-site antiunitary
+reflection for one AKLT bond, using a strictly positive coherent-state frame and a fixed
+traceless Hermitian witness. Its smallest frame eigenvalue is exactly $`1/20`$.
+This does not exclude blocked/nonlocal reflections or scalar gluing.
+The earlier 2+1D note proves that the standard time-reversal construction fails for one
 AKLT bond: with \(\theta(A)=U\bar AU^\dagger\), \(U=e^{-i\pi S^y}\), and the quadrupole
 \(Q=(S^z)^2-\tfrac54\), \(\mathrm{Tr}[e^{-tP^{(3)}}(Q\otimes\theta Q)]=\tfrac75(e^{-t}-1)<0\)
 for every \(t>0\). `test/runtests.jl` checks the ingredients in floating point
-(\(\mathrm{Tr}[P^{(3)}(Q\otimes Q)]=7/5\) and the projector polynomial). This excludes only
-that local construction; the scalar gluing inequalities the 2+1D recursion needs remain open.
+(\(\mathrm{Tr}[P^{(3)}(Q\otimes Q)]=7/5\) and the projector polynomial).
+The scalar gluing inequalities the 2+1D recursion needs remain open.
 
 ## Result
 
-- **No certified gap or partition-function enclosure.** All outputs in this directory are exploratory
-  `Float64` calculations stored with `certified = false`.
+- **No certified gap or partition-function enclosure.** Stored thermal-pilot outputs are exploratory
+  `Float64` calculations with `certified = false`; the separate exact algebra checks do not certify them.
 - **Negative result for 2D snake-ordered thermal MPO purification:** On the 8-spin ($2\times 2$-cell)
   torus at $\beta = 2$, dense diagonalization gives $\log Z = 5.31205522615$. Evolving the purified
   amplitude $e^{-\beta H/2}$ with step $\delta\beta = 1/8$ at maximum bond dimensions
@@ -79,19 +85,29 @@ that local construction; the scalar gluing inequalities the 2+1D recursion needs
 
 ## Reproduce
 
+The new standalone exact checks need only Julia standard libraries:
+
+```sh
+julia --startup-file=no code/models/aklt/scripts/verify_rp_trajectory.jl
+```
+
+This runs 132 exact checks in about 2.2 seconds on Julia 1.12.4, verifying the obstruction's
+finite algebra and the conditional recurrence constants. It is not an AKLT gap or thermal-seed
+checker. The same checks run in the model test suite.
+
 `AKLTPilot` depends on the shared core package `CertifiedGaps` (`../../julia`) for spin matrices, sector
 diagonalization, thermal purification, and JSON output. From the repository root:
 
 ```sh
 julia --startup-file=no --project=code/models/aklt -e 'using Pkg; Pkg.instantiate()'
-julia --startup-file=no --project=code/models/aklt code/models/aklt/test/runtests.jl   # 38 tests, ≈3.5 min
+julia --startup-file=no --project=code/models/aklt code/models/aklt/test/runtests.jl
 julia --startup-file=no --project=code/models/aklt code/models/aklt/scripts/run.jl \
   code/models/aklt/scripts/configs/exact-small.toml code/models/aklt/results/exact-small.json
 ```
 
-There is no `certify.jl` (nothing is certified) and no `check.jl` (there are no tracked results to
-check); the test suite is the verification. Additional configuration files in `scripts/configs/`
-are:
+There is no `certify.jl` or gap-certificate `check.jl`: no thermal seed or gluing certificate
+has been obtained. The exact theorem checks above are separate from the thermal pilot.
+Additional configuration files in `scripts/configs/` are:
 - `thermal-pilot.toml`: $2\times 2$ base geometry, $`\chi \in \{16, 32\}`$,
   $`\delta\beta \in \{1/8, 1/16\}`$;
 - `thermal-reference-refinement.toml`: 8-spin torus, $`\chi \in \{64, 128\}`$;
@@ -104,7 +120,15 @@ an earlier run.
 
 ## What is rigorous
 
-Nothing in this directory is a rigorous certificate. The exact identities checked by the tests
+There is no rigorous AKLT gap or thermal-seed certificate in this directory. The proofs in
+`METHOD.md` establish the on-site RP no-go and conditional trajectory criteria; the new
+standalone checker uses `Rational{BigInt}` throughout, without numerical eigensolvers.
+It verifies two independent bond-projector constructions, the positive weighted
+Hilbert-Schmidt metric, exact frame spectral projections and multiplicities, and rational
+recurrence constants. It is not a Lean formalization, and supplies no model-specific thermal
+gluing bound. The following older tests and thermal data remain floating-point only.
+
+The older exact identities checked by the tests
 (projector polynomial, $\mathrm{Tr}[P^{(3)}(Q\otimes Q)]=7/5$, and the single-bond partition
 function) hold in exact arithmetic, but the tests evaluate them in `Float64`.
 - **Reference diagonalization (`src/exact.jl`):** Builds $P_{ij}^{(S=3)}$ from its exact degree-3
@@ -125,6 +149,9 @@ this directory's `results/` is a relative symlink to that canonical location.
 
 | file | role |
 |---|---|
+| `METHOD.md` | Standalone proofs, scope limits, and targeted prior-art check |
+| `scripts/verify_rp_trajectory.jl` | Fast exact rational obstruction and recurrence checks |
+| `test/rigorous_checks.jl` | Exact algebra and constants, also included in the model test suite |
 | `src/AKLTPilot.jl` | Top-level module re-exporting model, exact diagonalization, and thermal purification routines |
 | `src/model.jl` | Periodic honeycomb torus geometry, perfect-matching bond layers, and snake ordering |
 | `src/exact.jl` | Polynomial spin-3 bond projector and sector-by-sector `Float64` reference diagonalization |

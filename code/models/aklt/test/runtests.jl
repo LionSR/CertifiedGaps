@@ -3,6 +3,8 @@ using AKLTPilot
 using CertifiedGaps.Spins: spin_matrices
 BLAS.set_num_threads(1)
 
+include("rigorous_checks.jl")
+
 @testset "honeycomb quotient and coloring" begin
     for (nx, ny) in ((2, 2), (4, 2), (4, 4))
         graph = honeycomb(nx, ny)
