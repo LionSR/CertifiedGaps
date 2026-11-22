@@ -66,7 +66,7 @@ in Lean and is not included in the Lean leaderboard.
 
 | Model | Points | Largest certified gap | Sizes | Directory |
 |---|---:|---|---|---|
-| Square-lattice transverse-field Ising | 3 ($g/J=18,20,24$) | $5.52173J$, at $g/J=24$ | every even square side $L\ge4$ | [`code/models/square_tfim`](code/models/square_tfim/) |
+| Square-lattice transverse-field Ising | 5 ($g/J=15,16,18,20,24$) | $8.14192J$, at $g/J=24$ | every even square side $L\ge4$ | [`code/models/square_tfim`](code/models/square_tfim/) |
 
 Pilot studies without a gap certificate: [`code/models/blbq_haldane`](code/models/blbq_haldane/)
 (bilinear–biquadratic chain), [`code/models/spin2`](code/models/spin2/) (spin-2 chain), and

@@ -37,22 +37,44 @@ function approximate_bound(defects, beta)
     end
 end
 
+# The direct route uses the same spectra but evaluates its spatial input at 2β.
+function approximate_direct_defects(spectra, beta)
+    f(z) = z^2 / (2*(1-z)^2)
+    a = approximate_logz(spectra["4x2"], 2beta)
+    b = approximate_logz(spectra["4x4"], 2beta)
+    c = approximate_logz(spectra["4x4"], beta)
+    ex, et = -expm1(b-2a), -expm1(b-2c)
+    x = f(ex)
+    x < 1 || return (2.0, 2.0, 2.0)
+    y = f(-expm1(2log1p(-ex) + log1p(-x)))
+    y < 1 || return (2.0, 2.0, 2.0)
+    t = f(-expm1(4log1p(-et) + 2log1p(-x) + log1p(-y)))
+    return (x, y, t)
+end
+
+all(==("--direct"), ARGS) || error("usage: refine_scan.jl [--direct]")
+direct = "--direct" in ARGS
 records = Dict{String,Any}()
-for g in (18, 20, 24)
+for g in (direct ? [p.g for p in POINTS] : [18, 20, 24])
     manifest = read_result(Certificate.manifest_path(root, g))
     spectra = Certificate.load_spectra(root, manifest, g)
     rows = []
-    for k in 120:240
+    for k in (direct ? (40:320) : (120:240))
         beta = k/(40g)
-        a, b, c = [approximate_logz(spectra[s], beta) for s in ("2x2", "4x2", "4x4")]
-        d = approximate_logz(spectra["4x4"], 2beta)
-        e = (-expm1(b-2a), -expm1(c-2b), -expm1(d-2c))
+        if direct
+            e = approximate_direct_defects(spectra, beta)
+        else
+            a, b, c = [approximate_logz(spectra[s], beta) for s in ("2x2", "4x2", "4x4")]
+            d = approximate_logz(spectra["4x4"], 2beta)
+            e = (-expm1(b-2a), -expm1(c-2b), -expm1(d-2c))
+        end
         push!(rows, Dict("beta_g" => k/40, "beta" => beta,
-            "defects" => collect(e), "bound" => approximate_bound(e, beta)))
+            "defects" => collect(e), "bound" => approximate_bound(e, direct ? 2beta : beta)))
     end
     best = rows[argmax([r["bound"] for r in rows])]
     records[string(g)] = Dict("best" => best, "rows" => rows)
     println("g=$g: $best")
 end
-write_result(joinpath(root, "results", "refinement_scan.json"),
+name = direct ? "direct_temperature_scan.json" : "refinement_scan.json"
+write_result(joinpath(root, "results", name),
     Dict("status" => "floating-point diagnostics, not certified", "fields" => records))

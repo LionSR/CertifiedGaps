@@ -9,5 +9,5 @@ for p in points
     seconds = @elapsed cert = check(@__DIR__, p.g; full = "--full" in ARGS)
     println("Verified g=$(p.g): gap >= ",
         Float64(uniform_bound(cert)),
-        " on every even square torus L >= 2; $seconds seconds")
+        " on every even square torus L >= 4; $seconds seconds")
 end
