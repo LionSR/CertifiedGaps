@@ -1,5 +1,7 @@
 -- The abstract criterion and its rational certificates
 import CertifiedGaps.PurityCriterion
+import CertifiedGaps.CubeCriterion
+import CertifiedGaps.CubeChain
 import CertifiedGaps.Chain
 import CertifiedGaps.ChainCheck
 -- Transfer-matrix tools

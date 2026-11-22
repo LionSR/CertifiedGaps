@@ -494,6 +494,8 @@ exact `C_α, o`. Building blocks shared by several models (one-site matrices, th
 | File | Role |
 |---|---|
 | `PurityCriterion.lean` | Abstract two-purity criterion: squaring inequality, thermal-spatial coupling, one exact doubling step for arbitrary defects, $`\beta`$-interpolation, the purity-to-gap bound, the criterion with a coefficient `C ≥ G(u₀)` (`gapGT_of_coefficient`) and its equal-defect case (seed defects $\le 1/100$, `C = 5`) |
+| `CubeCriterion.lean` | Three-direction criterion: cube coupling, $25\varepsilon^2$ propagation, and `Spacetime.gapGT_of_cube_seeds`. Assumes scalar moment inequalities and explicit spatial window interpolation. The Ising transfer construction and numerical seeds are not formalized here. |
+| `CubeChain.lean` | Unequal three-direction defects, rational upper bounds on each update, finite interpolation windows, and the quadratic tail. `Spacetime.gapGT_of_cube_chain` concludes a uniform bound from explicit moment, window, and seed inputs. |
 | `Chain.lean` | Exact asymmetric doubling recurrence for unequal seed defects and `gapGT_of_chain` with bound `log r / β₀` |
 | `ChainCheck.lean` | Decidable rational `ChainCertificate` structure discharging the hypotheses of `gapGT_of_chain`, and `StepsValid` for the purities along a chain alone |
 | `Transfer/PiTensor.lean` | Sitewise tensor products (`piTensor`), expansion of $`\mathrm{Tr}\, T^N`$ as a sum over closed label paths and of matrix elements of ordered products as sums over open paths |
