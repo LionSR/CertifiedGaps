@@ -6,6 +6,7 @@ Authors: thermal-mpo-gap contributors
 import SeedKernel.Ising.Bridge
 import SeedKernel.Ising.Generated
 import SeedKernel.Ising.ChunkCoverage
+import SeedKernel.LowSpectrum
 import Mathlib.Analysis.SpecialFunctions.Exponential
 import Mathlib.Analysis.Complex.ExponentialBounds
 
@@ -31,41 +32,6 @@ partition functions are then bounded by `Z ≥ e^{-β(θ₀+r)}` and
 open Matrix CertifiedGaps Real
 
 namespace SeedKernel.Ising
-
-/-! ### Partition functions from a low spectrum -/
-
-/-- One eigenvalue in `[a₀, b₀]`, a second one at least `a₁`, all others at least `ρ`. -/
-def LowSpectrum {ι : Type*} (e : ι → ℝ) (a₀ b₀ a₁ ρ : ℝ) : Prop :=
-  ∃ i₀ i₁, i₀ ≠ i₁ ∧ a₀ ≤ e i₀ ∧ e i₀ ≤ b₀ ∧ a₁ ≤ e i₁ ∧ ∀ i, i ≠ i₀ → i ≠ i₁ → ρ ≤ e i
-
-theorem sum_exp_ge {ι : Type*} [Fintype ι] {e : ι → ℝ} {a₀ b₀ a₁ ρ β : ℝ} (hβ : 0 ≤ β)
-    (h : LowSpectrum e a₀ b₀ a₁ ρ) : exp (-(β * b₀)) ≤ ∑ i, exp (-(β * e i)) := by
-  obtain ⟨i₀, -, -, -, hb, -, -⟩ := h
-  calc exp (-(β * b₀)) ≤ exp (-(β * e i₀)) := exp_le_exp.2 (by nlinarith)
-    _ ≤ ∑ i, exp (-(β * e i)) :=
-      Finset.single_le_sum (f := fun i ↦ exp (-(β * e i))) (fun i _ ↦ (exp_pos _).le)
-        (Finset.mem_univ i₀)
-
-theorem sum_exp_le {ι : Type*} [Fintype ι] {e : ι → ℝ} {a₀ b₀ a₁ ρ β : ℝ}
-    (hβ : 0 ≤ β) (h : LowSpectrum e a₀ b₀ a₁ ρ) :
-    ∑ i, exp (-(β * e i)) ≤
-      exp (-(β * a₀)) + exp (-(β * a₁)) + Fintype.card ι * exp (-(β * ρ)) := by
-  classical
-  obtain ⟨i₀, i₁, hne, ha, -, ha₁, hρ⟩ := h
-  have hi₁ : i₁ ∈ Finset.univ.erase i₀ := Finset.mem_erase.2 ⟨hne.symm, Finset.mem_univ _⟩
-  rw [← Finset.add_sum_erase _ _ (Finset.mem_univ i₀), ← Finset.add_sum_erase _ _ hi₁,
-    ← add_assoc]
-  refine add_le_add (add_le_add (exp_le_exp.2 (by nlinarith)) (exp_le_exp.2 (by nlinarith))) ?_
-  calc ∑ i ∈ (Finset.univ.erase i₀).erase i₁, exp (-(β * e i))
-      ≤ ∑ i ∈ (Finset.univ.erase i₀).erase i₁, exp (-(β * ρ)) :=
-        Finset.sum_le_sum fun i hi ↦ by
-          have hi' := Finset.mem_erase.1 hi
-          have hi'' := Finset.mem_erase.1 hi'.2
-          exact exp_le_exp.2 (by nlinarith [hρ i hi''.1 hi'.1])
-    _ ≤ Fintype.card ι * exp (-(β * ρ)) := by
-        rw [Finset.sum_const, nsmul_eq_mul]
-        gcongr
-        exact_mod_cast (Finset.card_le_univ _)
 
 /-! ### The low spectrum of a ring from the kernel checks -/
 
@@ -318,22 +284,6 @@ theorem partition_lower {L : ℕ} {a₀ b₀ a₁ ρ β : ℝ} (hβ : 0 ≤ β)
     exp (-(β * b₀)) ≤ isingModel.partitionFunction L β := by
   rw [RPRing.partitionFunction_eq_sum]
   exact sum_exp_ge hβ h
-
-/-- The ratio step: from `Z₂ ≥ A² e^{-x}`, `Z₁ ≤ A (1 + T)`, `T ≤ t` to
-`Z₂ / Z₁² ≥ (1-x)/(1+t)²`. -/
-theorem ratio_ge {Z₁ Z₂ A x T t : ℝ} (hA : 0 < A) (hZ₁ : 0 < Z₁) (h₁ : Z₁ ≤ A * (1 + T))
-    (h₂ : A ^ 2 * exp (-x) ≤ Z₂) (hT : 0 ≤ T) (hTt : T ≤ t) :
-    (1 - x) / (1 + t) ^ 2 ≤ Z₂ / Z₁ ^ 2 := by
-  have hx : 1 - x ≤ exp (-x) := by linarith [add_one_le_exp (-x)]
-  have hZ : Z₁ ^ 2 ≤ A ^ 2 * (1 + t) ^ 2 := by
-    rw [← mul_pow]; gcongr; linarith [mul_le_mul_of_nonneg_left hTt hA.le]
-  have ht : 0 < 1 + t := by linarith
-  rw [div_le_div_iff₀ (by positivity) (by positivity)]
-  by_cases hx0 : 1 - x ≤ 0
-  · nlinarith [sq_nonneg Z₁, exp_pos (-x), sq_nonneg A, sq_nonneg (1 + t)]
-  · calc (1 - x) * Z₁ ^ 2 ≤ (1 - x) * (A ^ 2 * (1 + t) ^ 2) := by gcongr; linarith
-      _ ≤ exp (-x) * A ^ 2 * (1 + t) ^ 2 := by nlinarith [sq_nonneg A, sq_nonneg (1 + t)]
-      _ ≤ Z₂ * (1 + t) ^ 2 := by nlinarith [sq_nonneg (1 + t)]
 
 /-- **The spatial seed of the first grid point**, unconditionally. -/
 theorem seed_spatial :

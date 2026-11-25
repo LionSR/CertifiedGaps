@@ -1,7 +1,7 @@
 """
     Common
 
-Paths and helpers shared by the five studies: directory layout, source fingerprints, the Sᶻ
+Paths and helpers shared by the six studies: directory layout, source fingerprints, the Sᶻ
 product basis of a spin-1 chain, and the Lake/axiom-audit driver for `lean/SeedKernel`.
 """
 module Common
@@ -18,8 +18,8 @@ const LEAN = joinpath(REPO, "lean")
 const SPIN1_RESULTS = joinpath(REPO, "models", "spin1", "results")
 "Paper sources fetched by `scripts/fetch_paper.jl` (gitignored)."
 const UPSTREAM = joinpath(MODEL, "upstream")
-"The five studies, in the order the checker runs them."
-const STUDIES = ("seed_design", "spectrum", "anchor", "spin1_kernel", "ising")
+"The six studies, in the order the checker runs them."
+const STUDIES = ("seed_design", "spectrum", "anchor", "spin1_kernel", "ising", "ising_open")
 
 "`results/<study>` of this model."
 results_dir(study) = joinpath(MODEL, "results", study)
